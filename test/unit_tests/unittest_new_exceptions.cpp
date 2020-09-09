@@ -14,7 +14,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <gtest/gtest.h>
-#include "psen_scan_v2/build_ros_message_exception.h"
 #include "psen_scan_v2/get_ros_parameter_exception.h"
 #include "psen_scan_v2/psen_scan_v2_fatal_exception.h"
 
@@ -22,13 +21,6 @@ using namespace psen_scan_v2;
 
 namespace psen_scan_v2_test
 {
-TEST(BuildROSMessageExceptionTest, new_build_ros_message_exception)
-{
-  std::string except_str = "BuildROSMessageException";
-  std::unique_ptr<BuildROSMessageException> e(new BuildROSMessageException(except_str));
-  EXPECT_EQ(except_str, e->what());
-}
-
 TEST(GetROSParameterExceptionTest, new_param_missing_on_server_exception)
 {
   std::string except_str = "GetROSParameterException";

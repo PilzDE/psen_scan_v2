@@ -16,13 +16,13 @@
 #ifndef PSEN_SCAN_V2_ROS_SCANNER_NODE_H
 #define PSEN_SCAN_V2_ROS_SCANNER_NODE_H
 
+#include <stdexcept>
 #include <string>
 #include <atomic>
 #include <gtest/gtest_prod.h>
 
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
-#include "psen_scan_v2/build_ros_message_exception.h"
 #include "psen_scan_v2/psen_scan_v2_fatal_exception.h"
 #include "psen_scan_v2/scanner_data.h"
 
@@ -89,9 +89,6 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
  * @param laserscan
  *
  * @return sensor_msgs::LaserScan, ROS message, ready to be published
- *
- * @throws BuildROSMessageException
- *
  */
 template <typename S>
 sensor_msgs::LaserScan ROSScannerNodeT<S>::buildRosMessage(const LaserScan& laserscan)
@@ -101,7 +98,7 @@ sensor_msgs::LaserScan ROSScannerNodeT<S>::buildRosMessage(const LaserScan& lase
 
   if (!laserscan.isNumberOfScansValid())
   {
-    throw BuildROSMessageException("Calculated number of scans doesn't match actual number of scans!");
+    throw std::invalid_argument("Calculated number of scans doesn't match actual number of scans.");
   }
 
   sensor_msgs::LaserScan ros_message;
