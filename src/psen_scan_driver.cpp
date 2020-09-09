@@ -50,7 +50,7 @@ int main(int argc, char** argv)
                                     param_handler.getFrameID(),
                                     param_handler.getXAxisRotation(),
                                     scanner_configuration);
-    ros_scanner_node.processingLoop();
+    ros_scanner_node.run();
   }
   catch (std::exception& e)
   {
