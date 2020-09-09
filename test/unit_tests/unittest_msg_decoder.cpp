@@ -20,7 +20,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "psen_scan_v2/reply_msg_from_scanner.h"
+#include "psen_scan_v2/scanner_reply_msg.h"
 #include "psen_scan_v2/msg_decoder.h"
 
 using namespace psen_scan_v2;
@@ -44,9 +44,9 @@ TEST(MsgDecoderTest, decodeStartReply)
   MsgDecoder decoder(std::bind(&MockCallbackHolder::start_reply_callback, &mock),
                      std::bind(&MockCallbackHolder::error_callback, &mock, std::placeholders::_1));
 
-  ReplyMsgFromScanner reply{ ReplyMsgFromScanner::getStartOpCode(), DEFAULT_RESULT_CODE };
+  ScannerReplyMsg reply{ ScannerReplyMsg::getStartOpCode(), DEFAULT_RESULT_CODE };
 
-  ReplyMsgFromScanner::RawType reply_raw{ reply.toCharArray() };
+  ScannerReplyMsg::RawType reply_raw{ reply.toCharArray() };
   RawScannerData raw_data{};
   std::copy(reply_raw.begin(), reply_raw.end(), raw_data.begin());
 
@@ -61,9 +61,9 @@ TEST(MsgDecoderTest, decodeStartReplyCrcFail)
   MsgDecoder decoder(std::bind(&MockCallbackHolder::start_reply_callback, &mock),
                      std::bind(&MockCallbackHolder::error_callback, &mock, std::placeholders::_1));
 
-  ReplyMsgFromScanner reply{ ReplyMsgFromScanner::getStartOpCode(), DEFAULT_RESULT_CODE };
+  ScannerReplyMsg reply{ ScannerReplyMsg::getStartOpCode(), DEFAULT_RESULT_CODE };
 
-  ReplyMsgFromScanner::RawType reply_raw{ reply.toCharArray() };
+  ScannerReplyMsg::RawType reply_raw{ reply.toCharArray() };
   RawScannerData raw_data{};
   std::copy(reply_raw.begin(), reply_raw.end(), raw_data.begin());
   raw_data[0] = 'a';
@@ -83,9 +83,9 @@ TEST(MsgDecoderTest, decodeStartReplyWrongSizeNotImplemented)
   MsgDecoder decoder(std::bind(&MockCallbackHolder::start_reply_callback, &mock),
                      std::bind(&MockCallbackHolder::error_callback, &mock, std::placeholders::_1));
 
-  ReplyMsgFromScanner reply{ ReplyMsgFromScanner::getStartOpCode(), DEFAULT_RESULT_CODE };
+  ScannerReplyMsg reply{ ScannerReplyMsg::getStartOpCode(), DEFAULT_RESULT_CODE };
 
-  ReplyMsgFromScanner::RawType reply_raw{ reply.toCharArray() };
+  ScannerReplyMsg::RawType reply_raw{ reply.toCharArray() };
   RawScannerData raw_data{};
   std::copy(reply_raw.begin(), reply_raw.end(), raw_data.begin());
 
@@ -105,9 +105,9 @@ TEST(MsgDecoderTest, decodeWrongOpCodeNotImplemented)
   MsgDecoder decoder(std::bind(&MockCallbackHolder::start_reply_callback, &mock),
                      std::bind(&MockCallbackHolder::error_callback, &mock, std::placeholders::_1));
 
-  ReplyMsgFromScanner reply{ ReplyMsgFromScanner::getStartOpCode() + 1, DEFAULT_RESULT_CODE };
+  ScannerReplyMsg reply{ ScannerReplyMsg::getStartOpCode() + 1, DEFAULT_RESULT_CODE };
 
-  ReplyMsgFromScanner::RawType reply_raw{ reply.toCharArray() };
+  ScannerReplyMsg::RawType reply_raw{ reply.toCharArray() };
   RawScannerData raw_data{};
   std::copy(reply_raw.begin(), reply_raw.end(), raw_data.begin());
 

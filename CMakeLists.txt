@@ -243,10 +243,10 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES}
   )
 
-  catkin_add_gtest(unittest_reply_msg_from_scanner
-    test/unit_tests/unittest_reply_msg_from_scanner.cpp
+  catkin_add_gtest(unittest_scanner_reply_msg
+    test/unit_tests/unittest_scanner_reply_msg.cpp
   )
-  target_link_libraries(unittest_reply_msg_from_scanner
+  target_link_libraries(unittest_scanner_reply_msg
     ${catkin_LIBRARIES}
   )
 
