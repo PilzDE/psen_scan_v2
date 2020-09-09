@@ -30,7 +30,6 @@
 #include "psen_scan_v2/ros_scanner_node.h"
 #include "psen_scan_v2/laserscan.h"
 #include "psen_scan_v2/scanner_mock.h"
-#include "psen_scan_v2/psen_scan_v2_fatal_exception.h"
 #include "psen_scan_v2/scanner_configuration.h"
 
 using namespace psen_scan_v2;

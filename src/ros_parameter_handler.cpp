@@ -17,7 +17,6 @@
 
 #include "psen_scan_v2/ros_parameter_handler.h"
 #include "psen_scan_v2/get_ros_parameter_exception.h"
-#include "psen_scan_v2/psen_scan_v2_fatal_exception.h"
 #include "psen_scan_v2/default_parameters.h"
 #include "psen_scan_v2/scanner_data.h"
 
@@ -29,8 +28,6 @@ namespace psen_scan_v2
  * Gets all Parameters from Parameter Server.
  *
  * @param nh Nodehandle from which parameters will be fetched
- *
- * @throws PSENScanV2FatalException
  */
 RosParameterHandler::RosParameterHandler(const ros::NodeHandle& nh)
   : nh_(nh)

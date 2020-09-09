@@ -23,7 +23,6 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
-#include "psen_scan_v2/psen_scan_v2_fatal_exception.h"
 #include "psen_scan_v2/scanner_data.h"
 
 #include "psen_scan_v2/scanner.h"

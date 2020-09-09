@@ -15,7 +15,6 @@
 
 #include <gtest/gtest.h>
 #include "psen_scan_v2/get_ros_parameter_exception.h"
-#include "psen_scan_v2/psen_scan_v2_fatal_exception.h"
 
 using namespace psen_scan_v2;
 
@@ -35,10 +34,4 @@ TEST(GetROSParameterExceptionTest, new_wrong_parameter_type_exception)
   EXPECT_EQ(except_str, e->what());
 }
 
-TEST(PSENScanV2FatalExceptionTest, new_psen_scan_v2_fatal_exception)
-{
-  std::string except_str = "PSENScanV2FatalException";
-  std::unique_ptr<PSENScanV2FatalException> e(new PSENScanV2FatalException(except_str));
-  EXPECT_EQ(except_str, e->what());
-}
 }  // namespace psen_scan_v2_test
