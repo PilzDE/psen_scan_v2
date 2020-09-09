@@ -37,6 +37,9 @@ namespace mpl = boost::mpl;
 using SendStartRequestCallback = std::function<void()>;
 
 // front-end: define the FSM structure
+/**
+ * @brief State machine implementing the scanner protocol.
+ */
 struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_connection_state_machine_>
 {
   udp_connection_state_machine_(const SendStartRequestCallback& sr):
