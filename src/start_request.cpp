@@ -22,11 +22,11 @@
 #include <string>
 #include <iostream>
 
-#include "psen_scan_v2/tenth_degree_conversion.h"
-#include "psen_scan_v2/start_request.h"
-#include "psen_scan_v2/degree_to_rad.h"
+#include "psen_scan/tenth_degree_conversion.h"
+#include "psen_scan/start_request.h"
+#include "psen_scan/degree_to_rad.h"
 
-namespace psen_scan_v2
+namespace psen_scan
 {
 static constexpr double MASTER_RESOLUTION_RAD{ degreeToRad(1.) };
 
@@ -44,7 +44,6 @@ uint32_t StartRequest::getCRC() const
   boost::crc_32_type result;
 
   std::vector<char> raw_data = toRawType();
-
   result.process_bytes(&raw_data.at(sizeof(crc_)), raw_data.size() - sizeof(crc_));
 
   return result.checksum();
@@ -99,4 +98,4 @@ StartRequest::RawType StartRequest::toRawType() const
   return raw_data;
 }
 
-}  // namespace psen_scan_v2
+}  // namespace psen_scan

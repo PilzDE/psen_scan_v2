@@ -20,10 +20,10 @@
 
 #include <arpa/inet.h>
 
-#include "psen_scan_v2/scanner_configuration.h"
-#include "psen_scan_v2/degree_to_rad.h"
+#include "psen_scan/scanner_configuration.h"
+#include "psen_scan/degree_to_rad.h"
 
-namespace psen_scan_v2
+namespace psen_scan
 {
 static constexpr double MIN_SCAN_ANGLE{ 0. };
 static constexpr double MAX_SCAN_ANGLE{ degreeToRad(275.) };
@@ -41,7 +41,7 @@ ScannerConfiguration::ScannerConfiguration(const std::string& host_ip,
   {
     throw std::invalid_argument("Host IP invalid");
   }
-  assert(sizeof(host_ip_number) == 4);
+  assert(sizeof(host_ip_number) == 4 && "host_ip_number has not the expected size");
   host_ip_ = static_cast<uint32_t>(host_ip_number);
 
   if (host_udp_port_data < std::numeric_limits<uint16_t>::min() ||
@@ -63,7 +63,7 @@ ScannerConfiguration::ScannerConfiguration(const std::string& host_ip,
   {
     throw std::invalid_argument("client IP invalid");
   }
-  assert(sizeof(client_ip_number) == 4);
+  assert(sizeof(client_ip_number) == 4 && "client_ip_number has not the expected size");
   client_ip_ = static_cast<uint32_t>(client_ip_number);
 
   if (start_angle < MIN_SCAN_ANGLE || start_angle > MAX_SCAN_ANGLE)
@@ -112,4 +112,4 @@ double ScannerConfiguration::endAngle() const
   return end_angle_;
 }
 
-}  // namespace psen_scan_v2
+}  // namespace psen_scan

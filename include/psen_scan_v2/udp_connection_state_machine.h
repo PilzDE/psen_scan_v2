@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef PSEN_SCAN_V2_UDP_CONNECTION_STATE_MACHINE_H
-#define PSEN_SCAN_V2_UDP_CONNECTION_STATE_MACHINE_H
+#ifndef PSEN_SCAN_UDP_CONNECTION_STATE_MACHINE_H
+#define PSEN_SCAN_UDP_CONNECTION_STATE_MACHINE_H
 
 #include <functional>
 
@@ -23,18 +23,16 @@
 // front-end
 #include <boost/msm/front/state_machine_def.hpp>
 
-#include "psen_scan_v2/logging.h"
+#include "psen_scan/logging.h"
+#include "psen_scan/function_pointers.h"
 
-namespace psen_scan_v2
+namespace psen_scan
 {
 namespace msm = boost::msm;
 namespace mpl = boost::mpl;
 
 // special case: lots of empty structs due to metaprogramming
 // clang-format off
-
-
-using SendStartRequestCallback = std::function<void()>;
 
 // front-end: define the FSM structure
 struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_connection_state_machine_>
@@ -137,6 +135,6 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
 // Pick a back-end
 typedef msm::back::state_machine<udp_connection_state_machine_> udp_connection_state_machine;
 
-}  // namespace psen_scan_v2
+}  // namespace psen_scan
 
-#endif  // PSEN_SCAN_V2_UDP_CONNECTION_STATE_MACHINE_H
+#endif  // PSEN_SCAN_UDP_CONNECTION_STATE_MACHINE_H

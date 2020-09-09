@@ -12,8 +12,8 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#ifndef PSEN_SCAN_V2_UDP_CLIENT_H
-#define PSEN_SCAN_V2_UDP_CLIENT_H
+#ifndef PSEN_SCAN_UDP_CLIENT_H
+#define PSEN_SCAN_UDP_CLIENT_H
 
 #include <atomic>
 #include <chrono>
@@ -31,12 +31,12 @@
 #include <boost/asio/high_resolution_timer.hpp>
 #include <boost/bind.hpp>
 
-#include "psen_scan_v2/raw_scanner_data.h"
-#include "psen_scan_v2/open_connection_failure.h"
-#include "psen_scan_v2/close_connection_failure.h"
-#include "psen_scan_v2/logging.h"
+#include "psen_scan/raw_scanner_data.h"
+#include "psen_scan/open_connection_failure.h"
+#include "psen_scan/close_connection_failure.h"
+#include "psen_scan/logging.h"
 
-namespace psen_scan_v2
+namespace psen_scan
 {
 using NewDataHandler = std::function<void(const RawScannerData&, const std::size_t&)>;
 using ErrorHandler = std::function<void(const std::string&)>;
@@ -116,7 +116,7 @@ inline UdpClientImpl::UdpClientImpl(const NewDataHandler& data_handler,
   }
   // LCOV_EXCL_STOP
 
-  assert(!io_service_thread_.joinable());
+  assert(!io_service_thread_.joinable() && "io_service_thread_ is joinable!");
   io_service_thread_ = std::thread([this]() { io_service_.run(); });
 }
 
@@ -232,5 +232,5 @@ inline void UdpClientImpl::asyncReceive(const std::chrono::high_resolution_clock
                         std::bind(&UdpClientImpl::handleReceive, this, _1, _2, timeout));
 }
 
-}  // namespace psen_scan_v2
-#endif  // PSEN_SCAN_V2_UDP_CLIENT_H
+}  // namespace psen_scan
+#endif  // PSEN_SCAN_UDP_CLIENT_H

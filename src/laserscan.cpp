@@ -18,10 +18,10 @@
 #include <limits>
 #include <cmath>
 
-#include "psen_scan_v2/laserscan.h"
-#include "psen_scan_v2/degree_to_rad.h"
+#include "psen_scan/laserscan.h"
+#include "psen_scan/degree_to_rad.h"
 
-namespace psen_scan_v2
+namespace psen_scan
 {
 static constexpr double MAX_X_AXIS_ROTATION(degreeToRad(360.));
 static constexpr double MIN_X_AXIS_ROTATION(degreeToRad(-360.));
@@ -62,7 +62,7 @@ const double& LaserScan::getMaxScanAngle() const
 
 bool LaserScan::isNumberOfScansValid() const
 {
-  assert(getMinScanAngle() < getMaxScanAngle());
+  assert(getMinScanAngle() < getMaxScanAngle() && "Invalid scan range");
 
   using size_type = MeasurementData::size_type;
   const auto angle_range{ getMaxScanAngle() - getMinScanAngle() };
@@ -80,4 +80,4 @@ MeasurementData& LaserScan::getMeasurements()
   return measures_;
 }
 
-}  // namespace psen_scan_v2
+}  // namespace psen_scan
