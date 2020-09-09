@@ -23,18 +23,19 @@
 namespace psen_scan_v2
 {
 /**
- * @brief Class for getting ROS-Parameters from the parameter-server
+ * @brief Helper to fetch data from the ROS parameter server.
  *
  */
 class RosParameterHandler
 {
 public:
+  /**
+   * @brief Construct a new RosParameterHandler and gets all parameters from the ROS parameter server.
+   *
+   * @param nh Nodehandle from which parameters will be fetched.
+   */
   RosParameterHandler(const ros::NodeHandle& nh);
-  void updateAllParamsFromParamServer();
-  template <class T>
-  void getRequiredParamFromParamServer(const std::string& key, T& param);
-  template <class T>
-  bool getOptionalParamFromParamServer(const std::string& key, T& param);
+
   std::string getHostIP() const;
   uint32_t getHostUDPPortData() const;
   uint32_t getHostUDPPortControl() const;
@@ -45,15 +46,30 @@ public:
   double getXAxisRotation() const;
 
 private:
-  ros::NodeHandle const nh_;  /**< Nodehandle through which parameters are fetched */
-  std::string host_ip_;       /**< IP-Adress of host machine */
-  int host_udp_port_data_;    /**< UDP Port on which monitoring frames (scans) should be received.*/
-  int host_udp_port_control_; /**< UDP Port used to send commands (start/stop) and receive the corresponding replies. */
-  std::string sensor_ip_;     /**< IP-Adress of Safety laser scanner */
-  std::string frame_id_;      /**< ROS Frame ID */
-  double angle_start_;        /**< Start angle of measurement in radian */
-  double angle_end_;          /**< End angle of measurement in radian */
-  double x_axis_rotation_;    /**< Rotation of x-axis arround the center in radian */
+  template <class T>
+  void getRequiredParamFromParamServer(const std::string& key, T& param);
+
+  template <class T>
+  bool getOptionalParamFromParamServer(const std::string& key, T& param);
+
+  void updateAllParamsFromParamServer();
+
+private:
+  ros::NodeHandle const nh_;
+  std::string host_ip_;
+  //! @brief UDP Port on which monitoring frames (scans) should be received.
+  int host_udp_port_data_;
+  //! @brief UDP Port used to send commands (start/stop) and receive the corresponding replies.
+  int host_udp_port_control_;
+  //! @brief  IP-Adress of Safety laser scanner.
+  std::string sensor_ip_;
+  std::string frame_id_;
+  //! @brief Start angle of measurement (in radian).
+  double angle_start_;
+  //! @brief nd angle of measurement (in radian).
+  double angle_end_;
+  //! @brief Rotation of x-axis arround the center (in radian).
+  double x_axis_rotation_;
 };
 }  // namespace psen_scan_v2
 
