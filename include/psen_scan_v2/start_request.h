@@ -12,16 +12,16 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#ifndef PSEN_SCAN_V2_START_REQUEST_H
-#define PSEN_SCAN_V2_START_REQUEST_H
+#ifndef PSEN_SCAN_START_REQUEST_H
+#define PSEN_SCAN_START_REQUEST_H
 
 #include <array>
 #include <cstdint>
 #include <string>
 
-#include "psen_scan_v2/scanner_configuration.h"
+#include "psen_scan/scanner_configuration.h"
 
-namespace psen_scan_v2
+namespace psen_scan
 {
 static constexpr std::size_t START_REQUEST_SIZE{ 58 };  // See protocol description
 
@@ -42,6 +42,9 @@ public:
   RawType toRawType() const;
 
 private:
+  template <typename T>
+  void write(std::ostringstream& os, const T& data) const;
+
   uint32_t crc_{ 0 }; /**< Will be filled in constructor */
   uint32_t seq_number_;
   uint64_t const RESERVED_{ 0 };           /**< Use all zeros */
@@ -97,6 +100,6 @@ private:
   std::array<DeviceField, 3> slaves_;
 };
 
-}  // namespace psen_scan_v2
+}  // namespace psen_scan
 
-#endif  // PSEN_SCAN_V2_START_REQUEST_H
+#endif  // PSEN_SCAN_START_REQUEST_H

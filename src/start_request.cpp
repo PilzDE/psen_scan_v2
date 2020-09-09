@@ -22,11 +22,11 @@
 #include <string>
 #include <iostream>
 
-#include "psen_scan_v2/tenth_degree_conversion.h"
-#include "psen_scan_v2/start_request.h"
-#include "psen_scan_v2/degree_to_rad.h"
+#include "psen_scan/tenth_degree_conversion.h"
+#include "psen_scan/start_request.h"
+#include "psen_scan/degree_to_rad.h"
 
-namespace psen_scan_v2
+namespace psen_scan
 {
 static constexpr double MASTER_RESOLUTION_RAD{ degreeToRad(1.) };
 
@@ -54,39 +54,39 @@ StartRequest::RawType StartRequest::toRawType() const
 {
   std::ostringstream os;
 
-  os.write((char*)&crc_, sizeof(crc_));
-  os.write((char*)&seq_number_, sizeof(seq_number_));
-  os.write((char*)&RESERVED_, sizeof(RESERVED_));
-  os.write((char*)&OPCODE_, sizeof(OPCODE_));
+  write<uint32_t>(os, crc_);
+  write<uint32_t>(os, seq_number_);
+  write<uint64_t>(os, RESERVED_);
+  write<uint32_t>(os, OPCODE_);
 
   uint32_t host_ip_big_endian = htobe32(host_ip_);
-  os.write((char*)&host_ip_big_endian, sizeof(host_ip_big_endian));
+  write<uint32_t>(os, host_ip_big_endian);
 
-  os.write((char*)&host_udp_port_data_, sizeof(host_udp_port_data_));
-  os.write((char*)&device_enabled_, sizeof(device_enabled_));
-  os.write((char*)&intensity_enabled_, sizeof(intensity_enabled_));
-  os.write((char*)&point_in_safety_enabled_, sizeof(point_in_safety_enabled_));
-  os.write((char*)&active_zone_set_enabled_, sizeof(active_zone_set_enabled_));
-  os.write((char*)&io_pin_enabled_, sizeof(io_pin_enabled_));
-  os.write((char*)&scan_counter_enabled_, sizeof(scan_counter_enabled_));
-  os.write((char*)&speed_encoder_enabled_, sizeof(speed_encoder_enabled_));
-  os.write((char*)&diagnostics_enabled_, sizeof(diagnostics_enabled_));
+  write<uint16_t>(os, host_udp_port_data_);
+  write<uint8_t>(os, device_enabled_);
+  write<uint8_t>(os, intensity_enabled_);
+  write<uint8_t>(os, point_in_safety_enabled_);
+  write<uint8_t>(os, active_zone_set_enabled_);
+  write<uint8_t>(os, io_pin_enabled_);
+  write<uint8_t>(os, scan_counter_enabled_);
+  write<uint8_t>(os, speed_encoder_enabled_);
+  write<uint8_t>(os, diagnostics_enabled_);
 
   uint16_t start_angle{ radToTenthDegree(master_.getStartAngle()) };
   uint16_t end_angle{ radToTenthDegree(master_.getEndAngle()) };
   uint16_t resolution{ radToTenthDegree(master_.getResolution()) };
-  os.write((char*)&start_angle, sizeof(start_angle));
-  os.write((char*)&end_angle, sizeof(end_angle));
-  os.write((char*)&resolution, sizeof(resolution));
+  write<uint16_t>(os, start_angle);
+  write<uint16_t>(os, end_angle);
+  write<uint16_t>(os, resolution);
 
   for (const auto& slave : slaves_)
   {
     uint16_t slave_start_angle{ radToTenthDegree(slave.getStartAngle()) };
     uint16_t slave_end_angle{ radToTenthDegree(slave.getEndAngle()) };
     uint16_t slave_resolution{ radToTenthDegree(slave.getResolution()) };
-    os.write((char*)&slave_start_angle, sizeof(slave_start_angle));
-    os.write((char*)&slave_end_angle, sizeof(slave_end_angle));
-    os.write((char*)&slave_resolution, sizeof(slave_resolution));
+    write<uint16_t>(os, slave_start_angle);
+    write<uint16_t>(os, slave_end_angle);
+    write<uint16_t>(os, slave_resolution);
   }
 
   std::string data_str(os.str());
@@ -99,4 +99,11 @@ StartRequest::RawType StartRequest::toRawType() const
   return raw_data;
 }
 
-}  // namespace psen_scan_v2
+template <typename T>
+void StartRequest::write(std::ostringstream& os, const T& data) const
+{
+  os.write((char*)&data, sizeof(T));
+  return;
+}
+
+}  // namespace psen_scan
