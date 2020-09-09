@@ -41,7 +41,7 @@ ScannerConfiguration::ScannerConfiguration(const std::string& host_ip,
   {
     throw std::invalid_argument("Host IP invalid");
   }
-  assert(sizeof(host_ip_number) == 4  && "host_ip_number has not the expected size");
+  assert(sizeof(host_ip_number) == 4 && "host_ip_number has not the expected size");
   host_ip_ = static_cast<uint32_t>(host_ip_number);
 
   if (host_udp_port_data < std::numeric_limits<uint16_t>::min() ||
