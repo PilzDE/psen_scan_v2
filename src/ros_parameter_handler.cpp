@@ -17,21 +17,11 @@
 
 #include "psen_scan_v2/ros_parameter_handler.h"
 #include "psen_scan_v2/get_ros_parameter_exception.h"
-#include "psen_scan_v2/psen_scan_v2_fatal_exception.h"
 #include "psen_scan_v2/default_parameters.h"
 #include "psen_scan_v2/scanner_data.h"
 
 namespace psen_scan_v2
 {
-/**
- * @brief Construct a new Ros Parameter Handler:: Ros Parameter Handler object
- *
- * Gets all Parameters from Parameter Server.
- *
- * @param nh Nodehandle from which parameters will be fetched
- *
- * @throws PSENScanV2FatalException
- */
 RosParameterHandler::RosParameterHandler(const ros::NodeHandle& nh)
   : nh_(nh)
   , host_ip_()
@@ -45,10 +35,6 @@ RosParameterHandler::RosParameterHandler(const ros::NodeHandle& nh)
   updateAllParamsFromParamServer();
 }
 
-/**
- * @brief Update all Parameters from ROS Parameter Server
- *
- */
 void RosParameterHandler::updateAllParamsFromParamServer()
 {
   // required parameters first
@@ -62,14 +48,6 @@ void RosParameterHandler::updateAllParamsFromParamServer()
   getOptionalParamFromParamServer<double>("x_axis_rotation", x_axis_rotation_);
 }
 
-/**
- * @brief Gets one required ROS-parameter from parameter server
- *
- * @tparam T Type of parameter to fetch
- * @param key Key for the parameter on parameter-server
- * @param param variable where the parameter is stored
- * @throws GetROSParameterException
- */
 template <class T>
 void RosParameterHandler::getRequiredParamFromParamServer(const std::string& key, T& param)
 {
@@ -85,16 +63,6 @@ void RosParameterHandler::getRequiredParamFromParamServer(const std::string& key
   return;
 }
 
-/**
- * @brief Gets one optional ROS-parameter from parameter server
- *
- * @tparam T Type of parameter to fetch
- * @param key Key for the parameter on parameter-server
- * @param param variable where the parameter is stored
- * @return true for sucess and false if the parameter does not exist
- *
- * @throws GetROSParameterException
- */
 template <class T>
 bool RosParameterHandler::getOptionalParamFromParamServer(const std::string& key, T& param)
 {
@@ -110,49 +78,26 @@ bool RosParameterHandler::getOptionalParamFromParamServer(const std::string& key
   return true;
 }
 
-/**
- * @brief Getter method for host_ip_
- */
 std::string RosParameterHandler::getHostIP() const
 {
   return host_ip_;
 }
 
-/**
- * @brief Getter method for host_udp_port_
- *
- * @return uint32_t
- */
 uint32_t RosParameterHandler::getHostUDPPortData() const
 {
   return host_udp_port_data_;
 }
 
-/**
- * @brief Getter method for host_udp_port_
- *
- * @return uint32_t
- */
 uint32_t RosParameterHandler::getHostUDPPortControl() const
 {
   return host_udp_port_control_;
 }
 
-/**
- * @brief Getter Method for sensor_ip_
- *
- * @return std::string
- */
 std::string RosParameterHandler::getSensorIP() const
 {
   return sensor_ip_;
 }
 
-/**
- * @brief Getter method for frame_id_
- *
- * @return std::string
- */
 std::string RosParameterHandler::getFrameID() const
 {
   return frame_id_;

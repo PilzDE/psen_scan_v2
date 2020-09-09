@@ -26,19 +26,27 @@ namespace psen_scan_v2
 static constexpr std::size_t START_REQUEST_SIZE{ 58 };  // See protocol description
 
 /**
- * @brief Frame containing all necessary fields for a Start Request.
+ * @brief Higher level data type representing a scanner start request.
  *
- * Unless otherwise indicated the byte order is little endian.
+ * @note Unless otherwise indicated the byte order is little endian.
  *
  */
 class StartRequest
 {
 public:
+  /**
+   * @brief Constructor.
+   *
+   * @param scanner_configuration Specifies the required scanner configuration.
+   * @param seq_number TODO
+   */
   StartRequest(const ScannerConfiguration& scanner_configuration, const uint32_t& seq_number);
 
+  //! @returns the CRC of the start request.
   uint32_t getCRC() const;
 
   using RawType = std::vector<char>;
+  //! @brief Serializes the start request into a raw data which can be send to the scanner.
   RawType toRawType() const;
 
 private:

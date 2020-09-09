@@ -21,8 +21,8 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2/decode_exception.h"
-#include "psen_scan_v2/reply_msg_from_scanner.h"
+#include "psen_scan_v2/crc_mismatch_exception.h"
+#include "psen_scan_v2/scanner_reply_msg.h"
 #include "psen_scan_v2/raw_data_test_helper.h"
 
 using namespace psen_scan_v2;
@@ -33,30 +33,30 @@ static constexpr uint32_t OP_CODE_START{ 0x35 };
 static constexpr uint32_t OP_CODE_UNKNOWN{ 0x01 };
 static constexpr uint32_t RES_CODE_ACCEPTED{ 0x00 };
 
-TEST(ReplyMsgFromScannerTest, testTypeStart)
+TEST(ScannerReplyMsgTest, testTypeStart)
 {
-  ReplyMsgFromScanner msg(OP_CODE_START, RES_CODE_ACCEPTED);
-  EXPECT_EQ(ReplyMsgFromScannerType::Start, msg.type());
+  ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
+  EXPECT_EQ(ScannerReplyMsgType::Start, msg.type());
 }
 
-TEST(ReplyMsgFromScannerTest, testTypeUnknown)
+TEST(ScannerReplyMsgTest, testTypeUnknown)
 {
-  ReplyMsgFromScanner msg(OP_CODE_UNKNOWN, RES_CODE_ACCEPTED);
-  EXPECT_EQ(ReplyMsgFromScannerType::Unknown, msg.type());
+  ScannerReplyMsg msg(OP_CODE_UNKNOWN, RES_CODE_ACCEPTED);
+  EXPECT_EQ(ScannerReplyMsgType::Unknown, msg.type());
 }
 
-TEST(ReplyMsgFromScannerTest, testGetStartOpCode)
+TEST(ScannerReplyMsgTest, testGetStartOpCode)
 {
-  EXPECT_EQ(OP_CODE_START, ReplyMsgFromScanner::getStartOpCode());
+  EXPECT_EQ(OP_CODE_START, ScannerReplyMsg::getStartOpCode());
 }
 
-TEST(ReplyMsgFromScannerTest, testToCharArray)
+TEST(ScannerReplyMsgTest, testToCharArray)
 {
   const uint32_t op_code{ OP_CODE_START };
   const uint32_t res_code{ RES_CODE_ACCEPTED };
 
-  ReplyMsgFromScanner msg(op_code, res_code);
-  ReplyMsgFromScanner::RawType raw_msg{ msg.toCharArray() };
+  ScannerReplyMsg msg(op_code, res_code);
+  ScannerReplyMsg::RawType raw_msg{ msg.toCharArray() };
 
   boost::crc_32_type crc;
   crc.process_bytes(&raw_msg[sizeof(uint32_t)], raw_msg.size() - sizeof(uint32_t));
@@ -69,46 +69,46 @@ TEST(ReplyMsgFromScannerTest, testToCharArray)
   DecodingEquals(raw_msg, 0x12, res_code);
 }
 
-TEST(ReplyMsgFromScannerTest, testCalcCRC)
+TEST(ScannerReplyMsgTest, testCalcCRC)
 {
-  ReplyMsgFromScanner msg(OP_CODE_START, RES_CODE_ACCEPTED);
+  ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
 
   // Calculate crc checksum from raw data
-  ReplyMsgFromScanner::RawType raw_msg{ msg.toCharArray() };
+  ScannerReplyMsg::RawType raw_msg{ msg.toCharArray() };
   boost::crc_32_type crc;
   crc.process_bytes(&raw_msg[sizeof(uint32_t)], raw_msg.size() - sizeof(uint32_t));
 
-  EXPECT_EQ(crc.checksum(), ReplyMsgFromScanner::calcCRC(msg));
+  EXPECT_EQ(crc.checksum(), ScannerReplyMsg::calcCRC(msg));
 }
 
-TEST(ReplyMsgFromScannerTest, testFromRawDataValidCRC)
+TEST(ScannerReplyMsgTest, testFromRawDataValidCRC)
 {
   // Use raw data generated from toCharArray()
-  ReplyMsgFromScanner msg(OP_CODE_START, RES_CODE_ACCEPTED);
-  ReplyMsgFromScanner::RawType raw_msg{ msg.toCharArray() };
+  ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
+  ScannerReplyMsg::RawType raw_msg{ msg.toCharArray() };
 
   RawScannerData data;
   std::copy(raw_msg.begin(), raw_msg.end(), data.begin());
 
-  ReplyMsgFromScanner msg_from_raw{ ReplyMsgFromScanner::fromRawData(data) };
+  ScannerReplyMsg msg_from_raw{ ScannerReplyMsg::fromRawData(data) };
 
   // Check equality by comparing crc checksums
   boost::crc_32_type crc;
   crc.process_bytes(&raw_msg[sizeof(uint32_t)], raw_msg.size() - sizeof(uint32_t));
-  EXPECT_EQ(crc.checksum(), ReplyMsgFromScanner::calcCRC(msg_from_raw));
+  EXPECT_EQ(crc.checksum(), ScannerReplyMsg::calcCRC(msg_from_raw));
 }
 
-TEST(ReplyMsgFromScannerTest, testFromRawDataInvalidCRC)
+TEST(ScannerReplyMsgTest, testFromRawDataInvalidCRC)
 {
   // Use raw data generated from toCharArray()
-  ReplyMsgFromScanner msg(OP_CODE_START, RES_CODE_ACCEPTED);
-  ReplyMsgFromScanner::RawType raw_msg{ msg.toCharArray() };
+  ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
+  ScannerReplyMsg::RawType raw_msg{ msg.toCharArray() };
   raw_msg[0] += 0x01;  // alter crc checksum
 
   RawScannerData data;
   std::copy(raw_msg.begin(), raw_msg.end(), data.begin());
 
-  EXPECT_THROW(ReplyMsgFromScanner::fromRawData(data), DecodeCRCMismatchException);
+  EXPECT_THROW(ScannerReplyMsg::fromRawData(data), CRCMismatch);
 }
 
 }  // namespace psen_scan_v2_test

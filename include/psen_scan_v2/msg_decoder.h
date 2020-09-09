@@ -22,16 +22,32 @@
 
 #include "psen_scan_v2/function_pointers.h"
 #include "psen_scan_v2/raw_scanner_data.h"
-#include "psen_scan_v2/reply_msg_from_scanner.h"
-#include "psen_scan_v2/decode_exception.h"
+#include "psen_scan_v2/scanner_reply_msg.h"
+#include "psen_scan_v2/crc_mismatch_exception.h"
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Deserializes raw byte data from the scanner.
+ */
 class MsgDecoder
 {
 public:
+  /**
+   * @brief Constructor.
+   *
+   * @param start_reply_callback Callback called whenever a StartReply is processed by the decodeAndDispatch method.
+   * @param error_callback Callback called whenever an error occurs during deserialization.
+   */
   MsgDecoder(const StartReplyCallback& start_reply_callback, const ErrorCallback& error_callback);
 
+  /**
+   * @brief decodeAndDispatch Deserializes the specified data and calls the appropriate callback to inform the user
+   * about the type of the received data.
+   *
+   * @param data Container holding the received data from the scanner.
+   * @param bytes_received Numbers of data received from the scanner.
+   */
   void decodeAndDispatch(const RawScannerData& data, const std::size_t& bytes_received);
 
 private:
@@ -48,9 +64,9 @@ inline void MsgDecoder::decodeAndDispatch(const RawScannerData& data, const std:
 {
   if (bytes_received == REPLY_MSG_FROM_SCANNER_SIZE)  // Check if this could be a reply
   {
-    ReplyMsgFromScanner frame{ ReplyMsgFromScanner::fromRawData(data) };  // TODO how to handle throw?
+    ScannerReplyMsg frame{ ScannerReplyMsg::fromRawData(data) };  // TODO how to handle throw?
 
-    if (frame.type() == ReplyMsgFromScannerType::Start)
+    if (frame.type() == ScannerReplyMsgType::Start)
     {
       start_reply_callback_();
     }

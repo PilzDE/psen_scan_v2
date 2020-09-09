@@ -23,19 +23,16 @@ namespace psen_scan_v2
 {
 using MeasurementData = std::vector<uint16_t>;
 
-/**
- * @brief Class to hold the data for one laserscan without depencies to ROS.
- *
- */
+//! @brief Holds the measurement data for one laserscan.
 class LaserScan
 {
 public:
   /**
-   * @brief Construct a new Laser Scan object
+   * @brief Construct a new Laser Scan object.
    *
-   * @param resolution Distance of angle between the measurements in radian.
-   * @param min_scan_angle Lowest  Angle the Scanner is scanning in radian.
-   * @param max_scan_angle Highest Angle the Scanner is scanning in radian.
+   * @param resolution Distance of angle between the measurements (in radian).
+   * @param min_scan_angle Lowest angle the scanner is scanning (in radian).
+   * @param max_scan_angle Highest angle the scanner is scanning (in radian).
    */
   LaserScan(const double& resolution, const double& min_scan_angle, const double& max_scan_angle);
 
@@ -47,16 +44,18 @@ public:
   const MeasurementData& getMeasurements() const;
   MeasurementData& getMeasurements();
 
+  //! @returns true if the measurement data contain as much measurements as required by the measurement range
+  //! and measurement resolution.
   bool isNumberOfScansValid() const;
 
 private:
-  //! Measurement data of the laserscan in Millimeters.
+  //! Measurement data of the laserscan (in Millimeters).
   MeasurementData measures_;
-  //! Distance of angle between the measurements in radian.
+  //! Distance of angle between the measurements (in radian).
   double resolution_;
-  //! Lowest  Angle the Scanner is scanning in radian.
+  //! Lowest angle the scanner is scanning (in radian).
   const double min_scan_angle_;
-  //! Highest Angle the Scanner is scanning in radian.
+  //! Highest angle the scanner is scanning (in radian).
   const double max_scan_angle_;
 };
 

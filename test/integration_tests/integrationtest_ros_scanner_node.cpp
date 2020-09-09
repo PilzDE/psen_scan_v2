@@ -30,7 +30,6 @@
 #include "psen_scan_v2/ros_scanner_node.h"
 #include "psen_scan_v2/laserscan.h"
 #include "psen_scan_v2/scanner_mock.h"
-#include "psen_scan_v2/psen_scan_v2_fatal_exception.h"
 #include "psen_scan_v2/scanner_configuration.h"
 
 using namespace psen_scan_v2;
@@ -96,9 +95,9 @@ TEST_F(RosScannerNodeTests, testScannerInvocation)
     EXPECT_CALL(ros_scanner_node.scanner_, stop()).WillOnce(ACTION_OPEN_BARRIER_VOID(SCANNER_STOPPED));
   }
 
-  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.processingLoop(); });
+  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
   BARRIER(SCANNER_STARTED);
-  ros_scanner_node.terminateProcessingLoop();
+  ros_scanner_node.terminate();
   BARRIER(SCANNER_STOPPED);
   EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
 }
@@ -115,9 +114,9 @@ TEST_F(RosScannerNodeTests, testScanTopicReceived)
   EXPECT_CALL(ros_scanner_node.scanner_, getCompleteScan()).WillRepeatedly(Return(laser_scan_fake));
 
   subscriber.initialize(nh_priv_);
-  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.processingLoop(); });
+  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
   BARRIER(LASER_SCAN_RECEIVED);
-  ros_scanner_node.terminateProcessingLoop();
+  ros_scanner_node.terminate();
   EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
 }
 
@@ -144,9 +143,9 @@ TEST_F(RosScannerNodeTests, testScanBuildFailure)
   }
 
   subscriber.initialize(nh_priv_);
-  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.processingLoop(); });
+  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
   BARRIER(LASER_SCAN_RECEIVED);
-  ros_scanner_node.terminateProcessingLoop();
+  ros_scanner_node.terminate();
   EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
 }
 

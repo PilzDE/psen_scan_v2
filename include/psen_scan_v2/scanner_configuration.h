@@ -21,9 +21,23 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Higher level data type storing the configuration details of the scanner like scanner IP, port,
+ * scan range, etc.
+ */
 class ScannerConfiguration
 {
 public:
+  /**
+   * @brief Construtor.
+   *
+   * @param host_ip IP address of the host.
+   * @param host_udp_port_data Port on which monitoring frames (scans) should be received.
+   * @param host_udp_port_control Port used to send commands (start/stop) and receive the corresponding replies.
+   * @param device_ip IP address of the scanner.
+   * @param start_angle Start angle of measurement (in radian).
+   * @param end_angle End angle of measurement (in radian).
+   */
   ScannerConfiguration(const std::string& host_ip,
                        const int& host_udp_port_data,
                        const int& host_udp_port_control,
