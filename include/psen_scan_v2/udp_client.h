@@ -116,7 +116,7 @@ inline UdpClientImpl::UdpClientImpl(const NewDataHandler& data_handler,
   }
   // LCOV_EXCL_STOP
 
-  assert(!io_service_thread_.joinable());
+  assert(!io_service_thread_.joinable()  && "io_service_thread_ is joinable!");
   io_service_thread_ = std::thread([this]() { io_service_.run(); });
 }
 
