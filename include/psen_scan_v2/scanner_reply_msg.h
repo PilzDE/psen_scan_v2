@@ -67,13 +67,17 @@ public:
   static uint32_t getStartOpCode();
   static uint32_t calcCRC(const ScannerReplyMsg& msg);
 
+private:
+  template <typename T>
+  static void process_bytes(boost::crc_32_type& crc_32, const T& data);
+
+public:
   using RawType = std::array<char, REPLY_MSG_FROM_SCANNER_SIZE>;
   RawType toCharArray();
 
 private:
   ScannerReplyMsg() = delete;
 
-private:
   //! A CRC32 of all the following fields.
   uint32_t crc_{ 0 };
   uint32_t reserved_{ 0 };
@@ -85,7 +89,6 @@ private:
   //! If the CRC is not correct, the device will not send any message.
   uint32_t res_code_{ 0 };
 
-private:
   static constexpr uint32_t OPCODE_START{ 0x35 };
 };
 
@@ -94,13 +97,20 @@ inline uint32_t ScannerReplyMsg::calcCRC(const ScannerReplyMsg& msg)
   boost::crc_32_type result;
   // Read all data except the field of the sent crc at the beginning according to:
   // Reference Guide Rev. A – November 2019 Page 14
-  result.process_bytes(&(msg.reserved_), sizeof(ScannerReplyMsg::reserved_));
-  result.process_bytes(&(msg.opcode_), sizeof(ScannerReplyMsg::opcode_));
-  result.process_bytes(&(msg.res_code_), sizeof(ScannerReplyMsg::res_code_));
+  process_bytes<uint32_t>(result, msg.reserved_);
+  process_bytes<uint32_t>(result, msg.opcode_);
+  process_bytes<uint32_t>(result, msg.res_code_);
   return result.checksum();
 }
 
-inline uint32_t ScannerReplyMsg::getStartOpCode()
+template <typename T>
+inline void ReplyMsgFromScanner::process_bytes(boost::crc_32_type& crc_32, const T& data)
+{
+  crc_32.process_bytes(&(data), sizeof(T));
+  return;
+}
+
+inline uint32_t ReplyMsgFromScanner::getStartOpCode()
 {
   return OPCODE_START;
 }
@@ -115,23 +125,30 @@ inline ScannerReplyMsg ScannerReplyMsg::fromRawData(const RawScannerData& data)
 {
   ScannerReplyMsg msg{ 0, 0 };
 
-  // Alternatives for transformation:
-  // typedef boost::iostreams::basic_array_source<char> Device;
-  // boost::iostreams::stream<Device> stream((char*)&data, sizeof(DataReply::MemoryFormat));
+  std::istringstream is(std::string((char*)&data, REPLY_MSG_FROM_SCANNER_SIZE));
 
-  std::istringstream stream(std::string((char*)&data, REPLY_MSG_FROM_SCANNER_SIZE));
-
-  stream.read((char*)&msg.crc_, sizeof(ScannerReplyMsg::crc_));
-  stream.read((char*)&msg.reserved_, sizeof(ScannerReplyMsg::reserved_));
-  stream.read((char*)&msg.opcode_, sizeof(ScannerReplyMsg::opcode_));
-  stream.read((char*)&msg.res_code_, sizeof(ScannerReplyMsg::res_code_));
-
+  read<uint32_t>(is, msg.crc_);
+  read<uint32_t>(is, msg.reserved_);
+  read<uint32_t>(is, msg.opcode_);
+  read<uint32_t>(is, msg.res_code_);
+  
   if (msg.crc_ != calcCRC(msg))
   {
     throw CRCMismatch();
   }
 
   return msg;
+}
+
+template <typename T>
+inline void ReplyMsgFromScanner::read(std::istringstream& is, const T& data)
+{
+  // Alternatives for transformation:
+  // typedef boost::iostreams::basic_array_source<char> Device;
+  // boost::iostreams::stream<Device> stream((char*)&data, sizeof(DataReply::MemoryFormat));
+
+  is.read((char*)&data, sizeof(T));
+  return;
 }
 
 inline ScannerReplyMsgType ScannerReplyMsg::type() const
@@ -148,19 +165,27 @@ inline ScannerReplyMsg::RawType ScannerReplyMsg::toCharArray()
   std::ostringstream os;
 
   uint32_t crc{ calcCRC(*this) };
-  os.write((char*)&crc, sizeof(uint32_t));
-  os.write((char*)&reserved_, sizeof(uint32_t));
-  os.write((char*)&opcode_, sizeof(uint32_t));
-  os.write((char*)&res_code_, sizeof(uint32_t));
 
-  ScannerReplyMsg::RawType ret_val{};
+  write<uint32_t>(os, crc);
+  write<uint32_t>(os, reserved_);
+  write<uint32_t>(os, opcode_);
+  write<uint32_t>(os, res_code_);
 
   // TODO check limits
   std::string data_str(os.str());
   assert(data_str.length() == REPLY_MSG_FROM_SCANNER_SIZE && "Message data of start reply has not the expected size");
+
+  ScannerReplyMsg::RawType ret_val{};
   std::copy(data_str.begin(), data_str.end(), ret_val.begin());
 
   return ret_val;
+}
+
+template <typename T>
+inline void ReplyMsgFromScanner::write(std::ostringstream& os, const T& data) const
+{
+  os.write((char*)&data, sizeof(T));
+  return;
 }
 
 }  // namespace psen_scan_v2
