@@ -2,7 +2,7 @@
 <package format="2">
   <name>psen_scan_v2</name>
   <version>1.0.6</version>
-  <description>The psen_scan_v2 package for Pilz laser scanner</description>
+  <description>ROS support for the Pilz laser scanner</description>
 
   <maintainer email="a.gutenkunst@pilz.de">Alexander Gutenkunst</maintainer>
   <maintainer email="c.doehn@pilz.de">Christian Döhn</maintainer>

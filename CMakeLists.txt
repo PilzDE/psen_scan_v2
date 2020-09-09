@@ -58,8 +58,8 @@ catkin_package(
 # build and devel folders have to be deleted before run
 if(CATKIN_SANITIZER)
   set(SANITIZER_OPTIONS "address|thread|undefined")
-  if(CATKIN_SANITIZER MATCHES ${SANITIZER_OPTIONS})
-    message(STATUS "${CATKIN_SANITIZER}-sanitizer activated.")
+  if("${CATKIN_SANITIZER}" MATCHES "${SANITIZER_OPTIONS}")
+    message(STATUS "Activated: ${CATKIN_SANITIZER}-sanitizer")
     add_compile_options(-fsanitize=${CATKIN_SANITIZER} -g)
   else()
     message(FATAL_ERROR "${CATKIN_SANITIZER} is not a valid sanitizer. Valid options are: [${SANITIZER_OPTIONS}]")
@@ -150,7 +150,7 @@ if(CATKIN_ENABLE_TESTING)
 
   if(ENABLE_COVERAGE_TESTING)
     find_package(code_coverage REQUIRED)
-    APPEND_COVERAGE_COMPILER_FLAGS()
+    append_coverage_compiler_flags()
   endif()
 
   roslaunch_add_file_check(launch DEPENDENCIES ${PROJECT_NAME}_node)
