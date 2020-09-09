@@ -1,0 +1,55 @@
+<!--
+Copyright (c) 2020 Pilz GmbH & Co. KG
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<launch>
+
+  <!-- IP-Address of host machine -->
+  <arg name="host_ip" default="192.168.0.50" />
+
+  <!-- UDP Port on which monitoring frames (scans) should be received -->
+  <arg name="host_udp_port_data" default="55115" />
+
+  <!-- UDP Port used to send commands (start/stop) and receive the corresponding replies -->
+  <arg name="host_udp_port_control" default="55116" />
+
+  <!-- IP-Address of Safety laser scanner -->
+  <arg name="sensor_ip" default="192.168.0.10" />
+
+  <!-- ROS Frame ID -->
+  <arg name="frame_id" default="scanner" />
+
+  <!-- Start angle of measurement in radian -->
+  <arg name="angle_start" default="0" />
+
+  <!-- End angle of measurement in radian -->
+  <arg name="angle_end" default="$(eval 275.0 /180.0 * pi)" />
+
+  <!-- Rotation of x-axis around the center in radian. -->
+  <arg name="x_axis_rotation" default="$(eval 137.5 / 180.0 * pi)" />
+
+  <node name="laser_scanner" type="psen_scan_v2_node" pkg="psen_scan_v2" output="screen" required="true">
+    <rosparam param="host_ip" subst_value="True">$(arg host_ip)</rosparam>
+    <rosparam param="host_udp_port_data" subst_value="True">$(arg host_udp_port_data)</rosparam>
+    <rosparam param="host_udp_port_control" subst_value="True">$(arg host_udp_port_control)</rosparam>
+    <rosparam param="sensor_ip" subst_value="True">$(arg sensor_ip)</rosparam>
+    <rosparam param="frame_id" subst_value="True">$(arg frame_id)</rosparam>
+    <rosparam param="angle_start" subst_value="True">$(arg angle_start)</rosparam>
+    <rosparam param="angle_end" subst_value="True">$(arg angle_end)</rosparam>
+    <rosparam param="x_axis_rotation" subst_value="True">$(arg x_axis_rotation)</rosparam>
+  </node>
+  <node name="rviz" type="rviz" pkg="rviz" args="-d $(find psen_scan_v2)/config/config.rviz" />
+</launch>
