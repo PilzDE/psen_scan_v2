@@ -41,19 +41,54 @@ namespace psen_scan_v2
 using NewDataHandler = std::function<void(const RawScannerData&, const std::size_t&)>;
 using ErrorHandler = std::function<void(const std::string&)>;
 
+/**
+ * @brief Helper for asynchronously sending and receiving data via UDP.
+ */
 class UdpClientImpl
 {
 public:
+  /**
+   * @brief Opens an UDP connection.
+   *
+   * @note The client does not start listing for new messages until explicitly triggered via startReceiving().
+   *
+   * @param data_handler Handler called whenever new data are received.
+   * @param error_handler Handler called whenever something wents wrong while receiving data.
+   * @param host_port Port from which data are sent and received.
+   * @param endpoint_ip IP address of the endpoint from which data are received and sent too.
+   * @param endpoint_port Port on which the other endpoint is sending and receiving data.
+   */
   UdpClientImpl(const NewDataHandler& data_handler,
                 const ErrorHandler& error_handler,
                 const unsigned short& host_port,
                 const unsigned int& endpoint_ip,
                 const unsigned short& endpoint_port);
+
+  /**
+   * @brief Closes the UDP connection and stops all pending asynchronous operation.
+   */
   ~UdpClientImpl();
 
 public:
+  /**
+   * @brief Starts an asynchronous process constantly listing to new messages from the other endpoint.
+   * - If a new message is received, the data handler is called.
+   * - If an error occurs while receiving data, the error handler is called.
+   *
+   * @param timeout Specifies how long to wait for new messages.
+   */
   void startReceiving(const std::chrono::high_resolution_clock::duration timeout);
+
+  /**
+   * @brief Asynchronously sends the specified data to the other endpoint.
+   *
+   * @param data Data which have to be send to the other endpoint.
+   */
   void write(const std::vector<char>& data);
+
+  /**
+   * @brief Closes the UDP connection and stops all pending asynchronous operation.
+   */
   void close();
 
 private:
