@@ -27,11 +27,27 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Deserializes raw byte data from the scanner.
+ */
 class MsgDecoder
 {
 public:
+  /**
+   * @brief Constructor.
+   *
+   * @param start_reply_callback Callback called whenever a StartReply is processed by the decodeAndDispatch method.
+   * @param error_callback Callback called whenever an error occurs during deserialization.
+   */
   MsgDecoder(const StartReplyCallback& start_reply_callback, const ErrorCallback& error_callback);
 
+  /**
+   * @brief decodeAndDispatch Deserializes the specified data and calls the appropriate callback to inform the user
+   * about the type of the received data.
+   *
+   * @param data Container holding the received data from the scanner.
+   * @param bytes_received Numbers of data received from the scanner.
+   */
   void decodeAndDispatch(const RawScannerData& data, const std::size_t& bytes_received);
 
 private:
