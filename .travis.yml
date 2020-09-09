@@ -10,9 +10,7 @@ notifications:
   email:
     on_failure: always
     recipients:
-      - g.sansone@pilz.de
       - c.doehn@pilz.de
-      - s.heinisch@pilz.de
       - o.ibrocevic@pilz.de
       - a.gutenkunst@pilz.de
       - c.henkel@pilz.de
