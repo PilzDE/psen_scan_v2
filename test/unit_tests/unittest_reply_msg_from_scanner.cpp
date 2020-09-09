@@ -21,7 +21,7 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2/decode_exception.h"
+#include "psen_scan_v2/crc_mismatch_exception.h"
 #include "psen_scan_v2/reply_msg_from_scanner.h"
 #include "psen_scan_v2/raw_data_test_helper.h"
 
@@ -108,7 +108,7 @@ TEST(ReplyMsgFromScannerTest, testFromRawDataInvalidCRC)
   RawScannerData data;
   std::copy(raw_msg.begin(), raw_msg.end(), data.begin());
 
-  EXPECT_THROW(ReplyMsgFromScanner::fromRawData(data), DecodeCRCMismatchException);
+  EXPECT_THROW(ReplyMsgFromScanner::fromRawData(data), CRCMismatch);
 }
 
 }  // namespace psen_scan_v2_test

@@ -23,7 +23,7 @@
 #include "psen_scan_v2/function_pointers.h"
 #include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/reply_msg_from_scanner.h"
-#include "psen_scan_v2/decode_exception.h"
+#include "psen_scan_v2/crc_mismatch_exception.h"
 
 namespace psen_scan_v2
 {

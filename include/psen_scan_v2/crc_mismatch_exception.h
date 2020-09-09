@@ -12,35 +12,24 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#ifndef PSEN_SCAN_V2_DECODE_EXCEPTION_H
-#define PSEN_SCAN_V2_DECODE_EXCEPTION_H
+#ifndef PSEN_SCAN_V2_CRC_MISMATCH_EXCEPTION_H
+#define PSEN_SCAN_V2_CRC_MISMATCH_EXCEPTION_H
 
 #include <stdexcept>
 #include <string>
 
 namespace psen_scan_v2
 {
-class DecodeException : public std::runtime_error
+class CRCMismatch : public std::runtime_error
 {
 public:
-  DecodeException(const std::string& msg = "Decoding failed");
-  virtual ~DecodeException() = default;
+  CRCMismatch(const std::string& msg = "CRC did not match");
+  virtual ~CRCMismatch() = default;
 };
 
-class DecodeCRCMismatchException : public DecodeException
-{
-public:
-  DecodeCRCMismatchException(const std::string& msg = "Decoding failed! CRC did not match");
-  virtual ~DecodeCRCMismatchException() = default;
-};
-
-inline DecodeException::DecodeException(const std::string& msg) : std::runtime_error(msg)
-{
-}
-
-inline DecodeCRCMismatchException::DecodeCRCMismatchException(const std::string& msg) : DecodeException(msg)
+inline CRCMismatch::CRCMismatch(const std::string& msg) : std::runtime_error(msg)
 {
 }
 
 }  // namespace psen_scan_v2
-#endif  // PSEN_SCAN_V2_NOT_IMPLEMENTED_EXCEPTION_H
+#endif  // PSEN_SCAN_V2_CRC_MISMATCH_EXCEPTION_H

@@ -21,6 +21,9 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief State machine reprensenting the communication protocol of the scanner.
+ */
 class ControllerStateMachine
 {
 public:

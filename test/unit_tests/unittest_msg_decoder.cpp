@@ -70,7 +70,7 @@ TEST(MsgDecoderTest, decodeStartReplyCrcFail)
 
   EXPECT_CALL(mock, start_reply_callback()).Times(0);
 
-  EXPECT_THROW(decoder.decodeAndDispatch(raw_data, REPLY_MSG_FROM_SCANNER_SIZE), DecodeCRCMismatchException);
+  EXPECT_THROW(decoder.decodeAndDispatch(raw_data, REPLY_MSG_FROM_SCANNER_SIZE), CRCMismatch);
 }
 
 /**
@@ -117,14 +117,9 @@ TEST(MsgDecoderTest, decodeWrongOpCodeNotImplemented)
   decoder.decodeAndDispatch(raw_data, REPLY_MSG_FROM_SCANNER_SIZE);
 }
 
-TEST(MsgDecoderTest, testDecodeExceptionForCompleteCoverage)
+TEST(MsgDecoderTest, testCRCMismatchForCompleteCoverage)
 {
-  std::unique_ptr<DecodeException> ex{ new DecodeException() };
-}
-
-TEST(MsgDecoderTest, testDecodeCRCMismatchExceptionForCompleteCoverage)
-{
-  std::unique_ptr<DecodeCRCMismatchException> ex{ new DecodeCRCMismatchException() };
+  std::unique_ptr<CRCMismatch> ex{ new CRCMismatch() };
 }
 
 int main(int argc, char* argv[])
