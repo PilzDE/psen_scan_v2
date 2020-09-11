@@ -97,7 +97,6 @@ TEST_F(MsgDecoderTest, decodeWrongOpCodeNotImplemented)
   decoder_.decodeAndDispatch(raw_data_, REPLY_MSG_FROM_SCANNER_SIZE);
 }
 
-
 TEST_F(MsgDecoderTest, testCRCMismatchForCompleteCoverage)
 {
   std::unique_ptr<CRCMismatch> ex{ new CRCMismatch() };
