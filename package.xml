@@ -1,13 +1,14 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>psen_scan_v2</name>
-  <version>1.0.6</version>
+  <version>0.0.1</version>
   <description>ROS support for the Pilz laser scanner</description>
 
   <maintainer email="a.gutenkunst@pilz.de">Alexander Gutenkunst</maintainer>
   <maintainer email="c.doehn@pilz.de">Christian Döhn</maintainer>
-  <maintainer email="g.sansone@pilz.de">Giuseppe Sansone</maintainer>
-  <maintainer email="s.heinisch@pilz.de">Sascha Heinisch</maintainer>
+  <maintainer email="c.henkel@pilz.de">Christian Henkel</maintainer>
+  <maintainer email="h.slusarek@pilz.de">Hagen Slusarek</maintainer>
+  <maintainer email="i.martini@pilz.de">Immanuel Martini</maintainer>
 
   <license>LGPLv3</license>
 

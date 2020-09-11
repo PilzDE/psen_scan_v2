@@ -20,7 +20,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "psen_scan_v2/reply_msg_from_scanner.h"
+#include "psen_scan_v2/scanner_reply_msg.h"
 #include "psen_scan_v2/msg_decoder.h"
 
 using namespace psen_scan_v2;
@@ -97,14 +97,10 @@ TEST_F(MsgDecoderTest, decodeWrongOpCodeNotImplemented)
   decoder_.decodeAndDispatch(raw_data_, REPLY_MSG_FROM_SCANNER_SIZE);
 }
 
-TEST_F(MsgDecoderTest, testDecodeExceptionForCompleteCoverage)
-{
-  std::unique_ptr<DecodeException> ex{ new DecodeException() };
-}
 
-TEST_F(MsgDecoderTest, testDecodeCRCMismatchExceptionForCompleteCoverage)
+TEST(MsgDecoderTest, testCRCMismatchForCompleteCoverage)
 {
-  std::unique_ptr<DecodeCRCMismatchException> ex{ new DecodeCRCMismatchException() };
+  std::unique_ptr<CRCMismatch> ex{ new CRCMismatch() };
 }
 
 int main(int argc, char* argv[])

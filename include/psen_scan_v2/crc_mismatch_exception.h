@@ -12,21 +12,24 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-#ifndef PSEN_SCAN_V2_FATAL_EXCEPTION_H
-#define PSEN_SCAN_V2_FATAL_EXCEPTION_H
+#ifndef PSEN_SCAN_V2_CRC_MISMATCH_EXCEPTION_H
+#define PSEN_SCAN_V2_CRC_MISMATCH_EXCEPTION_H
 
 #include <stdexcept>
+#include <string>
 
 namespace psen_scan_v2
 {
-class PSENScanV2FatalException : public std::runtime_error
+class CRCMismatch : public std::runtime_error
 {
 public:
-  PSENScanV2FatalException(const std::string& msg) : std::runtime_error(msg)
-  {
-  }
+  CRCMismatch(const std::string& msg = "CRC did not match");
+  virtual ~CRCMismatch() = default;
 };
-}  // namespace psen_scan_v2
 
-#endif  // PSEN_SCAN_V2_FATAL_EXCEPTION_H
+inline CRCMismatch::CRCMismatch(const std::string& msg) : std::runtime_error(msg)
+{
+}
+
+}  // namespace psen_scan_v2
+#endif  // PSEN_SCAN_V2_CRC_MISMATCH_EXCEPTION_H

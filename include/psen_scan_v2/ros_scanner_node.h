@@ -16,14 +16,13 @@
 #ifndef PSEN_SCAN_V2_ROS_SCANNER_NODE_H
 #define PSEN_SCAN_V2_ROS_SCANNER_NODE_H
 
+#include <stdexcept>
 #include <string>
 #include <atomic>
 #include <gtest/gtest_prod.h>
 
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
-#include "psen_scan_v2/build_ros_message_exception.h"
-#include "psen_scan_v2/psen_scan_v2_fatal_exception.h"
 #include "psen_scan_v2/scanner_data.h"
 
 #include "psen_scan_v2/scanner.h"
@@ -31,28 +30,42 @@
 namespace psen_scan_v2
 {
 /**
- * @brief Class implements a ROS-Node for the PSENscan safety laser scanner
+ * @brief ROS Node for fetching and publishing laserscan data from the scanner.
  *
  */
 template <typename S = Scanner>
 class ROSScannerNodeT
 {
 public:
+  /**
+   * @brief Constructor.
+   *
+   * @param nh Node handle for the ROS node on which the scanner topic is advertised.
+   * @param topic Name of the ROS topic under which the scanner data are published.
+   * @param frame_id Name of the frame id.
+   * @param x_axis_rotation Rotation of 2D scan around the z-axis.
+   * @param scanner_config Scanner configuration.
+   */
   ROSScannerNodeT(ros::NodeHandle& nh,
                   const std::string& topic,
                   const std::string& frame_id,
                   const double& x_axis_rotation,
                   const ScannerConfiguration& scanner_config);
-  sensor_msgs::LaserScan buildRosMessage(const LaserScan& laserscan);
-  void processingLoop();
-  void terminateProcessingLoop();
+
+  //! @brief Continuously fetches data from the scanner and publishes the data as ROS scanner message.
+  void run();
+  //! @brief Terminates the fetching and publishing of scanner data.
+  void terminate();
 
 private:
-  ros::NodeHandle nh_;     /**< ROS Node handler*/
-  ros::Publisher pub_;     /**< ROS message publisher*/
-  std::string frame_id_;   /**< Defines the name of the frame_id. Default is scanner.*/
-  double x_axis_rotation_; /**< X-axis rotation.*/
-  S scanner_;              /**< Points to an instance of the Scanner class.*/
+  sensor_msgs::LaserScan toRosMessage(const LaserScan& laserscan) const;
+
+private:
+  ros::NodeHandle nh_;
+  ros::Publisher pub_;
+  std::string frame_id_;
+  double x_axis_rotation_;
+  S scanner_;
   std::atomic_bool terminate_{ false };
 
   friend class RosScannerNodeTests;
@@ -63,15 +76,6 @@ private:
 
 typedef ROSScannerNodeT<> ROSScannerNode;
 
-/**
- * @brief Construct a new ROSScannerNodeROSScannerNodeT::ROSScannerNodeROSScannerNodeT object
- *
- * @param nh node handle for the ROS node
- * @param topic name of the ROS topic
- * @param frame_id name of the frame id
- * @param scanner pointer ot an instance of the class Scanner
- * @param x_axis_rotation rotation of 2D scan around the z-axis.
- */
 template <typename S>
 ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
                                     const std::string& topic,
@@ -83,25 +87,15 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
   pub_ = nh_.advertise<sensor_msgs::LaserScan>(topic, 1);
 }
 
-/**
- * @brief Creates a ROS message from an LaserScan, which contains one scanning round.
- *
- * @param laserscan
- *
- * @return sensor_msgs::LaserScan, ROS message, ready to be published
- *
- * @throws BuildROSMessageException
- *
- */
 template <typename S>
-sensor_msgs::LaserScan ROSScannerNodeT<S>::buildRosMessage(const LaserScan& laserscan)
+sensor_msgs::LaserScan ROSScannerNodeT<S>::toRosMessage(const LaserScan& laserscan) const
 {
   // TODO Remove after implementing building of laserscans
   // LCOV_EXCL_START
 
   if (!laserscan.isNumberOfScansValid())
   {
-    throw BuildROSMessageException("Calculated number of scans doesn't match actual number of scans!");
+    throw std::invalid_argument("Calculated number of scans doesn't match actual number of scans.");
   }
 
   sensor_msgs::LaserScan ros_message;
@@ -127,17 +121,13 @@ sensor_msgs::LaserScan ROSScannerNodeT<S>::buildRosMessage(const LaserScan& lase
 }
 
 template <typename S>
-void ROSScannerNodeT<S>::terminateProcessingLoop()
+void ROSScannerNodeT<S>::terminate()
 {
   terminate_ = true;
 }
 
-/**
- * @brief endless loop for processing incoming UDP data from the laser scanner
- *
- */
 template <typename S>
-void ROSScannerNodeT<S>::processingLoop()
+void ROSScannerNodeT<S>::run()
 {
   ros::Rate r(10);
   scanner_.start();
@@ -145,7 +135,7 @@ void ROSScannerNodeT<S>::processingLoop()
   {
     try
     {
-      pub_.publish(buildRosMessage(scanner_.getCompleteScan()));
+      pub_.publish(toRosMessage(scanner_.getCompleteScan()));
     }
     catch (const LaserScanBuildFailure& ex)
     {

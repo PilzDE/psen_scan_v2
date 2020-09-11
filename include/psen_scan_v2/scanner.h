@@ -37,13 +37,24 @@ public:
   LaserScanBuildFailure(const std::string& msg = "Error while building laser scan");
 };
 
+/**
+ * @brief API to control and to fetch measurements from the scanner.
+ */
 template <typename SC = ScannerController>
 class ScannerT
 {
 public:
+  /**
+   * @brief Constructor.
+   *
+   * @param scanner_config Configuration details of the scanner.
+   */
   ScannerT(const ScannerConfiguration& scanner_config);
+  //! @brief Starts the scanner.
   void start();
+  //! @brief Stops the scanner.
   void stop();
+  //! @brief Fetches a complete laser scan from the scanner.
   LaserScan getCompleteScan();
 
 private:

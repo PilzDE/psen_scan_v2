@@ -41,7 +41,7 @@ static constexpr std::chrono::milliseconds RECEIVE_TIMEOUT{ 1000 };
 
 static constexpr uint32_t DEFAULT_SEQ_NUMBER{ 0 };
 
-template <typename TSCM = ControllerStateMachine, typename TUCI = UdpClientImpl>
+template <typename TCSM = ControllerStateMachine, typename TUCI = UdpClientImpl>
 class ScannerControllerT
 {
 public:
@@ -54,7 +54,7 @@ public:
 
 private:
   ScannerConfiguration scanner_config_;
-  TSCM state_machine_;
+  TCSM state_machine_;
   MsgDecoder control_msg_decoder_;
   MsgDecoder data_msg_decoder_;
   TUCI control_udp_client_;
@@ -68,13 +68,13 @@ private:
 
 typedef ScannerControllerT<> ScannerController;
 
-template <typename TSCM, typename TUCI>
-ScannerControllerT<TSCM, TUCI>::ScannerControllerT(const ScannerConfiguration& scanner_config)
+template <typename TCSM, typename TUCI>
+ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& scanner_config)
   : scanner_config_(scanner_config)
   , state_machine_(std::bind(&ScannerControllerT::sendStartRequest, this))
-  , control_msg_decoder_(std::bind(&TSCM::processStartReplyReceivedEvent, &state_machine_),
+  , control_msg_decoder_(std::bind(&TCSM::processStartReplyReceivedEvent, &state_machine_),
                          std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1))
-  , data_msg_decoder_(std::bind(&TSCM::processStartReplyReceivedEvent, &state_machine_),
+  , data_msg_decoder_(std::bind(&TCSM::processStartReplyReceivedEvent, &state_machine_),
                       std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1))
   , control_udp_client_(
         std::bind(&MsgDecoder::decodeAndDispatch, &control_msg_decoder_, std::placeholders::_1, std::placeholders::_2),
@@ -91,28 +91,28 @@ ScannerControllerT<TSCM, TUCI>::ScannerControllerT(const ScannerConfiguration& s
 {
 }
 
-template <typename TSCM, typename TUCI>
-void ScannerControllerT<TSCM, TUCI>::handleError(const std::string& error_msg)
+template <typename TCSM, typename TUCI>
+void ScannerControllerT<TCSM, TUCI>::handleError(const std::string& error_msg)
 {
   PSENSCAN_ERROR("ScannerController", error_msg);
   // TODO: Add implementation -> Tell state machine about error
 }
 
-template <typename TSCM, typename TUCI>
-void ScannerControllerT<TSCM, TUCI>::start()
+template <typename TCSM, typename TUCI>
+void ScannerControllerT<TCSM, TUCI>::start()
 {
   state_machine_.processStartRequestEvent();
 }
 
-template <typename TSCM, typename TUCI>
-void ScannerControllerT<TSCM, TUCI>::stop()
+template <typename TCSM, typename TUCI>
+void ScannerControllerT<TCSM, TUCI>::stop()
 {
   // TODO: Impl. sending of StopRequest
   state_machine_.processStopRequestEvent();
 }
 
-template <typename TSCM, typename TUCI>
-void ScannerControllerT<TSCM, TUCI>::sendStartRequest()
+template <typename TCSM, typename TUCI>
+void ScannerControllerT<TCSM, TUCI>::sendStartRequest()
 {
   control_udp_client_.startReceiving(RECEIVE_TIMEOUT);
   data_udp_client_.startReceiving(RECEIVE_TIMEOUT);

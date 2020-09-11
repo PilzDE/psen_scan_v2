@@ -22,10 +22,18 @@
 
 namespace psen_scan_v2
 {
-static const std::string DEFAULT_FRAME_ID = "scanner";               /**< ROS Frame ID */
-static constexpr double DEFAULT_ANGLE_START(0.0);                    /**< Start angle of measurement */
-static constexpr double DEFAULT_ANGLE_END(degreeToRad(275.));        /**< End angle of measurement */
-static constexpr double DEFAULT_X_AXIS_ROTATION(degreeToRad(137.5)); /**< Rotation of x-axis around the center */
-static const std::string DEFAULT_PUBLISH_TOPIC = "scan";             /**< Topic to publish LaserScan data on */
+static const std::string DEFAULT_FRAME_ID = "scanner";
+
+//! @brief Start angle of measurement.
+static constexpr double DEFAULT_ANGLE_START(0.0);
+//! @brief  End angle of measurement.
+static constexpr double DEFAULT_ANGLE_END(degreeToRad(275.));
+
+//! @brief Rotation of x-axis around the center.
+static constexpr double DEFAULT_X_AXIS_ROTATION(degreeToRad(137.5));
+
+//! @brief Topic on which the LaserScan data are published.
+static const std::string DEFAULT_PUBLISH_TOPIC = "scan";
+
 }  // namespace psen_scan_v2
 #endif  // PSEN_SCAN_V2_DEFAULT_PARAMETERS_H

@@ -4,7 +4,7 @@
 
 ## Package: psen_scan_v2
 
-The **psen_scan_v2** package is a ROS integration of the PSENscan safety laser scanner product. It allows for an easy integration of the laser scanner data into your ROS Environment. Using the standard [sensor_msgs/LaserScan][] message format ensures compatibility with other laserscan-post-processing nodes such as [gmapping][]. For a general overview and link collection we refer to the [wiki page](http://wiki.ros.org/psen_scan).
+The **psen_scan_v2** package is a ROS integration of the PSENscan safety laser scanner product. It allows for an easy integration of the laser scanner data into your ROS Environment. Using the standard [sensor_msgs/LaserScan][] message format ensures compatibility with other laserscan-post-processing nodes such as [gmapping][]. For a general overview and link collection we refer to the [wiki page](http://wiki.ros.org/psen_scan_v2).
 
 <p align="center">
 <img src="img/PSENscan.jpg" alt="PILZ safety laser scanner" title="PILZ safety laser scanner">
@@ -37,9 +37,9 @@ sudo apt install ros-melodic-psen-scan
 ## Build Status
 | Platform | Status |
 | -------- | ------ |
-| Travis | [![Build Status](https://travis-ci.org/PilzDE/psen_scan.svg?branch=melodic-devel)](https://travis-ci.org/PilzDE/psen_scan) |
-| Buildfarm src | [![Build Status](http://build.ros.org/job/Msrc_uB__psen_scan__ubuntu_bionic__source/badge/icon)](http://build.ros.org/job/Msrc_uB__psen_scan__ubuntu_bionic__source/) |
-| Buildfarm bin | [![Build Status](http://build.ros.org/job/Mbin_uB64__psen_scan__ubuntu_bionic_amd64__binary/badge/icon)](http://build.ros.org/job/Mbin_uB64__psen_scan__ubuntu_bionic_amd64__binary/) |
+| Travis | [![Build Status](https://travis-ci.org/PilzDE/psen_scan_v2.svg?branch=melodic-devel)](https://travis-ci.org/PilzDE/psen_scan_v2) |
+| Buildfarm src | [![Build Status](http://build.ros.org/job/Msrc_uB__psen_scan_v2__ubuntu_bionic__source/badge/icon)](http://build.ros.org/job/Msrc_uB__psen_scan_v2__ubuntu_bionic__source/) |
+| Buildfarm bin | [![Build Status](http://build.ros.org/job/Mbin_uB64__psen_scan_v2__ubuntu_bionic_amd64__binary/badge/icon)](http://build.ros.org/job/Mbin_uB64__psen_scan_v2__ubuntu_bionic_amd64__binary/) |
 
 
 ## Branching model
@@ -94,7 +94,7 @@ This example configures the safety laser scanner at 192.168.0.10 to send it´s f
 
 ### Adjust expert parameters
 If you've created an application package with your own launch file as described in the
-[tutorials](http://wiki.ros.org/psen_scan_v2/Tutorials/),
+[tutorials](http://wiki.ros.org/psen_scan/Tutorials/),
 you can easily adjust the aforementioned configuration parameters.
 
 ## Test concept

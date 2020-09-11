@@ -22,7 +22,6 @@
 #include "psen_scan_v2/scanner_controller.h"
 #include "psen_scan_v2/ros_parameter_handler.h"
 #include "psen_scan_v2/ros_scanner_node.h"
-#include "psen_scan_v2/psen_scan_v2_fatal_exception.h"
 #include "psen_scan_v2/default_parameters.h"
 #include "psen_scan_v2/scanner_configuration.h"
 #include <rosconsole_bridge/bridge.h>
@@ -51,11 +50,7 @@ int main(int argc, char** argv)
                                     param_handler.getFrameID(),
                                     param_handler.getXAxisRotation(),
                                     scanner_configuration);
-    ros_scanner_node.processingLoop();
-  }
-  catch (PSENScanV2FatalException& e)
-  {
-    ROS_ERROR_STREAM(e.what());
+    ros_scanner_node.run();
   }
   catch (std::exception& e)
   {
