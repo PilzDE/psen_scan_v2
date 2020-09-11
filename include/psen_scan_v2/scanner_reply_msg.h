@@ -26,7 +26,6 @@
 #include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/crc_mismatch_exception.h"
 #include "psen_scan_v2/raw_processing.h"
-//#include "psen_scan_v2/decode_exception.h"
 
 namespace psen_scan_v2
 {
