@@ -58,14 +58,11 @@ int main(int argc, char** argv)
                                                param_handler.getHostUDPPortData(),
                                                param_handler.getHostUDPPortControl(),
                                                param_handler.getSensorIP(),
-                                               param_handler.getAngleStart(),
-                                               param_handler.getAngleEnd());
+                                               param_handler.getAngleStart() + DEFAULT_X_AXIS_ROTATION,
+                                               param_handler.getAngleEnd() + DEFAULT_X_AXIS_ROTATION);
 
-    ROSScannerNode ros_scanner_node(pnh,
-                                    DEFAULT_PUBLISH_TOPIC,
-                                    param_handler.getFrameID(),
-                                    param_handler.getXAxisRotation(),
-                                    scanner_configuration);
+    ROSScannerNode ros_scanner_node(
+        pnh, DEFAULT_PUBLISH_TOPIC, param_handler.getFrameID(), DEFAULT_X_AXIS_ROTATION, scanner_configuration);
 
     NODE_TERMINATE_CB = std::bind(&ROSScannerNode::terminate, &ros_scanner_node);
 
