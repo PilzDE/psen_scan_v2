@@ -78,6 +78,7 @@ public:
 private:
   ScannerReplyMsg() = delete;
 
+private:
   //! A CRC32 of all the following fields.
   uint32_t crc_{ 0 };
   uint32_t reserved_{ 0 };
@@ -89,6 +90,7 @@ private:
   //! If the CRC is not correct, the device will not send any message.
   uint32_t res_code_{ 0 };
 
+private:
   static constexpr uint32_t OPCODE_START{ 0x35 };
 };
 
@@ -97,16 +99,16 @@ inline uint32_t ScannerReplyMsg::calcCRC(const ScannerReplyMsg& msg)
   boost::crc_32_type result;
   // Read all data except the field of the sent crc at the beginning according to:
   // Reference Guide Rev. A – November 2019 Page 14
-  process_bytes<uint32_t>(result, msg.reserved_);
-  process_bytes<uint32_t>(result, msg.opcode_);
-  process_bytes<uint32_t>(result, msg.res_code_);
+  processBytes(result, msg.reserved_);
+  processBytes(result, msg.opcode_);
+  processBytes(result, msg.res_code_);
   return result.checksum();
 }
 
 template <typename T>
-inline void ReplyMsgFromScanner::process_bytes(boost::crc_32_type& crc_32, const T& data)
+inline void ReplyMsgFromScanner::processBytes(boost::crc_32_type& crc_32, const T& data)
 {
-  crc_32.process_bytes(&(data), sizeof(T));
+  crc_32.process_bytes(&data, sizeof(T));
   return;
 }
 
@@ -125,12 +127,13 @@ inline ScannerReplyMsg ScannerReplyMsg::fromRawData(const RawScannerData& data)
 {
   ScannerReplyMsg msg{ 0, 0 };
 
-  std::istringstream is(std::string((char*)&data, REPLY_MSG_FROM_SCANNER_SIZE));
+  RawScannerData tmp_data{ data };
+  std::istringstream is(std::string(tmp_data.data(), REPLY_MSG_FROM_SCANNER_SIZE));
 
-  read<uint32_t>(is, msg.crc_);
-  read<uint32_t>(is, msg.reserved_);
-  read<uint32_t>(is, msg.opcode_);
-  read<uint32_t>(is, msg.res_code_);
+  read(is, msg.crc_);
+  read(is, msg.reserved_);
+  read(is, msg.opcode_);
+  read(is, msg.res_code_);
   
   if (msg.crc_ != calcCRC(msg))
   {
@@ -141,13 +144,13 @@ inline ScannerReplyMsg ScannerReplyMsg::fromRawData(const RawScannerData& data)
 }
 
 template <typename T>
-inline void ReplyMsgFromScanner::read(std::istringstream& is, const T& data)
+inline void ReplyMsgFromScanner::read(std::istringstream& is, T& data)
 {
   // Alternatives for transformation:
   // typedef boost::iostreams::basic_array_source<char> Device;
   // boost::iostreams::stream<Device> stream((char*)&data, sizeof(DataReply::MemoryFormat));
 
-  is.read((char*)&data, sizeof(T));
+  is.read(reinterpret_cast<char*>(&data), sizeof(T));
   return;
 }
 
@@ -166,10 +169,10 @@ inline ScannerReplyMsg::RawType ScannerReplyMsg::toCharArray()
 
   uint32_t crc{ calcCRC(*this) };
 
-  write<uint32_t>(os, crc);
-  write<uint32_t>(os, reserved_);
-  write<uint32_t>(os, opcode_);
-  write<uint32_t>(os, res_code_);
+  write(os, crc);
+  write(os, reserved_);
+  write(os, opcode_);
+  write(os, res_code_);
 
   // TODO check limits
   std::string data_str(os.str());
@@ -184,7 +187,7 @@ inline ScannerReplyMsg::RawType ScannerReplyMsg::toCharArray()
 template <typename T>
 inline void ReplyMsgFromScanner::write(std::ostringstream& os, const T& data) const
 {
-  os.write((char*)&data, sizeof(T));
+  os.write((char*)(&data), sizeof(T));
   return;
 }
 

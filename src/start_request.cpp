@@ -54,39 +54,39 @@ StartRequest::RawType StartRequest::toRawType() const
 {
   std::ostringstream os;
 
-  write<uint32_t>(os, crc_);
-  write<uint32_t>(os, seq_number_);
-  write<uint64_t>(os, RESERVED_);
-  write<uint32_t>(os, OPCODE_);
+  write(os, crc_);
+  write(os, seq_number_);
+  write(os, RESERVED_);
+  write(os, OPCODE_);
 
   uint32_t host_ip_big_endian = htobe32(host_ip_);
-  write<uint32_t>(os, host_ip_big_endian);
+  write(os, host_ip_big_endian);
 
-  write<uint16_t>(os, host_udp_port_data_);
-  write<uint8_t>(os, device_enabled_);
-  write<uint8_t>(os, intensity_enabled_);
-  write<uint8_t>(os, point_in_safety_enabled_);
-  write<uint8_t>(os, active_zone_set_enabled_);
-  write<uint8_t>(os, io_pin_enabled_);
-  write<uint8_t>(os, scan_counter_enabled_);
-  write<uint8_t>(os, speed_encoder_enabled_);
-  write<uint8_t>(os, diagnostics_enabled_);
+  write(os, host_udp_port_data_);
+  write(os, device_enabled_);
+  write(os, intensity_enabled_);
+  write(os, point_in_safety_enabled_);
+  write(os, active_zone_set_enabled_);
+  write(os, io_pin_enabled_);
+  write(os, scan_counter_enabled_);
+  write(os, speed_encoder_enabled_);
+  write(os, diagnostics_enabled_);
 
   uint16_t start_angle{ radToTenthDegree(master_.getStartAngle()) };
   uint16_t end_angle{ radToTenthDegree(master_.getEndAngle()) };
   uint16_t resolution{ radToTenthDegree(master_.getResolution()) };
-  write<uint16_t>(os, start_angle);
-  write<uint16_t>(os, end_angle);
-  write<uint16_t>(os, resolution);
+  write(os, start_angle);
+  write(os, end_angle);
+  write(os, resolution);
 
   for (const auto& slave : slaves_)
   {
     uint16_t slave_start_angle{ radToTenthDegree(slave.getStartAngle()) };
     uint16_t slave_end_angle{ radToTenthDegree(slave.getEndAngle()) };
     uint16_t slave_resolution{ radToTenthDegree(slave.getResolution()) };
-    write<uint16_t>(os, slave_start_angle);
-    write<uint16_t>(os, slave_end_angle);
-    write<uint16_t>(os, slave_resolution);
+    write(os, slave_start_angle);
+    write(os, slave_end_angle);
+    write(os, slave_resolution);
   }
 
   std::string data_str(os.str());
@@ -102,7 +102,7 @@ StartRequest::RawType StartRequest::toRawType() const
 template <typename T>
 void StartRequest::write(std::ostringstream& os, const T& data) const
 {
-  os.write((char*)&data, sizeof(T));
+  os.write((char*)(&data), sizeof(T));
   return;
 }
 
