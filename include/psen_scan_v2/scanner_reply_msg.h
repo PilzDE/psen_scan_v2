@@ -69,17 +69,15 @@ public:
   static uint32_t getStartOpCode();
   static uint32_t calcCRC(const ScannerReplyMsg& msg);
 
-private:
-  template <typename T>
-  static void processBytes(boost::crc_32_type& crc_32, const T& data);
-  template <typename T>
-  static void read(std::istringstream& is, T& data);
-
 public:
   using RawType = std::array<char, REPLY_MSG_FROM_SCANNER_SIZE>;
   RawType toCharArray();
 
 private:
+  template <typename T>
+  static void processBytes(boost::crc_32_type& crc_32, const T& data);
+  template <typename T>
+  static void read(std::istringstream& is, T& data);
   ScannerReplyMsg() = delete;
 
 private:
