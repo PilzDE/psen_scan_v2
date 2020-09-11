@@ -34,90 +34,70 @@ public:
   MOCK_METHOD1(error_callback, void(const std::string&));
 };
 
+class MsgDecoderTest : public ::testing::Test
+{
+protected:
+  MsgDecoderTest()
+    : decoder_(std::bind(&MockCallbackHolder::start_reply_callback, &mock_),
+               std::bind(&MockCallbackHolder::error_callback, &mock_, std::placeholders::_1))
+    , reply_(ScannerReplyMsg::getStartOpCode(), DEFAULT_RESULT_CODE)
+    , reply_raw_(reply_.toCharArray())
+  {
+    std::copy(reply_raw_.begin(), reply_raw_.end(), raw_data_.begin());
+  }
+
+protected:
+  MockCallbackHolder mock_;
+  MsgDecoder decoder_;
+  ScannerReplyMsg reply_;
+  ScannerReplyMsg::RawType reply_raw_;
+  RawScannerData raw_data_;
+};
+
 /**
  * Testing if a StartReply message can be identified correctly with the correct crc value.
  * This should call the start_reply_callback method.
  */
-TEST(MsgDecoderTest, decodeStartReply)
+TEST_F(MsgDecoderTest, decodeStartReply)
 {
-  MockCallbackHolder mock;
-  MsgDecoder decoder(std::bind(&MockCallbackHolder::start_reply_callback, &mock),
-                     std::bind(&MockCallbackHolder::error_callback, &mock, std::placeholders::_1));
-
-  ScannerReplyMsg reply{ ScannerReplyMsg::getStartOpCode(), DEFAULT_RESULT_CODE };
-
-  ScannerReplyMsg::RawType reply_raw{ reply.toCharArray() };
-  RawScannerData raw_data{};
-  std::copy(reply_raw.begin(), reply_raw.end(), raw_data.begin());
-
-  EXPECT_CALL(mock, start_reply_callback()).Times(1);
-
-  decoder.decodeAndDispatch(raw_data, REPLY_MSG_FROM_SCANNER_SIZE);
+  EXPECT_CALL(mock_, start_reply_callback()).Times(1);
+  decoder_.decodeAndDispatch(raw_data_, REPLY_MSG_FROM_SCANNER_SIZE);
 }
 
-TEST(MsgDecoderTest, decodeStartReplyCrcFail)
+TEST_F(MsgDecoderTest, decodeStartReplyCrcFail)
 {
-  MockCallbackHolder mock;
-  MsgDecoder decoder(std::bind(&MockCallbackHolder::start_reply_callback, &mock),
-                     std::bind(&MockCallbackHolder::error_callback, &mock, std::placeholders::_1));
-
-  ScannerReplyMsg reply{ ScannerReplyMsg::getStartOpCode(), DEFAULT_RESULT_CODE };
-
-  ScannerReplyMsg::RawType reply_raw{ reply.toCharArray() };
-  RawScannerData raw_data{};
-  std::copy(reply_raw.begin(), reply_raw.end(), raw_data.begin());
-  raw_data[0] = 'a';
-
-  EXPECT_CALL(mock, start_reply_callback()).Times(0);
-
-  EXPECT_THROW(decoder.decodeAndDispatch(raw_data, REPLY_MSG_FROM_SCANNER_SIZE), CRCMismatch);
+  raw_data_[0] = 'a';
+  EXPECT_CALL(mock_, start_reply_callback()).Times(0);
+  EXPECT_THROW(decoder_.decodeAndDispatch(raw_data_, REPLY_MSG_FROM_SCANNER_SIZE), CRCMismatch);
 }
 
 /**
  * Testing if a StartReply message can not be identified correctly with incorrect size.
  * This should *not* call the start_reply_callback method and raise a NotImplementedException.
  */
-TEST(MsgDecoderTest, decodeStartReplyWrongSizeNotImplemented)
+TEST_F(MsgDecoderTest, decodeStartReplyWrongSizeNotImplemented)
 {
-  MockCallbackHolder mock;
-  MsgDecoder decoder(std::bind(&MockCallbackHolder::start_reply_callback, &mock),
-                     std::bind(&MockCallbackHolder::error_callback, &mock, std::placeholders::_1));
-
-  ScannerReplyMsg reply{ ScannerReplyMsg::getStartOpCode(), DEFAULT_RESULT_CODE };
-
-  ScannerReplyMsg::RawType reply_raw{ reply.toCharArray() };
-  RawScannerData raw_data{};
-  std::copy(reply_raw.begin(), reply_raw.end(), raw_data.begin());
-
-  EXPECT_CALL(mock, start_reply_callback()).Times(0);
-  EXPECT_CALL(mock, error_callback(::testing::_)).Times(1);
-
-  decoder.decodeAndDispatch(raw_data, REPLY_MSG_FROM_SCANNER_SIZE + 1);
+  EXPECT_CALL(mock_, start_reply_callback()).Times(0);
+  EXPECT_CALL(mock_, error_callback(::testing::_)).Times(1);
+  decoder_.decodeAndDispatch(raw_data_, REPLY_MSG_FROM_SCANNER_SIZE + 1);
 }
 
 /**
  * Testing if a StartReply message can not be identified correctly with incorrect opcode.
  * This should *not* call the start_reply_callback method and raise a NotImplementedException.
  */
-TEST(MsgDecoderTest, decodeWrongOpCodeNotImplemented)
+TEST_F(MsgDecoderTest, decodeWrongOpCodeNotImplemented)
 {
-  MockCallbackHolder mock;  // Needed
-  MsgDecoder decoder(std::bind(&MockCallbackHolder::start_reply_callback, &mock),
-                     std::bind(&MockCallbackHolder::error_callback, &mock, std::placeholders::_1));
-
   ScannerReplyMsg reply{ ScannerReplyMsg::getStartOpCode() + 1, DEFAULT_RESULT_CODE };
-
   ScannerReplyMsg::RawType reply_raw{ reply.toCharArray() };
-  RawScannerData raw_data{};
-  std::copy(reply_raw.begin(), reply_raw.end(), raw_data.begin());
+  std::copy(reply_raw.begin(), reply_raw.end(), raw_data_.begin());
 
-  EXPECT_CALL(mock, start_reply_callback()).Times(0);
-  EXPECT_CALL(mock, error_callback(::testing::_)).Times(1);
-
-  decoder.decodeAndDispatch(raw_data, REPLY_MSG_FROM_SCANNER_SIZE);
+  EXPECT_CALL(mock_, start_reply_callback()).Times(0);
+  EXPECT_CALL(mock_, error_callback(::testing::_)).Times(1);
+  decoder_.decodeAndDispatch(raw_data_, REPLY_MSG_FROM_SCANNER_SIZE);
 }
 
-TEST(MsgDecoderTest, testCRCMismatchForCompleteCoverage)
+TEST_F(MsgDecoderTest, testCRCMismatchForCompleteCoverage)
 {
   std::unique_ptr<CRCMismatch> ex{ new CRCMismatch() };
 }
