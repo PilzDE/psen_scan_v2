@@ -40,7 +40,7 @@ protected:
   MsgDecoderTest()
     : decoder_(std::bind(&MockCallbackHolder::start_reply_callback, &mock_),
                std::bind(&MockCallbackHolder::error_callback, &mock_, std::placeholders::_1))
-    , reply_(ReplyMsgFromScanner::getStartOpCode(), DEFAULT_RESULT_CODE)
+    , reply_(ScannerReplyMsg::getStartOpCode(), DEFAULT_RESULT_CODE)
     , reply_raw_(reply_.toCharArray())
   {
     std::copy(reply_raw_.begin(), reply_raw_.end(), raw_data_.begin());
@@ -49,8 +49,8 @@ protected:
 protected:
   MockCallbackHolder mock_;
   MsgDecoder decoder_;
-  ReplyMsgFromScanner reply_;
-  ReplyMsgFromScanner::RawType reply_raw_;
+  ScannerReplyMsg reply_;
+  ScannerReplyMsg::RawType reply_raw_;
   RawScannerData raw_data_;
 };
 
@@ -68,7 +68,7 @@ TEST_F(MsgDecoderTest, decodeStartReplyCrcFail)
 {
   raw_data_[0] = 'a';
   EXPECT_CALL(mock_, start_reply_callback()).Times(0);
-  EXPECT_THROW(decoder_.decodeAndDispatch(raw_data_, REPLY_MSG_FROM_SCANNER_SIZE), DecodeCRCMismatchException);
+  EXPECT_THROW(decoder_.decodeAndDispatch(raw_data_, REPLY_MSG_FROM_SCANNER_SIZE), CRCMismatch);
 }
 
 /**
@@ -88,8 +88,8 @@ TEST_F(MsgDecoderTest, decodeStartReplyWrongSizeNotImplemented)
  */
 TEST_F(MsgDecoderTest, decodeWrongOpCodeNotImplemented)
 {
-  ReplyMsgFromScanner reply{ ReplyMsgFromScanner::getStartOpCode() + 1, DEFAULT_RESULT_CODE };
-  ReplyMsgFromScanner::RawType reply_raw{ reply.toCharArray() };
+  ScannerReplyMsg reply{ ScannerReplyMsg::getStartOpCode() + 1, DEFAULT_RESULT_CODE };
+  ScannerReplyMsg::RawType reply_raw{ reply.toCharArray() };
   std::copy(reply_raw.begin(), reply_raw.end(), raw_data_.begin());
 
   EXPECT_CALL(mock_, start_reply_callback()).Times(0);
@@ -98,7 +98,7 @@ TEST_F(MsgDecoderTest, decodeWrongOpCodeNotImplemented)
 }
 
 
-TEST(MsgDecoderTest, testCRCMismatchForCompleteCoverage)
+TEST_F(MsgDecoderTest, testCRCMismatchForCompleteCoverage)
 {
   std::unique_ptr<CRCMismatch> ex{ new CRCMismatch() };
 }
