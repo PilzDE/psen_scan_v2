@@ -44,6 +44,7 @@ public:
 
   //! @returns the CRC of the start request.
   uint32_t getCRC() const;
+
   using RawType = std::vector<char>;
   //! @brief Serializes the start request into a raw data which can be send to the scanner.
   RawType toRawType() const;
