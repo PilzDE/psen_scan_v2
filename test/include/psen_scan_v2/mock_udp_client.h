@@ -13,6 +13,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#ifndef PSEN_SCAN_V2_TEST_MOCK_UDP_CLIENT_H
+#define PSEN_SCAN_V2_TEST_MOCK_UDP_CLIENT_H
+
 #include <gmock/gmock.h>
 
 #include "psen_scan_v2/raw_scanner_data.h"
@@ -36,3 +39,5 @@ public:
 };
 
 }  // namespace psen_scan_v2_test
+
+#endif  // PSEN_SCAN_V2_TEST_MOCK_UDP_CLIENT_H
