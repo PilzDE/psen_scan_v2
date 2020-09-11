@@ -26,7 +26,7 @@
 #include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/crc_mismatch_exception.h"
 #include "psen_scan_v2/raw_processing.h"
-#include "psen_scan_v2/decode_exception.h"
+//#include "psen_scan_v2/decode_exception.h"
 
 namespace psen_scan_v2
 {
@@ -71,7 +71,9 @@ public:
 
 private:
   template <typename T>
-  static void process_bytes(boost::crc_32_type& crc_32, const T& data);
+  static void processBytes(boost::crc_32_type& crc_32, const T& data);
+  template <typename T>
+  static void read(std::istringstream& is, T& data);
 
 public:
   using RawType = std::array<char, REPLY_MSG_FROM_SCANNER_SIZE>;
@@ -108,13 +110,13 @@ inline uint32_t ScannerReplyMsg::calcCRC(const ScannerReplyMsg& msg)
 }
 
 template <typename T>
-inline void ReplyMsgFromScanner::processBytes(boost::crc_32_type& crc_32, const T& data)
+inline void ScannerReplyMsg::processBytes(boost::crc_32_type& crc_32, const T& data)
 {
   crc_32.process_bytes(&data, sizeof(T));
   return;
 }
 
-inline uint32_t ReplyMsgFromScanner::getStartOpCode()
+inline uint32_t ScannerReplyMsg::getStartOpCode()
 {
   return OPCODE_START;
 }
@@ -136,7 +138,7 @@ inline ScannerReplyMsg ScannerReplyMsg::fromRawData(const RawScannerData& data)
   read(is, msg.reserved_);
   read(is, msg.opcode_);
   read(is, msg.res_code_);
-  
+
   if (msg.crc_ != calcCRC(msg))
   {
     throw CRCMismatch();
@@ -146,7 +148,7 @@ inline ScannerReplyMsg ScannerReplyMsg::fromRawData(const RawScannerData& data)
 }
 
 template <typename T>
-inline void ReplyMsgFromScanner::read(std::istringstream& is, T& data)
+inline void ScannerReplyMsg::read(std::istringstream& is, T& data)
 {
   // Alternatives for transformation:
   // typedef boost::iostreams::basic_array_source<char> Device;
