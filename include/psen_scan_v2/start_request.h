@@ -41,7 +41,7 @@ public:
    * @param seq_number TODO
    */
   StartRequest(const ScannerConfiguration& scanner_configuration, const uint32_t& seq_number);
-  
+
   //! @returns the CRC of the start request.
   uint32_t getCRC() const;
   using RawType = std::vector<char>;
