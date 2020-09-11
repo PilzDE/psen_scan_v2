@@ -52,7 +52,7 @@ class UdpClientTests : public testing::Test, public testing::AsyncTest
 {
 public:
   UdpClientTests();
-  MOCK_METHOD2(handleNewData, void(const RawScannerData&, const std::size_t&));
+  MOCK_METHOD2(handleNewData, void(const MaxSizeRawData&, const std::size_t&));
   MOCK_METHOD1(handleError, void(const std::string&));
 
 public:
@@ -69,7 +69,7 @@ protected:
     UDP_MOCK_PORT
   };
 
-  RawDataContainer<DATA_SIZE_BYTES> send_array = { "Hello" };
+  FixedSizeRawData<DATA_SIZE_BYTES> send_array = { "Hello" };
   const udp::endpoint host_endpoint;
 };
 
@@ -127,7 +127,7 @@ TEST_F(UdpClientTests, testWriteOperation)
 
   mock_udp_server_.asyncReceive();
   std::string str = "Hello!";
-  std::vector<char> write_buf;
+  DynamicSizeRawData write_buf;
   std::copy(str.begin(), str.end(), std::back_inserter(write_buf));
   udp_client_.write(write_buf);
 
@@ -146,7 +146,7 @@ TEST_F(UdpClientTests, testWritingWhileReceiving)
   udp_client_.startReceiving(RECEIVE_TIMEOUT);
 
   std::string str = "Hello!";
-  std::vector<char> write_buf;
+  DynamicSizeRawData write_buf;
   std::copy(str.begin(), str.end(), std::back_inserter(write_buf));
   udp_client_.write(write_buf);
 

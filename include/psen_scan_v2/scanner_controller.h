@@ -22,14 +22,15 @@
 #include <iostream>
 #include <memory>
 #include <string>
+
 #include <gtest/gtest_prod.h>
 
 #include "psen_scan_v2/msg_decoder.h"
 #include "psen_scan_v2/controller_state_machine.h"
 #include "psen_scan_v2/udp_client.h"
-#include "psen_scan_v2/controller_state_machine.h"
-#include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/scanner_configuration.h"
+#include "psen_scan_v2/start_request.h"
+#include "psen_scan_v2/stop_request.h"
 
 namespace psen_scan_v2
 {
@@ -51,6 +52,7 @@ public:
 
   void handleError(const std::string& error_msg);
   void sendStartRequest();
+  void sendStopRequest();
 
 private:
   ScannerConfiguration scanner_config_;
@@ -64,6 +66,7 @@ private:
   FRIEND_TEST(ScannerControllerTest, test_start_method_calls_correct_state_machine_event);
   FRIEND_TEST(ScannerControllerTest, test_stop_method_calls_correct_state_machine_event);
   FRIEND_TEST(ScannerControllerTest, test_udp_clients_listen_before_sending_start_request);
+  FRIEND_TEST(ScannerControllerTest, testStopRequestSending);
 };
 
 typedef ScannerControllerT<> ScannerController;
@@ -71,7 +74,8 @@ typedef ScannerControllerT<> ScannerController;
 template <typename TCSM, typename TUCI>
 ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& scanner_config)
   : scanner_config_(scanner_config)
-  , state_machine_(std::bind(&ScannerControllerT::sendStartRequest, this))
+  , state_machine_(std::bind(&ScannerControllerT::sendStartRequest, this),
+                   std::bind(&ScannerControllerT::sendStopRequest, this))
   , control_msg_decoder_(std::bind(&TCSM::processStartReplyReceivedEvent, &state_machine_),
                          std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1))
   , data_msg_decoder_(std::bind(&TCSM::processStartReplyReceivedEvent, &state_machine_),
@@ -107,7 +111,6 @@ void ScannerControllerT<TCSM, TUCI>::start()
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::stop()
 {
-  // TODO: Impl. sending of StopRequest
   state_machine_.processStopRequestEvent();
 }
 
@@ -118,7 +121,14 @@ void ScannerControllerT<TCSM, TUCI>::sendStartRequest()
   data_udp_client_.startReceiving(RECEIVE_TIMEOUT);
   StartRequest start_request(scanner_config_, DEFAULT_SEQ_NUMBER);
 
-  control_udp_client_.write(start_request.toRawType());
+  control_udp_client_.write(start_request.toRawData());
+}
+
+template <typename TCSM, typename TUCI>
+void ScannerControllerT<TCSM, TUCI>::sendStopRequest()
+{
+  StopRequest stop_request;
+  control_udp_client_.write(stop_request.toRawData());
 }
 
 }  // namespace psen_scan_v2

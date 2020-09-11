@@ -41,7 +41,7 @@ protected:
     : decoder_(std::bind(&MockCallbackHolder::start_reply_callback, &mock_),
                std::bind(&MockCallbackHolder::error_callback, &mock_, std::placeholders::_1))
     , reply_(ScannerReplyMsg::getStartOpCode(), DEFAULT_RESULT_CODE)
-    , reply_raw_(reply_.toCharArray())
+    , reply_raw_(reply_.toRawData())
   {
     std::copy(reply_raw_.begin(), reply_raw_.end(), raw_data_.begin());
   }
@@ -51,7 +51,7 @@ protected:
   MsgDecoder decoder_;
   ScannerReplyMsg reply_;
   ScannerReplyMsg::RawType reply_raw_;
-  RawScannerData raw_data_;
+  MaxSizeRawData raw_data_;
 };
 
 /**
@@ -89,7 +89,7 @@ TEST_F(MsgDecoderTest, decodeStartReplyWrongSizeNotImplemented)
 TEST_F(MsgDecoderTest, decodeWrongOpCodeNotImplemented)
 {
   ScannerReplyMsg reply{ ScannerReplyMsg::getStartOpCode() + 1, DEFAULT_RESULT_CODE };
-  ScannerReplyMsg::RawType reply_raw{ reply.toCharArray() };
+  ScannerReplyMsg::RawType reply_raw{ reply.toRawData() };
   std::copy(reply_raw.begin(), reply_raw.end(), raw_data_.begin());
 
   EXPECT_CALL(mock_, start_reply_callback()).Times(0);

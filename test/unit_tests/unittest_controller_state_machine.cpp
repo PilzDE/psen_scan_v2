@@ -31,15 +31,30 @@ class ControllerStateMachineTest : public ::testing::Test
 {
 public:
   MOCK_METHOD0(send_start_request_callbackTest, void());
+  MOCK_METHOD0(send_stop_request_callbackTest, void());
 };
 
-TEST_F(ControllerStateMachineTest, triggerSendStartRequestCallbackTest)
+TEST_F(ControllerStateMachineTest, triggerSendRequestCallbackTest)
 {
   EXPECT_CALL(*this, send_start_request_callbackTest()).Times(1);
 
-  ControllerStateMachine sm(std::bind(&ControllerStateMachineTest::send_start_request_callbackTest, this));
+  ControllerStateMachine sm(std::bind(&ControllerStateMachineTest::send_start_request_callbackTest, this),
+                            std::bind(&ControllerStateMachineTest::send_stop_request_callbackTest, this));
 
   sm.processStartRequestEvent();
+}
+
+TEST_F(ControllerStateMachineTest, testThatStopRequestCallbackIsCalled)
+{
+  EXPECT_CALL(*this, send_start_request_callbackTest()).Times(1);
+  EXPECT_CALL(*this, send_stop_request_callbackTest()).Times(1);
+
+  ControllerStateMachine sm(std::bind(&ControllerStateMachineTest::send_start_request_callbackTest, this),
+                            std::bind(&ControllerStateMachineTest::send_stop_request_callbackTest, this));
+
+  sm.processStartRequestEvent();
+  sm.processStartReplyReceivedEvent();
+  sm.processStopRequestEvent();
 }
 
 }  // namespace psen_scan_v2_test

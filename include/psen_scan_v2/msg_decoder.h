@@ -48,7 +48,7 @@ public:
    * @param data Container holding the received data from the scanner.
    * @param bytes_received Numbers of data received from the scanner.
    */
-  void decodeAndDispatch(const RawScannerData& data, const std::size_t& bytes_received);
+  void decodeAndDispatch(const MaxSizeRawData& data, const std::size_t& bytes_received);
 
 private:
   StartReplyCallback start_reply_callback_;
@@ -60,7 +60,7 @@ inline MsgDecoder::MsgDecoder(const StartReplyCallback& start_reply_callback, co
 {
 }
 
-inline void MsgDecoder::decodeAndDispatch(const RawScannerData& data, const std::size_t& bytes_received)
+inline void MsgDecoder::decodeAndDispatch(const MaxSizeRawData& data, const std::size_t& bytes_received)
 {
   if (bytes_received == REPLY_MSG_FROM_SCANNER_SIZE)  // Check if this could be a reply
   {

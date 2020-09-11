@@ -24,6 +24,7 @@
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/scanner_controller.h"
 #include "psen_scan_v2/start_request.h"
+#include "psen_scan_v2/stop_request.h"
 
 using namespace psen_scan_v2;
 
@@ -75,10 +76,22 @@ TEST_F(ScannerControllerTest, test_udp_clients_listen_before_sending_start_reque
   Expectation control_udp_client_start_receiving =
       EXPECT_CALL(scanner_controller_.control_udp_client_, startReceiving(_));
   Expectation data_udp_client_start_receiving = EXPECT_CALL(scanner_controller_.data_udp_client_, startReceiving(_));
-  EXPECT_CALL(scanner_controller_.control_udp_client_, write(start_request.toRawType()))
+  EXPECT_CALL(scanner_controller_.control_udp_client_, write(start_request.toRawData()))
       .After(control_udp_client_start_receiving, data_udp_client_start_receiving);
 
   scanner_controller_.sendStartRequest();
+}
+
+TEST_F(ScannerControllerTest, testStopRequestSending)
+{
+  using ::testing::_;
+  using ::testing::Expectation;
+
+  StopRequest stop_request;
+
+  EXPECT_CALL(scanner_controller_.control_udp_client_, write(stop_request.toRawData())).Times(1);
+
+  scanner_controller_.sendStopRequest();
 }
 
 TEST_F(ScannerControllerTest, test_handle_error_no_throw)

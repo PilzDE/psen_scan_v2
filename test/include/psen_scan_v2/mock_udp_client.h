@@ -35,7 +35,7 @@ public:
 public:
   MOCK_METHOD0(close, void());
   MOCK_METHOD1(startReceiving, void(const std::chrono::high_resolution_clock::duration timeout));
-  MOCK_METHOD1(write, void(const std::vector<char>& data));
+  MOCK_METHOD1(write, void(const psen_scan_v2::DynamicSizeRawData& data));
 };
 
 }  // namespace psen_scan_v2_test

@@ -16,14 +16,17 @@
 #define PSEN_SCAN_V2_RAW_SCANNER_DATA_H
 
 #include <array>
+#include <vector>
 
 namespace psen_scan_v2
 {
 template <std::size_t NumberOfBytes>
-using RawDataContainer = std::array<char, NumberOfBytes>;
+using FixedSizeRawData = std::array<char, NumberOfBytes>;
 
 static constexpr std::size_t MAX_UDP_DATA_SIZE_IN_BYTES{ 65507 };
-using RawScannerData = RawDataContainer<MAX_UDP_DATA_SIZE_IN_BYTES>;
+using MaxSizeRawData = FixedSizeRawData<MAX_UDP_DATA_SIZE_IN_BYTES>;
+
+using DynamicSizeRawData = std::vector<char>;
 
 }  // namespace psen_scan_v2
 

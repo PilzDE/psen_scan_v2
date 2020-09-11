@@ -50,13 +50,13 @@ TEST(ScannerReplyMsgTest, testGetStartOpCode)
   EXPECT_EQ(OP_CODE_START, ScannerReplyMsg::getStartOpCode());
 }
 
-TEST(ScannerReplyMsgTest, testToCharArray)
+TEST(ScannerReplyMsgTest, testtoRawData)
 {
   const uint32_t op_code{ OP_CODE_START };
   const uint32_t res_code{ RES_CODE_ACCEPTED };
 
   ScannerReplyMsg msg(op_code, res_code);
-  ScannerReplyMsg::RawType raw_msg{ msg.toCharArray() };
+  ScannerReplyMsg::RawType raw_msg{ msg.toRawData() };
 
   boost::crc_32_type crc;
   crc.process_bytes(&raw_msg[sizeof(uint32_t)], raw_msg.size() - sizeof(uint32_t));
@@ -74,7 +74,7 @@ TEST(ScannerReplyMsgTest, testCalcCRC)
   ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
 
   // Calculate crc checksum from raw data
-  ScannerReplyMsg::RawType raw_msg{ msg.toCharArray() };
+  ScannerReplyMsg::RawType raw_msg{ msg.toRawData() };
   boost::crc_32_type crc;
   crc.process_bytes(&raw_msg[sizeof(uint32_t)], raw_msg.size() - sizeof(uint32_t));
 
@@ -83,11 +83,11 @@ TEST(ScannerReplyMsgTest, testCalcCRC)
 
 TEST(ScannerReplyMsgTest, testFromRawDataValidCRC)
 {
-  // Use raw data generated from toCharArray()
+  // Use raw data generated from toRawData()
   ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
-  ScannerReplyMsg::RawType raw_msg{ msg.toCharArray() };
+  ScannerReplyMsg::RawType raw_msg{ msg.toRawData() };
 
-  RawScannerData data;
+  MaxSizeRawData data;
   std::copy(raw_msg.begin(), raw_msg.end(), data.begin());
 
   ScannerReplyMsg msg_from_raw{ ScannerReplyMsg::fromRawData(data) };
@@ -100,12 +100,12 @@ TEST(ScannerReplyMsgTest, testFromRawDataValidCRC)
 
 TEST(ScannerReplyMsgTest, testFromRawDataInvalidCRC)
 {
-  // Use raw data generated from toCharArray()
+  // Use raw data generated from toRawData()
   ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
-  ScannerReplyMsg::RawType raw_msg{ msg.toCharArray() };
+  ScannerReplyMsg::RawType raw_msg{ msg.toRawData() };
   raw_msg[0] += 0x01;  // alter crc checksum
 
-  RawScannerData data;
+  MaxSizeRawData data;
   std::copy(raw_msg.begin(), raw_msg.end(), data.begin());
 
   EXPECT_THROW(ScannerReplyMsg::fromRawData(data), CRCMismatch);
