@@ -49,10 +49,6 @@ public:
   RawType toRawType() const;
 
 private:
-  template <typename T>
-  void write(std::ostringstream& os, const T& data) const;
-
-private:
   uint32_t crc_{ 0 }; /**< Will be filled in constructor */
   uint32_t seq_number_;
   uint64_t const RESERVED_{ 0 };           /**< Use all zeros */

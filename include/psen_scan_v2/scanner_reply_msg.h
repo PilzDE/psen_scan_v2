@@ -25,6 +25,8 @@
 
 #include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/crc_mismatch_exception.h"
+#include "psen_scan_v2/raw_processing.h"
+#include "psen_scan_v2/decode_exception.h"
 
 namespace psen_scan_v2
 {
@@ -169,10 +171,10 @@ inline ScannerReplyMsg::RawType ScannerReplyMsg::toCharArray()
 
   uint32_t crc{ calcCRC(*this) };
 
-  write(os, crc);
-  write(os, reserved_);
-  write(os, opcode_);
-  write(os, res_code_);
+  raw_processing::write(os, crc);
+  raw_processing::write(os, reserved_);
+  raw_processing::write(os, opcode_);
+  raw_processing::write(os, res_code_);
 
   // TODO check limits
   std::string data_str(os.str());
@@ -182,13 +184,6 @@ inline ScannerReplyMsg::RawType ScannerReplyMsg::toCharArray()
   std::copy(data_str.begin(), data_str.end(), ret_val.begin());
 
   return ret_val;
-}
-
-template <typename T>
-inline void ReplyMsgFromScanner::write(std::ostringstream& os, const T& data) const
-{
-  os.write((char*)(&data), sizeof(T));
-  return;
 }
 
 }  // namespace psen_scan_v2
