@@ -35,7 +35,7 @@ public:
    * @param host_udp_port_data Port on which monitoring frames (scans) should be received.
    * @param host_udp_port_control Port used to send commands (start/stop) and receive the corresponding replies.
    * @param device_ip IP address of the scanner.
-   * @param start_angle Start angle of measurement (in radian).
+   * @param start_angle Start angle of measurement (in radian, scanner-zero = zero on the left).
    * @param end_angle End angle of measurement (in radian).
    */
   ScannerConfiguration(const std::string& host_ip,

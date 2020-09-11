@@ -43,7 +43,6 @@ public:
   std::string getFrameID() const;
   double getAngleStart() const;
   double getAngleEnd() const;
-  double getXAxisRotation() const;
 
 private:
   template <class T>
@@ -68,8 +67,6 @@ private:
   double angle_start_;
   //! @brief nd angle of measurement (in radian).
   double angle_end_;
-  //! @brief Rotation of x-axis arround the center (in radian).
-  double x_axis_rotation_;
 };
 }  // namespace psen_scan_v2
 

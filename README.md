@@ -4,11 +4,13 @@
 
 ## Package: psen_scan_v2
 
-The **psen_scan_v2** package is a ROS integration of the PSENscan safety laser scanner product. It allows for an easy integration of the laser scanner data into your ROS Environment. Using the standard [sensor_msgs/LaserScan][] message format ensures compatibility with other laserscan-post-processing nodes such as [gmapping][]. For a general overview and link collection we refer to the [wiki page](http://wiki.ros.org/psen_scan_v2).
+The **psen_scan_v2** package is a ROS integration of the PSENscan safety laser scanner product. It lets you integrate the laser scanner data into your ROS Environment easily. Using the standard [sensor_msgs/LaserScan][] message format ensures compatibility with other laserscan-post-processing nodes such as [gmapping][]. For a general overview and link collection we refer to the [wiki page](http://wiki.ros.org/psen_scan_v2).
 
 <p align="center">
 <img src="img/PSENscan.jpg" alt="PILZ safety laser scanner" title="PILZ safety laser scanner">
 </p>
+
+PSENscan firmware >= 3.1.0 is supported on the following models:
 
 | Type | Features | Order number |
 |------|----------|--------------|
@@ -31,7 +33,7 @@ The **psen_scan_v2** package is a ROS integration of the PSENscan safety laser s
 ## Installation
 To use the package, you can install prebuilt packages with
 ```
-sudo apt install ros-melodic-psen-scan
+sudo apt install ros-melodic-psen-scan-v2
 ```
 
 ## Migration
@@ -82,14 +84,11 @@ IP-Address of safety laser scanner.
 _frame_id_ (_string_, default: "scanner")<br/>
 Identifier used for transformations within ROS environment.
 
-_angle_start_ (_double_, default: 0)<br/>
+_angle_start_ (_double_, default: -2.40 (= -137.5 deg))<br/>
 Start angle of measurement. (Radian)
 
-_angle_end_ (_double_, default: 4.79965544298 (=275.0 deg))<br/>
+_angle_end_ (_double_, default: 2.40 (= 137.5 deg))<br/>
 End angle of measurement. (Radian)
-
-_x_axis_rotation_ (_double_, default: 2.39982772149 (=137.5 deg))<br/>
-Clockwise rotation of the x-axis around the center in radian.
 
 ## Usage
 To start reading from the safety laser scanner and publishing complete scans execute `roslaunch psen_scan_v2 psen_scan.launch` in a command line. This will launch the ROS Node with the default configuration.

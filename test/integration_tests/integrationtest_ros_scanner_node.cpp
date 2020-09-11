@@ -48,7 +48,6 @@ static const std::string SCANNER_STARTED{ "SCANNER_STARTED" };
 static const std::string SCANNER_STOPPED{ "SCANNER_STOPPED" };
 
 static constexpr double DEFAULT_X_AXIS_ROTATION{ degreeToRadian(137.5) };
-
 class SubscriberMock
 {
 public:
