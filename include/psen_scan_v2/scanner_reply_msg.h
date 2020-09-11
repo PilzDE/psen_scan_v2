@@ -113,7 +113,6 @@ template <typename T>
 inline void ScannerReplyMsg::processBytes(boost::crc_32_type& crc_32, const T& data)
 {
   crc_32.process_bytes(&data, sizeof(T));
-  return;
 }
 
 inline uint32_t ScannerReplyMsg::getStartOpCode()
@@ -155,7 +154,6 @@ inline void ScannerReplyMsg::read(std::istringstream& is, T& data)
   // boost::iostreams::stream<Device> stream((char*)&data, sizeof(DataReply::MemoryFormat));
 
   is.read(reinterpret_cast<char*>(&data), sizeof(T));
-  return;
 }
 
 inline ScannerReplyMsgType ScannerReplyMsg::type() const

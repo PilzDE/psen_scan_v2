@@ -92,7 +92,6 @@ void MockUDPServer::handleSend(const boost::system::error_code& error, std::size
   if (error || bytes_transferred == 0)
   {
     std::cerr << "UDP server mock failed to send data. Error msg: " << error.message() << std::endl;
-    return;
   }
 }
 

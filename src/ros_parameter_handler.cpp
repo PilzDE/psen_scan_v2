@@ -60,7 +60,6 @@ void RosParameterHandler::getRequiredParamFromParamServer(const std::string& key
   {
     throw WrongParameterType("Parameter " + key + " has wrong datatype on parameter server.");
   }
-  return;
 }
 
 template <class T>
