@@ -16,6 +16,8 @@
 #ifndef PSEN_SCAN_V2_TEST_SCANNER_CONTROLLER_MOCK_H
 #define PSEN_SCAN_V2_TEST_SCANNER_CONTROLLER_MOCK_H
 
+#include <future>
+
 #include <gmock/gmock.h>
 
 #include "psen_scan_v2/scanner_configuration.h"
@@ -28,7 +30,7 @@ class ScannerControllerMock
 public:
   ScannerControllerMock(const psen_scan_v2::ScannerConfiguration& scanner_config){};
   MOCK_METHOD0(start, void());
-  MOCK_METHOD0(stop, void());
+  MOCK_METHOD0(stop, std::future<void>());
   MOCK_METHOD1(handleError, void(const std::string& error_msg));
   MOCK_METHOD0(sendStartRequest, void());
 };

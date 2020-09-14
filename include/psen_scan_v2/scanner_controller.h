@@ -22,14 +22,17 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <future>
+#include <sstream>
+
 #include <gtest/gtest_prod.h>
 
 #include "psen_scan_v2/msg_decoder.h"
 #include "psen_scan_v2/controller_state_machine.h"
 #include "psen_scan_v2/udp_client.h"
-#include "psen_scan_v2/controller_state_machine.h"
-#include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/scanner_configuration.h"
+#include "psen_scan_v2/start_request.h"
+#include "psen_scan_v2/stop_request.h"
 
 namespace psen_scan_v2
 {
@@ -37,9 +40,12 @@ namespace psen_scan_v2
 static constexpr unsigned short DATA_PORT_OF_SCANNER_DEVICE{ 2000 };
 static constexpr unsigned short CONTROL_PORT_OF_SCANNER_DEVICE{ 3000 };
 
-static constexpr std::chrono::milliseconds RECEIVE_TIMEOUT{ 1000 };
+static constexpr std::chrono::milliseconds RECEIVE_TIMEOUT_CONTROL{ 1000 };
+static constexpr std::chrono::milliseconds RECEIVE_TIMEOUT_DATA{ 1000 };
 
 static constexpr uint32_t DEFAULT_SEQ_NUMBER{ 0 };
+
+using std::placeholders::_1;
 
 template <typename TCSM = ControllerStateMachine, typename TUCI = UdpClientImpl>
 class ScannerControllerT
@@ -47,10 +53,15 @@ class ScannerControllerT
 public:
   ScannerControllerT(const ScannerConfiguration& scanner_config);
   void start();
-  void stop();
+  std::future<void> stop();
 
   void handleError(const std::string& error_msg);
   void sendStartRequest();
+  void sendStopRequest();
+
+private:
+  void handleStartReplyTimeout(const std::string& error_str);
+  void handleStopReplyTimeout(const std::string& error_str);
 
 private:
   ScannerConfiguration scanner_config_;
@@ -60,10 +71,18 @@ private:
   TUCI control_udp_client_;
   TUCI data_udp_client_;
 
+  void notifyStoppedState();
+
+  std::promise<void> stopped_;
+
   friend class ScannerControllerTest;
-  FRIEND_TEST(ScannerControllerTest, test_start_method_calls_correct_state_machine_event);
-  FRIEND_TEST(ScannerControllerTest, test_stop_method_calls_correct_state_machine_event);
-  FRIEND_TEST(ScannerControllerTest, test_udp_clients_listen_before_sending_start_request);
+  FRIEND_TEST(ScannerControllerTest, testStartRequestEvent);
+  FRIEND_TEST(ScannerControllerTest, testStartRequestSending);
+  FRIEND_TEST(ScannerControllerTest, testStopRequestEvent);
+  FRIEND_TEST(ScannerControllerTest, testStopRequestSending);
+  FRIEND_TEST(ScannerControllerTest, testHandleStartReplyTimeout);
+  FRIEND_TEST(ScannerControllerTest, testHandleStopReplyTimeout);
+  FRIEND_TEST(ScannerControllerTest, testStopRequestEventWithFutureUsage);
 };
 
 typedef ScannerControllerT<> ScannerController;
@@ -71,10 +90,14 @@ typedef ScannerControllerT<> ScannerController;
 template <typename TCSM, typename TUCI>
 ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& scanner_config)
   : scanner_config_(scanner_config)
-  , state_machine_(std::bind(&ScannerControllerT::sendStartRequest, this))
+  , state_machine_(std::bind(&ScannerControllerT::sendStartRequest, this),
+                   std::bind(&ScannerControllerT::sendStopRequest, this),
+                   std::bind(&ScannerControllerT::notifyStoppedState, this))
   , control_msg_decoder_(std::bind(&TCSM::processStartReplyReceivedEvent, &state_machine_),
+                         std::bind(&TCSM::processStopReplyReceivedEvent, &state_machine_),
                          std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1))
   , data_msg_decoder_(std::bind(&TCSM::processStartReplyReceivedEvent, &state_machine_),
+                      std::bind(&TCSM::processStopReplyReceivedEvent, &state_machine_),
                       std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1))
   , control_udp_client_(
         std::bind(&MsgDecoder::decodeAndDispatch, &control_msg_decoder_, std::placeholders::_1, std::placeholders::_2),
@@ -105,20 +128,54 @@ void ScannerControllerT<TCSM, TUCI>::start()
 }
 
 template <typename TCSM, typename TUCI>
-void ScannerControllerT<TCSM, TUCI>::stop()
+std::future<void> ScannerControllerT<TCSM, TUCI>::stop()
 {
-  // TODO: Impl. sending of StopRequest
   state_machine_.processStopRequestEvent();
+  return stopped_.get_future();
 }
 
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::sendStartRequest()
 {
-  control_udp_client_.startReceiving(RECEIVE_TIMEOUT);
-  data_udp_client_.startReceiving(RECEIVE_TIMEOUT);
+  control_udp_client_.startAsyncReceiving(
+      ReceiveMode::single, std::bind(&ScannerControllerT::handleStartReplyTimeout, this, _1), RECEIVE_TIMEOUT_CONTROL);
+  data_udp_client_.startAsyncReceiving();
   StartRequest start_request(scanner_config_, DEFAULT_SEQ_NUMBER);
 
-  control_udp_client_.write(start_request.toRawType());
+  control_udp_client_.write(start_request.toRawData());
+}
+
+template <typename TCSM, typename TUCI>
+void ScannerControllerT<TCSM, TUCI>::handleStartReplyTimeout(const std::string& error_str)
+{
+  PSENSCAN_ERROR("ScannerController",
+                 "Timeout while waiting for start reply message from scanner | Error message: " << error_str);
+}
+
+template <typename TCSM, typename TUCI>
+void ScannerControllerT<TCSM, TUCI>::handleStopReplyTimeout(const std::string& error_str)
+{
+  PSENSCAN_ERROR("ScannerController",
+                 "Timeout while waiting for stop reply message from scanner | Error message: " << error_str);
+}
+
+template <typename TCSM, typename TUCI>
+void ScannerControllerT<TCSM, TUCI>::sendStopRequest()
+{
+  control_udp_client_.startAsyncReceiving(
+      ReceiveMode::single, std::bind(&ScannerControllerT::handleStopReplyTimeout, this, _1), RECEIVE_TIMEOUT_CONTROL);
+  StopRequest stop_request;
+  control_udp_client_.write(stop_request.toRawData());
+}
+
+template <typename TCSM, typename TUCI>
+void ScannerControllerT<TCSM, TUCI>::notifyStoppedState()
+{
+  PSENSCAN_DEBUG("ScannerController", "Stopped() called.");
+  stopped_.set_value();
+
+  // Reinitialize
+  stopped_ = std::promise<void>();
 }
 
 }  // namespace psen_scan_v2

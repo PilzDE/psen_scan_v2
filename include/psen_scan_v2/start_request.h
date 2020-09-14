@@ -20,6 +20,7 @@
 #include <string>
 
 #include "psen_scan_v2/scanner_configuration.h"
+#include "psen_scan_v2/raw_scanner_data.h"
 
 namespace psen_scan_v2
 {
@@ -45,9 +46,8 @@ public:
   //! @returns the CRC of the start request.
   uint32_t getCRC() const;
 
-  using RawType = std::vector<char>;
-  //! @brief Serializes the start request into a raw data which can be send to the scanner.
-  RawType toRawType() const;
+  //! @brief Serializes the request into raw data which can be send to the scanner.
+  DynamicSizeRawData toRawData() const;
 
 private:
   uint32_t crc_{ 0 }; /**< Will be filled in constructor */

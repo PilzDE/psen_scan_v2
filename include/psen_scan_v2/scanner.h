@@ -87,7 +87,10 @@ void ScannerT<SC>::start()
 template <typename SC>
 void ScannerT<SC>::stop()
 {
-  scanner_controller_.stop();
+  std::future<void> stop_finished_barrier = scanner_controller_.stop();
+  PSENSCAN_INFO("Scanner", "Waiting for scanner to stop...");
+  stop_finished_barrier.wait();
+  PSENSCAN_INFO("Scanner", "Scanner has stopped.");
 }
 
 template <typename SC>
