@@ -63,9 +63,9 @@ private:
   TUCI data_udp_client_;
 
   friend class ScannerControllerTest;
-  FRIEND_TEST(ScannerControllerTest, test_start_method_calls_correct_state_machine_event);
-  FRIEND_TEST(ScannerControllerTest, test_stop_method_calls_correct_state_machine_event);
-  FRIEND_TEST(ScannerControllerTest, test_udp_clients_listen_before_sending_start_request);
+  FRIEND_TEST(ScannerControllerTest, testStartRequestEvent);
+  FRIEND_TEST(ScannerControllerTest, testStartRequestSending);
+  FRIEND_TEST(ScannerControllerTest, testStopRequestEvent);
   FRIEND_TEST(ScannerControllerTest, testStopRequestSending);
 };
 
