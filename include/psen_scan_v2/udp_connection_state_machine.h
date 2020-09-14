@@ -63,17 +63,17 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
 
   struct states
   {
-    struct init : public msm::front::state<>
+    struct idle : public msm::front::state<>
     {
       template <class Event,class FSM>
       void on_entry(Event const& ,FSM&)
       {
-        PSENSCAN_DEBUG("StateMachine", "Entering: InitState");
+        PSENSCAN_DEBUG("StateMachine", "Entering: IdleState");
       }
       template <class Event,class FSM>
       void on_exit(Event const&,FSM& )
       {
-        PSENSCAN_DEBUG("StateMachine", "Leaving: InitState");
+        PSENSCAN_DEBUG("StateMachine", "Leaving: IdleState");
       }
     };
 
@@ -133,8 +133,8 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
     send_stop_request_callback_();
   }
 
-  typedef states::init initial_state;
-  //typedef typename states::init initial_state;
+  typedef states::idle initial_state;
+  //typedef typename states::idle initial_state;
 
   typedef udp_connection_state_machine_ m;  // makes transition table cleaner
   typedef events e;  // makes transition table cleaner
@@ -144,11 +144,11 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
   struct transition_table : mpl::vector<
     //    Start                                 Event                            Next           			           Action	                             Guard
     //  +--------------------------------+--------------------------------+-------------------------------+-----------------------------------+-------+
-    a_row < s::init,                       e::start_request,                 s::wait_for_start_reply,      &m::action_send_start_request   >,
+    a_row < s::idle,                       e::start_request,                 s::wait_for_start_reply,      &m::action_send_start_request   >,
      _row < s::wait_for_start_reply,       e::start_reply_received,          s::wait_for_monitoring_frame                                  >,
      _row < s::wait_for_monitoring_frame,  e::monitoring_frame_received,     s::wait_for_monitoring_frame                                  >,
-    a_row < s::wait_for_monitoring_frame,  e::stop_request,                  s::wait_for_stop_reply,      &m::action_send_stop_request     >,
-     _row < s::wait_for_stop_reply,        e::stop_reply_received,           s::init                                                       >
+    a_row < s::wait_for_monitoring_frame,  e::stop_request,                  s::wait_for_stop_reply,       &m::action_send_stop_request    >,
+     _row < s::wait_for_stop_reply,        e::stop_reply_received,           s::idle                                                       >
     //  +--------------------------------+--------------------------------+------------------------------------+------------------------------------+-------+
   > {};
   // clang-format on
