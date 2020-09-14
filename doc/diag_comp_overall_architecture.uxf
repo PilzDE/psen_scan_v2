@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?><diagram program="umlet" version="13.3">
-  <zoom_level>7</zoom_level>
+  <zoom_level>11</zoom_level>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>1015</x>
-      <y>322</y>
-      <w>133</w>
-      <h>196</h>
+      <x>1485</x>
+      <y>506</y>
+      <w>209</w>
+      <h>308</h>
     </coordinates>
     <panel_attributes>symbol=component
 style=wordwrap
@@ -19,10 +19,10 @@ Takes care of the creation/construction of a complete LaserScan (360 degree).</p
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>378</x>
-      <y>868</y>
-      <w>525</w>
-      <h>56</h>
+      <x>484</x>
+      <y>1364</y>
+      <w>825</w>
+      <h>88</h>
     </coordinates>
     <panel_attributes>symbol=component
 bg=yellow
@@ -33,10 +33,10 @@ Scanner device</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>630</x>
-      <y>812</y>
-      <w>84</w>
-      <h>70</h>
+      <x>880</x>
+      <y>1276</y>
+      <w>132</w>
+      <h>110</h>
     </coordinates>
     <panel_attributes>lt=&lt;..
 UDP package</panel_attributes>
@@ -45,10 +45,10 @@ UDP package</panel_attributes>
   <element>
     <id>UMLActor</id>
     <coordinates>
-      <x>595</x>
+      <x>825</x>
       <y>0</y>
-      <w>84</w>
-      <h>91</h>
+      <w>132</w>
+      <h>143</h>
     </coordinates>
     <panel_attributes>User
 (ROS agnostic)
@@ -58,10 +58,10 @@ UDP package</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>378</x>
-      <y>721</y>
-      <w>525</w>
-      <h>98</h>
+      <x>484</x>
+      <y>1133</y>
+      <w>825</w>
+      <h>154</h>
     </coordinates>
     <panel_attributes>symbol=component
 style=wordwrap
@@ -75,10 +75,10 @@ The software component of this abstraction level deliveres data as simple byte v
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>476</x>
-      <y>679</y>
-      <w>105</w>
-      <h>56</h>
+      <x>638</x>
+      <y>1067</y>
+      <w>165</w>
+      <h>88</h>
     </coordinates>
     <panel_attributes>lt=&lt;..
 byte vector/buffer</panel_attributes>
@@ -87,10 +87,10 @@ byte vector/buffer</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>378</x>
-      <y>322</y>
-      <w>532</w>
-      <h>196</h>
+      <x>484</x>
+      <y>506</y>
+      <w>836</w>
+      <h>308</h>
     </coordinates>
     <panel_attributes>symbol=component
 style=wordwrap
@@ -115,160 +115,150 @@ The state machine consists roughly of the following transitions:
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>126</x>
-      <y>308</y>
-      <w>77</w>
-      <h>28</h>
+      <x>176</x>
+      <y>484</y>
+      <w>121</w>
+      <h>44</h>
     </coordinates>
-    <panel_attributes>Idle
-group=1</panel_attributes>
+    <panel_attributes>Idle</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>126</x>
-      <y>371</y>
-      <w>77</w>
-      <h>28</h>
+      <x>176</x>
+      <y>583</y>
+      <w>121</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>Wait for
-start reply
-group=1</panel_attributes>
+start reply</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>154</x>
-      <y>329</y>
-      <w>56</w>
-      <h>56</h>
+      <x>220</x>
+      <y>517</y>
+      <w>88</w>
+      <h>88</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 Start
-request
-group=1</panel_attributes>
+request</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
   </element>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>126</x>
-      <y>434</y>
-      <w>77</w>
-      <h>49</h>
+      <x>176</x>
+      <y>682</y>
+      <w>121</w>
+      <h>77</h>
     </coordinates>
     <panel_attributes>Wait for
 monitoring
-frame
-group=1</panel_attributes>
+frame</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>154</x>
-      <y>392</y>
-      <w>70</w>
-      <h>56</h>
+      <x>220</x>
+      <y>616</y>
+      <w>110</w>
+      <h>88</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 StartReply
-received
-group=1</panel_attributes>
+received</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>154</x>
-      <y>476</y>
-      <w>56</w>
-      <h>56</h>
+      <x>220</x>
+      <y>748</y>
+      <w>88</w>
+      <h>88</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 Stop 
-request
-group=1</panel_attributes>
+request</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
   </element>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>126</x>
-      <y>518</y>
-      <w>77</w>
-      <h>28</h>
+      <x>176</x>
+      <y>814</y>
+      <w>121</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>Wait for
-stop reply
-group=1</panel_attributes>
+stop reply</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>91</x>
-      <y>315</y>
-      <w>175</w>
-      <h>259</h>
+      <x>44</x>
+      <y>495</y>
+      <w>352</w>
+      <h>407</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-m1=StopReply received
-group=1</panel_attributes>
-    <additional_attributes>100.0;330.0;100.0;350.0;10.0;350.0;10.0;10.0;50.0;10.0</additional_attributes>
+m1=StopReply received</panel_attributes>
+    <additional_attributes>170.0;330.0;170.0;350.0;10.0;350.0;10.0;10.0;120.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>196</x>
-      <y>434</y>
-      <w>98</w>
-      <h>49</h>
+      <x>286</x>
+      <y>682</y>
+      <w>154</w>
+      <h>77</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 Monitoring 
 frame
-received
-group=1</panel_attributes>
+received</panel_attributes>
     <additional_attributes>10.0;10.0;50.0;10.0;50.0;50.0;10.0;50.0</additional_attributes>
   </element>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>70</x>
-      <y>203</y>
-      <w>224</w>
-      <h>378</h>
+      <x>11</x>
+      <y>319</y>
+      <w>429</w>
+      <h>594</h>
     </coordinates>
     <panel_attributes>symbol=component
 &lt;&lt;State machine&gt;&gt;
 Scanner Controller
 (possible realization; not fixed)
---
-group=1</panel_attributes>
+--</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>287</x>
-      <y>406</y>
-      <w>105</w>
-      <h>28</h>
+      <x>429</x>
+      <y>638</y>
+      <w>77</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>lt=..
 </panel_attributes>
-    <additional_attributes>130.0;20.0;10.0;20.0</additional_attributes>
+    <additional_attributes>50.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>378</x>
-      <y>133</y>
-      <w>532</w>
-      <h>147</h>
+      <x>484</x>
+      <y>209</y>
+      <w>836</w>
+      <h>231</h>
     </coordinates>
     <panel_attributes>symbol=component
 style=wordwrap
@@ -290,10 +280,10 @@ This software component represents the user API (ROS-agnostic) and consists of t
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>630</x>
-      <y>77</y>
-      <w>21</w>
-      <h>70</h>
+      <x>880</x>
+      <y>121</y>
+      <w>33</w>
+      <h>110</h>
     </coordinates>
     <panel_attributes>lt=&lt;..&gt;
 </panel_attributes>
@@ -302,10 +292,10 @@ This software component represents the user API (ROS-agnostic) and consists of t
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>903</x>
-      <y>406</y>
-      <w>126</w>
-      <h>28</h>
+      <x>1309</x>
+      <y>638</y>
+      <w>198</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>lt=&lt;..
 MonitoringFrame</panel_attributes>
@@ -314,10 +304,10 @@ MonitoringFrame</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>378</x>
-      <y>588</y>
-      <w>245</w>
-      <h>98</h>
+      <x>484</x>
+      <y>924</y>
+      <w>385</w>
+      <h>154</h>
     </coordinates>
     <panel_attributes>symbol=component
 style=wordwrap
@@ -333,10 +323,10 @@ Needs access to the ScannerConfiguration!
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>476</x>
-      <y>511</y>
-      <w>105</w>
-      <h>91</h>
+      <x>638</x>
+      <y>803</y>
+      <w>165</w>
+      <h>143</h>
     </coordinates>
     <panel_attributes>lt=..&gt;
 StartReply
@@ -347,10 +337,10 @@ MonitoringFrame</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>637</x>
-      <y>588</y>
-      <w>273</w>
-      <h>98</h>
+      <x>891</x>
+      <y>924</y>
+      <w>429</w>
+      <h>154</h>
     </coordinates>
     <panel_attributes>symbol=component
 style=wordwrap
@@ -365,10 +355,10 @@ Needs access to the ScannerConfiguration!</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>763</x>
-      <y>679</y>
-      <w>105</w>
-      <h>56</h>
+      <x>1089</x>
+      <y>1067</y>
+      <w>165</w>
+      <h>88</h>
     </coordinates>
     <panel_attributes>lt=..&gt;
 byte vector/buffer</panel_attributes>
@@ -377,10 +367,10 @@ byte vector/buffer</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>763</x>
-      <y>511</y>
-      <w>84</w>
-      <h>91</h>
+      <x>1089</x>
+      <y>803</y>
+      <w>132</w>
+      <h>143</h>
     </coordinates>
     <panel_attributes>lt=&lt;..
 StartRequest
@@ -390,10 +380,10 @@ StopRequest</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>903</x>
-      <y>455</y>
-      <w>126</w>
-      <h>35</h>
+      <x>1309</x>
+      <y>715</y>
+      <w>198</w>
+      <h>55</h>
     </coordinates>
     <panel_attributes>lt=&lt;..
 LaserScan
@@ -403,10 +393,10 @@ LaserScan
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>623</x>
-      <y>273</y>
-      <w>105</w>
-      <h>63</h>
+      <x>869</x>
+      <y>429</y>
+      <w>165</w>
+      <h>99</h>
     </coordinates>
     <panel_attributes>lt=&lt;..
 LaserScan
@@ -416,10 +406,10 @@ LaserScan
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>1015</x>
-      <y>133</y>
-      <w>133</w>
-      <h>147</h>
+      <x>1485</x>
+      <y>209</y>
+      <w>209</w>
+      <h>231</h>
     </coordinates>
     <panel_attributes>symbol=component
 style=wordwrap
@@ -432,10 +422,10 @@ Contains all parameters of the current scanner state.</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>154</x>
-      <y>273</y>
-      <w>14</w>
-      <h>14</h>
+      <x>132</x>
+      <y>429</y>
+      <w>22</w>
+      <h>22</h>
     </coordinates>
     <panel_attributes>type=initial</panel_attributes>
     <additional_attributes/>
@@ -443,12 +433,36 @@ Contains all parameters of the current scanner state.</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>154</x>
-      <y>280</y>
-      <w>21</w>
-      <h>42</h>
+      <x>132</x>
+      <y>440</y>
+      <w>121</w>
+      <h>66</h>
     </coordinates>
     <panel_attributes>lt=-&gt;</panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+    <additional_attributes>10.0;10.0;90.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>77</x>
+      <y>594</y>
+      <w>121</w>
+      <h>264</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+Stop
+Request</panel_attributes>
+    <additional_attributes>90.0;10.0;10.0;10.0;10.0;220.0;90.0;220.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>77</x>
+      <y>517</y>
+      <w>132</w>
+      <h>341</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>100.0;10.0;10.0;60.0;10.0;290.0;90.0;290.0</additional_attributes>
   </element>
 </diagram>
