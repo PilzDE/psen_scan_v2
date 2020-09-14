@@ -46,7 +46,7 @@ class ScannerReplyMsg
 {
 public:
   //! @brief Deserializes the specified data into a reply message.
-  static ScannerReplyMsg fromRawData(const RawScannerData& data);
+  static ScannerReplyMsg fromRawData(const MaxSizeRawData& data);
 
 public:
   /**
@@ -67,8 +67,9 @@ public:
   static uint32_t getStartOpCode();
   static uint32_t calcCRC(const ScannerReplyMsg& msg);
 
-  using RawType = std::array<char, REPLY_MSG_FROM_SCANNER_SIZE>;
-  RawType toCharArray();
+  using RawType = FixedSizeRawData<REPLY_MSG_FROM_SCANNER_SIZE>;
+  //! @brief Serializes the reply into raw data.
+  RawType toRawData() const;
 
 private:
   ScannerReplyMsg() = delete;
@@ -111,7 +112,7 @@ inline ScannerReplyMsg::ScannerReplyMsg(const uint32_t op_code, const uint32_t r
   crc_ = calcCRC(*this);
 }
 
-inline ScannerReplyMsg ScannerReplyMsg::fromRawData(const RawScannerData& data)
+inline ScannerReplyMsg ScannerReplyMsg::fromRawData(const MaxSizeRawData& data)
 {
   ScannerReplyMsg msg{ 0, 0 };
 
@@ -143,7 +144,7 @@ inline ScannerReplyMsgType ScannerReplyMsg::type() const
   return ScannerReplyMsgType::Unknown;
 }
 
-inline ScannerReplyMsg::RawType ScannerReplyMsg::toCharArray()
+inline ScannerReplyMsg::RawType ScannerReplyMsg::toRawData() const
 {
   std::ostringstream os;
 

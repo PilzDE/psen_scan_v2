@@ -38,7 +38,7 @@
 
 namespace psen_scan_v2
 {
-using NewDataHandler = std::function<void(const RawScannerData&, const std::size_t&)>;
+using NewDataHandler = std::function<void(const MaxSizeRawData&, const std::size_t&)>;
 using ErrorHandler = std::function<void(const std::string&)>;
 
 /**
@@ -84,7 +84,7 @@ public:
    *
    * @param data Data which have to be send to the other endpoint.
    */
-  void write(const std::vector<char>& data);
+  void write(const DynamicSizeRawData& data);
 
   /**
    * @brief Closes the UDP connection and stops all pending asynchronous operation.
@@ -106,7 +106,7 @@ private:
   boost::asio::high_resolution_timer timeout_timer_{ io_service_ };
   std::thread io_service_thread_;
 
-  RawScannerData received_data_;
+  MaxSizeRawData received_data_;
 
   std::atomic_bool receive_called_{ false };
   std::condition_variable receive_cv_;
@@ -207,7 +207,7 @@ inline void UdpClientImpl::sendCompleteHandler(const boost::system::error_code& 
   PSENSCAN_DEBUG("UdpClient", "Data successfully send.");
 }
 
-inline void UdpClientImpl::write(const std::vector<char>& data)
+inline void UdpClientImpl::write(const DynamicSizeRawData& data)
 {
   io_service_.post([this, data]() {
     socket_.async_send(boost::asio::buffer(data.data(), data.size()),

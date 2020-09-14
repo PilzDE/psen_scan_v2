@@ -34,7 +34,7 @@ namespace mpl = boost::mpl;
 // clang-format off
 
 
-using SendStartRequestCallback = std::function<void()>;
+using SendRequestCallback = std::function<void()>;
 
 // front-end: define the FSM structure
 /**
@@ -42,12 +42,15 @@ using SendStartRequestCallback = std::function<void()>;
  */
 struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_connection_state_machine_>
 {
-  udp_connection_state_machine_(const SendStartRequestCallback& sr):
-    send_start_request_callback_(sr)
+  udp_connection_state_machine_(const SendRequestCallback& start_request_cb,
+                                const SendRequestCallback& stop_request_cb)
+    : send_start_request_callback_(start_request_cb)
+    , send_stop_request_callback_(stop_request_cb)
   {
   }
 
-  SendStartRequestCallback send_start_request_callback_;
+  SendRequestCallback send_start_request_callback_;
+  SendRequestCallback send_stop_request_callback_;
 
   struct events
   {
@@ -90,12 +93,30 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
 
     struct wait_for_monitoring_frame : public msm::front::state<>
     {
-      // TODO Add logging
+      template <class Event,class FSM>
+      void on_entry(Event const& ,FSM&)
+      {
+        PSENSCAN_DEBUG("StateMachine", "Entering: WaitForMonitoringFrames");
+      }
+      template <class Event,class FSM>
+      void on_exit(Event const&,FSM& )
+      {
+        PSENSCAN_DEBUG("StateMachine", "Leaving: WaitForMonitoringFrames");
+      }
     };
 
     struct wait_for_stop_reply : public msm::front::state<>
     {
-      // TODO Add logging
+      template <class Event,class FSM>
+      void on_entry(Event const& ,FSM&)
+      {
+        PSENSCAN_DEBUG("StateMachine", "Entering: WaitForStopReplyState");
+      }
+      template <class Event,class FSM>
+      void on_exit(Event const&,FSM& )
+      {
+        PSENSCAN_DEBUG("StateMachine", "Leaving: WaitForStopReplyState");
+      }
     };
   };
 
@@ -104,6 +125,12 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
   {
     PSENSCAN_DEBUG("StateMachine", "Action: send_start_request_action");
     send_start_request_callback_();
+  }
+
+  void action_send_stop_request(events::stop_request const&)
+  {
+    PSENSCAN_DEBUG("StateMachine", "Action: send_stop_request_action");
+    send_stop_request_callback_();
   }
 
   typedef states::init initial_state;
@@ -120,7 +147,7 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
     a_row < s::init,                       e::start_request,                 s::wait_for_start_reply,      &m::action_send_start_request   >,
      _row < s::wait_for_start_reply,       e::start_reply_received,          s::wait_for_monitoring_frame                                  >,
      _row < s::wait_for_monitoring_frame,  e::monitoring_frame_received,     s::wait_for_monitoring_frame                                  >,
-     _row < s::wait_for_monitoring_frame,  e::stop_request,                  s::wait_for_stop_reply                                        >,
+    a_row < s::wait_for_monitoring_frame,  e::stop_request,                  s::wait_for_stop_reply,      &m::action_send_stop_request     >,
      _row < s::wait_for_stop_reply,        e::stop_reply_received,           s::init                                                       >
     //  +--------------------------------+--------------------------------+------------------------------------+------------------------------------+-------+
   > {};

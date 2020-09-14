@@ -52,7 +52,7 @@ public:
   void asyncReceive();
 
   template <unsigned int N>
-  void asyncSend(const udp::endpoint& receiver_of_data, const psen_scan_v2::RawDataContainer<N>& data);
+  void asyncSend(const udp::endpoint& receiver_of_data, const psen_scan_v2::FixedSizeRawData<N>& data);
 
 private:
   void handleSend(const boost::system::error_code& error, std::size_t bytes_transferred);
@@ -61,7 +61,7 @@ private:
 private:
   udp::endpoint remote_endpoint_;
 
-  psen_scan_v2::RawScannerData recv_buffer_;
+  psen_scan_v2::MaxSizeRawData recv_buffer_;
 
   boost::asio::io_service io_service_;
   // Prevent the run() method of the io_service from returning when there is no more work.
@@ -97,7 +97,7 @@ void MockUDPServer::handleSend(const boost::system::error_code& error, std::size
 }
 
 template <unsigned int N>
-void MockUDPServer::asyncSend(const udp::endpoint& receiver_of_data, const psen_scan_v2::RawDataContainer<N>& data)
+void MockUDPServer::asyncSend(const udp::endpoint& receiver_of_data, const psen_scan_v2::FixedSizeRawData<N>& data)
 {
   io_service_.post([this, receiver_of_data, data]() {
     socket_.async_send_to(boost::asio::buffer(data),
