@@ -52,21 +52,21 @@ protected:
       scanner_controller_;
 };
 
-TEST_F(ScannerControllerTest, test_start_method_calls_correct_state_machine_event)
+TEST_F(ScannerControllerTest, testStartRequestEvent)
 {
   EXPECT_CALL(scanner_controller_.state_machine_, processStartRequestEvent()).Times(1);
 
   scanner_controller_.start();
 }
 
-TEST_F(ScannerControllerTest, test_stop_method_calls_correct_state_machine_event)
+TEST_F(ScannerControllerTest, testStopRequestEvent)
 {
   EXPECT_CALL(scanner_controller_.state_machine_, processStopRequestEvent()).Times(1);
 
   scanner_controller_.stop();
 }
 
-TEST_F(ScannerControllerTest, test_udp_clients_listen_before_sending_start_request)
+TEST_F(ScannerControllerTest, testStartRequestSending)
 {
   using ::testing::_;
   using ::testing::Expectation;
