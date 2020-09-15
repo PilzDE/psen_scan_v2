@@ -15,7 +15,7 @@
 #ifndef PSEN_SCAN_V2_RAW_PROCESSING_H
 #define PSEN_SCAN_V2_RAW_PROCESSING_H
 
-#include <string>
+#include <sstream>
 
 namespace psen_scan_v2
 {
