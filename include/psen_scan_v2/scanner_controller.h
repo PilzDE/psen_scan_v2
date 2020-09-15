@@ -128,8 +128,8 @@ std::future<void> ScannerControllerT<TCSM, TUCI>::stop()
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::sendStartRequest()
 {
-  control_udp_client_.startReceiving(RECEIVE_TIMEOUT_CONTROL);
-  data_udp_client_.startReceiving(RECEIVE_TIMEOUT_DATA);
+  control_udp_client_.startAsyncReceiving(RECEIVE_TIMEOUT_CONTROL);
+  data_udp_client_.startAsyncReceiving(RECEIVE_TIMEOUT_DATA);
   StartRequest start_request(scanner_config_, DEFAULT_SEQ_NUMBER);
 
   control_udp_client_.write(start_request.toRawData());

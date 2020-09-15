@@ -40,6 +40,7 @@ namespace psen_scan_v2
 {
 using NewDataHandler = std::function<void(const MaxSizeRawData&, const std::size_t&)>;
 using ErrorHandler = std::function<void(const std::string&)>;
+using TimeoutHandler = std::function<void()>;
 
 /**
  * @brief Helper for asynchronously sending and receiving data via UDP.
@@ -50,7 +51,8 @@ public:
   /**
    * @brief Opens an UDP connection.
    *
-   * @note The client does not start listing for new messages until explicitly triggered via startReceiving().
+   * @note The client does not start listing for new messages until explicitly triggered via
+   * startAsyncReceiving().
    *
    * @param data_handler Handler called whenever new data are received.
    * @param error_handler Handler called whenever something wents wrong while receiving data.
@@ -77,7 +79,7 @@ public:
    *
    * @param timeout Specifies how long to wait for new messages.
    */
-  void startReceiving(const std::chrono::high_resolution_clock::duration timeout);
+  void startAsyncReceiving(const std::chrono::high_resolution_clock::duration timeout);
 
   /**
    * @brief Asynchronously sends the specified data to the other endpoint.
@@ -234,7 +236,7 @@ inline void UdpClientImpl::handleReceive(const boost::system::error_code& error_
   asyncReceive(timeout);
 }
 
-inline void UdpClientImpl::startReceiving(const std::chrono::high_resolution_clock::duration timeout)
+inline void UdpClientImpl::startAsyncReceiving(const std::chrono::high_resolution_clock::duration timeout)
 {
   // Function is intended to be called from main thread.
   // To ensure that socket operations only happen on one strand (in this case an implicit one),

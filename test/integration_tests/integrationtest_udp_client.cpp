@@ -87,7 +87,7 @@ TEST_F(UdpClientTests, testAsyncReadOperation)
 {
   EXPECT_CALL(*this, handleNewData(_, DATA_SIZE_BYTES)).WillOnce(ACTION_OPEN_BARRIER_VOID(CLIENT_RECEIVED_DATA));
 
-  udp_client_.startReceiving(RECEIVE_TIMEOUT);
+  udp_client_.startAsyncReceiving(RECEIVE_TIMEOUT);
   sendTestDataToClient();
   BARRIER(CLIENT_RECEIVED_DATA);
 }
@@ -98,10 +98,10 @@ TEST_F(UdpClientTests, testTwoConsecutiveTimeouts)
       .WillOnce(ACTION_OPEN_BARRIER_VOID(TIMEOUT_BARRIER_1))
       .WillOnce(ACTION_OPEN_BARRIER_VOID(TIMEOUT_BARRIER_2));
 
-  udp_client_.startReceiving(RECEIVE_TIMEOUT);
+  udp_client_.startAsyncReceiving(RECEIVE_TIMEOUT);
   BARRIER(TIMEOUT_BARRIER_1);
 
-  udp_client_.startReceiving(RECEIVE_TIMEOUT);
+  udp_client_.startAsyncReceiving(RECEIVE_TIMEOUT);
   BARRIER(TIMEOUT_BARRIER_2);
 }
 
@@ -113,10 +113,10 @@ TEST_F(UdpClientTests, testRestartAfterTimeout)
     EXPECT_CALL(*this, handleNewData(_, _)).WillOnce(ACTION_OPEN_BARRIER_VOID(CLIENT_RECEIVED_DATA));
   }
 
-  udp_client_.startReceiving(RECEIVE_TIMEOUT);
+  udp_client_.startAsyncReceiving(RECEIVE_TIMEOUT);
   BARRIER(TIMEOUT_BARRIER_1);
 
-  udp_client_.startReceiving(RECEIVE_TIMEOUT);
+  udp_client_.startAsyncReceiving(RECEIVE_TIMEOUT);
   sendTestDataToClient();
   BARRIER(CLIENT_RECEIVED_DATA);
 }
@@ -143,7 +143,7 @@ TEST_F(UdpClientTests, testWritingWhileReceiving)
 
   mock_udp_server_.asyncReceive();
 
-  udp_client_.startReceiving(RECEIVE_TIMEOUT);
+  udp_client_.startAsyncReceiving(RECEIVE_TIMEOUT);
 
   std::string str = "Hello!";
   DynamicSizeRawData write_buf;

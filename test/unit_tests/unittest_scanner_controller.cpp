@@ -74,8 +74,9 @@ TEST_F(ScannerControllerTest, testStartRequestSending)
   StartRequest start_request(scanner_config_, 0);
 
   Expectation control_udp_client_start_receiving =
-      EXPECT_CALL(scanner_controller_.control_udp_client_, startReceiving(_));
-  Expectation data_udp_client_start_receiving = EXPECT_CALL(scanner_controller_.data_udp_client_, startReceiving(_));
+      EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_));
+  Expectation data_udp_client_start_receiving =
+      EXPECT_CALL(scanner_controller_.data_udp_client_, startAsyncReceiving(_));
   EXPECT_CALL(scanner_controller_.control_udp_client_, write(start_request.toRawData()))
       .After(control_udp_client_start_receiving, data_udp_client_start_receiving);
 
