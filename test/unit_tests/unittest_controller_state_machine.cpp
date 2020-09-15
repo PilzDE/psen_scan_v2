@@ -32,6 +32,7 @@ class ControllerStateMachineTest : public ::testing::Test
 public:
   MOCK_METHOD0(send_start_request_callbackTest, void());
   MOCK_METHOD0(send_stop_request_callbackTest, void());
+  MOCK_METHOD0(stopped_cb, void());
 };
 
 TEST_F(ControllerStateMachineTest, triggerSendRequestCallbackTest)
@@ -39,7 +40,8 @@ TEST_F(ControllerStateMachineTest, triggerSendRequestCallbackTest)
   EXPECT_CALL(*this, send_start_request_callbackTest()).Times(1);
 
   ControllerStateMachine sm(std::bind(&ControllerStateMachineTest::send_start_request_callbackTest, this),
-                            std::bind(&ControllerStateMachineTest::send_stop_request_callbackTest, this));
+                            std::bind(&ControllerStateMachineTest::send_stop_request_callbackTest, this),
+                            std::bind(&ControllerStateMachineTest::stopped_cb, this));
 
   sm.processStartRequestEvent();
 }
@@ -50,11 +52,28 @@ TEST_F(ControllerStateMachineTest, testThatStopRequestCallbackIsCalled)
   EXPECT_CALL(*this, send_stop_request_callbackTest()).Times(1);
 
   ControllerStateMachine sm(std::bind(&ControllerStateMachineTest::send_start_request_callbackTest, this),
-                            std::bind(&ControllerStateMachineTest::send_stop_request_callbackTest, this));
+                            std::bind(&ControllerStateMachineTest::send_stop_request_callbackTest, this),
+                            std::bind(&ControllerStateMachineTest::stopped_cb, this));
 
   sm.processStartRequestEvent();
   sm.processStartReplyReceivedEvent();
   sm.processStopRequestEvent();
+}
+
+TEST_F(ControllerStateMachineTest, testThatStopReplyReceivedCallbackIsCalled)
+{
+  EXPECT_CALL(*this, send_start_request_callbackTest()).Times(1);
+  EXPECT_CALL(*this, send_stop_request_callbackTest()).Times(1);
+  EXPECT_CALL(*this, stopped_cb()).Times(1);
+
+  ControllerStateMachine sm(std::bind(&ControllerStateMachineTest::send_start_request_callbackTest, this),
+                            std::bind(&ControllerStateMachineTest::send_stop_request_callbackTest, this),
+                            std::bind(&ControllerStateMachineTest::stopped_cb, this));
+
+  sm.processStartRequestEvent();
+  sm.processStartReplyReceivedEvent();
+  sm.processStopRequestEvent();
+  sm.processStopReplyReceivedEvent();
 }
 
 }  // namespace psen_scan_v2_test
