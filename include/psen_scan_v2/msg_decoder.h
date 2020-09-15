@@ -39,8 +39,8 @@ public:
    * @param start_reply_callback Callback called whenever a StartReply is processed by the decodeAndDispatch method.
    * @param error_callback Callback called whenever an error occurs during deserialization.
    */
-  MsgDecoder(const StartReplyCallback& start_reply_callback,
-             const StartReplyCallback& stop_reply_callback,
+  MsgDecoder(const ReplyCallback& start_reply_callback,
+             const ReplyCallback& stop_reply_callback,
              const ErrorCallback& error_callback);
 
   /**
@@ -53,13 +53,13 @@ public:
   void decodeAndDispatch(const MaxSizeRawData& data, const std::size_t& bytes_received);
 
 private:
-  StartReplyCallback start_reply_callback_;
-  StartReplyCallback stop_reply_callback_;
+  ReplyCallback start_reply_callback_;
+  ReplyCallback stop_reply_callback_;
   ErrorCallback error_callback_;
 };
 
-inline MsgDecoder::MsgDecoder(const StartReplyCallback& start_reply_callback,
-                              const StartReplyCallback& stop_reply_callback,
+inline MsgDecoder::MsgDecoder(const ReplyCallback& start_reply_callback,
+                              const ReplyCallback& stop_reply_callback,
                               const ErrorCallback& error_callback)
   : start_reply_callback_(start_reply_callback)
   , stop_reply_callback_(stop_reply_callback)

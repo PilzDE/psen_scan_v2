@@ -21,8 +21,7 @@
 namespace psen_scan_v2
 {
 using SendRequestCallback = std::function<void()>;
-using StartReplyCallback = std::function<void()>;
-using StopReplyCallback = std::function<void()>;
+using ReplyCallback = std::function<void()>;
 using ErrorCallback = std::function<void(const std::string&)>;
 }  // namespace psen_scan_v2
 
