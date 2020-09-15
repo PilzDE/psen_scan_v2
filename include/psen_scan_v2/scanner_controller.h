@@ -23,6 +23,7 @@
 #include <memory>
 #include <string>
 #include <future>
+#include <sstream>
 
 #include <gtest/gtest_prod.h>
 
@@ -39,8 +40,7 @@ namespace psen_scan_v2
 static constexpr unsigned short DATA_PORT_OF_SCANNER_DEVICE{ 2000 };
 static constexpr unsigned short CONTROL_PORT_OF_SCANNER_DEVICE{ 3000 };
 
-static constexpr std::chrono::milliseconds RECEIVE_TIMEOUT_CONTROL{ 100000 };  // TODO Needs single receive instead of
-                                                                               // timeout
+static constexpr std::chrono::milliseconds RECEIVE_TIMEOUT_CONTROL{ 1000 };
 static constexpr std::chrono::milliseconds RECEIVE_TIMEOUT_DATA{ 1000 };
 
 static constexpr uint32_t DEFAULT_SEQ_NUMBER{ 0 };
@@ -56,6 +56,9 @@ public:
   void handleError(const std::string& error_msg);
   void sendStartRequest();
   void sendStopRequest();
+
+private:
+  void handleStartReplyTimeout(const std::string& error_str);
 
 private:
   ScannerConfiguration scanner_config_;
@@ -128,11 +131,22 @@ std::future<void> ScannerControllerT<TCSM, TUCI>::stop()
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::sendStartRequest()
 {
-  control_udp_client_.startAsyncReceiving(RECEIVE_TIMEOUT_CONTROL);
-  data_udp_client_.startAsyncReceiving(RECEIVE_TIMEOUT_DATA);
+  using std::placeholders::_1;
+  using std::placeholders::_2;
+  control_udp_client_.startSingleAsyncReceiving(std::bind(&ScannerControllerT::handleStartReplyTimeout, this, _1),
+                                                RECEIVE_TIMEOUT_CONTROL);
+  data_udp_client_.startAsyncReceiving(RECEIVE_TIMEOUT_DATA);  // TODO: Should be done when entering monitoring state
   StartRequest start_request(scanner_config_, DEFAULT_SEQ_NUMBER);
 
   control_udp_client_.write(start_request.toRawData());
+}
+
+template <typename TCSM, typename TUCI>
+void ScannerControllerT<TCSM, TUCI>::handleStartReplyTimeout(const std::string& error_str)
+{
+  std::stringstream ss;
+  ss << "Timeout while waiting for start reply message from scanner | Error message: " << error_str;
+  PSENSCAN_ERROR("ScannerController", ss.str());
 }
 
 template <typename TCSM, typename TUCI>

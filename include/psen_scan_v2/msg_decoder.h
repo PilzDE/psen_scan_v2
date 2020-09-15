@@ -24,6 +24,7 @@
 #include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/scanner_reply_msg.h"
 #include "psen_scan_v2/crc_mismatch_exception.h"
+#include "psen_scan_v2/logging.h"
 
 namespace psen_scan_v2
 {
@@ -76,10 +77,11 @@ inline void MsgDecoder::decodeAndDispatch(const MaxSizeRawData& data, const std:
     switch (frame.type())
     {
       case ScannerReplyMsgType::Start:
+        PSENSCAN_DEBUG("MsgDecoder", "Start reply detected");
         start_reply_callback_();
         break;
       case ScannerReplyMsgType::Stop:
-        std::cerr << "Stop received\n";
+        PSENSCAN_DEBUG("MsgDecoder", "Stop reply detected");
         stop_reply_callback_();
         break;
       default:

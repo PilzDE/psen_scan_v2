@@ -40,7 +40,7 @@ namespace psen_scan_v2
 {
 using NewDataHandler = std::function<void(const MaxSizeRawData&, const std::size_t&)>;
 using ErrorHandler = std::function<void(const std::string&)>;
-using TimeoutHandler = std::function<void()>;
+using TimeoutHandler = std::function<void(const std::string&)>;
 
 /**
  * @brief Helper for asynchronously sending and receiving data via UDP.
@@ -81,6 +81,9 @@ public:
    */
   void startAsyncReceiving(const std::chrono::high_resolution_clock::duration timeout);
 
+  void startSingleAsyncReceiving(const TimeoutHandler& timeout_handler = nullptr,
+                                 const std::chrono::high_resolution_clock::duration timeout = std::chrono::seconds(0));
+
   /**
    * @brief Asynchronously sends the specified data to the other endpoint.
    *
@@ -98,6 +101,8 @@ private:
   void handleReceive(const boost::system::error_code& error_code,
                      const std::size_t& bytes_received,
                      const std::chrono::high_resolution_clock::duration timeout);
+
+  void handleSingleReceive(const boost::system::error_code& error_code, const std::size_t& bytes_received);
 
   void sendCompleteHandler(const boost::system::error_code& error, std::size_t bytes_transferred);
 
@@ -229,9 +234,6 @@ inline void UdpClientImpl::handleReceive(const boost::system::error_code& error_
     error_handler_(error_code.message());
     return;
   }
-
-  std::cerr << "bytes " << bytes_received << "\n";
-
   data_handler_(received_data_, bytes_received);
   asyncReceive(timeout);
 }
@@ -269,6 +271,35 @@ inline void UdpClientImpl::asyncReceive(const std::chrono::high_resolution_clock
 
   socket_.async_receive(boost::asio::buffer(received_data_, received_data_.size()),
                         std::bind(&UdpClientImpl::handleReceive, this, _1, _2, timeout));
+}
+
+inline void UdpClientImpl::handleSingleReceive(const boost::system::error_code& error_code,
+                                               const std::size_t& bytes_received)
+{
+  if (error_code || bytes_received == 0)
+  {
+    error_handler_(error_code.message());
+    return;
+  }
+
+  data_handler_(received_data_, bytes_received);
+}
+
+inline void UdpClientImpl::startSingleAsyncReceiving(const TimeoutHandler& timeout_handler,
+                                                     const std::chrono::high_resolution_clock::duration timeout)
+{
+  using std::placeholders::_1;
+  using std::placeholders::_2;
+
+  if (timeout_handler)
+  {
+    timeout_timer_.expires_from_now(timeout);
+    timeout_timer_.async_wait(
+        [timeout_handler](const boost::system::error_code& error_code) { timeout_handler(error_code.message()); });
+  }
+
+  socket_.async_receive(boost::asio::buffer(received_data_, received_data_.size()),
+                        std::bind(&UdpClientImpl::handleSingleReceive, this, _1, _2));
 }
 
 }  // namespace psen_scan_v2

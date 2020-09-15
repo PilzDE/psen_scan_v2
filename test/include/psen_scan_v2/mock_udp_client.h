@@ -35,6 +35,8 @@ public:
 public:
   MOCK_METHOD0(close, void());
   MOCK_METHOD1(startAsyncReceiving, void(const std::chrono::high_resolution_clock::duration timeout));
+  MOCK_METHOD2(startSingleAsyncReceiving,
+               void(const psen_scan_v2::TimeoutHandler&, const std::chrono::high_resolution_clock::duration timeout));
   MOCK_METHOD1(write, void(const psen_scan_v2::DynamicSizeRawData& data));
 };
 
