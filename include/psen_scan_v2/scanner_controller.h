@@ -39,7 +39,8 @@ namespace psen_scan_v2
 static constexpr unsigned short DATA_PORT_OF_SCANNER_DEVICE{ 2000 };
 static constexpr unsigned short CONTROL_PORT_OF_SCANNER_DEVICE{ 3000 };
 
-static constexpr std::chrono::milliseconds RECEIVE_TIMEOUT_CONTROL{ 100000 }; //TODO Needs single receive instead of timeout
+static constexpr std::chrono::milliseconds RECEIVE_TIMEOUT_CONTROL{ 100000 };  // TODO Needs single receive instead of
+                                                                               // timeout
 static constexpr std::chrono::milliseconds RECEIVE_TIMEOUT_DATA{ 1000 };
 
 static constexpr uint32_t DEFAULT_SEQ_NUMBER{ 0 };

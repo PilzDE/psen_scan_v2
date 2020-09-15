@@ -73,7 +73,7 @@ inline void MsgDecoder::decodeAndDispatch(const MaxSizeRawData& data, const std:
   {
     ScannerReplyMsg frame{ ScannerReplyMsg::fromRawData(data) };  // TODO how to handle throw?
 
-    switch(frame.type())
+    switch (frame.type())
     {
       case ScannerReplyMsgType::Start:
         start_reply_callback_();
@@ -86,7 +86,6 @@ inline void MsgDecoder::decodeAndDispatch(const MaxSizeRawData& data, const std:
         // TODO: Replace with stop reply callback in future.
         error_callback_("Unknown message type (Size " + std::to_string(bytes_received) + ")");
     }
-
   }
   else
   {
