@@ -24,7 +24,7 @@ namespace raw_processing
 template <typename T>
 inline void write(std::ostringstream& os, const T& data)
 {
-  os.write((char*)(&data), sizeof(T));
+  os.write(reinterpret_cast<char*>(&data), sizeof(T));
 }
 }  // namespace raw_processing
 }  // namespace psen_scan_v2
