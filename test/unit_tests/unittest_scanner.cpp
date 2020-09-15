@@ -66,7 +66,7 @@ TEST_F(ScannerTest, testStop)
 {
   MockedScanner scanner(scanner_config_);
   std::promise<void> mocked_stop_finished_barrier;
-  EXPECT_CALL(scanner.scanner_controller_, stop()).WillOnce(InvokeWithoutArgs([&mocked_stop_finished_barrier](void) {
+  EXPECT_CALL(scanner.scanner_controller_, stop()).WillOnce(InvokeWithoutArgs([&mocked_stop_finished_barrier]() {
     return mocked_stop_finished_barrier.get_future();
   }));
 
