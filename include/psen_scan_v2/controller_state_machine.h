@@ -28,7 +28,8 @@ class ControllerStateMachine
 {
 public:
   explicit ControllerStateMachine(const SendRequestCallback& start_request_cb,
-                                  const SendRequestCallback& stop_request_cb);
+                                  const SendRequestCallback& stop_request_cb,
+                                  const StoppedCallback& stopped_cb);
   virtual ~ControllerStateMachine();
 
   void processStartRequestEvent();

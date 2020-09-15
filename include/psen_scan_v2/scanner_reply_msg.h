@@ -34,6 +34,7 @@ namespace psen_scan_v2
 enum class ScannerReplyMsgType
 {
   Start,
+  Stop,
   Unknown
 };
 
@@ -65,6 +66,7 @@ public:
 
 public:
   static uint32_t getStartOpCode();
+  static uint32_t getStopOpCode();
   static uint32_t calcCRC(const ScannerReplyMsg& msg);
 
   using RawType = FixedSizeRawData<REPLY_MSG_FROM_SCANNER_SIZE>;
@@ -88,6 +90,7 @@ private:
 
 private:
   static constexpr uint32_t OPCODE_START{ 0x35 };
+  static constexpr uint32_t OPCODE_STOP{ 0x36 };
 };
 
 inline uint32_t ScannerReplyMsg::calcCRC(const ScannerReplyMsg& msg)
@@ -104,6 +107,11 @@ inline uint32_t ScannerReplyMsg::calcCRC(const ScannerReplyMsg& msg)
 inline uint32_t ScannerReplyMsg::getStartOpCode()
 {
   return OPCODE_START;
+}
+
+inline uint32_t ScannerReplyMsg::getStopOpCode()
+{
+  return OPCODE_STOP;
 }
 
 inline ScannerReplyMsg::ScannerReplyMsg(const uint32_t op_code, const uint32_t res_code)
@@ -140,6 +148,10 @@ inline ScannerReplyMsgType ScannerReplyMsg::type() const
   if (opcode_ == OPCODE_START)
   {
     return ScannerReplyMsgType::Start;
+  }
+  else if(opcode_ == OPCODE_STOP)
+  {
+    return ScannerReplyMsgType::Stop;
   }
   return ScannerReplyMsgType::Unknown;
 }

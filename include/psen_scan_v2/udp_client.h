@@ -228,6 +228,8 @@ inline void UdpClientImpl::handleReceive(const boost::system::error_code& error_
     return;
   }
 
+  std::cerr << "bytes " << bytes_received << "\n";
+
   data_handler_(received_data_, bytes_received);
   asyncReceive(timeout);
 }

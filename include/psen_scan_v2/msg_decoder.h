@@ -39,7 +39,9 @@ public:
    * @param start_reply_callback Callback called whenever a StartReply is processed by the decodeAndDispatch method.
    * @param error_callback Callback called whenever an error occurs during deserialization.
    */
-  MsgDecoder(const StartReplyCallback& start_reply_callback, const ErrorCallback& error_callback);
+  MsgDecoder(const StartReplyCallback& start_reply_callback,
+             const StartReplyCallback& stop_reply_callback,
+             const ErrorCallback& error_callback);
 
   /**
    * @brief decodeAndDispatch Deserializes the specified data and calls the appropriate callback to inform the user
@@ -52,11 +54,16 @@ public:
 
 private:
   StartReplyCallback start_reply_callback_;
+  StartReplyCallback stop_reply_callback_;
   ErrorCallback error_callback_;
 };
 
-inline MsgDecoder::MsgDecoder(const StartReplyCallback& start_reply_callback, const ErrorCallback& error_callback)
-  : start_reply_callback_(start_reply_callback), error_callback_(error_callback)
+inline MsgDecoder::MsgDecoder(const StartReplyCallback& start_reply_callback,
+                              const StartReplyCallback& stop_reply_callback,
+                              const ErrorCallback& error_callback)
+  : start_reply_callback_(start_reply_callback)
+  , stop_reply_callback_(stop_reply_callback)
+  , error_callback_(error_callback)
 {
 }
 
@@ -66,15 +73,20 @@ inline void MsgDecoder::decodeAndDispatch(const MaxSizeRawData& data, const std:
   {
     ScannerReplyMsg frame{ ScannerReplyMsg::fromRawData(data) };  // TODO how to handle throw?
 
-    if (frame.type() == ScannerReplyMsgType::Start)
+    switch(frame.type())
     {
-      start_reply_callback_();
+      case ScannerReplyMsgType::Start:
+        start_reply_callback_();
+        break;
+      case ScannerReplyMsgType::Stop:
+        std::cerr << "Stop received\n";
+        stop_reply_callback_();
+        break;
+      default:
+        // TODO: Replace with stop reply callback in future.
+        error_callback_("Unknown message type (Size " + std::to_string(bytes_received) + ")");
     }
-    else
-    {
-      // TODO: Replace with stop reply callback in future.
-      error_callback_("Unknown message type (Size " + std::to_string(bytes_received) + ")");
-    }
+
   }
   else
   {
