@@ -27,7 +27,8 @@ class ControllerStateMachineMock
 {
 public:
   ControllerStateMachineMock(const psen_scan_v2::SendRequestCallback& start_request_cb,
-                             const psen_scan_v2::SendRequestCallback& stop_request_cb){};
+                             const psen_scan_v2::SendRequestCallback& stop_request_cb,
+                             const psen_scan_v2::StoppedCallback& stopped_cb){};
 
 public:
   MOCK_METHOD0(processStartRequestEvent, void());
