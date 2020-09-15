@@ -87,14 +87,10 @@ void ScannerT<SC>::start()
 template <typename SC>
 void ScannerT<SC>::stop()
 {
-  std::future<bool> stop_result = scanner_controller_.stop();
-  std::cerr << "stop called\n";
-  stop_result.wait();
-  std::cerr << "waiting done\n";
-  stop_result.get();
-  std::cerr << "got result\n";
-
-  // Should return only if state "stopped", expection on timeout
+  std::future<void> stop_finished_barrier = scanner_controller_.stop();
+  PSENSCAN_INFO("Scanner", "Waiting for scanner to stop...");
+  stop_finished_barrier.wait();
+  PSENSCAN_INFO("Scanner", "Scanner has stopped.");
 }
 
 template <typename SC>

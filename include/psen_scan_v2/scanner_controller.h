@@ -51,7 +51,7 @@ class ScannerControllerT
 public:
   ScannerControllerT(const ScannerConfiguration& scanner_config);
   void start();
-  std::future<bool> stop();
+  std::future<void> stop();
 
   void handleError(const std::string& error_msg);
   void sendStartRequest();
@@ -67,7 +67,7 @@ private:
 
   void stopped();
 
-  std::promise<bool> stopped_;
+  std::promise<void> stopped_;
 
   friend class ScannerControllerTest;
   FRIEND_TEST(ScannerControllerTest, testStartRequestEvent);
@@ -119,7 +119,7 @@ void ScannerControllerT<TCSM, TUCI>::start()
 }
 
 template <typename TCSM, typename TUCI>
-std::future<bool> ScannerControllerT<TCSM, TUCI>::stop()
+std::future<void> ScannerControllerT<TCSM, TUCI>::stop()
 {
   state_machine_.processStopRequestEvent();
   return stopped_.get_future();
@@ -145,12 +145,11 @@ void ScannerControllerT<TCSM, TUCI>::sendStopRequest()
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::stopped()
 {
-  std::cerr << "stopped called--\n";
-
-  stopped_.set_value(true);
+  PSENSCAN_DEBUG("ScannerController", "Stopped() called.");
+  stopped_.set_value();
 
   // Reinitialize
-  stopped_ = std::promise<bool>();
+  stopped_ = std::promise<void>();
 }
 
 }  // namespace psen_scan_v2
