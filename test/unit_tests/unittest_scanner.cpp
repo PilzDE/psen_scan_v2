@@ -65,22 +65,22 @@ TEST_F(ScannerTest, testStart)
 TEST_F(ScannerTest, testStop)
 {
   MockedScanner scanner(scanner_config_);
-  std::promise<void> stopped_;
-  EXPECT_CALL(scanner.scanner_controller_, stop()).WillOnce(InvokeWithoutArgs([&stopped_](void) {
-    return stopped_.get_future();
+  std::promise<void> mocked_stop_finished_barrier;
+  EXPECT_CALL(scanner.scanner_controller_, stop()).WillOnce(InvokeWithoutArgs([&mocked_stop_finished_barrier](void) {
+    return mocked_stop_finished_barrier.get_future();
   }));
 
-  std::promise<void> stop_finished_barrier;
-  std::future<void> stop_finished_barrier_future = stop_finished_barrier.get_future();
-  std::future<void> stop_future = std::async(std::launch::async, [&scanner, &stop_finished_barrier]() {
+  std::promise<void> stop_func_finished_barrier;
+  std::future<void> stop_func_finished_barrier_future = stop_func_finished_barrier.get_future();
+  std::future<void> stop_future = std::async(std::launch::async, [&scanner, &stop_func_finished_barrier]() {
     scanner.stop();
-    stop_finished_barrier.set_value();
+    stop_func_finished_barrier.set_value();
   });
 
-  EXPECT_EQ(stop_finished_barrier_future.wait_for(std::chrono::milliseconds(50)), std::future_status::timeout)
+  EXPECT_EQ(stop_func_finished_barrier_future.wait_for(std::chrono::milliseconds(50)), std::future_status::timeout)
       << "Scanner::stop() function has finished too early";
-  stopped_.set_value();
-  EXPECT_EQ(stop_finished_barrier_future.wait_for(std::chrono::milliseconds(50)), std::future_status::ready)
+  mocked_stop_finished_barrier.set_value();
+  EXPECT_EQ(stop_func_finished_barrier_future.wait_for(std::chrono::milliseconds(50)), std::future_status::ready)
       << "Scanner::stop() function has not finished";
 }
 
