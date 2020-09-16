@@ -123,6 +123,7 @@ private:
   boost::asio::io_service::work work_{ io_service_ };
   boost::asio::high_resolution_timer timeout_timer_{ io_service_ };
   std::thread io_service_thread_;
+  std::atomic_bool close_called_{ false };
 
   MaxSizeRawData received_data_;
 
@@ -175,6 +176,7 @@ inline UdpClientImpl::UdpClientImpl(const NewDataHandler& data_handler,
 
 inline void UdpClientImpl::close()
 {
+  close_called_ = true;
   io_service_.stop();
   if (io_service_thread_.joinable())
   {
@@ -260,10 +262,13 @@ inline void UdpClientImpl::asyncReceive(const ReceiveMode& modi,
   {
     timeout_timer_.expires_from_now(timeout);
     timeout_timer_.async_wait([timeout_handler](const boost::system::error_code& error_code) {
+      // LCOV_EXCL_START
+      // No coverage check because testing because of the timing extremely difficult.
       if (error_code == boost::asio::error::operation_aborted)  // Do nothing if timer was aborted
       {
         return;
       }
+      // LCOV_EXCL_STOP
       timeout_handler(error_code.message());
     });
   }
@@ -271,11 +276,15 @@ inline void UdpClientImpl::asyncReceive(const ReceiveMode& modi,
   socket_.async_receive(boost::asio::buffer(received_data_, received_data_.size()),
                         [this, modi, timeout_handler, timeout](const boost::system::error_code& error_code,
                                                                const std::size_t& bytes_received) {
+                          if (close_called_)
+                          {
+                            PSENSCAN_DEBUG("UdpClient", "Receive not processed because close() in progress.");
+                            return;
+                          }
                           if (modi == ReceiveMode::single)
                           {
                             timeout_timer_.cancel();
                           }
-
                           if (error_code || bytes_received == 0)
                           {
                             error_handler_(error_code.message());

@@ -128,8 +128,10 @@ TEST_F(UdpClientTests, testTwoConsecutiveTimeouts)
 TEST_F(UdpClientTests, testErrorHandlingForReceive)
 {
   EXPECT_CALL(*this, handleError(_)).WillOnce(ACTION_OPEN_BARRIER_VOID(ERROR_HANDLER_CALLED));
+  EXPECT_CALL(*this, handleTimeout(_)).Times(0);
 
-  udp_client_.startAsyncReceiving(ReceiveMode::single);
+  udp_client_.startAsyncReceiving(
+      ReceiveMode::single, std::bind(&UdpClientTests::handleTimeout, this, std::placeholders::_1), RECEIVE_TIMEOUT);
   sendEmptyTestDataToClient();
   BARRIER(ERROR_HANDLER_CALLED);
 }
