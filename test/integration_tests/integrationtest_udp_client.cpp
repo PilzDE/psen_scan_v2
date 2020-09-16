@@ -36,6 +36,7 @@ namespace psen_scan_v2_test
 {
 static const std::string CLIENT_RECEIVED_DATA{ "CLIENT_RECEIVED_DATA" };
 static const std::string MOCK_RECEIVED_DATA{ "MOCK_RECEIVED_DATA" };
+static const std::string ERROR_HANDLER_CALLED{ "ERROR_HANDLER_CALLED" };
 static const std::string TIMEOUT_BARRIER{ "TIMEOUT_BARRIER" };
 static const std::string TIMEOUT_BARRIER_1{ "TIMEOUT_BARRIER_1" };
 static const std::string TIMEOUT_BARRIER_2{ "TIMEOUT_BARRIER_2" };
@@ -59,6 +60,7 @@ public:
 
 public:
   void sendTestDataToClient();
+  void sendEmptyTestDataToClient();
 
 protected:
   MockUDPServer mock_udp_server_{ UDP_MOCK_PORT };
@@ -83,6 +85,11 @@ UdpClientTests::UdpClientTests()
 void UdpClientTests::sendTestDataToClient()
 {
   mock_udp_server_.asyncSend<DATA_SIZE_BYTES>(host_endpoint, send_array);
+}
+
+void UdpClientTests::sendEmptyTestDataToClient()
+{
+  mock_udp_server_.asyncSendEmpty(host_endpoint);
 }
 
 TEST_F(UdpClientTests, testAsyncReadOperation)
@@ -122,6 +129,15 @@ TEST_F(UdpClientTests, testTimeoutHandlingForSingleReceive)
 
   udp_client_.startSingleAsyncReceiving([this](const std::string& error) { handleTimeout(error); }, RECEIVE_TIMEOUT);
   BARRIER(TIMEOUT_BARRIER);
+}
+
+TEST_F(UdpClientTests, testErrorHandlingForSingleReceive)
+{
+  EXPECT_CALL(*this, handleError(_)).WillOnce(ACTION_OPEN_BARRIER_VOID(ERROR_HANDLER_CALLED));
+
+  udp_client_.startSingleAsyncReceiving([this](const std::string& error) {}, RECEIVE_TIMEOUT);
+  sendEmptyTestDataToClient();
+  BARRIER(ERROR_HANDLER_CALLED);
 }
 
 TEST_F(UdpClientTests, testRestartAfterTimeout)

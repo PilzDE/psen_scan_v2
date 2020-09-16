@@ -54,6 +54,8 @@ public:
   template <unsigned int N>
   void asyncSend(const udp::endpoint& receiver_of_data, const psen_scan_v2::FixedSizeRawData<N>& data);
 
+  void asyncSendEmpty(const udp::endpoint& receiver_of_data);
+
 private:
   void handleSend(const boost::system::error_code& error, std::size_t bytes_transferred);
   void handleReceive(const boost::system::error_code& error, std::size_t /*bytes_transferred*/);
@@ -107,6 +109,12 @@ void MockUDPServer::asyncSend(const udp::endpoint& receiver_of_data, const psen_
                                       boost::asio::placeholders::error,
                                       boost::asio::placeholders::bytes_transferred));
   });
+}
+
+void MockUDPServer::asyncSendEmpty(const udp::endpoint& receiver_of_data)
+{
+  const psen_scan_v2::FixedSizeRawData<0> data;
+  asyncSend<0>(receiver_of_data, data);
 }
 
 void MockUDPServer::handleReceive(const boost::system::error_code& error, std::size_t bytes_received)
