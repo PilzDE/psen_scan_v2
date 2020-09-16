@@ -43,6 +43,18 @@ using ErrorHandler = std::function<void(const std::string&)>;
 using TimeoutHandler = std::function<void(const std::string&)>;
 
 /**
+ * @brief Lists the different possible receive modi.
+ */
+enum class ReceiveMode
+{
+  //! @brief Wait for one message and then stop listening.
+  single,
+  //! @brief Continuously wait for new messages. In other words, after a message is received, automatically start
+  //! listening for the next message.
+  continuous
+};
+
+/**
  * @brief Helper for asynchronously sending and receiving data via UDP.
  */
 class UdpClientImpl
@@ -73,16 +85,18 @@ public:
 
 public:
   /**
-   * @brief Starts an asynchronous process constantly listing to new messages from the other endpoint.
+   * @brief Starts an asynchronous process listing to (a) new message(s) from the other endpoint. If the function
+   * continuously listens to new messages or only listens for one message is specified by the receive modi specified.
    * - If a new message is received, the data handler is called.
    * - If an error occurs while receiving data, the error handler is called.
    *
+   * @param modi Specifies if the function continuously listens to new messages or or not.
+   * @param timeout_handler Handler which is called when a new message is not received in the specified time range.
    * @param timeout Specifies how long to wait for new messages.
    */
-  void startAsyncReceiving(const std::chrono::high_resolution_clock::duration timeout);
-
-  void startSingleAsyncReceiving(const TimeoutHandler& timeout_handler = nullptr,
-                                 const std::chrono::high_resolution_clock::duration timeout = std::chrono::seconds(0));
+  void startAsyncReceiving(const ReceiveMode& modi = ReceiveMode::continuous,
+                           const TimeoutHandler& timeout_handler = nullptr,
+                           const std::chrono::high_resolution_clock::duration& timeout = std::chrono::seconds(0));
 
   /**
    * @brief Asynchronously sends the specified data to the other endpoint.
@@ -97,12 +111,9 @@ public:
   void close();
 
 private:
-  void asyncReceive(const std::chrono::high_resolution_clock::duration timeout);
-  void handleReceive(const boost::system::error_code& error_code,
-                     const std::size_t& bytes_received,
-                     const std::chrono::high_resolution_clock::duration timeout);
-
-  void handleSingleReceive(const boost::system::error_code& error_code, const std::size_t& bytes_received);
+  void asyncReceive(const ReceiveMode& modi,
+                    const TimeoutHandler& timeout_handler,
+                    const std::chrono::high_resolution_clock::duration& timeout);
 
   void sendCompleteHandler(const boost::system::error_code& error, std::size_t bytes_transferred);
 
@@ -225,26 +236,15 @@ inline void UdpClientImpl::write(const DynamicSizeRawData& data)
   });
 }
 
-inline void UdpClientImpl::handleReceive(const boost::system::error_code& error_code,
-                                         const std::size_t& bytes_received,
-                                         const std::chrono::high_resolution_clock::duration timeout)
-{
-  if (error_code || bytes_received == 0)
-  {
-    error_handler_(error_code.message());
-    return;
-  }
-  data_handler_(received_data_, bytes_received);
-  asyncReceive(timeout);
-}
-
-inline void UdpClientImpl::startAsyncReceiving(const std::chrono::high_resolution_clock::duration timeout)
+inline void UdpClientImpl::startAsyncReceiving(const ReceiveMode& modi,
+                                               const TimeoutHandler& timeout_handler,
+                                               const std::chrono::high_resolution_clock::duration& timeout)
 {
   // Function is intended to be called from main thread.
   // To ensure that socket operations only happen on one strand (in this case an implicit one),
   // the asyncReceive() operation is scheduled as task to the io_service thread.
-  io_service_.post([this, &timeout]() {
-    asyncReceive(timeout);
+  io_service_.post([this, modi, timeout_handler, timeout]() {
+    asyncReceive(modi, timeout_handler, timeout);
     receive_called_ = true;
     receive_cv_.notify_all();
   });
@@ -252,47 +252,10 @@ inline void UdpClientImpl::startAsyncReceiving(const std::chrono::high_resolutio
   receive_cv_.wait(lock, [this]() { return receive_called_.load(); });
 }
 
-inline void UdpClientImpl::asyncReceive(const std::chrono::high_resolution_clock::duration timeout)
+inline void UdpClientImpl::asyncReceive(const ReceiveMode& modi,
+                                        const TimeoutHandler& timeout_handler,
+                                        const std::chrono::high_resolution_clock::duration& timeout)
 {
-  using std::placeholders::_1;
-  using std::placeholders::_2;
-
-  timeout_timer_.expires_from_now(timeout);
-  timeout_timer_.async_wait([this](const boost::system::error_code& error_code) {
-    // LCOV_EXCL_START
-    // No coverage check. Testing the if-loop is extremly difficult because of timing issues.
-    if (error_code)
-    {
-      return;
-    }
-    // LCOV_EXCL_STOP
-    socket_.cancel();
-  });
-
-  socket_.async_receive(boost::asio::buffer(received_data_, received_data_.size()),
-                        std::bind(&UdpClientImpl::handleReceive, this, _1, _2, timeout));
-}
-
-inline void UdpClientImpl::handleSingleReceive(const boost::system::error_code& error_code,
-                                               const std::size_t& bytes_received)
-{
-  timeout_timer_.cancel();
-
-  if (error_code || bytes_received == 0)
-  {
-    error_handler_(error_code.message());
-    return;
-  }
-
-  data_handler_(received_data_, bytes_received);
-}
-
-inline void UdpClientImpl::startSingleAsyncReceiving(const TimeoutHandler& timeout_handler,
-                                                     const std::chrono::high_resolution_clock::duration timeout)
-{
-  using std::placeholders::_1;
-  using std::placeholders::_2;
-
   if (timeout_handler)
   {
     timeout_timer_.expires_from_now(timeout);
@@ -306,7 +269,19 @@ inline void UdpClientImpl::startSingleAsyncReceiving(const TimeoutHandler& timeo
   }
 
   socket_.async_receive(boost::asio::buffer(received_data_, received_data_.size()),
-                        std::bind(&UdpClientImpl::handleSingleReceive, this, _1, _2));
+                        [this, modi, timeout_handler, timeout](const boost::system::error_code& error_code,
+                                                               const std::size_t& bytes_received) {
+                          if (error_code || bytes_received == 0)
+                          {
+                            error_handler_(error_code.message());
+                            return;
+                          }
+                          data_handler_(received_data_, bytes_received);
+                          if (modi == ReceiveMode::continuous)
+                          {
+                            asyncReceive(modi, timeout_handler, timeout);
+                          }
+                        });
 }
 
 }  // namespace psen_scan_v2
