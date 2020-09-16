@@ -75,8 +75,6 @@ public:
 private:
   template <typename T>
   static void processBytes(boost::crc_32_type& crc_32, const T& data);
-  template <typename T>
-  static void read(std::istringstream& is, T& data);
   ScannerReplyMsg() = delete;
 
 private:
@@ -130,10 +128,10 @@ inline ScannerReplyMsg ScannerReplyMsg::fromRawData(const RawScannerData& data)
   RawScannerData tmp_data{ data };
   std::istringstream is(std::string(tmp_data.data(), REPLY_MSG_FROM_SCANNER_SIZE));
 
-  read(is, msg.crc_);
-  read(is, msg.reserved_);
-  read(is, msg.opcode_);
-  read(is, msg.res_code_);
+  raw_processing::read(is, msg.crc_);
+  raw_processing::read(is, msg.reserved_);
+  raw_processing::read(is, msg.opcode_);
+  raw_processing::read(is, msg.res_code_);
 
   if (msg.crc_ != calcCRC(msg))
   {
@@ -141,16 +139,6 @@ inline ScannerReplyMsg ScannerReplyMsg::fromRawData(const RawScannerData& data)
   }
 
   return msg;
-}
-
-template <typename T>
-inline void ScannerReplyMsg::read(std::istringstream& is, T& data)
-{
-  // Alternatives for transformation:
-  // typedef boost::iostreams::basic_array_source<char> Device;
-  // boost::iostreams::stream<Device> stream((char*)&data, sizeof(DataReply::MemoryFormat));
-
-  is.read(reinterpret_cast<char*>(&data), sizeof(T));
 }
 
 inline ScannerReplyMsgType ScannerReplyMsg::type() const
