@@ -271,6 +271,11 @@ inline void UdpClientImpl::asyncReceive(const ReceiveMode& modi,
   socket_.async_receive(boost::asio::buffer(received_data_, received_data_.size()),
                         [this, modi, timeout_handler, timeout](const boost::system::error_code& error_code,
                                                                const std::size_t& bytes_received) {
+                          if (modi == ReceiveMode::single)
+                          {
+                            timeout_timer_.cancel();
+                          }
+
                           if (error_code || bytes_received == 0)
                           {
                             error_handler_(error_code.message());
