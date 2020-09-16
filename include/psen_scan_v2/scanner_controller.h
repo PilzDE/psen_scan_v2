@@ -68,7 +68,7 @@ private:
   TUCI control_udp_client_;
   TUCI data_udp_client_;
 
-  void stopped();
+  void notifyStoppedState();
 
   std::promise<void> stopped_;
 
@@ -78,6 +78,7 @@ private:
   FRIEND_TEST(ScannerControllerTest, testStopRequestEvent);
   FRIEND_TEST(ScannerControllerTest, testStopRequestSending);
   FRIEND_TEST(ScannerControllerTest, testHandleStartReplyTimeout);
+  FRIEND_TEST(ScannerControllerTest, testStopRequestEventWithFutureUsage);
 };
 
 typedef ScannerControllerT<> ScannerController;
@@ -87,7 +88,7 @@ ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& s
   : scanner_config_(scanner_config)
   , state_machine_(std::bind(&ScannerControllerT::sendStartRequest, this),
                    std::bind(&ScannerControllerT::sendStopRequest, this),
-                   std::bind(&ScannerControllerT::stopped, this))
+                   std::bind(&ScannerControllerT::notifyStoppedState, this))
   , control_msg_decoder_(std::bind(&TCSM::processStartReplyReceivedEvent, &state_machine_),
                          std::bind(&TCSM::processStopReplyReceivedEvent, &state_machine_),
                          std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1))
@@ -158,7 +159,7 @@ void ScannerControllerT<TCSM, TUCI>::sendStopRequest()
 }
 
 template <typename TCSM, typename TUCI>
-void ScannerControllerT<TCSM, TUCI>::stopped()
+void ScannerControllerT<TCSM, TUCI>::notifyStoppedState()
 {
   PSENSCAN_DEBUG("ScannerController", "Stopped() called.");
   stopped_.set_value();

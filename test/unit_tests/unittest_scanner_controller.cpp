@@ -66,6 +66,17 @@ TEST_F(ScannerControllerTest, testStopRequestEvent)
   scanner_controller_.stop();
 }
 
+TEST_F(ScannerControllerTest, testStopRequestEventWithFutureUsage)
+{
+  EXPECT_CALL(scanner_controller_.state_machine_, processStopRequestEvent()).Times(1);
+
+  std::future<void> stop_future = scanner_controller_.stop();
+
+  scanner_controller_.state_machine_.stopped_cb_();  // TODO needs to be real async?
+
+  stop_future.wait();
+}
+
 TEST_F(ScannerControllerTest, testStartRequestSending)
 {
   using ::testing::_;
