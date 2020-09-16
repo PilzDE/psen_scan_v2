@@ -95,6 +95,20 @@ TEST_F(ScannerControllerTest, testStopRequestSending)
   scanner_controller_.sendStopRequest();
 }
 
+TEST_F(ScannerControllerTest, testHandleStartReplyTimeout)
+{
+  using ::testing::_;
+  using ::testing::Expectation;
+
+  StopRequest stop_request;
+  EXPECT_CALL(scanner_controller_.control_udp_client_, startSingleAsyncReceiving(_, _))
+      .WillOnce(::testing::Invoke(
+          [](const TimeoutHandler& timeout_handler, const std::chrono::high_resolution_clock::duration timeout) {
+            timeout_handler("timeout!");
+          }));
+  scanner_controller_.sendStartRequest();
+}
+
 TEST_F(ScannerControllerTest, test_handle_error_no_throw)
 {
   ASSERT_NO_THROW(scanner_controller_.handleError("Error Message."));
