@@ -14,6 +14,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <functional>
+#include <csignal>
+#include <future>
 
 #include <ros/ros.h>
 
@@ -29,10 +31,22 @@ REGISTER_ROSCONSOLE_BRIDGE;
 
 using namespace psen_scan_v2;
 
+std::function<void()> node_terminate_cb;
+
+void delayed_shutdown_sig_handler(int sig)
+{
+  node_terminate_cb();
+  ros::Duration(0.2).sleep();
+
+  ros::shutdown();
+}
+
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "psen_scan_v2_node");
   ros::NodeHandle pnh("~");
+
+  std::signal(SIGINT, delayed_shutdown_sig_handler);
 
   try
   {
@@ -50,7 +64,11 @@ int main(int argc, char** argv)
                                     param_handler.getFrameID(),
                                     param_handler.getXAxisRotation(),
                                     scanner_configuration);
-    ros_scanner_node.run();
+
+    node_terminate_cb = std::bind(&ROSScannerNode::terminate, &ros_scanner_node);
+
+    auto f = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
+    f.wait();
   }
   catch (std::exception& e)
   {
