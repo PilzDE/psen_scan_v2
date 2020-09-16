@@ -81,6 +81,7 @@ private:
   FRIEND_TEST(ScannerControllerTest, testStopRequestEvent);
   FRIEND_TEST(ScannerControllerTest, testStopRequestSending);
   FRIEND_TEST(ScannerControllerTest, testHandleStartReplyTimeout);
+  FRIEND_TEST(ScannerControllerTest, testHandleStopReplyTimeout);
   FRIEND_TEST(ScannerControllerTest, testStopRequestEventWithFutureUsage);
 };
 
