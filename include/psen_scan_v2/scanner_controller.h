@@ -45,6 +45,8 @@ static constexpr std::chrono::milliseconds RECEIVE_TIMEOUT_DATA{ 1000 };
 
 static constexpr uint32_t DEFAULT_SEQ_NUMBER{ 0 };
 
+using std::placeholders::_1;
+
 template <typename TCSM = ControllerStateMachine, typename TUCI = UdpClientImpl>
 class ScannerControllerT
 {
@@ -59,6 +61,7 @@ public:
 
 private:
   void handleStartReplyTimeout(const std::string& error_str);
+  void handleStopReplyTimeout(const std::string& error_str);
 
 private:
   ScannerConfiguration scanner_config_;
@@ -133,8 +136,6 @@ std::future<void> ScannerControllerT<TCSM, TUCI>::stop()
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::sendStartRequest()
 {
-  using std::placeholders::_1;
-  using std::placeholders::_2;
   control_udp_client_.startSingleAsyncReceiving(std::bind(&ScannerControllerT::handleStartReplyTimeout, this, _1),
                                                 RECEIVE_TIMEOUT_CONTROL);
   data_udp_client_.startAsyncReceiving(RECEIVE_TIMEOUT_DATA);  // TODO: Should be done when entering monitoring state
@@ -151,8 +152,17 @@ void ScannerControllerT<TCSM, TUCI>::handleStartReplyTimeout(const std::string& 
 }
 
 template <typename TCSM, typename TUCI>
+void ScannerControllerT<TCSM, TUCI>::handleStopReplyTimeout(const std::string& error_str)
+{
+  PSENSCAN_ERROR("ScannerController",
+                 "Timeout while waiting for stop reply message from scanner | Error message: " << error_str);
+}
+
+template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::sendStopRequest()
 {
+  control_udp_client_.startSingleAsyncReceiving(std::bind(&ScannerControllerT::handleStopReplyTimeout, this, _1),
+                                                RECEIVE_TIMEOUT_CONTROL);
   StopRequest stop_request;
   control_udp_client_.write(stop_request.toRawData());
 }
