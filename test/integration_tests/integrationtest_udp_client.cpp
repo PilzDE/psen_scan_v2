@@ -36,6 +36,7 @@ namespace psen_scan_v2_test
 {
 static const std::string CLIENT_RECEIVED_DATA{ "CLIENT_RECEIVED_DATA" };
 static const std::string MOCK_RECEIVED_DATA{ "MOCK_RECEIVED_DATA" };
+static const std::string TIMEOUT_BARRIER{ "TIMEOUT_BARRIER" };
 static const std::string TIMEOUT_BARRIER_1{ "TIMEOUT_BARRIER_1" };
 static const std::string TIMEOUT_BARRIER_2{ "TIMEOUT_BARRIER_2" };
 
@@ -54,6 +55,7 @@ public:
   UdpClientTests();
   MOCK_METHOD2(handleNewData, void(const MaxSizeRawData&, const std::size_t&));
   MOCK_METHOD1(handleError, void(const std::string&));
+  MOCK_METHOD1(handleTimeout, void(const std::string&));
 
 public:
   void sendTestDataToClient();
@@ -92,6 +94,15 @@ TEST_F(UdpClientTests, testAsyncReadOperation)
   BARRIER(CLIENT_RECEIVED_DATA);
 }
 
+TEST_F(UdpClientTests, testSingleAsyncReadOperation)
+{
+  EXPECT_CALL(*this, handleNewData(_, DATA_SIZE_BYTES)).WillOnce(ACTION_OPEN_BARRIER_VOID(CLIENT_RECEIVED_DATA));
+
+  udp_client_.startSingleAsyncReceiving([](const std::string& error_str) {}, RECEIVE_TIMEOUT);
+  sendTestDataToClient();
+  BARRIER(CLIENT_RECEIVED_DATA);
+}
+
 TEST_F(UdpClientTests, testTwoConsecutiveTimeouts)
 {
   EXPECT_CALL(*this, handleError(_))
@@ -103,6 +114,14 @@ TEST_F(UdpClientTests, testTwoConsecutiveTimeouts)
 
   udp_client_.startAsyncReceiving(RECEIVE_TIMEOUT);
   BARRIER(TIMEOUT_BARRIER_2);
+}
+
+TEST_F(UdpClientTests, testTimeoutHandlingForSingleReceive)
+{
+  EXPECT_CALL(*this, handleTimeout(_)).WillOnce(ACTION_OPEN_BARRIER_VOID(TIMEOUT_BARRIER));
+
+  udp_client_.startSingleAsyncReceiving([this](const std::string& error) { handleTimeout(error); }, RECEIVE_TIMEOUT);
+  BARRIER(TIMEOUT_BARRIER);
 }
 
 TEST_F(UdpClientTests, testRestartAfterTimeout)
