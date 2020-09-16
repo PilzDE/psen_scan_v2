@@ -53,7 +53,6 @@ using namespace std::placeholders;
 class MonitoringFrameMsg
 {
 public:
-  //! @brief Deserializes the specified data into a monitoring frame message.
   static MonitoringFrameMsg fromRawData(const RawScannerData& data);
 
 public:
@@ -65,6 +64,7 @@ private:
   void deserializeAdditionalField(std::istringstream& is);
 
 private:
+  // Fixed fields
   uint32_t device_status_{ 0 };
   uint32_t op_code_{ 0 };
   uint32_t working_mode_{ 0 };
@@ -73,6 +73,7 @@ private:
   uint16_t from_theta_{ 0 };
   uint16_t resolution_{ 0 };
 
+  // Additional information
   uint32_t scan_counter_{ 0 };
   std::vector<uint16_t> measures_;
 
