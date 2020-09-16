@@ -297,13 +297,11 @@ inline void UdpClientImpl::startSingleAsyncReceiving(const TimeoutHandler& timeo
   {
     timeout_timer_.expires_from_now(timeout);
     timeout_timer_.async_wait([timeout_handler](const boost::system::error_code& error_code) {
-
       if (error_code == boost::asio::error::operation_aborted)  // Do nothing if timer was aborted
       {
         return;
       }
       timeout_handler(error_code.message());
-
     });
   }
 
