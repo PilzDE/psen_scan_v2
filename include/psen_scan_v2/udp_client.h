@@ -276,6 +276,8 @@ inline void UdpClientImpl::asyncReceive(const std::chrono::high_resolution_clock
 inline void UdpClientImpl::handleSingleReceive(const boost::system::error_code& error_code,
                                                const std::size_t& bytes_received)
 {
+  timeout_timer_.cancel();
+
   if (error_code || bytes_received == 0)
   {
     error_handler_(error_code.message());
@@ -294,8 +296,15 @@ inline void UdpClientImpl::startSingleAsyncReceiving(const TimeoutHandler& timeo
   if (timeout_handler)
   {
     timeout_timer_.expires_from_now(timeout);
-    timeout_timer_.async_wait(
-        [timeout_handler](const boost::system::error_code& error_code) { timeout_handler(error_code.message()); });
+    timeout_timer_.async_wait([timeout_handler](const boost::system::error_code& error_code) {
+
+      if (error_code == boost::asio::error::operation_aborted)  // Do nothing if timer was aborted
+      {
+        return;
+      }
+      timeout_handler(error_code.message());
+
+    });
   }
 
   socket_.async_receive(boost::asio::buffer(received_data_, received_data_.size()),
