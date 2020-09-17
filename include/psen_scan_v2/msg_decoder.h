@@ -27,6 +27,13 @@
 
 namespace psen_scan_v2
 {
+enum class ScannerMsgType
+{
+  Reply,
+  MonitoringFrame,
+  Unknown
+};
+
 /**
  * @brief Deserializes raw byte data from the scanner.
  */
@@ -51,6 +58,14 @@ public:
   void decodeAndDispatch(const RawScannerData& data, const std::size_t& bytes_received);
 
 private:
+  ScannerMsgType determineMsgType(const RawScannerData& data, const std::size_t& bytes_received);
+  bool rawDataMatchesReply(const RawScannerData& data, const std::size_t& bytes_received);
+  bool rawDataMatchesMonitoringFrame(const RawScannerData& data, const std::size_t& bytes_received);
+
+  void handleReplyMsg(const RawScannerData& data, const std::size_t& bytes_received);
+  void handleMonitoringFrameMsg(const RawScannerData& data, const std::size_t& bytes_received);
+  void handleUnknownMsg(const RawScannerData& data, const std::size_t& bytes_received);
+
   StartReplyCallback start_reply_callback_;
   ErrorCallback error_callback_;
 };
@@ -62,25 +77,68 @@ inline MsgDecoder::MsgDecoder(const StartReplyCallback& start_reply_callback, co
 
 inline void MsgDecoder::decodeAndDispatch(const RawScannerData& data, const std::size_t& bytes_received)
 {
-  if (bytes_received == REPLY_MSG_FROM_SCANNER_SIZE)  // Check if this could be a reply
+  ScannerMsgType scanner_msg = determineMsgType(data, bytes_received);
+  switch (scanner_msg)
   {
-    ScannerReplyMsg frame{ ScannerReplyMsg::fromRawData(data) };  // TODO how to handle throw?
+    case ScannerMsgType::Reply:
+      handleReplyMsg(data, bytes_received);
+      break;
+    case ScannerMsgType::MonitoringFrame:
+      handleMonitoringFrameMsg(data,bytes_received);
+      break;
+    case ScannerMsgType::Unknown:
+      handleUnknownMsg(data, bytes_received);
+      break;
+  }
+}
 
-    if (frame.type() == ScannerReplyMsgType::Start)
-    {
-      start_reply_callback_();
-    }
-    else
-    {
-      // TODO: Replace with stop reply callback in future.
-      error_callback_("Unknown message type (Size " + std::to_string(bytes_received) + ")");
-    }
+inline void MsgDecoder::handleReplyMsg(const RawScannerData& data, const std::size_t& bytes_received)
+{
+  ScannerReplyMsg frame{ ScannerReplyMsg::fromRawData(data) };  // TODO how to handle throw?
+
+  if (frame.type() == ScannerReplyMsgType::Start)
+  {
+    start_reply_callback_();
   }
   else
   {
-    // TODO: Replace with monitoring frame callback in future.
+    // TODO: Replace with stop reply callback in future.
     error_callback_("Unknown message type (Size " + std::to_string(bytes_received) + ")");
   }
+}
+
+inline void MsgDecoder::handleMonitoringFrameMsg(const RawScannerData& data, const std::size_t& bytes_received)
+{
+  // TODO:
+}
+
+inline void MsgDecoder::handleUnknownMsg(const RawScannerData& data, const std::size_t& bytes_received)
+{
+  // TODO: Replace with monitoring frame callback in future.
+  error_callback_("Unknown message type (Size " + std::to_string(bytes_received) + ")");
+}
+
+inline ScannerMsgType MsgDecoder::determineMsgType(const RawScannerData& data, const std::size_t& bytes_received)
+{
+  if (rawDataMatchesReply(data, bytes_received))
+  {
+    return ScannerMsgType::Reply;
+  }
+  if (rawDataMatchesMonitoringFrame(data, bytes_received))
+  {
+    return ScannerMsgType::MonitoringFrame;
+  }
+  return ScannerMsgType::Unknown;
+}
+
+inline bool MsgDecoder::rawDataMatchesReply(const RawScannerData& data, const std::size_t& bytes_received)
+{
+  return bytes_received == REPLY_MSG_FROM_SCANNER_SIZE;
+}
+
+inline bool MsgDecoder::rawDataMatchesMonitoringFrame(const RawScannerData& data, const std::size_t& bytes_received)
+{
+  // TODO
 }
 
 }  // namespace psen_scan_v2
