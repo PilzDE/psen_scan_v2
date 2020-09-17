@@ -47,7 +47,7 @@ public:
 
   //! @returns true if the measurement data contain as much measurements as required by the measurement range
   //! and measurement resolution.
-  bool isNumberOfScansValid() const;
+  bool isValid() const;
 
 private:
   //! Measurement data of the laserscan (in Millimeters).

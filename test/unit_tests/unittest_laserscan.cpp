@@ -46,7 +46,7 @@ TEST(LaserScanTests, testInvalidStartEndAngle)
 TEST(LaserScanTests, testInvalidNumberOfScans)
 {
   LaserScan laser_scan(DEFAULT_RESOLUTION, DEFAULT_START_ANGLE, DEFAULT_END_ANGLE);
-  EXPECT_FALSE(laser_scan.isNumberOfScansValid());
+  EXPECT_FALSE(laser_scan.isValid());
 }
 
 }  // namespace psen_scan_v2_test
