@@ -28,16 +28,19 @@ namespace psen_scan_v2
 {
 struct ScanCounterField
 {
+  //! @brief Read length and payload
   static void read(std::istringstream& is, uint32_t& scan_counter);
 };
 
 struct MeasuresField
 {
+  //! @brief Read length and payload
   static void read(std::istringstream& is, std::vector<uint16_t>& measures);
 };
 
 struct EndOfFrameField
 {
+  //! @brief Set @p end_of_frame to true
   static void read(std::istringstream& is, bool& end_of_frame);
 };
 
