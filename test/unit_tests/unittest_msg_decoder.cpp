@@ -32,6 +32,7 @@ class MockCallbackHolder
 public:
   MOCK_METHOD0(start_reply_callback, void());
   MOCK_METHOD1(error_callback, void(const std::string&));
+  MOCK_METHOD1(monitoring_frame_callback, void(const MonitoringFrameMsg&));
 };
 
 class MsgDecoderTest : public ::testing::Test
@@ -39,7 +40,8 @@ class MsgDecoderTest : public ::testing::Test
 protected:
   MsgDecoderTest()
     : decoder_(std::bind(&MockCallbackHolder::start_reply_callback, &mock_),
-               std::bind(&MockCallbackHolder::error_callback, &mock_, std::placeholders::_1))
+               std::bind(&MockCallbackHolder::error_callback, &mock_, std::placeholders::_1),
+               std::bind(&MockCallbackHolder::monitoring_frame_callback, &mock_, std::placeholders::_1))
     , reply_(ScannerReplyMsg::getStartOpCode(), DEFAULT_RESULT_CODE)
     , reply_raw_(reply_.toCharArray())
   {

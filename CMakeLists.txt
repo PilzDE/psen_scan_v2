@@ -175,6 +175,7 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gmock(unittest_msg_decoder
     test/unit_tests/unittest_msg_decoder.cpp
+    src/monitoring_frame_msg.cpp
   )
   target_link_libraries(unittest_msg_decoder
     ${catkin_LIBRARIES}
