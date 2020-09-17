@@ -42,7 +42,7 @@ private:
 
 inline void LaserScanBuilder::add(const MonitoringFrameMsg& frame)
 {
-  if ( !ready_ )
+  if (!ready_)
   {
     frames_.front() = frame;
     ready_ = true;
@@ -56,22 +56,20 @@ inline bool LaserScanBuilder::laserScanReady() const
 
 inline LaserScan LaserScanBuilder::build()
 {
-    const MonitoringFrameMsg frame = frames_.front();
+  const MonitoringFrameMsg frame = frames_.front();
 
-    const double resolution = tenthDegreeToRad(frame.resolution());
-    const double min_angle = tenthDegreeToRad(frame.fromTheta());
-    const uint16_t number_of_samples = frame.measures().size();
-    const double max_angle = min_angle + resolution * number_of_samples;
+  const double resolution = tenthDegreeToRad(frame.resolution());
+  const double min_angle = tenthDegreeToRad(frame.fromTheta());
+  const uint16_t number_of_samples = frame.measures().size();
+  const double max_angle = min_angle + resolution * number_of_samples;
 
-    LaserScan ret(resolution,
-                  min_angle,
-                  max_angle);
+  LaserScan ret(resolution, min_angle, max_angle);
 
-    ret.setMeasurements(frame.measures());
+  ret.setMeasurements(frame.measures());
 
-    reset();
+  reset();
 
-    return ret;
+  return ret;
 }
 
 inline LaserScanBuildFailure::LaserScanBuildFailure(const std::string& msg) : std::runtime_error(msg)

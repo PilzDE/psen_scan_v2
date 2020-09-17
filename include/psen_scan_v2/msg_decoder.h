@@ -151,7 +151,6 @@ inline void MsgDecoder::handleUnknownMsg(const RawScannerData& data, const std::
   error_callback_("Unknown message type (Size " + std::to_string(bytes_received) + ")");
 }
 
-
 }  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_MSG_DECODER_H
