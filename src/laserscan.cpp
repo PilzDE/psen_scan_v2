@@ -75,6 +75,11 @@ const MeasurementData& LaserScan::getMeasurements() const
   return measures_;
 }
 
+void LaserScan::setMeasurements(const MeasurementData& measures)
+{
+  measures_ = measures;
+}
+
 MeasurementData& LaserScan::getMeasurements()
 {
   return measures_;

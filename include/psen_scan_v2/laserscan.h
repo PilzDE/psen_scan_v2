@@ -43,6 +43,7 @@ public:
 
   const MeasurementData& getMeasurements() const;
   MeasurementData& getMeasurements();
+  void setMeasurements(const MeasurementData&);
 
   //! @returns true if the measurement data contain as much measurements as required by the measurement range
   //! and measurement resolution.

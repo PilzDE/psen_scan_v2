@@ -18,10 +18,13 @@
 
 #include <functional>
 
+#include "psen_scan_v2/monitoring_frame_msg.h"
+
 namespace psen_scan_v2
 {
 using SendStartRequestCallback = std::function<void()>;
 using StartReplyCallback = std::function<void()>;
+using MonitoringFrameCallback = std::function<void(const MonitoringFrameMsg&)>;
 using ErrorCallback = std::function<void(const std::string&)>;
 }  // namespace psen_scan_v2
 
