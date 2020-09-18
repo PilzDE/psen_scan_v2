@@ -31,11 +31,11 @@ REGISTER_ROSCONSOLE_BRIDGE;
 
 using namespace psen_scan_v2;
 
-std::function<void()> node_terminate_cb;
+std::function<void()> NODE_TERMINATE_CB;
 
 void delayed_shutdown_sig_handler(int sig)
 {
-  node_terminate_cb();
+  NODE_TERMINATE_CB();
   ros::Duration(0.2).sleep();
 
   ros::shutdown();
@@ -65,7 +65,7 @@ int main(int argc, char** argv)
                                     param_handler.getXAxisRotation(),
                                     scanner_configuration);
 
-    node_terminate_cb = std::bind(&ROSScannerNode::terminate, &ros_scanner_node);
+    NODE_TERMINATE_CB = std::bind(&ROSScannerNode::terminate, &ros_scanner_node);
 
     auto f = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
     f.wait();
