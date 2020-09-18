@@ -48,6 +48,11 @@ protected:
 class FromRawTest : public ::testing::Test
 {
 protected:
+  FromRawTest()
+  {
+    data_ = buildRawData(monitoring_frame_without_intensities_hex_dump);
+    msg_ = MonitoringFrameMsg::fromRawData(data_);
+  }
   template <typename T>
   inline MaxSizeRawData buildRawData(const T hex_dump)
   {
@@ -58,6 +63,9 @@ protected:
     }
     return ret;
   }
+  MaxSizeRawData data_;
+  MonitoringFrameMsg msg_;
+
 };
 
 TEST(ScanCounterFieldTest, testReadSuccess)
@@ -168,26 +176,30 @@ TEST(EndOfFrameFieldTest, testReadIgnoreInvalidLength)
 
 TEST_F(FromRawTest, testReadSuccess)
 {
-  MaxSizeRawData data = buildRawData(monitoring_frame_without_intensities_hex_dump);
-  MonitoringFrameMsg msg = MonitoringFrameMsg::fromRawData(data);
-
   // You get the following expected values from
   // the protocol description and the udp hex dump
   // You may need a hex calulator
-  EXPECT_EQ(msg.fromTheta(), 1000);
-  EXPECT_EQ(msg.resolution(), 10);
+  EXPECT_EQ(msg_.fromTheta(), 1000);
+  EXPECT_EQ(msg_.resolution(), 10);
 
   size_t expected_measures_size = (0x65 - 1) / 2;
-  EXPECT_EQ(msg.measures().size(), expected_measures_size);
+  EXPECT_EQ(msg_.measures().size(), expected_measures_size);
 
-  EXPECT_EQ(msg.measures().at(0), 681);
-  EXPECT_EQ(msg.measures().at(1), 774);
-  EXPECT_EQ(msg.measures().at(2), 636);
-  EXPECT_EQ(msg.measures().at(3), 506);
-  EXPECT_EQ(msg.measures().at(4), 496);
-  EXPECT_EQ(msg.measures().at(30), 4063);
-  EXPECT_EQ(msg.measures().at(45), 4074);
-  EXPECT_EQ(msg.measures().at(49), 4657);
+  EXPECT_EQ(msg_.measures().at(0), 681);
+  EXPECT_EQ(msg_.measures().at(1), 774);
+  EXPECT_EQ(msg_.measures().at(2), 636);
+  EXPECT_EQ(msg_.measures().at(3), 506);
+  EXPECT_EQ(msg_.measures().at(4), 496);
+  EXPECT_EQ(msg_.measures().at(30), 4063);
+  EXPECT_EQ(msg_.measures().at(45), 4074);
+  EXPECT_EQ(msg_.measures().at(49), 4657);
+}
+
+TEST_F(FromRawTest, testWrongOpCode)
+{
+ MaxSizeRawData data = data_;
+ data.at(4) += 1;
+ EXPECT_THROW(MonitoringFrameMsg::fromRawData(data);, MonitoringFrameFormatError);
 }
 
 }  // namespace psen_scan_v2_test

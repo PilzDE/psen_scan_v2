@@ -49,7 +49,10 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
   raw_processing::read(is, msg.from_theta_fixed_);
   raw_processing::read(is, msg.resolution_fixed_);
 
-  assert(msg.op_code_fixed_ == OP_CODE_MONITORING_FRAME && "Invalid Op_Code!");
+  if ( OP_CODE_MONITORING_FRAME != msg.op_code_fixed_)
+  {
+    throw MonitoringFrameFormatError("Wrong Op Code!");
+  }
 
   while (!msg.end_of_frame_)
   {
