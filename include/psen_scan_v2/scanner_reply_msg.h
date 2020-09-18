@@ -149,10 +149,12 @@ inline ScannerReplyMsgType ScannerReplyMsg::type() const
   {
     return ScannerReplyMsgType::Start;
   }
-  else if (opcode_ == OPCODE_STOP)
+
+  if (opcode_ == OPCODE_STOP)
   {
     return ScannerReplyMsgType::Stop;
   }
+
   return ScannerReplyMsgType::Unknown;
 }
 
