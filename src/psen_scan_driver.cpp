@@ -36,7 +36,9 @@ std::function<void()> NODE_TERMINATE_CB;
 void delayed_shutdown_sig_handler(int sig)
 {
   NODE_TERMINATE_CB();
-  ros::Duration(0.2).sleep();
+
+  // Delay the shutdown() to get full debug output. Workaround for https://github.com/ros/ros_comm/issues/688
+  ros::Duration(0.2).sleep();  // TODO check if we can get rid of this sleep
 
   ros::shutdown();
 }
