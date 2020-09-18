@@ -120,7 +120,12 @@ The state machine consists roughly of the following transitions:
       <w>121</w>
       <h>44</h>
     </coordinates>
+<<<<<<< HEAD
     <panel_attributes>Idle</panel_attributes>
+=======
+    <panel_attributes>Idle
+group=1</panel_attributes>
+>>>>>>> feature/new_firmware_stop
     <additional_attributes/>
   </element>
   <element>
@@ -228,10 +233,17 @@ received</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
+<<<<<<< HEAD
       <x>11</x>
       <y>319</y>
       <w>429</w>
       <h>594</h>
+=======
+      <x>70</x>
+      <y>203</y>
+      <w>224</w>
+      <h>378</h>
+>>>>>>> feature/new_firmware_stop
     </coordinates>
     <panel_attributes>symbol=component
 &lt;&lt;State machine&gt;&gt;
@@ -422,10 +434,17 @@ Contains all parameters of the current scanner state.</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
+<<<<<<< HEAD
       <x>132</x>
       <y>429</y>
       <w>22</w>
       <h>22</h>
+=======
+      <x>154</x>
+      <y>273</y>
+      <w>14</w>
+      <h>14</h>
+>>>>>>> feature/new_firmware_stop
     </coordinates>
     <panel_attributes>type=initial</panel_attributes>
     <additional_attributes/>
@@ -433,6 +452,7 @@ Contains all parameters of the current scanner state.</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
+<<<<<<< HEAD
       <x>132</x>
       <y>440</y>
       <w>121</w>
@@ -464,5 +484,14 @@ Request</panel_attributes>
     </coordinates>
     <panel_attributes>lt=-&gt;</panel_attributes>
     <additional_attributes>100.0;10.0;10.0;60.0;10.0;290.0;90.0;290.0</additional_attributes>
+=======
+      <x>154</x>
+      <y>280</y>
+      <w>21</w>
+      <h>42</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+>>>>>>> feature/new_firmware_stop
   </element>
 </diagram>
