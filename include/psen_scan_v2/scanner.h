@@ -86,6 +86,7 @@ void ScannerT<SC>::stop()
 template <typename SC>
 LaserScan ScannerT<SC>::getCompleteScan()
 {
+  // TODO: Move implementation from ScannerController?
   return scanner_controller_.buildLaserScan();
 }
 
