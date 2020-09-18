@@ -15,6 +15,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <cassert>
 #include <iterator>
 #include <sstream>
 #include <string>
@@ -91,6 +92,8 @@ void MeasuresField::readLengthAndPayload(std::istringstream& is, std::vector<uin
       raw_processing::read(is, sample);
       measures.at(i) = sample;
   }
+
+  assert(is.eof());
   // TODO get this to work or remove the comment
   //std::copy_n(std::istream_iterator<uint16_t>(is), number_of_samples, measures.begin());
 }
