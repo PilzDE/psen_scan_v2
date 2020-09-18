@@ -59,6 +59,7 @@ public:
 
 private:
   sensor_msgs::LaserScan toRosMessage(const LaserScan& laserscan) const;
+  void laserScanCallback(const LaserScan& scan);
 
 private:
   ros::NodeHandle nh_;
@@ -82,7 +83,10 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
                                     const std::string& frame_id,
                                     const double& x_axis_rotation,
                                     const ScannerConfiguration& scanner_config)
-  : nh_(nh), frame_id_(frame_id), x_axis_rotation_(x_axis_rotation), scanner_(scanner_config)
+  : nh_(nh)
+  , frame_id_(frame_id)
+  , x_axis_rotation_(x_axis_rotation)
+  , scanner_(scanner_config, std::bind(&ROSScannerNodeT<S>::laserScanCallback, this, std::placeholders::_1))
 {
   pub_ = nh_.advertise<sensor_msgs::LaserScan>(topic, 1);
 }
@@ -116,6 +120,12 @@ sensor_msgs::LaserScan ROSScannerNodeT<S>::toRosMessage(const LaserScan& lasersc
 }
 
 template <typename S>
+void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
+{
+  pub_.publish(toRosMessage(scan));
+}
+
+template <typename S>
 void ROSScannerNodeT<S>::terminate()
 {
   terminate_ = true;
@@ -128,14 +138,6 @@ void ROSScannerNodeT<S>::run()
   scanner_.start();
   while (ros::ok() && !terminate_)
   {
-    try
-    {
-      pub_.publish(toRosMessage(scanner_.getCompleteScan()));
-    }
-    catch (const LaserScanBuildFailure& ex)
-    {
-      ROS_ERROR_STREAM(ex.what());
-    }
     r.sleep();
   }
   scanner_.stop();
