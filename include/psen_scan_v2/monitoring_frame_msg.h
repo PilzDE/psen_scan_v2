@@ -28,20 +28,17 @@ namespace psen_scan_v2
 {
 struct ScanCounterField
 {
-  //! @brief Read length and payload
-  static void read(std::istringstream& is, uint32_t& scan_counter);
+  static void readLengthAndPayload(std::istringstream& is, uint32_t& scan_counter);
 };
 
 struct MeasuresField
 {
-  //! @brief Read length and payload
-  static void read(std::istringstream& is, std::vector<uint16_t>& measures);
+  static void readLengthAndPayload(std::istringstream& is, std::vector<uint16_t>& measures);
 };
 
 struct EndOfFrameField
 {
-  //! @brief Set @p end_of_frame to true
-  static void read(std::istringstream& is, bool& end_of_frame);
+  static void setEndOfFrameMemberToTrue(std::istringstream& is, bool& end_of_frame);
 };
 
 struct MonitoringFrameIds
@@ -65,14 +62,13 @@ private:
   void deserializeAdditionalField(std::istringstream& is);
 
 private:
-  // Fixed fields
-  uint32_t device_status_{ 0 };
-  uint32_t op_code_{ 0 };
-  uint32_t working_mode_{ 0 };
-  uint32_t transaction_type_{ 0 };
-  uint8_t scanner_id_{ 0 };
-  uint16_t from_theta_{ 0 };
-  uint16_t resolution_{ 0 };
+  uint32_t device_status_fixed_{ 0 };
+  uint32_t op_code_fixed_{ 0 };
+  uint32_t working_mode_fixed_{ 0 };
+  uint32_t transaction_type_fixed_{ 0 };
+  uint8_t scanner_id_fixed_{ 0 };
+  uint16_t from_theta_fixed_{ 0 };
+  uint16_t resolution_fixed_{ 0 };
 
   // Additional information
   uint32_t scan_counter_{ 0 };
@@ -83,25 +79,20 @@ private:
 private:
   using SingleFieldReader = std::function<void(std::istringstream&)>;
   std::map<uint8_t, SingleFieldReader> id_to_field_reader_{
-    { MonitoringFrameIds::SCAN_COUNTER, std::bind(ScanCounterField::read, std::placeholders::_1, scan_counter_) },
-    { MonitoringFrameIds::MEASURES, std::bind(MeasuresField::read, std::placeholders::_1, measures_) },
-    { MonitoringFrameIds::END_OF_FRAME, std::bind(EndOfFrameField::read, std::placeholders::_1, end_of_frame_) }
+    { MonitoringFrameIds::SCAN_COUNTER, std::bind(ScanCounterField::readLengthAndPayload, std::placeholders::_1, scan_counter_) },
+    { MonitoringFrameIds::MEASURES, std::bind(MeasuresField::readLengthAndPayload, std::placeholders::_1, measures_) },
+    { MonitoringFrameIds::END_OF_FRAME, std::bind(EndOfFrameField::setEndOfFrameMemberToTrue, std::placeholders::_1, end_of_frame_) }
   };
 };
 
-inline void EndOfFrameField::read(std::istringstream& is, bool& end_of_frame)
-{
-  end_of_frame = true;
-}
-
 inline uint16_t MonitoringFrameMsg::fromTheta() const
 {
-  return from_theta_;
+  return from_theta_fixed_;
 }
 
 inline uint16_t MonitoringFrameMsg::resolution() const
 {
-  return resolution_;
+  return resolution_fixed_;
 }
 
 inline std::vector<uint16_t> MonitoringFrameMsg::measures() const

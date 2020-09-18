@@ -37,7 +37,7 @@ TEST(ScanCounterFieldTest, testReadSuccess)
   std::istringstream is{ builder.get() };
 
   uint32_t scan_counter;
-  EXPECT_NO_THROW(ScanCounterField::read(is, scan_counter););
+  EXPECT_NO_THROW(ScanCounterField::readLengthAndPayload(is, scan_counter););
   EXPECT_EQ(expected_scan_counter, scan_counter);
 }
 
@@ -50,7 +50,7 @@ TEST(ScanCounterFieldTest, testReadInvalidLengthFailure)
   std::istringstream is{ builder.get() };
 
   uint32_t scan_counter;
-  EXPECT_THROW(ScanCounterField::read(is, scan_counter);, MonitoringFrameFormatError);
+  EXPECT_THROW(ScanCounterField::readLengthAndPayload(is, scan_counter);, MonitoringFrameFormatError);
 }
 
 TEST(ScanCounterFieldTest, testReadMissingPayloadFailure)
@@ -62,7 +62,28 @@ TEST(ScanCounterFieldTest, testReadMissingPayloadFailure)
   std::istringstream is{ builder.get() };
 
   uint32_t scan_counter;
-  EXPECT_THROW(ScanCounterField::read(is, scan_counter);, StringStreamFailure);
+  EXPECT_THROW(ScanCounterField::readLengthAndPayload(is, scan_counter);, StringStreamFailure);
+}
+
+TEST(MeasuresFieldTest, testReadSuccess)
+{
+  const uint16_t length = 6;
+
+  IStringStreamBuilder builder;
+
+  const uint16_t expected_first = 44;
+  const uint16_t expected_second = 43;
+  const uint16_t expected_third = 42;
+
+  builder.add(length).add(expected_first).add(expected_second).add(expected_third);
+  std::istringstream is{ builder.get() };
+
+  std::vector<uint16_t> measures;
+
+  EXPECT_NO_THROW(MeasuresField::readLengthAndPayload(is, measures););
+  EXPECT_EQ(measures.at(0), 44);
+  EXPECT_EQ(measures.at(1), 43);
+  EXPECT_EQ(measures.at(2), 42);
 }
 
 TEST(EndOfFrameFieldTest, testReadSuccess)
@@ -74,7 +95,7 @@ TEST(EndOfFrameFieldTest, testReadSuccess)
   std::istringstream is{ builder.get() };
 
   bool end_of_frame = false;
-  EXPECT_NO_THROW(EndOfFrameField::read(is, end_of_frame););
+  EXPECT_NO_THROW(EndOfFrameField::setEndOfFrameMemberToTrue(is, end_of_frame););
   EXPECT_TRUE(end_of_frame);
 }
 
@@ -87,7 +108,7 @@ TEST(EndOfFrameFieldTest, testReadIgnoreInvalidLength)
   std::istringstream is{ builder.get() };
 
   bool end_of_frame = false;
-  EXPECT_NO_THROW(EndOfFrameField::read(is, end_of_frame););
+  EXPECT_NO_THROW(EndOfFrameField::setEndOfFrameMemberToTrue(is, end_of_frame););
   EXPECT_TRUE(end_of_frame);
 }
 }  // namespace psen_scan_v2_test
