@@ -31,6 +31,9 @@
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/laserscan_builder.h"
+#include "psen_scan_v2/monitoring_frame_msg.h"
+#include "psen_scan_v2/raw_scanner_data.h"
+#include "psen_scan_v2/function_pointers.h"
 
 namespace psen_scan_v2
 {
@@ -46,22 +49,23 @@ template <typename TCSM = ControllerStateMachine, typename TUCI = UdpClientImpl>
 class ScannerControllerT
 {
 public:
-  ScannerControllerT(const ScannerConfiguration& scanner_config);
+  ScannerControllerT(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback);
   void start();
   void stop();
 
   void handleError(const std::string& error_msg);
   void sendStartRequest();
   LaserScan buildLaserScan();
+  void handleNewData(const RawScannerData& data, const std::size_t& bytes_received);
 
 private:
   ScannerConfiguration scanner_config_;
   TCSM state_machine_;
   MsgDecoder control_msg_decoder_;
-  MsgDecoder data_msg_decoder_;
   TUCI control_udp_client_;
   TUCI data_udp_client_;
   LaserScanBuilder laser_scan_builder_;
+  LaserScanCallback laser_scan_callback_;
 
   friend class ScannerControllerTest;
   FRIEND_TEST(ScannerControllerTest, test_start_method_calls_correct_state_machine_event);
@@ -72,28 +76,40 @@ private:
 typedef ScannerControllerT<> ScannerController;
 
 template <typename TCSM, typename TUCI>
-ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& scanner_config)
+ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& scanner_config,
+                                                   const LaserScanCallback& laser_scan_callback)
   : scanner_config_(scanner_config)
   , state_machine_(std::bind(&ScannerControllerT::sendStartRequest, this))
   , control_msg_decoder_(std::bind(&TCSM::processStartReplyReceivedEvent, &state_machine_),
                          std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1),
                          std::bind(&LaserScanBuilder::add, &laser_scan_builder_, std::placeholders::_1))
-  , data_msg_decoder_(std::bind(&TCSM::processStartReplyReceivedEvent, &state_machine_),
-                      std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1),
-                      std::bind(&LaserScanBuilder::add, &laser_scan_builder_, std::placeholders::_1))
   , control_udp_client_(
         std::bind(&MsgDecoder::decodeAndDispatch, &control_msg_decoder_, std::placeholders::_1, std::placeholders::_2),
         std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1),
         scanner_config.hostUDPPortControl(),
         scanner_config.clientIp(),
         CONTROL_PORT_OF_SCANNER_DEVICE)
-  , data_udp_client_(
-        std::bind(&MsgDecoder::decodeAndDispatch, &data_msg_decoder_, std::placeholders::_1, std::placeholders::_2),
-        std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1),
-        scanner_config.hostUDPPortData(),
-        scanner_config.clientIp(),
-        DATA_PORT_OF_SCANNER_DEVICE)
+  , data_udp_client_(std::bind(&ScannerControllerT::handleNewData, this, std::placeholders::_1, std::placeholders::_2),
+                     std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1),
+                     scanner_config.hostUDPPortData(),
+                     scanner_config.clientIp(),
+                     DATA_PORT_OF_SCANNER_DEVICE)
+  , laser_scan_callback_(laser_scan_callback)
 {
+}
+
+template <typename TCSM, typename TUCI>
+void ScannerControllerT<TCSM, TUCI>::handleNewData(const RawScannerData& data, const std::size_t& bytes_received)
+{
+  MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
+  state_machine_.processMonitoringFrameReceivedEvent();
+
+  laser_scan_builder_.add(frame);
+  if (laser_scan_builder_.laserScanReady())
+  {
+    LaserScan scan{ laser_scan_builder_.build() };
+    laser_scan_callback_(scan);
+  }
 }
 
 template <typename TCSM, typename TUCI>
@@ -129,12 +145,13 @@ void ScannerControllerT<TCSM, TUCI>::sendStartRequest()
 template <typename TCSM, typename TUCI>
 LaserScan ScannerControllerT<TCSM, TUCI>::buildLaserScan()
 {
+  // TODO: Move to user API (Scanner class)?
   constexpr std::chrono::milliseconds sleeping_time{ 10 };
 
   using cl = std::chrono::system_clock;
   cl::time_point start_time = cl::now();
 
-  int i=0;
+  int i = 0;
   while (!laser_scan_builder_.laserScanReady())
   {
     std::this_thread::sleep_for(sleeping_time);

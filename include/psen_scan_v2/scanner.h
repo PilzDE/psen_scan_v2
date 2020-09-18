@@ -23,6 +23,7 @@
 #include <gtest/gtest_prod.h>
 
 #include "psen_scan_v2/controller_state_machine.h"
+#include "psen_scan_v2/function_pointers.h"
 #include "psen_scan_v2/laserscan.h"
 #include "psen_scan_v2/msg_decoder.h"
 #include "psen_scan_v2/scanner_configuration.h"
@@ -42,8 +43,9 @@ public:
    * @brief Constructor.
    *
    * @param scanner_config Configuration details of the scanner.
+   * @param callback Callback for processing complete laser scans.
    */
-  ScannerT(const ScannerConfiguration& scanner_config);
+  ScannerT(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback);
   //! @brief Starts the scanner.
   void start();
   //! @brief Stops the scanner.
@@ -64,7 +66,8 @@ private:
 typedef ScannerT<> Scanner;
 
 template <typename SC>
-ScannerT<SC>::ScannerT(const ScannerConfiguration& scanner_config) : scanner_controller_(scanner_config)
+ScannerT<SC>::ScannerT(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback)
+  : scanner_controller_(scanner_config, laser_scan_callback)
 {
 }
 
@@ -83,6 +86,7 @@ void ScannerT<SC>::stop()
 template <typename SC>
 LaserScan ScannerT<SC>::getCompleteScan()
 {
+  // TODO: Move implementation from ScannerController?
   return scanner_controller_.buildLaserScan();
 }
 
