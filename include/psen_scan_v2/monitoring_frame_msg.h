@@ -51,7 +51,7 @@ struct MonitoringFrameIds
 class MonitoringFrameMsg
 {
 public:
-  static MonitoringFrameMsg fromRawData(const RawScannerData& data);
+  static MonitoringFrameMsg fromRawData(const MaxSizeRawData& data);
 
 public:
   uint16_t fromTheta() const;

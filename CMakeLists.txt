@@ -100,6 +100,7 @@ set(${PROJECT_NAME}_sources
   src/laserscan.cpp
   src/start_request.cpp
   src/monitoring_frame_msg.cpp
+  src/stop_request.cpp
 )
 
 set(${PROJECT_NAME}_node_sources
@@ -190,6 +191,14 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES}
   )
 
+  catkin_add_gtest(unittest_stop_request
+    test/unit_tests/unittest_stop_request.cpp
+    src/stop_request.cpp
+  )
+  target_link_libraries(unittest_stop_request
+    ${catkin_LIBRARIES}
+  )
+
   catkin_add_gmock(unittest_controller_state_machine
     test/unit_tests/unittest_controller_state_machine.cpp
     src/controller_state_machine.cpp
@@ -241,6 +250,7 @@ if(CATKIN_ENABLE_TESTING)
     src/scanner_configuration.cpp
     src/start_request.cpp
     src/monitoring_frame_msg.cpp
+    src/stop_request.cpp
   )
   target_link_libraries(unittest_scanner_controller
     ${catkin_LIBRARIES}

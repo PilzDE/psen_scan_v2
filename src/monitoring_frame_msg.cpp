@@ -31,11 +31,11 @@ constexpr uint8_t MonitoringFrameIds::SCAN_COUNTER;
 constexpr uint8_t MonitoringFrameIds::MEASURES;
 constexpr uint8_t MonitoringFrameIds::END_OF_FRAME;
 
-MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const RawScannerData& data)
+MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
 {
   MonitoringFrameMsg msg;
 
-  RawScannerData tmp_data{ data };
+  MaxSizeRawData tmp_data{ data };
   std::istringstream is(std::string(tmp_data.data(), tmp_data.size()));
 
   raw_processing::read(is, msg.device_status_fixed_);

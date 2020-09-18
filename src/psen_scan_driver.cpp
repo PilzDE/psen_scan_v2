@@ -14,6 +14,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <functional>
+#include <csignal>
+#include <future>
 
 #include <ros/ros.h>
 
@@ -29,10 +31,24 @@ REGISTER_ROSCONSOLE_BRIDGE;
 
 using namespace psen_scan_v2;
 
+std::function<void()> NODE_TERMINATE_CB;
+
+void delayed_shutdown_sig_handler(int sig)
+{
+  NODE_TERMINATE_CB();
+
+  // Delay the shutdown() to get full debug output. Workaround for https://github.com/ros/ros_comm/issues/688
+  ros::Duration(0.2).sleep();  // TODO check if we can get rid of this sleep
+
+  ros::shutdown();
+}
+
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "psen_scan_v2_node");
   ros::NodeHandle pnh("~");
+
+  std::signal(SIGINT, delayed_shutdown_sig_handler);
 
   try
   {
@@ -50,7 +66,11 @@ int main(int argc, char** argv)
                                     param_handler.getFrameID(),
                                     param_handler.getXAxisRotation(),
                                     scanner_configuration);
-    ros_scanner_node.run();
+
+    NODE_TERMINATE_CB = std::bind(&ROSScannerNode::terminate, &ros_scanner_node);
+
+    auto f = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
+    f.wait();
   }
   catch (std::exception& e)
   {

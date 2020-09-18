@@ -44,14 +44,14 @@ uint32_t StartRequest::getCRC() const
 {
   boost::crc_32_type result;
 
-  std::vector<char> raw_data = toRawType();
+  DynamicSizeRawData raw_data{ toRawData() };
 
   result.process_bytes(&raw_data.at(sizeof(crc_)), raw_data.size() - sizeof(crc_));
 
   return result.checksum();
 }
 
-StartRequest::RawType StartRequest::toRawType() const
+DynamicSizeRawData StartRequest::toRawData() const
 {
   std::ostringstream os;
 
@@ -92,7 +92,7 @@ StartRequest::RawType StartRequest::toRawType() const
 
   std::string data_str(os.str());
 
-  std::vector<char> raw_data;
+  DynamicSizeRawData raw_data;
   raw_data.reserve(data_str.length());
   assert(data_str.length() == START_REQUEST_SIZE && "Message data of start request has not the expected size");
   std::copy(data_str.begin(), data_str.end(), std::back_inserter(raw_data));

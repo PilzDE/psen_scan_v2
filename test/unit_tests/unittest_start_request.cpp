@@ -44,7 +44,7 @@ TEST_F(StartRequestTest, constructorTest)
   uint32_t sequence_number{ 123 };
   StartRequest sr(sc, sequence_number);
 
-  auto data = sr.toRawType();
+  auto data = sr.toRawData();
   boost::crc_32_type result;
   result.process_bytes(&data[sizeof(uint32_t)], data.size() - sizeof(uint32_t));
 
@@ -94,7 +94,7 @@ TEST_F(StartRequestTest, regressionForRealSystem)
   ScannerConfiguration sc("192.168.0.50", 55115, 0, "192.168.0.10", 0.0, degreeToRad(275.));
   StartRequest sr(sc, 0);
 
-  auto data = sr.toRawType();
+  auto data = sr.toRawData();
 
   unsigned char expected_crc[4] = { 0x95, 0x58, 0x3a, 0x93 };  // see wireshark for this number
 

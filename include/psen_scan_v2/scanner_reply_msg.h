@@ -35,6 +35,7 @@ namespace psen_scan_v2
 enum class ScannerReplyMsgType
 {
   Start,
+  Stop,
   Unknown
 };
 
@@ -47,7 +48,7 @@ class ScannerReplyMsg
 {
 public:
   //! @brief Deserializes the specified data into a reply message.
-  static ScannerReplyMsg fromRawData(const RawScannerData& data);
+  static ScannerReplyMsg fromRawData(const MaxSizeRawData& data);
 
 public:
   /**
@@ -66,11 +67,12 @@ public:
 
 public:
   static uint32_t getStartOpCode();
+  static uint32_t getStopOpCode();
   static uint32_t calcCRC(const ScannerReplyMsg& msg);
 
-public:
-  using RawType = std::array<char, REPLY_MSG_FROM_SCANNER_SIZE>;
-  RawType toCharArray();
+  using RawType = FixedSizeRawData<REPLY_MSG_FROM_SCANNER_SIZE>;
+  //! @brief Serializes the reply into raw data.
+  RawType toRawData() const;
 
 private:
   template <typename T>
@@ -91,6 +93,7 @@ private:
 
 private:
   static constexpr uint32_t OPCODE_START{ 0x35 };
+  static constexpr uint32_t OPCODE_STOP{ 0x36 };
 };
 
 inline uint32_t ScannerReplyMsg::calcCRC(const ScannerReplyMsg& msg)
@@ -115,17 +118,22 @@ inline uint32_t ScannerReplyMsg::getStartOpCode()
   return OPCODE_START;
 }
 
+inline uint32_t ScannerReplyMsg::getStopOpCode()
+{
+  return OPCODE_STOP;
+}
+
 inline ScannerReplyMsg::ScannerReplyMsg(const uint32_t op_code, const uint32_t res_code)
   : opcode_(op_code), res_code_(res_code)
 {
   crc_ = calcCRC(*this);
 }
 
-inline ScannerReplyMsg ScannerReplyMsg::fromRawData(const RawScannerData& data)
+inline ScannerReplyMsg ScannerReplyMsg::fromRawData(const MaxSizeRawData& data)
 {
   ScannerReplyMsg msg{ 0, 0 };
 
-  RawScannerData tmp_data{ data };
+  MaxSizeRawData tmp_data{ data };
   std::istringstream is(std::string(tmp_data.data(), REPLY_MSG_FROM_SCANNER_SIZE));
 
   raw_processing::read(is, msg.crc_);
@@ -147,10 +155,16 @@ inline ScannerReplyMsgType ScannerReplyMsg::type() const
   {
     return ScannerReplyMsgType::Start;
   }
+
+  if (opcode_ == OPCODE_STOP)
+  {
+    return ScannerReplyMsgType::Stop;
+  }
+
   return ScannerReplyMsgType::Unknown;
 }
 
-inline ScannerReplyMsg::RawType ScannerReplyMsg::toCharArray()
+inline ScannerReplyMsg::RawType ScannerReplyMsg::toRawData() const
 {
   std::ostringstream os;
 

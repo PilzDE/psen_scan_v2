@@ -27,7 +27,9 @@ namespace psen_scan_v2
 class ControllerStateMachine
 {
 public:
-  explicit ControllerStateMachine(const SendStartRequestCallback& sr);
+  explicit ControllerStateMachine(const SendRequestCallback& start_request_cb,
+                                  const SendRequestCallback& stop_request_cb,
+                                  const StoppedCallback& stopped_cb);
   virtual ~ControllerStateMachine();
 
   void processStartRequestEvent();

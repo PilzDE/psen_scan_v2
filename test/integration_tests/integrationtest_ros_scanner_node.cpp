@@ -137,7 +137,7 @@ TEST_F(RosScannerNodeTests, testScanBuildFailure)
   {
     ::testing::InSequence s;
     EXPECT_CALL(ros_scanner_node.scanner_, getCompleteScan())
-        .Times(100)
+        .Times(5)
         .WillRepeatedly(DoAll(ThrowScanBuildFailure(), Return(laser_scan_fake)));
     EXPECT_CALL(ros_scanner_node.scanner_, getCompleteScan()).Times(1).WillRepeatedly(Return(laser_scan_fake));
   }
