@@ -79,9 +79,12 @@ private:
 private:
   using SingleFieldReader = std::function<void(std::istringstream&)>;
   std::map<uint8_t, SingleFieldReader> id_to_field_reader_{
-    { MonitoringFrameIds::SCAN_COUNTER, std::bind(ScanCounterField::readLengthAndPayload, std::placeholders::_1, scan_counter_) },
-    { MonitoringFrameIds::MEASURES, std::bind(MeasuresField::readLengthAndPayload, std::placeholders::_1, measures_) },
-    { MonitoringFrameIds::END_OF_FRAME, std::bind(EndOfFrameField::setEndOfFrameMemberToTrue, std::placeholders::_1, end_of_frame_) }
+    { MonitoringFrameIds::SCAN_COUNTER,
+      std::bind(ScanCounterField::readLengthAndPayload, std::placeholders::_1, std::ref(scan_counter_)) },
+    { MonitoringFrameIds::MEASURES,
+      std::bind(MeasuresField::readLengthAndPayload, std::placeholders::_1, std::ref(measures_)) },
+    { MonitoringFrameIds::END_OF_FRAME,
+      std::bind(EndOfFrameField::setEndOfFrameMemberToTrue, std::placeholders::_1, std::ref(end_of_frame_)) }
   };
 };
 
