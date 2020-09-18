@@ -60,7 +60,7 @@ const double& LaserScan::getMaxScanAngle() const
   return max_scan_angle_;
 }
 
-bool LaserScan::isNumberOfScansValid() const
+bool LaserScan::isValid() const
 {
   assert(getMinScanAngle() < getMaxScanAngle() && "Invalid scan range");
 
@@ -73,6 +73,11 @@ bool LaserScan::isNumberOfScansValid() const
 const MeasurementData& LaserScan::getMeasurements() const
 {
   return measures_;
+}
+
+void LaserScan::setMeasurements(const MeasurementData& measures)
+{
+  measures_ = measures;
 }
 
 MeasurementData& LaserScan::getMeasurements()

@@ -31,12 +31,6 @@
 
 namespace psen_scan_v2
 {
-class LaserScanBuildFailure : public std::runtime_error
-{
-public:
-  LaserScanBuildFailure(const std::string& msg = "Error while building laser scan");
-};
-
 /**
  * @brief API to control and to fetch measurements from the scanner.
  */
@@ -69,10 +63,6 @@ private:
 
 typedef ScannerT<> Scanner;
 
-inline LaserScanBuildFailure::LaserScanBuildFailure(const std::string& msg) : std::runtime_error(msg)
-{
-}
-
 template <typename SC>
 ScannerT<SC>::ScannerT(const ScannerConfiguration& scanner_config) : scanner_controller_(scanner_config)
 {
@@ -93,8 +83,7 @@ void ScannerT<SC>::stop()
 template <typename SC>
 LaserScan ScannerT<SC>::getCompleteScan()
 {
-  // TODO: Add implementation in following stories
-  throw LaserScanBuildFailure();
+  return scanner_controller_.buildLaserScan();
 }
 
 }  // namespace psen_scan_v2

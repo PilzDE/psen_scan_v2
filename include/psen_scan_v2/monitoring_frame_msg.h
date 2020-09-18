@@ -51,8 +51,6 @@ struct MonitoringFrameIds
   static constexpr uint8_t END_OF_FRAME{ 0x09 };
 };
 
-using namespace std::placeholders;
-
 class MonitoringFrameMsg
 {
 public:
@@ -85,9 +83,9 @@ private:
 private:
   using SingleFieldReader = std::function<void(std::istringstream&)>;
   std::map<uint8_t, SingleFieldReader> id_to_field_reader_{
-    { MonitoringFrameIds::SCAN_COUNTER, std::bind(ScanCounterField::read, _1, scan_counter_) },
-    { MonitoringFrameIds::MEASURES, std::bind(MeasuresField::read, _1, measures_) },
-    { MonitoringFrameIds::END_OF_FRAME, std::bind(EndOfFrameField::read, _1, end_of_frame_) }
+    { MonitoringFrameIds::SCAN_COUNTER, std::bind(ScanCounterField::read, std::placeholders::_1, scan_counter_) },
+    { MonitoringFrameIds::MEASURES, std::bind(MeasuresField::read, std::placeholders::_1, measures_) },
+    { MonitoringFrameIds::END_OF_FRAME, std::bind(EndOfFrameField::read, std::placeholders::_1, end_of_frame_) }
   };
 };
 

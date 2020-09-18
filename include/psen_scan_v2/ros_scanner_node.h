@@ -90,12 +90,9 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
 template <typename S>
 sensor_msgs::LaserScan ROSScannerNodeT<S>::toRosMessage(const LaserScan& laserscan) const
 {
-  // TODO Remove after implementing building of laserscans
-  // LCOV_EXCL_START
-
-  if (!laserscan.isNumberOfScansValid())
+  if (!laserscan.isValid())
   {
-    throw std::invalid_argument("Calculated number of scans doesn't match actual number of scans.");
+    throw std::invalid_argument("Calculated number of measures doesn't match actual number of measures.");
   }
 
   sensor_msgs::LaserScan ros_message;
@@ -116,8 +113,6 @@ sensor_msgs::LaserScan ROSScannerNodeT<S>::toRosMessage(const LaserScan& lasersc
   });
 
   return ros_message;
-
-  // LCOV_EXCL_STOP
 }
 
 template <typename S>
