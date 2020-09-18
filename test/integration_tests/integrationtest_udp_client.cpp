@@ -40,7 +40,7 @@ static const std::string TIMEOUT_BARRIER_1{ "TIMEOUT_BARRIER_1" };
 static const std::string TIMEOUT_BARRIER_2{ "TIMEOUT_BARRIER_2" };
 
 static const std::string HOST_IP_ADDRESS{ "127.0.0.1" };
-static constexpr unsigned short HOST_UDP_PORT{ 45001 };
+static constexpr unsigned short HOST_UDP_PORT{ 46001 };
 
 static const std::string UDP_MOCK_IP_ADDRESS{ "127.0.0.1" };
 static constexpr unsigned short UDP_MOCK_PORT{ HOST_UDP_PORT + 1 };
