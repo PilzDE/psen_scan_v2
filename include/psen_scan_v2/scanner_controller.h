@@ -31,6 +31,8 @@
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/laserscan_builder.h"
+#include "psen_scan_v2/monitoring_frame_msg.h"
+#include "psen_scan_v2/raw_scanner_data.h"
 
 namespace psen_scan_v2
 {
