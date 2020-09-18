@@ -53,12 +53,12 @@ public:
   void handleError(const std::string& error_msg);
   void sendStartRequest();
   LaserScan buildLaserScan();
+  void handleNewData(const RawScannerData& data, const std::size_t& bytes_received);
 
 private:
   ScannerConfiguration scanner_config_;
   TCSM state_machine_;
   MsgDecoder control_msg_decoder_;
-  MsgDecoder data_msg_decoder_;
   TUCI control_udp_client_;
   TUCI data_udp_client_;
   LaserScanBuilder laser_scan_builder_;
@@ -78,9 +78,6 @@ ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& s
   , control_msg_decoder_(std::bind(&TCSM::processStartReplyReceivedEvent, &state_machine_),
                          std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1),
                          std::bind(&LaserScanBuilder::add, &laser_scan_builder_, std::placeholders::_1))
-  , data_msg_decoder_(std::bind(&TCSM::processStartReplyReceivedEvent, &state_machine_),
-                      std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1),
-                      std::bind(&LaserScanBuilder::add, &laser_scan_builder_, std::placeholders::_1))
   , control_udp_client_(
         std::bind(&MsgDecoder::decodeAndDispatch, &control_msg_decoder_, std::placeholders::_1, std::placeholders::_2),
         std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1),
@@ -88,12 +85,20 @@ ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& s
         scanner_config.clientIp(),
         CONTROL_PORT_OF_SCANNER_DEVICE)
   , data_udp_client_(
-        std::bind(&MsgDecoder::decodeAndDispatch, &data_msg_decoder_, std::placeholders::_1, std::placeholders::_2),
+        std::bind(&ScannerControllerT::handleNewData, this, std::placeholders::_1, std::placeholders::_2),
         std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1),
         scanner_config.hostUDPPortData(),
         scanner_config.clientIp(),
         DATA_PORT_OF_SCANNER_DEVICE)
 {
+}
+
+
+template <typename TCSM, typename TUCI>
+void ScannerControllerT<TCSM, TUCI>::handleNewData(const RawScannerData& data, const std::size_t& bytes_received)
+{
+  MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
+  laser_scan_builder_.add(frame);
 }
 
 template <typename TCSM, typename TUCI>
