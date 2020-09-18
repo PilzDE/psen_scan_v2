@@ -31,28 +31,6 @@ constexpr uint8_t MonitoringFrameIds::SCAN_COUNTER;
 constexpr uint8_t MonitoringFrameIds::MEASURES;
 constexpr uint8_t MonitoringFrameIds::END_OF_FRAME;
 
-void ScanCounterField::read(std::istringstream& is, uint32_t& scan_counter)
-{
-  uint16_t length;
-  raw_processing::read(is, length);
-  if (length != sizeof(scan_counter))
-  {
-    std::ostringstream os;
-    os << "Length of scan counter field is " << length << ", but should be " << sizeof(scan_counter) << ".";
-    throw MonitoringFrameFormatError(os.str());
-  }
-  raw_processing::read(is, scan_counter);
-}
-
-void MeasuresField::read(std::istringstream& is, std::vector<uint16_t>& measures)
-{
-  uint16_t length;
-  raw_processing::read(is, length);
-  unsigned int number_of_samples = length / 2U;
-  measures.reserve(number_of_samples);
-  std::copy_n(std::istream_iterator<uint16_t>(is), number_of_samples, measures.begin());
-}
-
 MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const RawScannerData& data)
 {
   MonitoringFrameMsg msg;
@@ -60,13 +38,13 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const RawScannerData& data)
   RawScannerData tmp_data{ data };
   std::istringstream is(std::string(tmp_data.data(), tmp_data.size()));
 
-  raw_processing::read(is, msg.device_status_);
-  raw_processing::read(is, msg.op_code_);
-  raw_processing::read(is, msg.working_mode_);
-  raw_processing::read(is, msg.transaction_type_);
-  raw_processing::read(is, msg.scanner_id_);
-  raw_processing::read(is, msg.from_theta_);
-  raw_processing::read(is, msg.resolution_);
+  raw_processing::read(is, msg.device_status_fixed_);
+  raw_processing::read(is, msg.op_code_fixed_);
+  raw_processing::read(is, msg.working_mode_fixed_);
+  raw_processing::read(is, msg.transaction_type_fixed_);
+  raw_processing::read(is, msg.scanner_id_fixed_);
+  raw_processing::read(is, msg.from_theta_fixed_);
+  raw_processing::read(is, msg.resolution_fixed_);
 
   while (!msg.end_of_frame_)
   {
@@ -82,6 +60,44 @@ void MonitoringFrameMsg::deserializeAdditionalField(std::istringstream& is)
   raw_processing::read(is, id);
   const SingleFieldReader read_single_field{ id_to_field_reader_.at(id) };
   read_single_field(is);
+}
+
+void ScanCounterField::readLengthAndPayload(std::istringstream& is, uint32_t& scan_counter)
+{
+  uint16_t length;
+  raw_processing::read(is, length);
+  if (length != sizeof(scan_counter))
+  {
+    std::ostringstream os;
+    os << "Length of scan counter field is " << length << ", but should be " << sizeof(scan_counter) << ".";
+    throw MonitoringFrameFormatError(os.str());
+  }
+  raw_processing::read(is, scan_counter);
+}
+
+void MeasuresField::readLengthAndPayload(std::istringstream& is, std::vector<uint16_t>& measures)
+{
+  uint16_t length;
+  raw_processing::read(is, length);
+
+  size_t bytes_per_sample = sizeof(uint16_t);
+  size_t number_of_samples = length / bytes_per_sample;
+
+  measures.resize(number_of_samples);
+
+  for (unsigned i = 0; i < number_of_samples; i++)
+  {
+      uint16_t sample;
+      raw_processing::read(is, sample);
+      measures.at(i) = sample;
+  }
+  // TODO get this to work or remove the comment
+  //std::copy_n(std::istream_iterator<uint16_t>(is), number_of_samples, measures.begin());
+}
+
+void EndOfFrameField::setEndOfFrameMemberToTrue(std::istringstream& is, bool& end_of_frame)
+{
+  end_of_frame = true;
 }
 
 }  // namespace psen_scan_v2
