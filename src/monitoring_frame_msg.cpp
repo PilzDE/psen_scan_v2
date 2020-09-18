@@ -28,6 +28,8 @@
 
 namespace psen_scan_v2
 {
+static constexpr uint32_t OP_CODE_MONITORING_FRAME{ 0xCA };
+
 constexpr uint8_t MonitoringFrameIds::SCAN_COUNTER;
 constexpr uint8_t MonitoringFrameIds::MEASURES;
 constexpr uint8_t MonitoringFrameIds::END_OF_FRAME;
@@ -46,6 +48,8 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
   raw_processing::read(is, msg.scanner_id_fixed_);
   raw_processing::read(is, msg.from_theta_fixed_);
   raw_processing::read(is, msg.resolution_fixed_);
+
+  assert(msg.op_code_fixed_ == OP_CODE_MONITORING_FRAME && "Invalid Op_Code!");
 
   while (!msg.end_of_frame_)
   {
@@ -67,6 +71,8 @@ void ScanCounterField::readLengthAndPayload(std::istringstream& is, uint32_t& sc
 {
   uint16_t length;
   raw_processing::read(is, length);
+  length = length - 1;
+
   if (length != sizeof(scan_counter))
   {
     std::ostringstream os;
@@ -80,6 +86,7 @@ void MeasuresField::readLengthAndPayload(std::istringstream& is, std::vector<uin
 {
   uint16_t length;
   raw_processing::read(is, length);
+  length = length - 1;
 
   size_t bytes_per_sample = sizeof(uint16_t);
   size_t number_of_samples = length / bytes_per_sample;
