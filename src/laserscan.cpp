@@ -91,15 +91,15 @@ bool LaserScan::operator==(const LaserScan& scan) const
       (this->getScanResolution() != scan.getScanResolution()) ||
       (this->getMeasurements().size() != scan.getMeasurements().size()))
   {
-    return false;
-  }
-  for (size_t i = 0; i < this->getMeasurements().size(); i++)
-  {
-    if (this->getMeasurements().at(i) != scan.getMeasurements().at(i))
+    for (size_t i = 0; i < this->getMeasurements().size(); i++)
     {
-      return false;
+      if (this->getMeasurements().at(i) != scan.getMeasurements().at(i))
+      {
+        return false;
+      }
     }
   }
+
   return true;
 }
 

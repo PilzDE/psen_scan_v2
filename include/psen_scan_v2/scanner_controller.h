@@ -110,7 +110,7 @@ ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& s
         scanner_config.hostUDPPortControl(),
         scanner_config.clientIp(),
         CONTROL_PORT_OF_SCANNER_DEVICE)
-  , data_udp_client_(std::bind(&ScannerControllerT::handleNewData, this, std::placeholders::_1, std::placeholders::_2),
+  , data_udp_client_(std::bind(&ScannerControllerT::handleNewMonitoringFrame, this, std::placeholders::_1, std::placeholders::_2),
                      std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1),
                      scanner_config.hostUDPPortData(),
                      scanner_config.clientIp(),

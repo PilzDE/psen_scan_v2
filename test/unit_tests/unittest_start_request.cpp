@@ -90,7 +90,7 @@ TEST_F(StartRequestTest, constructorTest)
 
 TEST_F(StartRequestTest, regressionForRealSystem)
 {
-  ScannerConfiguration sc("192.168.0.50", 55115, 0, "192.168.0.10", 0.0, degreeToRad(275.));
+  ScannerConfiguration sc("192.168.0.50", 55115, 0, "192.168.0.10", 0.0, degreeToRadian(275.));
   StartRequest sr(sc, 0);
 
   auto data = sr.toRawData();
