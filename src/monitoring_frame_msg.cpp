@@ -15,7 +15,6 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <cassert>
 #include <iterator>
 #include <sstream>
 #include <string>
@@ -28,9 +27,9 @@
 
 namespace psen_scan_v2
 {
-constexpr uint8_t MonitoringFrameIds::SCAN_COUNTER;
-constexpr uint8_t MonitoringFrameIds::MEASURES;
-constexpr uint8_t MonitoringFrameIds::END_OF_FRAME;
+constexpr FieldHeader::Id AdditionalFieldIds::SCAN_COUNTER;
+constexpr FieldHeader::Id AdditionalFieldIds::MEASURES;
+constexpr FieldHeader::Id AdditionalFieldIds::END_OF_FRAME;
 
 MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
 {
@@ -77,51 +76,37 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
 
 void MonitoringFrameMsg::deserializeAdditionalField(std::istringstream& is)
 {
-  uint8_t id;
-  raw_processing::read(is, id);
-  const SingleFieldReader read_single_field{ id_to_field_reader_.at(id) };
-  read_single_field(is);
+  const FieldHeader header(is);
+  const PayloadReader read_payload{ id_to_payload_reader_.at(header.id()) };
+  read_payload(this, is, header.length());
 }
 
-void ScanCounterField::readLengthAndPayload(std::istringstream& is, uint32_t& scan_counter)
+void MonitoringFrameMsg::readScanCounter(std::istringstream& is, FieldLength length)
 {
-  uint16_t length;
-  raw_processing::read(is, length);
-  length = length - 1;
-
-  if (length != sizeof(scan_counter))
+  if (length != sizeof(scan_counter_))
   {
     std::ostringstream os;
-    os << "Length of scan counter field is " << length << ", but should be " << sizeof(scan_counter) << ".";
+    os << "Length of scan counter field is " << length << ", but should be " << sizeof(scan_counter_) << ".";
     throw MonitoringFrameFormatError(os.str());
   }
-  raw_processing::read(is, scan_counter);
+  raw_processing::read(is, scan_counter_);
 }
 
-void MeasuresField::readLengthAndPayload(std::istringstream& is, std::vector<uint16_t>& measures)
+void MonitoringFrameMsg::readMeasures(std::istringstream& is, FieldLength length)
 {
-  uint16_t length;
-  raw_processing::read(is, length);
-  length = length - 1;
-
   size_t bytes_per_sample = sizeof(uint16_t);
   size_t number_of_samples = length / bytes_per_sample;
 
-  measures.resize(number_of_samples);
+  measures_.resize(number_of_samples);
 
   for (unsigned i = 0; i < number_of_samples; i++)
   {
     uint16_t sample;
     raw_processing::read(is, sample);
-    measures.at(i) = sample;
+    measures_.at(i) = sample;
   }
   // TODO get this to work or remove the comment
-  // std::copy_n(std::istream_iterator<uint16_t>(is), number_of_samples, measures.begin());
-}
-
-void EndOfFrameField::setEndOfFrameMemberToTrue(std::istringstream& is, bool& end_of_frame)
-{
-  end_of_frame = true;
+  // std::copy_n(std::istream_iterator<uint16_t>(is), number_of_samples, measures_.begin());
 }
 
 }  // namespace psen_scan_v2

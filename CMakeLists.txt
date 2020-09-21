@@ -98,8 +98,8 @@ include_directories(
 set(${PROJECT_NAME}_sources
   src/controller_state_machine.cpp
   src/laserscan.cpp
-  src/start_request.cpp
   src/monitoring_frame_msg.cpp
+  src/start_request.cpp
   src/stop_request.cpp
 )
 

@@ -22,6 +22,9 @@
 #include <sstream>
 #include <vector>
 
+#include <gtest/gtest_prod.h>
+
+#include "psen_scan_v2/raw_processing.h"
 #include "psen_scan_v2/raw_scanner_data.h"
 
 namespace psen_scan_v2
@@ -31,26 +34,40 @@ static constexpr uint32_t ONLINE_WORKING_MODE{ 0x00 };
 static constexpr uint32_t GUI_MONITORING_TRANSACTION{ 0x05 };
 static constexpr uint32_t MAX_SCANNER_ID{ 0x03 };
 
-struct ScanCounterField
+class FieldHeader
 {
-  static void readLengthAndPayload(std::istringstream& is, uint32_t& scan_counter);
+public:
+  using Id = uint8_t;
+  using Length = uint16_t;
+
+public:
+  FieldHeader(std::istringstream& is)
+  {
+    raw_processing::read(is, id_);
+    raw_processing::read(is, length_);
+    length_--;
+  }
+
+  Id id() const
+  {
+    return id_;
+  }
+
+  Length length() const
+  {
+    return length_;
+  }
+
+private:
+  Id id_;
+  Length length_;
 };
 
-struct MeasuresField
+struct AdditionalFieldIds
 {
-  static void readLengthAndPayload(std::istringstream& is, std::vector<uint16_t>& measures);
-};
-
-struct EndOfFrameField
-{
-  static void setEndOfFrameMemberToTrue(std::istringstream& is, bool& end_of_frame);
-};
-
-struct MonitoringFrameIds
-{
-  static constexpr uint8_t SCAN_COUNTER{ 0x02 };
-  static constexpr uint8_t MEASURES{ 0x05 };
-  static constexpr uint8_t END_OF_FRAME{ 0x09 };
+  static constexpr FieldHeader::Id SCAN_COUNTER{ 0x02 };
+  static constexpr FieldHeader::Id MEASURES{ 0x05 };
+  static constexpr FieldHeader::Id END_OF_FRAME{ 0x09 };
 };
 
 class MonitoringFrameMsg
@@ -61,10 +78,31 @@ public:
 public:
   uint16_t fromTheta() const;
   uint16_t resolution() const;
+  uint32_t scanCounter() const;
   std::vector<uint16_t> measures() const;
 
 private:
+  using FieldId = FieldHeader::Id;
+  using FieldLength = FieldHeader::Length;
+
+private:
   void deserializeAdditionalField(std::istringstream& is);
+
+  void readScanCounter(std::istringstream& is, FieldLength length);
+  void readMeasures(std::istringstream& is, FieldLength length);
+
+  void setEndOfFrame(std::istringstream& /*is*/, FieldLength /*length*/);
+
+private:
+  FRIEND_TEST(MonitoringFrameMsgTest, testReadScanCounterSuccess);
+  FRIEND_TEST(MonitoringFrameMsgTest, testReadScanCounterInvalidLengthFailure);
+  FRIEND_TEST(MonitoringFrameMsgTest, testReadScanCounterMissingPayloadFailure);
+  FRIEND_TEST(MonitoringFrameMsgTest, testReadMeasuresSuccess);
+  FRIEND_TEST(MonitoringFrameMsgTest, testReadMeasuresMissingPayloadFailure);
+  FRIEND_TEST(MonitoringFrameMsgTest, testReadMeasuresTooMuchMeasures);
+  FRIEND_TEST(MonitoringFrameMsgTest, testReadMeasuresTooFewMeasures);
+  FRIEND_TEST(MonitoringFrameMsgTest, testSetEndOfFrame);
+  FRIEND_TEST(MonitoringFrameMsgTest, testSetEndOfFrameIgnoreInvalidLength);
 
 private:
   uint32_t device_status_fixed_{ 0 };
@@ -75,21 +113,15 @@ private:
   uint16_t from_theta_fixed_{ 0 };
   uint16_t resolution_fixed_{ 0 };
 
-  // Additional information
   uint32_t scan_counter_{ 0 };
   std::vector<uint16_t> measures_;
-
   bool end_of_frame_{ false };
 
-private:
-  using SingleFieldReader = std::function<void(std::istringstream&)>;
-  std::map<uint8_t, SingleFieldReader> id_to_field_reader_{
-    { MonitoringFrameIds::SCAN_COUNTER,
-      std::bind(ScanCounterField::readLengthAndPayload, std::placeholders::_1, std::ref(scan_counter_)) },
-    { MonitoringFrameIds::MEASURES,
-      std::bind(MeasuresField::readLengthAndPayload, std::placeholders::_1, std::ref(measures_)) },
-    { MonitoringFrameIds::END_OF_FRAME,
-      std::bind(EndOfFrameField::setEndOfFrameMemberToTrue, std::placeholders::_1, std::ref(end_of_frame_)) }
+  using PayloadReader = std::function<void(MonitoringFrameMsg*, std::istringstream&, FieldLength)>;
+  std::map<FieldId, PayloadReader> id_to_payload_reader_{
+    { AdditionalFieldIds::SCAN_COUNTER, &MonitoringFrameMsg::readScanCounter },
+    { AdditionalFieldIds::MEASURES, &MonitoringFrameMsg::readMeasures },
+    { AdditionalFieldIds::END_OF_FRAME, &MonitoringFrameMsg::setEndOfFrame }
   };
 };
 
@@ -103,9 +135,19 @@ inline uint16_t MonitoringFrameMsg::resolution() const
   return resolution_fixed_;
 }
 
+inline uint32_t MonitoringFrameMsg::scanCounter() const
+{
+  return scan_counter_;
+}
+
 inline std::vector<uint16_t> MonitoringFrameMsg::measures() const
 {
   return measures_;
+}
+
+inline void MonitoringFrameMsg::setEndOfFrame(std::istringstream& /*is*/, FieldLength /*length*/)
+{
+  end_of_frame_ = true;
 }
 
 }  // namespace psen_scan_v2

@@ -13,7 +13,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <algorithm>
 #include <array>
+#include <memory>
 
 #include <gtest/gtest.h>
 
@@ -24,34 +26,164 @@
 #include "psen_scan_v2/string_stream_failure.h"
 #include "psen_scan_v2/udp_frame_dumps.h"
 
-using namespace psen_scan_v2;
-
-namespace psen_scan_v2_test
+namespace psen_scan_v2
 {
-class MeasuresFieldTest : public ::testing::Test
+using namespace psen_scan_v2_test;
+
+TEST(FieldHeaderTest, testCreationSuccess)
+{
+  uint8_t id = 5;
+  uint16_t length = 7;
+  uint16_t expected_length = length - 1;
+
+  IStringStreamBuilder builder;
+  builder.add(id);
+  builder.add(length);
+  std::istringstream is{ builder.get() };
+
+  std::unique_ptr<FieldHeader> header_ptr;
+  ASSERT_NO_THROW(header_ptr.reset(new FieldHeader(is)););
+  EXPECT_EQ(id, header_ptr->id());
+  EXPECT_EQ(expected_length, header_ptr->length());
+}
+
+TEST(FieldHeaderTest, testCreationHeaderTooShortFailure)
+{
+  uint16_t too_short_header;
+
+  IStringStreamBuilder builder;
+  builder.add(too_short_header);
+  std::istringstream is{ builder.get() };
+
+  EXPECT_THROW(FieldHeader header(is);, StringStreamFailure);
+}
+
+class MonitoringFrameMsgTest : public ::testing::Test
 {
 protected:
-  const std::array<uint16_t, 3> expected_measures_{ 44, 43, 42 };
-
-  inline std::istringstream buildExpectedMeasuresStream(uint16_t length)
+  inline std::istringstream buildExpectedMeasuresStream()
   {
     IStringStreamBuilder builder;
-    builder.add(length);
-    builder.add(expected_measures_.at(0));
-    builder.add(expected_measures_.at(1));
-    builder.add(expected_measures_.at(2));
-    std::istringstream is{ builder.get() };
-    return is;
+    for (const auto& measure : expected_measures_)
+    {
+      builder.add(measure);
+    }
+    return builder.get();
   }
+
+  inline bool expectMeasuresPartEqual(const std::vector<uint16_t>& measures)
+  {
+    return std::equal(measures.begin(), measures.end(), expected_measures_.begin());
+  }
+
+  inline bool expectMeasuresEqual(const std::vector<uint16_t>& measures)
+  {
+    return (measures.size() == expected_measures_.size() && expectMeasuresPartEqual(measures));
+  }
+
+protected:
+  const std::array<uint16_t, 3> expected_measures_{ 44, 43, 42 };
 };
 
-class FromRawTest : public ::testing::Test
+TEST_F(MonitoringFrameMsgTest, testReadScanCounterSuccess)
+{
+  const uint16_t length = 4;
+  const uint32_t expected_scan_counter = 2;
+
+  IStringStreamBuilder builder;
+  builder.add(expected_scan_counter);
+  std::istringstream is{ builder.get() };
+
+  MonitoringFrameMsg frame;
+  ASSERT_NO_THROW(frame.readScanCounter(is, length));
+  EXPECT_EQ(expected_scan_counter, frame.scanCounter());
+}
+
+TEST_F(MonitoringFrameMsgTest, testReadScanCounterInvalidLengthFailure)
+{
+  const uint16_t length = 3;
+  const uint32_t expected_scan_counter = 2;
+
+  IStringStreamBuilder builder;
+  builder.add(expected_scan_counter);
+  std::istringstream is{ builder.get() };
+
+  MonitoringFrameMsg frame;
+  EXPECT_THROW(frame.readScanCounter(is, length);, MonitoringFrameFormatError);
+}
+
+TEST_F(MonitoringFrameMsgTest, testReadScanCounterMissingPayloadFailure)
+{
+  const uint16_t length = 4;
+  std::istringstream is;
+  MonitoringFrameMsg frame;
+  EXPECT_THROW(frame.readScanCounter(is, length);, StringStreamFailure);
+}
+
+TEST_F(MonitoringFrameMsgTest, testReadMeasuresSuccess)
+{
+  const uint16_t length = 2 * expected_measures_.size();
+  std::istringstream is = buildExpectedMeasuresStream();
+
+  MonitoringFrameMsg frame;
+  ASSERT_NO_THROW(frame.readMeasures(is, length););
+  EXPECT_TRUE(expectMeasuresEqual(frame.measures()));
+}
+
+TEST_F(MonitoringFrameMsgTest, testReadMeasuresMissingPayloadFailure)
+{
+  const uint16_t length = 2 * expected_measures_.size();
+  std::istringstream is;
+  MonitoringFrameMsg frame;
+  EXPECT_THROW(frame.readMeasures(is, length);, StringStreamFailure);
+}
+
+TEST_F(MonitoringFrameMsgTest, testReadMeasuresTooMuchMeasures)
+{
+  const uint16_t length = 2 * expected_measures_.size() - 1;
+  std::istringstream is = buildExpectedMeasuresStream();
+
+  MonitoringFrameMsg frame;
+  ASSERT_NO_THROW(frame.readMeasures(is, length););
+  EXPECT_TRUE(expectMeasuresPartEqual(frame.measures()));
+}
+
+TEST_F(MonitoringFrameMsgTest, testReadMeasuresTooFewMeasures)
+{
+  const uint16_t length = 2 * (expected_measures_.size() + 1);
+  std::istringstream is = buildExpectedMeasuresStream();
+  MonitoringFrameMsg frame;
+  EXPECT_THROW(frame.readMeasures(is, length);, StringStreamFailure);
+}
+
+TEST_F(MonitoringFrameMsgTest, testSetEndOfFrame)
+{
+  MonitoringFrameMsg frame;
+  EXPECT_FALSE(frame.end_of_frame_);
+
+  const uint16_t length = 0;
+  std::istringstream is;
+  ASSERT_NO_THROW(frame.setEndOfFrame(is, length););
+  EXPECT_TRUE(frame.end_of_frame_);
+}
+
+TEST_F(MonitoringFrameMsgTest, testSetEndOfFrameIgnoreInvalidLength)
+{
+  const uint16_t length = 1;
+  std::istringstream is;
+  MonitoringFrameMsg frame;
+  ASSERT_NO_THROW(frame.setEndOfFrame(is, length););
+  EXPECT_TRUE(frame.end_of_frame_);
+}
+
+class MonitoringFrameMsgFromRawTest : public ::testing::Test
 {
 protected:
-  FromRawTest()
+  MonitoringFrameMsgFromRawTest()
   {
     data_ = buildRawData(monitoring_frame_without_intensities_hex_dump);
   }
+
   template <typename T>
   inline MaxSizeRawData buildRawData(const T hex_dump)
   {
@@ -62,119 +194,15 @@ protected:
     }
     return ret;
   }
+
+protected:
   MaxSizeRawData data_;
 };
 
-TEST(ScanCounterFieldTest, testReadSuccess)
-{
-  const uint16_t length = 5;
-  const uint32_t expected_scan_counter = 2;
-
-  IStringStreamBuilder builder;
-  builder.add(length).add(expected_scan_counter);
-  std::istringstream is{ builder.get() };
-
-  uint32_t scan_counter;
-  EXPECT_NO_THROW(ScanCounterField::readLengthAndPayload(is, scan_counter););
-  EXPECT_EQ(expected_scan_counter, scan_counter);
-}
-
-TEST(ScanCounterFieldTest, testReadInvalidLengthFailure)
-{
-  const uint16_t length = 4;
-
-  IStringStreamBuilder builder;
-  builder.add(length);
-  std::istringstream is{ builder.get() };
-
-  uint32_t scan_counter;
-  EXPECT_THROW(ScanCounterField::readLengthAndPayload(is, scan_counter);, MonitoringFrameFormatError);
-}
-
-TEST(ScanCounterFieldTest, testReadMissingPayloadFailure)
-{
-  const uint16_t length = 5;
-
-  IStringStreamBuilder builder;
-  builder.add(length);
-  std::istringstream is{ builder.get() };
-
-  uint32_t scan_counter;
-  EXPECT_THROW(ScanCounterField::readLengthAndPayload(is, scan_counter);, StringStreamFailure);
-}
-
-TEST_F(MeasuresFieldTest, testReadSuccess)
-{
-  const uint16_t length = 7;
-
-  std::istringstream is = buildExpectedMeasuresStream(length);
-
-  std::vector<uint16_t> measures;
-
-  EXPECT_NO_THROW(MeasuresField::readLengthAndPayload(is, measures););
-  EXPECT_EQ(measures.at(0), 44);
-  EXPECT_EQ(measures.at(1), 43);
-  EXPECT_EQ(measures.at(2), 42);
-}
-
-TEST_F(MeasuresFieldTest, testReadMissingPayloadFailure)
-{
-  const uint16_t length = 7;
-
-  IStringStreamBuilder builder;
-  builder.add(length);
-  std::istringstream is{ builder.get() };
-
-  std::vector<uint16_t> measures;
-  EXPECT_THROW(MeasuresField::readLengthAndPayload(is, measures);, StringStreamFailure);
-}
-
-TEST_F(MeasuresFieldTest, testTooMuchMeasures)
-{
-  const uint16_t length = 5;
-  std::istringstream is = buildExpectedMeasuresStream(length);
-  std::vector<uint16_t> measures;
-  EXPECT_NO_THROW(MeasuresField::readLengthAndPayload(is, measures););
-}
-
-TEST_F(MeasuresFieldTest, testTooFewMeasures)
-{
-  const uint16_t length = 9;
-  std::istringstream is = buildExpectedMeasuresStream(length);
-  std::vector<uint16_t> measures;
-  EXPECT_THROW(MeasuresField::readLengthAndPayload(is, measures);, StringStreamFailure);
-}
-
-TEST(EndOfFrameFieldTest, testReadSuccess)
-{
-  const uint16_t length = 0;
-
-  IStringStreamBuilder builder;
-  builder.add(length);
-  std::istringstream is{ builder.get() };
-
-  bool end_of_frame = false;
-  EXPECT_NO_THROW(EndOfFrameField::setEndOfFrameMemberToTrue(is, end_of_frame););
-  EXPECT_TRUE(end_of_frame);
-}
-
-TEST(EndOfFrameFieldTest, testReadIgnoreInvalidLength)
-{
-  const uint16_t length = 1;
-
-  IStringStreamBuilder builder;
-  builder.add(length);
-  std::istringstream is{ builder.get() };
-
-  bool end_of_frame = false;
-  EXPECT_NO_THROW(EndOfFrameField::setEndOfFrameMemberToTrue(is, end_of_frame););
-  EXPECT_TRUE(end_of_frame);
-}
-
-TEST_F(FromRawTest, testReadSuccess)
+TEST_F(MonitoringFrameMsgFromRawTest, testReadSuccess)
 {
   MonitoringFrameMsg msg;
-  msg = MonitoringFrameMsg::fromRawData(data_);
+  ASSERT_NO_THROW(msg = MonitoringFrameMsg::fromRawData(data_););
 
   // You get the following expected values from
   // the protocol description and the udp hex dump
@@ -195,35 +223,35 @@ TEST_F(FromRawTest, testReadSuccess)
   EXPECT_EQ(msg.measures().at(49), 4657);
 }
 
-TEST_F(FromRawTest, testWrongOpCode)
+TEST_F(MonitoringFrameMsgFromRawTest, testWrongOpCode)
 {
   MaxSizeRawData data = data_;
   data.at(4) += 1;
   EXPECT_THROW(MonitoringFrameMsg::fromRawData(data);, MonitoringFrameFormatError);
 }
 
-TEST_F(FromRawTest, testInvalidWorkingMode)
+TEST_F(MonitoringFrameMsgFromRawTest, testInvalidWorkingMode)
 {
   MaxSizeRawData data = data_;
   data.at(8) = 0x03;
   EXPECT_THROW(MonitoringFrameMsg::fromRawData(data);, MonitoringFrameFormatError);
 }
 
-TEST_F(FromRawTest, testInvalidTransactionType)
+TEST_F(MonitoringFrameMsgFromRawTest, testInvalidTransactionType)
 {
   MaxSizeRawData data = data_;
   data.at(12) = 0x06;
   EXPECT_THROW(MonitoringFrameMsg::fromRawData(data);, MonitoringFrameFormatError);
 }
 
-TEST_F(FromRawTest, testInvalidScannerId)
+TEST_F(MonitoringFrameMsgFromRawTest, testInvalidScannerId)
 {
   MaxSizeRawData data = data_;
   data.at(16) = 0x04;
   EXPECT_THROW(MonitoringFrameMsg::fromRawData(data);, MonitoringFrameFormatError);
 }
 
-}  // namespace psen_scan_v2_test
+}  // namespace psen_scan_v2
 
 int main(int argc, char** argv)
 {
