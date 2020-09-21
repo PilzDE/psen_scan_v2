@@ -26,7 +26,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <pilz_testutils/async_test.h>
 
-#include "psen_scan_v2/degree_to_rad.h"
+#include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/ros_scanner_node.h"
 #include "psen_scan_v2/laserscan.h"
 #include "psen_scan_v2/scanner_mock.h"

@@ -18,13 +18,13 @@
 #include <limits>
 #include <cmath>
 
+#include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/laserscan.h"
-#include "psen_scan_v2/degree_to_rad.h"
 
 namespace psen_scan_v2
 {
-static constexpr double MAX_X_AXIS_ROTATION(degreeToRad(360.));
-static constexpr double MIN_X_AXIS_ROTATION(degreeToRad(-360.));
+static constexpr double MAX_X_AXIS_ROTATION(degreeToRadian(360.));
+static constexpr double MIN_X_AXIS_ROTATION(degreeToRadian(-360.));
 
 LaserScan::LaserScan(const double& resolution, const double& min_scan_angle, const double& max_scan_angle)
   : resolution_(resolution), min_scan_angle_(min_scan_angle), max_scan_angle_(max_scan_angle)

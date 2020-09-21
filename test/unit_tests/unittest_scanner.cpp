@@ -20,7 +20,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "psen_scan_v2/degree_to_rad.h"
+#include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/scanner.h"
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/scanner_controller.h"

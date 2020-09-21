@@ -15,9 +15,9 @@
 #ifndef PSEN_SCAN_V2_LASERSCAN_BUILDER_H
 #define PSEN_SCAN_V2_LASERSCAN_BUILDER_H
 
+#include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/laserscan.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
-#include "psen_scan_v2/tenth_degree_conversion.h"
 
 namespace psen_scan_v2
 {

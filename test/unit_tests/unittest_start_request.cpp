@@ -17,10 +17,9 @@
 #include <boost/crc.hpp>
 #include <gtest/gtest.h>
 
+#include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/start_request.h"
-#include "psen_scan_v2/tenth_degree_conversion.h"
-#include "psen_scan_v2/degree_to_rad.h"
 #include "psen_scan_v2/raw_data_test_helper.h"
 
 using namespace psen_scan_v2;

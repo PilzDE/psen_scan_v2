@@ -21,7 +21,7 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2/tenth_degree_conversion.h"
+#include "psen_scan_v2/angle_conversions.h"
 
 namespace psen_scan_v2_test
 {
@@ -39,6 +39,13 @@ TEST(TenthDegreeConversionTests, testOutOfRangeAngle)
 
   const double min_exceeding_angle_in_rad{ static_cast<double>(std::numeric_limits<uint16_t>::min()) - .1 };
   EXPECT_THROW(psen_scan_v2::radToTenthDegree(min_exceeding_angle_in_rad), std::invalid_argument);
+}
+
+TEST(TenthDegreeConversionTests, testInRadian)
+{
+  const double expected_radian{ 0.01 * boost::math::double_constants::pi };
+  const uint16_t angle_in_tenth_degree{ 18 };
+  EXPECT_DOUBLE_EQ(expected_radian, psen_scan_v2::tenthDegreeToRad(angle_in_tenth_degree));
 }
 
 }  // namespace psen_scan_v2_test
