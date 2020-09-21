@@ -152,7 +152,7 @@ TEST_F(ScannerControllerTest, test_handle_error_no_throw)
   ASSERT_NO_THROW(scanner_controller_.handleError("Error Message."));
 }
 
-TEST_F(ScannerControllerTest, testHandleNewData)
+TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
 {
   MaxSizeRawData data = convertToMaxSizeRawData(monitoring_frame_without_intensities_hex_dump);
   MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
