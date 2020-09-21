@@ -251,7 +251,9 @@ if(CATKIN_ENABLE_TESTING)
     src/start_request.cpp
     src/monitoring_frame_msg.cpp
     src/stop_request.cpp
+    src/laserscan.cpp
   )
+
   target_link_libraries(unittest_scanner_controller
     ${catkin_LIBRARIES}
   )

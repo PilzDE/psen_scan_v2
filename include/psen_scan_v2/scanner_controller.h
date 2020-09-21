@@ -61,7 +61,7 @@ public:
 
   void handleError(const std::string& error_msg);
   void sendStartRequest();
-  // LaserScan buildLaserScan();
+
   void handleNewData(const MaxSizeRawData& data, const std::size_t& bytes_received);
   void sendStopRequest();
 
@@ -89,6 +89,7 @@ private:
   FRIEND_TEST(ScannerControllerTest, testHandleStartReplyTimeout);
   FRIEND_TEST(ScannerControllerTest, testHandleStopReplyTimeout);
   FRIEND_TEST(ScannerControllerTest, testStopRequestEventWithFutureUsage);
+  FRIEND_TEST(ScannerControllerTest, testHandleNewData);
 };
 
 typedef ScannerControllerT<> ScannerController;
@@ -125,6 +126,7 @@ void ScannerControllerT<TCSM, TUCI>::handleNewData(const MaxSizeRawData& data, c
   state_machine_.processMonitoringFrameReceivedEvent();
 
   LaserScan scan{ LaserScanBuilder::build(frame) };
+
   laser_scan_callback_(scan);
 }
 
