@@ -209,6 +209,7 @@ TEST_F(MonitoringFrameMsgFromRawTest, testReadSuccess)
   // You may need a hex calulator
   EXPECT_EQ(msg.fromTheta(), 1000);
   EXPECT_EQ(msg.resolution(), 10);
+  EXPECT_EQ(msg.scanCounter(), 1656U);
 
   size_t expected_measures_size = (0x65 - 1) / 2;
   EXPECT_EQ(msg.measures().size(), expected_measures_size);
