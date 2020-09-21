@@ -94,24 +94,24 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
 template <typename S>
 sensor_msgs::LaserScan ROSScannerNodeT<S>::toRosMessage(const LaserScan& laserscan) const
 {
-  if (!laserscan.isValid())
-  {
-    throw std::invalid_argument("Calculated number of measures doesn't match actual number of measures.");
-  }
+  // TODO fix isValid()
+  // if (!laserscan.isValid())
+  // {
+  //   throw std::invalid_argument("Calculated number of measures doesn't match actual number of measures.");
+  // }
 
   sensor_msgs::LaserScan ros_message;
   ros_message.header.stamp = ros::Time::now();
   ros_message.header.frame_id = frame_id_;
-  ros_message.angle_min = laserscan.getMinScanAngle() - x_axis_rotation_;
-  ros_message.angle_max = laserscan.getMaxScanAngle() - x_axis_rotation_;
+  ros_message.angle_min = -(laserscan.getMaxScanAngle() - x_axis_rotation_);
+  ros_message.angle_max = -(laserscan.getMinScanAngle() - x_axis_rotation_);
   ros_message.angle_increment = laserscan.getScanResolution();
   ros_message.time_increment = SCAN_TIME / NUMBER_OF_SAMPLES_FULL_SCAN_MASTER;
   ros_message.scan_time = SCAN_TIME;
   ros_message.range_min = 0;
   ros_message.range_max = 10;
-  ros_message.ranges.insert(ros_message.ranges.end(),
-                            laserscan.getMeasurements().crbegin(),
-                            laserscan.getMeasurements().crend());  // reverse order
+  ros_message.ranges.insert(
+      ros_message.ranges.end(), laserscan.getMeasurements().crbegin(), laserscan.getMeasurements().crend());
   std::transform(ros_message.ranges.begin(), ros_message.ranges.end(), ros_message.ranges.begin(), [](float f) {
     return f * 0.001;
   });
