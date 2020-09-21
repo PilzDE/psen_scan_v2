@@ -154,7 +154,8 @@ TEST_F(ScannerControllerTest, test_handle_error_no_throw)
 
 TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
 {
-  MaxSizeRawData data = convertToMaxSizeRawData(monitoring_frame_without_intensities_hex_dump);
+  UDPFrameTestDataWithoutIntensities test_data;
+  MaxSizeRawData data = convertToMaxSizeRawData(test_data.hex_dump);
   MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
   LaserScan scan = LaserScanBuilder::build(frame);
 
