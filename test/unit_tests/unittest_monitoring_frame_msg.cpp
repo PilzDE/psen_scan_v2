@@ -51,7 +51,6 @@ protected:
   FromRawTest()
   {
     data_ = buildRawData(monitoring_frame_without_intensities_hex_dump);
-    msg_ = MonitoringFrameMsg::fromRawData(data_);
   }
   template <typename T>
   inline MaxSizeRawData buildRawData(const T hex_dump)
@@ -64,13 +63,11 @@ protected:
     return ret;
   }
   MaxSizeRawData data_;
-  MonitoringFrameMsg msg_;
-
 };
 
 TEST(ScanCounterFieldTest, testReadSuccess)
 {
-  const uint16_t length = 4;
+  const uint16_t length = 5;
   const uint32_t expected_scan_counter = 2;
 
   IStringStreamBuilder builder;
@@ -84,7 +81,7 @@ TEST(ScanCounterFieldTest, testReadSuccess)
 
 TEST(ScanCounterFieldTest, testReadInvalidLengthFailure)
 {
-  const uint16_t length = 3;
+  const uint16_t length = 4;
 
   IStringStreamBuilder builder;
   builder.add(length);
@@ -96,7 +93,7 @@ TEST(ScanCounterFieldTest, testReadInvalidLengthFailure)
 
 TEST(ScanCounterFieldTest, testReadMissingPayloadFailure)
 {
-  const uint16_t length = 4;
+  const uint16_t length = 5;
 
   IStringStreamBuilder builder;
   builder.add(length);
@@ -108,7 +105,7 @@ TEST(ScanCounterFieldTest, testReadMissingPayloadFailure)
 
 TEST_F(MeasuresFieldTest, testReadSuccess)
 {
-  const uint16_t length = 6;
+  const uint16_t length = 7;
 
   std::istringstream is = buildExpectedMeasuresStream(length);
 
@@ -122,7 +119,7 @@ TEST_F(MeasuresFieldTest, testReadSuccess)
 
 TEST_F(MeasuresFieldTest, testReadMissingPayloadFailure)
 {
-  const uint16_t length = 6;
+  const uint16_t length = 7;
 
   IStringStreamBuilder builder;
   builder.add(length);
@@ -134,7 +131,7 @@ TEST_F(MeasuresFieldTest, testReadMissingPayloadFailure)
 
 TEST_F(MeasuresFieldTest, testTooMuchMeasures)
 {
-  const uint16_t length = 4;
+  const uint16_t length = 5;
   std::istringstream is = buildExpectedMeasuresStream(length);
   std::vector<uint16_t> measures;
   EXPECT_NO_THROW(MeasuresField::readLengthAndPayload(is, measures););
@@ -142,7 +139,7 @@ TEST_F(MeasuresFieldTest, testTooMuchMeasures)
 
 TEST_F(MeasuresFieldTest, testTooFewMeasures)
 {
-  const uint16_t length = 8;
+  const uint16_t length = 9;
   std::istringstream is = buildExpectedMeasuresStream(length);
   std::vector<uint16_t> measures;
   EXPECT_THROW(MeasuresField::readLengthAndPayload(is, measures);, StringStreamFailure);
@@ -176,30 +173,54 @@ TEST(EndOfFrameFieldTest, testReadIgnoreInvalidLength)
 
 TEST_F(FromRawTest, testReadSuccess)
 {
+  MonitoringFrameMsg msg;
+  msg = MonitoringFrameMsg::fromRawData(data_);
+
   // You get the following expected values from
   // the protocol description and the udp hex dump
   // You may need a hex calulator
-  EXPECT_EQ(msg_.fromTheta(), 1000);
-  EXPECT_EQ(msg_.resolution(), 10);
+  EXPECT_EQ(msg.fromTheta(), 1000);
+  EXPECT_EQ(msg.resolution(), 10);
 
   size_t expected_measures_size = (0x65 - 1) / 2;
-  EXPECT_EQ(msg_.measures().size(), expected_measures_size);
+  EXPECT_EQ(msg.measures().size(), expected_measures_size);
 
-  EXPECT_EQ(msg_.measures().at(0), 681);
-  EXPECT_EQ(msg_.measures().at(1), 774);
-  EXPECT_EQ(msg_.measures().at(2), 636);
-  EXPECT_EQ(msg_.measures().at(3), 506);
-  EXPECT_EQ(msg_.measures().at(4), 496);
-  EXPECT_EQ(msg_.measures().at(30), 4063);
-  EXPECT_EQ(msg_.measures().at(45), 4074);
-  EXPECT_EQ(msg_.measures().at(49), 4657);
+  EXPECT_EQ(msg.measures().at(0), 681);
+  EXPECT_EQ(msg.measures().at(1), 774);
+  EXPECT_EQ(msg.measures().at(2), 636);
+  EXPECT_EQ(msg.measures().at(3), 506);
+  EXPECT_EQ(msg.measures().at(4), 496);
+  EXPECT_EQ(msg.measures().at(30), 4063);
+  EXPECT_EQ(msg.measures().at(45), 4074);
+  EXPECT_EQ(msg.measures().at(49), 4657);
 }
 
 TEST_F(FromRawTest, testWrongOpCode)
 {
- MaxSizeRawData data = data_;
- data.at(4) += 1;
- EXPECT_THROW(MonitoringFrameMsg::fromRawData(data);, MonitoringFrameFormatError);
+  MaxSizeRawData data = data_;
+  data.at(4) += 1;
+  EXPECT_THROW(MonitoringFrameMsg::fromRawData(data);, MonitoringFrameFormatError);
+}
+
+TEST_F(FromRawTest, testInvalidWorkingMode)
+{
+  MaxSizeRawData data = data_;
+  data.at(8) = 0x03;
+  EXPECT_THROW(MonitoringFrameMsg::fromRawData(data);, MonitoringFrameFormatError);
+}
+
+TEST_F(FromRawTest, testInvalidTransactionType)
+{
+  MaxSizeRawData data = data_;
+  data.at(12) = 0x06;
+  EXPECT_THROW(MonitoringFrameMsg::fromRawData(data);, MonitoringFrameFormatError);
+}
+
+TEST_F(FromRawTest, testInvalidScannerId)
+{
+  MaxSizeRawData data = data_;
+  data.at(16) = 0x04;
+  EXPECT_THROW(MonitoringFrameMsg::fromRawData(data);, MonitoringFrameFormatError);
 }
 
 }  // namespace psen_scan_v2_test

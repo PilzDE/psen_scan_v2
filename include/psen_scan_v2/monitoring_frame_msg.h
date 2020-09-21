@@ -26,6 +26,11 @@
 
 namespace psen_scan_v2
 {
+static constexpr uint32_t OP_CODE_MONITORING_FRAME{ 0xCA };
+static constexpr uint32_t ONLINE_WORKING_MODE{ 0x00 };
+static constexpr uint32_t GUI_MONITORING_TRANSACTION{ 0x05 };
+static constexpr uint32_t MAX_SCANNER_ID{ 0x03 };
+
 struct ScanCounterField
 {
   static void readLengthAndPayload(std::istringstream& is, uint32_t& scan_counter);
