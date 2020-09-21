@@ -62,7 +62,7 @@ public:
   void handleError(const std::string& error_msg);
   void sendStartRequest();
 
-  void handleNewMonitoringFrame(const MaxSizeRawData& data, const std::size_t& bytes_received);
+  void handleNewMonitoringFrame(const MaxSizeRawData& data);
   void sendStopRequest();
 
 private:
@@ -110,7 +110,7 @@ ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& s
         scanner_config.hostUDPPortControl(),
         scanner_config.clientIp(),
         CONTROL_PORT_OF_SCANNER_DEVICE)
-  , data_udp_client_(std::bind(&ScannerControllerT::handleNewMonitoringFrame, this, std::placeholders::_1, std::placeholders::_2),
+  , data_udp_client_(std::bind(&ScannerControllerT::handleNewMonitoringFrame, this, std::placeholders::_1),
                      std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1),
                      scanner_config.hostUDPPortData(),
                      scanner_config.clientIp(),
@@ -120,7 +120,7 @@ ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& s
 }
 
 template <typename TCSM, typename TUCI>
-void ScannerControllerT<TCSM, TUCI>::handleNewMonitoringFrame(const MaxSizeRawData& data, const std::size_t& bytes_received)
+void ScannerControllerT<TCSM, TUCI>::handleNewMonitoringFrame(const MaxSizeRawData& data)
 {
   MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
   state_machine_.processMonitoringFrameReceivedEvent();
