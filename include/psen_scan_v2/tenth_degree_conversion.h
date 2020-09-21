@@ -8,6 +8,8 @@
 
 #include <boost/math/constants/constants.hpp>
 
+#include "psen_scan_v2/degree_to_rad.h"
+
 namespace psen_scan_v2
 {
 inline static constexpr double radianToDegree(const double& angle_in_rad)
@@ -30,7 +32,7 @@ inline static uint16_t radToTenthDegree(const double& angle_in_rad)
 
 inline static double tenthDegreeToRad(const uint16_t& angle_in_tenth_degree)
 {
-  return static_cast<double>(angle_in_tenth_degree) / 10.;
+  return degreeToRad(static_cast<double>(angle_in_tenth_degree) / 10.);
 }
 
 }  // namespace psen_scan_v2
