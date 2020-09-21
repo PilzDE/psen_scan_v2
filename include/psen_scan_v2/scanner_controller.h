@@ -61,7 +61,7 @@ public:
 
   void handleError(const std::string& error_msg);
   void sendStartRequest();
-  LaserScan buildLaserScan();
+  // LaserScan buildLaserScan();
   void handleNewData(const MaxSizeRawData& data, const std::size_t& bytes_received);
   void sendStopRequest();
 
@@ -75,7 +75,6 @@ private:
   MsgDecoder control_msg_decoder_;
   TUCI control_udp_client_;
   TUCI data_udp_client_;
-  LaserScanBuilder laser_scan_builder_;
   LaserScanCallback laser_scan_callback_;
 
   void notifyStoppedState();
@@ -125,12 +124,8 @@ void ScannerControllerT<TCSM, TUCI>::handleNewData(const MaxSizeRawData& data, c
   MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
   state_machine_.processMonitoringFrameReceivedEvent();
 
-  laser_scan_builder_.add(frame);
-  if (laser_scan_builder_.laserScanReady())
-  {
-    LaserScan scan{ laser_scan_builder_.build() };
-    laser_scan_callback_(scan);
-  }
+  LaserScan scan{ LaserScanBuilder::build(frame) };
+  laser_scan_callback_(scan);
 }
 
 template <typename TCSM, typename TUCI>
@@ -197,27 +192,27 @@ void ScannerControllerT<TCSM, TUCI>::notifyStoppedState()
   stopped_ = std::promise<void>();
 }
 
-template <typename TCSM, typename TUCI>
-LaserScan ScannerControllerT<TCSM, TUCI>::buildLaserScan()
-{
-  // TODO: Move to user API (Scanner class)?
-  constexpr std::chrono::milliseconds sleeping_time{ 10 };
+// template <typename TCSM, typename TUCI>
+// LaserScan ScannerControllerT<TCSM, TUCI>::buildLaserScan()
+// {
+//   // TODO: Move to user API (Scanner class)?
+//   constexpr std::chrono::milliseconds sleeping_time{ 10 };
 
-  using cl = std::chrono::system_clock;
-  cl::time_point start_time = cl::now();
+//   using cl = std::chrono::system_clock;
+//   cl::time_point start_time = cl::now();
 
-  int i = 0;
-  while (!laser_scan_builder_.laserScanReady())
-  {
-    std::this_thread::sleep_for(sleeping_time);
-    if ((0 == i++ % 100) && (cl::now() - start_time > std::chrono::seconds(5)))
-    {
-      throw LaserScanBuildFailure("Timeout reached, while waiting for laserscan data.");
-    }
-  }
+//   int i = 0;
+//   while (!laser_scan_builder_.laserScanReady())
+//   {
+//     std::this_thread::sleep_for(sleeping_time);
+//     if ((0 == i++ % 100) && (cl::now() - start_time > std::chrono::seconds(5)))
+//     {
+//       throw LaserScanBuildFailure("Timeout reached, while waiting for laserscan data.");
+//     }
+//   }
 
-  return laser_scan_builder_.build();
-}
+//   return laser_scan_builder_.build();
+// }
 
 }  // namespace psen_scan_v2
 

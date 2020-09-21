@@ -30,57 +30,22 @@ public:
 class LaserScanBuilder
 {
 public:
-  void add(const MonitoringFrameMsg& frame);
-  bool laserScanReady() const;
-  LaserScan build();
-  void reset();
-
-private:
-  std::vector<MonitoringFrameMsg> frames_;
-  bool ready_{ false };
+  static LaserScan build(const MonitoringFrameMsg& frame);
 };
 
-inline void LaserScanBuilder::add(const MonitoringFrameMsg& frame)
+inline LaserScan LaserScanBuilder::build(const MonitoringFrameMsg& frame)
 {
-  if (!ready_)
-  {
-    frames_.front() = frame;
-    ready_ = true;
-  }
-}
-
-inline bool LaserScanBuilder::laserScanReady() const
-{
-  return ready_;
-}
-
-inline LaserScan LaserScanBuilder::build()
-{
-  const MonitoringFrameMsg frame = frames_.front();
-
   const double resolution = tenthDegreeToRad(frame.resolution());
   const double min_angle = tenthDegreeToRad(frame.fromTheta());
   const uint16_t number_of_samples = frame.measures().size();
   const double max_angle = min_angle + resolution * number_of_samples;
 
-  LaserScan ret(resolution, min_angle, max_angle);
+  LaserScan scan(resolution, min_angle, max_angle);
+  scan.setMeasurements(frame.measures());
 
-  ret.setMeasurements(frame.measures());
-
-  reset();
-
-  return ret;
+  return scan;
 }
 
-inline LaserScanBuildFailure::LaserScanBuildFailure(const std::string& msg) : std::runtime_error(msg)
-{
-}
-
-inline void LaserScanBuilder::reset()
-{
-  frames_.clear();
-  ready_ = false;
-}
 }  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_LASERSCAN_BUILDER_H

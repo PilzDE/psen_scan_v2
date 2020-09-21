@@ -51,7 +51,7 @@ public:
   //! @brief Stops the scanner.
   void stop();
   //! @brief Fetches a complete laser scan from the scanner.
-  LaserScan getCompleteScan();
+  // LaserScan getCompleteScan();
 
 private:
   SC scanner_controller_;
@@ -86,12 +86,12 @@ void ScannerT<SC>::stop()
   PSENSCAN_INFO("Scanner", "Scanner has stopped.");
 }
 
-template <typename SC>
-LaserScan ScannerT<SC>::getCompleteScan()
-{
-  // TODO: Move implementation from ScannerController?
-  return scanner_controller_.buildLaserScan();
-}
+// template <typename SC>
+// LaserScan ScannerT<SC>::getCompleteScan()
+// {
+//   // TODO: Move implementation from ScannerController?
+//   return scanner_controller_.buildLaserScan();
+// }
 
 }  // namespace psen_scan_v2
 
