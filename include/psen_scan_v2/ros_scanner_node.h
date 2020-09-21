@@ -22,10 +22,9 @@
 #include <gtest/gtest_prod.h>
 
 #include <ros/ros.h>
-#include <sensor_msgs/LaserScan.h>
-#include "psen_scan_v2/scanner_data.h"
 
 #include "psen_scan_v2/scanner.h"
+#include "psen_scan_v2/laserscan_ros_conversions.h"
 
 namespace psen_scan_v2
 {
@@ -58,7 +57,6 @@ public:
   void terminate();
 
 private:
-  sensor_msgs::LaserScan toRosMessage(const LaserScan& laserscan) const;
   void laserScanCallback(const LaserScan& scan);
 
 private:
@@ -92,37 +90,9 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
 }
 
 template <typename S>
-sensor_msgs::LaserScan ROSScannerNodeT<S>::toRosMessage(const LaserScan& laserscan) const
-{
-  // TODO fix isValid()
-  // if (!laserscan.isValid())
-  // {
-  //   throw std::invalid_argument("Calculated number of measures doesn't match actual number of measures.");
-  // }
-
-  sensor_msgs::LaserScan ros_message;
-  ros_message.header.stamp = ros::Time::now();
-  ros_message.header.frame_id = frame_id_;
-  ros_message.angle_min = -(laserscan.getMaxScanAngle() - x_axis_rotation_);
-  ros_message.angle_max = -(laserscan.getMinScanAngle() - x_axis_rotation_);
-  ros_message.angle_increment = laserscan.getScanResolution();
-  ros_message.time_increment = SCAN_TIME / NUMBER_OF_SAMPLES_FULL_SCAN_MASTER;
-  ros_message.scan_time = SCAN_TIME;
-  ros_message.range_min = 0;
-  ros_message.range_max = 10;
-  ros_message.ranges.insert(
-      ros_message.ranges.end(), laserscan.getMeasurements().crbegin(), laserscan.getMeasurements().crend());
-  std::transform(ros_message.ranges.begin(), ros_message.ranges.end(), ros_message.ranges.begin(), [](float f) {
-    return f * 0.001;
-  });
-
-  return ros_message;
-}
-
-template <typename S>
 void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
 {
-  pub_.publish(toRosMessage(scan));
+  pub_.publish(toLaserScanMsg(scan, frame_id_, x_axis_rotation_));
 }
 
 template <typename S>
