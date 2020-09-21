@@ -37,9 +37,9 @@ public:
   LaserScan(const double& resolution, const double& min_scan_angle, const double& max_scan_angle);
 
 public:
-  const double& getScanResolution() const;
-  const double& getMinScanAngle() const;
-  const double& getMaxScanAngle() const;
+  double getScanResolution() const;
+  double getMinScanAngle() const;
+  double getMaxScanAngle() const;
 
   const MeasurementData& getMeasurements() const;
   MeasurementData& getMeasurements();
