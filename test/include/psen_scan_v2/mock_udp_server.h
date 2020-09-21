@@ -46,7 +46,7 @@ public:
 public:
   MockUDPServer(const unsigned short port);
 
-  MOCK_CONST_METHOD1(receivedUdpMsg, void(const udp::endpoint&));
+  MOCK_CONST_METHOD2(receivedUdpMsg, void(const udp::endpoint&, const psen_scan_v2::DynamicSizeRawData&));
 
 public:
   void asyncReceive();
@@ -123,7 +123,8 @@ void MockUDPServer::handleReceive(const boost::system::error_code& error, std::s
     std::cerr << "UDP server mock failed to receive data. Error msg: " << error.message() << std::endl;
     return;
   }
-  receivedUdpMsg(remote_endpoint_);
+  psen_scan_v2::DynamicSizeRawData recv_data(recv_buffer_.cbegin(), recv_buffer_.cbegin() + bytes_received);
+  receivedUdpMsg(remote_endpoint_, recv_data);
 }
 
 void MockUDPServer::asyncReceive()

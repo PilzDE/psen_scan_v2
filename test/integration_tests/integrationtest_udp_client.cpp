@@ -155,12 +155,13 @@ TEST_F(UdpClientTests, testRestartAfterTimeout)
 
 TEST_F(UdpClientTests, testWriteOperation)
 {
-  EXPECT_CALL(mock_udp_server_, receivedUdpMsg(_)).WillOnce(ACTION_OPEN_BARRIER_VOID(CLIENT_RECEIVED_DATA));
-
-  mock_udp_server_.asyncReceive();
   std::string str = "Hello!";
   DynamicSizeRawData write_buf;
   std::copy(str.begin(), str.end(), std::back_inserter(write_buf));
+
+  EXPECT_CALL(mock_udp_server_, receivedUdpMsg(_, write_buf)).WillOnce(ACTION_OPEN_BARRIER_VOID(CLIENT_RECEIVED_DATA));
+
+  mock_udp_server_.asyncReceive();
   udp_client_.write(write_buf);
 
   BARRIER(CLIENT_RECEIVED_DATA);
@@ -168,8 +169,12 @@ TEST_F(UdpClientTests, testWriteOperation)
 
 TEST_F(UdpClientTests, testWritingWhileReceiving)
 {
+  std::string str = "Hello!";
+  DynamicSizeRawData write_buf;
+  std::copy(str.begin(), str.end(), std::back_inserter(write_buf));
+
   EXPECT_CALL(*this, handleNewData(_, DATA_SIZE_BYTES)).WillOnce(ACTION_OPEN_BARRIER_VOID(CLIENT_RECEIVED_DATA));
-  EXPECT_CALL(mock_udp_server_, receivedUdpMsg(_))
+  EXPECT_CALL(mock_udp_server_, receivedUdpMsg(_, write_buf))
       .WillOnce(DoAll(InvokeWithoutArgs(this, &UdpClientTests::sendTestDataToClient),
                       ACTION_OPEN_BARRIER_VOID(MOCK_RECEIVED_DATA)));
 
@@ -177,9 +182,6 @@ TEST_F(UdpClientTests, testWritingWhileReceiving)
 
   udp_client_.startAsyncReceiving();
 
-  std::string str = "Hello!";
-  DynamicSizeRawData write_buf;
-  std::copy(str.begin(), str.end(), std::back_inserter(write_buf));
   udp_client_.write(write_buf);
 
   BARRIER(MOCK_RECEIVED_DATA);
