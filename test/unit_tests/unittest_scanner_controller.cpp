@@ -162,7 +162,7 @@ TEST_F(ScannerControllerTest, testHandleNewData)
   EXPECT_CALL(scanner_controller_.state_machine_, processMonitoringFrameReceivedEvent()).Times(1);
   EXPECT_CALL(mock_, laserscan_callback(scan)).Times(1);
 
-  scanner_controller_.handleNewData(data, 0);
+  scanner_controller_.handleNewMonitoringFrame(data, 0);
 
   // TODO: Segmentation fault at the end of the test
 }

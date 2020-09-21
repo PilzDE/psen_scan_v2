@@ -62,7 +62,7 @@ public:
   void handleError(const std::string& error_msg);
   void sendStartRequest();
 
-  void handleNewData(const MaxSizeRawData& data, const std::size_t& bytes_received);
+  void handleNewMonitoringFrame(const MaxSizeRawData& data, const std::size_t& bytes_received);
   void sendStopRequest();
 
 private:
@@ -120,7 +120,7 @@ ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& s
 }
 
 template <typename TCSM, typename TUCI>
-void ScannerControllerT<TCSM, TUCI>::handleNewData(const MaxSizeRawData& data, const std::size_t& bytes_received)
+void ScannerControllerT<TCSM, TUCI>::handleNewMonitoringFrame(const MaxSizeRawData& data, const std::size_t& bytes_received)
 {
   MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
   state_machine_.processMonitoringFrameReceivedEvent();
