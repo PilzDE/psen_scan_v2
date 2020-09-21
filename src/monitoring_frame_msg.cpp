@@ -46,25 +46,7 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
   raw_processing::read(is, msg.from_theta_fixed_);
   raw_processing::read(is, msg.resolution_fixed_);
 
-  if (OP_CODE_MONITORING_FRAME != msg.op_code_fixed_)
-  {
-    throw MonitoringFrameFormatError("Wrong Op Code!");
-  }
-
-  if (ONLINE_WORKING_MODE != msg.working_mode_fixed_)
-  {
-    throw MonitoringFrameFormatError("Invalid working mode!");
-  }
-
-  if (GUI_MONITORING_TRANSACTION != msg.transaction_type_fixed_)
-  {
-    throw MonitoringFrameFormatError("Invalid transaction type!");
-  }
-
-  if (MAX_SCANNER_ID < msg.scanner_id_fixed_)
-  {
-    throw MonitoringFrameFormatError("Invalid Scanner id!");
-  }
+  msg.checkFixedFields();
 
   while (!msg.end_of_frame_)
   {
@@ -105,8 +87,29 @@ void MonitoringFrameMsg::readMeasures(std::istringstream& is, FieldLength length
     raw_processing::read(is, sample);
     measures_.at(i) = sample;
   }
-  // TODO get this to work or remove the comment
-  // std::copy_n(std::istream_iterator<uint16_t>(is), number_of_samples, measures_.begin());
+}
+
+void MonitoringFrameMsg::checkFixedFields()
+{
+  if (OP_CODE_MONITORING_FRAME != op_code_fixed_)
+  {
+    throw MonitoringFrameFormatError("Wrong Op Code!");
+  }
+
+  if (ONLINE_WORKING_MODE != working_mode_fixed_)
+  {
+    throw MonitoringFrameFormatError("Invalid working mode!");
+  }
+
+  if (GUI_MONITORING_TRANSACTION != transaction_type_fixed_)
+  {
+    throw MonitoringFrameFormatError("Invalid transaction type!");
+  }
+
+  if (MAX_SCANNER_ID < scanner_id_fixed_)
+  {
+    throw MonitoringFrameFormatError("Invalid Scanner id!");
+  }
 }
 
 }  // namespace psen_scan_v2

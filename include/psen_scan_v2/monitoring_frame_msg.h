@@ -93,6 +93,8 @@ private:
 
   void setEndOfFrame(std::istringstream& /*is*/, FieldLength /*length*/);
 
+  void checkFixedFields();
+
 private:
   FRIEND_TEST(MonitoringFrameMsgTest, testReadScanCounterSuccess);
   FRIEND_TEST(MonitoringFrameMsgTest, testReadScanCounterInvalidLengthFailure);
