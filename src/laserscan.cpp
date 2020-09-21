@@ -85,4 +85,22 @@ MeasurementData& LaserScan::getMeasurements()
   return measures_;
 }
 
+bool LaserScan::operator==(const LaserScan& scan) const
+{
+  if ((this->getMaxScanAngle() != scan.getMaxScanAngle()) || (this->getMinScanAngle() != scan.getMinScanAngle()) ||
+      (this->getScanResolution() != scan.getScanResolution()) ||
+      (this->getMeasurements().size() != scan.getMeasurements().size()))
+  {
+    for (size_t i = 0; i < this->getMeasurements().size(); i++)
+    {
+      if (this->getMeasurements().at(i) != scan.getMeasurements().at(i))
+      {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
 }  // namespace psen_scan_v2

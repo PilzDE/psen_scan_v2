@@ -25,6 +25,7 @@
 #include "psen_scan_v2/raw_processing.h"
 #include "psen_scan_v2/string_stream_failure.h"
 #include "psen_scan_v2/udp_frame_dumps.h"
+#include "psen_scan_v2/raw_data_array_conversion.h"
 
 namespace psen_scan_v2
 {
@@ -181,18 +182,7 @@ class MonitoringFrameMsgFromRawTest : public ::testing::Test
 protected:
   MonitoringFrameMsgFromRawTest()
   {
-    data_ = buildRawData(monitoring_frame_without_intensities_hex_dump);
-  }
-
-  template <typename T>
-  inline MaxSizeRawData buildRawData(const T hex_dump)
-  {
-    MaxSizeRawData ret;
-    for (size_t i = 0; i < hex_dump.size(); i++)
-    {
-      ret.at(i) = static_cast<char>(hex_dump.at(i));
-    }
-    return ret;
+    data_ = convertToMaxSizeRawData(monitoring_frame_without_intensities_hex_dump);
   }
 
 protected:

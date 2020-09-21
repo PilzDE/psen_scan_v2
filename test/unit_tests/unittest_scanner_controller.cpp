@@ -25,8 +25,12 @@
 #include "psen_scan_v2/scanner_controller.h"
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/stop_request.h"
+#include "psen_scan_v2/laserscan_builder.h"
+#include "psen_scan_v2/laserscan.h"
+#include "psen_scan_v2/udp_frame_dumps.h"
+#include "psen_scan_v2/raw_data_array_conversion.h"
 
-using namespace psen_scan_v2;
+using namespace psen_scan_v2_test;
 
 namespace psen_scan_v2
 {
@@ -37,19 +41,29 @@ static const std::string DEVICE_IP{ "127.0.0.100" };
 static constexpr double START_ANGLE{ 0. };
 static constexpr double END_ANGLE{ 275. * 2 * M_PI / 360. };
 
+class MockCallbackHolder
+{
+public:
+  MOCK_METHOD1(laserscan_callback, void(const LaserScan&));
+};
+
 class ScannerControllerTest : public ::testing::Test
 {
 protected:
   ScannerControllerTest()
     : scanner_config_(HOST_IP, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, DEVICE_IP, START_ANGLE, END_ANGLE)
-    , scanner_controller_(scanner_config_)
+    , scanner_controller_(scanner_config_, laser_scan_callback_)
   {
   }
 
 protected:
+  MockCallbackHolder mock_;
   ScannerConfiguration scanner_config_;
   ScannerControllerT<psen_scan_v2_test::ControllerStateMachineMock, psen_scan_v2_test::MockUdpClient>
       scanner_controller_;
+  LaserScanCallback laser_scan_callback_{
+    std::bind(&MockCallbackHolder::laserscan_callback, &mock_, std::placeholders::_1)
+  };
 };
 
 TEST_F(ScannerControllerTest, testStartRequestEvent)
@@ -136,6 +150,21 @@ TEST_F(ScannerControllerTest, testHandleStopReplyTimeout)
 TEST_F(ScannerControllerTest, test_handle_error_no_throw)
 {
   ASSERT_NO_THROW(scanner_controller_.handleError("Error Message."));
+}
+
+TEST_F(ScannerControllerTest, testHandleNewData)
+{
+  MaxSizeRawData data = convertToMaxSizeRawData(monitoring_frame_without_intensities_hex_dump);
+  MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
+  LaserScan scan = LaserScanBuilder::build(frame);
+
+  // TODO: It doesn't matter how many times called
+  EXPECT_CALL(scanner_controller_.state_machine_, processMonitoringFrameReceivedEvent()).Times(1);
+  EXPECT_CALL(mock_, laserscan_callback(scan)).Times(1);
+
+  scanner_controller_.handleNewMonitoringFrame(data, 0);
+
+  // TODO: Segmentation fault at the end of the test
 }
 
 }  // namespace psen_scan_v2
