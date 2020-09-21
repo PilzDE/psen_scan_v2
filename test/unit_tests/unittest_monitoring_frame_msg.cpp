@@ -182,64 +182,53 @@ class MonitoringFrameMsgFromRawTest : public ::testing::Test
 protected:
   MonitoringFrameMsgFromRawTest()
   {
-    data_ = convertToMaxSizeRawData(monitoring_frame_without_intensities_hex_dump);
+    raw_frame_data_ = convertToMaxSizeRawData(test_data_.hex_dump);
   }
 
 protected:
-  MaxSizeRawData data_;
+  UDPFrameTestDataWithoutIntensities test_data_;
+  MaxSizeRawData raw_frame_data_;
 };
 
 TEST_F(MonitoringFrameMsgFromRawTest, testReadSuccess)
 {
   MonitoringFrameMsg msg;
-  ASSERT_NO_THROW(msg = MonitoringFrameMsg::fromRawData(data_););
+  ASSERT_NO_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data_););
 
-  // You get the following expected values from
-  // the protocol description and the udp hex dump
-  // You may need a hex calulator
-  EXPECT_EQ(msg.fromTheta(), 1000);
-  EXPECT_EQ(msg.resolution(), 10);
-  EXPECT_EQ(msg.scanCounter(), 1656U);
+  EXPECT_EQ(msg.fromTheta(), test_data_.from_theta);
+  EXPECT_EQ(msg.resolution(), test_data_.resolution);
+  EXPECT_EQ(msg.scanCounter(), test_data_.scan_counter);
 
-  size_t expected_measures_size = (0x65 - 1) / 2;
-  EXPECT_EQ(msg.measures().size(), expected_measures_size);
-
-  EXPECT_EQ(msg.measures().at(0), 681);
-  EXPECT_EQ(msg.measures().at(1), 774);
-  EXPECT_EQ(msg.measures().at(2), 636);
-  EXPECT_EQ(msg.measures().at(3), 506);
-  EXPECT_EQ(msg.measures().at(4), 496);
-  EXPECT_EQ(msg.measures().at(30), 4063);
-  EXPECT_EQ(msg.measures().at(45), 4074);
-  EXPECT_EQ(msg.measures().at(49), 4657);
+  const auto measures = msg.measures();
+  EXPECT_EQ(measures.size(), test_data_.number_of_measures);
+  for (const auto& index_value_pair : test_data_.measures)
+  {
+    EXPECT_EQ(measures.at(index_value_pair.first), index_value_pair.second);
+  }
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testWrongOpCode)
 {
-  MaxSizeRawData data = data_;
-  data.at(4) += 1;
-  EXPECT_THROW(MonitoringFrameMsg::fromRawData(data);, MonitoringFrameFormatError);
+  raw_frame_data_.at(4) += 1;
+  EXPECT_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_);, MonitoringFrameFormatError);
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testInvalidWorkingMode)
 {
-  MaxSizeRawData data = data_;
-  data.at(8) = 0x03;
-  EXPECT_THROW(MonitoringFrameMsg::fromRawData(data);, MonitoringFrameFormatError);
+  raw_frame_data_.at(8) = 0x03;
+  EXPECT_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_);, MonitoringFrameFormatError);
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testInvalidTransactionType)
 {
-  MaxSizeRawData data = data_;
-  data.at(12) = 0x06;
-  EXPECT_THROW(MonitoringFrameMsg::fromRawData(data);, MonitoringFrameFormatError);
+  raw_frame_data_.at(12) = 0x06;
+  EXPECT_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_);, MonitoringFrameFormatError);
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testInvalidScannerId)
 {
-  MaxSizeRawData data = data_;
-  data.at(16) = 0x04;
-  EXPECT_THROW(MonitoringFrameMsg::fromRawData(data);, MonitoringFrameFormatError);
+  raw_frame_data_.at(16) = 0x04;
+  EXPECT_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_);, MonitoringFrameFormatError);
 }
 
 }  // namespace psen_scan_v2
