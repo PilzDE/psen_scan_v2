@@ -30,7 +30,6 @@ public:
 
   MOCK_METHOD0(start, void());
   MOCK_METHOD0(stop, void());
-  MOCK_METHOD0(getCompleteScan, psen_scan_v2::LaserScan());
 };
 
 }  // namespace psen_scan_v2_test

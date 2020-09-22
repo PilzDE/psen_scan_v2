@@ -47,7 +47,7 @@ static const std::string LASER_SCAN_RECEIVED{ "LASER_SCAN_RECEIVED" };
 static const std::string SCANNER_STARTED{ "SCANNER_STARTED" };
 static const std::string SCANNER_STOPPED{ "SCANNER_STOPPED" };
 
-static constexpr double DEFAULT_X_AXIS_ROTATION{ degreeToRad(137.5) };
+static constexpr double DEFAULT_X_AXIS_ROTATION{ degreeToRadian(137.5) };
 
 class SubscriberMock
 {
@@ -83,70 +83,77 @@ protected:
 
 TEST_F(RosScannerNodeTests, testScannerInvocation)
 {
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  EXPECT_EQ(true, false);  // TODO: Implement tst with callback and without getCompleteScan
+  // ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", DEFAULT_X_AXIS_ROTATION,
+  // scanner_config_);
 
-  LaserScan laser_scan_fake(0.02, 0.03, 0.05);
-  laser_scan_fake.getMeasurements().push_back(1);
+  // LaserScan laser_scan_fake(0.02, 0.03, 0.05);
+  // laser_scan_fake.getMeasurements().push_back(1);
 
-  {
-    ::testing::InSequence s;
-    EXPECT_CALL(ros_scanner_node.scanner_, start()).WillOnce(ACTION_OPEN_BARRIER_VOID(SCANNER_STARTED));
-    EXPECT_CALL(ros_scanner_node.scanner_, getCompleteScan()).WillRepeatedly(Return(laser_scan_fake));
-    EXPECT_CALL(ros_scanner_node.scanner_, stop()).WillOnce(ACTION_OPEN_BARRIER_VOID(SCANNER_STOPPED));
-  }
+  // {
+  //   ::testing::InSequence s;
+  //   EXPECT_CALL(ros_scanner_node.scanner_, start()).WillOnce(ACTION_OPEN_BARRIER_VOID(SCANNER_STARTED));
+  //   EXPECT_CALL(ros_scanner_node.scanner_, getCompleteScan()).WillRepeatedly(Return(laser_scan_fake));
+  //   EXPECT_CALL(ros_scanner_node.scanner_, stop()).WillOnce(ACTION_OPEN_BARRIER_VOID(SCANNER_STOPPED));
+  // }
 
-  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
-  BARRIER(SCANNER_STARTED);
-  ros_scanner_node.terminate();
-  BARRIER(SCANNER_STOPPED);
-  EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
+  // std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
+  // BARRIER(SCANNER_STARTED);
+  // ros_scanner_node.terminate();
+  // BARRIER(SCANNER_STOPPED);
+  // EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
 }
 
 TEST_F(RosScannerNodeTests, testScanTopicReceived)
 {
-  SubscriberMock subscriber;
-  EXPECT_CALL(subscriber, callback(::testing::_)).WillOnce(ACTION_OPEN_BARRIER_VOID(LASER_SCAN_RECEIVED));
+  EXPECT_EQ(true, false);  // TODO: Implement tst with callback and without getCompleteScan
+  // SubscriberMock subscriber;
+  // EXPECT_CALL(subscriber, callback(::testing::_)).WillOnce(ACTION_OPEN_BARRIER_VOID(LASER_SCAN_RECEIVED));
 
-  LaserScan laser_scan_fake(0.02, 0.03, 0.05);
-  laser_scan_fake.getMeasurements().push_back(1);
+  // LaserScan laser_scan_fake(0.02, 0.03, 0.05);
+  // laser_scan_fake.getMeasurements().push_back(1);
 
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", DEFAULT_X_AXIS_ROTATION, scanner_config_);
-  EXPECT_CALL(ros_scanner_node.scanner_, getCompleteScan()).WillRepeatedly(Return(laser_scan_fake));
+  // ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", DEFAULT_X_AXIS_ROTATION,
+  // scanner_config_); EXPECT_CALL(ros_scanner_node.scanner_,
+  // getCompleteScan()).WillRepeatedly(Return(laser_scan_fake));
 
-  subscriber.initialize(nh_priv_);
-  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
-  BARRIER(LASER_SCAN_RECEIVED);
-  ros_scanner_node.terminate();
-  EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
+  // subscriber.initialize(nh_priv_);
+  // std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
+  // BARRIER(LASER_SCAN_RECEIVED);
+  // ros_scanner_node.terminate();
+  // EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
 }
 
 ACTION(ThrowScanBuildFailure)
 {
-  throw LaserScanBuildFailure();
+  throw ThrowScanBuildFailureAction();
 }
 
 TEST_F(RosScannerNodeTests, testScanBuildFailure)
 {
-  SubscriberMock subscriber;
-  EXPECT_CALL(subscriber, callback(::testing::_)).Times(1).WillOnce(ACTION_OPEN_BARRIER_VOID(LASER_SCAN_RECEIVED));
+  EXPECT_EQ(true, false);  // TODO: Implement tst with callback and without getCompleteScan
+  //   SubscriberMock subscriber;
+  //   EXPECT_CALL(subscriber, callback(::testing::_)).Times(1).WillOnce(ACTION_OPEN_BARRIER_VOID(LASER_SCAN_RECEIVED));
 
-  LaserScan laser_scan_fake(0.02, 0.03, 0.05);
-  laser_scan_fake.getMeasurements().push_back(1);
+  //   LaserScan laser_scan_fake(0.02, 0.03, 0.05);
+  //   laser_scan_fake.getMeasurements().push_back(1);
 
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", DEFAULT_X_AXIS_ROTATION, scanner_config_);
-  {
-    ::testing::InSequence s;
-    EXPECT_CALL(ros_scanner_node.scanner_, getCompleteScan())
-        .Times(5)
-        .WillRepeatedly(DoAll(ThrowScanBuildFailure(), Return(laser_scan_fake)));
-    EXPECT_CALL(ros_scanner_node.scanner_, getCompleteScan()).Times(1).WillRepeatedly(Return(laser_scan_fake));
-  }
+  //   ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", DEFAULT_X_AXIS_ROTATION,
+  //   scanner_config_);
+  //   {
+  //     ::testing::InSequence s;
+  //     EXPECT_CALL(ros_scanner_node.scanner_, getCompleteScan())
+  //         .Times(5)
+  //         .WillRepeatedly(DoAll(ThrowScanBuildFailure(), Return(laser_scan_fake)));
+  //     EXPECT_CALL(ros_scanner_node.scanner_, getCompleteScan()).Times(1).WillRepeatedly(Return(laser_scan_fake));
+  //   }
 
-  subscriber.initialize(nh_priv_);
-  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
-  BARRIER(LASER_SCAN_RECEIVED);
-  ros_scanner_node.terminate();
-  EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
+  //   subscriber.initialize(nh_priv_);
+  //   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
+  //   BARRIER(LASER_SCAN_RECEIVED);
+  //   ros_scanner_node.terminate();
+  //   EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
+  //
 }
 
 }  // namespace psen_scan_v2
