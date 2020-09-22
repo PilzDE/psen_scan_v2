@@ -23,13 +23,14 @@
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/scanner_controller.h"
 #include "psen_scan_v2/laserscan.h"
+#include "psen_scan_v2/function_pointers.h"
 
 namespace psen_scan_v2_test
 {
 class ScannerControllerMock
 {
 public:
-  ScannerControllerMock(const psen_scan_v2::ScannerConfiguration& scanner_config){};
+  ScannerControllerMock(const psen_scan_v2::ScannerConfiguration& scanner_config, const psen_scan_v2::LaserScanCallback& laser_scan_callback){};
   MOCK_METHOD0(start, void());
   MOCK_METHOD0(stop, std::future<void>());
   MOCK_METHOD1(handleError, void(const std::string& error_msg));

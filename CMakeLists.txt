@@ -218,6 +218,7 @@ if(CATKIN_ENABLE_TESTING)
   catkin_add_gmock(unittest_scanner
     test/unit_tests/unittest_scanner.cpp
     src/scanner_configuration.cpp
+    src/laserscan.cpp
   )
   target_link_libraries(unittest_scanner
     ${catkin_LIBRARIES}

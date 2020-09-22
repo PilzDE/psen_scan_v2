@@ -37,7 +37,7 @@ static constexpr int HOST_UDP_PORT_DATA{ 50505 };
 static constexpr int HOST_UDP_PORT_CONTROL{ 55055 };
 static const std::string DEVICE_IP{ "127.0.0.100" };
 static constexpr double START_ANGLE{ 0. };
-static constexpr double END_ANGLE{ degreeToRad(275.) };
+static constexpr double END_ANGLE{ degreeToRadian(275.) };
 
 class ScannerTest : public testing::Test
 {
@@ -47,6 +47,7 @@ protected:
   }
 
   ScannerConfiguration scanner_config_;
+  LaserScanCallback laserscan_callback_;
 };
 // TEST_F(ScannerTest, testConstructorSuccess)
 // {
@@ -57,14 +58,14 @@ typedef ScannerT<psen_scan_v2_test::ScannerControllerMock> MockedScanner;
 
 TEST_F(ScannerTest, testStart)
 {
-  MockedScanner scanner(scanner_config_);
+  MockedScanner scanner(scanner_config_, laserscan_callback_);
   EXPECT_CALL(scanner.scanner_controller_, start()).Times(1);
   scanner.start();
 }
 
 TEST_F(ScannerTest, testStop)
 {
-  MockedScanner scanner(scanner_config_);
+  MockedScanner scanner(scanner_config_, laserscan_callback_);
   std::promise<void> mocked_stop_finished_barrier;
   EXPECT_CALL(scanner.scanner_controller_, stop()).WillOnce(InvokeWithoutArgs([&mocked_stop_finished_barrier]() {
     return mocked_stop_finished_barrier.get_future();
@@ -83,13 +84,6 @@ TEST_F(ScannerTest, testStop)
   EXPECT_EQ(stop_func_finished_barrier_future.wait_for(std::chrono::milliseconds(50)), std::future_status::ready)
       << "Scanner::stop() function has not finished";
 }
-
-TEST_F(ScannerTest, testGetCompleteScan)
-{
-  MockedScanner scanner(scanner_config_);
-  EXPECT_THROW(scanner.getCompleteScan(), LaserScanBuildFailure);
-}
-
 }  // namespace psen_scan_v2
 
 int main(int argc, char* argv[])

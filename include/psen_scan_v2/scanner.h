@@ -50,8 +50,6 @@ public:
   void start();
   //! @brief Stops the scanner.
   void stop();
-  //! @brief Fetches a complete laser scan from the scanner.
-  // LaserScan getCompleteScan();
 
 private:
   SC scanner_controller_;
