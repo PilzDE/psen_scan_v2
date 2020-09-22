@@ -48,7 +48,7 @@ public:
   //! @returns true if the measurement data contain as much measurements as required by the measurement range
   //! and measurement resolution.
   bool isValid() const;
-  bool operator ==(const LaserScan &scan) const;
+  bool operator==(const LaserScan& scan) const;
 
 private:
   //! Measurement data of the laserscan (in Millimeters).
