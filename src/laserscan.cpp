@@ -45,17 +45,17 @@ LaserScan::LaserScan(const double& resolution, const double& min_scan_angle, con
   }
 }
 
-const double& LaserScan::getScanResolution() const
+double LaserScan::getScanResolution() const
 {
   return resolution_;
 }
 
-const double& LaserScan::getMinScanAngle() const
+double LaserScan::getMinScanAngle() const
 {
   return min_scan_angle_;
 }
 
-const double& LaserScan::getMaxScanAngle() const
+double LaserScan::getMaxScanAngle() const
 {
   return max_scan_angle_;
 }

@@ -101,12 +101,12 @@ set(${PROJECT_NAME}_sources
   src/monitoring_frame_msg.cpp
   src/start_request.cpp
   src/stop_request.cpp
+  src/scanner_configuration.cpp
 )
 
 set(${PROJECT_NAME}_node_sources
   src/psen_scan_driver.cpp
   src/ros_parameter_handler.cpp
-  src/scanner_configuration.cpp
 )
 
 add_library(${PROJECT_NAME} ${${PROJECT_NAME}_sources})
