@@ -67,7 +67,7 @@ template <typename SC>
 ScannerT<SC>::ScannerT(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback)
   : scanner_controller_(scanner_config, laser_scan_callback)
 {
-  if (! laser_scan_callback)
+  if (!laser_scan_callback)
   {
     throw std::invalid_argument("Invalid laserscanner callback registered!");
   }
