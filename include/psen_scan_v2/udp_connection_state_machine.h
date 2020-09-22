@@ -172,7 +172,7 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
     a_row < s::idle,                       e::start_request,                 s::wait_for_start_reply,      &m::action_send_start_request   >,
     a_row < s::idle,                       e::stop_request,                  s::wait_for_stop_reply,       &m::action_send_stop_request    >,
      _row < s::wait_for_start_reply,       e::start_reply_received,          s::wait_for_monitoring_frame                                  >,
-     _row < s::wait_for_monitoring_frame,  e::monitoring_frame_received,     s::wait_for_monitoring_frame                                  >,
+    _irow < s::wait_for_monitoring_frame,  e::monitoring_frame_received                                                                    >,
     a_row < s::wait_for_start_reply,       e::stop_request,                  s::wait_for_stop_reply,       &m::action_send_stop_request    >,
     a_row < s::wait_for_monitoring_frame,  e::stop_request,                  s::wait_for_stop_reply,       &m::action_send_stop_request    >,
     a_row < s::wait_for_stop_reply,        e::stop_reply_received,           s::stopped,                   &m::action_notify_stop          >
