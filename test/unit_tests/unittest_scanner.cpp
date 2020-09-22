@@ -32,6 +32,12 @@ using namespace ::testing;
 
 namespace psen_scan_v2
 {
+class MockCallbackHolder
+{
+public:
+  MOCK_METHOD1(laserscan_callback, void(const LaserScan&));
+};
+
 static const std::string HOST_IP{ "127.0.0.1" };
 static constexpr int HOST_UDP_PORT_DATA{ 50505 };
 static constexpr int HOST_UDP_PORT_CONTROL{ 55055 };
@@ -46,15 +52,25 @@ protected:
   {
   }
 
+  MockCallbackHolder mock_;
   ScannerConfiguration scanner_config_;
-  LaserScanCallback laserscan_callback_;
+  LaserScanCallback laserscan_callback_{
+    std::bind(&MockCallbackHolder::laserscan_callback, &mock_, std::placeholders::_1)
+  };
 };
+
+typedef ScannerT<psen_scan_v2_test::ScannerControllerMock> MockedScanner;
+
+TEST_F(ScannerTest, testConstructorInvalidLaserScanCallback)
+{
+  LaserScanCallback laserscan_callback;
+  EXPECT_THROW(MockedScanner scanner(scanner_config_, laserscan_callback);, std::invalid_argument);
+}
+
 // TEST_F(ScannerTest, testConstructorSuccess)
 // {
 //   EXPECT_NO_THROW(ScannerT<ScannerControllerMock>());
 // }
-
-typedef ScannerT<psen_scan_v2_test::ScannerControllerMock> MockedScanner;
 
 TEST_F(ScannerTest, testStart)
 {

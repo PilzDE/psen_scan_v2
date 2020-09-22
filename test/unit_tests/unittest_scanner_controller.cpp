@@ -161,7 +161,7 @@ TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
   scanner_controller_.handleNewMonitoringFrame(data, data.size());
 }
 
-TEST_F(ScannerControllerTest, testConstructor)
+TEST_F(ScannerControllerTest, testConstructorInvalidLaserScanCallback)
 {
   LaserScanCallback laserscan_callback;
   typedef ScannerControllerT<psen_scan_v2_test::ControllerStateMachineMock, psen_scan_v2_test::MockUdpClient> SCT;
