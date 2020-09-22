@@ -60,16 +60,6 @@ double LaserScan::getMaxScanAngle() const
   return max_scan_angle_;
 }
 
-bool LaserScan::isNumberOfScansValid() const
-{
-  assert(getMinScanAngle() < getMaxScanAngle() && "Invalid scan range");
-
-  using size_type = MeasurementData::size_type;
-  const auto angle_range{ getMaxScanAngle() - getMinScanAngle() };
-  const size_type expected_size{ static_cast<size_type>(std::floor(angle_range / getScanResolution())) };
-  return measures_.size() == expected_size;
-}
-
 const MeasurementData& LaserScan::getMeasurements() const
 {
   return measures_;
