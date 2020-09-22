@@ -14,9 +14,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <stdexcept>
-#include <cassert>
-#include <limits>
-#include <cmath>
 
 #include "psen_scan_v2/laserscan.h"
 #include "psen_scan_v2/degree_to_rad.h"
