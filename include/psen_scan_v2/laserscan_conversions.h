@@ -12,8 +12,9 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#ifndef PSEN_SCAN_V2_LASERSCAN_BUILDER_H
-#define PSEN_SCAN_V2_LASERSCAN_BUILDER_H
+
+#ifndef PSEN_SCAN_V2_LASERSCAN_CONVERSIONS_H
+#define PSEN_SCAN_V2_LASERSCAN_CONVERSIONS_H
 
 #include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/laserscan.h"
@@ -21,19 +22,7 @@
 
 namespace psen_scan_v2
 {
-class LaserScanBuildFailure : public std::runtime_error
-{
-public:
-  LaserScanBuildFailure(const std::string& msg = "Error while building laser scan");
-};
-
-class LaserScanBuilder
-{
-public:
-  static LaserScan build(const MonitoringFrameMsg& frame);
-};
-
-inline LaserScan LaserScanBuilder::build(const MonitoringFrameMsg& frame)
+LaserScan toLaserScan(const MonitoringFrameMsg& frame)
 {
   const double resolution = tenthDegreeToRad(frame.resolution());
   const double min_angle = tenthDegreeToRad(frame.fromTheta());
@@ -48,4 +37,4 @@ inline LaserScan LaserScanBuilder::build(const MonitoringFrameMsg& frame)
 
 }  // namespace psen_scan_v2
 
-#endif  // PSEN_SCAN_V2_LASERSCAN_BUILDER_H
+#endif  // PSEN_SCAN_V2_LASERSCAN_CONVERSIONS_H

@@ -29,7 +29,7 @@
 
 #include "psen_scan_v2/controller_state_machine.h"
 #include "psen_scan_v2/function_pointers.h"
-#include "psen_scan_v2/laserscan_builder.h"
+#include "psen_scan_v2/laserscan_conversions.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/msg_decoder.h"
 #include "psen_scan_v2/raw_scanner_data.h"
@@ -125,7 +125,7 @@ void ScannerControllerT<TCSM, TUCI>::handleNewMonitoringFrame(const MaxSizeRawDa
   MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
   state_machine_.processMonitoringFrameReceivedEvent();
 
-  LaserScan scan{ LaserScanBuilder::build(frame) };
+  LaserScan scan{ toLaserScan(frame) };
 
   laser_scan_callback_(scan);
 }

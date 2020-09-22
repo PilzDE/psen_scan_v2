@@ -25,7 +25,7 @@
 #include "psen_scan_v2/scanner_controller.h"
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/stop_request.h"
-#include "psen_scan_v2/laserscan_builder.h"
+#include "psen_scan_v2/laserscan_conversions.h"
 #include "psen_scan_v2/laserscan.h"
 #include "psen_scan_v2/udp_frame_dumps.h"
 #include "psen_scan_v2/raw_data_array_conversion.h"
@@ -157,7 +157,7 @@ TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
   UDPFrameTestDataWithoutIntensities test_data;
   MaxSizeRawData data = convertToMaxSizeRawData(test_data.hex_dump);
   MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
-  LaserScan scan = LaserScanBuilder::build(frame);
+  LaserScan scan = toLaserScan(frame);
 
   // TODO: It doesn't matter how many times called
   EXPECT_CALL(scanner_controller_.state_machine_, processMonitoringFrameReceivedEvent()).Times(1);
