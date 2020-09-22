@@ -59,13 +59,13 @@ public:
   void start();
   std::future<void> stop();
 
+private:
   void handleError(const std::string& error_msg);
   void handleNewMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes);
-  void sendStartRequest();
 
+  void sendStartRequest();
   void sendStopRequest();
 
-private:
   void handleStartReplyTimeout(const std::string& error_str);
   void handleStopReplyTimeout(const std::string& error_str);
 
@@ -90,6 +90,7 @@ private:
   FRIEND_TEST(ScannerControllerTest, testHandleStopReplyTimeout);
   FRIEND_TEST(ScannerControllerTest, testStopRequestEventWithFutureUsage);
   FRIEND_TEST(ScannerControllerTest, testHandleNewMonitoringFrame);
+  FRIEND_TEST(ScannerControllerTest, test_handle_error_no_throw);
 };
 
 typedef ScannerControllerT<> ScannerController;

@@ -164,9 +164,8 @@ TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
 TEST_F(ScannerControllerTest, testConstructor)
 {
   LaserScanCallback laserscan_callback;
-  typedef ScannerControllerT<psen_scan_v2_test::ControllerStateMachineMock, psen_scan_v2_test::MockUdpClient>  SCT;
-  EXPECT_THROW(
-    SCT scanner_controller_(scanner_config_, laserscan_callback );, std::invalid_argument);
+  typedef ScannerControllerT<psen_scan_v2_test::ControllerStateMachineMock, psen_scan_v2_test::MockUdpClient> SCT;
+  EXPECT_THROW(SCT scanner_controller_(scanner_config_, laserscan_callback);, std::invalid_argument);
 }
 
 }  // namespace psen_scan_v2
