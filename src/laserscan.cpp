@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <algorithm>
 #include <stdexcept>
 #include <cassert>
 #include <limits>
@@ -87,20 +88,9 @@ MeasurementData& LaserScan::getMeasurements()
 
 bool LaserScan::operator==(const LaserScan& scan) const
 {
-  if ((this->getMaxScanAngle() != scan.getMaxScanAngle()) || (this->getMinScanAngle() != scan.getMinScanAngle()) ||
-      (this->getScanResolution() != scan.getScanResolution()) ||
-      (this->getMeasurements().size() != scan.getMeasurements().size()))
-  {
-    for (size_t i = 0; i < this->getMeasurements().size(); i++)
-    {
-      if (this->getMeasurements().at(i) != scan.getMeasurements().at(i))
-      {
-        return false;
-      }
-    }
-  }
-
-  return true;
+  return ((max_scan_angle_ == scan.max_scan_angle_) && (min_scan_angle_ == scan.min_scan_angle_) &&
+          (resolution_ == scan.resolution_) && (measures_.size() == scan.measures_.size()) &&
+          std::equal(measures_.begin(), measures_.end(), scan.measures_.begin()));
 }
 
 }  // namespace psen_scan_v2
