@@ -50,20 +50,16 @@ public:
 class ScannerControllerTest : public ::testing::Test
 {
 protected:
-  ScannerControllerTest()
-    : scanner_config_(HOST_IP, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, DEVICE_IP, START_ANGLE, END_ANGLE)
-    , scanner_controller_(scanner_config_, laser_scan_callback_)
-  {
-  }
-
-protected:
   MockCallbackHolder mock_;
-  ScannerConfiguration scanner_config_;
-  ScannerControllerT<psen_scan_v2_test::ControllerStateMachineMock, psen_scan_v2_test::MockUdpClient>
-      scanner_controller_;
+  ScannerConfiguration scanner_config_{ HOST_IP,   HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL,
+                                        DEVICE_IP, START_ANGLE,        END_ANGLE };
+
   LaserScanCallback laser_scan_callback_{
     std::bind(&MockCallbackHolder::laserscan_callback, &mock_, std::placeholders::_1)
   };
+
+  ScannerControllerT<psen_scan_v2_test::ControllerStateMachineMock, psen_scan_v2_test::MockUdpClient>
+      scanner_controller_{ scanner_config_, laser_scan_callback_ };
 };
 
 TEST_F(ScannerControllerTest, testStartRequestEvent)
@@ -159,13 +155,10 @@ TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
   MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
   LaserScan scan = toLaserScan(frame);
 
-  // TODO: It doesn't matter how many times called
   EXPECT_CALL(scanner_controller_.state_machine_, processMonitoringFrameReceivedEvent()).Times(1);
   EXPECT_CALL(mock_, laserscan_callback(scan)).Times(1);
 
-  scanner_controller_.handleNewMonitoringFrame(data);
-
-  // TODO: Segmentation fault at the end of the test
+  scanner_controller_.handleNewMonitoringFrame(data, data.size());
 }
 
 }  // namespace psen_scan_v2

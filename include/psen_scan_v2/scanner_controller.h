@@ -60,9 +60,9 @@ public:
   std::future<void> stop();
 
   void handleError(const std::string& error_msg);
+  void handleNewMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes);
   void sendStartRequest();
 
-  void handleNewMonitoringFrame(const MaxSizeRawData& data);
   void sendStopRequest();
 
 private:
@@ -110,23 +110,26 @@ ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& s
         scanner_config.hostUDPPortControl(),
         scanner_config.clientIp(),
         CONTROL_PORT_OF_SCANNER_DEVICE)
-  , data_udp_client_(std::bind(&ScannerControllerT::handleNewMonitoringFrame, this, std::placeholders::_1),
-                     std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1),
-                     scanner_config.hostUDPPortData(),
-                     scanner_config.clientIp(),
-                     DATA_PORT_OF_SCANNER_DEVICE)
+  , data_udp_client_(
+        std::bind(&ScannerControllerT::handleNewMonitoringFrame, this, std::placeholders::_1, std::placeholders::_2),
+        std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1),
+        scanner_config.hostUDPPortData(),
+        scanner_config.clientIp(),
+        DATA_PORT_OF_SCANNER_DEVICE)
   , laser_scan_callback_(laser_scan_callback)
 {
+  if (!laser_scan_callback)
+  {
+    throw std::invalid_argument("Laserscan callback must not be null");
+  }
 }
 
 template <typename TCSM, typename TUCI>
-void ScannerControllerT<TCSM, TUCI>::handleNewMonitoringFrame(const MaxSizeRawData& data)
+void ScannerControllerT<TCSM, TUCI>::handleNewMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes)
 {
   MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
   state_machine_.processMonitoringFrameReceivedEvent();
-
   LaserScan scan{ toLaserScan(frame) };
-
   laser_scan_callback_(scan);
 }
 
