@@ -52,7 +52,7 @@ style=wordwrap
 Primitive Scanner Communication Layer
 --
 **Explanation:**
-Takes care of the primitve network communication.
+Takes care of the primitive network communication.
 The software component of this abstraction level deliveres data as simple byte vectors/buffers to the next abstraction level.</panel_attributes>
     <additional_attributes/>
   </element>
@@ -83,7 +83,7 @@ Scanner Controller
 **Explanation:**
 Represents the state machine (indirectly) described in the Communication manual of the scanner on page 1.
 The state machine consists roughly of the following states:
-- Init
+- Idle
 - Wait for Start Reply
 - Wait for Monitoring Frames
 - Wait for Stop Reply
@@ -252,8 +252,8 @@ Scanner
 --
 + Scanner(ScannerConfiguration, LaserscanAvailableCallback)
 
-+ connect()
-+ disconnect()
++ start()
++ stop()
 
 --
 **Explanation:**
