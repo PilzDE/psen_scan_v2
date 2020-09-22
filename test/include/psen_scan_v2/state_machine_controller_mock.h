@@ -28,8 +28,9 @@ class ControllerStateMachineMock
 public:
   ControllerStateMachineMock(const psen_scan_v2::SendRequestCallback& start_request_cb,
                              const psen_scan_v2::SendRequestCallback& stop_request_cb,
+                             const psen_scan_v2::StartedCallback& started_cb,
                              const psen_scan_v2::StoppedCallback& stopped_cb)
-    : stopped_cb_(stopped_cb){};
+    : started_cb_(started_cb), stopped_cb_(stopped_cb){};
 
 public:
   MOCK_METHOD0(processStartRequestEvent, void());
@@ -38,6 +39,7 @@ public:
   MOCK_METHOD0(processStopRequestEvent, void());
   MOCK_METHOD0(processStopReplyReceivedEvent, void());
 
+  const psen_scan_v2::StoppedCallback started_cb_;
   const psen_scan_v2::StoppedCallback stopped_cb_;
 };
 

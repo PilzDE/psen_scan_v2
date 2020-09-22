@@ -32,6 +32,7 @@ class ControllerStateMachineTest : public ::testing::Test
 public:
   MOCK_METHOD0(send_start_request_callbackTest, void());
   MOCK_METHOD0(send_stop_request_callbackTest, void());
+  MOCK_METHOD0(started_cb, void());
   MOCK_METHOD0(stopped_cb, void());
 };
 
@@ -41,6 +42,7 @@ TEST_F(ControllerStateMachineTest, triggerSendRequestCallbackTest)
 
   ControllerStateMachine sm(std::bind(&ControllerStateMachineTest::send_start_request_callbackTest, this),
                             std::bind(&ControllerStateMachineTest::send_stop_request_callbackTest, this),
+                            std::bind(&ControllerStateMachineTest::started_cb, this),
                             std::bind(&ControllerStateMachineTest::stopped_cb, this));
 
   sm.processStartRequestEvent();
@@ -53,6 +55,7 @@ TEST_F(ControllerStateMachineTest, testThatStopRequestCallbackIsCalled)
 
   ControllerStateMachine sm(std::bind(&ControllerStateMachineTest::send_start_request_callbackTest, this),
                             std::bind(&ControllerStateMachineTest::send_stop_request_callbackTest, this),
+                            std::bind(&ControllerStateMachineTest::started_cb, this),
                             std::bind(&ControllerStateMachineTest::stopped_cb, this));
 
   sm.processStartRequestEvent();
@@ -68,6 +71,7 @@ TEST_F(ControllerStateMachineTest, testThatStopReplyReceivedCallbackIsCalled)
 
   ControllerStateMachine sm(std::bind(&ControllerStateMachineTest::send_start_request_callbackTest, this),
                             std::bind(&ControllerStateMachineTest::send_stop_request_callbackTest, this),
+                            std::bind(&ControllerStateMachineTest::started_cb, this),
                             std::bind(&ControllerStateMachineTest::stopped_cb, this));
 
   sm.processStartRequestEvent();
