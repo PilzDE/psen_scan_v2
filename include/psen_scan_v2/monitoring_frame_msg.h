@@ -41,22 +41,11 @@ public:
   using Length = uint16_t;
 
 public:
-  FieldHeader(std::istringstream& is)
-  {
-    raw_processing::read(is, id_);
-    raw_processing::read(is, length_);
-    length_--;
-  }
+  FieldHeader(std::istringstream& is);
 
-  Id id() const
-  {
-    return id_;
-  }
-
-  Length length() const
-  {
-    return length_;
-  }
+public:
+  Id id() const;
+  Length length() const;
 
 private:
   Id id_;
@@ -126,6 +115,16 @@ private:
     { AdditionalFieldIds::END_OF_FRAME, &MonitoringFrameMsg::setEndOfFrame }
   };
 };
+
+inline FieldHeader::Id FieldHeader::id() const
+{
+  return id_;
+}
+
+inline FieldHeader::Length FieldHeader::length() const
+{
+  return length_;
+}
 
 inline uint16_t MonitoringFrameMsg::fromTheta() const
 {

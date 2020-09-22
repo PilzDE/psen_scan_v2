@@ -31,6 +31,13 @@ constexpr FieldHeader::Id AdditionalFieldIds::SCAN_COUNTER;
 constexpr FieldHeader::Id AdditionalFieldIds::MEASURES;
 constexpr FieldHeader::Id AdditionalFieldIds::END_OF_FRAME;
 
+FieldHeader::FieldHeader(std::istringstream& is)
+{
+  raw_processing::read(is, id_);
+  raw_processing::read(is, length_);
+  length_--;
+}
+
 MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
 {
   MonitoringFrameMsg msg;
