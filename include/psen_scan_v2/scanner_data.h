@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef PSEN_SCAN_V2_SCANNER_PARAMETER_H
-#define PSEN_SCAN_V2_SCANNER_PARAMETER_H
+#ifndef PSEN_SCAN_V2_SCANNER_DATA_H
+#define PSEN_SCAN_V2_SCANNER_DATA_H
 
 namespace psen_scan_v2
 {
@@ -25,4 +25,4 @@ constexpr uint16_t NUMBER_OF_SAMPLES_FULL_SCAN_MASTER{ 2750 };
 constexpr double SCAN_TIME{ 0.03 };
 }  // namespace psen_scan_v2
 
-#endif  // PSEN_SCAN_V2_SCANNER_PARAMETER_H
+#endif  // PSEN_SCAN_V2_SCANNER_DATA_H
