@@ -47,7 +47,7 @@ TEST(ScannerReplyMsgTest, testTypeUnknown)
 
 TEST(ScannerReplyMsgTest, testGetStartOpCode)
 {
-  EXPECT_EQ(OP_CODE_START, ScannerReplyMsg::getStartOpCode());
+  EXPECT_EQ(OP_CODE_START, getOpCodeValue(ScannerReplyMsgType::Start));
 }
 
 TEST(ScannerReplyMsgTest, testtoRawData)
