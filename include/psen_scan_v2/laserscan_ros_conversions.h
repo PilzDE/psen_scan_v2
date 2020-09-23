@@ -22,7 +22,10 @@
 
 namespace psen_scan_v2
 {
-sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan, std::string& frame_id, const double x_axis_rotation)
+sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
+                                      const std::string& frame_id,
+                                      const double x_axis_rotation,
+                                      const ros::Time& timestamp = ros::Time::now())
 {
   // TODO fix isValid()
   // if (!laserscan.isValid())
@@ -31,7 +34,7 @@ sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan, std::string& f
   // }
 
   sensor_msgs::LaserScan ros_message;
-  ros_message.header.stamp = ros::Time::now();
+  ros_message.header.stamp = timestamp;
   ros_message.header.frame_id = frame_id;
   ros_message.angle_min = -(laserscan.getMaxScanAngle() - x_axis_rotation);
   ros_message.angle_max = -(laserscan.getMinScanAngle() - x_axis_rotation);
