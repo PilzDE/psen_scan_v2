@@ -46,8 +46,8 @@ sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
   ros_message.time_increment = 0;
 
   ros_message.scan_time = SCAN_TIME;
-  ros_message.range_min = 0;
-  ros_message.range_max = 10;
+  ros_message.range_min = RANGE_MIN;
+  ros_message.range_max = RANGE_MAX;
 
   // Note that the ranges field from the laserscan msg is field in reverse order
   // from the actual measurements. Thus the first element is the newest measurement and the last

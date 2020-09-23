@@ -23,6 +23,10 @@ constexpr uint16_t NUMBER_OF_SAMPLES_FULL_SCAN_MASTER{ 2750 };
 
 //! @brief Time per scan (in seconds.)
 constexpr double SCAN_TIME{ 0.03 };
+
+constexpr double RANGE_MIN{ 0 };
+constexpr double RANGE_MAX{ 10 };
+
 }  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_SCANNER_CONSTANTS_H
