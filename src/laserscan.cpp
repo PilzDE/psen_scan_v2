@@ -14,9 +14,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <stdexcept>
-#include <cassert>
-#include <limits>
-#include <cmath>
 
 #include "psen_scan_v2/laserscan.h"
 #include "psen_scan_v2/degree_to_rad.h"
@@ -58,16 +55,6 @@ double LaserScan::getMinScanAngle() const
 double LaserScan::getMaxScanAngle() const
 {
   return max_scan_angle_;
-}
-
-bool LaserScan::isNumberOfScansValid() const
-{
-  assert(getMinScanAngle() < getMaxScanAngle() && "Invalid scan range");
-
-  using size_type = MeasurementData::size_type;
-  const auto angle_range{ getMaxScanAngle() - getMinScanAngle() };
-  const size_type expected_size{ static_cast<size_type>(std::floor(angle_range / getScanResolution())) };
-  return measures_.size() == expected_size;
 }
 
 const MeasurementData& LaserScan::getMeasurements() const

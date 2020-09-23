@@ -93,11 +93,6 @@ sensor_msgs::LaserScan ROSScannerNodeT<S>::toRosMessage(const LaserScan& lasersc
   // TODO Remove after implementing building of laserscans
   // LCOV_EXCL_START
 
-  if (!laserscan.isNumberOfScansValid())
-  {
-    throw std::invalid_argument("Calculated number of scans doesn't match actual number of scans.");
-  }
-
   sensor_msgs::LaserScan ros_message;
   ros_message.header.stamp = ros::Time::now();
   ros_message.header.frame_id = frame_id_;
