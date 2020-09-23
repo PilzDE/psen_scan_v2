@@ -15,9 +15,6 @@
 
 #include <algorithm>
 #include <stdexcept>
-#include <cassert>
-#include <limits>
-#include <cmath>
 
 #include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/laserscan.h"
@@ -59,16 +56,6 @@ double LaserScan::getMinScanAngle() const
 double LaserScan::getMaxScanAngle() const
 {
   return max_scan_angle_;
-}
-
-bool LaserScan::isValid() const
-{
-  assert(getMinScanAngle() < getMaxScanAngle() && "Invalid scan range");
-
-  using size_type = MeasurementData::size_type;
-  const auto angle_range{ getMaxScanAngle() - getMinScanAngle() };
-  const size_type expected_size{ static_cast<size_type>(std::floor(angle_range / getScanResolution())) };
-  return measures_.size() == expected_size;
 }
 
 const MeasurementData& LaserScan::getMeasurements() const

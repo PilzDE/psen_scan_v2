@@ -45,16 +45,13 @@ public:
   MeasurementData& getMeasurements();
   void setMeasurements(const MeasurementData&);
 
-  //! @returns true if the measurement data contain as much measurements as required by the measurement range
-  //! and measurement resolution.
-  bool isValid() const;
   bool operator==(const LaserScan& scan) const;
 
 private:
   //! Measurement data of the laserscan (in Millimeters).
   MeasurementData measures_;
   //! Distance of angle between the measurements (in radian).
-  double resolution_;
+  const double resolution_;
   //! Lowest angle the scanner is scanning (in radian).
   const double min_scan_angle_;
   //! Highest angle the scanner is scanning (in radian).
