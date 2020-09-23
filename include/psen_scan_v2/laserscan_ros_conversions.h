@@ -45,8 +45,14 @@ sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan, std::string& f
   ros_message.scan_time = SCAN_TIME;
   ros_message.range_min = 0;
   ros_message.range_max = 10;
+
+  // Note that the ranges field from the laserscan msg is field in reverse order
+  // from the actual measurements. Thus the first element is the newest measurement and the last
+  // element is the oldest
   ros_message.ranges.insert(
       ros_message.ranges.end(), laserscan.getMeasurements().crbegin(), laserscan.getMeasurements().crend());
+
+  // Transform into meters
   std::transform(ros_message.ranges.begin(), ros_message.ranges.end(), ros_message.ranges.begin(), [](float f) {
     return f * 0.001;
   });
