@@ -246,6 +246,15 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES}
   )
 
+  catkin_add_gtest(unittest_laserscan_conversions
+    test/unit_tests/unittest_laserscan_conversions.cpp
+    src/laserscan.cpp
+    src/monitoring_frame_msg.cpp
+  )
+  target_link_libraries(unittest_laserscan_conversions
+    ${catkin_LIBRARIES}
+  )
+
   catkin_add_gmock(unittest_scanner_controller
     test/unit_tests/unittest_scanner_controller.cpp
     src/scanner_configuration.cpp
