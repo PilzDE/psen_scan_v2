@@ -38,18 +38,20 @@ TEST(LaserScanConversionsTest, testToLaserScan)
   MonitoringFrameMsg frame;
   ASSERT_NO_THROW(frame = MonitoringFrameMsg::fromRawData(raw_data););
 
-  LaserScan scan{ toLaserScan(frame) };
-  EXPECT_DOUBLE_EQ(tenthDegreeToRad(frame.fromTheta()), scan.getMinScanAngle());
-  EXPECT_DOUBLE_EQ(tenthDegreeToRad(frame.resolution()), scan.getScanResolution());
+  std::unique_ptr<LaserScan> scan_ptr;
+  ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ toLaserScan(frame) }););
+
+  EXPECT_DOUBLE_EQ(tenthDegreeToRad(frame.fromTheta()), scan_ptr->getMinScanAngle());
+  EXPECT_DOUBLE_EQ(tenthDegreeToRad(frame.resolution()), scan_ptr->getScanResolution());
 
   const double max_scan_angle{ tenthDegreeToRad(frame.fromTheta() + frame.resolution() * frame.measures().size()) };
-  EXPECT_DOUBLE_EQ(max_scan_angle, scan.getMaxScanAngle());
+  EXPECT_DOUBLE_EQ(max_scan_angle, scan_ptr->getMaxScanAngle());
 
-  EXPECT_EQ(frame.measures().size(), scan.getMeasurements().size());
+  EXPECT_EQ(frame.measures().size(), scan_ptr->getMeasurements().size());
   const auto mismatch_pair =
-      std::mismatch(scan.getMeasurements().begin(), scan.getMeasurements().end(), frame.measures().begin());
-  EXPECT_EQ(scan.getMeasurements().end(), mismatch_pair.first)
-      << "Measure number " << std::distance(scan.getMeasurements().begin(), mismatch_pair.first)
+      std::mismatch(scan_ptr->getMeasurements().begin(), scan_ptr->getMeasurements().end(), frame.measures().begin());
+  EXPECT_EQ(scan_ptr->getMeasurements().end(), mismatch_pair.first)
+      << "Measure number " << std::distance(scan_ptr->getMeasurements().begin(), mismatch_pair.first)
       << " in LaserScan is: " << *(mismatch_pair.first) << ", but expected: " << *(mismatch_pair.second);
 }
 }  // namespace psen_scan_v2_test
