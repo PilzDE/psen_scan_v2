@@ -18,7 +18,7 @@
 #include "psen_scan_v2/ros_parameter_handler.h"
 #include "psen_scan_v2/get_ros_parameter_exception.h"
 #include "psen_scan_v2/default_parameters.h"
-#include "psen_scan_v2/scanner_data.h"
+#include "psen_scan_v2/scanner_constants.h"
 
 namespace psen_scan_v2
 {

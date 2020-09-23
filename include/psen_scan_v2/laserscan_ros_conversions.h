@@ -18,7 +18,7 @@
 
 #include <sensor_msgs/LaserScan.h>
 
-#include "psen_scan_v2/scanner_data.h"
+#include "psen_scan_v2/scanner_constants.h"
 
 namespace psen_scan_v2
 {
