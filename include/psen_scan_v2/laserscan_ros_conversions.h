@@ -36,7 +36,12 @@ sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan, std::string& f
   ros_message.angle_min = -(laserscan.getMaxScanAngle() - x_axis_rotation);
   ros_message.angle_max = -(laserscan.getMinScanAngle() - x_axis_rotation);
   ros_message.angle_increment = laserscan.getScanResolution();
-  ros_message.time_increment = SCAN_TIME / NUMBER_OF_SAMPLES_FULL_SCAN_MASTER;
+
+  // For now we set this to zero to hint that the ranges are actually ordered
+  // from new to old. Thus applying some sort of interpolation using time_increment
+  // could lead to unwanted results.
+  ros_message.time_increment = 0;
+
   ros_message.scan_time = SCAN_TIME;
   ros_message.range_min = 0;
   ros_message.range_max = 10;
