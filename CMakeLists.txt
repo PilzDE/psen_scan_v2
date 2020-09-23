@@ -106,7 +106,6 @@ set(${PROJECT_NAME}_sources
 
 set(${PROJECT_NAME}_node_sources
   src/psen_scan_driver.cpp
-  src/ros_parameter_handler.cpp
 )
 
 add_library(${PROJECT_NAME} ${${PROJECT_NAME}_sources})
@@ -313,13 +312,13 @@ target_link_libraries(integrationtest_scanner_api
     ${pilz_testutils_LIBRARIES}
   )
 
-  add_rostest_gtest(integrationtest_ros_parameter_handler
-    test/integration_tests/integrationtest_ros_parameter_handler.test
-    test/integration_tests/integrationtest_ros_parameter_handler.cpp
-    src/ros_parameter_handler.cpp
+  add_rostest_gmock(unittest_ros_parameter_handler
+      test/unit_tests/unittest_ros_parameter_handler.test
+      test/unit_tests/unittest_ros_parameter_handler.cpp
   )
-  target_link_libraries(integrationtest_ros_parameter_handler
+  target_link_libraries(unittest_ros_parameter_handler
     ${catkin_LIBRARIES}
+    ${pilz_testutils_LIBRARIES}
   )
 
   # generate coverage report using CATKIN_MAKE:

@@ -22,15 +22,10 @@
 
 namespace psen_scan_v2
 {
-static const std::string DEFAULT_FRAME_ID = "scanner";
-
 //! @brief Start angle of measurement.
 static constexpr double DEFAULT_ANGLE_START(-degreeToRadian(137.5));
 //! @brief  End angle of measurement.
 static constexpr double DEFAULT_ANGLE_END(degreeToRadian(137.5));
-
-//! @brief Topic on which the LaserScan data are published.
-static const std::string DEFAULT_PUBLISH_TOPIC = "scan";
 
 }  // namespace psen_scan_v2
 #endif  // PSEN_SCAN_V2_DEFAULT_PARAMETERS_H

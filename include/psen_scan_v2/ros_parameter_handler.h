@@ -18,56 +18,54 @@
 
 #include <string>
 
+#include <boost/optional.hpp>
+
 #include <ros/ros.h>
+
+#include "psen_scan_v2/get_ros_parameter_exception.h"
 
 namespace psen_scan_v2
 {
-/**
- * @brief Helper to fetch data from the ROS parameter server.
- *
- */
-class RosParameterHandler
+template <class T>
+boost::optional<T> getParam(const ros::NodeHandle& node_handle, const std::string& key)
 {
-public:
-  /**
-   * @brief Construct a new RosParameterHandler and gets all parameters from the ROS parameter server.
-   *
-   * @param nh Nodehandle from which parameters will be fetched.
-   */
-  RosParameterHandler(const ros::NodeHandle& nh);
+  if (!node_handle.hasParam(key))
+  {
+    ROS_WARN_STREAM("Parameter " + key + " doesn't exist on parameter server.");
+    return boost::none;
+  }
 
-  std::string getHostIP() const;
-  uint32_t getHostUDPPortData() const;
-  uint32_t getHostUDPPortControl() const;
-  std::string getSensorIP() const;
-  std::string getFrameID() const;
-  double getAngleStart() const;
-  double getAngleEnd() const;
+  T default_val;
+  boost::optional<T> ret_val(default_val);
+  if (!node_handle.getParam(key, ret_val.get()))
+  {
+    throw WrongParameterType("Parameter " + key + " has wrong datatype on parameter server.");
+  }
+  return ret_val;
+}
 
-private:
-  template <class T>
-  void getRequiredParamFromParamServer(const std::string& key, T& param);
+template <class T>
+T getOptionalParamFromServer(const ros::NodeHandle& node_handle, const std::string& key, const T& default_value)
+{
+  boost::optional<T> val{ getParam<T>(node_handle, key) };
+  if (!val)
+  {
+    return default_value;
+  }
+  return val.value();
+}
 
-  template <class T>
-  bool getOptionalParamFromParamServer(const std::string& key, T& param);
+template <class T>
+T getRequiredParamFromServer(const ros::NodeHandle& node_handle, const std::string& key)
+{
+  boost::optional<T> val{ getParam<T>(node_handle, key) };
+  if (!val)
+  {
+    throw ParamMissingOnServer("Parameter " + key + " doesn't exist on parameter server.");
+  }
+  return val.value();
+}
 
-  void updateAllParamsFromParamServer();
-
-private:
-  ros::NodeHandle const nh_;
-  std::string host_ip_;
-  //! @brief UDP Port on which monitoring frames (scans) should be received.
-  int host_udp_port_data_;
-  //! @brief UDP Port used to send commands (start/stop) and receive the corresponding replies.
-  int host_udp_port_control_;
-  //! @brief  IP-Adress of Safety laser scanner.
-  std::string sensor_ip_;
-  std::string frame_id_;
-  //! @brief Start angle of measurement (in radian).
-  double angle_start_;
-  //! @brief nd angle of measurement (in radian).
-  double angle_end_;
-};
 }  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_ROS_PARAMETER_HANDLER_H

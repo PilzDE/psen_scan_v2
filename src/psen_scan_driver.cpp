@@ -16,6 +16,7 @@
 #include <functional>
 #include <csignal>
 #include <future>
+#include <string>
 
 #include <ros/ros.h>
 
@@ -32,6 +33,20 @@ REGISTER_ROSCONSOLE_BRIDGE;
 using namespace psen_scan_v2;
 
 std::function<void()> NODE_TERMINATE_CB;
+
+const std::string PARAM_HOST_IP{ "host_ip" };
+const std::string PARAM_HOST_DATA_PORT{ "host_udp_port_data" };
+const std::string PARAM_HOST_CONTROL_PORT{ "host_udp_port_control" };
+const std::string PARAM_SCANNER_IP{ "sensor_ip" };
+const std::string PARAM_FRAME_ID{ "frame_id" };
+const std::string PARAM_ANGLE_START{ "angle_start" };
+const std::string PARAM_ANGLE_END{ "angle_end" };
+const std::string PARAM_X_AXIS_ROTATION{ "x_axis_rotation" };
+
+static const std::string DEFAULT_FRAME_ID = "scanner";
+
+//! @brief Topic on which the LaserScan data are published.
+static const std::string DEFAULT_PUBLISH_TOPIC = "scan";
 
 void delayed_shutdown_sig_handler(int sig)
 {
@@ -52,17 +67,23 @@ int main(int argc, char** argv)
 
   try
   {
-    psen_scan_v2::RosParameterHandler param_handler(pnh);
+    const double start_angle{ DEFAULT_X_AXIS_ROTATION -
+                              getOptionalParamFromServer<double>(pnh, PARAM_ANGLE_END, DEFAULT_ANGLE_END) };
+    const double end_angle{ DEFAULT_X_AXIS_ROTATION -
+                            getOptionalParamFromServer<double>(pnh, PARAM_ANGLE_START, DEFAULT_ANGLE_START) };
 
-    ScannerConfiguration scanner_configuration(param_handler.getHostIP(),
-                                               param_handler.getHostUDPPortData(),
-                                               param_handler.getHostUDPPortControl(),
-                                               param_handler.getSensorIP(),
-                                               DEFAULT_X_AXIS_ROTATION - param_handler.getAngleEnd(),
-                                               DEFAULT_X_AXIS_ROTATION - param_handler.getAngleStart());
+    ScannerConfiguration scanner_configuration(getRequiredParamFromServer<std::string>(pnh, PARAM_HOST_IP),
+                                               getRequiredParamFromServer<int>(pnh, PARAM_HOST_DATA_PORT),
+                                               getRequiredParamFromServer<int>(pnh, PARAM_HOST_CONTROL_PORT),
+                                               getRequiredParamFromServer<std::string>(pnh, PARAM_SCANNER_IP),
+                                               start_angle,
+                                               end_angle);
 
-    ROSScannerNode ros_scanner_node(
-        pnh, DEFAULT_PUBLISH_TOPIC, param_handler.getFrameID(), DEFAULT_X_AXIS_ROTATION, scanner_configuration);
+    ROSScannerNode ros_scanner_node(pnh,
+                                    DEFAULT_PUBLISH_TOPIC,
+                                    getOptionalParamFromServer<std::string>(pnh, PARAM_FRAME_ID, DEFAULT_FRAME_ID),
+                                    DEFAULT_X_AXIS_ROTATION,
+                                    scanner_configuration);
 
     NODE_TERMINATE_CB = std::bind(&ROSScannerNode::terminate, &ros_scanner_node);
 
