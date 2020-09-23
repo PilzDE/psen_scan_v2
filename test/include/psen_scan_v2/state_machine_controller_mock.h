@@ -20,6 +20,7 @@
 
 #include "psen_scan_v2/controller_state_machine.h"
 #include "psen_scan_v2/function_pointers.h"
+#include "psen_scan_v2/scanner_reply_msg.h"
 
 namespace psen_scan_v2_test
 {
@@ -34,10 +35,9 @@ public:
 
 public:
   MOCK_METHOD0(processStartRequestEvent, void());
-  MOCK_METHOD0(processStartReplyReceivedEvent, void());
+  MOCK_METHOD1(processReplyReceivedEvent, void(psen_scan_v2::ScannerReplyMsgType));
   MOCK_METHOD0(processMonitoringFrameReceivedEvent, void());
   MOCK_METHOD0(processStopRequestEvent, void());
-  MOCK_METHOD0(processStopReplyReceivedEvent, void());
 
   const psen_scan_v2::StoppedCallback started_cb_;
   const psen_scan_v2::StoppedCallback stopped_cb_;

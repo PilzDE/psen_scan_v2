@@ -59,7 +59,7 @@ TEST_F(ControllerStateMachineTest, testThatStopRequestCallbackIsCalled)
                             std::bind(&ControllerStateMachineTest::stopped_cb, this));
 
   sm.processStartRequestEvent();
-  sm.processStartReplyReceivedEvent();
+  sm.processReplyReceivedEvent(ScannerReplyMsgType::Start);
   sm.processStopRequestEvent();
 }
 
@@ -75,9 +75,9 @@ TEST_F(ControllerStateMachineTest, testThatStopReplyReceivedCallbackIsCalled)
                             std::bind(&ControllerStateMachineTest::stopped_cb, this));
 
   sm.processStartRequestEvent();
-  sm.processStartReplyReceivedEvent();
+  sm.processReplyReceivedEvent(ScannerReplyMsgType::Start);
   sm.processStopRequestEvent();
-  sm.processStopReplyReceivedEvent();
+  sm.processReplyReceivedEvent(ScannerReplyMsgType::Stop);
 }
 
 }  // namespace psen_scan_v2_test

@@ -15,6 +15,7 @@
 
 #include "psen_scan_v2/logging.h"
 #include "psen_scan_v2/controller_state_machine.h"
+#include "psen_scan_v2/scanner_reply_msg.h"
 
 namespace psen_scan_v2
 {
@@ -43,11 +44,10 @@ void ControllerStateMachine::processStartRequestEvent()
 
 // LCOV_EXCL_START
 // TODO: Add again to coverage when function are actually used.
-void ControllerStateMachine::processStartReplyReceivedEvent()
+void ControllerStateMachine::processReplyReceivedEvent(ScannerReplyMsgType type)
 {
-  PSENSCAN_INFO("Scanner", "Scanner started.");
   const std::lock_guard<std::mutex> lock(sm_access_mutex_);
-  sm_.process_event(udp_connection_state_machine::events::start_reply_received());
+  sm_.process_event(udp_connection_state_machine::events::reply_received(type));
 }
 
 void ControllerStateMachine::processMonitoringFrameReceivedEvent()
@@ -60,12 +60,6 @@ void ControllerStateMachine::processStopRequestEvent()
 {
   const std::lock_guard<std::mutex> lock(sm_access_mutex_);
   sm_.process_event(udp_connection_state_machine::events::stop_request());
-}
-
-void ControllerStateMachine::processStopReplyReceivedEvent()
-{
-  const std::lock_guard<std::mutex> lock(sm_access_mutex_);
-  sm_.process_event(udp_connection_state_machine::events::stop_reply_received());
 }
 // LCOV_EXCL_STOP
 
