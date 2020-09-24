@@ -24,6 +24,7 @@
 #include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/raw_processing.h"
 #include "psen_scan_v2/raw_scanner_data.h"
+#include "psen_scan_v2/logging.h"
 
 namespace psen_scan_v2
 {
@@ -100,22 +101,24 @@ void MonitoringFrameMsg::checkFixedFields()
 {
   if (OP_CODE_MONITORING_FRAME != op_code_fixed_)
   {
-    throw MonitoringFrameFormatError("Wrong Op Code!");
+    // TODO: Get rid of the issue not to spam the system with this debug messages
+    //       Would something like  ROS_DEBUG_THROTTLE(period, ...) be a good solution?
+    PSENSCAN_DEBUG("MonitoringFrameMsg", "Wrong Op Code!");
   }
 
   if (ONLINE_WORKING_MODE != working_mode_fixed_)
   {
-    throw MonitoringFrameFormatError("Invalid working mode!");
+    PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid working mode!");
   }
 
   if (GUI_MONITORING_TRANSACTION != transaction_type_fixed_)
   {
-    throw MonitoringFrameFormatError("Invalid transaction type!");
+    PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid transaction type!");
   }
 
   if (MAX_SCANNER_ID < scanner_id_fixed_)
   {
-    throw MonitoringFrameFormatError("Invalid Scanner id!");
+    PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid Scanner id!");
   }
 }
 
