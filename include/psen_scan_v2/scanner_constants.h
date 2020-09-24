@@ -16,6 +16,8 @@
 #ifndef PSEN_SCAN_V2_SCANNER_CONSTANTS_H
 #define PSEN_SCAN_V2_SCANNER_CONSTANTS_H
 
+#include "psen_scan_v2/angle_conversions.h"
+
 namespace psen_scan_v2
 {
 //! @brief Number of samples for complete scan for master scanner.
@@ -27,6 +29,8 @@ static constexpr double SCAN_TIME{ 0.03 };
 static constexpr double RANGE_MIN{ 0 };
 static constexpr double RANGE_MAX{ 10 };
 
+//! @brief Rotation of x-axis around the center.
+static constexpr double DEFAULT_X_AXIS_ROTATION(degreeToRadian(137.5));
 }  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_SCANNER_CONSTANTS_H

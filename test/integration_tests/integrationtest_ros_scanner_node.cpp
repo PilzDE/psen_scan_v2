@@ -31,6 +31,7 @@
 #include "psen_scan_v2/laserscan.h"
 #include "psen_scan_v2/scanner_mock.h"
 #include "psen_scan_v2/scanner_configuration.h"
+#include "psen_scan_v2/scanner_constants.h"
 
 using namespace psen_scan_v2;
 using namespace psen_scan_v2_test;
@@ -47,7 +48,6 @@ static const std::string LASER_SCAN_RECEIVED{ "LASER_SCAN_RECEIVED" };
 static const std::string SCANNER_STARTED{ "SCANNER_STARTED" };
 static const std::string SCANNER_STOPPED{ "SCANNER_STOPPED" };
 
-static constexpr double DEFAULT_X_AXIS_ROTATION{ degreeToRadian(137.5) };
 class SubscriberMock
 {
 public:
