@@ -20,6 +20,7 @@
 #include <functional>
 #include <map>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #include <gtest/gtest_prod.h>
@@ -45,6 +46,8 @@ public:
 public:
   Id id() const;
   Length length() const;
+
+  std::string idToString() const;
 
 private:
   Id id_;

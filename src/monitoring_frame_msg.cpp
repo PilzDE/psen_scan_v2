@@ -38,6 +38,13 @@ FieldHeader::FieldHeader(Id id, Length length) : id_(id), length_(length)
 {
 }
 
+std::string FieldHeader::idToString() const
+{
+  std::ostringstream os;
+  os << "0x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(id_);
+  return os.str();
+}
+
 MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
 {
   MonitoringFrameMsg msg;
@@ -76,7 +83,7 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
 
       default:
         std::ostringstream os;
-        os << "Header Id " << std::hex << header.id() << " unknown. Cannot read additional field of monitoring frame.";
+        os << "Header Id " << header.idToString() << " unknown. Cannot read additional field of monitoring frame.";
         throw MonitoringFrameFormatError(os.str());
     }
   }

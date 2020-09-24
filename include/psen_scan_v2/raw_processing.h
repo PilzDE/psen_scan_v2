@@ -36,7 +36,9 @@ inline void read(std::istringstream& is, T& data)
   is.read(reinterpret_cast<char*>(&data), sizeof(T));
   if (!is)
   {
-    throw StringStreamFailure("Reading from string stream failed.");
+    std::ostringstream os;
+    os << "Failure reading " << sizeof(T) << " characters from input stream, could only read " << is.gcount() << ".";
+    throw StringStreamFailure(os.str());
   }
 }
 }  // namespace raw_processing
