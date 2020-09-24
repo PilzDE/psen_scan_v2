@@ -156,7 +156,7 @@ TEST_F(ScannerControllerTest, testHandleStopReplyTimeout)
   scanner_controller_.sendStopRequest();
 }
 
-TEST_F(ScannerControllerTest, test_handle_error_no_throw)
+TEST_F(ScannerControllerTest, testHandleErrorNoThrow)
 {
   ASSERT_NO_THROW(scanner_controller_.handleError("Error Message."));
 }

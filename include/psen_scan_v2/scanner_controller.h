@@ -94,7 +94,7 @@ private:
   FRIEND_TEST(ScannerControllerTest, testStopRequestEventWithFutureUsage);
   FRIEND_TEST(ScannerControllerTest, testHandleNewMonitoringFrame);
   FRIEND_TEST(ScannerControllerTest, testHandleEmptyMonitoringFrame);
-  FRIEND_TEST(ScannerControllerTest, test_handle_error_no_throw);
+  FRIEND_TEST(ScannerControllerTest, testHandleErrorNoThrow);
 };
 
 typedef ScannerControllerT<> ScannerController;
