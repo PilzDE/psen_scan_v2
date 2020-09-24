@@ -27,7 +27,7 @@ LaserScan toLaserScan(const MonitoringFrameMsg& frame)
   const double resolution = tenthDegreeToRad(frame.resolution());
   const double min_angle = tenthDegreeToRad(frame.fromTheta());
   const uint16_t number_of_samples = frame.measures().size();
-  const double max_angle = min_angle + resolution * number_of_samples;
+  const double max_angle = min_angle + resolution * (number_of_samples - 1);
 
   LaserScan scan(resolution, min_angle, max_angle);
   scan.setMeasurements(frame.measures());

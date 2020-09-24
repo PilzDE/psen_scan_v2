@@ -45,7 +45,8 @@ TEST(LaserScanConversionsTest, testToLaserScan)
   EXPECT_DOUBLE_EQ(tenthDegreeToRad(frame.fromTheta()), scan_ptr->getMinScanAngle());
   EXPECT_DOUBLE_EQ(tenthDegreeToRad(frame.resolution()), scan_ptr->getScanResolution());
 
-  const double max_scan_angle{ tenthDegreeToRad(frame.fromTheta() + frame.resolution() * frame.measures().size()) };
+  const double max_scan_angle{ tenthDegreeToRad(frame.fromTheta() +
+                                                frame.resolution() * (frame.measures().size() - 1)) };
   EXPECT_DOUBLE_EQ(max_scan_angle, scan_ptr->getMaxScanAngle());
 
   EXPECT_EQ(frame.measures().size(), scan_ptr->getMeasurements().size());
