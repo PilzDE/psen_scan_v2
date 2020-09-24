@@ -29,7 +29,7 @@ class ScannerControllerMock
 {
 public:
   ScannerControllerMock(const psen_scan_v2::ScannerConfiguration& scanner_config){};
-  MOCK_METHOD0(start, void());
+  MOCK_METHOD0(start, std::future<void>());
   MOCK_METHOD0(stop, std::future<void>());
   MOCK_METHOD1(handleError, void(const std::string& error_msg));
   MOCK_METHOD0(sendStartRequest, void());

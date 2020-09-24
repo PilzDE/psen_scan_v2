@@ -35,6 +35,7 @@ namespace mpl = boost::mpl;
 
 
 using SendRequestCallback = std::function<void()>;
+using StartedCallback = std::function<void()>;
 using StoppedCallback = std::function<void()>;
 
 // front-end: define the FSM structure
@@ -45,15 +46,18 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
 {
   udp_connection_state_machine_(const SendRequestCallback& start_request_cb,
                                 const SendRequestCallback& stop_request_cb,
+                                const StartedCallback& started_cb,
                                 const StoppedCallback& stopped_cb)
     : send_start_request_callback_(start_request_cb)
     , send_stop_request_callback_(stop_request_cb)
+    , notify_started_callback_(started_cb)
     , notify_stopped_callback_(stopped_cb)
   {
   }
 
   SendRequestCallback send_start_request_callback_;
   SendRequestCallback send_stop_request_callback_;
+  StoppedCallback notify_started_callback_;
   StoppedCallback notify_stopped_callback_;
 
   struct events
@@ -152,6 +156,12 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
     send_stop_request_callback_();
   }
 
+  void action_notify_start(events::start_reply_received const&)
+  {
+    PSENSCAN_DEBUG("StateMachine", "Action: action_notify_start");
+    notify_started_callback_();
+  }
+
   void action_notify_stop(events::stop_reply_received const&)
   {
     PSENSCAN_DEBUG("StateMachine", "Action: action_notify_stop");
@@ -171,7 +181,7 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
     //  +--------------------------------+--------------------------------+-------------------------------+-----------------------------------+-------+
     a_row < s::idle,                       e::start_request,                 s::wait_for_start_reply,      &m::action_send_start_request   >,
     a_row < s::idle,                       e::stop_request,                  s::wait_for_stop_reply,       &m::action_send_stop_request    >,
-     _row < s::wait_for_start_reply,       e::start_reply_received,          s::wait_for_monitoring_frame                                  >,
+    a_row < s::wait_for_start_reply,       e::start_reply_received,          s::wait_for_monitoring_frame, &m::action_notify_start         >,
     _irow < s::wait_for_monitoring_frame,  e::monitoring_frame_received                                                                    >,
     a_row < s::wait_for_start_reply,       e::stop_request,                  s::wait_for_stop_reply,       &m::action_send_stop_request    >,
     a_row < s::wait_for_monitoring_frame,  e::stop_request,                  s::wait_for_stop_reply,       &m::action_send_stop_request    >,
