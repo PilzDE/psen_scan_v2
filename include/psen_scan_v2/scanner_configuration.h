@@ -16,9 +16,8 @@
 #define PSEN_SCAN_V2_SCANNER_CONFIGURATION_H
 
 #include <string>
-#include <arpa/inet.h>
 
-using namespace std;
+#include <arpa/inet.h>
 
 namespace psen_scan_v2
 {
