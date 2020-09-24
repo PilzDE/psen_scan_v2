@@ -56,7 +56,7 @@ class ScannerControllerT
 {
 public:
   ScannerControllerT(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback);
-  void start();
+  std::future<void> start();
   std::future<void> stop();
 
 private:
@@ -69,6 +69,9 @@ private:
   void handleStartReplyTimeout(const std::string& error_str);
   void handleStopReplyTimeout(const std::string& error_str);
 
+  void notifyStartedState();
+  void notifyStoppedState();
+
 private:
   ScannerConfiguration scanner_config_;
   TCSM state_machine_;
@@ -77,8 +80,7 @@ private:
   TUCI data_udp_client_;
   LaserScanCallback laser_scan_callback_;
 
-  void notifyStoppedState();
-
+  std::promise<void> started_;
   std::promise<void> stopped_;
 
   friend class ScannerControllerTest;
@@ -88,6 +90,7 @@ private:
   FRIEND_TEST(ScannerControllerTest, testStopRequestSending);
   FRIEND_TEST(ScannerControllerTest, testHandleStartReplyTimeout);
   FRIEND_TEST(ScannerControllerTest, testHandleStopReplyTimeout);
+  FRIEND_TEST(ScannerControllerTest, testStartRequestEventWithFutureUsage);
   FRIEND_TEST(ScannerControllerTest, testStopRequestEventWithFutureUsage);
   FRIEND_TEST(ScannerControllerTest, testHandleNewMonitoringFrame);
   FRIEND_TEST(ScannerControllerTest, test_handle_error_no_throw);
@@ -101,6 +104,7 @@ ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& s
   : scanner_config_(scanner_config)
   , state_machine_(std::bind(&ScannerControllerT::sendStartRequest, this),
                    std::bind(&ScannerControllerT::sendStopRequest, this),
+                   std::bind(&ScannerControllerT::notifyStartedState, this),
                    std::bind(&ScannerControllerT::notifyStoppedState, this))
   , control_msg_decoder_(std::bind(&TCSM::processStartReplyReceivedEvent, &state_machine_),
                          std::bind(&TCSM::processStopReplyReceivedEvent, &state_machine_),
@@ -142,9 +146,10 @@ void ScannerControllerT<TCSM, TUCI>::handleError(const std::string& error_msg)
 }
 
 template <typename TCSM, typename TUCI>
-void ScannerControllerT<TCSM, TUCI>::start()
+std::future<void> ScannerControllerT<TCSM, TUCI>::start()
 {
   state_machine_.processStartRequestEvent();
+  return started_.get_future();
 }
 
 template <typename TCSM, typename TUCI>
@@ -186,6 +191,16 @@ void ScannerControllerT<TCSM, TUCI>::sendStopRequest()
       ReceiveMode::single, std::bind(&ScannerControllerT::handleStopReplyTimeout, this, _1), RECEIVE_TIMEOUT_CONTROL);
   StopRequest stop_request;
   control_udp_client_.write(stop_request.toRawData());
+}
+
+template <typename TCSM, typename TUCI>
+void ScannerControllerT<TCSM, TUCI>::notifyStartedState()
+{
+  PSENSCAN_DEBUG("ScannerController", "Started() called.");
+  started_.set_value();
+
+  // Reinitialize
+  started_ = std::promise<void>();
 }
 
 template <typename TCSM, typename TUCI>

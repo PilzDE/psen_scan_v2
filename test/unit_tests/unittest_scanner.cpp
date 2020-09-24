@@ -45,6 +45,8 @@ static const std::string DEVICE_IP{ "127.0.0.100" };
 static constexpr double START_ANGLE{ 0. };
 static constexpr double END_ANGLE{ degreeToRadian(275.) };
 
+static constexpr std::chrono::milliseconds DEFAULT_TIMEOUT{ 50 };
+
 class ScannerTest : public testing::Test
 {
 protected:
@@ -75,8 +77,16 @@ TEST_F(ScannerTest, testConstructorInvalidLaserScanCallback)
 TEST_F(ScannerTest, testStart)
 {
   MockedScanner scanner(scanner_config_, laserscan_callback_);
-  EXPECT_CALL(scanner.scanner_controller_, start()).Times(1);
-  scanner.start();
+  std::promise<void> mocked_start_finished_barrier;
+  EXPECT_CALL(scanner.scanner_controller_, start()).WillOnce(InvokeWithoutArgs([&mocked_start_finished_barrier]() {
+    return mocked_start_finished_barrier.get_future();
+  }));
+
+  std::future<void> start_future = std::async(std::launch::async, [&scanner]() { scanner.start(); });
+
+  EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::timeout) << "Scanner::start() already finished";
+  mocked_start_finished_barrier.set_value();
+  EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
 }
 
 TEST_F(ScannerTest, testStop)
@@ -87,18 +97,11 @@ TEST_F(ScannerTest, testStop)
     return mocked_stop_finished_barrier.get_future();
   }));
 
-  std::promise<void> stop_func_finished_barrier;
-  std::future<void> stop_func_finished_barrier_future = stop_func_finished_barrier.get_future();
-  std::future<void> stop_future = std::async(std::launch::async, [&scanner, &stop_func_finished_barrier]() {
-    scanner.stop();
-    stop_func_finished_barrier.set_value();
-  });
+  std::future<void> stop_future = std::async(std::launch::async, [&scanner]() { scanner.stop(); });
 
-  EXPECT_EQ(stop_func_finished_barrier_future.wait_for(std::chrono::milliseconds(50)), std::future_status::timeout)
-      << "Scanner::stop() function has finished too early";
+  EXPECT_EQ(stop_future.wait_for(DEFAULT_TIMEOUT), std::future_status::timeout) << "Scanner::stop() already finished";
   mocked_stop_finished_barrier.set_value();
-  EXPECT_EQ(stop_func_finished_barrier_future.wait_for(std::chrono::milliseconds(50)), std::future_status::ready)
-      << "Scanner::stop() function has not finished";
+  EXPECT_EQ(stop_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::stop() not finished";
 }
 }  // namespace psen_scan_v2
 

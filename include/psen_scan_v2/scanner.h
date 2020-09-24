@@ -76,15 +76,18 @@ ScannerT<SC>::ScannerT(const ScannerConfiguration& scanner_config, const LaserSc
 template <typename SC>
 void ScannerT<SC>::start()
 {
-  scanner_controller_.start();
+  std::future<void> start_future = scanner_controller_.start();
+  PSENSCAN_INFO("Scanner", "Waiting for scanner to start...");
+  start_future.wait();
+  PSENSCAN_INFO("Scanner", "Scanner has started.");
 }
 
 template <typename SC>
 void ScannerT<SC>::stop()
 {
-  std::future<void> stop_finished_barrier = scanner_controller_.stop();
+  std::future<void> stop_future = scanner_controller_.stop();
   PSENSCAN_INFO("Scanner", "Waiting for scanner to stop...");
-  stop_finished_barrier.wait();
+  stop_future.wait();
   PSENSCAN_INFO("Scanner", "Scanner has stopped.");
 }
 

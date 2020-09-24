@@ -58,7 +58,7 @@ TEST_F(MsgDecoderTest, testCorrectStartReply)
   EXPECT_CALL(mock_, start_reply_callback()).Times(1);
   EXPECT_CALL(mock_, stop_reply_callback()).Times(0);
 
-  const auto raw_start_reply{ buildRawData(ScannerReplyMsg::getStartOpCode(), DEFAULT_RESULT_CODE) };
+  const auto raw_start_reply{ buildRawData(getOpCodeValue(ScannerReplyMsgType::Start), DEFAULT_RESULT_CODE) };
   decoder_.decodeAndDispatch(raw_start_reply, REPLY_MSG_FROM_SCANNER_SIZE);
 }
 
@@ -67,7 +67,7 @@ TEST_F(MsgDecoderTest, testCorrectStopReply)
   EXPECT_CALL(mock_, start_reply_callback()).Times(0);
   EXPECT_CALL(mock_, stop_reply_callback()).Times(1);
 
-  const auto raw_stop_reply{ buildRawData(ScannerReplyMsg::getStopOpCode(), DEFAULT_RESULT_CODE) };
+  const auto raw_stop_reply{ buildRawData(getOpCodeValue(ScannerReplyMsgType::Stop), DEFAULT_RESULT_CODE) };
   decoder_.decodeAndDispatch(raw_stop_reply, REPLY_MSG_FROM_SCANNER_SIZE);
 }
 
@@ -75,7 +75,7 @@ TEST_F(MsgDecoderTest, testIncorrectCrCForStartReply)
 {
   EXPECT_CALL(mock_, start_reply_callback()).Times(0);
 
-  auto raw_reply{ buildRawData(ScannerReplyMsg::getStartOpCode(), DEFAULT_RESULT_CODE) };
+  auto raw_reply{ buildRawData(getOpCodeValue(ScannerReplyMsgType::Start), DEFAULT_RESULT_CODE) };
   raw_reply[0] = 'a';
   EXPECT_THROW(decoder_.decodeAndDispatch(raw_reply, REPLY_MSG_FROM_SCANNER_SIZE), CRCMismatch);
 }
@@ -84,7 +84,7 @@ TEST_F(MsgDecoderTest, testIncorrectCrCForStopReply)
 {
   EXPECT_CALL(mock_, stop_reply_callback()).Times(0);
 
-  auto raw_reply{ buildRawData(ScannerReplyMsg::getStopOpCode(), DEFAULT_RESULT_CODE) };
+  auto raw_reply{ buildRawData(getOpCodeValue(ScannerReplyMsgType::Stop), DEFAULT_RESULT_CODE) };
   raw_reply[0] = 'a';
   EXPECT_THROW(decoder_.decodeAndDispatch(raw_reply, REPLY_MSG_FROM_SCANNER_SIZE), CRCMismatch);
 }
@@ -94,7 +94,7 @@ TEST_F(MsgDecoderTest, testIncorrectReplySize)
   EXPECT_CALL(mock_, start_reply_callback()).Times(0);
   EXPECT_CALL(mock_, error_callback(::testing::_)).Times(1);
 
-  const auto raw_reply{ buildRawData(ScannerReplyMsg::getStartOpCode(), DEFAULT_RESULT_CODE) };
+  const auto raw_reply{ buildRawData(getOpCodeValue(ScannerReplyMsgType::Start), DEFAULT_RESULT_CODE) };
   decoder_.decodeAndDispatch(raw_reply, REPLY_MSG_FROM_SCANNER_SIZE + 1);
 }
 
@@ -103,7 +103,7 @@ TEST_F(MsgDecoderTest, testIncorrectOPCode)
   EXPECT_CALL(mock_, start_reply_callback()).Times(0);
   EXPECT_CALL(mock_, error_callback(::testing::_)).Times(1);
 
-  const auto raw_wrong_reply{ buildRawData(ScannerReplyMsg::getStartOpCode() + 10, DEFAULT_RESULT_CODE) };
+  const auto raw_wrong_reply{ buildRawData(getOpCodeValue(ScannerReplyMsgType::Start) + 10, DEFAULT_RESULT_CODE) };
   decoder_.decodeAndDispatch(raw_wrong_reply, REPLY_MSG_FROM_SCANNER_SIZE);
 }
 

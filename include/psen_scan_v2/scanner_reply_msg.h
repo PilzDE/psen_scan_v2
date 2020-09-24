@@ -32,12 +32,18 @@ namespace psen_scan_v2
 /**
  * @brief Defines the possible types of reply messages which can be received from the scanner.
  */
-enum class ScannerReplyMsgType
+enum class ScannerReplyMsgType : uint32_t
 {
-  Start,
-  Stop,
-  Unknown
+  Unknown = 0,
+  Start = 0x35,
+  Stop = 0x36,
 };
+
+template <typename TEnum>
+auto getOpCodeValue(const TEnum value) -> typename std::underlying_type<TEnum>::type
+{
+  return static_cast<typename std::underlying_type<TEnum>::type>(value);
+}
 
 static constexpr std::size_t REPLY_MSG_FROM_SCANNER_SIZE = 16;  // See protocol description
 
@@ -66,8 +72,6 @@ public:
   ScannerReplyMsgType type() const;
 
 public:
-  static uint32_t getStartOpCode();
-  static uint32_t getStopOpCode();
   static uint32_t calcCRC(const ScannerReplyMsg& msg);
 
   using RawType = FixedSizeRawData<REPLY_MSG_FROM_SCANNER_SIZE>;
@@ -90,10 +94,6 @@ private:
   //! If the message is refused, the returned value is 0xEB.
   //! If the CRC is not correct, the device will not send any message.
   uint32_t res_code_{ 0 };
-
-private:
-  static constexpr uint32_t OPCODE_START{ 0x35 };
-  static constexpr uint32_t OPCODE_STOP{ 0x36 };
 };
 
 inline uint32_t ScannerReplyMsg::calcCRC(const ScannerReplyMsg& msg)
@@ -111,16 +111,6 @@ template <typename T>
 inline void ScannerReplyMsg::processBytes(boost::crc_32_type& crc_32, const T& data)
 {
   crc_32.process_bytes(&data, sizeof(T));
-}
-
-inline uint32_t ScannerReplyMsg::getStartOpCode()
-{
-  return OPCODE_START;
-}
-
-inline uint32_t ScannerReplyMsg::getStopOpCode()
-{
-  return OPCODE_STOP;
 }
 
 inline ScannerReplyMsg::ScannerReplyMsg(const uint32_t op_code, const uint32_t res_code)
@@ -151,12 +141,12 @@ inline ScannerReplyMsg ScannerReplyMsg::fromRawData(const MaxSizeRawData& data)
 
 inline ScannerReplyMsgType ScannerReplyMsg::type() const
 {
-  if (opcode_ == OPCODE_START)
+  if (opcode_ == getOpCodeValue(ScannerReplyMsgType::Start))
   {
     return ScannerReplyMsgType::Start;
   }
 
-  if (opcode_ == OPCODE_STOP)
+  if (opcode_ == getOpCodeValue(ScannerReplyMsgType::Stop))
   {
     return ScannerReplyMsgType::Stop;
   }
