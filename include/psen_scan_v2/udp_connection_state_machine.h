@@ -118,14 +118,12 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
       template <class Event,class FSM>
       void on_entry(Event const& ,FSM&)
       {
-        // This will block all ROS calls since the state is entered/left repeatedly
-        //PSENSCAN_DEBUG("StateMachine", "Entering: WaitForStopReplyState"); // TODO find solution
+        PSENSCAN_DEBUG("StateMachine", "Entering: WaitForStopReplyState");
       }
       template <class Event,class FSM>
       void on_exit(Event const&,FSM& )
       {
-        // This will block all ROS calls since the state is entered/left repeatedly
-        //PSENSCAN_DEBUG("StateMachine", "Leaving: WaitForStopReplyState"); // TODO find solution
+        PSENSCAN_DEBUG("StateMachine", "Leaving: WaitForStopReplyState");
       }
     };
 
