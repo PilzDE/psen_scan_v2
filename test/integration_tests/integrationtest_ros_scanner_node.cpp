@@ -69,7 +69,7 @@ static constexpr int HOST_UDP_PORT_DATA{ 50505 };
 static constexpr int HOST_UDP_PORT_CONTROL{ 55055 };
 static const std::string DEVICE_IP{ "127.0.0.100" };
 static constexpr double START_ANGLE{ 0. };
-static constexpr double END_ANGLE{ 275. * 2 * M_PI / 360. };
+static constexpr double END_ANGLE{ degreeToRadian(275.) };
 static constexpr int SCANNER_STARTED_TIMEOUT_MS{ 3000 };
 static constexpr int SCANNER_STOPPED_TIMEOUT_MS{ 3000 };
 static constexpr int LASERSCAN_RECEIVED_TIMEOUT{ 3000 };
