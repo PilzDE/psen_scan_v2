@@ -24,8 +24,8 @@ namespace psen_scan_v2
 {
 LaserScan toLaserScan(const MonitoringFrameMsg& frame)
 {
-  const double resolution = tenthDegreeToRad(frame.resolution());
-  const double min_angle = tenthDegreeToRad(frame.fromTheta());
+  const double resolution = frame.resolution();
+  const double min_angle = frame.fromTheta();
   const uint16_t number_of_samples = frame.measures().size();
   const double max_angle = min_angle + resolution * (number_of_samples - 1);
 

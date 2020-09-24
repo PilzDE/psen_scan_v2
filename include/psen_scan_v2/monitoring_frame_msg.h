@@ -64,8 +64,8 @@ public:
   static MonitoringFrameMsg fromRawData(const MaxSizeRawData& data);
 
 public:
-  uint16_t fromTheta() const;
-  uint16_t resolution() const;
+  double fromTheta() const;
+  double resolution() const;
   uint32_t scanCounter() const;
   std::vector<double> measures() const;
 
@@ -74,6 +74,8 @@ private:
   using FieldLength = FieldHeader::Length;
 
 private:
+  static void readAngle(std::istringstream& is, double& angle);
+
   static FieldHeader readFieldHeader(std::istringstream& is);
   static void readScanCounter(std::istringstream& is, uint32_t& scan_counter, const FieldLength length);
   static void readMeasures(std::istringstream& is, std::vector<double>& measures, const FieldLength length);
@@ -99,8 +101,8 @@ private:
   uint32_t working_mode_fixed_{ 0 };
   uint32_t transaction_type_fixed_{ 0 };
   uint8_t scanner_id_fixed_{ 0 };
-  uint16_t from_theta_fixed_{ 0 };
-  uint16_t resolution_fixed_{ 0 };
+  double from_theta_fixed_{ 0 };
+  double resolution_fixed_{ 0 };
 
   uint32_t scan_counter_{ 0 };
   std::vector<double> measures_;
@@ -116,12 +118,12 @@ inline FieldHeader::Length FieldHeader::length() const
   return length_;
 }
 
-inline uint16_t MonitoringFrameMsg::fromTheta() const
+inline double MonitoringFrameMsg::fromTheta() const
 {
   return from_theta_fixed_;
 }
 
-inline uint16_t MonitoringFrameMsg::resolution() const
+inline double MonitoringFrameMsg::resolution() const
 {
   return resolution_fixed_;
 }

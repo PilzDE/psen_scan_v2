@@ -19,6 +19,7 @@
 
 #include <gtest/gtest.h>
 
+#include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/istring_stream_builder.h"
 #include "psen_scan_v2/monitoring_frame_format_error.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
@@ -184,15 +185,15 @@ TEST_F(MonitoringFrameMsgFromRawTest, testReadSuccess)
   MonitoringFrameMsg msg;
   ASSERT_NO_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data_););
 
-  EXPECT_EQ(msg.fromTheta(), test_data_.from_theta);
-  EXPECT_EQ(msg.resolution(), test_data_.resolution);
+  EXPECT_DOUBLE_EQ(msg.fromTheta(), tenthDegreeToRad(test_data_.from_theta));
+  EXPECT_DOUBLE_EQ(msg.resolution(), tenthDegreeToRad(test_data_.resolution));
   EXPECT_EQ(msg.scanCounter(), test_data_.scan_counter);
 
   const auto measures = msg.measures();
   EXPECT_EQ(measures.size(), test_data_.number_of_measures);
   for (const auto& index_value_pair : test_data_.measures)
   {
-    EXPECT_EQ(measures.at(index_value_pair.first), index_value_pair.second / 1000.);
+    EXPECT_DOUBLE_EQ(measures.at(index_value_pair.first), index_value_pair.second / 1000.);
   }
 }
 }  // namespace psen_scan_v2
