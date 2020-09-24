@@ -35,3 +35,9 @@ TEST(GetROSParameterExceptionTest, new_wrong_parameter_type_exception)
 }
 
 }  // namespace psen_scan_v2_test
+
+int main(int argc, char* argv[])
+{
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}

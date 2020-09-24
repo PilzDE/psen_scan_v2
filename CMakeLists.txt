@@ -171,7 +171,6 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_new_exceptions
     ${catkin_LIBRARIES}
-    gtest_main
   )
 
   catkin_add_gmock(unittest_msg_decoder
