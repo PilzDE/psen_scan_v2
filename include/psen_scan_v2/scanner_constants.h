@@ -19,13 +19,13 @@
 namespace psen_scan_v2
 {
 //! @brief Number of samples for complete scan for master scanner.
-constexpr uint16_t NUMBER_OF_SAMPLES_FULL_SCAN_MASTER{ 2750 };
+static constexpr uint16_t NUMBER_OF_SAMPLES_FULL_SCAN_MASTER{ 2750 };
 
 //! @brief Time per scan (in seconds.)
-constexpr double SCAN_TIME{ 0.03 };
+static constexpr double SCAN_TIME{ 0.03 };
 
-constexpr double RANGE_MIN{ 0 };
-constexpr double RANGE_MAX{ 10 };
+static constexpr double RANGE_MIN{ 0 };
+static constexpr double RANGE_MAX{ 10 };
 
 }  // namespace psen_scan_v2
 
