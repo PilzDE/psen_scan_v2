@@ -206,31 +206,6 @@ TEST_F(MonitoringFrameMsgFromRawTest, testReadSuccess)
     EXPECT_EQ(measures.at(index_value_pair.first), index_value_pair.second / 1000.);
   }
 }
-
-TEST_F(MonitoringFrameMsgFromRawTest, testWrongOpCode)
-{
-  raw_frame_data_.at(4) += 1;
-  EXPECT_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_);, MonitoringFrameFormatError);
-}
-
-TEST_F(MonitoringFrameMsgFromRawTest, testInvalidWorkingMode)
-{
-  raw_frame_data_.at(8) = 0x03;
-  EXPECT_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_);, MonitoringFrameFormatError);
-}
-
-TEST_F(MonitoringFrameMsgFromRawTest, testInvalidTransactionType)
-{
-  raw_frame_data_.at(12) = 0x06;
-  EXPECT_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_);, MonitoringFrameFormatError);
-}
-
-TEST_F(MonitoringFrameMsgFromRawTest, testInvalidScannerId)
-{
-  raw_frame_data_.at(16) = 0x04;
-  EXPECT_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_);, MonitoringFrameFormatError);
-}
-
 }  // namespace psen_scan_v2
 
 int main(int argc, char** argv)
