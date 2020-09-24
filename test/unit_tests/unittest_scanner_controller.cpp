@@ -32,6 +32,8 @@
 
 using namespace psen_scan_v2_test;
 
+using ::testing::StrictMock;
+
 namespace psen_scan_v2
 {
 static const std::string HOST_IP{ "127.0.0.1" };
@@ -168,6 +170,20 @@ TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
 
   EXPECT_CALL(scanner_controller_.state_machine_, processMonitoringFrameReceivedEvent()).Times(1);
   EXPECT_CALL(mock_, laserscan_callback(scan)).Times(1);
+
+  scanner_controller_.handleNewMonitoringFrame(data, data.size());
+}
+
+TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
+{
+  using ::testing::_;
+
+  UDPFrameTestDataWithoutMeasurementsAndIntensities test_data;
+  MaxSizeRawData data = convertToMaxSizeRawData(test_data.hex_dump);
+  MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
+
+  EXPECT_CALL(scanner_controller_.state_machine_, processMonitoringFrameReceivedEvent()).Times(1);
+  EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
   scanner_controller_.handleNewMonitoringFrame(data, data.size());
 }
