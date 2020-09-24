@@ -58,8 +58,8 @@ int main(int argc, char** argv)
                                                param_handler.getHostUDPPortData(),
                                                param_handler.getHostUDPPortControl(),
                                                param_handler.getSensorIP(),
-                                               param_handler.getAngleStart() + DEFAULT_X_AXIS_ROTATION,
-                                               param_handler.getAngleEnd() + DEFAULT_X_AXIS_ROTATION);
+                                               DEFAULT_X_AXIS_ROTATION - param_handler.getAngleEnd(),
+                                               DEFAULT_X_AXIS_ROTATION - param_handler.getAngleStart());
 
     ROSScannerNode ros_scanner_node(
         pnh, DEFAULT_PUBLISH_TOPIC, param_handler.getFrameID(), DEFAULT_X_AXIS_ROTATION, scanner_configuration);
