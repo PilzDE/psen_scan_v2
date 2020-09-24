@@ -58,7 +58,7 @@ private:
   FRIEND_TEST(ScannerTest, testConstructorSuccess);
   FRIEND_TEST(ScannerTest, testStart);
   FRIEND_TEST(ScannerTest, testStop);
-  FRIEND_TEST(ScannerTest, testGetCompleteScan);
+  FRIEND_TEST(ScannerTest, testInvokeLaserScanCallback);
 };
 
 typedef ScannerT<> Scanner;

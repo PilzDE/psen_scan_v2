@@ -21,6 +21,7 @@
 #include <gmock/gmock.h>
 
 #include "psen_scan_v2/angle_conversions.h"
+#include "psen_scan_v2/laserscan.h"
 #include "psen_scan_v2/scanner.h"
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/scanner_controller.h"
@@ -102,6 +103,17 @@ TEST_F(ScannerTest, testStop)
   EXPECT_EQ(stop_future.wait_for(DEFAULT_TIMEOUT), std::future_status::timeout) << "Scanner::stop() already finished";
   mocked_stop_finished_barrier.set_value();
   EXPECT_EQ(stop_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::stop() not finished";
+}
+
+TEST_F(ScannerTest, testInvokeLaserScanCallback)
+{
+  LaserScan laser_scan_fake(0.02, 0.03, 0.05);
+  laser_scan_fake.getMeasurements().push_back(1);
+
+  MockedScanner scanner(scanner_config_, laserscan_callback_);
+  EXPECT_CALL(mock_, laserscan_callback(laser_scan_fake)).Times(1);
+
+  scanner.scanner_controller_.invokeLaserScanCallback(laser_scan_fake);
 }
 }  // namespace psen_scan_v2
 
