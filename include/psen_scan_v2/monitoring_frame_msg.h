@@ -24,7 +24,6 @@
 
 #include <gtest/gtest_prod.h>
 
-#include "psen_scan_v2/raw_processing.h"
 #include "psen_scan_v2/raw_scanner_data.h"
 
 namespace psen_scan_v2
@@ -41,7 +40,7 @@ public:
   using Length = uint16_t;
 
 public:
-  FieldHeader(std::istringstream& is);
+  FieldHeader(Id id, Length length);
 
 public:
   Id id() const;

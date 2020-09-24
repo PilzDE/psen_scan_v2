@@ -32,11 +32,8 @@ constexpr FieldHeader::Id AdditionalFieldIds::SCAN_COUNTER;
 constexpr FieldHeader::Id AdditionalFieldIds::MEASURES;
 constexpr FieldHeader::Id AdditionalFieldIds::END_OF_FRAME;
 
-FieldHeader::FieldHeader(std::istringstream& is)
+FieldHeader::FieldHeader(Id id, Length length) : id_(id), length_(length)
 {
-  raw_processing::read(is, id_);
-  raw_processing::read(is, length_);
-  length_--;
 }
 
 MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
@@ -66,7 +63,7 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
 
 void MonitoringFrameMsg::deserializeAdditionalField(std::istringstream& is)
 {
-  const FieldHeader header(is);
+  const FieldHeader header{ raw_processing::readFieldHeader(is) };
   const PayloadReader read_payload{ id_to_payload_reader_.at(header.id()) };
   read_payload(this, is, header.length());
 }

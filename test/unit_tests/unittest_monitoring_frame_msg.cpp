@@ -31,7 +31,16 @@ namespace psen_scan_v2
 {
 using namespace psen_scan_v2_test;
 
-TEST(FieldHeaderTest, testCreationSuccess)
+TEST(FieldHeaderTest, testGetIdAndLength)
+{
+  uint8_t id = 5;
+  uint16_t length = 7;
+  FieldHeader header(id, length);
+  EXPECT_EQ(id, header.id());
+  EXPECT_EQ(length, header.length());
+}
+
+TEST(FieldHeaderTest, testReadSuccess)
 {
   uint8_t id = 5;
   uint16_t length = 7;
@@ -43,12 +52,12 @@ TEST(FieldHeaderTest, testCreationSuccess)
   std::istringstream is{ builder.get() };
 
   std::unique_ptr<FieldHeader> header_ptr;
-  ASSERT_NO_THROW(header_ptr.reset(new FieldHeader(is)););
+  ASSERT_NO_THROW(header_ptr.reset(new FieldHeader{ raw_processing::readFieldHeader(is) }););
   EXPECT_EQ(id, header_ptr->id());
   EXPECT_EQ(expected_length, header_ptr->length());
 }
 
-TEST(FieldHeaderTest, testCreationHeaderTooShortFailure)
+TEST(FieldHeaderTest, testReadHeaderTooShortFailure)
 {
   uint16_t too_short_header;
 
@@ -56,7 +65,7 @@ TEST(FieldHeaderTest, testCreationHeaderTooShortFailure)
   builder.add(too_short_header);
   std::istringstream is{ builder.get() };
 
-  EXPECT_THROW(FieldHeader header(is);, StringStreamFailure);
+  EXPECT_THROW(raw_processing::readFieldHeader(is);, StringStreamFailure);
 }
 
 class MonitoringFrameMsgTest : public ::testing::Test
