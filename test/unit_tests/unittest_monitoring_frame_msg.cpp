@@ -199,25 +199,25 @@ TEST_F(MonitoringFrameMsgTest, testFromRawDataFailureUnknownFieldId)
 TEST_F(MonitoringFrameMsgFromRawTest, testWrongOpCode)
 {
   raw_frame_data_.at(4) += 1;
-  EXPECT_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_);, MonitoringFrameFormatError);
+  EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_););
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testInvalidWorkingMode)
 {
   raw_frame_data_.at(8) = 0x03;
-  EXPECT_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_);, MonitoringFrameFormatError);
+  EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_););
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testInvalidTransactionType)
 {
   raw_frame_data_.at(12) = 0x06;
-  EXPECT_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_);, MonitoringFrameFormatError);
+  EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_););
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testInvalidScannerId)
 {
   raw_frame_data_.at(16) = 0x04;
-  EXPECT_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_);, MonitoringFrameFormatError);
+  EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_););
 }
 
 }  // namespace psen_scan_v2
