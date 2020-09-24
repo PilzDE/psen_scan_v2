@@ -69,10 +69,10 @@ TEST_F(ScannerTest, testConstructorInvalidLaserScanCallback)
   EXPECT_THROW(MockedScanner scanner(scanner_config_, laserscan_callback);, std::invalid_argument);
 }
 
-// TEST_F(ScannerTest, testConstructorSuccess)
-// {
-//   EXPECT_NO_THROW(ScannerT<ScannerControllerMock>());
-// }
+TEST_F(ScannerTest, testConstructorSuccess)
+{
+  EXPECT_NO_THROW(MockedScanner scanner(scanner_config_, laserscan_callback_));
+}
 
 TEST_F(ScannerTest, testStart)
 {
