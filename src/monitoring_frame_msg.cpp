@@ -15,6 +15,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <iomanip>
 #include <iterator>
 #include <sstream>
 #include <string>
@@ -53,44 +54,68 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
 
   msg.checkFixedFields();
 
-  while (!msg.end_of_frame_)
+  bool end_of_frame{ false };
+  while (!end_of_frame)
   {
-    msg.deserializeAdditionalField(is);
+    const FieldHeader header{ readFieldHeader(is) };
+
+    switch (header.id())
+    {
+      case AdditionalFieldIds::SCAN_COUNTER:
+        readScanCounter(is, msg.scan_counter_, header.length());
+        break;
+
+      case AdditionalFieldIds::MEASURES:
+        readMeasures(is, msg.measures_, header.length());
+        break;
+
+      case AdditionalFieldIds::END_OF_FRAME:
+        end_of_frame = true;
+        break;
+
+      default:
+        std::ostringstream os;
+        os << "Header Id " << std::hex << header.id() << " unknown. Cannot read additional field of monitoring frame.";
+        throw MonitoringFrameFormatError(os.str());
+    }
   }
 
   return msg;
 }
 
-void MonitoringFrameMsg::deserializeAdditionalField(std::istringstream& is)
+FieldHeader MonitoringFrameMsg::readFieldHeader(std::istringstream& is)
 {
-  const FieldHeader header{ raw_processing::readFieldHeader(is) };
-  const PayloadReader read_payload{ id_to_payload_reader_.at(header.id()) };
-  read_payload(this, is, header.length());
+  FieldId id;
+  FieldLength length;
+  raw_processing::read(is, id);
+  raw_processing::read(is, length);
+  length--;
+  return FieldHeader(id, length);
 }
 
-void MonitoringFrameMsg::readScanCounter(std::istringstream& is, FieldLength length)
+void MonitoringFrameMsg::readScanCounter(std::istringstream& is, uint32_t& scan_counter, const FieldLength length)
 {
-  if (length != sizeof(scan_counter_))
+  if (length != sizeof(scan_counter))
   {
     std::ostringstream os;
     os << "Length of scan counter field is " << length << ", but should be " << sizeof(scan_counter_) << ".";
     throw MonitoringFrameFormatError(os.str());
   }
-  raw_processing::read(is, scan_counter_);
+  raw_processing::read(is, scan_counter);
 }
 
-void MonitoringFrameMsg::readMeasures(std::istringstream& is, FieldLength length)
+void MonitoringFrameMsg::readMeasures(std::istringstream& is, std::vector<double>& measures, const FieldLength length)
 {
   size_t bytes_per_sample = sizeof(uint16_t);
   size_t number_of_samples = length / bytes_per_sample;
 
-  measures_.resize(number_of_samples);
+  measures.resize(number_of_samples);
 
   for (unsigned i = 0; i < number_of_samples; i++)
   {
     uint16_t sample;
     raw_processing::read(is, sample);
-    measures_.at(i) = sample / 1000.;  // Convert to mm
+    measures.at(i) = sample / 1000.;  // Convert to m
   }
 }
 

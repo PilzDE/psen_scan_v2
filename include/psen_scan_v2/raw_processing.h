@@ -39,16 +39,6 @@ inline void read(std::istringstream& is, T& data)
     throw StringStreamFailure("Reading from string stream failed.");
   }
 }
-
-inline FieldHeader readFieldHeader(std::istringstream& is)
-{
-  FieldHeader::Id id;
-  FieldHeader::Length length;
-  raw_processing::read(is, id);
-  raw_processing::read(is, length);
-  length--;
-  return FieldHeader(id, length);
-}
 }  // namespace raw_processing
 }  // namespace psen_scan_v2
 

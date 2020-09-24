@@ -52,7 +52,7 @@ TEST(FieldHeaderTest, testReadSuccess)
   std::istringstream is{ builder.get() };
 
   std::unique_ptr<FieldHeader> header_ptr;
-  ASSERT_NO_THROW(header_ptr.reset(new FieldHeader{ raw_processing::readFieldHeader(is) }););
+  ASSERT_NO_THROW(header_ptr.reset(new FieldHeader{ MonitoringFrameMsg::readFieldHeader(is) }););
   EXPECT_EQ(id, header_ptr->id());
   EXPECT_EQ(expected_length, header_ptr->length());
 }
@@ -65,7 +65,7 @@ TEST(FieldHeaderTest, testReadHeaderTooShortFailure)
   builder.add(too_short_header);
   std::istringstream is{ builder.get() };
 
-  EXPECT_THROW(raw_processing::readFieldHeader(is);, StringStreamFailure);
+  EXPECT_THROW(MonitoringFrameMsg::readFieldHeader(is);, StringStreamFailure);
 }
 
 class MonitoringFrameMsgTest : public ::testing::Test
@@ -104,9 +104,9 @@ TEST_F(MonitoringFrameMsgTest, testReadScanCounterSuccess)
   builder.add(expected_scan_counter);
   std::istringstream is{ builder.get() };
 
-  MonitoringFrameMsg frame;
-  ASSERT_NO_THROW(frame.readScanCounter(is, length));
-  EXPECT_EQ(expected_scan_counter, frame.scanCounter());
+  uint32_t scan_counter;
+  ASSERT_NO_THROW(MonitoringFrameMsg::readScanCounter(is, scan_counter, length));
+  EXPECT_EQ(expected_scan_counter, scan_counter);
 }
 
 TEST_F(MonitoringFrameMsgTest, testReadScanCounterInvalidLengthFailure)
@@ -118,16 +118,16 @@ TEST_F(MonitoringFrameMsgTest, testReadScanCounterInvalidLengthFailure)
   builder.add(expected_scan_counter);
   std::istringstream is{ builder.get() };
 
-  MonitoringFrameMsg frame;
-  EXPECT_THROW(frame.readScanCounter(is, length);, MonitoringFrameFormatError);
+  uint32_t scan_counter;
+  EXPECT_THROW(MonitoringFrameMsg::readScanCounter(is, scan_counter, length);, MonitoringFrameFormatError);
 }
 
 TEST_F(MonitoringFrameMsgTest, testReadScanCounterMissingPayloadFailure)
 {
   const uint16_t length = 4;
   std::istringstream is;
-  MonitoringFrameMsg frame;
-  EXPECT_THROW(frame.readScanCounter(is, length);, StringStreamFailure);
+  uint32_t scan_counter;
+  EXPECT_THROW(MonitoringFrameMsg::readScanCounter(is, scan_counter, length);, StringStreamFailure);
 }
 
 TEST_F(MonitoringFrameMsgTest, testReadMeasuresSuccess)
@@ -135,17 +135,17 @@ TEST_F(MonitoringFrameMsgTest, testReadMeasuresSuccess)
   const uint16_t length = 2 * expected_measures_.size();
   std::istringstream is = buildExpectedMeasuresStream();
 
-  MonitoringFrameMsg frame;
-  ASSERT_NO_THROW(frame.readMeasures(is, length););
-  EXPECT_TRUE(expectMeasuresEqual(frame.measures()));
+  std::vector<double> measures;
+  ASSERT_NO_THROW(MonitoringFrameMsg::readMeasures(is, measures, length););
+  EXPECT_TRUE(expectMeasuresEqual(measures));
 }
 
 TEST_F(MonitoringFrameMsgTest, testReadMeasuresMissingPayloadFailure)
 {
   const uint16_t length = 2 * expected_measures_.size();
   std::istringstream is;
-  MonitoringFrameMsg frame;
-  EXPECT_THROW(frame.readMeasures(is, length);, StringStreamFailure);
+  std::vector<double> measures;
+  EXPECT_THROW(MonitoringFrameMsg::readMeasures(is, measures, length);, StringStreamFailure);
 }
 
 TEST_F(MonitoringFrameMsgTest, testReadMeasuresTooMuchMeasures)
@@ -153,37 +153,17 @@ TEST_F(MonitoringFrameMsgTest, testReadMeasuresTooMuchMeasures)
   const uint16_t length = 2 * expected_measures_.size() - 1;
   std::istringstream is = buildExpectedMeasuresStream();
 
-  MonitoringFrameMsg frame;
-  ASSERT_NO_THROW(frame.readMeasures(is, length););
-  EXPECT_TRUE(expectMeasuresPartEqual(frame.measures()));
+  std::vector<double> measures;
+  ASSERT_NO_THROW(MonitoringFrameMsg::readMeasures(is, measures, length););
+  EXPECT_TRUE(expectMeasuresPartEqual(measures));
 }
 
 TEST_F(MonitoringFrameMsgTest, testReadMeasuresTooFewMeasures)
 {
   const uint16_t length = 2 * (expected_measures_.size() + 1);
   std::istringstream is = buildExpectedMeasuresStream();
-  MonitoringFrameMsg frame;
-  EXPECT_THROW(frame.readMeasures(is, length);, StringStreamFailure);
-}
-
-TEST_F(MonitoringFrameMsgTest, testSetEndOfFrame)
-{
-  MonitoringFrameMsg frame;
-  EXPECT_FALSE(frame.end_of_frame_);
-
-  const uint16_t length = 0;
-  std::istringstream is;
-  ASSERT_NO_THROW(frame.setEndOfFrame(is, length););
-  EXPECT_TRUE(frame.end_of_frame_);
-}
-
-TEST_F(MonitoringFrameMsgTest, testSetEndOfFrameIgnoreInvalidLength)
-{
-  const uint16_t length = 1;
-  std::istringstream is;
-  MonitoringFrameMsg frame;
-  ASSERT_NO_THROW(frame.setEndOfFrame(is, length););
-  EXPECT_TRUE(frame.end_of_frame_);
+  std::vector<double> measures;
+  EXPECT_THROW(MonitoringFrameMsg::readMeasures(is, measures, length);, StringStreamFailure);
 }
 
 class MonitoringFrameMsgFromRawTest : public ::testing::Test

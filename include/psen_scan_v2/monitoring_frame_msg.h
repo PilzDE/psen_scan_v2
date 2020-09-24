@@ -74,16 +74,15 @@ private:
   using FieldLength = FieldHeader::Length;
 
 private:
-  void deserializeAdditionalField(std::istringstream& is);
-
-  void readScanCounter(std::istringstream& is, FieldLength length);
-  void readMeasures(std::istringstream& is, FieldLength length);
-
-  void setEndOfFrame(std::istringstream& /*is*/, FieldLength /*length*/);
+  static FieldHeader readFieldHeader(std::istringstream& is);
+  static void readScanCounter(std::istringstream& is, uint32_t& scan_counter, const FieldLength length);
+  static void readMeasures(std::istringstream& is, std::vector<double>& measures, const FieldLength length);
 
   void checkFixedFields();
 
 private:
+  FRIEND_TEST(FieldHeaderTest, testReadSuccess);
+  FRIEND_TEST(FieldHeaderTest, testReadHeaderTooShortFailure);
   FRIEND_TEST(MonitoringFrameMsgTest, testReadScanCounterSuccess);
   FRIEND_TEST(MonitoringFrameMsgTest, testReadScanCounterInvalidLengthFailure);
   FRIEND_TEST(MonitoringFrameMsgTest, testReadScanCounterMissingPayloadFailure);
@@ -105,14 +104,6 @@ private:
 
   uint32_t scan_counter_{ 0 };
   std::vector<double> measures_;
-  bool end_of_frame_{ false };
-
-  using PayloadReader = std::function<void(MonitoringFrameMsg*, std::istringstream&, FieldLength)>;
-  std::map<FieldId, PayloadReader> id_to_payload_reader_{
-    { AdditionalFieldIds::SCAN_COUNTER, &MonitoringFrameMsg::readScanCounter },
-    { AdditionalFieldIds::MEASURES, &MonitoringFrameMsg::readMeasures },
-    { AdditionalFieldIds::END_OF_FRAME, &MonitoringFrameMsg::setEndOfFrame }
-  };
 };
 
 inline FieldHeader::Id FieldHeader::id() const
@@ -143,11 +134,6 @@ inline uint32_t MonitoringFrameMsg::scanCounter() const
 inline std::vector<double> MonitoringFrameMsg::measures() const
 {
   return measures_;
-}
-
-inline void MonitoringFrameMsg::setEndOfFrame(std::istringstream& /*is*/, FieldLength /*length*/)
-{
-  end_of_frame_ = true;
 }
 
 }  // namespace psen_scan_v2
