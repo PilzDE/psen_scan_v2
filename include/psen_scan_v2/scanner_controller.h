@@ -134,6 +134,12 @@ void ScannerControllerT<TCSM, TUCI>::handleNewMonitoringFrame(const MaxSizeRawDa
 {
   MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
   state_machine_.processMonitoringFrameReceivedEvent();
+
+  if (frame.measures().empty())
+  {
+    return;
+  }
+
   LaserScan scan{ toLaserScan(frame) };
   laser_scan_callback_(scan);
 }
