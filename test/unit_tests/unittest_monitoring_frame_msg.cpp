@@ -167,34 +167,33 @@ TEST_F(MonitoringFrameMsgTest, testReadMeasuresTooFewMeasures)
   EXPECT_THROW(MonitoringFrameMsg::readMeasures(is, measures, length);, StringStreamFailure);
 }
 
-class MonitoringFrameMsgFromRawTest : public ::testing::Test
+TEST_F(MonitoringFrameMsgTest, testFromRawDataSuccess)
 {
-protected:
-  MonitoringFrameMsgFromRawTest()
-  {
-    raw_frame_data_ = convertToMaxSizeRawData(test_data_.hex_dump);
-  }
+  UDPFrameTestDataWithoutIntensities test_data;
+  const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
 
-protected:
-  UDPFrameTestDataWithoutIntensities test_data_;
-  MaxSizeRawData raw_frame_data_;
-};
-
-TEST_F(MonitoringFrameMsgFromRawTest, testReadSuccess)
-{
   MonitoringFrameMsg msg;
-  ASSERT_NO_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data_););
+  ASSERT_NO_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data););
 
-  EXPECT_DOUBLE_EQ(msg.fromTheta(), tenthDegreeToRad(test_data_.from_theta));
-  EXPECT_DOUBLE_EQ(msg.resolution(), tenthDegreeToRad(test_data_.resolution));
-  EXPECT_EQ(msg.scanCounter(), test_data_.scan_counter);
+  EXPECT_DOUBLE_EQ(msg.fromTheta(), tenthDegreeToRad(test_data.from_theta));
+  EXPECT_DOUBLE_EQ(msg.resolution(), tenthDegreeToRad(test_data.resolution));
+  EXPECT_EQ(msg.scanCounter(), test_data.scan_counter);
 
   const auto measures = msg.measures();
-  EXPECT_EQ(measures.size(), test_data_.number_of_measures);
-  for (const auto& index_value_pair : test_data_.measures)
+  EXPECT_EQ(measures.size(), test_data.number_of_measures);
+  for (const auto& index_value_pair : test_data.measures)
   {
     EXPECT_DOUBLE_EQ(measures.at(index_value_pair.first), index_value_pair.second / 1000.);
   }
+}
+
+TEST_F(MonitoringFrameMsgTest, testFromRawDataFailureUnknownFieldId)
+{
+  UDPFrameTestDataWithUnknownFieldId test_data;
+  const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
+
+  MonitoringFrameMsg msg;
+  EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data);, MonitoringFrameFormatError);
 }
 }  // namespace psen_scan_v2
 
