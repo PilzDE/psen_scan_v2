@@ -68,7 +68,7 @@ TEST(LaserScanROSConversionsTest, testToLaserScanMsg)
   auto iter_ranges = laserscan_msg.ranges.cbegin();
   while (reverse_it_measures != measures.rend() && iter_ranges != laserscan_msg.ranges.end())
   {
-    EXPECT_NEAR(*iter_ranges, *reverse_it_measures / 1000., 1.0e-8);
+    EXPECT_NEAR(*iter_ranges, *reverse_it_measures, 1.0e-8);
     iter_ranges++;
     reverse_it_measures++;
   }
