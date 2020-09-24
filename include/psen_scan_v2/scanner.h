@@ -43,7 +43,7 @@ public:
    * @brief Constructor.
    *
    * @param scanner_config Configuration details of the scanner.
-   * @param callback Callback for processing complete laser scans.
+   * @param laser_scan_callback Callback for processing complete laser scans.
    */
   ScannerT(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback);
   //! @brief Starts the scanner.
