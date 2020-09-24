@@ -230,6 +230,15 @@ TEST_F(MonitoringFrameMsgFromRawTest, testUnknownFieldId)
   EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data);, MonitoringFrameFormatError);
 }
 
+TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeFieldLength)
+{
+  UDPFrameTestDataWithTooLargeFieldLength test_data;
+  const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
+
+  MonitoringFrameMsg msg;
+  EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data);, MonitoringFrameFormatError);
+}
+
 }  // namespace psen_scan_v2
 
 int main(int argc, char** argv)

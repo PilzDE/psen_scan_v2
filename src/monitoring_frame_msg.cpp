@@ -30,6 +30,8 @@
 
 namespace psen_scan_v2
 {
+static constexpr std::size_t MAX_LENGTH_ADDITIONAL_MONITORING_FRAME_FIELD{ 65487 };
+
 constexpr FieldHeader::Id AdditionalFieldIds::SCAN_COUNTER;
 constexpr FieldHeader::Id AdditionalFieldIds::MEASURES;
 constexpr FieldHeader::Id AdditionalFieldIds::END_OF_FRAME;
@@ -38,10 +40,10 @@ FieldHeader::FieldHeader(Id id, Length length) : id_(id), length_(length)
 {
 }
 
-std::string FieldHeader::idToString() const
+std::string FieldHeader::idToString(Id id)
 {
   std::ostringstream os;
-  os << "0x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(id_);
+  os << "0x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(id);
   return os.str();
 }
 
@@ -83,7 +85,8 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
 
       default:
         std::ostringstream os;
-        os << "Header Id " << header.idToString() << " unknown. Cannot read additional field of monitoring frame.";
+        os << "Header Id " << FieldHeader::idToString(header.id())
+           << " unknown. Cannot read additional field of monitoring frame.";
         throw MonitoringFrameFormatError(os.str());
     }
   }
@@ -104,7 +107,18 @@ FieldHeader MonitoringFrameMsg::readFieldHeader(std::istringstream& is)
   FieldLength length;
   raw_processing::read(is, id);
   raw_processing::read(is, length);
-  length--;
+
+  if (length >= MAX_LENGTH_ADDITIONAL_MONITORING_FRAME_FIELD)
+  {
+    std::ostringstream os;
+    os << "Length given in header of additional field is too large: " << length
+       << ", id: " << FieldHeader::idToString(id);
+    throw MonitoringFrameFormatError(os.str());
+  }
+  if (length > 0)
+  {
+    length--;
+  }
   return FieldHeader(id, length);
 }
 

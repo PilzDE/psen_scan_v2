@@ -47,7 +47,7 @@ public:
   Id id() const;
   Length length() const;
 
-  std::string idToString() const;
+  static std::string idToString(Id id);
 
 private:
   Id id_;
