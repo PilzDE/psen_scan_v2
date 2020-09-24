@@ -169,10 +169,9 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
   }
 
   typedef states::idle initial_state;
-  //typedef typename states::idle initial_state;
 
-  typedef udp_connection_state_machine_ m;  // makes transition table cleaner
-  typedef events e;  // makes transition table cleaner
+  typedef udp_connection_state_machine_ m;
+  typedef events e;
   typedef states s;
 
   // Transition table for the scanner

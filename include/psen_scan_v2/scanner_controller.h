@@ -212,29 +212,6 @@ void ScannerControllerT<TCSM, TUCI>::notifyStoppedState()
   // Reinitialize
   stopped_ = std::promise<void>();
 }
-
-// template <typename TCSM, typename TUCI>
-// LaserScan ScannerControllerT<TCSM, TUCI>::buildLaserScan()
-// {
-//   // TODO: Move to user API (Scanner class)?
-//   constexpr std::chrono::milliseconds sleeping_time{ 10 };
-
-//   using cl = std::chrono::system_clock;
-//   cl::time_point start_time = cl::now();
-
-//   int i = 0;
-//   while (!laser_scan_builder_.laserScanReady())
-//   {
-//     std::this_thread::sleep_for(sleeping_time);
-//     if ((0 == i++ % 100) && (cl::now() - start_time > std::chrono::seconds(5)))
-//     {
-//       throw LaserScanBuildFailure("Timeout reached, while waiting for laserscan data.");
-//     }
-//   }
-
-//   return laser_scan_builder_.build();
-// }
-
 }  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_SCANNER_CONTROLLER_H

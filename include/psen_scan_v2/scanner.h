@@ -90,14 +90,6 @@ void ScannerT<SC>::stop()
   stop_future.wait();
   PSENSCAN_INFO("Scanner", "Scanner has stopped.");
 }
-
-// template <typename SC>
-// LaserScan ScannerT<SC>::getCompleteScan()
-// {
-//   // TODO: Move implementation from ScannerController?
-//   return scanner_controller_.buildLaserScan();
-// }
-
 }  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_SCANNER_H
