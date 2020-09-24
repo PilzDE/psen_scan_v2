@@ -67,23 +67,23 @@ protected:
     IStringStreamBuilder builder;
     for (const auto& measure : expected_measures_)
     {
-      builder.add(measure);
+      builder.add(static_cast<uint16_t>(measure * 1000.));
     }
     return builder.get();
   }
 
-  inline bool expectMeasuresPartEqual(const std::vector<uint16_t>& measures)
+  inline bool expectMeasuresPartEqual(const std::vector<double>& measures)
   {
     return std::equal(measures.begin(), measures.end(), expected_measures_.begin());
   }
 
-  inline bool expectMeasuresEqual(const std::vector<uint16_t>& measures)
+  inline bool expectMeasuresEqual(const std::vector<double>& measures)
   {
     return (measures.size() == expected_measures_.size() && expectMeasuresPartEqual(measures));
   }
 
 protected:
-  const std::array<uint16_t, 3> expected_measures_{ 44, 43, 42 };
+  const std::array<double, 3> expected_measures_{ 4.4, 4.3, 4.2 };
 };
 
 TEST_F(MonitoringFrameMsgTest, testReadScanCounterSuccess)
@@ -203,7 +203,7 @@ TEST_F(MonitoringFrameMsgFromRawTest, testReadSuccess)
   EXPECT_EQ(measures.size(), test_data_.number_of_measures);
   for (const auto& index_value_pair : test_data_.measures)
   {
-    EXPECT_EQ(measures.at(index_value_pair.first), index_value_pair.second);
+    EXPECT_EQ(measures.at(index_value_pair.first), index_value_pair.second / 1000.);
   }
 }
 

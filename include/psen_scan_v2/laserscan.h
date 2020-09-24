@@ -21,7 +21,7 @@
 
 namespace psen_scan_v2
 {
-using MeasurementData = std::vector<uint16_t>;
+using MeasurementData = std::vector<double>;
 
 //! @brief Holds the measurement data for one laserscan.
 class LaserScan

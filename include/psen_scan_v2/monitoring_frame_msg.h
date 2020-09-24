@@ -68,7 +68,7 @@ public:
   uint16_t fromTheta() const;
   uint16_t resolution() const;
   uint32_t scanCounter() const;
-  std::vector<uint16_t> measures() const;
+  std::vector<double> measures() const;
 
 private:
   using FieldId = FieldHeader::Id;
@@ -105,7 +105,7 @@ private:
   uint16_t resolution_fixed_{ 0 };
 
   uint32_t scan_counter_{ 0 };
-  std::vector<uint16_t> measures_;
+  std::vector<double> measures_;
   bool end_of_frame_{ false };
 
   using PayloadReader = std::function<void(MonitoringFrameMsg*, std::istringstream&, FieldLength)>;
@@ -141,7 +141,7 @@ inline uint32_t MonitoringFrameMsg::scanCounter() const
   return scan_counter_;
 }
 
-inline std::vector<uint16_t> MonitoringFrameMsg::measures() const
+inline std::vector<double> MonitoringFrameMsg::measures() const
 {
   return measures_;
 }

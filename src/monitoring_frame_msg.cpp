@@ -92,7 +92,7 @@ void MonitoringFrameMsg::readMeasures(std::istringstream& is, FieldLength length
   {
     uint16_t sample;
     raw_processing::read(is, sample);
-    measures_.at(i) = sample;
+    measures_.at(i) = sample / 1000.;  // Convert to mm
   }
 }
 

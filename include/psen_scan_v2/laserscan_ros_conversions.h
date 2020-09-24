@@ -55,11 +55,6 @@ sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
   ros_message.ranges.insert(
       ros_message.ranges.end(), laserscan.getMeasurements().crbegin(), laserscan.getMeasurements().crend());
 
-  // Transform into meters
-  std::transform(ros_message.ranges.begin(), ros_message.ranges.end(), ros_message.ranges.begin(), [](float f) {
-    return f * 0.001;
-  });
-
   return ros_message;
 }
 
