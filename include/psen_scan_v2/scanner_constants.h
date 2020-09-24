@@ -20,16 +20,13 @@
 
 namespace psen_scan_v2
 {
-//! @brief Number of samples for complete scan for master scanner.
 static constexpr uint16_t NUMBER_OF_SAMPLES_FULL_SCAN_MASTER{ 2750 };
 
-//! @brief Time per scan (in seconds.)
-static constexpr double SCAN_TIME{ 0.03 };
+static constexpr double TIME_PER_SCAN_IN_S{ 0.03 };
 
-static constexpr double RANGE_MIN{ 0 };
-static constexpr double RANGE_MAX{ 10 };
+static constexpr double RANGE_MIN_IN_M{ 0. };
+static constexpr double RANGE_MAX_IN_M{ 10. };
 
-//! @brief Rotation of x-axis around the center.
 static constexpr double DEFAULT_X_AXIS_ROTATION(degreeToRadian(137.5));
 }  // namespace psen_scan_v2
 
