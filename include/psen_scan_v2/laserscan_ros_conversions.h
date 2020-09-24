@@ -27,12 +27,6 @@ sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
                                       const double x_axis_rotation,
                                       const ros::Time& timestamp = ros::Time::now())
 {
-  // TODO fix isValid()
-  // if (!laserscan.isValid())
-  // {
-  //   throw std::invalid_argument("Calculated number of measures doesn't match actual number of measures.");
-  // }
-
   sensor_msgs::LaserScan ros_message;
   ros_message.header.stamp = timestamp;
   ros_message.header.frame_id = frame_id;
