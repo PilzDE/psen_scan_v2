@@ -23,7 +23,6 @@
 #include "psen_scan_v2/istring_stream_builder.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/raw_processing.h"
-#include "psen_scan_v2/string_stream_failure.h"
 #include "psen_scan_v2/udp_frame_dumps.h"
 #include "psen_scan_v2/raw_data_array_conversion.h"
 
@@ -65,7 +64,7 @@ TEST(FieldHeaderTest, testReadHeaderTooShortFailure)
   builder.add(too_short_header);
   std::istringstream is{ builder.get() };
 
-  EXPECT_THROW(MonitoringFrameMsg::readFieldHeader(is);, StringStreamFailure);
+  EXPECT_THROW(MonitoringFrameMsg::readFieldHeader(is);, raw_processing::StringStreamFailure);
 }
 
 class MonitoringFrameMsgTest : public ::testing::Test
@@ -128,7 +127,7 @@ TEST_F(MonitoringFrameMsgTest, testReadScanCounterMissingPayloadFailure)
   const uint16_t length = 4;
   std::istringstream is;
   uint32_t scan_counter;
-  EXPECT_THROW(MonitoringFrameMsg::readScanCounter(is, scan_counter, length);, StringStreamFailure);
+  EXPECT_THROW(MonitoringFrameMsg::readScanCounter(is, scan_counter, length);, raw_processing::StringStreamFailure);
 }
 
 TEST_F(MonitoringFrameMsgTest, testReadMeasuresSuccess)
@@ -146,7 +145,7 @@ TEST_F(MonitoringFrameMsgTest, testReadMeasuresMissingPayloadFailure)
   const uint16_t length = 2 * expected_measures_.size();
   std::istringstream is;
   std::vector<double> measures;
-  EXPECT_THROW(MonitoringFrameMsg::readMeasures(is, measures, length);, StringStreamFailure);
+  EXPECT_THROW(MonitoringFrameMsg::readMeasures(is, measures, length);, raw_processing::StringStreamFailure);
 }
 
 TEST_F(MonitoringFrameMsgTest, testReadMeasuresTooMuchMeasures)
@@ -164,7 +163,7 @@ TEST_F(MonitoringFrameMsgTest, testReadMeasuresTooFewMeasures)
   const uint16_t length = 2 * (expected_measures_.size() + 1);
   std::istringstream is = buildExpectedMeasuresStream();
   std::vector<double> measures;
-  EXPECT_THROW(MonitoringFrameMsg::readMeasures(is, measures, length);, StringStreamFailure);
+  EXPECT_THROW(MonitoringFrameMsg::readMeasures(is, measures, length);, raw_processing::StringStreamFailure);
 }
 
 class MonitoringFrameMsgFromRawTest : public ::testing::Test
