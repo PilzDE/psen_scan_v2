@@ -293,6 +293,15 @@ if(CATKIN_ENABLE_TESTING)
     ${pilz_testutils_LIBRARIES}
   )
 
+catkin_add_gmock(integrationtest_scanner_api
+  test/integration_tests/integrationtest_scanner_api.cpp
+)
+target_link_libraries(integrationtest_scanner_api
+  ${catkin_LIBRARIES}
+  ${PROJECT_NAME}
+  ${pilz_testutils_LIBRARIES}
+  )
+
   add_rostest_gmock(integrationtest_ros_scanner_node
     test/integration_tests/integrationtest_ros_scanner_node.test
     test/integration_tests/integrationtest_ros_scanner_node.cpp
