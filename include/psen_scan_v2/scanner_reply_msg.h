@@ -24,7 +24,6 @@
 #include <boost/crc.hpp>
 
 #include "psen_scan_v2/raw_scanner_data.h"
-#include "psen_scan_v2/crc_mismatch_exception.h"
 #include "psen_scan_v2/raw_processing.h"
 
 namespace psen_scan_v2
@@ -94,6 +93,14 @@ private:
   //! If the message is refused, the returned value is 0xEB.
   //! If the CRC is not correct, the device will not send any message.
   uint32_t res_code_{ 0 };
+
+public:
+  class CRCMismatch : public std::runtime_error
+  {
+  public:
+    CRCMismatch(const std::string& msg = "CRC did not match");
+    virtual ~CRCMismatch() = default;
+  };
 };
 
 inline uint32_t ScannerReplyMsg::calcCRC(const ScannerReplyMsg& msg)
@@ -173,6 +180,10 @@ inline ScannerReplyMsg::RawType ScannerReplyMsg::toRawData() const
   std::copy(data_str.begin(), data_str.end(), ret_val.begin());
 
   return ret_val;
+}
+
+inline ScannerReplyMsg::CRCMismatch::CRCMismatch(const std::string& msg) : std::runtime_error(msg)
+{
 }
 
 }  // namespace psen_scan_v2
