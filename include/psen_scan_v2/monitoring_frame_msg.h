@@ -26,41 +26,11 @@
 #include <gtest/gtest_prod.h>
 
 #include "psen_scan_v2/raw_scanner_data.h"
+#include "psen_scan_v2/scanner_constants.h"
 
+using namespace psen_scan_v2::monitoring_frame_constants;
 namespace psen_scan_v2
 {
-static constexpr uint32_t OP_CODE_MONITORING_FRAME{ 0xCA };
-static constexpr uint32_t ONLINE_WORKING_MODE{ 0x00 };
-static constexpr uint32_t GUI_MONITORING_TRANSACTION{ 0x05 };
-static constexpr uint32_t MAX_SCANNER_ID{ 0x03 };
-
-class FieldHeader
-{
-public:
-  using Id = uint8_t;
-  using Length = uint16_t;
-
-public:
-  FieldHeader(Id id, Length length);
-
-public:
-  Id id() const;
-  Length length() const;
-
-  static std::string idToString(Id id);
-
-private:
-  Id id_;
-  Length length_;
-};
-
-struct AdditionalFieldIds
-{
-  static constexpr FieldHeader::Id SCAN_COUNTER{ 0x02 };
-  static constexpr FieldHeader::Id MEASURES{ 0x05 };
-  static constexpr FieldHeader::Id END_OF_FRAME{ 0x09 };
-};
-
 class MonitoringFrameMsg
 {
 public:

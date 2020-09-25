@@ -27,25 +27,15 @@
 #include "psen_scan_v2/raw_processing.h"
 #include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/logging.h"
+#include "psen_scan_v2/scanner_constants.h"
+
+using namespace psen_scan_v2::monitoring_frame_constants;
 
 namespace psen_scan_v2
 {
-static constexpr std::size_t MAX_LENGTH_ADDITIONAL_MONITORING_FRAME_FIELD{ 65487 };
-
 constexpr FieldHeader::Id AdditionalFieldIds::SCAN_COUNTER;
 constexpr FieldHeader::Id AdditionalFieldIds::MEASURES;
 constexpr FieldHeader::Id AdditionalFieldIds::END_OF_FRAME;
-
-FieldHeader::FieldHeader(Id id, Length length) : id_(id), length_(length)
-{
-}
-
-std::string FieldHeader::idToString(Id id)
-{
-  std::ostringstream os;
-  os << "0x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(id);
-  return os.str();
-}
 
 MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
 {
@@ -143,26 +133,28 @@ void MonitoringFrameMsg::readMeasures(std::istringstream& is, std::vector<double
   for (unsigned i = 0; i < number_of_samples; i++)
   {
     uint16_t sample;
+    double sample_in_meter;
     raw_processing::read(is, sample);
-    measures.at(i) = sample / 1000.;  // Convert to m
+    sample_in_meter = sample / 1000.;
+    measures.at(i) = sample_in_meter;
   }
 }
 
 void MonitoringFrameMsg::checkFixedFields()
 {
-  if (OP_CODE_MONITORING_FRAME != op_code_fixed_)
+  if (monitoring_frame_constants::OPCODE != op_code_fixed_)
   {
     // TODO: Get rid of the issue not to spam the system with this debug messages
     //       Would something like  ROS_DEBUG_THROTTLE(period, ...) be a good solution?
     PSENSCAN_DEBUG("MonitoringFrameMsg", "Wrong Op Code!");
   }
 
-  if (ONLINE_WORKING_MODE != working_mode_fixed_)
+  if (monitoring_frame_constants::ONLINE_WORKING_MODE != working_mode_fixed_)
   {
     PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid working mode!");
   }
 
-  if (GUI_MONITORING_TRANSACTION != transaction_type_fixed_)
+  if (monitoring_frame_constants::GUI_MONITORING_TRANSACTION != transaction_type_fixed_)
   {
     PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid transaction type!");
   }

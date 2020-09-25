@@ -19,6 +19,7 @@
 
 #include "psen_scan_v2/stop_request.h"
 #include "psen_scan_v2/raw_data_test_helper.h"
+#include "psen_scan_v2/scanner_constants.h"
 
 using namespace psen_scan_v2;
 
@@ -35,17 +36,17 @@ TEST_F(StopRequestTest, constructorTest)
   boost::crc_32_type crc;
   crc.process_bytes(&data[sizeof(uint32_t)], data.size() - sizeof(uint32_t));
 
-  EXPECT_TRUE(DecodingEquals(data, 0x00, static_cast<uint32_t>(crc.checksum()))) << "Calculated CRC incorrect";
+  EXPECT_TRUE(DecodingEquals(data, OFFSET_CRC, static_cast<uint32_t>(crc.checksum()))) << "Calculated CRC incorrect";
 
-  const std::size_t crc_offset{ 4u };
-  for (std::size_t i = 0; i < StopRequest::NUM_RESERVED_FIELDS; ++i)
+  const std::size_t reserved_offset{ OFFSET_RESERVED };
+  for (std::size_t i = 0; i < stop_request_constants::NUM_RESERVED_FIELDS; ++i)
   {
-    const std::size_t curr_field_offset{ crc_offset + i * sizeof(uint8_t) };
+    const std::size_t curr_field_offset{ reserved_offset + i * sizeof(uint8_t) };
     EXPECT_TRUE(DecodingEquals(data, curr_field_offset, static_cast<uint8_t>(0)))
         << "Reserved field has incorrect value";
   }
 
-  const std::size_t op_code_offset{ crc_offset + StopRequest::NUM_RESERVED_FIELDS * sizeof(uint8_t) };
+  const std::size_t op_code_offset{ reserved_offset + stop_request_constants::NUM_RESERVED_FIELDS * sizeof(uint8_t) };
   EXPECT_TRUE(DecodingEquals(data, op_code_offset, static_cast<uint32_t>(0x36))) << "OP code incorrect";
 }
 

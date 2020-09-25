@@ -16,16 +16,17 @@
 #define PSEN_SCAN_V2_START_REQUEST_H
 
 #include <array>
-#include <cstdint>
 #include <string>
 
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/raw_scanner_data.h"
 
+#include "psen_scan_v2/scanner_constants.h"
+
+using namespace psen_scan_v2::start_request_constants;
+
 namespace psen_scan_v2
 {
-static constexpr std::size_t START_REQUEST_SIZE{ 58 };  // See protocol description
-
 /**
  * @brief Higher level data type representing a scanner start request.
  *
@@ -52,10 +53,10 @@ public:
 private:
   uint32_t crc_{ 0 }; /**< Will be filled in constructor */
   uint32_t seq_number_;
-  uint64_t const RESERVED_{ 0 };           /**< Use all zeros */
-  uint32_t const OPCODE_{ htole32(0x35) }; /**< Constant 0x35. */
-  uint32_t host_ip_;                       /**< Byte order: big endian */
-  uint16_t host_udp_port_data_;            /**< Byte order: big endian */
+  uint64_t const RESERVED_{ 0 }; /**< Use all zeros */
+  uint32_t const OPCODE_{ start_request_constants::OPCODE };
+  uint32_t host_ip_;            /**< Byte order: big endian */
+  uint16_t host_udp_port_data_; /**< Byte order: big endian */
 
   /**< The following 'enable' fields are a 1-byte mask each.
    * Only the last 4 bits (little endian) are used, each of which represents a device.

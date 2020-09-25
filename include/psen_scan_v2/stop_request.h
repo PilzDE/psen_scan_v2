@@ -20,6 +20,9 @@
 #include <array>
 
 #include "psen_scan_v2/raw_scanner_data.h"
+#include "psen_scan_v2/scanner_constants.h"
+
+using namespace psen_scan_v2::stop_request_constants;
 
 namespace psen_scan_v2
 {
@@ -32,9 +35,6 @@ namespace psen_scan_v2
 class StopRequest
 {
 public:
-  static constexpr std::size_t STOP_REQUEST_SIZE{ 20 };
-  static constexpr std::size_t NUM_RESERVED_FIELDS{ 12 };
-
 public:
   //! @brief Serializes the request into raw data which can be send to the scanner.
   DynamicSizeRawData toRawData() const;
@@ -45,7 +45,7 @@ private:
 
 private:
   const std::array<uint8_t, NUM_RESERVED_FIELDS> RESERVED_{};
-  const uint32_t OPCODE_{ htole32(0x36) };
+  const uint32_t OPCODE_{ stop_request_constants::OPCODE };
 };
 
 }  // namespace psen_scan_v2

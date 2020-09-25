@@ -28,6 +28,10 @@
 #include "psen_scan_v2/udp_frame_dumps.h"
 #include "psen_scan_v2/raw_data_array_conversion.h"
 
+#include "psen_scan_v2/scanner_constants.h"
+
+using namespace psen_scan_v2::monitoring_frame_constants;
+
 namespace psen_scan_v2
 {
 using namespace psen_scan_v2_test;
@@ -199,25 +203,25 @@ TEST_F(MonitoringFrameMsgFromRawTest, testReadSuccess)
 
 TEST_F(MonitoringFrameMsgFromRawTest, testWrongOpCode)
 {
-  raw_frame_data_.at(4) += 1;
+  raw_frame_data_.at(OFFSET_OPCODE) += 1;
   EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_););
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testInvalidWorkingMode)
 {
-  raw_frame_data_.at(8) = 0x03;
+  raw_frame_data_.at(OFFSET_WORKING_MODE) = 0x03;
   EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_););
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testInvalidTransactionType)
 {
-  raw_frame_data_.at(12) = 0x06;
+  raw_frame_data_.at(OFFSET_TRANSACTION_TYPE) = 0x06;
   EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_););
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testInvalidScannerId)
 {
-  raw_frame_data_.at(16) = 0x04;
+  raw_frame_data_.at(OFFSET_SCANNER_ID) = 0x04;
   EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_););
 }
 
