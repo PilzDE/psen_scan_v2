@@ -64,7 +64,7 @@ Visualization Manager:
       Class: rviz/LaserScan
       Color: 255; 0; 0
       Color Transformer: FlatColor
-      Decay Time: 0
+      Decay Time: 0.1
       Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
