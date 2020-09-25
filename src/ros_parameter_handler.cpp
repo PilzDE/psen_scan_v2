@@ -18,7 +18,7 @@
 #include "psen_scan_v2/ros_parameter_handler.h"
 #include "psen_scan_v2/get_ros_parameter_exception.h"
 #include "psen_scan_v2/default_parameters.h"
-#include "psen_scan_v2/scanner_data.h"
+#include "psen_scan_v2/scanner_constants.h"
 
 namespace psen_scan_v2
 {
@@ -30,7 +30,6 @@ RosParameterHandler::RosParameterHandler(const ros::NodeHandle& nh)
   , frame_id_(DEFAULT_FRAME_ID)
   , angle_start_(DEFAULT_ANGLE_START)
   , angle_end_(DEFAULT_ANGLE_END)
-  , x_axis_rotation_(DEFAULT_X_AXIS_ROTATION)
 {
   updateAllParamsFromParamServer();
 }
@@ -45,7 +44,6 @@ void RosParameterHandler::updateAllParamsFromParamServer()
   getOptionalParamFromParamServer<std::string>("frame_id", frame_id_);
   getOptionalParamFromParamServer<double>("angle_start", angle_start_);
   getOptionalParamFromParamServer<double>("angle_end", angle_end_);
-  getOptionalParamFromParamServer<double>("x_axis_rotation", x_axis_rotation_);
 }
 
 template <class T>
@@ -110,11 +108,6 @@ double RosParameterHandler::getAngleStart() const
 double RosParameterHandler::getAngleEnd() const
 {
   return angle_end_;
-}
-
-double RosParameterHandler::getXAxisRotation() const
-{
-  return x_axis_rotation_;
 }
 
 }  // namespace psen_scan_v2

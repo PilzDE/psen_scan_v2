@@ -22,14 +22,13 @@
 #include <string>
 #include <iostream>
 
-#include "psen_scan_v2/tenth_degree_conversion.h"
+#include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/start_request.h"
-#include "psen_scan_v2/degree_to_rad.h"
 #include "psen_scan_v2/raw_processing.h"
 
 namespace psen_scan_v2
 {
-static constexpr double MASTER_RESOLUTION_RAD{ degreeToRad(1.) };
+static constexpr double MASTER_RESOLUTION_RAD{ degreeToRadian(1.) };
 
 StartRequest::StartRequest(const ScannerConfiguration& scanner_configuration, const uint32_t& seq_number)
   : seq_number_(seq_number)

@@ -18,19 +18,16 @@
 
 #include <string>
 
-#include "psen_scan_v2/degree_to_rad.h"
+#include "psen_scan_v2/angle_conversions.h"
 
 namespace psen_scan_v2
 {
 static const std::string DEFAULT_FRAME_ID = "scanner";
 
 //! @brief Start angle of measurement.
-static constexpr double DEFAULT_ANGLE_START(0.0);
+static constexpr double DEFAULT_ANGLE_START(-degreeToRadian(137.5));
 //! @brief  End angle of measurement.
-static constexpr double DEFAULT_ANGLE_END(degreeToRad(275.));
-
-//! @brief Rotation of x-axis around the center.
-static constexpr double DEFAULT_X_AXIS_ROTATION(degreeToRad(137.5));
+static constexpr double DEFAULT_ANGLE_END(degreeToRadian(137.5));
 
 //! @brief Topic on which the LaserScan data are published.
 static const std::string DEFAULT_PUBLISH_TOPIC = "scan";

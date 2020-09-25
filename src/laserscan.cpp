@@ -13,15 +13,16 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <algorithm>
 #include <stdexcept>
 
+#include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/laserscan.h"
-#include "psen_scan_v2/degree_to_rad.h"
 
 namespace psen_scan_v2
 {
-static constexpr double MAX_X_AXIS_ROTATION(degreeToRad(360.));
-static constexpr double MIN_X_AXIS_ROTATION(degreeToRad(-360.));
+static constexpr double MAX_X_AXIS_ROTATION(degreeToRadian(360.));
+static constexpr double MIN_X_AXIS_ROTATION(degreeToRadian(-360.));
 
 LaserScan::LaserScan(const double& resolution, const double& min_scan_angle, const double& max_scan_angle)
   : resolution_(resolution), min_scan_angle_(min_scan_angle), max_scan_angle_(max_scan_angle)
@@ -62,9 +63,21 @@ const MeasurementData& LaserScan::getMeasurements() const
   return measures_;
 }
 
+void LaserScan::setMeasurements(const MeasurementData& measures)
+{
+  measures_ = measures;
+}
+
 MeasurementData& LaserScan::getMeasurements()
 {
   return measures_;
+}
+
+bool LaserScan::operator==(const LaserScan& scan) const
+{
+  return ((max_scan_angle_ == scan.max_scan_angle_) && (min_scan_angle_ == scan.min_scan_angle_) &&
+          (resolution_ == scan.resolution_) && (measures_.size() == scan.measures_.size()) &&
+          std::equal(measures_.begin(), measures_.end(), scan.measures_.begin()));
 }
 
 }  // namespace psen_scan_v2

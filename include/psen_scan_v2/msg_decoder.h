@@ -38,6 +38,7 @@ public:
    * @brief Constructor.
    *
    * @param start_reply_callback Callback called whenever a StartReply is processed by the decodeAndDispatch method.
+   * @param stop_reply_callback Callback called whenever a StopReply is processed by the decodeAndDispatch method.
    * @param error_callback Callback called whenever an error occurs during deserialization.
    */
   MsgDecoder(const ReplyCallback& start_reply_callback,

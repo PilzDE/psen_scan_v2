@@ -23,6 +23,7 @@
 #include <gtest/gtest_prod.h>
 
 #include "psen_scan_v2/controller_state_machine.h"
+#include "psen_scan_v2/function_pointers.h"
 #include "psen_scan_v2/laserscan.h"
 #include "psen_scan_v2/msg_decoder.h"
 #include "psen_scan_v2/scanner_configuration.h"
@@ -31,12 +32,6 @@
 
 namespace psen_scan_v2
 {
-class LaserScanBuildFailure : public std::runtime_error
-{
-public:
-  LaserScanBuildFailure(const std::string& msg = "Error while building laser scan");
-};
-
 /**
  * @brief API to control and to fetch measurements from the scanner.
  */
@@ -48,14 +43,13 @@ public:
    * @brief Constructor.
    *
    * @param scanner_config Configuration details of the scanner.
+   * @param laser_scan_callback Callback for processing complete laser scans.
    */
-  ScannerT(const ScannerConfiguration& scanner_config);
+  ScannerT(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback);
   //! @brief Starts the scanner.
   void start();
   //! @brief Stops the scanner.
   void stop();
-  //! @brief Fetches a complete laser scan from the scanner.
-  LaserScan getCompleteScan();
 
 private:
   SC scanner_controller_;
@@ -64,18 +58,19 @@ private:
   FRIEND_TEST(ScannerTest, testConstructorSuccess);
   FRIEND_TEST(ScannerTest, testStart);
   FRIEND_TEST(ScannerTest, testStop);
-  FRIEND_TEST(ScannerTest, testGetCompleteScan);
+  FRIEND_TEST(ScannerTest, testInvokeLaserScanCallback);
 };
 
 typedef ScannerT<> Scanner;
 
-inline LaserScanBuildFailure::LaserScanBuildFailure(const std::string& msg) : std::runtime_error(msg)
-{
-}
-
 template <typename SC>
-ScannerT<SC>::ScannerT(const ScannerConfiguration& scanner_config) : scanner_controller_(scanner_config)
+ScannerT<SC>::ScannerT(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback)
+  : scanner_controller_(scanner_config, laser_scan_callback)
 {
+  if (!laser_scan_callback)
+  {
+    throw std::invalid_argument("Invalid laserscanner callback registered!");
+  }
 }
 
 template <typename SC>
@@ -95,14 +90,6 @@ void ScannerT<SC>::stop()
   stop_future.wait();
   PSENSCAN_INFO("Scanner", "Scanner has stopped.");
 }
-
-template <typename SC>
-LaserScan ScannerT<SC>::getCompleteScan()
-{
-  // TODO: Add implementation in following stories
-  throw LaserScanBuildFailure();
-}
-
 }  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_SCANNER_H

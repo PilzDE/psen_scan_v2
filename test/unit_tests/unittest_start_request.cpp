@@ -17,10 +17,9 @@
 #include <boost/crc.hpp>
 #include <gtest/gtest.h>
 
+#include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/start_request.h"
-#include "psen_scan_v2/tenth_degree_conversion.h"
-#include "psen_scan_v2/degree_to_rad.h"
 #include "psen_scan_v2/raw_data_test_helper.h"
 
 using namespace psen_scan_v2;
@@ -91,7 +90,7 @@ TEST_F(StartRequestTest, constructorTest)
 
 TEST_F(StartRequestTest, regressionForRealSystem)
 {
-  ScannerConfiguration sc("192.168.0.50", 55115, 0, "192.168.0.10", 0.0, degreeToRad(275.));
+  ScannerConfiguration sc("192.168.0.50", 55115, 0, "192.168.0.10", 0.0, degreeToRadian(275.));
   StartRequest sr(sc, 0);
 
   auto data = sr.toRawData();

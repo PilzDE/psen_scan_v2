@@ -12,35 +12,22 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#ifndef PSEN_SCAN_V2_RAW_PROCESSING_H
-#define PSEN_SCAN_V2_RAW_PROCESSING_H
 
-#include <sstream>
+#ifndef PSEN_SCAN_V2_MONITORING_FRAME_FORMAT_ERROR_H
+#define PSEN_SCAN_V2_MONITORING_FRAME_FORMAT_ERROR_H
 
-#include "psen_scan_v2/string_stream_failure.h"
+#include <stdexcept>
+#include <string>
 
 namespace psen_scan_v2
 {
-namespace raw_processing
+class MonitoringFrameFormatError : public std::runtime_error
 {
-template <typename T>
-inline void write(std::ostringstream& os, const T& data)
-{
-  os.write(reinterpret_cast<const char*>(&data), sizeof(T));
-}
-
-template <typename T>
-inline void read(std::istringstream& is, T& data)
-{
-  is.read(reinterpret_cast<char*>(&data), sizeof(T));
-  if (!is)
+public:
+  MonitoringFrameFormatError(const std::string& msg) : std::runtime_error(msg)
   {
-    std::ostringstream os;
-    os << "Failure reading " << sizeof(T) << " characters from input stream, could only read " << is.gcount() << ".";
-    throw StringStreamFailure(os.str());
   }
-}
-}  // namespace raw_processing
+};
 }  // namespace psen_scan_v2
 
-#endif  // PSEN_SCAN_V2_RAW_PROCESSING_H
+#endif  // PSEN_SCAN_V2_MONITORING_FRAME_FORMAT_ERROR_H

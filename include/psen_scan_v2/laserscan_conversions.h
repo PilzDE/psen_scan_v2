@@ -13,16 +13,28 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef PSEN_SCAN_V2_SCANNER_PARAMETER_H
-#define PSEN_SCAN_V2_SCANNER_PARAMETER_H
+#ifndef PSEN_SCAN_V2_LASERSCAN_CONVERSIONS_H
+#define PSEN_SCAN_V2_LASERSCAN_CONVERSIONS_H
+
+#include "psen_scan_v2/angle_conversions.h"
+#include "psen_scan_v2/laserscan.h"
+#include "psen_scan_v2/monitoring_frame_msg.h"
 
 namespace psen_scan_v2
 {
-//! @brief Number of samples for complete scan for master scanner.
-constexpr uint16_t NUMBER_OF_SAMPLES_FULL_SCAN_MASTER{ 2750 };
+LaserScan toLaserScan(const MonitoringFrameMsg& frame)
+{
+  const double resolution = frame.resolution();
+  const double min_angle = frame.fromTheta();
+  const uint16_t number_of_samples = frame.measures().size();
+  const double max_angle = min_angle + resolution * (number_of_samples - 1);
 
-//! @brief Time per scan (in seconds.)
-constexpr double SCAN_TIME{ 0.03 };
+  LaserScan scan(resolution, min_angle, max_angle);
+  scan.setMeasurements(frame.measures());
+
+  return scan;
+}
+
 }  // namespace psen_scan_v2
 
-#endif  // PSEN_SCAN_V2_SCANNER_PARAMETER_H
+#endif  // PSEN_SCAN_V2_LASERSCAN_CONVERSIONS_H

@@ -98,6 +98,7 @@ include_directories(
 set(${PROJECT_NAME}_sources
   src/controller_state_machine.cpp
   src/laserscan.cpp
+  src/monitoring_frame_msg.cpp
   src/start_request.cpp
   src/stop_request.cpp
   src/scanner_configuration.cpp
@@ -170,11 +171,11 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_new_exceptions
     ${catkin_LIBRARIES}
-    gtest_main
   )
 
   catkin_add_gmock(unittest_msg_decoder
     test/unit_tests/unittest_msg_decoder.cpp
+    src/monitoring_frame_msg.cpp
   )
   target_link_libraries(unittest_msg_decoder
     ${catkin_LIBRARIES}
@@ -216,6 +217,7 @@ if(CATKIN_ENABLE_TESTING)
   catkin_add_gmock(unittest_scanner
     test/unit_tests/unittest_scanner.cpp
     src/scanner_configuration.cpp
+    src/laserscan.cpp
   )
   target_link_libraries(unittest_scanner
     ${catkin_LIBRARIES}
@@ -243,12 +245,32 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES}
   )
 
+  catkin_add_gtest(unittest_laserscan_conversions
+    test/unit_tests/unittest_laserscan_conversions.cpp
+    src/laserscan.cpp
+    src/monitoring_frame_msg.cpp
+  )
+  target_link_libraries(unittest_laserscan_conversions
+    ${catkin_LIBRARIES}
+  )
+
+  catkin_add_gtest(unittest_laserscan_ros_conversions
+    test/unit_tests/unittest_laserscan_ros_conversions.cpp
+    src/laserscan.cpp
+  )
+  target_link_libraries(unittest_laserscan_ros_conversions
+    ${catkin_LIBRARIES}
+  )
+
   catkin_add_gmock(unittest_scanner_controller
     test/unit_tests/unittest_scanner_controller.cpp
     src/scanner_configuration.cpp
     src/start_request.cpp
+    src/monitoring_frame_msg.cpp
     src/stop_request.cpp
+    src/laserscan.cpp
   )
+
   target_link_libraries(unittest_scanner_controller
     ${catkin_LIBRARIES}
   )
@@ -257,6 +279,14 @@ if(CATKIN_ENABLE_TESTING)
     test/unit_tests/unittest_scanner_reply_msg.cpp
   )
   target_link_libraries(unittest_scanner_reply_msg
+    ${catkin_LIBRARIES}
+  )
+
+  catkin_add_gtest(unittest_monitoring_frame_msg
+    test/unit_tests/unittest_monitoring_frame_msg.cpp
+    src/monitoring_frame_msg.cpp
+  )
+  target_link_libraries(unittest_monitoring_frame_msg
     ${catkin_LIBRARIES}
   )
 

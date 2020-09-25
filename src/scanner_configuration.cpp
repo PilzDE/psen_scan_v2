@@ -20,13 +20,13 @@
 
 #include <arpa/inet.h>
 
+#include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/scanner_configuration.h"
-#include "psen_scan_v2/degree_to_rad.h"
 
 namespace psen_scan_v2
 {
 static constexpr double MIN_SCAN_ANGLE{ 0. };
-static constexpr double MAX_SCAN_ANGLE{ degreeToRad(275.) };
+static constexpr double MAX_SCAN_ANGLE{ degreeToRadian(275.) };
 
 ScannerConfiguration::ScannerConfiguration(const std::string& host_ip,
                                            const int& host_udp_port_data,
