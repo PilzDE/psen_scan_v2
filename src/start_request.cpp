@@ -28,7 +28,7 @@
 
 namespace psen_scan_v2
 {
-static constexpr double MASTER_RESOLUTION_RAD{ degreeToRadian(1.) };
+static constexpr double MASTER_RESOLUTION_RAD{ degreeToRadian(0.1) };
 
 StartRequest::StartRequest(const ScannerConfiguration& scanner_configuration, const uint32_t& seq_number)
   : seq_number_(seq_number)
