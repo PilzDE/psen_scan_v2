@@ -17,7 +17,6 @@
 
 #include <sstream>
 
-#include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/string_stream_failure.h"
 
 namespace psen_scan_v2
