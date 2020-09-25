@@ -138,13 +138,17 @@ public:
   class CloseConnectionFailure : public std::runtime_error
   {
   public:
-    CloseConnectionFailure(const std::string& msg = "Failure while closing connection");
+    CloseConnectionFailure(const std::string& msg = "Failure while closing connection") : std::runtime_error(msg)
+    {
+    }
   };
 
   class OpenConnectionFailure : public std::runtime_error
   {
   public:
-    OpenConnectionFailure(const std::string& msg = "Failure while opening connection");
+    OpenConnectionFailure(const std::string& msg = "Failure while opening connection") : std::runtime_error(msg)
+    {
+    }
   };
 };
 
@@ -307,14 +311,5 @@ inline void UdpClientImpl::asyncReceive(const ReceiveMode& modi,
                           }
                         });
 }
-
-inline UdpClientImpl::CloseConnectionFailure::CloseConnectionFailure(const std::string& msg) : std::runtime_error(msg)
-{
-}
-
-inline UdpClientImpl::OpenConnectionFailure::OpenConnectionFailure(const std::string& msg) : std::runtime_error(msg)
-{
-}
-
 }  // namespace psen_scan_v2
 #endif  // PSEN_SCAN_V2_UDP_CLIENT_H

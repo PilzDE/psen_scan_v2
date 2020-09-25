@@ -98,7 +98,9 @@ public:
   class CRCMismatch : public std::runtime_error
   {
   public:
-    CRCMismatch(const std::string& msg = "CRC did not match");
+    CRCMismatch(const std::string& msg = "CRC did not match") : std::runtime_error(msg)
+    {
+    }
     virtual ~CRCMismatch() = default;
   };
 };
@@ -181,11 +183,6 @@ inline ScannerReplyMsg::RawType ScannerReplyMsg::toRawData() const
 
   return ret_val;
 }
-
-inline ScannerReplyMsg::CRCMismatch::CRCMismatch(const std::string& msg) : std::runtime_error(msg)
-{
-}
-
 }  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_SCANNER_REPLY_MSG_H
