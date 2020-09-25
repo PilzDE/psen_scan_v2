@@ -26,8 +26,14 @@
 #include "psen_scan_v2/scanner_controller.h"
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/stop_request.h"
+#include "psen_scan_v2/laserscan_conversions.h"
+#include "psen_scan_v2/laserscan.h"
+#include "psen_scan_v2/udp_frame_dumps.h"
+#include "psen_scan_v2/raw_data_array_conversion.h"
 
-using namespace psen_scan_v2;
+using namespace psen_scan_v2_test;
+
+using ::testing::StrictMock;
 
 namespace psen_scan_v2
 {
@@ -36,7 +42,13 @@ static constexpr int HOST_UDP_PORT_DATA{ 50505 };
 static constexpr int HOST_UDP_PORT_CONTROL{ 55055 };
 static const std::string DEVICE_IP{ "127.0.0.100" };
 static constexpr double START_ANGLE{ 0. };
-static constexpr double END_ANGLE{ 275. * 2 * M_PI / 360. };
+static constexpr double END_ANGLE{ degreeToRadian(275.) };
+
+class MockCallbackHolder
+{
+public:
+  MOCK_METHOD1(laserscan_callback, void(const LaserScan&));
+};
 
 static constexpr uint32_t OP_CODE_START{ 0x35 };
 static constexpr uint32_t OP_CODE_STOP{ 0x36 };
@@ -46,16 +58,16 @@ static constexpr uint32_t RES_CODE_ACCEPTED{ 0x00 };
 class ScannerControllerTest : public ::testing::Test
 {
 protected:
-  ScannerControllerTest()
-    : scanner_config_(HOST_IP, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, DEVICE_IP, START_ANGLE, END_ANGLE)
-    , scanner_controller_(scanner_config_)
-  {
-  }
+  MockCallbackHolder mock_;
+  ScannerConfiguration scanner_config_{ HOST_IP,   HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL,
+                                        DEVICE_IP, START_ANGLE,        END_ANGLE };
 
-protected:
-  ScannerConfiguration scanner_config_;
+  LaserScanCallback laser_scan_callback_{
+    std::bind(&MockCallbackHolder::laserscan_callback, &mock_, std::placeholders::_1)
+  };
+
   ScannerControllerT<psen_scan_v2_test::ControllerStateMachineMock, psen_scan_v2_test::MockUdpClient>
-      scanner_controller_;
+      scanner_controller_{ scanner_config_, laser_scan_callback_ };
 };
 
 TEST_F(ScannerControllerTest, testStartRequestEvent)
@@ -186,6 +198,40 @@ TEST_F(ScannerControllerTest, testHandleScannerReplyTypeUnknown)
 
   EXPECT_CALL(scanner_controller_.state_machine_, processReplyReceivedEvent(ScannerReplyMsgType::Unknown)).Times(1);
   scanner_controller_.handleScannerReply(max_size_data, max_size_data.size());
+}
+
+TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
+{
+  UDPFrameTestDataWithoutIntensities test_data;
+  MaxSizeRawData data = convertToMaxSizeRawData(test_data.hex_dump);
+  MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
+  LaserScan scan = toLaserScan(frame);
+
+  EXPECT_CALL(scanner_controller_.state_machine_, processMonitoringFrameReceivedEvent()).Times(1);
+  EXPECT_CALL(mock_, laserscan_callback(scan)).Times(1);
+
+  scanner_controller_.handleNewMonitoringFrame(data, data.size());
+}
+
+TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
+{
+  using ::testing::_;
+
+  UDPFrameTestDataWithoutMeasurementsAndIntensities test_data;
+  MaxSizeRawData data = convertToMaxSizeRawData(test_data.hex_dump);
+  MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
+
+  EXPECT_CALL(scanner_controller_.state_machine_, processMonitoringFrameReceivedEvent()).Times(1);
+  EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
+
+  scanner_controller_.handleNewMonitoringFrame(data, data.size());
+}
+
+TEST_F(ScannerControllerTest, testConstructorInvalidLaserScanCallback)
+{
+  LaserScanCallback laserscan_callback;
+  typedef ScannerControllerT<psen_scan_v2_test::ControllerStateMachineMock, psen_scan_v2_test::MockUdpClient> SCT;
+  EXPECT_THROW(SCT scanner_controller_(scanner_config_, laserscan_callback);, std::invalid_argument);
 }
 
 }  // namespace psen_scan_v2

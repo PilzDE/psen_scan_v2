@@ -33,23 +33,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <arg name="frame_id" default="scanner" />
 
   <!-- Start angle of measurement in radian -->
-  <arg name="angle_start" default="0" />
+  <arg name="angle_start" default="$(eval -137.5 /180.0 * pi)" />
 
   <!-- End angle of measurement in radian -->
-  <arg name="angle_end" default="$(eval 275.0 /180.0 * pi)" />
-
-  <!-- Rotation of x-axis around the center in radian. -->
-  <arg name="x_axis_rotation" default="$(eval 137.5 / 180.0 * pi)" />
+  <arg name="angle_end" default="$(eval 137.5 /180.0 * pi)" />
 
   <node name="laser_scanner" type="psen_scan_v2_node" pkg="psen_scan_v2" output="screen" required="true">
-    <rosparam param="host_ip" subst_value="True">$(arg host_ip)</rosparam>
-    <rosparam param="host_udp_port_data" subst_value="True">$(arg host_udp_port_data)</rosparam>
-    <rosparam param="host_udp_port_control" subst_value="True">$(arg host_udp_port_control)</rosparam>
-    <rosparam param="sensor_ip" subst_value="True">$(arg sensor_ip)</rosparam>
-    <rosparam param="frame_id" subst_value="True">$(arg frame_id)</rosparam>
-    <rosparam param="angle_start" subst_value="True">$(arg angle_start)</rosparam>
-    <rosparam param="angle_end" subst_value="True">$(arg angle_end)</rosparam>
-    <rosparam param="x_axis_rotation" subst_value="True">$(arg x_axis_rotation)</rosparam>
+    <param name="host_ip" value="$(arg host_ip)" />
+    <param name="host_udp_port_data" value="$(arg host_udp_port_data)" />
+    <param name="host_udp_port_control" value="$(arg host_udp_port_control)" />
+    <param name="sensor_ip" value="$(arg sensor_ip)" />
+    <param name="frame_id" value="$(arg frame_id)" />
+    <param name="angle_start" value="$(arg angle_start)" />
+    <param name="angle_end" value="$(arg angle_end)" />
   </node>
   <node name="rviz" type="rviz" pkg="rviz" args="-d $(find psen_scan_v2)/config/config.rviz" />
 </launch>

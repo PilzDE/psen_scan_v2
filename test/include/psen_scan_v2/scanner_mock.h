@@ -20,18 +20,31 @@
 
 #include "psen_scan_v2/scanner.h"
 #include "psen_scan_v2/scanner_configuration.h"
+#include "psen_scan_v2/function_pointers.h"
+#include "psen_scan_v2/laserscan.h"
 
 namespace psen_scan_v2_test
 {
 class ScannerMock
 {
 public:
-  ScannerMock(const psen_scan_v2::ScannerConfiguration& scanner_config){};
+  ScannerMock(const psen_scan_v2::ScannerConfiguration& scanner_config,
+              const psen_scan_v2::LaserScanCallback& laser_scan_callback)
+    : laser_scan_callback_(laser_scan_callback){};
 
   MOCK_METHOD0(start, void());
   MOCK_METHOD0(stop, void());
-  MOCK_METHOD0(getCompleteScan, psen_scan_v2::LaserScan());
+
+  void invokeLaserScanCallback(const psen_scan_v2::LaserScan& scan);
+
+private:
+  psen_scan_v2::LaserScanCallback laser_scan_callback_;
 };
+
+inline void ScannerMock::invokeLaserScanCallback(const psen_scan_v2::LaserScan& scan)
+{
+  laser_scan_callback_(scan);
+}
 
 }  // namespace psen_scan_v2_test
 

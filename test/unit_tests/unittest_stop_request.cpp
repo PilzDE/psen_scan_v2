@@ -49,10 +49,19 @@ TEST_F(StopRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals(data, op_code_offset, static_cast<uint32_t>(0x36))) << "OP code incorrect";
 }
 
-// TEST_F(StopRequestTest, regressionForRealSystem)
-//{
-//  TODO
-//}
+TEST_F(StopRequestTest, regressionForRealSystem)
+{
+  StopRequest sr;
+
+  auto data = sr.toRawData();
+
+  unsigned char expected_crc[4] = { 0x28, 0xec, 0xfb, 0x39 };  // see wireshark for this number
+
+  for (size_t i = 0; i < sizeof(expected_crc); i++)
+  {
+    EXPECT_EQ(static_cast<unsigned int>(static_cast<unsigned char>(data[i])), expected_crc[i]);
+  }
+}
 
 }  // namespace psen_scan_v2_test
 

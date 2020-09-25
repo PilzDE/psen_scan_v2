@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Pilz GmbH & Co. KG
+// Copyright (c) 2019-2020 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -13,31 +13,37 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <gtest/gtest.h>
-#include "psen_scan_v2/get_ros_parameter_exception.h"
+#ifndef PSEN_SCAN_V2_TEST_ISTRING_STREAM_BUILDER_H
+#define PSEN_SCAN_V2_TEST_ISTRING_STREAM_BUILDER_H
 
-using namespace psen_scan_v2;
+#include <sstream>
 
 namespace psen_scan_v2_test
 {
-TEST(GetROSParameterExceptionTest, new_param_missing_on_server_exception)
+class IStringStreamBuilder
 {
-  std::string except_str = "GetROSParameterException";
-  std::unique_ptr<ParamMissingOnServer> e(new ParamMissingOnServer(except_str));
-  EXPECT_EQ(except_str, e->what());
+public:
+  template <typename T>
+  IStringStreamBuilder& add(const T& datum);
+
+  std::istringstream get() const;
+
+private:
+  std::ostringstream os_;
+};
+
+template <typename T>
+IStringStreamBuilder& IStringStreamBuilder::add(const T& datum)
+{
+  os_.write(reinterpret_cast<const char*>(&datum), sizeof(T));
+  return *this;
 }
 
-TEST(GetROSParameterExceptionTest, new_wrong_parameter_type_exception)
+inline std::istringstream IStringStreamBuilder::get() const
 {
-  std::string except_str = "GetROSParameterException";
-  std::unique_ptr<WrongParameterType> e(new WrongParameterType(except_str));
-  EXPECT_EQ(except_str, e->what());
+  return std::istringstream(os_.str());
 }
 
 }  // namespace psen_scan_v2_test
 
-int main(int argc, char* argv[])
-{
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
+#endif  // PSEN_SCAN_V2_TEST_ISTRING_STREAM_BUILDER_H

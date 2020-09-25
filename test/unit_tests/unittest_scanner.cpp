@@ -20,7 +20,8 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "psen_scan_v2/degree_to_rad.h"
+#include "psen_scan_v2/angle_conversions.h"
+#include "psen_scan_v2/laserscan.h"
 #include "psen_scan_v2/scanner.h"
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/scanner_controller.h"
@@ -32,27 +33,51 @@ using namespace ::testing;
 
 namespace psen_scan_v2
 {
+class MockCallbackHolder
+{
+public:
+  MOCK_METHOD1(laserscan_callback, void(const LaserScan&));
+};
+
 static const std::string HOST_IP{ "127.0.0.1" };
 static constexpr int HOST_UDP_PORT_DATA{ 50505 };
 static constexpr int HOST_UDP_PORT_CONTROL{ 55055 };
 static const std::string DEVICE_IP{ "127.0.0.100" };
 static constexpr double START_ANGLE{ 0. };
-static constexpr double END_ANGLE{ degreeToRad(275.) };
+static constexpr double END_ANGLE{ degreeToRadian(275.) };
 
 static constexpr std::chrono::milliseconds DEFAULT_TIMEOUT{ 50 };
 
 class ScannerTest : public testing::Test
 {
 protected:
-  ScannerConfiguration scanner_config_{ HOST_IP,   HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL,
-                                        DEVICE_IP, START_ANGLE,        END_ANGLE };
+  ScannerTest() : scanner_config_(HOST_IP, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, DEVICE_IP, START_ANGLE, END_ANGLE)
+  {
+  }
+
+  MockCallbackHolder mock_;
+  ScannerConfiguration scanner_config_;
+  LaserScanCallback laserscan_callback_{
+    std::bind(&MockCallbackHolder::laserscan_callback, &mock_, std::placeholders::_1)
+  };
 };
 
 typedef ScannerT<psen_scan_v2_test::ScannerControllerMock> MockedScanner;
 
+TEST_F(ScannerTest, testConstructorInvalidLaserScanCallback)
+{
+  LaserScanCallback laserscan_callback;
+  EXPECT_THROW(MockedScanner scanner(scanner_config_, laserscan_callback);, std::invalid_argument);
+}
+
+TEST_F(ScannerTest, testConstructorSuccess)
+{
+  EXPECT_NO_THROW(MockedScanner scanner(scanner_config_, laserscan_callback_));
+}
+
 TEST_F(ScannerTest, testStart)
 {
-  MockedScanner scanner(scanner_config_);
+  MockedScanner scanner(scanner_config_, laserscan_callback_);
   std::promise<void> mocked_start_finished_barrier;
   EXPECT_CALL(scanner.scanner_controller_, start()).WillOnce(InvokeWithoutArgs([&mocked_start_finished_barrier]() {
     return mocked_start_finished_barrier.get_future();
@@ -67,7 +92,7 @@ TEST_F(ScannerTest, testStart)
 
 TEST_F(ScannerTest, testStop)
 {
-  MockedScanner scanner(scanner_config_);
+  MockedScanner scanner(scanner_config_, laserscan_callback_);
   std::promise<void> mocked_stop_finished_barrier;
   EXPECT_CALL(scanner.scanner_controller_, stop()).WillOnce(InvokeWithoutArgs([&mocked_stop_finished_barrier]() {
     return mocked_stop_finished_barrier.get_future();
@@ -80,12 +105,16 @@ TEST_F(ScannerTest, testStop)
   EXPECT_EQ(stop_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::stop() not finished";
 }
 
-TEST_F(ScannerTest, testGetCompleteScan)
+TEST_F(ScannerTest, testInvokeLaserScanCallback)
 {
-  MockedScanner scanner(scanner_config_);
-  EXPECT_THROW(scanner.getCompleteScan(), LaserScanBuildFailure);
-}
+  LaserScan laser_scan_fake(0.02, 0.03, 0.05);
+  laser_scan_fake.getMeasurements().push_back(1);
 
+  MockedScanner scanner(scanner_config_, laserscan_callback_);
+  EXPECT_CALL(mock_, laserscan_callback(laser_scan_fake)).Times(1);
+
+  scanner.scanner_controller_.invokeLaserScanCallback(laser_scan_fake);
+}
 }  // namespace psen_scan_v2
 
 int main(int argc, char* argv[])

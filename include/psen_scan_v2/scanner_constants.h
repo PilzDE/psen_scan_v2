@@ -13,18 +13,21 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef PSEN_SCAN_V2_RAD_TO_DEGREE_H
-#define PSEN_SCAN_V2_RAD_TO_DEGREE_H
+#ifndef PSEN_SCAN_V2_SCANNER_CONSTANTS_H
+#define PSEN_SCAN_V2_SCANNER_CONSTANTS_H
 
-#include <boost/math/constants/constants.hpp>
+#include "psen_scan_v2/angle_conversions.h"
 
 namespace psen_scan_v2
 {
-static constexpr double degreeToRad(const double& angle_in_degree)
-{
-  return (angle_in_degree / 180.) * boost::math::double_constants::pi;
-}
+static constexpr uint16_t NUMBER_OF_SAMPLES_FULL_SCAN_MASTER{ 2750 };
 
+static constexpr double TIME_PER_SCAN_IN_S{ 0.03 };
+
+static constexpr double RANGE_MIN_IN_M{ 0. };
+static constexpr double RANGE_MAX_IN_M{ 10. };
+
+static constexpr double DEFAULT_X_AXIS_ROTATION(degreeToRadian(137.5));
 }  // namespace psen_scan_v2
 
-#endif  // PSEN_SCAN_V2_RAD_TO_DEGREE_H
+#endif  // PSEN_SCAN_V2_SCANNER_CONSTANTS_H

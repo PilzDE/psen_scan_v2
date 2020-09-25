@@ -20,8 +20,8 @@
 #include <arpa/inet.h>
 #include <gtest/gtest.h>
 
+#include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/scanner_configuration.h"
-#include "psen_scan_v2/degree_to_rad.h"
 
 using namespace psen_scan_v2;
 
@@ -30,7 +30,7 @@ namespace psen_scan_v2_test
 static constexpr int MINIMAL_PORT_NUMBER{ std::numeric_limits<uint16_t>::min() };
 static constexpr int MAXIMAL_PORT_NUMBER{ std::numeric_limits<uint16_t>::max() };
 static constexpr double MINIMAL_SCAN_ANGLE{ 0.0 };
-static constexpr double MAXIMAL_SCAN_ANGLE{ degreeToRad(275.) };
+static constexpr double MAXIMAL_SCAN_ANGLE{ degreeToRadian(275.) };
 static const double TOO_LARGE_SCAN_ANGLE{ std::nextafter(MAXIMAL_SCAN_ANGLE, MAXIMAL_SCAN_ANGLE + 1) };
 static const double TOO_SMALL_SCAN_ANGLE{ std::nextafter(MINIMAL_SCAN_ANGLE, MINIMAL_SCAN_ANGLE - 1) };
 static const std::string VALID_IP{ "127.0.0.1" };
@@ -161,7 +161,6 @@ TEST_F(ScannerConfigurationTest, testTargetIp)
   const auto host_ip = sc.hostIp();
   EXPECT_EQ(4U, sizeof(host_ip));
 
-  // convert host_ip back to string representation
   const auto network_number = inet_makeaddr(host_ip, 0);
   const auto network_number_ascii = inet_ntoa(network_number);
   const std::string host_ip_string(network_number_ascii);
@@ -176,7 +175,6 @@ TEST_F(ScannerConfigurationTest, testClientIp)
   const auto client_ip = sc.clientIp();
   EXPECT_EQ(4U, sizeof(client_ip));
 
-  // convert host_ip back to string representation
   const auto network_number = inet_makeaddr(client_ip, 0);
   const auto network_number_ascii = inet_ntoa(network_number);
   const std::string client_ip_string(network_number_ascii);

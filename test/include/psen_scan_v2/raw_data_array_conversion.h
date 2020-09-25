@@ -12,32 +12,23 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#ifndef PSEN_SCAN_V2_RAW_DATA_ARRAY_CONVERSION_H
+#define PSEN_SCAN_V2_RAW_DATA_ARRAY_CONVERSION_H
 
-#include <gtest/gtest.h>
-#include "psen_scan_v2/get_ros_parameter_exception.h"
-
-using namespace psen_scan_v2;
+#include "psen_scan_v2/raw_scanner_data.h"
 
 namespace psen_scan_v2_test
 {
-TEST(GetROSParameterExceptionTest, new_param_missing_on_server_exception)
+template <typename T>
+inline psen_scan_v2::MaxSizeRawData convertToMaxSizeRawData(const T data)
 {
-  std::string except_str = "GetROSParameterException";
-  std::unique_ptr<ParamMissingOnServer> e(new ParamMissingOnServer(except_str));
-  EXPECT_EQ(except_str, e->what());
+  psen_scan_v2::MaxSizeRawData ret;
+  for (size_t i = 0; i < data.size(); i++)
+  {
+    ret.at(i) = static_cast<char>(data.at(i));
+  }
+  return ret;
 }
-
-TEST(GetROSParameterExceptionTest, new_wrong_parameter_type_exception)
-{
-  std::string except_str = "GetROSParameterException";
-  std::unique_ptr<WrongParameterType> e(new WrongParameterType(except_str));
-  EXPECT_EQ(except_str, e->what());
-}
-
 }  // namespace psen_scan_v2_test
 
-int main(int argc, char* argv[])
-{
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
+#endif  // PSEN_SCAN_V2_RAW_DATA_ARRAY_CONVERSION_H
