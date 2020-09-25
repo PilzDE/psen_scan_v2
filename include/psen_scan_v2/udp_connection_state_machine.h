@@ -24,6 +24,7 @@
 #include <boost/msm/front/state_machine_def.hpp>
 
 #include "psen_scan_v2/logging.h"
+#include "psen_scan_v2/scanner_reply_msg.h"
 
 namespace psen_scan_v2
 {
@@ -63,10 +64,15 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
   struct events
   {
     struct start_request {};
-    struct start_reply_received {};
+    struct reply_received
+    {
+      reply_received(ScannerReplyMsgType type) : type_(type)
+      {}
+
+      ScannerReplyMsgType type_;
+    };
     struct monitoring_frame_received {};
     struct stop_request {};
-    struct stop_reply_received {};
   };
 
   struct states
@@ -156,16 +162,26 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
     send_stop_request_callback_();
   }
 
-  void action_notify_start(events::start_reply_received const&)
+  void action_notify_start(events::reply_received const&)
   {
     PSENSCAN_DEBUG("StateMachine", "Action: action_notify_start");
     notify_started_callback_();
   }
 
-  void action_notify_stop(events::stop_reply_received const&)
+  void action_notify_stop(events::reply_received const&)
   {
     PSENSCAN_DEBUG("StateMachine", "Action: action_notify_stop");
     notify_stopped_callback_();
+  }
+
+  bool guard_is_start_reply(events::reply_received const& reply_event)
+  {
+    return reply_event.type_ == ScannerReplyMsgType::Start;
+  }
+
+  bool guard_is_stop_reply(events::reply_received const& reply_event)
+  {
+    return reply_event.type_ == ScannerReplyMsgType::Stop;
   }
 
   typedef states::idle initial_state;
@@ -177,15 +193,15 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
   // Transition table for the scanner
   struct transition_table : mpl::vector<
     //    Start                                 Event                            Next           			           Action	                             Guard
-    //  +--------------------------------+--------------------------------+-------------------------------+-----------------------------------+-------+
-    a_row < s::idle,                       e::start_request,                 s::wait_for_start_reply,      &m::action_send_start_request   >,
-    a_row < s::idle,                       e::stop_request,                  s::wait_for_stop_reply,       &m::action_send_stop_request    >,
-    a_row < s::wait_for_start_reply,       e::start_reply_received,          s::wait_for_monitoring_frame, &m::action_notify_start         >,
-    _irow < s::wait_for_monitoring_frame,  e::monitoring_frame_received                                                                    >,
-    a_row < s::wait_for_start_reply,       e::stop_request,                  s::wait_for_stop_reply,       &m::action_send_stop_request    >,
-    a_row < s::wait_for_monitoring_frame,  e::stop_request,                  s::wait_for_stop_reply,       &m::action_send_stop_request    >,
-    a_row < s::wait_for_stop_reply,        e::stop_reply_received,           s::stopped,                   &m::action_notify_stop          >
-    //  +--------------------------------+--------------------------------+------------------------------------+------------------------------------+-------+
+    //  +--------------------------------+--------------------------------+-------------------------------+-----------------------------------+-----------------------------+
+    a_row < s::idle,                       e::start_request,                s::wait_for_start_reply,        &m::action_send_start_request                                 >,
+    a_row < s::idle,                       e::stop_request,                 s::wait_for_stop_reply,         &m::action_send_stop_request                                  >,
+      row < s::wait_for_start_reply,       e::reply_received,               s::wait_for_monitoring_frame,   &m::action_notify_start,            &m::guard_is_start_reply  >,
+    _irow < s::wait_for_monitoring_frame,  e::monitoring_frame_received                                                                                                   >,
+    a_row < s::wait_for_start_reply,       e::stop_request,                 s::wait_for_stop_reply,         &m::action_send_stop_request                                  >,
+    a_row < s::wait_for_monitoring_frame,  e::stop_request,                 s::wait_for_stop_reply,         &m::action_send_stop_request                                  >,
+      row < s::wait_for_stop_reply,        e::reply_received,               s::stopped,                     &m::action_notify_stop,             &m::guard_is_stop_reply   >
+    //  +--------------------------------+--------------------------------+-------------------------------+------------------------------------+-----------------------------+
   > {};
   // clang-format on
 

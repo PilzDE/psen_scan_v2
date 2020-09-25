@@ -173,14 +173,6 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES}
   )
 
-  catkin_add_gmock(unittest_msg_decoder
-    test/unit_tests/unittest_msg_decoder.cpp
-    src/monitoring_frame_msg.cpp
-  )
-  target_link_libraries(unittest_msg_decoder
-    ${catkin_LIBRARIES}
-  )
-
   catkin_add_gtest(unittest_start_request
     test/unit_tests/unittest_start_request.cpp
     src/start_request.cpp

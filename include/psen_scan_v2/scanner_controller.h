@@ -31,7 +31,6 @@
 #include "psen_scan_v2/function_pointers.h"
 #include "psen_scan_v2/laserscan_conversions.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
-#include "psen_scan_v2/msg_decoder.h"
 #include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/start_request.h"
@@ -62,10 +61,12 @@ public:
 private:
   void handleError(const std::string& error_msg);
   void handleNewMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes);
+  void handleScannerReply(const MaxSizeRawData& data, const std::size_t& num_bytes);
 
   void sendStartRequest();
   void sendStopRequest();
 
+private:
   void handleStartReplyTimeout(const std::string& error_str);
   void handleStopReplyTimeout(const std::string& error_str);
 
@@ -75,7 +76,6 @@ private:
 private:
   ScannerConfiguration scanner_config_;
   TCSM state_machine_;
-  MsgDecoder control_msg_decoder_;
   TUCI control_udp_client_;
   TUCI data_udp_client_;
   LaserScanCallback laser_scan_callback_;
@@ -92,6 +92,9 @@ private:
   FRIEND_TEST(ScannerControllerTest, testHandleStopReplyTimeout);
   FRIEND_TEST(ScannerControllerTest, testStartRequestEventWithFutureUsage);
   FRIEND_TEST(ScannerControllerTest, testStopRequestEventWithFutureUsage);
+  FRIEND_TEST(ScannerControllerTest, testHandleScannerReplyTypeStart);
+  FRIEND_TEST(ScannerControllerTest, testHandleScannerReplyTypeStop);
+  FRIEND_TEST(ScannerControllerTest, testHandleScannerReplyTypeUnknown);
   FRIEND_TEST(ScannerControllerTest, testHandleNewMonitoringFrame);
   FRIEND_TEST(ScannerControllerTest, testHandleEmptyMonitoringFrame);
   FRIEND_TEST(ScannerControllerTest, testHandleErrorNoThrow);
@@ -107,11 +110,8 @@ ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& s
                    std::bind(&ScannerControllerT::sendStopRequest, this),
                    std::bind(&ScannerControllerT::notifyStartedState, this),
                    std::bind(&ScannerControllerT::notifyStoppedState, this))
-  , control_msg_decoder_(std::bind(&TCSM::processStartReplyReceivedEvent, &state_machine_),
-                         std::bind(&TCSM::processStopReplyReceivedEvent, &state_machine_),
-                         std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1))
   , control_udp_client_(
-        std::bind(&MsgDecoder::decodeAndDispatch, &control_msg_decoder_, std::placeholders::_1, std::placeholders::_2),
+        std::bind(&ScannerControllerT::handleScannerReply, this, std::placeholders::_1, std::placeholders::_2),
         std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1),
         scanner_config.hostUDPPortControl(),
         scanner_config.clientIp(),
@@ -175,6 +175,13 @@ void ScannerControllerT<TCSM, TUCI>::sendStartRequest()
   StartRequest start_request(scanner_config_, DEFAULT_SEQ_NUMBER);
 
   control_udp_client_.write(start_request.toRawData());
+}
+
+template <typename TCSM, typename TUCI>
+void ScannerControllerT<TCSM, TUCI>::handleScannerReply(const MaxSizeRawData& data, const std::size_t& num_bytes)
+{
+  ScannerReplyMsg frame{ ScannerReplyMsg::fromRawData(data) };
+  state_machine_.processReplyReceivedEvent(frame.type());
 }
 
 template <typename TCSM, typename TUCI>

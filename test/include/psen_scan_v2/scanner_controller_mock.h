@@ -20,6 +20,7 @@
 
 #include <gmock/gmock.h>
 
+#include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/scanner_controller.h"
 #include "psen_scan_v2/laserscan.h"
@@ -36,6 +37,7 @@ public:
 
   MOCK_METHOD0(start, std::future<void>());
   MOCK_METHOD0(stop, std::future<void>());
+  MOCK_METHOD2(handleScannerReply, void(const psen_scan_v2::MaxSizeRawData& data, const std::size_t& num_bytes));
   MOCK_METHOD1(handleError, void(const std::string& error_msg));
   MOCK_METHOD0(sendStartRequest, void());
   MOCK_METHOD0(buildLaserScan, psen_scan_v2::LaserScan());

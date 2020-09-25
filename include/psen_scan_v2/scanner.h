@@ -25,7 +25,6 @@
 #include "psen_scan_v2/controller_state_machine.h"
 #include "psen_scan_v2/function_pointers.h"
 #include "psen_scan_v2/laserscan.h"
-#include "psen_scan_v2/msg_decoder.h"
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/scanner_controller.h"
 #include "psen_scan_v2/udp_client.h"

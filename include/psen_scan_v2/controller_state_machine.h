@@ -34,10 +34,9 @@ public:
   virtual ~ControllerStateMachine();
 
   void processStartRequestEvent();
-  void processStartReplyReceivedEvent();
+  void processReplyReceivedEvent(ScannerReplyMsgType type);
   void processMonitoringFrameReceivedEvent();
   void processStopRequestEvent();
-  void processStopReplyReceivedEvent();
 
 private:
   template <typename T>

@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <algorithm>
 #include <math.h>
 #include <memory>
 
@@ -48,6 +49,11 @@ class MockCallbackHolder
 public:
   MOCK_METHOD1(laserscan_callback, void(const LaserScan&));
 };
+
+static constexpr uint32_t OP_CODE_START{ 0x35 };
+static constexpr uint32_t OP_CODE_STOP{ 0x36 };
+static constexpr uint32_t OP_CODE_UNKNOWN{ 0x01 };
+static constexpr uint32_t RES_CODE_ACCEPTED{ 0x00 };
 
 class ScannerControllerTest : public ::testing::Test
 {
@@ -159,6 +165,39 @@ TEST_F(ScannerControllerTest, testHandleStopReplyTimeout)
 TEST_F(ScannerControllerTest, testHandleErrorNoThrow)
 {
   ASSERT_NO_THROW(scanner_controller_.handleError("Error Message."));
+}
+
+TEST_F(ScannerControllerTest, testHandleScannerReplyTypeStart)
+{
+  ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
+  const auto data{ msg.toRawData() };
+  MaxSizeRawData max_size_data;
+  std::copy_n(data.begin(), data.size(), max_size_data.begin());
+
+  EXPECT_CALL(scanner_controller_.state_machine_, processReplyReceivedEvent(ScannerReplyMsgType::Start)).Times(1);
+  scanner_controller_.handleScannerReply(max_size_data, max_size_data.size());
+}
+
+TEST_F(ScannerControllerTest, testHandleScannerReplyTypeStop)
+{
+  ScannerReplyMsg msg(OP_CODE_STOP, RES_CODE_ACCEPTED);
+  const auto data{ msg.toRawData() };
+  MaxSizeRawData max_size_data;
+  std::copy_n(data.begin(), data.size(), max_size_data.begin());
+
+  EXPECT_CALL(scanner_controller_.state_machine_, processReplyReceivedEvent(ScannerReplyMsgType::Stop)).Times(1);
+  scanner_controller_.handleScannerReply(max_size_data, max_size_data.size());
+}
+
+TEST_F(ScannerControllerTest, testHandleScannerReplyTypeUnknown)
+{
+  ScannerReplyMsg msg(OP_CODE_UNKNOWN, RES_CODE_ACCEPTED);
+  const auto data{ msg.toRawData() };
+  MaxSizeRawData max_size_data;
+  std::copy_n(data.begin(), data.size(), max_size_data.begin());
+
+  EXPECT_CALL(scanner_controller_.state_machine_, processReplyReceivedEvent(ScannerReplyMsgType::Unknown)).Times(1);
+  scanner_controller_.handleScannerReply(max_size_data, max_size_data.size());
 }
 
 TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
