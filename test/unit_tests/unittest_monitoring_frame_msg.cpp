@@ -21,7 +21,6 @@
 
 #include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/istring_stream_builder.h"
-#include "psen_scan_v2/monitoring_frame_format_error.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/raw_processing.h"
 #include "psen_scan_v2/string_stream_failure.h"
@@ -120,7 +119,8 @@ TEST_F(MonitoringFrameMsgTest, testReadScanCounterInvalidLengthFailure)
   std::istringstream is{ builder.get() };
 
   uint32_t scan_counter;
-  EXPECT_THROW(MonitoringFrameMsg::readScanCounter(is, scan_counter, length);, MonitoringFrameFormatError);
+  EXPECT_THROW(MonitoringFrameMsg::readScanCounter(is, scan_counter, length);
+               , MonitoringFrameMsg::MonitoringFrameFormatError);
 }
 
 TEST_F(MonitoringFrameMsgTest, testReadScanCounterMissingPayloadFailure)
@@ -227,7 +227,7 @@ TEST_F(MonitoringFrameMsgFromRawTest, testUnknownFieldId)
   const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
 
   MonitoringFrameMsg msg;
-  EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data);, MonitoringFrameFormatError);
+  EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data);, MonitoringFrameMsg::MonitoringFrameFormatError);
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeFieldLength)
@@ -236,7 +236,7 @@ TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeFieldLength)
   const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
 
   MonitoringFrameMsg msg;
-  EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data);, MonitoringFrameFormatError);
+  EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data);, MonitoringFrameMsg::MonitoringFrameFormatError);
 }
 
 }  // namespace psen_scan_v2

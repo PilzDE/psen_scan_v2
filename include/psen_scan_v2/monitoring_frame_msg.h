@@ -109,6 +109,15 @@ private:
 
   uint32_t scan_counter_{ 0 };
   std::vector<double> measures_;
+
+public:
+  class MonitoringFrameFormatError : public std::runtime_error
+  {
+  public:
+    MonitoringFrameFormatError(const std::string& msg) : std::runtime_error(msg)
+    {
+    }
+  };
 };
 
 inline FieldHeader::Id FieldHeader::id() const
