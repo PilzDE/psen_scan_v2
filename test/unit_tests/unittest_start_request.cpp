@@ -73,7 +73,7 @@ TEST_F(StartRequestTest, constructorTest)
 
   EXPECT_TRUE(DecodingEquals(data, 0x22, radToTenthDegree(start_angle)));          // Master Start Angle
   EXPECT_TRUE(DecodingEquals(data, 0x24, radToTenthDegree(end_angle)));            // Master End Angle
-  EXPECT_TRUE(DecodingEquals(data, 0x26, radToTenthDegree(degreeToRadian(0.1))));  // Master Angle Resolution
+  EXPECT_TRUE(DecodingEquals(data, 0x26, degreeToTenthDegree(0.1)));  // Master Angle Resolution
 
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, 0x28, 0));  // Slave 1 Start Angle
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, 0x2A, 0));  // Slave 1 End Angle
