@@ -30,9 +30,9 @@ inline static constexpr double degreeToRadian(const double& angle_in_degree)
   return (angle_in_degree / 180.) * boost::math::double_constants::pi;
 }
 
-inline static uint16_t radToTenthDegree(const double& angle_in_rad)
+inline static uint16_t degreeToTenthDegree(const double& angle_in_degree)
 {
-  const double tenth_degree_rounded{ std::round(10. * radianToDegree(angle_in_rad)) };
+  const double tenth_degree_rounded{ std::round(10. * angle_in_degree) };
   if (tenth_degree_rounded < std::numeric_limits<uint16_t>::min() ||
       tenth_degree_rounded > std::numeric_limits<uint16_t>::max())
   {
@@ -41,6 +41,11 @@ inline static uint16_t radToTenthDegree(const double& angle_in_rad)
     throw std::invalid_argument(exception_msg.str());
   }
   return static_cast<uint16_t>(tenth_degree_rounded);
+}
+
+inline static uint16_t radToTenthDegree(const double& angle_in_rad)
+{
+  return degreeToTenthDegree(radianToDegree(angle_in_rad));
 }
 
 inline static double tenthDegreeToRad(const uint16_t& angle_in_tenth_degree)

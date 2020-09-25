@@ -49,7 +49,7 @@ TEST_F(StartRequestTest, constructorTest)
 
   EXPECT_TRUE(DecodingEquals(data, 0x00, (uint32_t)result.checksum()));  // CRC
 
-  EXPECT_TRUE(DecodingEquals(data, 0x00, 0xe450d7c1));  // CRC - Fixed for now, Note: Other byte order as in wireshark
+  EXPECT_TRUE(DecodingEquals(data, 0x00, 0xd6224cb9));  // CRC - Fixed for now, Note: Other byte order as in wireshark
 
   EXPECT_TRUE(DecodingEquals(data, 0x04, (uint32_t)sequence_number));  // SequenceNumber
 
@@ -73,7 +73,7 @@ TEST_F(StartRequestTest, constructorTest)
 
   EXPECT_TRUE(DecodingEquals(data, 0x22, radToTenthDegree(start_angle)));  // Master Start Angle
   EXPECT_TRUE(DecodingEquals(data, 0x24, radToTenthDegree(end_angle)));    // Master End Angle
-  EXPECT_TRUE(DecodingEquals(data, 0x26, radToTenthDegree(0.0174533)));    // Master Angle Resolution
+  EXPECT_TRUE(DecodingEquals(data, 0x26, degreeToTenthDegree(0.1)));       // Master Angle Resolution
 
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, 0x28, 0));  // Slave 1 Start Angle
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, 0x2A, 0));  // Slave 1 End Angle
@@ -95,7 +95,7 @@ TEST_F(StartRequestTest, regressionForRealSystem)
 
   auto data = sr.toRawData();
 
-  unsigned char expected_crc[4] = { 0x95, 0x58, 0x3a, 0x93 };  // see wireshark for this number
+  unsigned char expected_crc[4] = { 0xed, 0xc3, 0x48, 0xa1 };  // see wireshark for this number
 
   for (size_t i = 0; i < sizeof(expected_crc); i++)
   {
