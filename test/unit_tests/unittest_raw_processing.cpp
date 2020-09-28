@@ -106,18 +106,9 @@ TYPED_TEST(RawProcessingTest, readArrayToMuch)
   std::istringstream is{ os.str() };
 
   std::vector<TypeParam> data_read;
-  try
-  {
-    raw_processing::readArray<TypeParam, TypeParam>(
-        is, data_read, data.size() + 1, [](TypeParam raw_data) { return raw_data; });
-  }
-  catch (const std::exception& e)
-  {
-    SUCCEED();
-    return;
-  }
-
-  FAIL() << "read without fail!";
+  EXPECT_THROW((raw_processing::readArray<TypeParam, TypeParam>(
+                   is, data_read, data.size() + 1, [](TypeParam raw_data) { return raw_data; })),
+               std::exception);
 }
 
 }  // namespace psen_scan_v2_test
