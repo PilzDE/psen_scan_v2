@@ -14,8 +14,8 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
-
 <launch>
-  <test pkg="psen_scan_v2" type="integrationtest_ros_parameter_handler" test-name="integrationtest_ros_parameter_handler">
-  </test>
+
+  <test test-name="unittest_ros_parameter_handler" pkg="psen_scan_v2" type="unittest_ros_parameter_handler"/>
+
 </launch>
