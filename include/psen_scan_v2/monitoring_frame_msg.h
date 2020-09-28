@@ -64,6 +64,13 @@ struct AdditionalFieldIds
 class MonitoringFrameMsg
 {
 public:
+  class MonitoringFrameFormatError : public std::runtime_error
+  {
+  public:
+    MonitoringFrameFormatError(const std::string& msg = "Error while decoding laser scanner measurement data");
+  };
+
+public:
   static MonitoringFrameMsg fromRawData(const MaxSizeRawData& data);
 
 public:
@@ -109,15 +116,6 @@ private:
 
   uint32_t scan_counter_{ 0 };
   std::vector<double> measures_;
-
-public:
-  class MonitoringFrameFormatError : public std::runtime_error
-  {
-  public:
-    MonitoringFrameFormatError(const std::string& msg) : std::runtime_error(msg)
-    {
-    }
-  };
 };
 
 inline FieldHeader::Id FieldHeader::id() const
@@ -148,6 +146,11 @@ inline uint32_t MonitoringFrameMsg::scanCounter() const
 inline std::vector<double> MonitoringFrameMsg::measures() const
 {
   return measures_;
+}
+
+inline MonitoringFrameMsg::MonitoringFrameFormatError::MonitoringFrameFormatError(const std::string& msg)
+  : std::runtime_error(msg)
+{
 }
 
 }  // namespace psen_scan_v2

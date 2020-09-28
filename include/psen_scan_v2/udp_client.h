@@ -58,6 +58,19 @@ enum class ReceiveMode
 class UdpClientImpl
 {
 public:
+  class CloseConnectionFailure : public std::runtime_error
+  {
+  public:
+    CloseConnectionFailure(const std::string& msg = "Failure while closing connection");
+  };
+
+  class OpenConnectionFailure : public std::runtime_error
+  {
+  public:
+    OpenConnectionFailure(const std::string& msg = "Failure while opening connection");
+  };
+
+public:
   /**
    * @brief Opens an UDP connection.
    *
@@ -133,23 +146,6 @@ private:
 
   boost::asio::ip::udp::socket socket_;
   boost::asio::ip::udp::endpoint endpoint_;
-
-public:
-  class CloseConnectionFailure : public std::runtime_error
-  {
-  public:
-    CloseConnectionFailure(const std::string& msg = "Failure while closing connection") : std::runtime_error(msg)
-    {
-    }
-  };
-
-  class OpenConnectionFailure : public std::runtime_error
-  {
-  public:
-    OpenConnectionFailure(const std::string& msg = "Failure while opening connection") : std::runtime_error(msg)
-    {
-    }
-  };
 };
 
 inline UdpClientImpl::UdpClientImpl(const NewDataHandler& data_handler,
@@ -310,6 +306,14 @@ inline void UdpClientImpl::asyncReceive(const ReceiveMode& modi,
                             asyncReceive(modi, timeout_handler, timeout);
                           }
                         });
+}
+
+inline UdpClientImpl::OpenConnectionFailure::OpenConnectionFailure(const std::string& msg) : std::runtime_error(msg)
+{
+}
+
+inline UdpClientImpl::CloseConnectionFailure::CloseConnectionFailure(const std::string& msg) : std::runtime_error(msg)
+{
 }
 }  // namespace psen_scan_v2
 #endif  // PSEN_SCAN_V2_UDP_CLIENT_H

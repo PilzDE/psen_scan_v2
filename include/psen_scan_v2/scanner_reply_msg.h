@@ -52,6 +52,13 @@ static constexpr std::size_t REPLY_MSG_FROM_SCANNER_SIZE = 16;  // See protocol 
 class ScannerReplyMsg
 {
 public:
+  class CRCMismatch : public std::runtime_error
+  {
+  public:
+    CRCMismatch(const std::string& msg = "CRC did not match!");
+  };
+
+public:
   //! @brief Deserializes the specified data into a reply message.
   static ScannerReplyMsg fromRawData(const MaxSizeRawData& data);
 
@@ -93,16 +100,6 @@ private:
   //! If the message is refused, the returned value is 0xEB.
   //! If the CRC is not correct, the device will not send any message.
   uint32_t res_code_{ 0 };
-
-public:
-  class CRCMismatch : public std::runtime_error
-  {
-  public:
-    CRCMismatch(const std::string& msg = "CRC did not match") : std::runtime_error(msg)
-    {
-    }
-    virtual ~CRCMismatch() = default;
-  };
 };
 
 inline uint32_t ScannerReplyMsg::calcCRC(const ScannerReplyMsg& msg)
@@ -182,6 +179,9 @@ inline ScannerReplyMsg::RawType ScannerReplyMsg::toRawData() const
   std::copy(data_str.begin(), data_str.end(), ret_val.begin());
 
   return ret_val;
+}
+inline ScannerReplyMsg::CRCMismatch::CRCMismatch(const std::string& msg) : std::runtime_error(msg)
+{
 }
 }  // namespace psen_scan_v2
 
