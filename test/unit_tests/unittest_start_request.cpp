@@ -29,7 +29,8 @@ namespace psen_scan_v2_test
 class StartRequestTest : public ::testing::Test
 {
 public:
-  enum class Offset : std::size_t  {
+  enum class Offset : std::size_t
+  {
     CRC = 0x00,
     SEQ_NUMBER = 0x04,
     RESERVED = 0x08,
@@ -76,9 +77,9 @@ TEST_F(StartRequestTest, constructorTest)
   boost::crc_32_type result;
   result.process_bytes(&data[sizeof(uint32_t)], data.size() - sizeof(uint32_t));
 
-  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::crc), (uint32_t)result.checksum()));
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::CRC), (uint32_t)result.checksum()));
 
-  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::crc), 0xd6224cb9));  // CRC - Fixed for now, Note:
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::CRC), 0xd6224cb9));  // CRC - Fixed for now, Note:
                                                                                     // Other byte order as in
                                                                                     // wireshark
 
