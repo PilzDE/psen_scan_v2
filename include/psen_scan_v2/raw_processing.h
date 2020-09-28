@@ -16,6 +16,8 @@
 #define PSEN_SCAN_V2_RAW_PROCESSING_H
 
 #include <sstream>
+#include <functional>
+
 namespace psen_scan_v2
 {
 namespace raw_processing
@@ -55,7 +57,7 @@ inline void readArray(std::istringstream& is,
                       const uint16_t& length,
                       std::function<ReturnType(RawType)> conversion_fcn)
 {
-  size_t bytes_per_element = sizeof(uint16_t);
+  size_t bytes_per_element = sizeof(RawType);
   size_t number_of_samples = length / bytes_per_element;
 
   data.reserve(number_of_samples);
