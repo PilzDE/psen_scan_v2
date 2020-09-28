@@ -94,42 +94,6 @@ protected:
   const std::array<double, 3> expected_measures_{ 4.4, 4.3, 4.2 };
 };
 
-TEST_F(MonitoringFrameMsgTest, testReadScanCounterSuccess)
-{
-  const uint16_t length = 4;
-  const uint32_t expected_scan_counter = 2;
-
-  IStringStreamBuilder builder;
-  builder.add(expected_scan_counter);
-  std::istringstream is{ builder.get() };
-
-  uint32_t scan_counter;
-  ASSERT_NO_THROW(MonitoringFrameMsg::readScanCounter(is, scan_counter, length));
-  EXPECT_EQ(expected_scan_counter, scan_counter);
-}
-
-TEST_F(MonitoringFrameMsgTest, testReadScanCounterInvalidLengthFailure)
-{
-  const uint16_t length = 3;
-  const uint32_t expected_scan_counter = 2;
-
-  IStringStreamBuilder builder;
-  builder.add(expected_scan_counter);
-  std::istringstream is{ builder.get() };
-
-  uint32_t scan_counter;
-  EXPECT_THROW(MonitoringFrameMsg::readScanCounter(is, scan_counter, length);
-               , MonitoringFrameMsg::MonitoringFrameFormatError);
-}
-
-TEST_F(MonitoringFrameMsgTest, testReadScanCounterMissingPayloadFailure)
-{
-  const uint16_t length = 4;
-  std::istringstream is;
-  uint32_t scan_counter;
-  EXPECT_THROW(MonitoringFrameMsg::readScanCounter(is, scan_counter, length);, raw_processing::StringStreamFailure);
-}
-
 class MonitoringFrameMsgFromRawTest : public ::testing::Test
 {
 protected:

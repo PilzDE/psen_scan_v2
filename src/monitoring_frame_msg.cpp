@@ -71,7 +71,13 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
     switch (header.id())
     {
       case AdditionalFieldIds::SCAN_COUNTER:
-        readScanCounter(is, msg.scan_counter_, header.length());
+        if (header.length() != 4)
+        {
+          std::ostringstream os;
+          os << "Length of scan counter field is " << header.length() << ", but should be " << 4 << ".";
+          throw MonitoringFrameFormatError(os.str());
+        }
+        raw_processing::read(is, msg.scan_counter_);
         break;
 
       case AdditionalFieldIds::MEASURES:
@@ -113,17 +119,6 @@ FieldHeader MonitoringFrameMsg::readFieldHeader(std::istringstream& is)
     length--;
   }
   return FieldHeader(id, length);
-}
-
-void MonitoringFrameMsg::readScanCounter(std::istringstream& is, uint32_t& scan_counter, const FieldLength length)
-{
-  if (length != sizeof(scan_counter))
-  {
-    std::ostringstream os;
-    os << "Length of scan counter field is " << length << ", but should be " << sizeof(scan_counter_) << ".";
-    throw MonitoringFrameFormatError(os.str());
-  }
-  raw_processing::read(is, scan_counter);
 }
 
 void MonitoringFrameMsg::checkFixedFields()
