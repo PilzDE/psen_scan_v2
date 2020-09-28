@@ -58,8 +58,8 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
   raw_processing::read(is, msg.working_mode_fixed_);
   raw_processing::read(is, msg.transaction_type_fixed_);
   raw_processing::read(is, msg.scanner_id_fixed_);
-  readAngle(is, msg.from_theta_fixed_);
-  readAngle(is, msg.resolution_fixed_);
+  raw_processing::read<uint16_t, double>(is, msg.from_theta_fixed_, tenthDegreeToRad);
+  raw_processing::read<uint16_t, double>(is, msg.resolution_fixed_, tenthDegreeToRad);
 
   msg.checkFixedFields();
 
@@ -91,13 +91,6 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
   }
 
   return msg;
-}
-
-void MonitoringFrameMsg::readAngle(std::istringstream& is, double& angle)
-{
-  uint16_t angle_in_tenth_degree;
-  raw_processing::read(is, angle_in_tenth_degree);
-  angle = tenthDegreeToRad(angle_in_tenth_degree);
 }
 
 FieldHeader MonitoringFrameMsg::readFieldHeader(std::istringstream& is)

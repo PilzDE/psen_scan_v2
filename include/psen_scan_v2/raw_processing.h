@@ -39,6 +39,16 @@ inline void read(std::istringstream& is, T& data)
     throw raw_processing::StringStreamFailure(os.str());
   }
 }
+
+template <typename RawType, typename ReturnType>
+inline void read(std::istringstream& is, ReturnType& data, std::function<ReturnType(RawType)> conversion_fcn)
+{
+  RawType raw_data;
+  read<RawType>(is, raw_data);
+
+  data = conversion_fcn(raw_data);
+}
+
 class StringStreamFailure : public std::runtime_error
 {
 public:
@@ -46,6 +56,7 @@ public:
   {
   }
 };
+
 }  // namespace raw_processing
 }  // namespace psen_scan_v2
 
