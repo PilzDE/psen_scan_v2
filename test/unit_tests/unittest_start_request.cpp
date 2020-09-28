@@ -28,6 +28,36 @@ namespace psen_scan_v2_test
 {
 class StartRequestTest : public ::testing::Test
 {
+public:
+  enum class Offset : std::size_t
+  {
+    crc = 0x00,
+    seq_number = 0x04,
+    reserved = 0x08,
+    opcode = 0x10,
+    ip = 0x14,
+    udp_port = 0x18,
+    device_enabled = 0x1a,
+    intensities_enabled = 0x1b,
+    point_in_safety_enabled = 0x1c,
+    active_zone_set_enabled = 0x1d,
+    io_pin_enabled = 0x1e,
+    scan_counter_enabled = 0x1f,
+    speed_encoder_enabled = 0x20,
+    diagnostics_enabled = 0x21,
+    master_start_angle = 0x22,
+    master_end_angle = 0x24,
+    master_angle_resolution = 0x26,
+    slave_one_start_angle = 0x28,
+    slave_one_end_angle = 0x2a,
+    slave_one_angle_resolution = 0x2c,
+    slave_two_start_angle = 0x2e,
+    slave_two_end_angle = 0x30,
+    slave_two_angle_resolution = 0x32,
+    slave_three_start_angle = 0x34,
+    slave_three_end_angle = 0x36,
+    slave_three_angle_resolution = 0x38
+  };
 };
 
 TEST_F(StartRequestTest, constructorTest)
@@ -47,45 +77,40 @@ TEST_F(StartRequestTest, constructorTest)
   boost::crc_32_type result;
   result.process_bytes(&data[sizeof(uint32_t)], data.size() - sizeof(uint32_t));
 
-  EXPECT_TRUE(DecodingEquals(data, 0x00, (uint32_t)result.checksum()));  // CRC
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::crc), (uint32_t)result.checksum()));
 
-  EXPECT_TRUE(DecodingEquals(data, 0x00, 0xd6224cb9));  // CRC - Fixed for now, Note: Other byte order as in wireshark
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::crc), 0xd6224cb9));  // CRC - Fixed for now, Note:
+                                                                                    // Other byte order as in
+                                                                                    // wireshark
 
-  EXPECT_TRUE(DecodingEquals(data, 0x04, (uint32_t)sequence_number));  // SequenceNumber
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::seq_number), (uint32_t)sequence_number));
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::reserved), (uint64_t)0));
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::opcode), (uint32_t)0x35));
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::ip), inet_network(host_ip.c_str()), Endian::BIG));
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::udp_port), host_udp_port_data));
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::device_enabled), (uint8_t)0b00001000));
 
-  EXPECT_TRUE(DecodingEquals(data, 0x08, (uint64_t)0));  // Reserved
+  EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::intensities_enabled), 0));
+  EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::point_in_safety_enabled), 0));
+  EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::active_zone_set_enabled), 0));
+  EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::io_pin_enabled), 0));
+  EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::scan_counter_enabled), 0b00001000));
+  EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::speed_encoder_enabled), 0));
+  EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::diagnostics_enabled), 0));
 
-  EXPECT_TRUE(DecodingEquals(data, 0x10, (uint32_t)0x35));  // OP code
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::master_start_angle), radToTenthDegree(start_angle)));
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::master_end_angle), radToTenthDegree(end_angle)));
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::master_angle_resolution), degreeToTenthDegree(0.1)));
 
-  EXPECT_TRUE(DecodingEquals(data, 0x14, inet_network(host_ip.c_str()), Endian::BIG));  // IP
-
-  EXPECT_TRUE(DecodingEquals(data, 0x18, host_udp_port_data));  // UDP port
-
-  EXPECT_TRUE(DecodingEquals(data, 0x1A, (uint8_t)0b00001000));  // Device enabled
-
-  EXPECT_TRUE(DecodingEquals<uint8_t>(data, 0x1B, 0));           // Intensities enabled
-  EXPECT_TRUE(DecodingEquals<uint8_t>(data, 0x1C, 0));           // Point in safety enabled
-  EXPECT_TRUE(DecodingEquals<uint8_t>(data, 0x1D, 0));           // Active zone set enabled
-  EXPECT_TRUE(DecodingEquals<uint8_t>(data, 0x1E, 0));           // IO Pin enabled
-  EXPECT_TRUE(DecodingEquals<uint8_t>(data, 0x1F, 0b00001000));  // Scan counter enabled
-  EXPECT_TRUE(DecodingEquals<uint8_t>(data, 0x20, 0));           // Speed encoder enabled
-  EXPECT_TRUE(DecodingEquals<uint8_t>(data, 0x21, 0));           // Diagnostics enabled
-
-  EXPECT_TRUE(DecodingEquals(data, 0x22, radToTenthDegree(start_angle)));  // Master Start Angle
-  EXPECT_TRUE(DecodingEquals(data, 0x24, radToTenthDegree(end_angle)));    // Master End Angle
-  EXPECT_TRUE(DecodingEquals(data, 0x26, degreeToTenthDegree(0.1)));       // Master Angle Resolution
-
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, 0x28, 0));  // Slave 1 Start Angle
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, 0x2A, 0));  // Slave 1 End Angle
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, 0x2C, 0));  // Slave 1 Angle Resolution
-
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, 0x2E, 0));  // Slave 2 Start Angle
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, 0x30, 0));  // Slave 2 End Angle
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, 0x32, 0));  // Slave 2 Angle Resolution
-
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, 0x34, 0));  // Slave 3 Start Angle
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, 0x36, 0));  // Slave 3 End Angle
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, 0x38, 0));  // Slave 3 Angle Resolution
+  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_one_start_angle), 0));
+  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_one_end_angle), 0));
+  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_one_angle_resolution), 0));
+  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_two_start_angle), 0));
+  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_two_end_angle), 0));
+  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_two_angle_resolution), 0));
+  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_three_start_angle), 0));
+  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_three_end_angle), 0));
+  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_three_angle_resolution), 0));
 }
 
 TEST_F(StartRequestTest, regressionForRealSystem)
