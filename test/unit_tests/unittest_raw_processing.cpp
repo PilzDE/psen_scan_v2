@@ -85,13 +85,39 @@ TYPED_TEST(RawProcessingTest, readArray)
 
   std::vector<TypeParam> data_read;
   raw_processing::readArray<TypeParam, TypeParam>(
-      is, data_read, data.size() * sizeof(TypeParam), [](TypeParam raw_data) { return raw_data * 2; });
+      is, data_read, data.size(), [](TypeParam raw_data) { return raw_data * 2; });
 
   EXPECT_EQ(data_read.size(), data.size());
   for (size_t i = 0; i < data_read.size(); ++i)
   {
     EXPECT_EQ(data_read.at(i), data.at(i) * 2);
   }
+}
+
+TYPED_TEST(RawProcessingTest, readArrayToMuch)
+{
+  std::ostringstream os;
+  std::vector<TypeParam> data{ (TypeParam)123, (TypeParam)345 };
+  for (const auto& d : data)
+  {
+    os.write(reinterpret_cast<const char*>(&d), sizeof(TypeParam));
+  }
+
+  std::istringstream is{ os.str() };
+
+  std::vector<TypeParam> data_read;
+  try
+  {
+    raw_processing::readArray<TypeParam, TypeParam>(
+        is, data_read, data.size() + 1, [](TypeParam raw_data) { return raw_data; });
+  }
+  catch (const std::exception& e)
+  {
+    SUCCEED();
+    return;
+  }
+
+  FAIL() << "read without fail!";
 }
 
 }  // namespace psen_scan_v2_test

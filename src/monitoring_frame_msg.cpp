@@ -82,7 +82,7 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
 
       case AdditionalFieldIds::MEASURES:
         raw_processing::readArray<uint16_t, double>(
-            is, msg.measures_, header.length(), [](uint16_t raw_element) { return raw_element / 1000.; });
+            is, msg.measures_, header.length() / 2, [](uint16_t raw_element) { return raw_element / 1000.; });
         break;
 
       case AdditionalFieldIds::END_OF_FRAME:

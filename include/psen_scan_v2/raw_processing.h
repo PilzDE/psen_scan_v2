@@ -54,12 +54,9 @@ inline void read(std::istringstream& is, ReturnType& data, std::function<ReturnT
 template <typename RawType, typename ReturnType>
 inline void readArray(std::istringstream& is,
                       std::vector<ReturnType>& data,
-                      const uint16_t& length,
+                      const size_t& number_of_samples,
                       std::function<ReturnType(RawType)> conversion_fcn)
 {
-  size_t bytes_per_element = sizeof(RawType);
-  size_t number_of_samples = length / bytes_per_element;
-
   data.reserve(number_of_samples);
 
   std::generate_n(std::back_inserter(data), number_of_samples, [&is, &conversion_fcn]() {
