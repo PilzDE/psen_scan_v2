@@ -175,7 +175,7 @@ TEST_F(ScannerControllerTest, testHandleScannerReplyTypeStart)
   std::copy_n(data.begin(), data.size(), max_size_data.begin());
 
   EXPECT_CALL(scanner_controller_.state_machine_, processReplyReceivedEvent(ScannerReplyMsgType::Start)).Times(1);
-  scanner_controller_.handleScannerReply(max_size_data, max_size_data.size());
+  scanner_controller_.handleScannerReply(max_size_data);
 }
 
 TEST_F(ScannerControllerTest, testHandleScannerReplyTypeStop)
@@ -186,7 +186,7 @@ TEST_F(ScannerControllerTest, testHandleScannerReplyTypeStop)
   std::copy_n(data.begin(), data.size(), max_size_data.begin());
 
   EXPECT_CALL(scanner_controller_.state_machine_, processReplyReceivedEvent(ScannerReplyMsgType::Stop)).Times(1);
-  scanner_controller_.handleScannerReply(max_size_data, max_size_data.size());
+  scanner_controller_.handleScannerReply(max_size_data);
 }
 
 TEST_F(ScannerControllerTest, testHandleScannerReplyTypeUnknown)
@@ -197,7 +197,7 @@ TEST_F(ScannerControllerTest, testHandleScannerReplyTypeUnknown)
   std::copy_n(data.begin(), data.size(), max_size_data.begin());
 
   EXPECT_CALL(scanner_controller_.state_machine_, processReplyReceivedEvent(ScannerReplyMsgType::Unknown)).Times(1);
-  scanner_controller_.handleScannerReply(max_size_data, max_size_data.size());
+  scanner_controller_.handleScannerReply(max_size_data);
 }
 
 TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
@@ -210,7 +210,7 @@ TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
   EXPECT_CALL(scanner_controller_.state_machine_, processMonitoringFrameReceivedEvent()).Times(1);
   EXPECT_CALL(mock_, laserscan_callback(scan)).Times(1);
 
-  scanner_controller_.handleNewMonitoringFrame(data, data.size());
+  scanner_controller_.handleNewMonitoringFrame(data);
 }
 
 TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
@@ -224,7 +224,7 @@ TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
   EXPECT_CALL(scanner_controller_.state_machine_, processMonitoringFrameReceivedEvent()).Times(1);
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
-  scanner_controller_.handleNewMonitoringFrame(data, data.size());
+  scanner_controller_.handleNewMonitoringFrame(data);
 }
 
 TEST_F(ScannerControllerTest, testConstructorInvalidLaserScanCallback)

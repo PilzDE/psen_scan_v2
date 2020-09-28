@@ -60,8 +60,8 @@ public:
 
 private:
   void handleError(const std::string& error_msg);
-  void handleNewMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes);
-  void handleScannerReply(const MaxSizeRawData& data, const std::size_t& num_bytes);
+  void handleNewMonitoringFrame(const MaxSizeRawData& data);
+  void handleScannerReply(const MaxSizeRawData& data);
 
   void sendStartRequest();
   void sendStopRequest();
@@ -110,18 +110,16 @@ ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& s
                    std::bind(&ScannerControllerT::sendStopRequest, this),
                    std::bind(&ScannerControllerT::notifyStartedState, this),
                    std::bind(&ScannerControllerT::notifyStoppedState, this))
-  , control_udp_client_(
-        std::bind(&ScannerControllerT::handleScannerReply, this, std::placeholders::_1, std::placeholders::_2),
-        std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1),
-        scanner_config.hostUDPPortControl(),
-        scanner_config.clientIp(),
-        CONTROL_PORT_OF_SCANNER_DEVICE)
-  , data_udp_client_(
-        std::bind(&ScannerControllerT::handleNewMonitoringFrame, this, std::placeholders::_1, std::placeholders::_2),
-        std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1),
-        scanner_config.hostUDPPortData(),
-        scanner_config.clientIp(),
-        DATA_PORT_OF_SCANNER_DEVICE)
+  , control_udp_client_(std::bind(&ScannerControllerT::handleScannerReply, this, std::placeholders::_1),
+                        std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1),
+                        scanner_config.hostUDPPortControl(),
+                        scanner_config.clientIp(),
+                        CONTROL_PORT_OF_SCANNER_DEVICE)
+  , data_udp_client_(std::bind(&ScannerControllerT::handleNewMonitoringFrame, this, std::placeholders::_1),
+                     std::bind(&ScannerControllerT::handleError, this, std::placeholders::_1),
+                     scanner_config.hostUDPPortData(),
+                     scanner_config.clientIp(),
+                     DATA_PORT_OF_SCANNER_DEVICE)
   , laser_scan_callback_(laser_scan_callback)
 {
   if (!laser_scan_callback)
@@ -131,7 +129,7 @@ ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& s
 }
 
 template <typename TCSM, typename TUCI>
-void ScannerControllerT<TCSM, TUCI>::handleNewMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes)
+void ScannerControllerT<TCSM, TUCI>::handleNewMonitoringFrame(const MaxSizeRawData& data)
 {
   MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
   state_machine_.processMonitoringFrameReceivedEvent();
@@ -178,7 +176,7 @@ void ScannerControllerT<TCSM, TUCI>::sendStartRequest()
 }
 
 template <typename TCSM, typename TUCI>
-void ScannerControllerT<TCSM, TUCI>::handleScannerReply(const MaxSizeRawData& data, const std::size_t& num_bytes)
+void ScannerControllerT<TCSM, TUCI>::handleScannerReply(const MaxSizeRawData& data)
 {
   ScannerReplyMsg frame{ ScannerReplyMsg::fromRawData(data) };
   state_machine_.processReplyReceivedEvent(frame.type());
