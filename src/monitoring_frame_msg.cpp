@@ -75,7 +75,8 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
         break;
 
       case AdditionalFieldIds::MEASURES:
-        readMeasures(is, msg.measures_, header.length());
+        raw_processing::readArray<uint16_t, double>(
+            is, msg.measures_, header.length(), [](uint16_t raw_element) { return raw_element / 1000.; });
         break;
 
       case AdditionalFieldIds::END_OF_FRAME:
@@ -123,21 +124,6 @@ void MonitoringFrameMsg::readScanCounter(std::istringstream& is, uint32_t& scan_
     throw MonitoringFrameFormatError(os.str());
   }
   raw_processing::read(is, scan_counter);
-}
-
-void MonitoringFrameMsg::readMeasures(std::istringstream& is, std::vector<double>& measures, const FieldLength length)
-{
-  size_t bytes_per_sample = sizeof(uint16_t);
-  size_t number_of_samples = length / bytes_per_sample;
-
-  measures.resize(number_of_samples);
-
-  for (unsigned i = 0; i < number_of_samples; i++)
-  {
-    uint16_t sample;
-    raw_processing::read(is, sample);
-    measures.at(i) = sample / 1000.;  // Convert to m
-  }
 }
 
 void MonitoringFrameMsg::checkFixedFields()

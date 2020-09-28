@@ -130,42 +130,6 @@ TEST_F(MonitoringFrameMsgTest, testReadScanCounterMissingPayloadFailure)
   EXPECT_THROW(MonitoringFrameMsg::readScanCounter(is, scan_counter, length);, raw_processing::StringStreamFailure);
 }
 
-TEST_F(MonitoringFrameMsgTest, testReadMeasuresSuccess)
-{
-  const uint16_t length = 2 * expected_measures_.size();
-  std::istringstream is = buildExpectedMeasuresStream();
-
-  std::vector<double> measures;
-  ASSERT_NO_THROW(MonitoringFrameMsg::readMeasures(is, measures, length););
-  EXPECT_TRUE(expectMeasuresEqual(measures));
-}
-
-TEST_F(MonitoringFrameMsgTest, testReadMeasuresMissingPayloadFailure)
-{
-  const uint16_t length = 2 * expected_measures_.size();
-  std::istringstream is;
-  std::vector<double> measures;
-  EXPECT_THROW(MonitoringFrameMsg::readMeasures(is, measures, length);, raw_processing::StringStreamFailure);
-}
-
-TEST_F(MonitoringFrameMsgTest, testReadMeasuresTooMuchMeasures)
-{
-  const uint16_t length = 2 * expected_measures_.size() - 1;
-  std::istringstream is = buildExpectedMeasuresStream();
-
-  std::vector<double> measures;
-  ASSERT_NO_THROW(MonitoringFrameMsg::readMeasures(is, measures, length););
-  EXPECT_TRUE(expectMeasuresPartEqual(measures));
-}
-
-TEST_F(MonitoringFrameMsgTest, testReadMeasuresTooFewMeasures)
-{
-  const uint16_t length = 2 * (expected_measures_.size() + 1);
-  std::istringstream is = buildExpectedMeasuresStream();
-  std::vector<double> measures;
-  EXPECT_THROW(MonitoringFrameMsg::readMeasures(is, measures, length);, raw_processing::StringStreamFailure);
-}
-
 class MonitoringFrameMsgFromRawTest : public ::testing::Test
 {
 protected:

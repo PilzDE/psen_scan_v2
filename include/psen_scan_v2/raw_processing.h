@@ -49,6 +49,24 @@ inline void read(std::istringstream& is, ReturnType& data, std::function<ReturnT
   data = conversion_fcn(raw_data);
 }
 
+template <typename RawType, typename ReturnType>
+inline void readArray(std::istringstream& is,
+                      std::vector<ReturnType>& data,
+                      const uint16_t& length,
+                      std::function<ReturnType(RawType)> conversion_fcn)
+{
+  size_t bytes_per_element = sizeof(uint16_t);
+  size_t number_of_samples = length / bytes_per_element;
+
+  data.reserve(number_of_samples);
+
+  std::generate_n(std::back_inserter(data), number_of_samples, [&is, &conversion_fcn]() {
+    ReturnType sample;
+    raw_processing::read<RawType, ReturnType>(is, sample, conversion_fcn);
+    return sample;
+  });
+}
+
 class StringStreamFailure : public std::runtime_error
 {
 public:
