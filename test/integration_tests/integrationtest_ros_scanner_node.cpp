@@ -31,7 +31,7 @@
 #include "psen_scan_v2/laserscan.h"
 #include "psen_scan_v2/scanner_mock.h"
 #include "psen_scan_v2/scanner_configuration.h"
-#include "psen_scan_v2/scanner_constants.h"
+#include "psen_scan_v2/scanner.h"
 
 using namespace psen_scan_v2;
 using namespace psen_scan_v2_test;
