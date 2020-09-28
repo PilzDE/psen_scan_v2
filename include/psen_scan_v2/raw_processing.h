@@ -16,13 +16,12 @@
 #define PSEN_SCAN_V2_RAW_PROCESSING_H
 
 #include <sstream>
-
-#include "psen_scan_v2/string_stream_failure.h"
-
 namespace psen_scan_v2
 {
 namespace raw_processing
 {
+class StringStreamFailure;
+
 template <typename T>
 inline void write(std::ostringstream& os, const T& data)
 {
@@ -37,9 +36,16 @@ inline void read(std::istringstream& is, T& data)
   {
     std::ostringstream os;
     os << "Failure reading " << sizeof(T) << " characters from input stream, could only read " << is.gcount() << ".";
-    throw StringStreamFailure(os.str());
+    throw raw_processing::StringStreamFailure(os.str());
   }
 }
+class StringStreamFailure : public std::runtime_error
+{
+public:
+  StringStreamFailure(const std::string& msg) : std::runtime_error(msg)
+  {
+  }
+};
 }  // namespace raw_processing
 }  // namespace psen_scan_v2
 

@@ -22,7 +22,6 @@
 #include <vector>
 
 #include "psen_scan_v2/angle_conversions.h"
-#include "psen_scan_v2/monitoring_frame_format_error.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/raw_processing.h"
 #include "psen_scan_v2/raw_scanner_data.h"

@@ -21,7 +21,6 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2/crc_mismatch_exception.h"
 #include "psen_scan_v2/scanner_reply_msg.h"
 #include "psen_scan_v2/raw_data_test_helper.h"
 
@@ -108,7 +107,7 @@ TEST(ScannerReplyMsgTest, testFromRawDataInvalidCRC)
   MaxSizeRawData data;
   std::copy(raw_msg.begin(), raw_msg.end(), data.begin());
 
-  EXPECT_THROW(ScannerReplyMsg::fromRawData(data), CRCMismatch);
+  EXPECT_THROW(ScannerReplyMsg::fromRawData(data), ScannerReplyMsg::CRCMismatch);
 }
 
 }  // namespace psen_scan_v2_test

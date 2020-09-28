@@ -67,12 +67,16 @@ TEST(UdpClientTests, testInvalidErrorHandler)
 
 TEST(UdpClientTests, testCloseConnectionFailureForCompleteCoverage)
 {
-  std::unique_ptr<psen_scan_v2::CloseConnectionFailure> ex{ new psen_scan_v2::CloseConnectionFailure() };
+  std::unique_ptr<psen_scan_v2::UdpClientImpl::CloseConnectionFailure> ex{
+    new psen_scan_v2::UdpClientImpl::CloseConnectionFailure()
+  };
 }
 
 TEST(UdpClientTests, testOpenConnectionFailureForCompleteCoverage)
 {
-  std::unique_ptr<psen_scan_v2::OpenConnectionFailure> ex{ new psen_scan_v2::OpenConnectionFailure() };
+  std::unique_ptr<psen_scan_v2::UdpClientImpl::OpenConnectionFailure> ex{
+    new psen_scan_v2::UdpClientImpl::OpenConnectionFailure()
+  };
 }
 
 }  // namespace psen_scan_v2_test

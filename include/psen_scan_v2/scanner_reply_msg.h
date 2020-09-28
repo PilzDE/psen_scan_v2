@@ -24,7 +24,6 @@
 #include <boost/crc.hpp>
 
 #include "psen_scan_v2/raw_scanner_data.h"
-#include "psen_scan_v2/crc_mismatch_exception.h"
 #include "psen_scan_v2/raw_processing.h"
 
 namespace psen_scan_v2
@@ -52,6 +51,13 @@ static constexpr std::size_t REPLY_MSG_FROM_SCANNER_SIZE = 16;  // See protocol 
  */
 class ScannerReplyMsg
 {
+public:
+  class CRCMismatch : public std::runtime_error
+  {
+  public:
+    CRCMismatch(const std::string& msg = "CRC did not match!");
+  };
+
 public:
   //! @brief Deserializes the specified data into a reply message.
   static ScannerReplyMsg fromRawData(const MaxSizeRawData& data);
@@ -174,7 +180,9 @@ inline ScannerReplyMsg::RawType ScannerReplyMsg::toRawData() const
 
   return ret_val;
 }
-
+inline ScannerReplyMsg::CRCMismatch::CRCMismatch(const std::string& msg) : std::runtime_error(msg)
+{
+}
 }  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_SCANNER_REPLY_MSG_H

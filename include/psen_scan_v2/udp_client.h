@@ -32,8 +32,6 @@
 #include <boost/bind.hpp>
 
 #include "psen_scan_v2/raw_scanner_data.h"
-#include "psen_scan_v2/open_connection_failure.h"
-#include "psen_scan_v2/close_connection_failure.h"
 #include "psen_scan_v2/logging.h"
 
 namespace psen_scan_v2
@@ -59,6 +57,19 @@ enum class ReceiveMode
  */
 class UdpClientImpl
 {
+public:
+  class CloseConnectionFailure : public std::runtime_error
+  {
+  public:
+    CloseConnectionFailure(const std::string& msg = "Failure while closing connection");
+  };
+
+  class OpenConnectionFailure : public std::runtime_error
+  {
+  public:
+    OpenConnectionFailure(const std::string& msg = "Failure while opening connection");
+  };
+
 public:
   /**
    * @brief Opens an UDP connection.
@@ -297,5 +308,12 @@ inline void UdpClientImpl::asyncReceive(const ReceiveMode& modi,
                         });
 }
 
+inline UdpClientImpl::OpenConnectionFailure::OpenConnectionFailure(const std::string& msg) : std::runtime_error(msg)
+{
+}
+
+inline UdpClientImpl::CloseConnectionFailure::CloseConnectionFailure(const std::string& msg) : std::runtime_error(msg)
+{
+}
 }  // namespace psen_scan_v2
 #endif  // PSEN_SCAN_V2_UDP_CLIENT_H
