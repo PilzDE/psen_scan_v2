@@ -69,7 +69,7 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
     switch (header.id())
     {
       case AdditionalFieldIds::SCAN_COUNTER:
-        if (header.length() != 4)
+        if (header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
         {
           std::ostringstream os;
           os << "Length of scan counter field is " << header.length() << ", but should be " << 4 << ".";
@@ -79,8 +79,10 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
         break;
 
       case AdditionalFieldIds::MEASURES:
-        raw_processing::readArray<uint16_t, double>(
-            is, msg.measures_, header.length() / 2, [](uint16_t raw_element) { return raw_element / 1000.; });
+        raw_processing::readArray<uint16_t, double>(is,
+                                                    msg.measures_,
+                                                    header.length() / NUMBER_OF_BYTES_SINGLE_MEASURE,
+                                                    [](uint16_t raw_element) { return raw_element / 1000.; });
         break;
 
       case AdditionalFieldIds::END_OF_FRAME:
