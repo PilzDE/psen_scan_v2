@@ -141,11 +141,16 @@ TEST_F(ScannerControllerTest, testHandleStartReplyTimeout)
   using ::testing::_;
   using ::testing::Expectation;
 
-  EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _))
-      .WillOnce(::testing::Invoke(
-          [](const ReceiveMode& modi,
-             const TimeoutHandler& timeout_handler,
-             const std::chrono::high_resolution_clock::duration timeout) { timeout_handler("timeout!"); }));
+  {
+    ::testing::InSequence seq;
+    EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _))
+        .WillOnce(::testing::Invoke(
+            [](const ReceiveMode& modi,
+               const TimeoutHandler& timeout_handler,
+               const std::chrono::high_resolution_clock::duration timeout) { timeout_handler("timeout!"); }));
+    EXPECT_CALL(scanner_controller_.data_udp_client_, startAsyncReceiving()).Times(1);
+    EXPECT_CALL(scanner_controller_.control_udp_client_, write(_)).Times(1);
+  }
   scanner_controller_.sendStartRequest();
 }
 
@@ -154,11 +159,15 @@ TEST_F(ScannerControllerTest, testHandleStopReplyTimeout)
   using ::testing::_;
   using ::testing::Expectation;
 
-  EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _))
-      .WillOnce(::testing::Invoke(
-          [](const ReceiveMode& modi,
-             const TimeoutHandler& timeout_handler,
-             const std::chrono::high_resolution_clock::duration timeout) { timeout_handler("timeout!"); }));
+  {
+    ::testing::InSequence seq;
+    EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _))
+        .WillOnce(::testing::Invoke(
+            [](const ReceiveMode& modi,
+               const TimeoutHandler& timeout_handler,
+               const std::chrono::high_resolution_clock::duration timeout) { timeout_handler("timeout!"); }));
+    EXPECT_CALL(scanner_controller_.control_udp_client_, write(_)).Times(1);
+  }
   scanner_controller_.sendStopRequest();
 }
 
