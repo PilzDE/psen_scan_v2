@@ -55,10 +55,36 @@ TEST(TenthOfDegreeTest, Addition)
   EXPECT_EQ((tenth_of_degree_1 + tenth_of_degree_2).value(), 5);
 }
 
-TEST(TenthOfDegreeTest, Comparison)
+TEST(TenthOfDegreeTest, EqualityComparison)
 {
   EXPECT_TRUE(TenthOfDegree(1) == TenthOfDegree(1));
   EXPECT_FALSE(TenthOfDegree(1) == TenthOfDegree(2));
+}
+
+TEST(TenthOfDegreeTest, LessThanComparison)
+{
+  EXPECT_TRUE(TenthOfDegree(1) < TenthOfDegree(2));
+  EXPECT_FALSE(TenthOfDegree(1) < TenthOfDegree(1));
+}
+
+TEST(TenthOfDegreeTest, LargerThanComparison)
+{
+  EXPECT_TRUE(TenthOfDegree(2) > TenthOfDegree(1));
+  EXPECT_FALSE(TenthOfDegree(1) > TenthOfDegree(1));
+}
+
+TEST(TenthOfDegreeTest, LessThanOrEqualComparison)
+{
+  EXPECT_TRUE(TenthOfDegree(1) <= TenthOfDegree(2));
+  EXPECT_TRUE(TenthOfDegree(1) <= TenthOfDegree(1));
+  EXPECT_FALSE(TenthOfDegree(2) <= TenthOfDegree(1));
+}
+
+TEST(TenthOfDegreeTest, LargerThanOrEqualComparison)
+{
+  EXPECT_TRUE(TenthOfDegree(2) >= TenthOfDegree(1));
+  EXPECT_TRUE(TenthOfDegree(1) >= TenthOfDegree(1));
+  EXPECT_FALSE(TenthOfDegree(1) >= TenthOfDegree(2));
 }
 
 }  // namespace psen_scan_v2_test
