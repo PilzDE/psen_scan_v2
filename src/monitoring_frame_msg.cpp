@@ -29,8 +29,6 @@
 
 namespace psen_scan_v2
 {
-static constexpr std::size_t MAX_LENGTH_ADDITIONAL_MONITORING_FRAME_FIELD{ 65487 };
-
 constexpr FieldHeader::Id AdditionalFieldIds::SCAN_COUNTER;
 constexpr FieldHeader::Id AdditionalFieldIds::MEASURES;
 constexpr FieldHeader::Id AdditionalFieldIds::END_OF_FRAME;
@@ -75,7 +73,7 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
         {
           std::ostringstream os;
           os << "Length of scan counter field is " << header.length() << ", but should be " << 4 << ".";
-          throw MonitoringFrameFormatError(os.str());
+          throw MonitoringFrameFormatErrorScanCounterUnexpectedSize(os.str());
         }
         raw_processing::read(is, msg.scan_counter_);
         break;

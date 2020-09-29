@@ -34,6 +34,8 @@ static constexpr uint32_t ONLINE_WORKING_MODE{ 0x00 };
 static constexpr uint32_t GUI_MONITORING_TRANSACTION{ 0x05 };
 static constexpr uint32_t MAX_SCANNER_ID{ 0x03 };
 
+static constexpr std::size_t MAX_LENGTH_ADDITIONAL_MONITORING_FRAME_FIELD{ 65487 };
+
 class FieldHeader
 {
 public:
@@ -68,6 +70,14 @@ public:
   {
   public:
     MonitoringFrameFormatError(const std::string& msg = "Error while decoding laser scanner measurement data");
+  };
+
+  class MonitoringFrameFormatErrorScanCounterUnexpectedSize : public MonitoringFrameFormatError
+  {
+  public:
+    MonitoringFrameFormatErrorScanCounterUnexpectedSize(const std::string& msg) : MonitoringFrameFormatError(msg)
+    {
+    }
   };
 
 public:

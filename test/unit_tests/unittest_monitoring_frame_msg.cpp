@@ -166,6 +166,16 @@ TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeFieldLength)
   EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data);, MonitoringFrameMsg::MonitoringFrameFormatError);
 }
 
+TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeScanCounterLength)
+{
+  UDPFrameTestDataWithTooLargeScanCounterLength test_data;
+  const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
+
+  MonitoringFrameMsg msg;
+  EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data);
+               , MonitoringFrameFormatErrorScanCounterUnexpectedSize);
+}
+
 }  // namespace psen_scan_v2
 
 int main(int argc, char** argv)
