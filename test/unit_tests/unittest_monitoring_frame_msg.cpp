@@ -173,7 +173,7 @@ TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeScanCounterLength)
 
   MonitoringFrameMsg msg;
   EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data);
-               , MonitoringFrameFormatErrorScanCounterUnexpectedSize);
+               , MonitoringFrameMsg::MonitoringFrameFormatErrorScanCounterUnexpectedSize);
 }
 
 }  // namespace psen_scan_v2
