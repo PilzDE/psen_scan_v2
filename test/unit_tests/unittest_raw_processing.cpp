@@ -59,6 +59,18 @@ TYPED_TEST(RawProcessingTest, read)
   EXPECT_EQ(data_read, data);
 }
 
+TYPED_TEST(RawProcessingTest, readTooMuch)
+{
+  std::ostringstream os;
+  TypeParam data{ 123 };
+  os.write(reinterpret_cast<const char*>(&data), sizeof(TypeParam));
+  std::istringstream is{ os.str() };
+
+  TypeParam data_read;
+  raw_processing::read(is, data_read);
+  EXPECT_THROW(raw_processing::read(is, data_read), std::exception);
+}
+
 TYPED_TEST(RawProcessingTest, readWithConversion)
 {
   std::ostringstream os;
