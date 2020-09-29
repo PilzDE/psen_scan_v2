@@ -16,6 +16,8 @@
 #define PSEN_SCAN_V2_RAW_PROCESSING_H
 
 #include <sstream>
+#include <functional>
+
 namespace psen_scan_v2
 {
 namespace raw_processing
@@ -39,6 +41,31 @@ inline void read(std::istringstream& is, T& data)
     throw raw_processing::StringStreamFailure(os.str());
   }
 }
+
+template <typename RawType, typename ReturnType>
+inline void read(std::istringstream& is, ReturnType& data, std::function<ReturnType(RawType)> conversion_fcn)
+{
+  RawType raw_data;
+  read<RawType>(is, raw_data);
+
+  data = conversion_fcn(raw_data);
+}
+
+template <typename RawType, typename ReturnType>
+inline void readArray(std::istringstream& is,
+                      std::vector<ReturnType>& data,
+                      const size_t& number_of_samples,
+                      std::function<ReturnType(RawType)> conversion_fcn)
+{
+  data.reserve(number_of_samples);
+
+  std::generate_n(std::back_inserter(data), number_of_samples, [&is, &conversion_fcn]() {
+    ReturnType sample;
+    raw_processing::read<RawType, ReturnType>(is, sample, conversion_fcn);
+    return sample;
+  });
+}
+
 class StringStreamFailure : public std::runtime_error
 {
 public:
@@ -46,6 +73,7 @@ public:
   {
   }
 };
+
 }  // namespace raw_processing
 }  // namespace psen_scan_v2
 

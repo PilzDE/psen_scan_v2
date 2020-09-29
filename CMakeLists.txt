@@ -172,6 +172,10 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES}
   )
 
+  catkin_add_gtest(unittest_raw_processing
+    test/unit_tests/unittest_raw_processing.cpp
+  )
+
   catkin_add_gtest(unittest_start_request
     test/unit_tests/unittest_start_request.cpp
     src/start_request.cpp
