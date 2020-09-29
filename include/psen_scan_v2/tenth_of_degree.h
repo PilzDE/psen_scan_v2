@@ -13,28 +13,48 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef PSEN_SCAN_V2_LASERSCAN_CONVERSIONS_H
-#define PSEN_SCAN_V2_LASERSCAN_CONVERSIONS_H
+#ifndef PSEN_SCAN_V2_TENTH_OF_DEGREE_H
+#define PSEN_SCAN_V2_TENTH_OF_DEGREE_H
+
+#include <stdexcept>
+#include <string>
 
 #include "psen_scan_v2/angle_conversions.h"
-#include "psen_scan_v2/laserscan.h"
-#include "psen_scan_v2/monitoring_frame_msg.h"
 
 namespace psen_scan_v2
 {
-LaserScan toLaserScan(const MonitoringFrameMsg& frame)
+class TenthOfDegree
 {
-  const double resolution = frame.resolution().toRad();
-  const double min_angle = frame.fromTheta().toRad();
-  const uint16_t number_of_samples = frame.measures().size();
-  const double max_angle = (frame.fromTheta() + frame.resolution() * (number_of_samples - 1)).toRad();
+public:
+  TenthOfDegree(const uint16_t& tenth_of_degree) : tenth_of_degree_(tenth_of_degree)
+  {
+  }
 
-  LaserScan scan(resolution, min_angle, max_angle);
-  scan.setMeasurements(frame.measures());
+  uint16_t value() const
+  {
+    return tenth_of_degree_;
+  }
 
-  return scan;
-}
+  double toRad() const
+  {
+    return tenthDegreeToRad(tenth_of_degree_);
+  }
 
+  TenthOfDegree& operator*(const TenthOfDegree& rhs)
+  {
+    tenth_of_degree_ = value() * rhs.value();
+    return *this;
+  }
+
+  TenthOfDegree& operator+(const TenthOfDegree& rhs)
+  {
+    tenth_of_degree_ = value() + rhs.value();
+    return *this;
+  }
+
+private:
+  uint16_t tenth_of_degree_{ 0 };
+};
 }  // namespace psen_scan_v2
 
-#endif  // PSEN_SCAN_V2_LASERSCAN_CONVERSIONS_H
+#endif  // PSEN_SCAN_V2_TENTH_OF_DEGREE_H

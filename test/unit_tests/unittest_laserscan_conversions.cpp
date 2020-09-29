@@ -42,10 +42,10 @@ TEST(LaserScanConversionsTest, testToLaserScan)
   std::unique_ptr<LaserScan> scan_ptr;
   ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ toLaserScan(frame) }););
 
-  EXPECT_DOUBLE_EQ(frame.fromTheta(), scan_ptr->getMinScanAngle());
-  EXPECT_DOUBLE_EQ(frame.resolution(), scan_ptr->getScanResolution());
+  EXPECT_DOUBLE_EQ(frame.fromTheta().toRad(), scan_ptr->getMinScanAngle());
+  EXPECT_DOUBLE_EQ(frame.resolution().toRad(), scan_ptr->getScanResolution());
 
-  const double max_scan_angle{ frame.fromTheta() + frame.resolution() * (frame.measures().size() - 1) };
+  const double max_scan_angle{ (frame.fromTheta() + frame.resolution() * (frame.measures().size() - 1)).toRad() };
   EXPECT_DOUBLE_EQ(max_scan_angle, scan_ptr->getMaxScanAngle());
 
   EXPECT_EQ(frame.measures().size(), scan_ptr->getMeasurements().size());

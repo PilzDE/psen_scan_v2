@@ -112,8 +112,8 @@ TEST_F(MonitoringFrameMsgFromRawTest, testReadSuccess)
   MonitoringFrameMsg msg;
   ASSERT_NO_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data_););
 
-  EXPECT_DOUBLE_EQ(msg.fromTheta(), tenthDegreeToRad(test_data_.from_theta));
-  EXPECT_DOUBLE_EQ(msg.resolution(), tenthDegreeToRad(test_data_.resolution));
+  EXPECT_DOUBLE_EQ(msg.fromTheta().toRad(), tenthDegreeToRad(test_data_.from_theta));
+  EXPECT_DOUBLE_EQ(msg.resolution().toRad(), tenthDegreeToRad(test_data_.resolution));
   EXPECT_EQ(msg.scanCounter(), test_data_.scan_counter);
 
   const auto measures = msg.measures();
