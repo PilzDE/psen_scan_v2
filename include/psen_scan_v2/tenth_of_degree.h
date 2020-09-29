@@ -70,6 +70,16 @@ public:
     return value() <= rhs.value();
   }
 
+  bool operator>(const TenthOfDegree& rhs) const
+  {
+    return value() > rhs.value();
+  }
+
+  bool operator<(const TenthOfDegree& rhs) const
+  {
+    return value() < rhs.value();
+  }
+
 private:
   uint16_t tenth_of_degree_{ 0 };
 };

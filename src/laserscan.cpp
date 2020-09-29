@@ -21,8 +21,7 @@
 
 namespace psen_scan_v2
 {
-static constexpr double MAX_X_AXIS_ROTATION(degreeToRadian(360.));
-static constexpr double MIN_X_AXIS_ROTATION(degreeToRadian(-360.));
+static const TenthOfDegree MAX_X_AXIS_ROTATION{ 275 };
 
 LaserScan::LaserScan(const TenthOfDegree& resolution,
                      const TenthOfDegree& min_scan_angle,
@@ -34,7 +33,7 @@ LaserScan::LaserScan(const TenthOfDegree& resolution,
     throw std::invalid_argument("Resolution must not be 0");
   }
 
-  if (getScanResolution().toRad() < MIN_X_AXIS_ROTATION || getScanResolution().toRad() > MAX_X_AXIS_ROTATION)
+  if (getScanResolution() > MAX_X_AXIS_ROTATION)
   {
     throw std::invalid_argument("Resolution out of possible angle range");
   }
