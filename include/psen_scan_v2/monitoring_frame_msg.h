@@ -107,15 +107,6 @@ private:
 private:
   FRIEND_TEST(FieldHeaderTest, testReadSuccess);
   FRIEND_TEST(FieldHeaderTest, testReadHeaderTooShortFailure);
-  FRIEND_TEST(MonitoringFrameMsgTest, testReadScanCounterSuccess);
-  FRIEND_TEST(MonitoringFrameMsgTest, testReadScanCounterInvalidLengthFailure);
-  FRIEND_TEST(MonitoringFrameMsgTest, testReadScanCounterMissingPayloadFailure);
-  FRIEND_TEST(MonitoringFrameMsgTest, testReadMeasuresSuccess);
-  FRIEND_TEST(MonitoringFrameMsgTest, testReadMeasuresMissingPayloadFailure);
-  FRIEND_TEST(MonitoringFrameMsgTest, testReadMeasuresTooMuchMeasures);
-  FRIEND_TEST(MonitoringFrameMsgTest, testReadMeasuresTooFewMeasures);
-  FRIEND_TEST(MonitoringFrameMsgTest, testSetEndOfFrame);
-  FRIEND_TEST(MonitoringFrameMsgTest, testSetEndOfFrameIgnoreInvalidLength);
 
 private:
   uint32_t device_status_fixed_{ 0 };
