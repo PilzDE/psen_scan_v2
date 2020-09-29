@@ -30,9 +30,9 @@ sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
   sensor_msgs::LaserScan ros_message;
   ros_message.header.stamp = timestamp;
   ros_message.header.frame_id = frame_id;
-  ros_message.angle_min = -(laserscan.getMaxScanAngle() - x_axis_rotation);
-  ros_message.angle_max = -(laserscan.getMinScanAngle() - x_axis_rotation);
-  ros_message.angle_increment = laserscan.getScanResolution();
+  ros_message.angle_min = -(laserscan.getMaxScanAngle().toRad() - x_axis_rotation);
+  ros_message.angle_max = -(laserscan.getMinScanAngle().toRad() - x_axis_rotation);
+  ros_message.angle_increment = laserscan.getScanResolution().toRad();
 
   // For now we set this to zero to hint that the ranges are actually ordered
   // from new to old. Thus applying some sort of interpolation using time_increment

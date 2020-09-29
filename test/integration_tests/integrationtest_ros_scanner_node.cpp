@@ -102,7 +102,7 @@ TEST_F(RosScannerNodeTests, testScannerInvocation)
 
 TEST_F(RosScannerNodeTests, testScanTopicReceived)
 {
-  LaserScan laser_scan_fake(0.02, 0.03, 0.05);
+  LaserScan laser_scan_fake(TenthOfDegree(1), TenthOfDegree(3), TenthOfDegree(5));
   laser_scan_fake.getMeasurements().push_back(1);
 
   SubscriberMock subscriber;

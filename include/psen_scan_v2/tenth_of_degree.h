@@ -26,7 +26,7 @@ namespace psen_scan_v2
 class TenthOfDegree
 {
 public:
-  TenthOfDegree(const uint16_t& tenth_of_degree) : tenth_of_degree_(tenth_of_degree)
+  explicit TenthOfDegree(const uint16_t& tenth_of_degree) : tenth_of_degree_(tenth_of_degree)
   {
   }
 
@@ -46,10 +46,31 @@ public:
     return *this;
   }
 
+  TenthOfDegree& operator*(const unsigned int& rhs)
+  {
+    tenth_of_degree_ = value() * rhs;
+    return *this;
+  }
+
   TenthOfDegree& operator+(const TenthOfDegree& rhs)
   {
     tenth_of_degree_ = value() + rhs.value();
     return *this;
+  }
+
+  bool operator==(const TenthOfDegree& rhs) const
+  {
+    return value() == rhs.value();
+  }
+
+  bool operator>=(const TenthOfDegree& rhs) const
+  {
+    return value() >= rhs.value();
+  }
+
+  bool operator<=(const TenthOfDegree& rhs) const
+  {
+    return value() <= rhs.value();
   }
 
 private:

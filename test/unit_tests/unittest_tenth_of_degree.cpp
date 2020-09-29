@@ -55,6 +55,12 @@ TEST(TenthOfDegreeTest, Addition)
   EXPECT_EQ((tenth_of_degree_1 + tenth_of_degree_2).value(), 5);
 }
 
+TEST(TenthOfDegreeTest, Comparision)
+{
+  EXPECT_TRUE(TenthOfDegree(1) == TenthOfDegree(1));
+  EXPECT_FALSE(TenthOfDegree(1) == TenthOfDegree(2));
+}
+
 }  // namespace psen_scan_v2_test
 
 int main(int argc, char* argv[])
