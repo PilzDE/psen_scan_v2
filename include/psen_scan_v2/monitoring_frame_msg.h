@@ -71,7 +71,7 @@ public:
   };
 
 public:
-  static MonitoringFrameMsg fromRawData(const MaxSizeRawData& data);
+  static MonitoringFrameMsg fromRawData(const MaxSizeRawData& data, const std::size_t& num_bytes);
 
 public:
   double fromTheta() const;
@@ -86,7 +86,7 @@ private:
 private:
   static void readAngle(std::istringstream& is, double& angle);
 
-  static FieldHeader readFieldHeader(std::istringstream& is);
+  static FieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes);
   static void readScanCounter(std::istringstream& is, uint32_t& scan_counter, const FieldLength length);
   static void readMeasures(std::istringstream& is, std::vector<double>& measures, const FieldLength length);
 
