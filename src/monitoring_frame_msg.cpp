@@ -57,13 +57,8 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
   raw_processing::read(is, msg.transaction_type_fixed_);
   raw_processing::read(is, msg.scanner_id_fixed_);
 
-  uint16_t raw_value_from_theta;
-  raw_processing::read(is, raw_value_from_theta);
-  msg.from_theta_fixed_ = TenthOfDegree(raw_value_from_theta);
-
-  uint16_t raw_value_resolution;
-  raw_processing::read(is, raw_value_resolution);
-  msg.resolution_fixed_ = TenthOfDegree(raw_value_resolution);
+  raw_processing::read<uint16_t, TenthOfDegree>(is, msg.from_theta_fixed_);
+  raw_processing::read<uint16_t, TenthOfDegree>(is, msg.resolution_fixed_);
 
   msg.checkFixedFields();
 
