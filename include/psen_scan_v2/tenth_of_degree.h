@@ -16,9 +16,6 @@
 #ifndef PSEN_SCAN_V2_TENTH_OF_DEGREE_H
 #define PSEN_SCAN_V2_TENTH_OF_DEGREE_H
 
-#include <stdexcept>
-#include <string>
-
 #include "psen_scan_v2/angle_conversions.h"
 
 namespace psen_scan_v2
