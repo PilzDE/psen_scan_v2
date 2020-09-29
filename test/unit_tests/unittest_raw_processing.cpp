@@ -94,7 +94,7 @@ TYPED_TEST(RawProcessingTest, readArray)
   }
 }
 
-TYPED_TEST(RawProcessingTest, readArrayToMuch)
+TYPED_TEST(RawProcessingTest, readArrayTooMuch)
 {
   std::ostringstream os;
   std::vector<TypeParam> data{ (TypeParam)123, (TypeParam)345 };
