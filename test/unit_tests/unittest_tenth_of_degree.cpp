@@ -47,6 +47,14 @@ TEST(TenthOfDegreeTest, Multiplication)
   EXPECT_EQ((tenth_of_degree_1 * tenth_of_degree_2).value(), 6);
 }
 
+TEST(TenthOfDegreeTest, MultiplicationWithInteger)
+{
+  TenthOfDegree tenth_of_degree{ 2 };
+  const int int_value{ 3 };
+
+  EXPECT_EQ((tenth_of_degree * int_value).value(), 6);
+}
+
 TEST(TenthOfDegreeTest, Addition)
 {
   TenthOfDegree tenth_of_degree_1{ 2 };
