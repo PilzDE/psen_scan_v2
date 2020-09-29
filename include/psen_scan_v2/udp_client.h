@@ -36,7 +36,7 @@
 
 namespace psen_scan_v2
 {
-using NewDataHandler = std::function<void(const MaxSizeRawData&, const std::size_t&)>;
+using NewDataHandler = std::function<void(const MaxSizeRawData&)>;
 using ErrorHandler = std::function<void(const std::string&)>;
 using TimeoutHandler = std::function<void(const std::string&)>;
 
@@ -300,7 +300,7 @@ inline void UdpClientImpl::asyncReceive(const ReceiveMode& modi,
                             error_handler_(error_code.message());
                             return;
                           }
-                          data_handler_(received_data_, bytes_received);
+                          data_handler_(received_data_);
                           if (modi == ReceiveMode::continuous)
                           {
                             asyncReceive(modi, timeout_handler, timeout);

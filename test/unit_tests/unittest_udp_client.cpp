@@ -37,7 +37,7 @@ using std::placeholders::_2;
 class CallbackHandler
 {
 public:
-  MOCK_METHOD2(handleNewData, void(const psen_scan_v2::MaxSizeRawData&, const std::size_t&));
+  MOCK_METHOD1(handleNewData, void(const psen_scan_v2::MaxSizeRawData&));
   MOCK_METHOD1(handleError, void(const std::string&));
 };
 
@@ -57,7 +57,7 @@ TEST(UdpClientTests, testInvalidErrorHandler)
 {
   CallbackHandler handler;
 
-  EXPECT_THROW(psen_scan_v2::UdpClientImpl reader(std::bind(&CallbackHandler::handleNewData, &handler, _1, _2),
+  EXPECT_THROW(psen_scan_v2::UdpClientImpl reader(std::bind(&CallbackHandler::handleNewData, &handler, _1),
                                                   nullptr,
                                                   HOST_UDP_READ_PORT,
                                                   inet_network(UDP_MOCK_IP_ADDRESS.c_str()),
