@@ -18,13 +18,12 @@
 
 #include <memory>
 #include <thread>
+#include <functional>
+#include <stdexcept>
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/array.hpp>
-
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
 #include "psen_scan_v2/raw_scanner_data.h"
 
@@ -41,12 +40,13 @@ static const std::string MOCK_IP_ADDRESS{ "127.0.0.1" };
 class MockUDPServer
 {
 public:
+  using NewDataHandler = std::function<void(const udp::endpoint&, const psen_scan_v2::DynamicSizeRawData&)>;
+
+public:
   ~MockUDPServer();
 
 public:
-  MockUDPServer(const unsigned short port);
-
-  MOCK_CONST_METHOD2(receivedUdpMsg, void(const udp::endpoint&, const psen_scan_v2::DynamicSizeRawData&));
+  MockUDPServer(const unsigned short port, const NewDataHandler& new_data_handler);
 
 public:
   void asyncReceive();
@@ -71,11 +71,19 @@ private:
   std::thread io_service_thread_;
 
   udp::socket socket_;
+
+  NewDataHandler new_data_handler_;
 };
 
-MockUDPServer::MockUDPServer(const unsigned short port)
+MockUDPServer::MockUDPServer(const unsigned short port, const NewDataHandler& new_data_handler)
   : socket_(io_service_, udp::endpoint(boost::asio::ip::address_v4::from_string(MOCK_IP_ADDRESS), port))
+  , new_data_handler_(new_data_handler)
 {
+  if (!new_data_handler_)
+  {
+    throw std::invalid_argument("New data handler must not be null");
+  }
+
   io_service_thread_ = std::thread([this]() { io_service_.run(); });
 }
 
@@ -124,7 +132,7 @@ void MockUDPServer::handleReceive(const boost::system::error_code& error, std::s
     return;
   }
   psen_scan_v2::DynamicSizeRawData recv_data(recv_buffer_.cbegin(), recv_buffer_.cbegin() + bytes_received);
-  receivedUdpMsg(remote_endpoint_, recv_data);
+  new_data_handler_(remote_endpoint_, recv_data);
 }
 
 void MockUDPServer::asyncReceive()
