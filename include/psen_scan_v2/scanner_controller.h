@@ -187,15 +187,15 @@ void ScannerControllerT<TCSM, TUCI>::handleScannerReply(const MaxSizeRawData& da
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::handleStartReplyTimeout(const std::string& error_str)
 {
-  PSENSCAN_ERROR("ScannerController",
-                 "Timeout while waiting for start reply message from scanner | Error message: " << error_str);
+  PSENSCAN_ERROR(
+      "ScannerController", "Timeout while waiting for start reply message from scanner | Error message: {}", error_str);
 }
 
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::handleStopReplyTimeout(const std::string& error_str)
 {
-  PSENSCAN_ERROR("ScannerController",
-                 "Timeout while waiting for stop reply message from scanner | Error message: " << error_str);
+  PSENSCAN_ERROR(
+      "ScannerController", "Timeout while waiting for stop reply message from scanner | Error message: {}", error_str);
 }
 
 template <typename TCSM, typename TUCI>

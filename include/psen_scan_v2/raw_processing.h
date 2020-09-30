@@ -18,6 +18,8 @@
 #include <sstream>
 #include <functional>
 
+#include <fmt/core.h>
+
 namespace psen_scan_v2
 {
 namespace raw_processing
@@ -40,9 +42,8 @@ inline void read(std::istringstream& is, T& data)
   is.read(reinterpret_cast<char*>(&data), sizeof(T));
   if (!is)
   {
-    std::ostringstream os;
-    os << "Failure reading " << sizeof(T) << " characters from input stream, could only read " << is.gcount() << ".";
-    throw StringStreamFailure(os.str());
+    throw raw_processing::StringStreamFailure(
+        fmt::format("Failure reading {} characters from input stream, could only read {}.", sizeof(T), is.gcount()));
   }
 }
 

@@ -37,13 +37,6 @@ FieldHeader::FieldHeader(Id id, Length length) : id_(id), length_(length)
 {
 }
 
-std::string FieldHeader::idToString(Id id)
-{
-  std::ostringstream os;
-  os << "0x" << std::setfill('0') << std::setw(2) << std::hex << static_cast<int>(id);
-  return os.str();
-}
-
 MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data, const std::size_t& num_bytes)
 {
   MonitoringFrameMsg msg;
@@ -72,10 +65,8 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data, c
       case AdditionalFieldIds::SCAN_COUNTER:
         if (header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
         {
-          std::ostringstream os;
-          os << "Length of scan counter field is " << header.length() << ", but should be "
-             << NUMBER_OF_BYTES_SCAN_COUNTER << ".";
-          throw MonitoringFrameFormatErrorScanCounterUnexpectedSize(os.str());
+          throw MonitoringFrameFormatErrorScanCounterUnexpectedSize(fmt::format(
+              "Length of scan counter field is {}, but should be {}.", header.length(), NUMBER_OF_BYTES_SCAN_COUNTER));
         }
         raw_processing::read(is, msg.scan_counter_);
         break;
@@ -92,10 +83,8 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data, c
         break;
 
       default:
-        std::ostringstream os;
-        os << "Header Id " << FieldHeader::idToString(header.id())
-           << " unknown. Cannot read additional field of monitoring frame.";
-        throw MonitoringFrameFormatError(os.str());
+        throw MonitoringFrameFormatError(
+            fmt::format("Header Id {:#04x} unknown. Cannot read additional field of monitoring frame.", header.id()));
     }
   }
 
@@ -111,10 +100,8 @@ FieldHeader MonitoringFrameMsg::readFieldHeader(std::istringstream& is, const st
 
   if (length >= max_num_bytes)
   {
-    std::ostringstream os;
-    os << "Length given in header of additional field is too large: " << length
-       << ", id: " << FieldHeader::idToString(id);
-    throw MonitoringFrameFormatError(os.str());
+    throw MonitoringFrameFormatError(
+        fmt::format("Length given in header of additional field is too large: {}, id: {:#04x}", length, id));
   }
   if (length > 0)
   {

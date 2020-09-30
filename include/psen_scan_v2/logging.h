@@ -18,19 +18,18 @@
 
 #include <console_bridge/console.h>
 #include <sstream>
+#include <fmt/core.h>
 
-#define PSENSCAN_LOG(name, file, line, level, args)                                                                    \
+#define PSENSCAN_LOG(name, file, line, level, ...)                                                                     \
   {                                                                                                                    \
-    std::stringstream ss;                                                                                              \
-    ss << name << ": " << args;                                                                                        \
-    console_bridge::getOutputHandler()->log(ss.str(), level, file, line);                                              \
+    console_bridge::getOutputHandler()->log(fmt::format("{}: {}", name, fmt::format(__VA_ARGS__)), level, file, line); \
   }
 
 using namespace console_bridge;
 
-#define PSENSCAN_ERROR(name, args) PSENSCAN_LOG(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, args)
-#define PSENSCAN_INFO(name, args) PSENSCAN_LOG(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_INFO, args)
-#define PSENSCAN_WARN(name, args) PSENSCAN_LOG(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_WARN, args)
-#define PSENSCAN_DEBUG(name, args) PSENSCAN_LOG(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_DEBUG, args)
+#define PSENSCAN_ERROR(name, ...) PSENSCAN_LOG(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, __VA_ARGS__)
+#define PSENSCAN_INFO(name, ...) PSENSCAN_LOG(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_INFO, __VA_ARGS__)
+#define PSENSCAN_WARN(name, ...) PSENSCAN_LOG(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_WARN, __VA_ARGS__)
+#define PSENSCAN_DEBUG(name, ...) PSENSCAN_LOG(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_DEBUG, __VA_ARGS__)
 
 #endif  // PSEN_SCAN_V2_LOGGING_H

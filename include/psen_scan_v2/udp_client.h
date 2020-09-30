@@ -230,7 +230,7 @@ inline void UdpClientImpl::sendCompleteHandler(const boost::system::error_code& 
   // No coverage check because testing the if-loop is extremly difficult.
   if (error || bytes_transferred == 0)
   {
-    PSENSCAN_ERROR("UdpClient", "Failed to send data. Error message: " + error.message());
+    PSENSCAN_ERROR("UdpClient", "Failed to send data. Error message: {}", error.message());
   }
   // LCOV_EXCL_STOP
   PSENSCAN_DEBUG("UdpClient", "Data successfully send.");
