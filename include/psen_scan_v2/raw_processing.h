@@ -52,6 +52,12 @@ inline void read(std::istringstream& is, ReturnType& data, std::function<ReturnT
 }
 
 template <typename RawType, typename ReturnType>
+inline void read(std::istringstream& is, ReturnType& data)
+{
+  read<RawType, ReturnType>(is, data, [](const RawType& raw_data) { return ReturnType(raw_data); });
+}
+
+template <typename RawType, typename ReturnType>
 inline void readArray(std::istringstream& is,
                       std::vector<ReturnType>& data,
                       const size_t& number_of_samples,

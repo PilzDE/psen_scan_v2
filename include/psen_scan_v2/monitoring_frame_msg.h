@@ -26,6 +26,7 @@
 #include <gtest/gtest_prod.h>
 
 #include "psen_scan_v2/raw_scanner_data.h"
+#include "psen_scan_v2/tenth_of_degree.h"
 
 namespace psen_scan_v2
 {
@@ -86,8 +87,8 @@ public:
   static MonitoringFrameMsg fromRawData(const MaxSizeRawData& data);
 
 public:
-  double fromTheta() const;
-  double resolution() const;
+  TenthOfDegree fromTheta() const;
+  TenthOfDegree resolution() const;
   uint32_t scanCounter() const;
   std::vector<double> measures() const;
 
@@ -114,8 +115,8 @@ private:
   uint32_t working_mode_fixed_{ 0 };
   uint32_t transaction_type_fixed_{ 0 };
   uint8_t scanner_id_fixed_{ 0 };
-  double from_theta_fixed_{ 0 };
-  double resolution_fixed_{ 0 };
+  TenthOfDegree from_theta_fixed_{ 0 };
+  TenthOfDegree resolution_fixed_{ 0 };
 
   uint32_t scan_counter_{ 0 };
   std::vector<double> measures_;
@@ -131,12 +132,12 @@ inline FieldHeader::Length FieldHeader::length() const
   return length_;
 }
 
-inline double MonitoringFrameMsg::fromTheta() const
+inline TenthOfDegree MonitoringFrameMsg::fromTheta() const
 {
   return from_theta_fixed_;
 }
 
-inline double MonitoringFrameMsg::resolution() const
+inline TenthOfDegree MonitoringFrameMsg::resolution() const
 {
   return resolution_fixed_;
 }

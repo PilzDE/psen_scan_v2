@@ -218,6 +218,10 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES}
   )
 
+  catkin_add_gmock(unittest_tenth_of_degree
+    test/unit_tests/unittest_tenth_of_degree.cpp
+  )
+
   catkin_add_gmock(unittest_udp_client
     test/unit_tests/unittest_udp_client.cpp
   )

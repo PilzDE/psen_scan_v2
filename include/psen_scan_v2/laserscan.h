@@ -19,6 +19,8 @@
 #include <vector>
 #include <cstdint>
 
+#include "psen_scan_v2/tenth_of_degree.h"
+
 namespace psen_scan_v2
 {
 using MeasurementData = std::vector<double>;
@@ -30,16 +32,16 @@ public:
   /**
    * @brief Construct a new Laser Scan object.
    *
-   * @param resolution Distance of angle between the measurements (in radian).
-   * @param min_scan_angle Lowest angle the scanner is scanning (in radian).
-   * @param max_scan_angle Highest angle the scanner is scanning (in radian).
+   * @param resolution Distance of angle between the measurements.
+   * @param min_scan_angle Lowest angle the scanner is scanning.
+   * @param max_scan_angle Highest angle the scanner is scanning.
    */
-  LaserScan(const double& resolution, const double& min_scan_angle, const double& max_scan_angle);
+  LaserScan(const TenthOfDegree& resolution, const TenthOfDegree& min_scan_angle, const TenthOfDegree& max_scan_angle);
 
 public:
-  double getScanResolution() const;
-  double getMinScanAngle() const;
-  double getMaxScanAngle() const;
+  TenthOfDegree getScanResolution() const;
+  TenthOfDegree getMinScanAngle() const;
+  TenthOfDegree getMaxScanAngle() const;
 
   const MeasurementData& getMeasurements() const;
   MeasurementData& getMeasurements();
@@ -51,11 +53,11 @@ private:
   //! Measurement data of the laserscan (in Millimeters).
   MeasurementData measures_;
   //! Distance of angle between the measurements (in radian).
-  const double resolution_;
+  const TenthOfDegree resolution_;
   //! Lowest angle the scanner is scanning (in radian).
-  const double min_scan_angle_;
+  const TenthOfDegree min_scan_angle_;
   //! Highest angle the scanner is scanning (in radian).
-  const double max_scan_angle_;
+  const TenthOfDegree max_scan_angle_;
 };
 
 }  // namespace psen_scan_v2
