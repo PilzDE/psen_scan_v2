@@ -73,7 +73,8 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
         if (header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
         {
           std::ostringstream os;
-          os << "Length of scan counter field is " << header.length() << ", but should be " << 4 << ".";
+          os << "Length of scan counter field is " << header.length() << ", but should be "
+             << NUMBER_OF_BYTES_SCAN_COUNTER << ".";
           throw MonitoringFrameFormatErrorScanCounterUnexpectedSize(os.str());
         }
         raw_processing::read(is, msg.scan_counter_);
