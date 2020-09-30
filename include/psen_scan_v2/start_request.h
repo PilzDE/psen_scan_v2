@@ -69,7 +69,7 @@ private:
   uint8_t io_pin_enabled_{ 0 };
   uint8_t scan_counter_enabled_{ 0b00001000 };
   uint8_t speed_encoder_enabled_{ 0 }; /**< 0000000bin disabled, 00001111bin enabled.*/
-  uint8_t diagnostics_enabled_{ 0 };
+  uint8_t diagnostics_enabled_{ 0b00001000 };
 
   class DeviceField
   {

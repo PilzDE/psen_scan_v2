@@ -22,6 +22,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <array>
+#include <bitset>
 
 #include <gtest/gtest_prod.h>
 
@@ -61,6 +63,7 @@ private:
 struct AdditionalFieldIds
 {
   static constexpr FieldHeader::Id SCAN_COUNTER{ 0x02 };
+  static constexpr FieldHeader::Id DIAGNOSTICS{ 0x04 };
   static constexpr FieldHeader::Id MEASURES{ 0x05 };
   static constexpr FieldHeader::Id END_OF_FRAME{ 0x09 };
 };
@@ -137,6 +140,7 @@ private:
   uint32_t scan_counter_{ 0 };
   std::vector<double> measures_;
   friend DynamicSizeRawData serialize(MonitoringFrameMsg& frame);
+  std::array<std::array<std::bitset<8>, 9>, 4> diagnostics_;
 };
 
 inline FieldHeader::Id FieldHeader::id() const

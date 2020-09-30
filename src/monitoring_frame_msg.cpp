@@ -21,17 +21,21 @@
 #include <string>
 #include <vector>
 
+#include <iostream>
+
 #include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/raw_processing.h"
 #include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/logging.h"
+#include "psen_scan_v2/diagnostic.h"
 
 namespace psen_scan_v2
 {
 constexpr FieldHeader::Id AdditionalFieldIds::SCAN_COUNTER;
 constexpr FieldHeader::Id AdditionalFieldIds::MEASURES;
 constexpr FieldHeader::Id AdditionalFieldIds::END_OF_FRAME;
+constexpr FieldHeader::Id AdditionalFieldIds::DIAGNOSTICS;
 
 FieldHeader::FieldHeader(Id id, Length length) : id_(id), length_(length)
 {
@@ -76,6 +80,46 @@ MonitoringFrameMsg MonitoringFrameMsg::deserialize(const MaxSizeRawData& data, c
                                                     msg.measures_,
                                                     header.length() / NUMBER_OF_BYTES_SINGLE_MEASURE,
                                                     [](uint16_t raw_element) { return raw_element / 1000.; });
+        break;
+
+      case AdditionalFieldIds::DIAGNOSTICS:
+        std::array<char, 4> reserved_diag;
+        raw_processing::read(is, reserved_diag);
+
+        for (size_t m = 0; m < 4; ++m)
+        {
+          //std::cerr << "Device " << m << "\n";
+          std::array<std::bitset<8>, 9> diagnostics_device_data;
+          raw_processing::read<std::array<char, 9>, std::array<std::bitset<8>, 9> >(
+              is, diagnostics_device_data, [](std::array<char, 9> raw) {
+                std::array<std::bitset<8>, 9> diagnostics;
+                for (size_t i = 0; i < 9; ++i)
+                {
+                  diagnostics[i] = std::bitset<8>(raw[i]);
+
+                  //std::cerr << "[" << i << "]" << diagnostics[i].to_string() << "\n";
+                }
+                //std::cerr << "--------\n";
+
+                return diagnostics;
+              });
+
+          msg.diagnostics_[m] = diagnostics_device_data;
+          for (size_t byte_n = 0; byte_n < 9; ++byte_n)
+          {
+            for (size_t bit_n = 0; bit_n < msg.diagnostics_[m][byte_n].size(); ++bit_n)
+            {
+              if (msg.diagnostics_[m][byte_n].test(bit_n))
+              {
+                if(error_bits[byte_n][bit_n] != DiagnosticCode::UNUSED)
+                {
+                  std::cerr << error_code_to_string.at(error_bits[byte_n][bit_n]) << " byte: " << byte_n << " bit_n:" << bit_n << "\n";
+                }
+              }
+            }
+          }
+        }
+
         break;
 
       case AdditionalFieldIds::END_OF_FRAME:
