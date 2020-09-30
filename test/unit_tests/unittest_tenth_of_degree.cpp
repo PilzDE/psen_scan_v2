@@ -36,7 +36,7 @@ TEST(TenthOfDegreeTest, valueTest)
 TEST(TenthOfDegreeTest, toRad)
 {
   TenthOfDegree tenth_of_degree{ 1 };
-  EXPECT_EQ(tenth_of_degree.toRad(), tenthDegreeToRad(1));
+  EXPECT_DOUBLE_EQ(tenth_of_degree.toRad(), tenthDegreeToRad(1));
 }
 
 TEST(TenthOfDegreeTest, Multiplication)
