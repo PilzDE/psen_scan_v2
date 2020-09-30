@@ -31,6 +31,15 @@
 
 namespace psen_scan_v2
 {
+static constexpr uint16_t NUMBER_OF_SAMPLES_FULL_SCAN_MASTER{ 2750 };
+
+static constexpr double TIME_PER_SCAN_IN_S{ 0.03 };
+
+static constexpr double RANGE_MIN_IN_M{ 0. };
+static constexpr double RANGE_MAX_IN_M{ 10. };
+
+static constexpr double DEFAULT_X_AXIS_ROTATION(degreeToRadian(137.5));
+
 /**
  * @brief API to control and to fetch measurements from the scanner.
  */

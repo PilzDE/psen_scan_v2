@@ -17,7 +17,7 @@
 #include <gmock/gmock.h>
 
 #include "psen_scan_v2/laserscan.h"
-#include "psen_scan_v2/scanner_constants.h"
+#include "psen_scan_v2/scanner.h"
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 
 using namespace psen_scan_v2;

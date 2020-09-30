@@ -22,7 +22,11 @@ namespace psen_scan_v2
 {
 namespace raw_processing
 {
-class StringStreamFailure;
+class StringStreamFailure : public std::runtime_error
+{
+public:
+  StringStreamFailure(const std::string& msg = "Error in raw data processing");
+};
 
 template <typename T>
 inline void write(std::ostringstream& os, const T& data)
@@ -38,7 +42,7 @@ inline void read(std::istringstream& is, T& data)
   {
     std::ostringstream os;
     os << "Failure reading " << sizeof(T) << " characters from input stream, could only read " << is.gcount() << ".";
-    throw raw_processing::StringStreamFailure(os.str());
+    throw StringStreamFailure(os.str());
   }
 }
 
@@ -72,13 +76,9 @@ inline void readArray(std::istringstream& is,
   });
 }
 
-class StringStreamFailure : public std::runtime_error
+inline StringStreamFailure::StringStreamFailure(const std::string& msg) : std::runtime_error(msg)
 {
-public:
-  StringStreamFailure(const std::string& msg) : std::runtime_error(msg)
-  {
-  }
-};
+}
 
 }  // namespace raw_processing
 }  // namespace psen_scan_v2
