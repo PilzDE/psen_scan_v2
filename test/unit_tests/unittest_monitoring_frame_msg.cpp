@@ -177,7 +177,7 @@ TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeScanCounterLength)
 {
   UDPFrameTestDataWithTooLargeScanCounterLength test_data;
   const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
-  const auto num_bytes = 2*test_data.hex_dump.size();
+  const auto num_bytes = 2 * test_data.hex_dump.size();
 
   MonitoringFrameMsg msg;
   EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data, num_bytes);
