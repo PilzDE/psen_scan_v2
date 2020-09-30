@@ -36,9 +36,9 @@ TEST(LaserScanROSConversionsTest, testToLaserScanMsg)
   const std::string frame_id{ "frame_id" };
   constexpr double x_axis_rotation{ 0 };
 
-  constexpr double angle_min_raw{ 0.0 };
-  constexpr double angle_max_raw{ 2.0 };
-  constexpr double angle_increment{ 0.1 };
+  const TenthOfDegree angle_min_raw{ 0 };
+  const TenthOfDegree angle_max_raw{ 20 };
+  const TenthOfDegree angle_increment{ 1 };
   LaserScan laserscan{ angle_increment, angle_min_raw, angle_max_raw };
   const MeasurementData measures{ 1, 2, 3 };
   laserscan.setMeasurements(measures);
@@ -50,10 +50,11 @@ TEST(LaserScanROSConversionsTest, testToLaserScanMsg)
   EXPECT_EQ(laserscan_msg.header.stamp, now);
   EXPECT_EQ(laserscan_msg.header.frame_id, frame_id);
 
-  EXPECT_EQ(laserscan_msg.angle_min, x_axis_rotation - angle_max_raw);
-  EXPECT_EQ(laserscan_msg.angle_max, x_axis_rotation - angle_min_raw);
+  EXPECT_NEAR(laserscan_msg.angle_min, x_axis_rotation - angle_max_raw.toRad(), 1.0e-8);
+  EXPECT_NEAR(laserscan_msg.angle_max, x_axis_rotation - angle_min_raw.toRad(), 1.0e-8);
 
-  EXPECT_NEAR(laserscan_msg.angle_increment, angle_increment, 1.0e-8);
+  EXPECT_NEAR(laserscan_msg.angle_increment, angle_increment.toRad(), 1.0e-8);
+  std::cerr << laserscan_msg.angle_increment << " " << angle_increment.toRad() << "\n";
   EXPECT_EQ(laserscan_msg.time_increment, 0);
 
   EXPECT_NEAR(laserscan_msg.scan_time, TIME_PER_SCAN_IN_S, 1.0e-8);

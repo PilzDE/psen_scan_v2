@@ -56,8 +56,9 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data, c
   raw_processing::read(is, msg.working_mode_fixed_);
   raw_processing::read(is, msg.transaction_type_fixed_);
   raw_processing::read(is, msg.scanner_id_fixed_);
-  readAngle(is, msg.from_theta_fixed_);
-  readAngle(is, msg.resolution_fixed_);
+
+  raw_processing::read<uint16_t, TenthOfDegree>(is, msg.from_theta_fixed_);
+  raw_processing::read<uint16_t, TenthOfDegree>(is, msg.resolution_fixed_);
 
   msg.checkFixedFields();
 
@@ -69,11 +70,21 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data, c
     switch (header.id())
     {
       case AdditionalFieldIds::SCAN_COUNTER:
-        readScanCounter(is, msg.scan_counter_, header.length());
+        if (header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
+        {
+          std::ostringstream os;
+          os << "Length of scan counter field is " << header.length() << ", but should be "
+             << NUMBER_OF_BYTES_SCAN_COUNTER << ".";
+          throw MonitoringFrameFormatErrorScanCounterUnexpectedSize(os.str());
+        }
+        raw_processing::read(is, msg.scan_counter_);
         break;
 
       case AdditionalFieldIds::MEASURES:
-        readMeasures(is, msg.measures_, header.length());
+        raw_processing::readArray<uint16_t, double>(is,
+                                                    msg.measures_,
+                                                    header.length() / NUMBER_OF_BYTES_SINGLE_MEASURE,
+                                                    [](uint16_t raw_element) { return raw_element / 1000.; });
         break;
 
       case AdditionalFieldIds::END_OF_FRAME:
@@ -89,13 +100,6 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data, c
   }
 
   return msg;
-}
-
-void MonitoringFrameMsg::readAngle(std::istringstream& is, double& angle)
-{
-  uint16_t angle_in_tenth_degree;
-  raw_processing::read(is, angle_in_tenth_degree);
-  angle = tenthDegreeToRad(angle_in_tenth_degree);
 }
 
 FieldHeader MonitoringFrameMsg::readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes)
@@ -117,32 +121,6 @@ FieldHeader MonitoringFrameMsg::readFieldHeader(std::istringstream& is, const st
     length--;
   }
   return FieldHeader(id, length);
-}
-
-void MonitoringFrameMsg::readScanCounter(std::istringstream& is, uint32_t& scan_counter, const FieldLength length)
-{
-  if (length != sizeof(scan_counter))
-  {
-    std::ostringstream os;
-    os << "Length of scan counter field is " << length << ", but should be " << sizeof(scan_counter_) << ".";
-    throw MonitoringFrameFormatError(os.str());
-  }
-  raw_processing::read(is, scan_counter);
-}
-
-void MonitoringFrameMsg::readMeasures(std::istringstream& is, std::vector<double>& measures, const FieldLength length)
-{
-  size_t bytes_per_sample = sizeof(uint16_t);
-  size_t number_of_samples = length / bytes_per_sample;
-
-  measures.resize(number_of_samples);
-
-  for (unsigned i = 0; i < number_of_samples; i++)
-  {
-    uint16_t sample;
-    raw_processing::read(is, sample);
-    measures.at(i) = sample / 1000.;  // Convert to m
-  }
 }
 
 void MonitoringFrameMsg::checkFixedFields()

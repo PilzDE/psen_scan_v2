@@ -26,6 +26,7 @@
 #include <gtest/gtest_prod.h>
 
 #include "psen_scan_v2/raw_scanner_data.h"
+#include "psen_scan_v2/tenth_of_degree.h"
 
 namespace psen_scan_v2
 {
@@ -33,6 +34,10 @@ static constexpr uint32_t OP_CODE_MONITORING_FRAME{ 0xCA };
 static constexpr uint32_t ONLINE_WORKING_MODE{ 0x00 };
 static constexpr uint32_t GUI_MONITORING_TRANSACTION{ 0x05 };
 static constexpr uint32_t MAX_SCANNER_ID{ 0x03 };
+
+static constexpr uint16_t NUMBER_OF_BYTES_SCAN_COUNTER{ 4 };
+static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_MEASURE{ 2 };
+static constexpr std::size_t MAX_LENGTH_ADDITIONAL_MONITORING_FRAME_FIELD{ 65487 };
 
 class FieldHeader
 {
@@ -70,12 +75,20 @@ public:
     MonitoringFrameFormatError(const std::string& msg = "Error while decoding laser scanner measurement data");
   };
 
+  class MonitoringFrameFormatErrorScanCounterUnexpectedSize : public MonitoringFrameFormatError
+  {
+  public:
+    MonitoringFrameFormatErrorScanCounterUnexpectedSize(const std::string& msg) : MonitoringFrameFormatError(msg)
+    {
+    }
+  };
+
 public:
   static MonitoringFrameMsg fromRawData(const MaxSizeRawData& data, const std::size_t& num_bytes);
 
 public:
-  double fromTheta() const;
-  double resolution() const;
+  TenthOfDegree fromTheta() const;
+  TenthOfDegree resolution() const;
   uint32_t scanCounter() const;
   std::vector<double> measures() const;
 
@@ -95,15 +108,6 @@ private:
 private:
   FRIEND_TEST(FieldHeaderTest, testReadSuccess);
   FRIEND_TEST(FieldHeaderTest, testReadHeaderTooShortFailure);
-  FRIEND_TEST(MonitoringFrameMsgTest, testReadScanCounterSuccess);
-  FRIEND_TEST(MonitoringFrameMsgTest, testReadScanCounterInvalidLengthFailure);
-  FRIEND_TEST(MonitoringFrameMsgTest, testReadScanCounterMissingPayloadFailure);
-  FRIEND_TEST(MonitoringFrameMsgTest, testReadMeasuresSuccess);
-  FRIEND_TEST(MonitoringFrameMsgTest, testReadMeasuresMissingPayloadFailure);
-  FRIEND_TEST(MonitoringFrameMsgTest, testReadMeasuresTooMuchMeasures);
-  FRIEND_TEST(MonitoringFrameMsgTest, testReadMeasuresTooFewMeasures);
-  FRIEND_TEST(MonitoringFrameMsgTest, testSetEndOfFrame);
-  FRIEND_TEST(MonitoringFrameMsgTest, testSetEndOfFrameIgnoreInvalidLength);
 
 private:
   uint32_t device_status_fixed_{ 0 };
@@ -111,8 +115,8 @@ private:
   uint32_t working_mode_fixed_{ 0 };
   uint32_t transaction_type_fixed_{ 0 };
   uint8_t scanner_id_fixed_{ 0 };
-  double from_theta_fixed_{ 0 };
-  double resolution_fixed_{ 0 };
+  TenthOfDegree from_theta_fixed_{ 0 };
+  TenthOfDegree resolution_fixed_{ 0 };
 
   uint32_t scan_counter_{ 0 };
   std::vector<double> measures_;
@@ -128,12 +132,12 @@ inline FieldHeader::Length FieldHeader::length() const
   return length_;
 }
 
-inline double MonitoringFrameMsg::fromTheta() const
+inline TenthOfDegree MonitoringFrameMsg::fromTheta() const
 {
   return from_theta_fixed_;
 }
 
-inline double MonitoringFrameMsg::resolution() const
+inline TenthOfDegree MonitoringFrameMsg::resolution() const
 {
   return resolution_fixed_;
 }

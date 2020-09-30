@@ -94,78 +94,6 @@ protected:
   const std::array<double, 3> expected_measures_{ 4.4, 4.3, 4.2 };
 };
 
-TEST_F(MonitoringFrameMsgTest, testReadScanCounterSuccess)
-{
-  const uint16_t length = 4;
-  const uint32_t expected_scan_counter = 2;
-
-  IStringStreamBuilder builder;
-  builder.add(expected_scan_counter);
-  std::istringstream is{ builder.get() };
-
-  uint32_t scan_counter;
-  ASSERT_NO_THROW(MonitoringFrameMsg::readScanCounter(is, scan_counter, length));
-  EXPECT_EQ(expected_scan_counter, scan_counter);
-}
-
-TEST_F(MonitoringFrameMsgTest, testReadScanCounterInvalidLengthFailure)
-{
-  const uint16_t length = 3;
-  const uint32_t expected_scan_counter = 2;
-
-  IStringStreamBuilder builder;
-  builder.add(expected_scan_counter);
-  std::istringstream is{ builder.get() };
-
-  uint32_t scan_counter;
-  EXPECT_THROW(MonitoringFrameMsg::readScanCounter(is, scan_counter, length);
-               , MonitoringFrameMsg::MonitoringFrameFormatError);
-}
-
-TEST_F(MonitoringFrameMsgTest, testReadScanCounterMissingPayloadFailure)
-{
-  const uint16_t length = 4;
-  std::istringstream is;
-  uint32_t scan_counter;
-  EXPECT_THROW(MonitoringFrameMsg::readScanCounter(is, scan_counter, length);, raw_processing::StringStreamFailure);
-}
-
-TEST_F(MonitoringFrameMsgTest, testReadMeasuresSuccess)
-{
-  const uint16_t length = 2 * expected_measures_.size();
-  std::istringstream is = buildExpectedMeasuresStream();
-
-  std::vector<double> measures;
-  ASSERT_NO_THROW(MonitoringFrameMsg::readMeasures(is, measures, length););
-  EXPECT_TRUE(expectMeasuresEqual(measures));
-}
-
-TEST_F(MonitoringFrameMsgTest, testReadMeasuresMissingPayloadFailure)
-{
-  const uint16_t length = 2 * expected_measures_.size();
-  std::istringstream is;
-  std::vector<double> measures;
-  EXPECT_THROW(MonitoringFrameMsg::readMeasures(is, measures, length);, raw_processing::StringStreamFailure);
-}
-
-TEST_F(MonitoringFrameMsgTest, testReadMeasuresTooMuchMeasures)
-{
-  const uint16_t length = 2 * expected_measures_.size() - 1;
-  std::istringstream is = buildExpectedMeasuresStream();
-
-  std::vector<double> measures;
-  ASSERT_NO_THROW(MonitoringFrameMsg::readMeasures(is, measures, length););
-  EXPECT_TRUE(expectMeasuresPartEqual(measures));
-}
-
-TEST_F(MonitoringFrameMsgTest, testReadMeasuresTooFewMeasures)
-{
-  const uint16_t length = 2 * (expected_measures_.size() + 1);
-  std::istringstream is = buildExpectedMeasuresStream();
-  std::vector<double> measures;
-  EXPECT_THROW(MonitoringFrameMsg::readMeasures(is, measures, length);, raw_processing::StringStreamFailure);
-}
-
 class MonitoringFrameMsgFromRawTest : public ::testing::Test
 {
 protected:
@@ -184,8 +112,8 @@ TEST_F(MonitoringFrameMsgFromRawTest, testReadSuccess)
   MonitoringFrameMsg msg;
   ASSERT_NO_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data_););
 
-  EXPECT_DOUBLE_EQ(msg.fromTheta(), tenthDegreeToRad(test_data_.from_theta));
-  EXPECT_DOUBLE_EQ(msg.resolution(), tenthDegreeToRad(test_data_.resolution));
+  EXPECT_EQ(msg.fromTheta().value(), test_data_.from_theta);
+  EXPECT_EQ(msg.resolution().value(), test_data_.resolution);
   EXPECT_EQ(msg.scanCounter(), test_data_.scan_counter);
 
   const auto measures = msg.measures();
@@ -236,6 +164,16 @@ TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeFieldLength)
 
   MonitoringFrameMsg msg;
   EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data);, MonitoringFrameMsg::MonitoringFrameFormatError);
+}
+
+TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeScanCounterLength)
+{
+  UDPFrameTestDataWithTooLargeScanCounterLength test_data;
+  const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
+
+  MonitoringFrameMsg msg;
+  EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data);
+               , MonitoringFrameMsg::MonitoringFrameFormatErrorScanCounterUnexpectedSize);
 }
 
 }  // namespace psen_scan_v2

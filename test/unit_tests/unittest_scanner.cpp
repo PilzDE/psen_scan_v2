@@ -77,7 +77,7 @@ TEST_F(ScannerTest, testConstructorSuccess)
 
 TEST_F(ScannerTest, testInvokeLaserScanCallback)
 {
-  LaserScan laser_scan_fake(0.02, 0.03, 0.05);
+  LaserScan laser_scan_fake(TenthOfDegree(1), TenthOfDegree(3), TenthOfDegree(5));
   laser_scan_fake.getMeasurements().push_back(1);
 
   MockedScanner scanner(scanner_config_, laserscan_callback_);
