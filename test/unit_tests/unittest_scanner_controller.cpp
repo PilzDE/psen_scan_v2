@@ -212,8 +212,9 @@ TEST_F(ScannerControllerTest, testHandleScannerReplyTypeUnknown)
 TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
 {
   UDPFrameTestDataWithoutIntensities test_data;
-  MaxSizeRawData data = convertToMaxSizeRawData(test_data.hex_dump);
-  MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
+  const MaxSizeRawData data = convertToMaxSizeRawData(test_data.hex_dump);
+  const auto num_bytes = 2 * test_data.hex_dump.size();
+  MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data, num_bytes) };
   LaserScan scan = toLaserScan(frame);
 
   EXPECT_CALL(scanner_controller_.state_machine_, processMonitoringFrameReceivedEvent()).Times(1);
@@ -228,7 +229,8 @@ TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
 
   UDPFrameTestDataWithoutMeasurementsAndIntensities test_data;
   MaxSizeRawData data = convertToMaxSizeRawData(test_data.hex_dump);
-  MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
+  const auto num_bytes = 2 * test_data.hex_dump.size();
+  MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data, num_bytes) };
 
   EXPECT_CALL(scanner_controller_.state_machine_, processMonitoringFrameReceivedEvent()).Times(1);
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);

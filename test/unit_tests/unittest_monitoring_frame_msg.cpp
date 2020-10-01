@@ -44,6 +44,7 @@ TEST(FieldHeaderTest, testReadSuccess)
   uint8_t id = 5;
   uint16_t length = 7;
   uint16_t expected_length = length - 1;
+  uint16_t max_num_bytes = 9;
 
   IStringStreamBuilder builder;
   builder.add(id);
@@ -51,7 +52,7 @@ TEST(FieldHeaderTest, testReadSuccess)
   std::istringstream is{ builder.get() };
 
   std::unique_ptr<FieldHeader> header_ptr;
-  ASSERT_NO_THROW(header_ptr.reset(new FieldHeader{ MonitoringFrameMsg::readFieldHeader(is) }););
+  ASSERT_NO_THROW(header_ptr.reset(new FieldHeader{ MonitoringFrameMsg::readFieldHeader(is, max_num_bytes) }););
   EXPECT_EQ(id, header_ptr->id());
   EXPECT_EQ(expected_length, header_ptr->length());
 }
@@ -59,12 +60,13 @@ TEST(FieldHeaderTest, testReadSuccess)
 TEST(FieldHeaderTest, testReadHeaderTooShortFailure)
 {
   uint16_t too_short_header;
+  uint16_t max_num_bytes = 2;
 
   IStringStreamBuilder builder;
   builder.add(too_short_header);
   std::istringstream is{ builder.get() };
 
-  EXPECT_THROW(MonitoringFrameMsg::readFieldHeader(is);, raw_processing::StringStreamFailure);
+  EXPECT_THROW(MonitoringFrameMsg::readFieldHeader(is, max_num_bytes);, raw_processing::StringStreamFailure);
 }
 
 class MonitoringFrameMsgTest : public ::testing::Test
@@ -105,12 +107,13 @@ protected:
 protected:
   UDPFrameTestDataWithoutIntensities test_data_;
   MaxSizeRawData raw_frame_data_;
+  std::size_t num_bytes_{ 2 * test_data_.hex_dump.size() };
 };
 
 TEST_F(MonitoringFrameMsgFromRawTest, testReadSuccess)
 {
   MonitoringFrameMsg msg;
-  ASSERT_NO_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data_););
+  ASSERT_NO_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data_, num_bytes_););
 
   EXPECT_EQ(msg.fromTheta().value(), test_data_.from_theta);
   EXPECT_EQ(msg.resolution().value(), test_data_.resolution);
@@ -127,52 +130,57 @@ TEST_F(MonitoringFrameMsgFromRawTest, testReadSuccess)
 TEST_F(MonitoringFrameMsgFromRawTest, testWrongOpCode)
 {
   raw_frame_data_.at(4) += 1;
-  EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_););
+  EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_, num_bytes_););
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testInvalidWorkingMode)
 {
   raw_frame_data_.at(8) = 0x03;
-  EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_););
+  EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_, num_bytes_););
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testInvalidTransactionType)
 {
   raw_frame_data_.at(12) = 0x06;
-  EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_););
+  EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_, num_bytes_););
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testInvalidScannerId)
 {
   raw_frame_data_.at(16) = 0x04;
-  EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_););
+  EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_, num_bytes_););
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testUnknownFieldId)
 {
   UDPFrameTestDataWithUnknownFieldId test_data;
   const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
+  const auto num_bytes = 2 * test_data.hex_dump.size();
 
   MonitoringFrameMsg msg;
-  EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data);, MonitoringFrameMsg::MonitoringFrameFormatError);
+  EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data, num_bytes);
+               , MonitoringFrameMsg::MonitoringFrameFormatError);
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeFieldLength)
 {
   UDPFrameTestDataWithTooLargeFieldLength test_data;
   const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
+  const auto num_bytes = 2 * test_data.hex_dump.size();
 
   MonitoringFrameMsg msg;
-  EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data);, MonitoringFrameMsg::MonitoringFrameFormatError);
+  EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data, num_bytes);
+               , MonitoringFrameMsg::MonitoringFrameFormatError);
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeScanCounterLength)
 {
   UDPFrameTestDataWithTooLargeScanCounterLength test_data;
   const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
+  const auto num_bytes = 2 * test_data.hex_dump.size();
 
   MonitoringFrameMsg msg;
-  EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data);
+  EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data, num_bytes);
                , MonitoringFrameMsg::MonitoringFrameFormatErrorScanCounterUnexpectedSize);
 }
 

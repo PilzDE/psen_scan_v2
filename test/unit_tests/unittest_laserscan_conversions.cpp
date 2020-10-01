@@ -35,9 +35,10 @@ namespace psen_scan_v2_test
 TEST(LaserScanConversionsTest, testToLaserScan)
 {
   UDPFrameTestDataWithoutIntensities test_data;
-  MaxSizeRawData raw_data{ convertToMaxSizeRawData(test_data.hex_dump) };
+  const MaxSizeRawData raw_data{ convertToMaxSizeRawData(test_data.hex_dump) };
+  const auto num_bytes = 2 * test_data.hex_dump.size();
   MonitoringFrameMsg frame;
-  ASSERT_NO_THROW(frame = MonitoringFrameMsg::fromRawData(raw_data););
+  ASSERT_NO_THROW(frame = MonitoringFrameMsg::fromRawData(raw_data, num_bytes););
 
   std::unique_ptr<LaserScan> scan_ptr;
   ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ toLaserScan(frame) }););

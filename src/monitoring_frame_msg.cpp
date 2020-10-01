@@ -44,7 +44,7 @@ std::string FieldHeader::idToString(Id id)
   return os.str();
 }
 
-MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
+MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data, const std::size_t& num_bytes)
 {
   MonitoringFrameMsg msg;
 
@@ -65,7 +65,7 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
   bool end_of_frame{ false };
   while (!end_of_frame)
   {
-    const FieldHeader header{ readFieldHeader(is) };
+    const FieldHeader header{ readFieldHeader(is, num_bytes) };
 
     switch (header.id())
     {
@@ -102,14 +102,14 @@ MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data)
   return msg;
 }
 
-FieldHeader MonitoringFrameMsg::readFieldHeader(std::istringstream& is)
+FieldHeader MonitoringFrameMsg::readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes)
 {
   FieldId id;
   FieldLength length;
   raw_processing::read(is, id);
   raw_processing::read(is, length);
 
-  if (length >= MAX_LENGTH_ADDITIONAL_MONITORING_FRAME_FIELD)
+  if (length >= max_num_bytes)
   {
     std::ostringstream os;
     os << "Length given in header of additional field is too large: " << length

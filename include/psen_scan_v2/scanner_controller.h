@@ -133,7 +133,7 @@ ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& s
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::handleNewMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes)
 {
-  MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data) };
+  MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data, num_bytes) };
   state_machine_.processMonitoringFrameReceivedEvent();
 
   if (frame.measures().empty())
