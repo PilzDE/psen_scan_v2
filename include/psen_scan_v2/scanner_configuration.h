@@ -19,6 +19,8 @@
 
 #include <arpa/inet.h>
 
+#include "psen_scan_v2/scan_range.h"
+
 namespace psen_scan_v2
 {
 /**
@@ -35,15 +37,13 @@ public:
    * @param host_udp_port_data Port on which monitoring frames (scans) should be received.
    * @param host_udp_port_control Port used to send commands (start/stop) and receive the corresponding replies.
    * @param device_ip IP address of the scanner.
-   * @param start_angle Start angle of measurement (in radian, scanner-zero = zero on the left).
-   * @param end_angle End angle of measurement (in radian).
+   * @param scan_range Range in which measurements are taken.
    */
   ScannerConfiguration(const std::string& host_ip,
                        const int& host_udp_port_data,
                        const int& host_udp_port_control,
                        const std::string& device_ip,
-                       const double& start_angle,
-                       const double& end_angle);
+                       const DefaultScanRange& scan_range);
 
 public:
   uint32_t hostIp() const;
@@ -53,8 +53,7 @@ public:
 
   uint32_t clientIp() const;
 
-  double startAngle() const;
-  double endAngle() const;
+  const DefaultScanRange& scanRange() const;
 
 private:
   uint32_t host_ip_;
@@ -63,10 +62,7 @@ private:
 
   uint32_t client_ip_;
 
-  //! Angle in rad.
-  double start_angle_;
-  //! Angle in rad.
-  double end_angle_;
+  const DefaultScanRange scan_range_;
 };
 
 }  // namespace psen_scan_v2

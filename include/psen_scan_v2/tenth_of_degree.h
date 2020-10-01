@@ -23,59 +23,65 @@ namespace psen_scan_v2
 class TenthOfDegree
 {
 public:
-  explicit TenthOfDegree(const uint16_t& tenth_of_degree) : tenth_of_degree_(tenth_of_degree)
+  static TenthOfDegree fromRad(const double& angle_in_rad)
+  {
+    return TenthOfDegree(radToTenthDegree(angle_in_rad));
+  }
+
+public:
+  explicit constexpr TenthOfDegree(const uint16_t& tenth_of_degree) : tenth_of_degree_(tenth_of_degree)
   {
   }
 
-  uint16_t value() const
+  constexpr uint16_t value() const
   {
     return tenth_of_degree_;
   }
 
-  double toRad() const
+  constexpr double toRad() const
   {
     return tenthDegreeToRad(tenth_of_degree_);
   }
 
-  TenthOfDegree& operator*(const TenthOfDegree& rhs)
+  constexpr TenthOfDegree& operator*(const TenthOfDegree& rhs)
   {
     tenth_of_degree_ = value() * rhs.value();
     return *this;
   }
 
-  TenthOfDegree& operator*(const unsigned int& rhs)
+  constexpr TenthOfDegree& operator*(const unsigned int& rhs)
   {
     tenth_of_degree_ = value() * rhs;
     return *this;
   }
 
-  TenthOfDegree& operator+(const TenthOfDegree& rhs)
+  constexpr TenthOfDegree& operator+(const TenthOfDegree& rhs)
   {
     tenth_of_degree_ = value() + rhs.value();
     return *this;
   }
 
-  bool operator==(const TenthOfDegree& rhs) const
+  constexpr bool operator==(const TenthOfDegree& rhs) const
   {
     return value() == rhs.value();
   }
 
-  bool operator>=(const TenthOfDegree& rhs) const
+  constexpr bool operator>=(const TenthOfDegree& rhs) const
   {
     return value() >= rhs.value();
   }
 
-  bool operator<=(const TenthOfDegree& rhs) const
+  constexpr bool operator<=(const TenthOfDegree& rhs) const
   {
     return value() <= rhs.value();
   }
 
-  bool operator>(const TenthOfDegree& rhs) const
+  constexpr bool operator>(const TenthOfDegree& rhs) const
   {
     return value() > rhs.value();
   }
 
-  bool operator<(const TenthOfDegree& rhs) const
+  constexpr bool operator<(const TenthOfDegree& rhs) const
   {
     return value() < rhs.value();
   }

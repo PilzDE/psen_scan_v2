@@ -21,6 +21,7 @@
 
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/raw_scanner_data.h"
+#include "psen_scan_v2/scan_range.h"
 
 namespace psen_scan_v2
 {
@@ -76,28 +77,24 @@ private:
   public:
     DeviceField() = default;
 
-    DeviceField(const double& start_angle, const double& end_angle, const double resolution)
-      : start_angle_(start_angle), end_angle_(end_angle), resolution_(resolution)
+    DeviceField(const DefaultScanRange& scan_range, const double resolution)
+      : scan_range_(scan_range), resolution_(resolution)
     {
     }
 
   public:
-    double getStartAngle() const
+    const DefaultScanRange& getScanRange() const
     {
-      return start_angle_;
+      return scan_range_;
     };
-    double getEndAngle() const
-    {
-      return end_angle_;
-    };
+
     double getResolution() const
     {
       return resolution_;
     };
 
   private:
-    double start_angle_{ 0. };
-    double end_angle_{ 0. };
+    const DefaultScanRange scan_range_;
     double resolution_{ 0. };
   };
 

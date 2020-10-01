@@ -21,6 +21,7 @@
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/raw_data_test_helper.h"
+#include "psen_scan_v2/scan_range.h"
 
 using namespace psen_scan_v2;
 
@@ -65,10 +66,9 @@ TEST_F(StartRequestTest, constructorTest)
   const std::string& host_ip = "192.168.0.1";
   const uint16_t& host_udp_port_data = 65535;
 
-  const double start_angle{ 0.0 };
-  const double end_angle{ 4.71 };
+  const DefaultScanRange scan_range{ TenthOfDegree(0), TenthOfDegree::fromRad(4.71) };
 
-  ScannerConfiguration sc(host_ip, host_udp_port_data, 0 /* irrelevant */, "192.168.0.50", start_angle, end_angle);
+  ScannerConfiguration sc(host_ip, host_udp_port_data, 0 /* irrelevant */, "192.168.0.50", scan_range);
 
   uint32_t sequence_number{ 123 };
   StartRequest sr(sc, sequence_number);
@@ -98,8 +98,8 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::SPEED_ENCODER_ENABLED), 0));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::DIAGNOSTICS_ENABLED), 0));
 
-  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::MASTER_START_ANGLE), radToTenthDegree(start_angle)));
-  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::MASTER_END_ANGLE), radToTenthDegree(end_angle)));
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::MASTER_START_ANGLE), scan_range.getStart().value()));
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::MASTER_END_ANGLE), scan_range.getEnd().value()));
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::MASTER_ANGLE_RESOLUTION), degreeToTenthDegree(0.1)));
 
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::SLAVE_ONE_START_ANGLE), 0));
@@ -115,7 +115,8 @@ TEST_F(StartRequestTest, constructorTest)
 
 TEST_F(StartRequestTest, regressionForRealSystem)
 {
-  ScannerConfiguration sc("192.168.0.50", 55115, 0, "192.168.0.10", 0.0, degreeToRadian(275.));
+  ScannerConfiguration sc(
+      "192.168.0.50", 55115, 0, "192.168.0.10", DefaultScanRange(TenthOfDegree(0), TenthOfDegree(2750)));
   StartRequest sr(sc, 0);
 
   auto data = sr.toRawData();

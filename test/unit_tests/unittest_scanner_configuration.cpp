@@ -22,6 +22,7 @@
 
 #include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/scanner_configuration.h"
+#include "psen_scan_v2/scan_range.h"
 
 using namespace psen_scan_v2;
 
@@ -29,10 +30,7 @@ namespace psen_scan_v2_test
 {
 static constexpr int MINIMAL_PORT_NUMBER{ std::numeric_limits<uint16_t>::min() };
 static constexpr int MAXIMAL_PORT_NUMBER{ std::numeric_limits<uint16_t>::max() };
-static constexpr double MINIMAL_SCAN_ANGLE{ 0.0 };
-static constexpr double MAXIMAL_SCAN_ANGLE{ degreeToRadian(275.) };
-static const double TOO_LARGE_SCAN_ANGLE{ std::nextafter(MAXIMAL_SCAN_ANGLE, MAXIMAL_SCAN_ANGLE + 1) };
-static const double TOO_SMALL_SCAN_ANGLE{ std::nextafter(MINIMAL_SCAN_ANGLE, MINIMAL_SCAN_ANGLE - 1) };
+static constexpr DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(2750) };
 static const std::string VALID_IP{ "127.0.0.1" };
 static const std::string INVALID_IP{ "invalid_ip" };
 
@@ -67,22 +65,9 @@ public:
     return *this;
   }
 
-  ScannerConfigurationBuilder& setStartAngle(const double& start_angle)
-  {
-    start_angle_ = start_angle;
-    return *this;
-  }
-
-  ScannerConfigurationBuilder& setEndAngle(const double& end_angle)
-  {
-    end_angle_ = end_angle;
-    return *this;
-  }
-
   ScannerConfiguration build()
   {
-    return ScannerConfiguration(
-        host_ip_, host_udp_port_data_, host_udp_port_control_, client_ip_, start_angle_, end_angle_);
+    return ScannerConfiguration(host_ip_, host_udp_port_data_, host_udp_port_control_, client_ip_, scan_range_);
   }
 
 protected:
@@ -90,8 +75,7 @@ protected:
   std::string client_ip_{ VALID_IP };
   int host_udp_port_data_{ MAXIMAL_PORT_NUMBER - 1 };
   int host_udp_port_control_{ MAXIMAL_PORT_NUMBER };
-  double start_angle_{ MINIMAL_SCAN_ANGLE };
-  double end_angle_{ MAXIMAL_SCAN_ANGLE };
+  const DefaultScanRange scan_range_{ SCAN_RANGE };
 };
 
 TEST_F(ScannerConfigurationTest, testConstructorSuccess)
@@ -127,31 +111,6 @@ TEST_F(ScannerConfigurationTest, testConstructorControlPortTooSmall)
 TEST_F(ScannerConfigurationTest, testConstructorControlPortTooLarge)
 {
   EXPECT_THROW(ScannerConfigurationBuilder().setHostUdpControlPort(MAXIMAL_PORT_NUMBER + 1).build(), std::out_of_range);
-}
-
-TEST_F(ScannerConfigurationTest, testConstructorStartAngleTooSmall)
-{
-  EXPECT_THROW(ScannerConfigurationBuilder().setStartAngle(TOO_SMALL_SCAN_ANGLE).build(), std::out_of_range);
-}
-
-TEST_F(ScannerConfigurationTest, testConstructorStartAngleTooLarge)
-{
-  EXPECT_THROW(ScannerConfigurationBuilder().setStartAngle(TOO_LARGE_SCAN_ANGLE).build(), std::out_of_range);
-}
-
-TEST_F(ScannerConfigurationTest, testConstructorEndAngleTooSmall)
-{
-  EXPECT_THROW(ScannerConfigurationBuilder().setEndAngle(TOO_SMALL_SCAN_ANGLE).build(), std::out_of_range);
-}
-
-TEST_F(ScannerConfigurationTest, testConstructorEndAngleTooLarge)
-{
-  EXPECT_THROW(ScannerConfigurationBuilder().setEndAngle(TOO_LARGE_SCAN_ANGLE).build(), std::out_of_range);
-}
-
-TEST_F(ScannerConfigurationTest, testConstructorEndAngleSmallerThanStartAngle)
-{
-  EXPECT_THROW(ScannerConfigurationBuilder().setStartAngle(2.0).setEndAngle(1.0).build(), std::invalid_argument);
 }
 
 TEST_F(ScannerConfigurationTest, testTargetIp)
@@ -199,14 +158,14 @@ TEST_F(ScannerConfigurationTest, testStartAngle)
 {
   ScannerConfiguration sc{ ScannerConfigurationBuilder().build() };
 
-  EXPECT_EQ(MINIMAL_SCAN_ANGLE, sc.startAngle());
+  EXPECT_EQ(SCAN_RANGE.getStart(), sc.scanRange().getStart());
 }
 
 TEST_F(ScannerConfigurationTest, testEndAngle)
 {
   ScannerConfiguration sc{ ScannerConfigurationBuilder().build() };
 
-  EXPECT_EQ(MAXIMAL_SCAN_ANGLE, sc.endAngle());
+  EXPECT_EQ(SCAN_RANGE.getEnd(), sc.scanRange().getEnd());
 }
 
 }  // namespace psen_scan_v2_test

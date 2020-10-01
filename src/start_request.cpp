@@ -34,7 +34,7 @@ StartRequest::StartRequest(const ScannerConfiguration& scanner_configuration, co
   : seq_number_(seq_number)
   , host_ip_(scanner_configuration.hostIp())
   , host_udp_port_data_(scanner_configuration.hostUDPPortData())  // Write is deduced by the scanner
-  , master_(scanner_configuration.startAngle(), scanner_configuration.endAngle(), MASTER_RESOLUTION_RAD)
+  , master_(scanner_configuration.scanRange(), MASTER_RESOLUTION_RAD)
 {
   crc_ = getCRC();
 }
@@ -72,8 +72,8 @@ DynamicSizeRawData StartRequest::toRawData() const
   raw_processing::write(os, speed_encoder_enabled_);
   raw_processing::write(os, diagnostics_enabled_);
 
-  uint16_t start_angle{ radToTenthDegree(master_.getStartAngle()) };
-  uint16_t end_angle{ radToTenthDegree(master_.getEndAngle()) };
+  uint16_t start_angle{ master_.getScanRange().getStart().value() };
+  uint16_t end_angle{ master_.getScanRange().getEnd().value() };
   uint16_t resolution{ radToTenthDegree(master_.getResolution()) };
   raw_processing::write(os, start_angle);
   raw_processing::write(os, end_angle);
@@ -81,8 +81,8 @@ DynamicSizeRawData StartRequest::toRawData() const
 
   for (const auto& slave : slaves_)
   {
-    uint16_t slave_start_angle{ radToTenthDegree(slave.getStartAngle()) };
-    uint16_t slave_end_angle{ radToTenthDegree(slave.getEndAngle()) };
+    uint16_t slave_start_angle{ slave.getScanRange().getStart().value() };
+    uint16_t slave_end_angle{ slave.getScanRange().getEnd().value() };
     uint16_t slave_resolution{ radToTenthDegree(slave.getResolution()) };
     raw_processing::write(os, slave_start_angle);
     raw_processing::write(os, slave_end_angle);

@@ -32,6 +32,7 @@
 #include "psen_scan_v2/scanner_mock.h"
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/scanner.h"
+#include "psen_scan_v2/scan_range.h"
 
 using namespace psen_scan_v2;
 using namespace psen_scan_v2_test;
@@ -68,8 +69,7 @@ static const std::string HOST_IP{ "127.0.0.1" };
 static constexpr int HOST_UDP_PORT_DATA{ 50505 };
 static constexpr int HOST_UDP_PORT_CONTROL{ 55055 };
 static const std::string DEVICE_IP{ "127.0.0.100" };
-static constexpr double START_ANGLE{ 0. };
-static constexpr double END_ANGLE{ degreeToRadian(275.) };
+static constexpr DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(2750) };
 static constexpr int SCANNER_STARTED_TIMEOUT_MS{ 3000 };
 static constexpr int SCANNER_STOPPED_TIMEOUT_MS{ 3000 };
 static constexpr int LASERSCAN_RECEIVED_TIMEOUT{ 3000 };
@@ -77,8 +77,7 @@ static constexpr int LASERSCAN_RECEIVED_TIMEOUT{ 3000 };
 class RosScannerNodeTests : public testing::Test, public testing::AsyncTest
 {
 protected:
-  RosScannerNodeTests()
-    : scanner_config_(HOST_IP, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, DEVICE_IP, START_ANGLE, END_ANGLE){};
+  RosScannerNodeTests() : scanner_config_(HOST_IP, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, DEVICE_IP, SCAN_RANGE){};
   ros::NodeHandle nh_priv_{ "~" };
   ScannerConfiguration scanner_config_;
 };
