@@ -88,7 +88,7 @@ MonitoringFrameMsg MonitoringFrameMsg::deserialize(const MaxSizeRawData& data, c
 
         for (size_t m = 0; m < 4; ++m)
         {
-          //std::cerr << "Device " << m << "\n";
+          // std::cerr << "Device " << m << "\n";
           std::array<std::bitset<8>, 9> diagnostics_device_data;
           raw_processing::read<std::array<char, 9>, std::array<std::bitset<8>, 9> >(
               is, diagnostics_device_data, [](std::array<char, 9> raw) {
@@ -97,9 +97,9 @@ MonitoringFrameMsg MonitoringFrameMsg::deserialize(const MaxSizeRawData& data, c
                 {
                   diagnostics[i] = std::bitset<8>(raw[i]);
 
-                  //std::cerr << "[" << i << "]" << diagnostics[i].to_string() << "\n";
+                  // std::cerr << "[" << i << "]" << diagnostics[i].to_string() << "\n";
                 }
-                //std::cerr << "--------\n";
+                // std::cerr << "--------\n";
 
                 return diagnostics;
               });
@@ -111,9 +111,10 @@ MonitoringFrameMsg MonitoringFrameMsg::deserialize(const MaxSizeRawData& data, c
             {
               if (msg.diagnostics_[m][byte_n].test(bit_n))
               {
-                if(error_bits[byte_n][bit_n] != DiagnosticCode::UNUSED)
+                if (error_bits[byte_n][bit_n] != DiagnosticCode::UNUSED)
                 {
-                  std::cerr << error_code_to_string.at(error_bits[byte_n][bit_n]) << " byte: " << byte_n << " bit_n:" << bit_n << "\n";
+                  std::cerr << error_code_to_string.at(error_bits[byte_n][bit_n]) << " byte: " << byte_n
+                            << " bit_n:" << bit_n << "\n";
                 }
               }
             }

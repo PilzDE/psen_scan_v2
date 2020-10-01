@@ -22,29 +22,28 @@
 
 namespace psen_scan_v2
 {
-
 // clang-format off
 enum class DiagnosticCode
 {
-  OSSD1_OVERCUR,
-  OSSD_SHORT_CIRC,
-  OSSD_INTEGRITY,
-  INTERNAL,
-  WINDOW_CLEAN_ALARM,
+  OSSD1_OC,
+  OSSD_SHRT_C,
+  OSSD_INTEGR,
+  INT,
+  WIN_CLN_AL,
   POWER_SUPPLY,
-  NETWORK_PROBLEM,
-  DUST_CIRC_FAIL,
+  NETW_PRB,
+  DUST_CRC_FL,
   OSSD2_OVERCUR,
   MEAS_PROB,
   INCOHERENCE,
-  ZONE_INVALID_TRANS,
+  ZONE_INVAL_TRANS,
   ZONE_INVALID_CONF,
-  WINDOW_CLEAN_WARN,
-  INT_COM_PROB,
+  WIN_CLN_WARN,
+  INT_COM_PRB,
   GENERIC_ERR,
-  DISPLAY_COM_PROB,
+  DISP_COM_PRB,
   TEMP_MEAS_PROB,
-  ENCOD_OUT_RANGE,
+  ENCOD_OOR,
   EDM2_ERR,
   EDM1_ERR,
   CONF_ERR,
@@ -57,25 +56,25 @@ enum class DiagnosticCode
 
   typedef DiagnosticCode Dc;
 
-  std::map<DiagnosticCode, std::string> error_code_to_string { { Dc::OSSD1_OVERCUR, "OSSD1_OVERCUR" },
-                                                               { Dc::OSSD_SHORT_CIRC, "OSSD_SHORT_CIRC" },
-                                                               { Dc::OSSD_INTEGRITY, "OSSD_INTEGRITY"},
-                                                               { Dc::INTERNAL, "INTERNAL"},
-                                                               { Dc::WINDOW_CLEAN_ALARM, "WINDOW_CLEAN_ALARM"},
+  std::map<DiagnosticCode, std::string> error_code_to_string { { Dc::OSSD1_OC, "OSSD1_OC" },
+                                                               { Dc::OSSD_SHRT_C, "OSSD_SHORT_CIRC" },
+                                                               { Dc::OSSD_INTEGR, "OSSD_INTEGRITY"},
+                                                               { Dc::INT, "INTERNAL"},
+                                                               { Dc::WIN_CLN_AL, "WIN_CLN_AL"},
                                                                { Dc::POWER_SUPPLY, "POWER_SUPPLY"},
-                                                               { Dc::NETWORK_PROBLEM, "NETWORK_PROBLEM"},
-                                                               { Dc::DUST_CIRC_FAIL, "DUST_CIRC_FAIL"},
+                                                               { Dc::NETW_PRB, "NETWORK_PROBLEM"},
+                                                               { Dc::DUST_CRC_FL, "DUST_CIRC_FAIL"},
                                                                { Dc::OSSD2_OVERCUR, "OSSD2_OVERCUR"},
                                                                { Dc::MEAS_PROB, "MEAS_PROB"},
                                                                { Dc::INCOHERENCE, "INCOHERENCE"},
-                                                               { Dc::ZONE_INVALID_TRANS, "ZONE_INVALID_TRANS"},
+                                                               { Dc::ZONE_INVAL_TRANS, "ZONE_INVALID_TRANS"},
                                                                { Dc::ZONE_INVALID_CONF, "ZONE_INVALID_CONF"},
-                                                               { Dc::WINDOW_CLEAN_WARN, "WINDOW_CLEAN_WARN"},
-                                                               { Dc::INT_COM_PROB, "INTERN_COMMUNCATION_PROB"},
+                                                               { Dc::WIN_CLN_WARN, "WINDOW_CLEAN_WARN"},
+                                                               { Dc::INT_COM_PRB, "INTERN_COMMUNCATION_PROB"},
                                                                { Dc::GENERIC_ERR, "GENERIC_ERR"},
-                                                               { Dc::DISPLAY_COM_PROB, "DISPLAY_COM_PROB"},
+                                                               { Dc::DISP_COM_PRB, "DISPLAY_COM_PROB"},
                                                                { Dc::TEMP_MEAS_PROB, "TEMP_MEAS_PROB"},
-                                                               { Dc::ENCOD_OUT_RANGE, "ENCOD_OUT_RANGE"},
+                                                               { Dc::ENCOD_OOR, "ENCOD_OOR"},
                                                                { Dc::EDM2_ERR, "EDM2_ERR"},
                                                                { Dc::EDM1_ERR, "EDM1_ERR"},
                                                                { Dc::CONF_ERR, "CONF_ERR"},
@@ -85,17 +84,19 @@ enum class DiagnosticCode
                                                                { Dc::_, "UNEXPECTED"}
                                                               };
 
+  #define REV(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) arg8, arg7, arg6, arg5, arg4, arg3, arg2, arg1
+
   std::array<std::array<DiagnosticCode, 8>, 9> error_bits{{
-  //Bit0                      Bit1                   Bit2                    Bit3                  Bit4                 Bit5                 Bit6                   Bit7
-  { Dc::INTERNAL,             Dc::INTERNAL,          Dc::INTERNAL,           Dc::INTERNAL,         Dc::INTERNAL,        Dc::OSSD_INTEGRITY,  Dc::OSSD_SHORT_CIRC,   Dc::OSSD1_OVERCUR },
-  { Dc::OSSD2_OVERCUR,        Dc::_,                 Dc::INTERNAL,           Dc::INTERNAL,         Dc::DUST_CIRC_FAIL,  Dc::NETWORK_PROBLEM, Dc::POWER_SUPPLY,      Dc::WINDOW_CLEAN_ALARM },
-  { Dc::WINDOW_CLEAN_WARN,    Dc::ZONE_INVALID_CONF, Dc::ZONE_INVALID_TRANS, Dc::INCOHERENCE,      Dc::INTERNAL,        Dc::INTERNAL,        Dc::INTERNAL,          Dc::MEAS_PROB },
-  { Dc::TEMP_MEAS_PROB,       Dc::INTERNAL,          Dc::INTERNAL,           Dc::DISPLAY_COM_PROB, Dc::GENERIC_ERR,     Dc::INTERNAL,        Dc::INTERNAL,          Dc::INT_COM_PROB },
-  { Dc::TEMP_RANGE_ERR,       Dc::OUT_OF_RANGE_ERR,  Dc::CONF_ERR,           Dc::EDM1_ERR,         Dc::EDM2_ERR,        Dc::_,               Dc::_,                 Dc::ENCOD_OUT_RANGE },
-  { Dc::ENCODER_GENERIC_ERR,  Dc::_,                 Dc::_,                  Dc::_,                Dc::_,               Dc::_,               Dc::_,                 Dc::_ },
-  { Dc::UNUSED,               Dc::UNUSED,            Dc::UNUSED,             Dc::UNUSED,           Dc::UNUSED,          Dc::UNUSED,          Dc::UNUSED,            Dc::UNUSED },
-  { Dc::UNUSED,               Dc::UNUSED,            Dc::UNUSED,             Dc::UNUSED,           Dc::UNUSED,          Dc::UNUSED,          Dc::UNUSED,            Dc::UNUSED },
-  { Dc::UNUSED,               Dc::UNUSED,            Dc::UNUSED,             Dc::UNUSED,           Dc::UNUSED,          Dc::UNUSED,          Dc::UNUSED,            Dc::UNUSED },
+  //Bit8                 Bit7              Bit6              Bit5              Bit4              Bit3                  Bit2                   Bit0
+  { REV(Dc::OSSD1_OC,    Dc::OSSD_SHRT_C,  Dc::OSSD_INTEGR,  Dc::INT,          Dc::INT,          Dc::INT,              Dc::INT,               Dc::INT) },
+  { REV(Dc::WIN_CLN_AL,  Dc::POWER_SUPPLY, Dc::NETW_PRB,     Dc::DUST_CRC_FL,  Dc::INT,          Dc::INT,              Dc::_,                 Dc::OSSD2_OVERCUR) },
+  { REV(Dc::MEAS_PROB,   Dc::INT,          Dc::INT,          Dc::INT,          Dc::INCOHERENCE,  Dc::ZONE_INVAL_TRANS, Dc::ZONE_INVALID_CONF, Dc::WIN_CLN_WARN) },
+  { REV(Dc::INT_COM_PRB, Dc::INT,          Dc::INT,          Dc::GENERIC_ERR,  Dc::DISP_COM_PRB, Dc::INT,              Dc::INT,               Dc::TEMP_MEAS_PROB) },
+  { REV(Dc::ENCOD_OOR,   Dc::_,            Dc::_,            Dc::EDM2_ERR,     Dc::EDM1_ERR,     Dc::CONF_ERR,         Dc::OUT_OF_RANGE_ERR,  Dc::TEMP_RANGE_ERR) },
+  { REV(Dc::_,           Dc::_,            Dc::_,            Dc::_,            Dc::_,            Dc::_,                Dc::_,                 Dc::ENCODER_GENERIC_ERR) },
+  { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::UNUSED) },
+  { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::UNUSED) },
+  { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::UNUSED) },
   }};
 
 // clang-format on
