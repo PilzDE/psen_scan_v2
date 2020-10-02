@@ -32,9 +32,12 @@
 #include "psen_scan_v2/scanner.h"
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/scanner_reply_msg.h"
+#include "psen_scan_v2/scan_range.h"
 
 namespace psen_scan_v2_test
 {
+using namespace psen_scan_v2;
+
 static const std::string SCANNER_IP_ADDRESS{ "127.0.0.1" };
 static constexpr unsigned short CONTROL_PORT_OF_SCANNER_DEVICE{ 3000 };
 static constexpr unsigned short DATA_PORT_OF_SCANNER_DEVICE{ 2000 };
@@ -43,8 +46,7 @@ static const std::string HOST_IP_ADDRESS{ "127.0.0.1" };
 static constexpr uint32_t HOST_UDP_PORT_DATA{ 45000 };
 static constexpr uint32_t HOST_UDP_PORT_CONTROL{ 57000 };
 
-static constexpr double START_ANGLE{ 0. };
-static constexpr double END_ANGLE{ 1. };
+static constexpr DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(1) };
 
 static constexpr std::chrono::milliseconds WAIT_TIMEOUT{ 10 };
 static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 3 };
@@ -57,8 +59,6 @@ using std::placeholders::_1;
 using std::placeholders::_2;
 
 using namespace ::testing;
-
-using namespace psen_scan_v2;
 
 class UserCallbacks
 {
@@ -126,7 +126,7 @@ void ScannerMock::sendMonitoringFrame()
 ScannerConfiguration createScannerConfig()
 {
   return ScannerConfiguration(
-      HOST_IP_ADDRESS, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, SCANNER_IP_ADDRESS, START_ANGLE, END_ANGLE);
+      HOST_IP_ADDRESS, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, SCANNER_IP_ADDRESS, SCAN_RANGE);
 }
 
 TEST(ScannerAPITests, testStartFunctionality)

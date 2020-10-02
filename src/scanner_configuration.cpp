@@ -25,16 +25,12 @@
 
 namespace psen_scan_v2
 {
-static constexpr double MIN_SCAN_ANGLE{ 0. };
-static constexpr double MAX_SCAN_ANGLE{ degreeToRadian(275.) };
-
 ScannerConfiguration::ScannerConfiguration(const std::string& host_ip,
                                            const int& host_udp_port_data,
                                            const int& host_udp_port_control,
                                            const std::string& client_ip,
-                                           const double& start_angle,
-                                           const double& end_angle)
-  : start_angle_(start_angle), end_angle_(end_angle)
+                                           const DefaultScanRange& scan_range)
+  : scan_range_(scan_range)
 {
   const auto host_ip_number = inet_network(host_ip.c_str());
   if (static_cast<in_addr_t>(-1) == host_ip_number)
@@ -65,21 +61,6 @@ ScannerConfiguration::ScannerConfiguration(const std::string& host_ip,
   }
   assert(sizeof(client_ip_number) == 4 && "client_ip_number has not the expected size");
   client_ip_ = static_cast<uint32_t>(client_ip_number);
-
-  if (start_angle < MIN_SCAN_ANGLE || start_angle > MAX_SCAN_ANGLE)
-  {
-    throw std::out_of_range("Start angle out of range");
-  }
-
-  if (end_angle < MIN_SCAN_ANGLE || end_angle > MAX_SCAN_ANGLE)
-  {
-    throw std::out_of_range("End angle out of range");
-  }
-
-  if (start_angle > end_angle)
-  {
-    throw std::invalid_argument("End angle must not be smaller than start angle");
-  }
 }
 
 uint32_t ScannerConfiguration::hostIp() const
@@ -102,14 +83,9 @@ uint32_t ScannerConfiguration::clientIp() const
   return client_ip_;
 }
 
-double ScannerConfiguration::startAngle() const
+const DefaultScanRange& ScannerConfiguration::scanRange() const
 {
-  return start_angle_;
-}
-
-double ScannerConfiguration::endAngle() const
-{
-  return end_angle_;
+  return scan_range_;
 }
 
 }  // namespace psen_scan_v2

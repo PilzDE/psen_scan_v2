@@ -48,7 +48,7 @@ inline static uint16_t radToTenthDegree(const double& angle_in_rad)
   return degreeToTenthDegree(radianToDegree(angle_in_rad));
 }
 
-inline static double tenthDegreeToRad(const uint16_t& angle_in_tenth_degree)
+inline static double constexpr tenthDegreeToRad(const uint16_t& angle_in_tenth_degree)
 {
   return degreeToRadian(static_cast<double>(angle_in_tenth_degree) / 10.);
 }

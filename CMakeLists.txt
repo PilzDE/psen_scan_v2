@@ -205,6 +205,13 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES}
   )
 
+  catkin_add_gtest(unittest_scan_range
+    test/unit_tests/unittest_scan_range.cpp
+  )
+  target_link_libraries(unittest_scan_range
+    ${catkin_LIBRARIES}
+  )
+
   catkin_add_gtest(unittest_scanner_configuration
     test/unit_tests/unittest_scanner_configuration.cpp
     src/scanner_configuration.cpp

@@ -30,6 +30,7 @@
 #include "psen_scan_v2/laserscan.h"
 #include "psen_scan_v2/udp_frame_dumps.h"
 #include "psen_scan_v2/raw_data_array_conversion.h"
+#include "psen_scan_v2/scan_range.h"
 
 using namespace psen_scan_v2_test;
 
@@ -41,8 +42,7 @@ static const std::string HOST_IP{ "127.0.0.1" };
 static constexpr int HOST_UDP_PORT_DATA{ 50505 };
 static constexpr int HOST_UDP_PORT_CONTROL{ 55055 };
 static const std::string DEVICE_IP{ "127.0.0.100" };
-static constexpr double START_ANGLE{ 0. };
-static constexpr double END_ANGLE{ degreeToRadian(275.) };
+static constexpr DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(2750) };
 
 class MockCallbackHolder
 {
@@ -59,8 +59,7 @@ class ScannerControllerTest : public ::testing::Test
 {
 protected:
   MockCallbackHolder mock_;
-  ScannerConfiguration scanner_config_{ HOST_IP,   HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL,
-                                        DEVICE_IP, START_ANGLE,        END_ANGLE };
+  ScannerConfiguration scanner_config_{ HOST_IP, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, DEVICE_IP, SCAN_RANGE };
 
   LaserScanCallback laser_scan_callback_{
     std::bind(&MockCallbackHolder::laserscan_callback, &mock_, std::placeholders::_1)
