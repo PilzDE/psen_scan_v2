@@ -91,6 +91,7 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
 
       MonitoringFrameMsg frame_;
     };
+    struct start_reply_timeout {};
     struct stop_request {};
   };
 
@@ -175,6 +176,12 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
     send_start_request_callback_();
   }
 
+  void action_send_start_request(events::start_reply_timeout const&)
+  {
+    PSENSCAN_DEBUG("StateMachine", "Action: send_start_request_action");
+    send_start_request_callback_();
+  }
+
   void action_send_stop_request(events::stop_request const&)
   {
     PSENSCAN_DEBUG("StateMachine", "Action: send_stop_request_action");
@@ -222,6 +229,7 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
     a_row  < s::idle,                       e::stop_request,                 s::wait_for_stop_reply,         &m::action_send_stop_request                                  >,
       row  < s::wait_for_start_reply,       e::reply_received,               s::wait_for_monitoring_frame,   &m::action_notify_start,            &m::guard_is_start_reply  >,
     a_irow < s::wait_for_monitoring_frame,  e::monitoring_frame_received,                                    &m::action_handle_monitoring_frame                            >,
+    a_irow < s::wait_for_start_reply,       e::start_reply_timeout,                                          &m::action_send_start_request                                 >,
     a_row  < s::wait_for_start_reply,       e::stop_request,                 s::wait_for_stop_reply,         &m::action_send_stop_request                                  >,
     a_row  < s::wait_for_monitoring_frame,  e::stop_request,                 s::wait_for_stop_reply,         &m::action_send_stop_request                                  >,
       row  < s::wait_for_stop_reply,        e::reply_received,               s::stopped,                     &m::action_notify_stop,             &m::guard_is_stop_reply   >

@@ -187,6 +187,7 @@ void ScannerControllerT<TCSM, TUCI>::handleStartReplyTimeout(const std::string& 
 {
   PSENSCAN_ERROR(
       "ScannerController", "Timeout while waiting for start reply message from scanner | Error message: {}", error_str);
+  state_machine_.processStartReplyTimeoutEvent();
 }
 
 template <typename TCSM, typename TUCI>
