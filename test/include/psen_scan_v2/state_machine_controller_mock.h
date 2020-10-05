@@ -35,6 +35,7 @@ public:
 
 public:
   MOCK_METHOD0(processStartRequestEvent, void());
+  MOCK_METHOD0(processStartReplyTimeoutEvent, void());
   MOCK_METHOD1(processReplyReceivedEvent, void(psen_scan_v2::ScannerReplyMsgType));
   MOCK_METHOD0(processMonitoringFrameReceivedEvent, void());
   MOCK_METHOD0(processStopRequestEvent, void());
