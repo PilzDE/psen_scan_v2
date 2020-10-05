@@ -94,7 +94,7 @@ private:
     };
 
   private:
-    const DefaultScanRange scan_range_;
+    const DefaultScanRange scan_range_{};
     double resolution_{ 0. };
   };
 
