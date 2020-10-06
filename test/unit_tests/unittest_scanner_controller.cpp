@@ -20,7 +20,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2/state_machine_controller_mock.h"
+#include "psen_scan_v2/controller_state_machine.h"
 #include "psen_scan_v2/mock_udp_client.h"
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/scanner_controller.h"
@@ -58,6 +58,10 @@ static constexpr uint32_t RES_CODE_ACCEPTED{ 0x00 };
 class ScannerControllerTest : public ::testing::Test
 {
 protected:
+  void sendStartReply();
+  void sendStopReply();
+
+protected:
   MockCallbackHolder mock_;
   ScannerConfiguration scanner_config_{ HOST_IP, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, DEVICE_IP, SCAN_RANGE };
 
@@ -65,161 +69,80 @@ protected:
     std::bind(&MockCallbackHolder::laserscan_callback, &mock_, std::placeholders::_1)
   };
 
-  ScannerControllerT<psen_scan_v2_test::ControllerStateMachineMock, psen_scan_v2_test::MockUdpClient>
-      scanner_controller_{ scanner_config_, laser_scan_callback_ };
+  ScannerControllerT<ControllerStateMachine, MockUdpClient> scanner_controller_{ scanner_config_,
+                                                                                 laser_scan_callback_ };
 };
 
-TEST_F(ScannerControllerTest, testStartRequestEvent)
-{
-  EXPECT_CALL(scanner_controller_.state_machine_, processStartRequestEvent()).Times(1);
-
-  scanner_controller_.start();
-}
-
-TEST_F(ScannerControllerTest, testStartRequestEventWithFutureUsage)
-{
-  EXPECT_CALL(scanner_controller_.state_machine_, processStartRequestEvent()).Times(1);
-
-  std::future<void> start_future = scanner_controller_.start();
-
-  scanner_controller_.state_machine_.started_cb_();  // TODO needs to be real async?
-
-  start_future.wait();
-}
-
-TEST_F(ScannerControllerTest, testStopRequestEvent)
-{
-  EXPECT_CALL(scanner_controller_.state_machine_, processStopRequestEvent()).Times(1);
-
-  scanner_controller_.stop();
-}
-
-TEST_F(ScannerControllerTest, testStopRequestEventWithFutureUsage)
-{
-  EXPECT_CALL(scanner_controller_.state_machine_, processStopRequestEvent()).Times(1);
-
-  std::future<void> stop_future = scanner_controller_.stop();
-
-  scanner_controller_.state_machine_.stopped_cb_();  // TODO needs to be real async?
-
-  stop_future.wait();
-}
-
-TEST_F(ScannerControllerTest, testStartRequestSending)
-{
-  using ::testing::_;
-  using ::testing::Expectation;
-
-  StartRequest start_request(scanner_config_, 0);
-
-  Expectation control_udp_client_start_receiving =
-      EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _));
-  Expectation data_udp_client_start_receiving =
-      EXPECT_CALL(scanner_controller_.data_udp_client_, startAsyncReceiving());
-  EXPECT_CALL(scanner_controller_.control_udp_client_, write(start_request.toRawData()))
-      .After(control_udp_client_start_receiving, data_udp_client_start_receiving);
-
-  scanner_controller_.sendStartRequest();
-}
-
-TEST_F(ScannerControllerTest, testStopRequestSending)
-{
-  using ::testing::_;
-  using ::testing::Expectation;
-
-  StopRequest stop_request;
-
-  EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _)).Times(1);
-  EXPECT_CALL(scanner_controller_.control_udp_client_, write(stop_request.toRawData())).Times(1);
-
-  scanner_controller_.sendStopRequest();
-}
-
-TEST_F(ScannerControllerTest, testHandleStartReplyTimeout)
-{
-  using ::testing::_;
-  using ::testing::Expectation;
-
-  {
-    ::testing::InSequence seq;
-    EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _))
-        .WillOnce(::testing::Invoke(
-            [](const ReceiveMode& modi,
-               const TimeoutHandler& timeout_handler,
-               const std::chrono::high_resolution_clock::duration timeout) { timeout_handler("timeout!"); }));
-    EXPECT_CALL(scanner_controller_.data_udp_client_, startAsyncReceiving()).Times(1);
-    EXPECT_CALL(scanner_controller_.control_udp_client_, write(_)).Times(1);
-  }
-  scanner_controller_.sendStartRequest();
-}
-
-TEST_F(ScannerControllerTest, testHandleStopReplyTimeout)
-{
-  using ::testing::_;
-  using ::testing::Expectation;
-
-  {
-    ::testing::InSequence seq;
-    EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _))
-        .WillOnce(::testing::Invoke(
-            [](const ReceiveMode& modi,
-               const TimeoutHandler& timeout_handler,
-               const std::chrono::high_resolution_clock::duration timeout) { timeout_handler("timeout!"); }));
-    EXPECT_CALL(scanner_controller_.control_udp_client_, write(_)).Times(1);
-  }
-  scanner_controller_.sendStopRequest();
-}
-
-TEST_F(ScannerControllerTest, testHandleErrorNoThrow)
-{
-  ASSERT_NO_THROW(scanner_controller_.handleError("Error Message."));
-}
-
-TEST_F(ScannerControllerTest, testHandleScannerReplyTypeStart)
+void ScannerControllerTest::sendStartReply()
 {
   ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
   const auto data{ msg.toRawData() };
   MaxSizeRawData max_size_data;
   std::copy_n(data.begin(), data.size(), max_size_data.begin());
 
-  EXPECT_CALL(scanner_controller_.state_machine_, processReplyReceivedEvent(ScannerReplyMsgType::Start)).Times(1);
-  scanner_controller_.handleScannerReply(max_size_data, max_size_data.size());
+  scanner_controller_.control_udp_client_.handleNewData(max_size_data, max_size_data.size());
 }
 
-TEST_F(ScannerControllerTest, testHandleScannerReplyTypeStop)
+void ScannerControllerTest::sendStopReply()
 {
   ScannerReplyMsg msg(OP_CODE_STOP, RES_CODE_ACCEPTED);
   const auto data{ msg.toRawData() };
   MaxSizeRawData max_size_data;
   std::copy_n(data.begin(), data.size(), max_size_data.begin());
 
-  EXPECT_CALL(scanner_controller_.state_machine_, processReplyReceivedEvent(ScannerReplyMsgType::Stop)).Times(1);
-  scanner_controller_.handleScannerReply(max_size_data, max_size_data.size());
+  scanner_controller_.control_udp_client_.handleNewData(max_size_data, max_size_data.size());
 }
 
-TEST_F(ScannerControllerTest, testHandleScannerReplyTypeUnknown)
+TEST_F(ScannerControllerTest, testStart)
 {
-  ScannerReplyMsg msg(OP_CODE_UNKNOWN, RES_CODE_ACCEPTED);
-  const auto data{ msg.toRawData() };
-  MaxSizeRawData max_size_data;
-  std::copy_n(data.begin(), data.size(), max_size_data.begin());
+  using ::testing::_;
+  using ::testing::InSequence;
 
-  EXPECT_CALL(scanner_controller_.state_machine_, processReplyReceivedEvent(ScannerReplyMsgType::Unknown)).Times(1);
-  scanner_controller_.handleScannerReply(max_size_data, max_size_data.size());
+  StartRequest start_request(scanner_config_, 0);
+
+  {
+    InSequence seq;
+    EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _)).Times(1);
+    EXPECT_CALL(scanner_controller_.data_udp_client_, startAsyncReceiving()).Times(1);
+    EXPECT_CALL(scanner_controller_.control_udp_client_, write(start_request.toRawData())).Times(1);
+  }
+
+  auto start_future = scanner_controller_.start();
+  sendStartReply();
+  start_future.wait_for(std::chrono::seconds(0));
+}
+
+TEST_F(ScannerControllerTest, testStop)
+{
+  using ::testing::_;
+  using ::testing::InSequence;
+
+  StopRequest stop_request;
+
+  {
+    InSequence seq;
+    EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _)).Times(1);
+    EXPECT_CALL(scanner_controller_.control_udp_client_, write(stop_request.toRawData())).Times(1);
+  }
+
+  auto stop_future = scanner_controller_.stop();
+  sendStopReply();
+  stop_future.wait_for(std::chrono::seconds(0));
 }
 
 TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
 {
   UDPFrameTestDataWithoutIntensities test_data;
-  const MaxSizeRawData data = convertToMaxSizeRawData(test_data.hex_dump);
+  const MaxSizeRawData raw_data = convertToMaxSizeRawData(test_data.hex_dump);
   const auto num_bytes = 2 * test_data.hex_dump.size();
-  MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data, num_bytes) };
+  MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(raw_data, num_bytes) };
   LaserScan scan = toLaserScan(frame);
 
-  EXPECT_CALL(scanner_controller_.state_machine_, processMonitoringFrameReceivedEvent()).Times(1);
   EXPECT_CALL(mock_, laserscan_callback(scan)).Times(1);
 
-  scanner_controller_.handleNewMonitoringFrame(data, data.size());
+  scanner_controller_.start();
+  sendStartReply();
+  scanner_controller_.data_udp_client_.handleNewData(raw_data, raw_data.size());
 }
 
 TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
@@ -227,20 +150,21 @@ TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
   using ::testing::_;
 
   UDPFrameTestDataWithoutMeasurementsAndIntensities test_data;
-  MaxSizeRawData data = convertToMaxSizeRawData(test_data.hex_dump);
+  MaxSizeRawData raw_data = convertToMaxSizeRawData(test_data.hex_dump);
   const auto num_bytes = 2 * test_data.hex_dump.size();
-  MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data, num_bytes) };
+  MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(raw_data, num_bytes) };
 
-  EXPECT_CALL(scanner_controller_.state_machine_, processMonitoringFrameReceivedEvent()).Times(1);
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
-  scanner_controller_.handleNewMonitoringFrame(data, data.size());
+  scanner_controller_.start();
+  sendStartReply();
+  scanner_controller_.data_udp_client_.handleNewData(raw_data, raw_data.size());
 }
 
 TEST_F(ScannerControllerTest, testConstructorInvalidLaserScanCallback)
 {
   LaserScanCallback laserscan_callback;
-  typedef ScannerControllerT<psen_scan_v2_test::ControllerStateMachineMock, psen_scan_v2_test::MockUdpClient> SCT;
+  typedef ScannerControllerT<ControllerStateMachine, MockUdpClient> SCT;
   EXPECT_THROW(SCT scanner_controller_(scanner_config_, laserscan_callback);, std::invalid_argument);
 }
 

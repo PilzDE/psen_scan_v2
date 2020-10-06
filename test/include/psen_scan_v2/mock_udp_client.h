@@ -30,7 +30,10 @@ public:
                 const psen_scan_v2::ErrorHandler& error_handler,
                 const unsigned short& host_port,
                 const unsigned int& endpoint_ip,
-                const unsigned short& endpoint_port){};
+                const unsigned short& endpoint_port)
+    : data_handler_(data_handler){};
+
+  void handleNewData(const psen_scan_v2::MaxSizeRawData& received_data, const std::size_t& bytes_received);
 
 public:
   MOCK_METHOD0(close, void());
@@ -41,7 +44,15 @@ public:
   // "Simulates" function call which uses default values
   MOCK_METHOD0(startAsyncReceiving, void());
   MOCK_METHOD1(write, void(const psen_scan_v2::DynamicSizeRawData& data));
+
+private:
+  psen_scan_v2::NewDataHandler data_handler_;
 };
+
+void MockUdpClient::handleNewData(const psen_scan_v2::MaxSizeRawData& received_data, const std::size_t& bytes_received)
+{
+  data_handler_(received_data, bytes_received);
+}
 
 }  // namespace psen_scan_v2_test
 
