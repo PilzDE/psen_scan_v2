@@ -17,33 +17,84 @@
 #define PSEN_SCAN_V2_TEST_MOCK_SCANNER_IMPL_H
 
 #include <gmock/gmock.h>
+#include <functional>
+#include <cstdint>
+#include <boost/asio/ip/udp.hpp>
+#include <boost/asio/ip/address_v4.hpp>
 
-#include "psen_scan_v2/scanner.h"
-#include "psen_scan_v2/scanner_configuration.h"
-#include "psen_scan_v2/function_pointers.h"
-#include "psen_scan_v2/laserscan.h"
+#include "psen_scan_v2/raw_scanner_data.h"
+#include "psen_scan_v2/mock_udp_server.h"
+#include "psen_scan_v2/scanner_reply_msg.h"
+#include "psen_scan_v2/udp_frame_dumps.h"
+#include "psen_scan_v2/raw_data_array_conversion.h"
 
 namespace psen_scan_v2_test
 {
+static constexpr unsigned short CONTROL_PORT_OF_SCANNER_DEVICE{ 3000 };
+static constexpr unsigned short DATA_PORT_OF_SCANNER_DEVICE{ 2000 };
+
+static const std::string HOST_IP_ADDRESS{ "127.0.0.1" };
+static constexpr uint32_t HOST_UDP_PORT_DATA{ 45000 };
+static constexpr uint32_t HOST_UDP_PORT_CONTROL{ 57000 };
+
+using std::placeholders::_1;
+using std::placeholders::_2;
+
 class ScannerMock
 {
 public:
-  ScannerMock(const psen_scan_v2::ScannerConfiguration& scanner_config,
-              const psen_scan_v2::LaserScanCallback& laser_scan_callback)
-    : laser_scan_callback_(laser_scan_callback){};
+  MOCK_METHOD2(receiveControlMsg, void(const udp::endpoint&, const psen_scan_v2::DynamicSizeRawData&));
+  MOCK_METHOD2(receiveDataMsg, void(const udp::endpoint&, const psen_scan_v2::DynamicSizeRawData&));
 
-  MOCK_METHOD0(start, void());
-  MOCK_METHOD0(stop, void());
+public:
+  void startListeningForControlMsg();
 
-  void invokeLaserScanCallback(const psen_scan_v2::LaserScan& scan);
+public:
+  void sendStartReply();
+  void sendStopReply();
+  void sendMonitoringFrame();
 
 private:
-  psen_scan_v2::LaserScanCallback laser_scan_callback_;
+  void sendReply(const uint32_t reply_type);
+
+private:
+  const udp::endpoint control_msg_receiver_{ udp::endpoint(boost::asio::ip::address_v4::from_string(HOST_IP_ADDRESS),
+                                                           HOST_UDP_PORT_CONTROL) };
+
+  const udp::endpoint monitoring_frame_receiver_{
+    udp::endpoint(boost::asio::ip::address_v4::from_string(HOST_IP_ADDRESS), HOST_UDP_PORT_DATA)
+  };
+
+  MockUDPServer control_server_{ CONTROL_PORT_OF_SCANNER_DEVICE,
+                                 std::bind(&ScannerMock::receiveControlMsg, this, _1, _2) };
+  MockUDPServer data_server_{ DATA_PORT_OF_SCANNER_DEVICE, std::bind(&ScannerMock::receiveDataMsg, this, _1, _2) };
 };
 
-inline void ScannerMock::invokeLaserScanCallback(const psen_scan_v2::LaserScan& scan)
+void ScannerMock::startListeningForControlMsg()
 {
-  laser_scan_callback_(scan);
+  control_server_.asyncReceive();
+}
+
+void ScannerMock::sendReply(const uint32_t reply_type)
+{
+  const psen_scan_v2::ScannerReplyMsg msg(reply_type, 0x00);
+  control_server_.asyncSend<psen_scan_v2::REPLY_MSG_FROM_SCANNER_SIZE>(control_msg_receiver_, msg.toRawData());
+}
+
+void ScannerMock::sendStartReply()
+{
+  sendReply(getOpCodeValue(psen_scan_v2::ScannerReplyMsgType::Start));
+}
+
+void ScannerMock::sendStopReply()
+{
+  sendReply(getOpCodeValue(psen_scan_v2::ScannerReplyMsgType::Stop));
+}
+
+void ScannerMock::sendMonitoringFrame()
+{
+  constexpr UDPFrameTestDataWithoutIntensities raw_scan;
+  data_server_.asyncSend<raw_scan.hex_dump.size()>(monitoring_frame_receiver_, transformArray(raw_scan.hex_dump));
 }
 
 }  // namespace psen_scan_v2_test

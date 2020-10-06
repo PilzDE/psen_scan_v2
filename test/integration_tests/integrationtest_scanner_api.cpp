@@ -23,7 +23,6 @@
 
 // Test frameworks
 #include "psen_scan_v2/async_barrier.h"
-#include "psen_scan_v2/mock_udp_server.h"
 #include "psen_scan_v2/udp_frame_dumps.h"
 #include "psen_scan_v2/raw_data_array_conversion.h"
 
@@ -33,18 +32,13 @@
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/scanner_reply_msg.h"
 #include "psen_scan_v2/scan_range.h"
+#include "psen_scan_v2/scanner_mock.h"
 
 namespace psen_scan_v2_test
 {
 using namespace psen_scan_v2;
 
 static const std::string SCANNER_IP_ADDRESS{ "127.0.0.1" };
-static constexpr unsigned short CONTROL_PORT_OF_SCANNER_DEVICE{ 3000 };
-static constexpr unsigned short DATA_PORT_OF_SCANNER_DEVICE{ 2000 };
-
-static const std::string HOST_IP_ADDRESS{ "127.0.0.1" };
-static constexpr uint32_t HOST_UDP_PORT_DATA{ 45000 };
-static constexpr uint32_t HOST_UDP_PORT_CONTROL{ 57000 };
 
 static constexpr DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(1) };
 
@@ -55,9 +49,6 @@ static constexpr uint32_t DEFAULT_SEQ_NUMBER{ 0u };
 
 static constexpr double EPS{ 0.001 };
 
-using std::placeholders::_1;
-using std::placeholders::_2;
-
 using namespace ::testing;
 
 class UserCallbacks
@@ -66,62 +57,6 @@ public:
   MOCK_METHOD1(LaserScanCallback, void(const LaserScan&));
 };
 
-class ScannerMock
-{
-public:
-  MOCK_METHOD2(receiveControlMsg, void(const udp::endpoint&, const psen_scan_v2::DynamicSizeRawData&));
-  MOCK_METHOD2(receiveDataMsg, void(const udp::endpoint&, const psen_scan_v2::DynamicSizeRawData&));
-
-public:
-  void startListeningForControlMsg();
-
-public:
-  void sendStartReply();
-  void sendStopReply();
-  void sendMonitoringFrame();
-
-private:
-  void sendReply(const uint32_t reply_type);
-
-private:
-  const udp::endpoint control_msg_receiver_{ udp::endpoint(boost::asio::ip::address_v4::from_string(HOST_IP_ADDRESS),
-                                                           HOST_UDP_PORT_CONTROL) };
-
-  const udp::endpoint monitoring_frame_receiver_{
-    udp::endpoint(boost::asio::ip::address_v4::from_string(HOST_IP_ADDRESS), HOST_UDP_PORT_DATA)
-  };
-
-  MockUDPServer control_server_{ CONTROL_PORT_OF_SCANNER_DEVICE,
-                                 std::bind(&ScannerMock::receiveControlMsg, this, _1, _2) };
-  MockUDPServer data_server_{ DATA_PORT_OF_SCANNER_DEVICE, std::bind(&ScannerMock::receiveDataMsg, this, _1, _2) };
-};
-
-void ScannerMock::startListeningForControlMsg()
-{
-  control_server_.asyncReceive();
-}
-
-void ScannerMock::sendReply(const uint32_t reply_type)
-{
-  const ScannerReplyMsg msg(reply_type, 0x00);
-  control_server_.asyncSend<REPLY_MSG_FROM_SCANNER_SIZE>(control_msg_receiver_, msg.toRawData());
-}
-
-void ScannerMock::sendStartReply()
-{
-  sendReply(getOpCodeValue(ScannerReplyMsgType::Start));
-}
-
-void ScannerMock::sendStopReply()
-{
-  sendReply(getOpCodeValue(ScannerReplyMsgType::Stop));
-}
-
-void ScannerMock::sendMonitoringFrame()
-{
-  constexpr UDPFrameTestDataWithoutIntensities raw_scan;
-  data_server_.asyncSend<raw_scan.hex_dump.size()>(monitoring_frame_receiver_, transformArray(raw_scan.hex_dump));
-}
 
 ScannerConfiguration createScannerConfig()
 {
