@@ -26,10 +26,8 @@
 #include "psen_scan_v2/scanner_controller.h"
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/stop_request.h"
-#include "psen_scan_v2/laserscan_conversions.h"
 #include "psen_scan_v2/laserscan.h"
 #include "psen_scan_v2/udp_frame_dumps.h"
-#include "psen_scan_v2/raw_data_array_conversion.h"
 #include "psen_scan_v2/scan_range.h"
 
 using namespace psen_scan_v2_test;
@@ -50,16 +48,15 @@ public:
   MOCK_METHOD1(laserscan_callback, void(const LaserScan&));
 };
 
-static constexpr uint32_t OP_CODE_START{ 0x35 };
-static constexpr uint32_t OP_CODE_STOP{ 0x36 };
-static constexpr uint32_t OP_CODE_UNKNOWN{ 0x01 };
-static constexpr uint32_t RES_CODE_ACCEPTED{ 0x00 };
-
 class ScannerControllerTest : public ::testing::Test
 {
 protected:
   void sendStartReply();
   void sendStopReply();
+  template <typename TestData>
+  void sendMonitoringFrame(const TestData& test_data);
+  template <typename TestData>
+  LaserScan testDataToLaserScan(const TestData& test_data);
 
 protected:
   MockCallbackHolder mock_;
@@ -75,22 +72,27 @@ protected:
 
 void ScannerControllerTest::sendStartReply()
 {
-  ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
-  const auto data{ msg.toRawData() };
-  MaxSizeRawData max_size_data;
-  std::copy_n(data.begin(), data.size(), max_size_data.begin());
-
-  scanner_controller_.control_udp_client_.handleNewData(max_size_data, max_size_data.size());
+  scanner_controller_.control_udp_client_.sendStartReply();
 }
 
 void ScannerControllerTest::sendStopReply()
 {
-  ScannerReplyMsg msg(OP_CODE_STOP, RES_CODE_ACCEPTED);
-  const auto data{ msg.toRawData() };
-  MaxSizeRawData max_size_data;
-  std::copy_n(data.begin(), data.size(), max_size_data.begin());
+  scanner_controller_.control_udp_client_.sendStopReply();
+}
 
-  scanner_controller_.control_udp_client_.handleNewData(max_size_data, max_size_data.size());
+template <typename TestData>
+void ScannerControllerTest::sendMonitoringFrame(const TestData& test_data)
+{
+  scanner_controller_.data_udp_client_.sendMonitoringFrame(test_data);
+}
+
+template <typename TestData>
+LaserScan ScannerControllerTest::testDataToLaserScan(const TestData& test_data)
+{
+  const MaxSizeRawData raw_data = convertToMaxSizeRawData(test_data.hex_dump);
+  const auto num_bytes = 2 * test_data.hex_dump.size();
+  const MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(raw_data, num_bytes) };
+  return toLaserScan(frame);
 }
 
 TEST_F(ScannerControllerTest, testStart)
@@ -98,7 +100,7 @@ TEST_F(ScannerControllerTest, testStart)
   using ::testing::_;
   using ::testing::InSequence;
 
-  StartRequest start_request(scanner_config_, 0);
+  const StartRequest start_request(scanner_config_, 0);
 
   {
     InSequence seq;
@@ -117,7 +119,7 @@ TEST_F(ScannerControllerTest, testStop)
   using ::testing::_;
   using ::testing::InSequence;
 
-  StopRequest stop_request;
+  const StopRequest stop_request;
 
   {
     InSequence seq;
@@ -132,38 +134,32 @@ TEST_F(ScannerControllerTest, testStop)
 
 TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
 {
-  UDPFrameTestDataWithoutIntensities test_data;
-  const MaxSizeRawData raw_data = convertToMaxSizeRawData(test_data.hex_dump);
-  const auto num_bytes = 2 * test_data.hex_dump.size();
-  MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(raw_data, num_bytes) };
-  LaserScan scan = toLaserScan(frame);
+  const UDPFrameTestDataWithoutIntensities test_data;
+  const LaserScan scan{ testDataToLaserScan(test_data) };
 
   EXPECT_CALL(mock_, laserscan_callback(scan)).Times(1);
 
   scanner_controller_.start();
   sendStartReply();
-  scanner_controller_.data_udp_client_.handleNewData(raw_data, raw_data.size());
+  sendMonitoringFrame(test_data);
 }
 
 TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
 {
   using ::testing::_;
 
-  UDPFrameTestDataWithoutMeasurementsAndIntensities test_data;
-  MaxSizeRawData raw_data = convertToMaxSizeRawData(test_data.hex_dump);
-  const auto num_bytes = 2 * test_data.hex_dump.size();
-  MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(raw_data, num_bytes) };
-
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
   scanner_controller_.start();
   sendStartReply();
-  scanner_controller_.data_udp_client_.handleNewData(raw_data, raw_data.size());
+
+  const UDPFrameTestDataWithoutMeasurementsAndIntensities test_data;
+  sendMonitoringFrame(test_data);
 }
 
 TEST_F(ScannerControllerTest, testConstructorInvalidLaserScanCallback)
 {
-  LaserScanCallback laserscan_callback;
+  const LaserScanCallback laserscan_callback;
   typedef ScannerControllerT<ControllerStateMachine, MockUdpClient> SCT;
   EXPECT_THROW(SCT scanner_controller_(scanner_config_, laserscan_callback);, std::invalid_argument);
 }

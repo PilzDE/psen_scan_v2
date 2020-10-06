@@ -18,11 +18,19 @@
 
 #include <gmock/gmock.h>
 
+#include "psen_scan_v2/scanner_reply_msg.h"
 #include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/udp_client.h"
 
+#include "psen_scan_v2/raw_data_array_conversion.h"
+
 namespace psen_scan_v2_test
 {
+static constexpr uint32_t OP_CODE_START{ 0x35 };
+static constexpr uint32_t OP_CODE_STOP{ 0x36 };
+static constexpr uint32_t OP_CODE_UNKNOWN{ 0x01 };
+static constexpr uint32_t RES_CODE_ACCEPTED{ 0x00 };
+
 class MockUdpClient
 {
 public:
@@ -33,7 +41,11 @@ public:
                 const unsigned short& endpoint_port)
     : data_handler_(data_handler){};
 
-  void handleNewData(const psen_scan_v2::MaxSizeRawData& received_data, const std::size_t& bytes_received);
+public:
+  void sendStartReply();
+  void sendStopReply();
+  template <typename TestData>
+  void sendMonitoringFrame(const TestData& test_data);
 
 public:
   MOCK_METHOD0(close, void());
@@ -46,8 +58,38 @@ public:
   MOCK_METHOD1(write, void(const psen_scan_v2::DynamicSizeRawData& data));
 
 private:
+  void handleNewData(const psen_scan_v2::MaxSizeRawData& received_data, const std::size_t& bytes_received);
+
+private:
   psen_scan_v2::NewDataHandler data_handler_;
 };
+
+void MockUdpClient::sendStartReply()
+{
+  const psen_scan_v2::ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
+  const auto data{ msg.toRawData() };
+  psen_scan_v2::MaxSizeRawData max_size_data;
+  std::copy_n(data.begin(), data.size(), max_size_data.begin());
+
+  handleNewData(max_size_data, max_size_data.size());
+}
+
+void MockUdpClient::sendStopReply()
+{
+  const psen_scan_v2::ScannerReplyMsg msg(OP_CODE_STOP, RES_CODE_ACCEPTED);
+  const auto data{ msg.toRawData() };
+  psen_scan_v2::MaxSizeRawData max_size_data;
+  std::copy_n(data.begin(), data.size(), max_size_data.begin());
+
+  handleNewData(max_size_data, max_size_data.size());
+}
+
+template <typename TestData>
+void MockUdpClient::sendMonitoringFrame(const TestData& test_data)
+{
+  const psen_scan_v2::MaxSizeRawData raw_data = convertToMaxSizeRawData(test_data.hex_dump);
+  handleNewData(raw_data, raw_data.size());
+}
 
 void MockUdpClient::handleNewData(const psen_scan_v2::MaxSizeRawData& received_data, const std::size_t& bytes_received)
 {
