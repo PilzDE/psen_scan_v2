@@ -29,11 +29,13 @@
 #include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/ros_scanner_node.h"
 #include "psen_scan_v2/laserscan.h"
+#include "psen_scan_v2/scanner_mock.h"
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/scanner.h"
 #include "psen_scan_v2/scan_range.h"
 
 using namespace psen_scan_v2;
+using namespace psen_scan_v2_test;
 using ::testing::DoAll;
 using ::testing::Return;
 
@@ -46,27 +48,6 @@ static constexpr int QUEUE_SIZE{ 10 };
 static const std::string LASER_SCAN_RECEIVED{ "LASER_SCAN_RECEIVED" };
 static const std::string SCANNER_STARTED{ "SCANNER_STARTED" };
 static const std::string SCANNER_STOPPED{ "SCANNER_STOPPED" };
-
-class ScannerMock
-{
-public:
-  ScannerMock(const psen_scan_v2::ScannerConfiguration& scanner_config,
-              const psen_scan_v2::LaserScanCallback& laser_scan_callback)
-    : laser_scan_callback_(laser_scan_callback){};
-
-  MOCK_METHOD0(start, void());
-  MOCK_METHOD0(stop, void());
-
-  void invokeLaserScanCallback(const psen_scan_v2::LaserScan& scan);
-
-private:
-  psen_scan_v2::LaserScanCallback laser_scan_callback_;
-};
-
-inline void ScannerMock::invokeLaserScanCallback(const psen_scan_v2::LaserScan& scan)
-{
-  laser_scan_callback_(scan);
-}
 
 class SubscriberMock
 {
