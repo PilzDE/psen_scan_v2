@@ -91,18 +91,18 @@ _angle_end_ (_double_, default: 2.40 (= 137.5 deg))<br/>
 End angle of measurement. (Radian)
 
 ## Usage
-To start reading from the safety laser scanner and publishing complete scans execute `roslaunch psen_scan_v2 psen_scan.launch` in a command line. This will launch the ROS Node with the default configuration.
+To start reading from the safety laser scanner and publishing complete scans execute `roslaunch psen_scan_v2 psen_scan_v2.launch` in a command line. This will launch the ROS Node with the default configuration.
 
 If you wish to set parameters from the command line, add them to the end of the command as follows: `parameter:=value`, separated by spaces.
 
 ```bash
-roslaunch psen_scan_v2 psen_scan.launch sensor_ip:=192.168.0.10 host_ip:=192.168.0.20 host_udp_port_data:=3050
+roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10 host_ip:=192.168.0.20 host_udp_port_data:=3050
 ```
 This example configures the safety laser scanner at 192.168.0.10 to send it´s frames to 192.168.0.20:3050.
 
 ### Adjust expert parameters
 If you've created an application package with your own launch file as described in the
-[tutorials](http://wiki.ros.org/psen_scan/Tutorials/),
+[tutorials](http://wiki.ros.org/psen_scan_v2/Tutorials/),
 you can easily adjust the aforementioned configuration parameters.
 
 ## Test concept

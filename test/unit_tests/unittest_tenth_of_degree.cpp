@@ -22,11 +22,6 @@ using namespace psen_scan_v2;
 
 namespace psen_scan_v2_test
 {
-TEST(TenthOfDegreeTest, constructorTest)
-{
-  TenthOfDegree tenth_of_degree{ 1 };
-}
-
 TEST(TenthOfDegreeTest, valueTest)
 {
   TenthOfDegree tenth_of_degree{ 1 };

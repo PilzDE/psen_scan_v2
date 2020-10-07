@@ -46,8 +46,6 @@ static constexpr int HOST_UDP_PORT_CONTROL{ 55055 };
 static const std::string DEVICE_IP{ "127.0.0.100" };
 static constexpr DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(2750) };
 
-static constexpr std::chrono::milliseconds DEFAULT_TIMEOUT{ 50 };
-
 class ScannerTest : public testing::Test
 {
 protected:
