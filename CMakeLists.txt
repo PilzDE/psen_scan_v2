@@ -302,8 +302,9 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gtest(unittest_monitoring_frame_serialization
+    src/monitoring_frame_msg.cpp
     test/unit_tests/unittest_monitoring_frame_serialization.cpp
-    test/src/psen_scan_v2/monitoring_frame_serialization.cpp
+    test/src/monitoring_frame_serialization.cpp
   )
   target_link_libraries(unittest_monitoring_frame_serialization
     ${catkin_LIBRARIES}

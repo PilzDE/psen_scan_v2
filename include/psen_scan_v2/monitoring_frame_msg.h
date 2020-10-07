@@ -119,6 +119,7 @@ private:
 
   uint32_t scan_counter_{ 0 };
   std::vector<double> measures_;
+  friend DynamicSizeRawData serialize(MonitoringFrameMsg& frame);
 };
 
 inline FieldHeader::Id FieldHeader::id() const

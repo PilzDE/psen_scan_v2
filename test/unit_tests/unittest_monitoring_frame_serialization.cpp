@@ -18,6 +18,7 @@
 #include "psen_scan_v2/monitoring_frame_serialization.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/udp_frame_dumps.h"
+#include "psen_scan_v2/raw_data_array_conversion.h"
 
 using namespace psen_scan_v2;
 
@@ -25,9 +26,20 @@ namespace psen_scan_v2_test
 {
 TEST(MonitoringFrameSerializationTest, testUDPFrameTestDataWithoutIntensitiesSuccess)
 {
-  MonitoringFrameMsg msg;
+  UDPFrameTestDataWithoutIntensities test_data;
+  MaxSizeRawData raw_frame_data_ = convertToMaxSizeRawData(test_data.hex_dump);
+
+  MonitoringFrameMsg msg = MonitoringFrameMsg::deserialize(raw_frame_data_, test_data.hex_dump.size());
   DynamicSizeRawData msg_raw = serialize(msg);
-  EXPECT_EQ(msg_raw.at(0), 1);
+
+  EXPECT_EQ(test_data.hex_dump.size(), msg_raw.size());
+
+  for (size_t i = 0; i < test_data.hex_dump.size(); i++)
+  {
+    uint8_t hex_dump_byte = test_data.hex_dump.at(i);
+    uint8_t msg_raw_byte = msg_raw.at(i);
+    EXPECT_EQ(msg_raw_byte, hex_dump_byte);
+  }
 }
 }  // namespace psen_scan_v2_test
 

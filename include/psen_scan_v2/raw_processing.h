@@ -77,6 +77,18 @@ inline void readArray(std::istringstream& is,
   });
 }
 
+template <typename T>
+inline T serialize(std::ostringstream& os)
+{
+  const std::string data_str(os.str());
+
+  T raw_data;
+  raw_data.reserve(data_str.length());
+
+  std::copy(data_str.begin(), data_str.end(), std::back_inserter(raw_data));
+  return raw_data;
+}
+
 inline StringStreamFailure::StringStreamFailure(const std::string& msg) : std::runtime_error(msg)
 {
 }

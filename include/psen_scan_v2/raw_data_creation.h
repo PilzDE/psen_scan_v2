@@ -5,23 +5,13 @@
 #include <string>
 
 #include "psen_scan_v2/raw_scanner_data.h"
+#include "psen_scan_v2/raw_processing.h"
 
 namespace psen_scan_v2
 {
-static DynamicSizeRawData serialize(std::ostringstream& os)
-{
-  const std::string data_str(os.str());
-
-  DynamicSizeRawData raw_data;
-  raw_data.reserve(data_str.length());
-
-  std::copy(data_str.begin(), data_str.end(), std::back_inserter(raw_data));
-  return raw_data;
-}
-
 static uint32_t calcCrc(std::ostringstream& os)
 {
-  const DynamicSizeRawData raw_data{ psen_scan_v2::serialize(os) };
+  const DynamicSizeRawData raw_data{ raw_processing::serialize<DynamicSizeRawData>(os) };
   boost::crc_32_type crc;
   crc.process_bytes(&raw_data.at(0), raw_data.size());
   return crc.checksum();
