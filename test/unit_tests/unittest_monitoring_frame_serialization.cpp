@@ -29,7 +29,7 @@ TEST(MonitoringFrameSerializationTest, testUDPFrameTestDataWithoutIntensitiesSuc
   DynamicSizeRawData msg_raw = serialize(msg);
   EXPECT_EQ(msg_raw.at(0), 1);
 }
-}
+}  // namespace psen_scan_v2_test
 
 int main(int argc, char* argv[])
 {

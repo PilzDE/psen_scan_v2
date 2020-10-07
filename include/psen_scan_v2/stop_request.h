@@ -36,7 +36,7 @@ public:
   static constexpr std::size_t NUM_RESERVED_FIELDS{ 12 };
 
 public:
- DynamicSizeRawData serialize() const;
+  DynamicSizeRawData serialize() const;
 
 private:
   std::ostringstream& processMember(std::ostringstream& os) const;
