@@ -24,6 +24,7 @@
 #include <boost/msm/front/state_machine_def.hpp>
 
 #include "psen_scan_v2/logging.h"
+#include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/scanner_reply_msg.h"
 
 namespace psen_scan_v2
@@ -35,6 +36,7 @@ namespace mpl = boost::mpl;
 // clang-format off
 
 
+using MonitoringFrameCallback = std::function<void(const MonitoringFrameMsg& msg)>;
 using SendRequestCallback = std::function<void()>;
 using StartedCallback = std::function<void()>;
 using StoppedCallback = std::function<void()>;
@@ -45,17 +47,20 @@ using StoppedCallback = std::function<void()>;
  */
 struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_connection_state_machine_>
 {
-  udp_connection_state_machine_(const SendRequestCallback& start_request_cb,
+  udp_connection_state_machine_(const MonitoringFrameCallback& monitoring_frame_cb,
+                                const SendRequestCallback& start_request_cb,
                                 const SendRequestCallback& stop_request_cb,
                                 const StartedCallback& started_cb,
                                 const StoppedCallback& stopped_cb)
-    : send_start_request_callback_(start_request_cb)
+    : monitoring_frame_callback_(monitoring_frame_cb)
+    , send_start_request_callback_(start_request_cb)
     , send_stop_request_callback_(stop_request_cb)
     , notify_started_callback_(started_cb)
     , notify_stopped_callback_(stopped_cb)
   {
   }
 
+  MonitoringFrameCallback monitoring_frame_callback_;
   SendRequestCallback send_start_request_callback_;
   SendRequestCallback send_stop_request_callback_;
   StoppedCallback notify_started_callback_;
@@ -66,12 +71,16 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
     struct start_request {};
     struct reply_received
     {
-      reply_received(ScannerReplyMsgType type) : type_(type)
-      {}
+      reply_received(ScannerReplyMsgType type) : type_(type) {}
 
       ScannerReplyMsgType type_;
     };
-    struct monitoring_frame_received {};
+    struct monitoring_frame_received
+    {
+      monitoring_frame_received(const MonitoringFrameMsg& frame) : frame_(frame) {}
+
+      MonitoringFrameMsg frame_;
+    };
     struct stop_request {};
   };
 
@@ -174,6 +183,11 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
     notify_stopped_callback_();
   }
 
+  void action_handle_monitoring_frame(events::monitoring_frame_received const& event)
+  {
+    monitoring_frame_callback_(event.frame_);
+  }
+
   bool guard_is_start_reply(events::reply_received const& reply_event)
   {
     return reply_event.type_ == ScannerReplyMsgType::Start;
@@ -194,26 +208,23 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
   struct transition_table : mpl::vector<
     //    Start                                 Event                            Next           			           Action	                             Guard
     //  +--------------------------------+--------------------------------+-------------------------------+-----------------------------------+-----------------------------+
-    a_row < s::idle,                       e::start_request,                s::wait_for_start_reply,        &m::action_send_start_request                                 >,
-    a_row < s::idle,                       e::stop_request,                 s::wait_for_stop_reply,         &m::action_send_stop_request                                  >,
-      row < s::wait_for_start_reply,       e::reply_received,               s::wait_for_monitoring_frame,   &m::action_notify_start,            &m::guard_is_start_reply  >,
-    _irow < s::wait_for_monitoring_frame,  e::monitoring_frame_received                                                                                                   >,
-    a_row < s::wait_for_start_reply,       e::stop_request,                 s::wait_for_stop_reply,         &m::action_send_stop_request                                  >,
-    a_row < s::wait_for_monitoring_frame,  e::stop_request,                 s::wait_for_stop_reply,         &m::action_send_stop_request                                  >,
-      row < s::wait_for_stop_reply,        e::reply_received,               s::stopped,                     &m::action_notify_stop,             &m::guard_is_stop_reply   >
+    a_row  < s::idle,                       e::start_request,                s::wait_for_start_reply,        &m::action_send_start_request                                 >,
+    a_row  < s::idle,                       e::stop_request,                 s::wait_for_stop_reply,         &m::action_send_stop_request                                  >,
+      row  < s::wait_for_start_reply,       e::reply_received,               s::wait_for_monitoring_frame,   &m::action_notify_start,            &m::guard_is_start_reply  >,
+    a_irow < s::wait_for_monitoring_frame,  e::monitoring_frame_received, &m::action_handle_monitoring_frame                                                                                                   >,
+    a_row  < s::wait_for_start_reply,       e::stop_request,                 s::wait_for_stop_reply,         &m::action_send_stop_request                                  >,
+    a_row  < s::wait_for_monitoring_frame,  e::stop_request,                 s::wait_for_stop_reply,         &m::action_send_stop_request                                  >,
+      row  < s::wait_for_stop_reply,        e::reply_received,               s::stopped,                     &m::action_notify_stop,             &m::guard_is_stop_reply   >
     //  +--------------------------------+--------------------------------+-------------------------------+------------------------------------+-----------------------------+
   > {};
   // clang-format on
 
-  // LCOV_EXCL_START
-  // TODO: Activate coverage again when function is actually used
   // Replaces the default no-transition response.
   template <class FSM, class Event>
   void no_transition(Event const&, FSM&, int)
   {
-    // TODO Implement handling
+    PSENSCAN_WARN("StateMachine", "TODO");
   }
-  // LCOV_EXCL_STOP
 };
 
 // Pick a back-end
