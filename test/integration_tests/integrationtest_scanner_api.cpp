@@ -57,7 +57,6 @@ public:
   MOCK_METHOD1(LaserScanCallback, void(const LaserScan&));
 };
 
-
 ScannerConfiguration createScannerConfig()
 {
   return ScannerConfiguration(

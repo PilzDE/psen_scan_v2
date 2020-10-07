@@ -55,6 +55,8 @@ protected:
   void sendStopReply();
   template <typename TestData>
   void sendMonitoringFrame(const TestData& test_data);
+  void simulateUdpError(const std::string& msg);
+  void simulateUdpTimeout(const std::string& msg);
   template <typename TestData>
   LaserScan testDataToLaserScan(const TestData& test_data);
 
@@ -86,6 +88,16 @@ void ScannerControllerTest::sendMonitoringFrame(const TestData& test_data)
   scanner_controller_.data_udp_client_.sendMonitoringFrame(test_data);
 }
 
+void ScannerControllerTest::simulateUdpError(const std::string& msg)
+{
+  scanner_controller_.control_udp_client_.simulateError(msg);
+}
+
+void ScannerControllerTest::simulateUdpTimeout(const std::string& msg)
+{
+  scanner_controller_.control_udp_client_.simulateTimeout(msg);
+}
+
 template <typename TestData>
 LaserScan ScannerControllerTest::testDataToLaserScan(const TestData& test_data)
 {
@@ -114,6 +126,24 @@ TEST_F(ScannerControllerTest, testStart)
   start_future.wait_for(std::chrono::seconds(0));
 }
 
+TEST_F(ScannerControllerTest, testStartReplyTimeout)
+{
+  using ::testing::_;
+  using ::testing::InSequence;
+
+  const StartRequest start_request(scanner_config_, 0);
+
+  {
+    InSequence seq;
+    EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _)).Times(1);
+    EXPECT_CALL(scanner_controller_.data_udp_client_, startAsyncReceiving()).Times(1);
+    EXPECT_CALL(scanner_controller_.control_udp_client_, write(start_request.toRawData())).Times(1);
+  }
+
+  scanner_controller_.sendStartRequest();
+  simulateUdpTimeout("Udp timeout");
+}
+
 TEST_F(ScannerControllerTest, testStop)
 {
   using ::testing::_;
@@ -130,6 +160,23 @@ TEST_F(ScannerControllerTest, testStop)
   auto stop_future = scanner_controller_.stop();
   sendStopReply();
   stop_future.wait_for(std::chrono::seconds(0));
+}
+
+TEST_F(ScannerControllerTest, testStopReplyTimeout)
+{
+  using ::testing::_;
+  using ::testing::InSequence;
+
+  const StopRequest stop_request;
+
+  {
+    InSequence seq;
+    EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _)).Times(1);
+    EXPECT_CALL(scanner_controller_.control_udp_client_, write(stop_request.toRawData())).Times(1);
+  }
+
+  scanner_controller_.sendStopRequest();
+  simulateUdpTimeout("Udp timeout");
 }
 
 TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
@@ -155,6 +202,11 @@ TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
 
   const UDPFrameTestDataWithoutMeasurementsAndIntensities test_data;
   sendMonitoringFrame(test_data);
+}
+
+TEST_F(ScannerControllerTest, testHandleError)
+{
+  simulateUdpError("Udp error");  // only for coverage for now
 }
 
 TEST_F(ScannerControllerTest, testConstructorInvalidLaserScanCallback)

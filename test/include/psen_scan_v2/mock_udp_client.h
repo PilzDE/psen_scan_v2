@@ -39,19 +39,26 @@ public:
                 const unsigned short& host_port,
                 const unsigned int& endpoint_ip,
                 const unsigned short& endpoint_port)
-    : data_handler_(data_handler){};
+    : data_handler_(data_handler), error_handler_(error_handler)
+  {
+    using ::testing::_;
+    using ::testing::SaveArg;
+    ON_CALL(*this, startAsyncReceiving(_, _, _)).WillByDefault(SaveArg<1>(&timeout_handler_));
+  };
 
 public:
   void sendStartReply();
   void sendStopReply();
   template <typename TestData>
   void sendMonitoringFrame(const TestData& test_data);
+  void simulateError(const std::string& msg);
+  void simulateTimeout(const std::string& msg);
 
 public:
   MOCK_METHOD0(close, void());
   MOCK_METHOD3(startAsyncReceiving,
                void(const psen_scan_v2::ReceiveMode& modi,
-                    const psen_scan_v2::TimeoutHandler&,
+                    const psen_scan_v2::TimeoutHandler& timeout_handler,
                     const std::chrono::high_resolution_clock::duration& timeout));
   // "Simulates" function call which uses default values
   MOCK_METHOD0(startAsyncReceiving, void());
@@ -62,6 +69,8 @@ private:
 
 private:
   psen_scan_v2::NewDataHandler data_handler_;
+  psen_scan_v2::ErrorHandler error_handler_;
+  psen_scan_v2::TimeoutHandler timeout_handler_;
 };
 
 void MockUdpClient::sendStartReply()
@@ -94,6 +103,16 @@ void MockUdpClient::sendMonitoringFrame(const TestData& test_data)
 void MockUdpClient::handleNewData(const psen_scan_v2::MaxSizeRawData& received_data, const std::size_t& bytes_received)
 {
   data_handler_(received_data, bytes_received);
+}
+
+void MockUdpClient::simulateError(const std::string& msg)
+{
+  error_handler_(msg);
+}
+
+void MockUdpClient::simulateTimeout(const std::string& msg)
+{
+  timeout_handler_(msg);
 }
 
 }  // namespace psen_scan_v2_test
