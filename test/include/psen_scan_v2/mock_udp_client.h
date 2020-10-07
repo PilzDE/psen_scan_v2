@@ -78,7 +78,7 @@ private:
 void MockUdpClient::sendStartReply()
 {
   const ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
-  const auto data{ msg.toRawData() };
+  const auto data{ msg.serialize() };
   MaxSizeRawData max_size_data;
   std::copy_n(data.begin(), data.size(), max_size_data.begin());
 
@@ -88,7 +88,7 @@ void MockUdpClient::sendStartReply()
 void MockUdpClient::sendStopReply()
 {
   const ScannerReplyMsg msg(OP_CODE_STOP, RES_CODE_ACCEPTED);
-  const auto data{ msg.toRawData() };
+  const auto data{ msg.serialize() };
   MaxSizeRawData max_size_data;
   std::copy_n(data.begin(), data.size(), max_size_data.begin());
 

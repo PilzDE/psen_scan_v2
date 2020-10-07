@@ -8,7 +8,7 @@
 
 namespace psen_scan_v2
 {
-static DynamicSizeRawData toRawData(std::ostringstream& os)
+static DynamicSizeRawData serialize(std::ostringstream& os)
 {
   const std::string data_str(os.str());
 
@@ -21,7 +21,7 @@ static DynamicSizeRawData toRawData(std::ostringstream& os)
 
 static uint32_t calcCrc(std::ostringstream& os)
 {
-  const DynamicSizeRawData raw_data{ psen_scan_v2::toRawData(os) };
+  const DynamicSizeRawData raw_data{ psen_scan_v2::serialize(os) };
   boost::crc_32_type crc;
   crc.process_bytes(&raw_data.at(0), raw_data.size());
   return crc.checksum();

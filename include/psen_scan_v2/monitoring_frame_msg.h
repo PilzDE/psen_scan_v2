@@ -83,7 +83,7 @@ public:
   };
 
 public:
-  static MonitoringFrameMsg fromRawData(const MaxSizeRawData& data, const std::size_t& num_bytes);
+  static MonitoringFrameMsg deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
 
 public:
   TenthOfDegree fromTheta() const;

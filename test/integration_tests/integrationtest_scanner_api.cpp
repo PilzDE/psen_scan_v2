@@ -104,7 +104,7 @@ void ScannerMock::startListeningForControlMsg()
 void ScannerMock::sendReply(const uint32_t reply_type)
 {
   const ScannerReplyMsg msg(reply_type, 0x00);
-  control_server_.asyncSend<REPLY_MSG_FROM_SCANNER_SIZE>(control_msg_receiver_, msg.toRawData());
+  control_server_.asyncSend<REPLY_MSG_FROM_SCANNER_SIZE>(control_msg_receiver_, msg.serialize());
 }
 
 void ScannerMock::sendStartReply()
@@ -138,7 +138,7 @@ TEST(ScannerAPITests, testStartFunctionality)
   const StartRequest start_req(config, DEFAULT_SEQ_NUMBER);
 
   Barrier start_req_received_barrier;
-  EXPECT_CALL(scanner_mock, receiveControlMsg(_, start_req.toRawData()))
+  EXPECT_CALL(scanner_mock, receiveControlMsg(_, start_req.serialize()))
       .WillOnce(InvokeWithoutArgs([&start_req_received_barrier]() { start_req_received_barrier.release(); }));
 
   scanner_mock.startListeningForControlMsg();
@@ -157,11 +157,11 @@ TEST(ScannerAPITests, testStopFunctionality)
   UserCallbacks cb;
   Scanner scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
-  EXPECT_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config, DEFAULT_SEQ_NUMBER).toRawData()))
+  EXPECT_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config, DEFAULT_SEQ_NUMBER).serialize()))
       .WillOnce(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
   Barrier stop_req_received_barrier;
-  EXPECT_CALL(scanner_mock, receiveControlMsg(_, StopRequest().toRawData()))
+  EXPECT_CALL(scanner_mock, receiveControlMsg(_, StopRequest().serialize()))
       .WillOnce(InvokeWithoutArgs([&stop_req_received_barrier]() { stop_req_received_barrier.release(); }));
 
   scanner_mock.startListeningForControlMsg();
@@ -199,7 +199,7 @@ TEST(ScannerAPITests, testReceivingOfMonitoringFrame)
   {
     InSequence seq;
 
-    EXPECT_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config, DEFAULT_SEQ_NUMBER).toRawData()))
+    EXPECT_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config, DEFAULT_SEQ_NUMBER).serialize()))
         .WillOnce(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
     EXPECT_CALL(cb, LaserScanCallback(isEqualToRawMeasurements(raw_scan.measures, EPS)))

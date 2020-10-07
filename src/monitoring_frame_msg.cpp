@@ -37,7 +37,7 @@ FieldHeader::FieldHeader(Id id, Length length) : id_(id), length_(length)
 {
 }
 
-MonitoringFrameMsg MonitoringFrameMsg::fromRawData(const MaxSizeRawData& data, const std::size_t& num_bytes)
+MonitoringFrameMsg MonitoringFrameMsg::deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes)
 {
   MonitoringFrameMsg msg;
 

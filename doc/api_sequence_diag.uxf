@@ -570,7 +570,7 @@ startAsyncReceiving()</panel_attributes>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-
 layer=2
-write(StartRequest.toRawData())</panel_attributes>
+write(StartRequest.serialize())</panel_attributes>
     <additional_attributes>870.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
@@ -906,7 +906,7 @@ layer=2</panel_attributes>
       <h>24</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-
-write(StopRequest.toRawData())
+write(StopRequest.serialize())
 layer=2</panel_attributes>
     <additional_attributes>870.0;20.0;10.0;20.0</additional_attributes>
   </element>

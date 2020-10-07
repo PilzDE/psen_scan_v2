@@ -36,8 +36,7 @@ public:
   static constexpr std::size_t NUM_RESERVED_FIELDS{ 12 };
 
 public:
-  //! @brief Serializes the request into raw data which can be send to the scanner.
-  DynamicSizeRawData toRawData() const;
+ DynamicSizeRawData serialize() const;
 
 private:
   std::ostringstream& processMember(std::ostringstream& os) const;
