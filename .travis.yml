@@ -1,0 +1,75 @@
+language: generic
+dist: trusty
+os: linux
+
+cache:
+  directories:
+    - $HOME/.ccache
+
+notifications:
+  email:
+    on_failure: always
+    recipients:
+      - c.doehn@pilz.de
+      - o.ibrocevic@pilz.de
+      - a.gutenkunst@pilz.de
+      - c.henkel@pilz.de
+      - h.slusarek@pilz.de
+      - i.martini@pilz.de
+      - r.feistenauer@pilz.de
+env:
+  global:
+    - CATKIN_LINT=true
+    - CATKIN_LINT_ARGS='--strict'
+    - CMAKE_ARGS="-DCATKIN_ENABLE_CLANG_TIDY=true"
+    - ADDITIONAL_DEBS="clang-tidy libclang-dev"
+    - CCACHE_DIR=$HOME/.ccache
+jobs:
+  include:
+    # Main Job - Checks against released packages of melodic
+    - name: "Build + Test with Main Repo of melodic (http://packages.ros.org/ros/ubuntu)"
+      install:
+        - git clone --depth=1 --branch master https://github.com/ros-industrial/industrial_ci.git .industrial_ci
+      env:
+        - ROS_REPO=main
+          ROS_DISTRO="melodic"
+      script:
+        - .industrial_ci/travis.sh
+      allow_failure: true
+
+    # Testing Job - Checks against packages in testing stage of melodic. Relevant since all these get released together during a sync.
+    - name: "Build + Test with Testing Repo of melodic (http://packages.ros.org/ros-testing/ubuntu)"
+      install:
+        - git clone --depth=1 --branch master https://github.com/ros-industrial/industrial_ci.git .industrial_ci
+      env:
+        - ROS_REPO=testing
+          ROS_DISTRO="melodic"
+      script:
+        - .industrial_ci/travis.sh
+
+    # Testing Job with clang format- Checks against packages in testing stage. Relevant since all these get released together during a sync.
+    - name: "Build + Test with clang format with Testing Repo of melodic (http://packages.ros.org/ros-testing/ubuntu)"
+      install:
+        - git clone --depth=1 --branch master https://github.com/ros-industrial/industrial_ci.git .industrial_ci
+      env:
+        - ROS_DISTRO="melodic"
+          CLANG_FORMAT_CHECK=file
+          CLANG_FORMAT_VERSION=3.9
+      script:
+        - .industrial_ci/travis.sh
+
+    # Coverage Job - Checks that the code coverage of psen_scan_v2 is at 100.0%.
+    - name: "Coverage check for psen_scan_v2"
+      install:
+        - git clone --depth=1 --branch master https://github.com/ros-industrial/industrial_ci.git .industrial_ci
+        - git clone --depth=1 --branch master https://github.com/PilzDE/industrial_ci_addons.git .industrial_ci/industrial_ci/src/industrial_ci_addons
+      env:
+        - ROS_REPO=testing
+          ROS_DISTRO="melodic"
+          CATKIN_LINT=false
+          NOT_TEST_BUILD=true
+          PARALLEL_TESTS=false
+          AFTER_SCRIPT="source /root/ici/industrial_ci_addons/check_coverage.sh && check_coverage psen_scan_v2"
+          CMAKE_ARGS="-DENABLE_COVERAGE_TESTING=ON -DCMAKE_BUILD_TYPE=Debug"
+      script:
+        - .industrial_ci/travis.sh

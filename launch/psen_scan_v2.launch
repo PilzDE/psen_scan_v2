@@ -1,0 +1,51 @@
+<!--
+Copyright (c) 2020 Pilz GmbH & Co. KG
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<launch>
+
+  <!-- IP-Address of host machine -->
+  <arg name="host_ip" default="192.168.0.50" />
+
+  <!-- UDP Port on which monitoring frames (scans) should be received -->
+  <arg name="host_udp_port_data" default="55115" />
+
+  <!-- UDP Port used to send commands (start/stop) and receive the corresponding replies -->
+  <arg name="host_udp_port_control" default="55116" />
+
+  <!-- IP-Address of Safety laser scanner -->
+  <arg name="sensor_ip" default="192.168.0.10" />
+
+  <!-- ROS Frame ID -->
+  <arg name="frame_id" default="scanner" />
+
+  <!-- Start angle of measurement in radian -->
+  <arg name="angle_start" default="$(eval -137.5 /180.0 * pi)" />
+
+  <!-- End angle of measurement in radian -->
+  <arg name="angle_end" default="$(eval 137.5 /180.0 * pi)" />
+
+  <node name="laser_scanner" type="psen_scan_v2_node" pkg="psen_scan_v2" output="screen" required="true">
+    <param name="host_ip" value="$(arg host_ip)" />
+    <param name="host_udp_port_data" value="$(arg host_udp_port_data)" />
+    <param name="host_udp_port_control" value="$(arg host_udp_port_control)" />
+    <param name="sensor_ip" value="$(arg sensor_ip)" />
+    <param name="frame_id" value="$(arg frame_id)" />
+    <param name="angle_start" value="$(arg angle_start)" />
+    <param name="angle_end" value="$(arg angle_end)" />
+  </node>
+  <node name="rviz" type="rviz" pkg="rviz" args="-d $(find psen_scan_v2)/config/config.rviz" />
+</launch>
