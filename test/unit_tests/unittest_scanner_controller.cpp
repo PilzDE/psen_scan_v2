@@ -134,13 +134,31 @@ TEST_F(ScannerControllerTest, testSuccessfulStartSequence)
   EXPECT_TRUE(isFutureReady(start_future));
 }
 
-TEST_F(ScannerControllerTest, testResendStartReplyOnTimeout)
+TEST_F(ScannerControllerTest, testRetryAfterStartReplyTimeout)
 {
-  EXPECT_CALL(scanner_controller_.control_udp_client_, write(_)).Times(1);  // Should be 2 after feature is implemented
+  using ::testing::_;
+  using ::testing::InSequence;
 
-  scanner_controller_.start();
-  simulateUdpTimeout("Udp timeout");
+  const StartRequest start_request(scanner_config_, 0);
+  const unsigned int number_of_retries{ 5 };
+
+  {
+    InSequence seq;
+    for (unsigned int i = 0; i < number_of_retries; ++i)
+    {
+      EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _)).Times(1);
+      EXPECT_CALL(scanner_controller_.data_udp_client_, startAsyncReceiving()).Times(1);
+      EXPECT_CALL(scanner_controller_.control_udp_client_, write(start_request.toRawData())).Times(1);
+    }
+  }
+
+  auto start_future = scanner_controller_.start();
+  for (unsigned int i = 0; i < (number_of_retries - 1); ++i)
+  {
+    simulateUdpTimeout("Udp timeout");
+  }
   sendStartReply();
+  EXPECT_TRUE(isFutureReady(start_future));
 }
 
 TEST_F(ScannerControllerTest, testSuccessfulStopSequence)
