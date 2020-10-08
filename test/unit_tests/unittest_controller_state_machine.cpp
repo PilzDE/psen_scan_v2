@@ -130,6 +130,14 @@ TEST_F(ControllerStateMachineTest, testStoppedCallbackIsCalled)
   state_machine_->processReplyReceivedEvent(ScannerReplyMsgType::Stop);
 }
 
+TEST_F(ControllerStateMachineTest, testIllegalTransitionNotTaken)
+{
+  EXPECT_CALL(controller_, start_request_cb()).Times(1);
+  EXPECT_CALL(controller_, started_cb()).Times(1);
+  state_machine_->processStartRequestEvent();
+  state_machine_->processStartRequestEvent();
+}
+
 }  // namespace psen_scan_v2_test
 
 int main(int argc, char* argv[])
