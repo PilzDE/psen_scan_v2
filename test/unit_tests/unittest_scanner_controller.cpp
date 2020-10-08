@@ -79,7 +79,7 @@ protected:
     std::bind(&MockCallbackHolder::laserscan_callback, &mock_, std::placeholders::_1)
   };
 
-  ScannerControllerT<ControllerStateMachine, MockUdpClient> scanner_controller_{ scanner_config_,
+  ScannerControllerT<ControllerStateMachine, StrictMock<MockUdpClient>> scanner_controller_{ scanner_config_,
                                                                                  laser_scan_callback_ };
 };
 
