@@ -32,8 +32,8 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
   raw_processing::write(os, frame.from_theta_fixed_);
   raw_processing::write(os, frame.resolution_fixed_);
 
-  uint8_t scan_counter_header_id = AdditionalFieldIds::SCAN_COUNTER;
-  uint16_t scan_counter_header_length = sizeof(frame.scan_counter_) + 1;
+  FieldHeader::Id scan_counter_header_id = AdditionalFieldIds::SCAN_COUNTER;
+  FieldHeader::Length scan_counter_header_length = sizeof(frame.scan_counter_) + 1;
   uint32_t scan_counter_header_payload = frame.scan_counter_;
   raw_processing::write(os, scan_counter_header_id);
   raw_processing::write(os, scan_counter_header_length);
@@ -43,9 +43,9 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
   uint16_t measures_header_length = frame.measures_.size() * NUMBER_OF_BYTES_SINGLE_MEASURE + 1;
   raw_processing::write(os, measures_header_id);
   raw_processing::write(os, measures_header_length);
-  for (size_t i = 0; i < frame.measures_.size(); ++i)
+  for (auto& elem : frame.measures_)
   {
-    uint16_t measure = static_cast<uint16_t>(std::round(frame.measures_.at(i) * 1000));
+    uint16_t measure = static_cast<uint16_t>(std::round(elem * 1000));
     raw_processing::write(os, measure);
   }
 
