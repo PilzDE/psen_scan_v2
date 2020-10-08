@@ -39,8 +39,8 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
   raw_processing::write(os, scan_counter_header_length);
   raw_processing::write(os, scan_counter_header_payload);
 
-  uint8_t measures_header_id = AdditionalFieldIds::MEASURES;
-  uint16_t measures_header_length = frame.measures_.size() * NUMBER_OF_BYTES_SINGLE_MEASURE + 1;
+  FieldHeader::Id measures_header_id = AdditionalFieldIds::MEASURES;
+  FieldHeader::Length measures_header_length = frame.measures_.size() * NUMBER_OF_BYTES_SINGLE_MEASURE + 1;
   raw_processing::write(os, measures_header_id);
   raw_processing::write(os, measures_header_length);
   for (auto& elem : frame.measures_)
@@ -49,7 +49,7 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
     raw_processing::write(os, measure);
   }
 
-  uint8_t end_of_frame_header_id = AdditionalFieldIds::END_OF_FRAME;
+  FieldHeader::Id end_of_frame_header_id = AdditionalFieldIds::END_OF_FRAME;
   raw_processing::write(os, end_of_frame_header_id);
 
   uint8_t unknown_data_at_the_end_of_frame = 0;
