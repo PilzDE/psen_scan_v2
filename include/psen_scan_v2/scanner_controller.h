@@ -90,7 +90,7 @@ private:
   FRIEND_TEST(ScannerControllerTest, testHandleNewMonitoringFrame);
   FRIEND_TEST(ScannerControllerTest, testHandleEmptyMonitoringFrame);
   FRIEND_TEST(ScannerControllerTest, testHandleError);
-  FRIEND_TEST(ScannerControllerTest, testResendStartReplyOnTimeout);
+  FRIEND_TEST(ScannerControllerTest, testRetryAfterStartReplyTimeout);
   FRIEND_TEST(ScannerControllerTest, testStopReplyTimeout);
   FRIEND_TEST(ScannerControllerTest, testStopWhileWaitingForStartReply);
 };

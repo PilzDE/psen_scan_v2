@@ -79,7 +79,7 @@ protected:
     std::bind(&MockCallbackHolder::laserscan_callback, &mock_, std::placeholders::_1)
   };
 
-  ScannerControllerT<ControllerStateMachine, StrictMock<MockUdpClient>> scanner_controller_{ scanner_config_,
+  ScannerControllerT<ControllerStateMachine, MockUdpClient> scanner_controller_{ scanner_config_,
                                                                                  laser_scan_callback_ };
 };
 
@@ -159,6 +159,21 @@ TEST_F(ScannerControllerTest, testRetryAfterStartReplyTimeout)
   }
   sendStartReply();
   EXPECT_TRUE(isFutureReady(start_future));
+}
+
+TEST_F(ScannerControllerTest, testReceivingMultipleStartReplies)
+{
+  const UDPFrameTestDataWithoutIntensities test_data;
+  const LaserScan scan{ testDataToLaserScan(test_data) };
+
+  EXPECT_CALL(mock_, laserscan_callback(scan)).Times(2);
+
+  scanner_controller_.start();
+  simulateUdpTimeout("Udp timeout");
+  sendStartReply();
+  sendMonitoringFrame(test_data);
+  sendStartReply();
+  sendMonitoringFrame(test_data);
 }
 
 TEST_F(ScannerControllerTest, testSuccessfulStopSequence)
