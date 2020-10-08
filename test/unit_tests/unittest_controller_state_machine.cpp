@@ -133,7 +133,6 @@ TEST_F(ControllerStateMachineTest, testStoppedCallbackIsCalled)
 TEST_F(ControllerStateMachineTest, testIllegalTransitionNotTaken)
 {
   EXPECT_CALL(controller_, start_request_cb()).Times(1);
-  EXPECT_CALL(controller_, started_cb()).Times(1);
   state_machine_->processStartRequestEvent();
   state_machine_->processStartRequestEvent();
 }
