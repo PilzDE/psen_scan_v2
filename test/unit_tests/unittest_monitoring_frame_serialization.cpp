@@ -27,18 +27,19 @@ namespace psen_scan_v2_test
 TEST(MonitoringFrameSerializationTest, testUDPFrameTestDataWithoutIntensitiesSuccess)
 {
   UDPFrameTestDataWithoutIntensities test_data;
-  MaxSizeRawData raw_frame_data_ = convertToMaxSizeRawData(test_data.hex_dump);
+  MaxSizeRawData monitoring_frame_without_intensities_raw = convertToMaxSizeRawData(test_data.hex_dump);
 
-  MonitoringFrameMsg msg = MonitoringFrameMsg::deserialize(raw_frame_data_, test_data.hex_dump.size());
-  DynamicSizeRawData msg_raw = serialize(msg);
+  MonitoringFrameMsg monitoring_frame_message =
+      MonitoringFrameMsg::deserialize(monitoring_frame_without_intensities_raw, test_data.hex_dump.size());
+  DynamicSizeRawData serialized_monitoring_frame_message = serialize(monitoring_frame_message);
 
-  EXPECT_EQ(test_data.hex_dump.size(), msg_raw.size());
+  EXPECT_EQ(test_data.hex_dump.size(), serialized_monitoring_frame_message.size());
 
   for (size_t i = 0; i < test_data.hex_dump.size(); i++)
   {
     uint8_t hex_dump_byte = test_data.hex_dump.at(i);
-    uint8_t msg_raw_byte = msg_raw.at(i);
-    EXPECT_EQ(msg_raw_byte, hex_dump_byte);
+    uint8_t serialized_monitoring_frame_message_byte = serialized_monitoring_frame_message.at(i);
+    EXPECT_EQ(serialized_monitoring_frame_message_byte, hex_dump_byte);
   }
 }
 }  // namespace psen_scan_v2_test
