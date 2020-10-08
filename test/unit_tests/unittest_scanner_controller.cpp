@@ -42,6 +42,15 @@ static constexpr int HOST_UDP_PORT_DATA{ 50505 };
 static constexpr int HOST_UDP_PORT_CONTROL{ 55055 };
 static const std::string DEVICE_IP{ "127.0.0.100" };
 static constexpr DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(2750) };
+static constexpr uint32_t DEFAULT_START_REQUEST_SEQ_NUMBER{ 0 };
+
+static constexpr unsigned int FUTURE_READY_TIMEOUT_SEC{ 0 };
+
+template <typename T>
+bool isFutureReady(const std::future<T>& future_obj)
+{
+  return future_obj.wait_for(std::chrono::seconds(FUTURE_READY_TIMEOUT_SEC)) == std::future_status::ready;
+}
 
 class MockCallbackHolder
 {
@@ -115,12 +124,14 @@ TEST_F(ScannerControllerTest, testSuccessfulStartSequence)
     InSequence seq;
     EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _)).Times(1);
     EXPECT_CALL(scanner_controller_.data_udp_client_, startAsyncReceiving()).Times(1);
-    EXPECT_CALL(scanner_controller_.control_udp_client_, write(StartRequest(scanner_config_, 0).toRawData())).Times(1);
+    EXPECT_CALL(scanner_controller_.control_udp_client_,
+                write(StartRequest(scanner_config_, DEFAULT_START_REQUEST_SEQ_NUMBER).toRawData()))
+        .Times(1);
   }
 
   auto start_future = scanner_controller_.start();
   sendStartReply();
-  EXPECT_EQ(start_future.wait_for(std::chrono::seconds(0)), std::future_status::ready);
+  EXPECT_TRUE(isFutureReady(start_future));
 }
 
 TEST_F(ScannerControllerTest, testResendStartReplyOnTimeout)
@@ -143,7 +154,7 @@ TEST_F(ScannerControllerTest, testSuccessfulStopSequence)
   }
   auto stop_future = scanner_controller_.stop();
   sendStopReply();
-  EXPECT_EQ(stop_future.wait_for(std::chrono::seconds(0)), std::future_status::ready);
+  EXPECT_TRUE(isFutureReady(stop_future));
 }
 
 TEST_F(ScannerControllerTest, testStopReplyTimeout)
