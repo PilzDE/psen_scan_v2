@@ -125,7 +125,7 @@ TEST_F(ScannerControllerTest, testSuccessfulStartSequence)
 
 TEST_F(ScannerControllerTest, testResendStartReplyOnTimeout)
 {
-  EXPECT_CALL(scanner_controller_.control_udp_client_, write(_)).Times(1); // Should be 2 after feature is implemented
+  EXPECT_CALL(scanner_controller_.control_udp_client_, write(_)).Times(1);  // Should be 2 after feature is implemented
 
   scanner_controller_.sendStartRequest();
   simulateUdpTimeout("Udp timeout");
@@ -177,7 +177,6 @@ TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
 
 TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
 {
-
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
   scanner_controller_.start();
@@ -194,9 +193,11 @@ TEST_F(ScannerControllerTest, testHandleError)
 
 TEST_F(ScannerControllerTest, testConstructorInvalidLaserScanCallback)
 {
-  const LaserScanCallback laserscan_callback;
-  typedef ScannerControllerT<ControllerStateMachine, MockUdpClient> SCT;
-  EXPECT_THROW(SCT scanner_controller_(scanner_config_, laserscan_callback);, std::invalid_argument);
+  EXPECT_THROW(({
+                 ScannerControllerT<ControllerStateMachine, MockUdpClient> scanner_controller_(scanner_config_,
+                                                                                               LaserScanCallback());
+               }),
+               std::invalid_argument);
 }
 
 }  // namespace psen_scan_v2
