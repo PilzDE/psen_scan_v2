@@ -31,6 +31,7 @@
 #include "psen_scan_v2/scan_range.h"
 
 using namespace psen_scan_v2_test;
+using ::testing::_;
 
 using ::testing::StrictMock;
 
@@ -107,64 +108,47 @@ LaserScan ScannerControllerTest::testDataToLaserScan(const TestData& test_data)
   return toLaserScan(frame);
 }
 
-TEST_F(ScannerControllerTest, testStart)
+TEST_F(ScannerControllerTest, testSuccessfulStartSequence)
 {
-  using ::testing::_;
   using ::testing::InSequence;
-
-  const StartRequest start_request(scanner_config_, 0);
-
   {
     InSequence seq;
     EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _)).Times(1);
     EXPECT_CALL(scanner_controller_.data_udp_client_, startAsyncReceiving()).Times(1);
-    EXPECT_CALL(scanner_controller_.control_udp_client_, write(start_request.toRawData())).Times(1);
+    EXPECT_CALL(scanner_controller_.control_udp_client_, write(StartRequest(scanner_config_, 0).toRawData())).Times(1);
   }
 
   auto start_future = scanner_controller_.start();
   sendStartReply();
-  start_future.wait_for(std::chrono::seconds(0));
+  EXPECT_EQ(start_future.wait_for(std::chrono::seconds(0)), std::future_status::ready);
 }
 
-TEST_F(ScannerControllerTest, testStartReplyTimeout)
+TEST_F(ScannerControllerTest, testResendStartReplyOnTimeout)
 {
-  using ::testing::_;
-  using ::testing::InSequence;
-
-  const StartRequest start_request(scanner_config_, 0);
-
-  {
-    InSequence seq;
-    EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _)).Times(1);
-    EXPECT_CALL(scanner_controller_.data_udp_client_, startAsyncReceiving()).Times(1);
-    EXPECT_CALL(scanner_controller_.control_udp_client_, write(start_request.toRawData())).Times(1);
-  }
+  EXPECT_CALL(scanner_controller_.control_udp_client_, write(_)).Times(1); // Should be 2 after feature is implemented
 
   scanner_controller_.sendStartRequest();
   simulateUdpTimeout("Udp timeout");
+  sendStartReply();
 }
 
-TEST_F(ScannerControllerTest, testStop)
+TEST_F(ScannerControllerTest, testSuccessfulStopSequence)
 {
-  using ::testing::_;
   using ::testing::InSequence;
-
-  const StopRequest stop_request;
 
   {
     InSequence seq;
     EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _)).Times(1);
-    EXPECT_CALL(scanner_controller_.control_udp_client_, write(stop_request.toRawData())).Times(1);
+    EXPECT_CALL(scanner_controller_.control_udp_client_, write(StopRequest().toRawData())).Times(1);
   }
-
   auto stop_future = scanner_controller_.stop();
   sendStopReply();
-  stop_future.wait_for(std::chrono::seconds(0));
+  EXPECT_EQ(stop_future.wait_for(std::chrono::seconds(0)), std::future_status::ready);
 }
 
 TEST_F(ScannerControllerTest, testStopReplyTimeout)
 {
-  using ::testing::_;
+  // Has no defined behaviour yet
   using ::testing::InSequence;
 
   const StopRequest stop_request;
@@ -193,7 +177,6 @@ TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
 
 TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
 {
-  using ::testing::_;
 
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
