@@ -173,6 +173,26 @@ TEST_F(ScannerControllerTest, testSuccessfulStopSequence)
   EXPECT_TRUE(isFutureReady(stop_future));
 }
 
+TEST_F(ScannerControllerTest, testStopWhileWaitingForStartReply)
+{
+  using ::testing::_;
+  using ::testing::InSequence;
+
+  const StartRequest start_request(scanner_config_, 0);
+  const StopRequest stop_request;
+
+  {
+    InSequence seq;
+    EXPECT_CALL(scanner_controller_.control_udp_client_, write(start_request.toRawData())).Times(1);
+    EXPECT_CALL(scanner_controller_.control_udp_client_, write(stop_request.toRawData())).Times(1);
+  }
+
+  scanner_controller_.sendStartRequest();
+  auto stop_future = scanner_controller_.stop();
+  sendStopReply();
+  EXPECT_EQ(stop_future.wait_for(std::chrono::seconds(0)), std::future_status::ready);
+}
+
 TEST_F(ScannerControllerTest, testStopReplyTimeout)
 {
   // Has no defined behaviour yet

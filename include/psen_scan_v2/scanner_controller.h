@@ -92,6 +92,7 @@ private:
   FRIEND_TEST(ScannerControllerTest, testHandleError);
   FRIEND_TEST(ScannerControllerTest, testResendStartReplyOnTimeout);
   FRIEND_TEST(ScannerControllerTest, testStopReplyTimeout);
+  FRIEND_TEST(ScannerControllerTest, testStopWhileWaitingForStartReply);
 };
 
 typedef ScannerControllerT<> ScannerController;
