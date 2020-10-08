@@ -24,6 +24,8 @@
 
 #include "psen_scan_v2/raw_data_array_conversion.h"
 
+using namespace psen_scan_v2;
+
 namespace psen_scan_v2_test
 {
 static constexpr uint32_t OP_CODE_START{ 0x35 };
@@ -34,8 +36,8 @@ static constexpr uint32_t RES_CODE_ACCEPTED{ 0x00 };
 class MockUdpClient
 {
 public:
-  MockUdpClient(const psen_scan_v2::NewDataHandler& data_handler,
-                const psen_scan_v2::ErrorHandler& error_handler,
+  MockUdpClient(const NewDataHandler& data_handler,
+                const ErrorHandler& error_handler,
                 const unsigned short& host_port,
                 const unsigned int& endpoint_ip,
                 const unsigned short& endpoint_port)
@@ -57,27 +59,27 @@ public:
 public:
   MOCK_METHOD0(close, void());
   MOCK_METHOD3(startAsyncReceiving,
-               void(const psen_scan_v2::ReceiveMode& modi,
-                    const psen_scan_v2::TimeoutHandler& timeout_handler,
+               void(const ReceiveMode& modi,
+                    const TimeoutHandler& timeout_handler,
                     const std::chrono::high_resolution_clock::duration& timeout));
   // "Simulates" function call which uses default values
   MOCK_METHOD0(startAsyncReceiving, void());
-  MOCK_METHOD1(write, void(const psen_scan_v2::DynamicSizeRawData& data));
+  MOCK_METHOD1(write, void(const DynamicSizeRawData& data));
 
 private:
-  void handleNewData(const psen_scan_v2::MaxSizeRawData& received_data, const std::size_t& bytes_received);
+  void handleNewData(const MaxSizeRawData& received_data, const std::size_t& bytes_received);
 
 private:
-  psen_scan_v2::NewDataHandler data_handler_;
-  psen_scan_v2::ErrorHandler error_handler_;
-  psen_scan_v2::TimeoutHandler timeout_handler_;
+  NewDataHandler data_handler_;
+  ErrorHandler error_handler_;
+  TimeoutHandler timeout_handler_;
 };
 
 void MockUdpClient::sendStartReply()
 {
-  const psen_scan_v2::ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
+  const ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
   const auto data{ msg.toRawData() };
-  psen_scan_v2::MaxSizeRawData max_size_data;
+  MaxSizeRawData max_size_data;
   std::copy_n(data.begin(), data.size(), max_size_data.begin());
 
   handleNewData(max_size_data, max_size_data.size());
@@ -85,9 +87,9 @@ void MockUdpClient::sendStartReply()
 
 void MockUdpClient::sendStopReply()
 {
-  const psen_scan_v2::ScannerReplyMsg msg(OP_CODE_STOP, RES_CODE_ACCEPTED);
+  const ScannerReplyMsg msg(OP_CODE_STOP, RES_CODE_ACCEPTED);
   const auto data{ msg.toRawData() };
-  psen_scan_v2::MaxSizeRawData max_size_data;
+  MaxSizeRawData max_size_data;
   std::copy_n(data.begin(), data.size(), max_size_data.begin());
 
   handleNewData(max_size_data, max_size_data.size());
@@ -96,11 +98,11 @@ void MockUdpClient::sendStopReply()
 template <typename TestData>
 void MockUdpClient::sendMonitoringFrame(const TestData& test_data)
 {
-  const psen_scan_v2::MaxSizeRawData raw_data = convertToMaxSizeRawData(test_data.hex_dump);
+  const MaxSizeRawData raw_data = convertToMaxSizeRawData(test_data.hex_dump);
   handleNewData(raw_data, raw_data.size());
 }
 
-void MockUdpClient::handleNewData(const psen_scan_v2::MaxSizeRawData& received_data, const std::size_t& bytes_received)
+void MockUdpClient::handleNewData(const MaxSizeRawData& received_data, const std::size_t& bytes_received)
 {
   data_handler_(received_data, bytes_received);
 }
