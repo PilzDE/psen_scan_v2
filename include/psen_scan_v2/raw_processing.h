@@ -78,13 +78,14 @@ inline void readArray(std::istringstream& is,
   });
 }
 
-template <typename RawType, typename ArrayElemType, typename ArrayType>
-inline void
-writeArray(std::ostringstream& os, ArrayType array, std::function<ArrayElemType(ArrayElemType)> conversion_fcn)
+template <typename RawType, typename ArrayElemType>
+inline void writeArray(std::ostringstream& os,
+                       std::vector<ArrayElemType> array,
+                       std::function<RawType(ArrayElemType)> conversion_fcn)
 {
   for (auto& elem : array)
   {
-    RawType raw = static_cast<RawType>(conversion_fcn(elem));
+    RawType raw = conversion_fcn(elem);
     raw_processing::write(os, raw);
   }
 }

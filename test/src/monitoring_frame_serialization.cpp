@@ -44,8 +44,8 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
   raw_processing::write(os, measures_header_id);
   raw_processing::write(os, measures_header_length);
 
-  raw_processing::writeArray<uint16_t, double, std::vector<double>>(
-      os, frame.measures_, [](double elem) { return (std::round(elem * 1000.)); });
+  raw_processing::writeArray<uint16_t, double>(
+      os, frame.measures_, [](double elem) { return (static_cast<uint16_t>(std::round(elem * 1000.))); });
 
   FieldHeader::Id end_of_frame_header_id = AdditionalFieldIds::END_OF_FRAME;
   raw_processing::write(os, end_of_frame_header_id);
