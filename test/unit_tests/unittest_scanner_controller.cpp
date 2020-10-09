@@ -171,14 +171,16 @@ TEST_F(ScannerControllerTest, testStopReplyTimeout)
 
 TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
 {
-  const UDPFrameTestDataWithoutIntensities test_data;
-  const LaserScan scan{ testDataToLaserScan(test_data) };
+  MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(275), 1, { 0.1, 20., 25, 10, 1., 2., 3. });
+  MaxSizeRawData serialized_msg = convertToMaxSizeRawData(serialize(msg));
+
+  const LaserScan scan{ toLaserScan(msg) };
 
   EXPECT_CALL(mock_, laserscan_callback(scan)).Times(1);
 
   scanner_controller_.start();
   sendStartReply();
-  sendMonitoringFrame(test_data);
+  scanner_controller_.data_udp_client_.sendMonitoringFrame(serialized_msg);
 }
 
 TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)

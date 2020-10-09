@@ -53,6 +53,7 @@ public:
   void sendStopReply();
   template <typename TestData>
   void sendMonitoringFrame(const TestData& test_data);
+  void sendMonitoringFrame(const MaxSizeRawData& raw_data);
   void simulateError(const std::string& msg);
   void simulateTimeout(const std::string& msg);
 
@@ -99,6 +100,11 @@ template <typename TestData>
 void MockUdpClient::sendMonitoringFrame(const TestData& test_data)
 {
   const MaxSizeRawData raw_data = convertToMaxSizeRawData(test_data.hex_dump);
+  handleNewData(raw_data, raw_data.size());
+}
+
+void MockUdpClient::sendMonitoringFrame(const MaxSizeRawData& raw_data)
+{
   handleNewData(raw_data, raw_data.size());
 }
 

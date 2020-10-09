@@ -274,6 +274,7 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gmock(unittest_scanner_controller
     test/unit_tests/unittest_scanner_controller.cpp
+    test/src/monitoring_frame_serialization.cpp
     src/controller_state_machine.cpp
     src/laserscan.cpp
     src/monitoring_frame_msg.cpp
