@@ -23,16 +23,17 @@
 
 #include "psen_scan_v2/stop_request.h"
 #include "psen_scan_v2/raw_data_creation.h"
+#include "psen_scan_v2/raw_processing.h"
 
 namespace psen_scan_v2
 {
 std::ostringstream& StopRequest::processMember(std::ostringstream& os) const
 {
   auto reserved{ RESERVED_ };
-  os.write(reinterpret_cast<char*>(&reserved), sizeof(reserved));
+  raw_processing::write(os, reserved);
 
   auto op_code{ OPCODE_ };
-  os.write(reinterpret_cast<char*>(&op_code), sizeof(op_code));
+  raw_processing::write(os, op_code);
 
   return os;
 }
@@ -43,13 +44,13 @@ uint32_t StopRequest::calcCrc() const
   return psen_scan_v2::calcCrc(processMember(os));
 }
 
-DynamicSizeRawData StopRequest::toRawData() const
+DynamicSizeRawData StopRequest::serialize() const
 {
   std::ostringstream os;
   uint32_t crc{ calcCrc() };
-  os.write(reinterpret_cast<char*>(&crc), sizeof(uint32_t));
+  raw_processing::write(os, crc);
   processMember(os);
-  return psen_scan_v2::toRawData(os);
+  return raw_processing::toArray<DynamicSizeRawData>(os);
 }
 
 }  // namespace psen_scan_v2

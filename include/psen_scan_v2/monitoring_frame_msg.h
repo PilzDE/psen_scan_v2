@@ -83,7 +83,7 @@ public:
   };
 
 public:
-  static MonitoringFrameMsg fromRawData(const MaxSizeRawData& data, const std::size_t& num_bytes);
+  static MonitoringFrameMsg deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
 
 public:
   TenthOfDegree fromTheta() const;
@@ -119,6 +119,7 @@ private:
 
   uint32_t scan_counter_{ 0 };
   std::vector<double> measures_;
+  friend DynamicSizeRawData serialize(MonitoringFrameMsg& frame);
 };
 
 inline FieldHeader::Id FieldHeader::id() const

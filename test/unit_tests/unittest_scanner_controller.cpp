@@ -114,7 +114,7 @@ LaserScan ScannerControllerTest::testDataToLaserScan(const TestData& test_data)
 {
   const MaxSizeRawData raw_data = convertToMaxSizeRawData(test_data.hex_dump);
   const auto num_bytes = 2 * test_data.hex_dump.size();
-  const MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(raw_data, num_bytes) };
+  const MonitoringFrameMsg frame{ MonitoringFrameMsg::deserialize(raw_data, num_bytes) };
   return toLaserScan(frame);
 }
 
@@ -125,7 +125,7 @@ TEST_F(ScannerControllerTest, testSuccessfulStartSequence)
     EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _)).Times(1);
     EXPECT_CALL(scanner_controller_.data_udp_client_, startAsyncReceiving()).Times(1);
     EXPECT_CALL(scanner_controller_.control_udp_client_,
-                write(StartRequest(scanner_config_, DEFAULT_START_REQUEST_SEQ_NUMBER).toRawData()))
+                write(StartRequest(scanner_config_, DEFAULT_START_REQUEST_SEQ_NUMBER).serialize()))
         .Times(1);
   }
 
@@ -148,7 +148,7 @@ TEST_F(ScannerControllerTest, testSuccessfulStopSequence)
   {
     InSequence seq;
     EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _)).Times(1);
-    EXPECT_CALL(scanner_controller_.control_udp_client_, write(StopRequest().toRawData())).Times(1);
+    EXPECT_CALL(scanner_controller_.control_udp_client_, write(StopRequest().serialize())).Times(1);
   }
   auto stop_future = scanner_controller_.stop();
   sendStopReply();
@@ -161,7 +161,7 @@ TEST_F(ScannerControllerTest, testStopReplyTimeout)
   {
     InSequence seq;
     EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _)).Times(1);
-    EXPECT_CALL(scanner_controller_.control_udp_client_, write(StopRequest().toRawData())).Times(1);
+    EXPECT_CALL(scanner_controller_.control_udp_client_, write(StopRequest().serialize())).Times(1);
   }
 
   scanner_controller_.stop();

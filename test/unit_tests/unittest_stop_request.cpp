@@ -31,7 +31,7 @@ class StopRequestTest : public ::testing::Test
 TEST_F(StopRequestTest, constructorTest)
 {
   StopRequest request;
-  auto data{ request.toRawData() };
+  auto data{ request.serialize() };
   boost::crc_32_type crc;
   crc.process_bytes(&data[sizeof(uint32_t)], data.size() - sizeof(uint32_t));
 
@@ -53,7 +53,7 @@ TEST_F(StopRequestTest, regressionForRealSystem)
 {
   StopRequest sr;
 
-  auto data = sr.toRawData();
+  auto data = sr.serialize();
 
   unsigned char expected_crc[4] = { 0x28, 0xec, 0xfb, 0x39 };  // see wireshark for this number
 

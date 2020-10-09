@@ -12,41 +12,17 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#ifndef PSEN_SCAN_STOP_REQUEST_H
-#define PSEN_SCAN_STOP_REQUEST_H
-
-#include <cstdint>
-#include <iostream>
-#include <array>
+#ifndef PSEN_SCAN_V2_MONITORING_FRAME_SERIALIZATION_H
+#define PSEN_SCAN_V2_MONITORING_FRAME_SERIALIZATION_H
 
 #include "psen_scan_v2/raw_scanner_data.h"
+#include "psen_scan_v2/monitoring_frame_msg.h"
+
+using namespace psen_scan_v2;
 
 namespace psen_scan_v2
 {
-/**
- * @brief Higher level data type representing a scanner stop request.
- *
- * @note Unless otherwise indicated the byte order is little endian.
- *
- */
-class StopRequest
-{
-public:
-  static constexpr std::size_t STOP_REQUEST_SIZE{ 20 };
-  static constexpr std::size_t NUM_RESERVED_FIELDS{ 12 };
-
-public:
-  DynamicSizeRawData serialize() const;
-
-private:
-  std::ostringstream& processMember(std::ostringstream& os) const;
-  uint32_t calcCrc() const;
-
-private:
-  const std::array<uint8_t, NUM_RESERVED_FIELDS> RESERVED_{};
-  const uint32_t OPCODE_{ htole32(0x36) };
-};
-
+DynamicSizeRawData serialize(MonitoringFrameMsg& frame);
 }  // namespace psen_scan_v2
 
-#endif  // PSEN_SCAN_STOP_REQUEST_H
+#endif  // PSEN_SCAN_V2_MONITORING_FRAME_SERIALIZATION_H

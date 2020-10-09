@@ -17,6 +17,7 @@
 
 #include <sstream>
 #include <functional>
+#include <cmath>
 
 #include <fmt/core.h>
 
@@ -75,6 +76,30 @@ inline void readArray(std::istringstream& is,
     raw_processing::read<RawType, ReturnType>(is, sample, conversion_fcn);
     return sample;
   });
+}
+
+template <typename RawType, typename ArrayElemType>
+inline void writeArray(std::ostringstream& os,
+                       std::vector<ArrayElemType> array,
+                       std::function<RawType(ArrayElemType)> conversion_fcn)
+{
+  for (auto& elem : array)
+  {
+    RawType raw = conversion_fcn(elem);
+    raw_processing::write(os, raw);
+  }
+}
+
+template <typename T>
+inline T toArray(std::ostringstream& os)
+{
+  const std::string data_str(os.str());
+
+  T raw_data;
+  raw_data.reserve(data_str.length());
+
+  std::copy(data_str.begin(), data_str.end(), std::back_inserter(raw_data));
+  return raw_data;
 }
 
 inline StringStreamFailure::StringStreamFailure(const std::string& msg) : std::runtime_error(msg)

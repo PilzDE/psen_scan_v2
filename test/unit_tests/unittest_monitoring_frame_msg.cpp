@@ -113,7 +113,7 @@ protected:
 TEST_F(MonitoringFrameMsgFromRawTest, testReadSuccess)
 {
   MonitoringFrameMsg msg;
-  ASSERT_NO_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data_, num_bytes_););
+  ASSERT_NO_THROW(msg = MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
 
   EXPECT_EQ(msg.fromTheta().value(), test_data_.from_theta);
   EXPECT_EQ(msg.resolution().value(), test_data_.resolution);
@@ -130,25 +130,25 @@ TEST_F(MonitoringFrameMsgFromRawTest, testReadSuccess)
 TEST_F(MonitoringFrameMsgFromRawTest, testWrongOpCode)
 {
   raw_frame_data_.at(4) += 1;
-  EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_, num_bytes_););
+  EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testInvalidWorkingMode)
 {
   raw_frame_data_.at(8) = 0x03;
-  EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_, num_bytes_););
+  EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testInvalidTransactionType)
 {
   raw_frame_data_.at(12) = 0x06;
-  EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_, num_bytes_););
+  EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testInvalidScannerId)
 {
   raw_frame_data_.at(16) = 0x04;
-  EXPECT_NO_THROW(MonitoringFrameMsg::fromRawData(raw_frame_data_, num_bytes_););
+  EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testUnknownFieldId)
@@ -158,7 +158,7 @@ TEST_F(MonitoringFrameMsgFromRawTest, testUnknownFieldId)
   const auto num_bytes = 2 * test_data.hex_dump.size();
 
   MonitoringFrameMsg msg;
-  EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data, num_bytes);
+  EXPECT_THROW(msg = MonitoringFrameMsg::deserialize(raw_frame_data, num_bytes);
                , MonitoringFrameMsg::MonitoringFrameFormatError);
 }
 
@@ -169,7 +169,7 @@ TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeFieldLength)
   const auto num_bytes = 2 * test_data.hex_dump.size();
 
   MonitoringFrameMsg msg;
-  EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data, num_bytes);
+  EXPECT_THROW(msg = MonitoringFrameMsg::deserialize(raw_frame_data, num_bytes);
                , MonitoringFrameMsg::MonitoringFrameFormatError);
 }
 
@@ -180,7 +180,7 @@ TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeScanCounterLength)
   const auto num_bytes = 2 * test_data.hex_dump.size();
 
   MonitoringFrameMsg msg;
-  EXPECT_THROW(msg = MonitoringFrameMsg::fromRawData(raw_frame_data, num_bytes);
+  EXPECT_THROW(msg = MonitoringFrameMsg::deserialize(raw_frame_data, num_bytes);
                , MonitoringFrameMsg::MonitoringFrameFormatErrorScanCounterUnexpectedSize);
 }
 

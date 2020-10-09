@@ -126,7 +126,7 @@ ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& s
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::handleNewMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes)
 {
-  MonitoringFrameMsg frame{ MonitoringFrameMsg::fromRawData(data, num_bytes) };
+  MonitoringFrameMsg frame{ MonitoringFrameMsg::deserialize(data, num_bytes) };
   state_machine_.processMonitoringFrameReceivedEvent();
 
   if (frame.measures().empty())
@@ -167,13 +167,13 @@ void ScannerControllerT<TCSM, TUCI>::sendStartRequest()
   data_udp_client_.startAsyncReceiving();
   StartRequest start_request(scanner_config_, DEFAULT_SEQ_NUMBER);
 
-  control_udp_client_.write(start_request.toRawData());
+  control_udp_client_.write(start_request.serialize());
 }
 
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::handleScannerReply(const MaxSizeRawData& data, const std::size_t& num_bytes)
 {
-  ScannerReplyMsg frame{ ScannerReplyMsg::fromRawData(data) };
+  ScannerReplyMsg frame{ ScannerReplyMsg::deserialize(data) };
   state_machine_.processReplyReceivedEvent(frame.type());
 }
 
@@ -197,7 +197,7 @@ void ScannerControllerT<TCSM, TUCI>::sendStopRequest()
   control_udp_client_.startAsyncReceiving(
       ReceiveMode::single, std::bind(&ScannerControllerT::handleStopReplyTimeout, this, _1), RECEIVE_TIMEOUT_CONTROL);
   StopRequest stop_request;
-  control_udp_client_.write(stop_request.toRawData());
+  control_udp_client_.write(stop_request.serialize());
 }
 
 template <typename TCSM, typename TUCI>

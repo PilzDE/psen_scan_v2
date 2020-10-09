@@ -43,14 +43,14 @@ uint32_t StartRequest::getCRC() const
 {
   boost::crc_32_type result;
 
-  DynamicSizeRawData raw_data{ toRawData() };
+  DynamicSizeRawData raw_data{ serialize() };
 
   result.process_bytes(&raw_data.at(sizeof(crc_)), raw_data.size() - sizeof(crc_));
 
   return result.checksum();
 }
 
-DynamicSizeRawData StartRequest::toRawData() const
+DynamicSizeRawData StartRequest::serialize() const
 {
   std::ostringstream os;
 

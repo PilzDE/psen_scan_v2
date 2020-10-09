@@ -47,8 +47,7 @@ public:
   //! @returns the CRC of the start request.
   uint32_t getCRC() const;
 
-  //! @brief Serializes the request into raw data which can be send to the scanner.
-  DynamicSizeRawData toRawData() const;
+  DynamicSizeRawData serialize() const;
 
 private:
   uint32_t crc_{ 0 }; /**< Will be filled in constructor */
