@@ -110,21 +110,12 @@ protected:
   std::size_t num_bytes_{ 2 * test_data_.hex_dump.size() };
 };
 
-TEST_F(MonitoringFrameMsgFromRawTest, testReadSuccess)
+TEST_F(MonitoringFrameMsgFromRawTest, testDeserializationSuccess)
 {
   MonitoringFrameMsg msg;
   ASSERT_NO_THROW(msg = MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
 
-  EXPECT_EQ(msg.fromTheta().value(), test_data_.from_theta);
-  EXPECT_EQ(msg.resolution().value(), test_data_.resolution);
-  EXPECT_EQ(msg.scanCounter(), test_data_.scan_counter);
-
-  const auto measures = msg.measures();
-  EXPECT_EQ(measures.size(), test_data_.number_of_measures);
-  for (const auto& index_value_pair : test_data_.measures)
-  {
-    EXPECT_DOUBLE_EQ(measures.at(index_value_pair.first), index_value_pair.second / 1000.);
-  }
+  EXPECT_EQ(msg, test_data_.msg_);
 }
 
 TEST_F(MonitoringFrameMsgFromRawTest, testWrongOpCode)

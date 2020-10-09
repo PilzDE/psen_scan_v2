@@ -17,13 +17,31 @@
 #define PSEN_SCAN_V2_UDP_FRAME_DUMPS_H
 
 #include <array>
+#include <vector>
 #include <map>
+#include <iostream>
+
+#include "psen_scan_v2/monitoring_frame_msg.h"
+
+using namespace psen_scan_v2;
 
 namespace psen_scan_v2_test
 {
 struct UDPFrameTestDataWithoutIntensities
 {
-  constexpr UDPFrameTestDataWithoutIntensities() = default;
+  UDPFrameTestDataWithoutIntensities()
+  {
+    std::vector<double> measures;
+
+    for (size_t idx = offset_measures; idx < (offset_measures + (n_measures * 2)); idx = idx + 2)
+    {
+      uint16_t raw_value = (((uint16_t)hex_dump.at(idx + 1)) << 8) + (uint16_t)hex_dump.at(idx);
+      measures.push_back(raw_value / 1000.);
+    }
+
+    MonitoringFrameMsg msg(TenthOfDegree(from_theta), TenthOfDegree(resolution), scan_counter, measures);
+    msg_ = msg;
+  }
 
   const std::array<uint8_t, 135> hex_dump = {
     0x00, 0x00, 0x00, 0x00, 0xca, 0x00,                                                              // 0020
@@ -38,6 +56,9 @@ struct UDPFrameTestDataWithoutIntensities
     0x00                                                                                             // 00b0
   };  // hex dump: successful_stop_request.pcapng md5 e800c4 No. 22 only data payload of the udp frame
 
+  const int n_measures{ (hex_dump.at(30) * 0xff + hex_dump.at(29) - 1) / 2 };
+  const size_t offset_measures{ 31 };
+
   const uint16_t from_theta{ 1000 };
   const uint16_t resolution{ 10 };
   const uint32_t scan_counter{ 1656 };
@@ -48,6 +69,8 @@ struct UDPFrameTestDataWithoutIntensities
   const std::array<MeasuresIndexValuePair, 8> measures{
     { { 0, 681 }, { 1, 774 }, { 2, 636 }, { 3, 506 }, { 4, 496 }, { 30, 4063 }, { 45, 4074 }, { 49, 4657 } }
   };
+
+  MonitoringFrameMsg msg_;
 };
 
 struct UDPFrameTestDataWithoutMeasurementsAndIntensities
