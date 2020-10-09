@@ -119,8 +119,13 @@ void ScannerMock::sendStopReply()
 
 void ScannerMock::sendMonitoringFrame()
 {
-  const UDPFrameTestDataWithoutIntensities raw_scan;
-  data_server_.asyncSend<raw_scan.hex_dump.size()>(monitoring_frame_receiver_, transformArray(raw_scan.hex_dump));
+  const UDPFrameTestDataWithoutIntensities test_data;
+  MonitoringFrameMsg msg = test_data.msg_;
+
+  DynamicSizeRawData dynamic_raw_scan = serialize(msg);
+  MaxSizeRawData max_size_raw_data = convertToMaxSizeRawData(dynamic_raw_scan);
+
+  data_server_.asyncSend<max_size_raw_data.size()>(monitoring_frame_receiver_, max_size_raw_data);
 }
 
 ScannerConfiguration createScannerConfig()

@@ -324,6 +324,7 @@ if(CATKIN_ENABLE_TESTING)
 
 catkin_add_gmock(integrationtest_scanner_api
   test/integration_tests/integrationtest_scanner_api.cpp
+  test/src/monitoring_frame_serialization.cpp
 )
 target_link_libraries(integrationtest_scanner_api
   ${catkin_LIBRARIES}
