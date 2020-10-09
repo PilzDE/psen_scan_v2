@@ -50,7 +50,7 @@ DynamicSizeRawData StopRequest::serialize() const
   uint32_t crc{ calcCrc() };
   raw_processing::write(os, crc);
   processMember(os);
-  return raw_processing::serialize<DynamicSizeRawData>(os);
+  return raw_processing::toArray<DynamicSizeRawData>(os);
 }
 
 }  // namespace psen_scan_v2

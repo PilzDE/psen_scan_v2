@@ -57,6 +57,6 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
   raw_processing::write(os, unknown_data_at_the_end_of_frame);
   raw_processing::write(os, unknown_data_at_the_end_of_frame);
 
-  return raw_processing::serialize<DynamicSizeRawData>(os);
+  return raw_processing::toArray<DynamicSizeRawData>(os);
 }
 }  // namespace psen_scan_v2

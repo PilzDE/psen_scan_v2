@@ -78,7 +78,7 @@ inline void readArray(std::istringstream& is,
 }
 
 template <typename T>
-inline T serialize(std::ostringstream& os)
+inline T toArray(std::ostringstream& os)
 {
   const std::string data_str(os.str());
 
