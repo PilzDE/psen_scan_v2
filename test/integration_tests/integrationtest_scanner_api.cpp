@@ -119,7 +119,7 @@ void ScannerMock::sendStopReply()
 
 void ScannerMock::sendMonitoringFrame()
 {
-  constexpr UDPFrameTestDataWithoutIntensities raw_scan;
+  const UDPFrameTestDataWithoutIntensities raw_scan;
   data_server_.asyncSend<raw_scan.hex_dump.size()>(monitoring_frame_receiver_, transformArray(raw_scan.hex_dump));
 }
 

@@ -83,6 +83,17 @@ public:
   };
 
 public:
+  MonitoringFrameMsg() = default;
+  MonitoringFrameMsg(const TenthOfDegree& from_theta,
+                     const TenthOfDegree& resolution,
+                     const uint32_t scan_counter,
+                     const std::vector<double> measures)
+    : from_theta_fixed_(from_theta)
+    , resolution_fixed_(resolution)
+    , scan_counter_(scan_counter)
+    , measures_(measures){
+
+    };
   static MonitoringFrameMsg deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
 
 public:
@@ -90,6 +101,12 @@ public:
   TenthOfDegree resolution() const;
   uint32_t scanCounter() const;
   std::vector<double> measures() const;
+
+  bool operator==(const MonitoringFrameMsg& rhs) const
+  {
+    return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
+            measures() == rhs.measures());
+  }
 
 private:
   using FieldId = FieldHeader::Id;
@@ -110,9 +127,9 @@ private:
 
 private:
   uint32_t device_status_fixed_{ 0 };
-  uint32_t op_code_fixed_{ 0 };
+  uint32_t op_code_fixed_{ OP_CODE_MONITORING_FRAME };
   uint32_t working_mode_fixed_{ 0 };
-  uint32_t transaction_type_fixed_{ 0 };
+  uint32_t transaction_type_fixed_{ GUI_MONITORING_TRANSACTION };
   uint8_t scanner_id_fixed_{ 0 };
   TenthOfDegree from_theta_fixed_{ 0 };
   TenthOfDegree resolution_fixed_{ 0 };

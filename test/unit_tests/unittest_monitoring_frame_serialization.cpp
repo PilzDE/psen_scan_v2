@@ -26,22 +26,41 @@ namespace psen_scan_v2_test
 {
 TEST(MonitoringFrameSerializationTest, testUDPFrameTestDataWithoutIntensitiesSuccess)
 {
+  // Load testdata from dump
   UDPFrameTestDataWithoutIntensities test_data;
-  MaxSizeRawData monitoring_frame_without_intensities_raw = convertToMaxSizeRawData(test_data.hex_dump);
 
-  MonitoringFrameMsg monitoring_frame_message =
-      MonitoringFrameMsg::deserialize(monitoring_frame_without_intensities_raw, test_data.hex_dump.size());
-  DynamicSizeRawData serialized_monitoring_frame_message = serialize(monitoring_frame_message);
+  // Serialize the message
+  DynamicSizeRawData serialized_monitoring_frame_message = serialize(test_data.msg_);
 
   EXPECT_EQ(test_data.hex_dump.size(), serialized_monitoring_frame_message.size());
 
   for (size_t i = 0; i < test_data.hex_dump.size(); i++)
   {
-    uint8_t hex_dump_byte = test_data.hex_dump.at(i);
-    uint8_t serialized_monitoring_frame_message_byte = serialized_monitoring_frame_message.at(i);
-    EXPECT_EQ(serialized_monitoring_frame_message_byte, hex_dump_byte);
+    EXPECT_EQ((uint8_t)serialized_monitoring_frame_message.at(i), test_data.hex_dump.at(i)) << " index " << i;
   }
 }
+
+TEST(MonitoringFrameSerializationTest, testSerializationInvariance)
+{
+  UDPFrameTestDataWithoutIntensities test_data;
+  DynamicSizeRawData raw = serialize(test_data.msg_);
+
+  MonitoringFrameMsg deserialized_msg = MonitoringFrameMsg::deserialize(convertToMaxSizeRawData(raw), raw.size());
+
+  EXPECT_EQ(test_data.msg_, deserialized_msg);
+}
+
+TEST(MonitoringFrameSerializationTest, testSerializationInvariance2)
+{
+  MonitoringFrameMsg msg(TenthOfDegree(25), TenthOfDegree(1), 456, { 10, 20, 30, 40 });
+
+  DynamicSizeRawData raw = serialize(msg);
+
+  MonitoringFrameMsg deserialized_msg = MonitoringFrameMsg::deserialize(convertToMaxSizeRawData(raw), raw.size());
+
+  EXPECT_EQ(msg, deserialized_msg);
+}
+
 }  // namespace psen_scan_v2_test
 
 int main(int argc, char* argv[])
