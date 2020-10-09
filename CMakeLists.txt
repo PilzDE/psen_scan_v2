@@ -274,11 +274,12 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gmock(unittest_scanner_controller
     test/unit_tests/unittest_scanner_controller.cpp
+    src/controller_state_machine.cpp
+    src/laserscan.cpp
+    src/monitoring_frame_msg.cpp
     src/scanner_configuration.cpp
     src/start_request.cpp
-    src/monitoring_frame_msg.cpp
     src/stop_request.cpp
-    src/laserscan.cpp
   )
 
   target_link_libraries(unittest_scanner_controller
