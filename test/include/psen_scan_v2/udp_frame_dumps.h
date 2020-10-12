@@ -59,9 +59,9 @@ struct UDPFrameTestDataWithoutIntensities
   const int n_measures{ (hex_dump.at(30) * 0xff + hex_dump.at(29) - 1) / 2 };
   const size_t offset_measures{ 31 };
 
-  const uint16_t from_theta{ 1000 };
-  const uint16_t resolution{ 10 };
-  const uint32_t scan_counter{ 1656 };
+  const uint16_t from_theta{ 0x03e8 };
+  const uint16_t resolution{ 0x0a };
+  const uint32_t scan_counter{ 0x0678 };
 
   const uint16_t number_of_measures{ 50 };
 
@@ -70,6 +70,18 @@ struct UDPFrameTestDataWithoutIntensities
 
 struct UDPFrameTestDataWithoutMeasurementsAndIntensities
 {
+  MonitoringFrameMsg msg_;
+
+  UDPFrameTestDataWithoutMeasurementsAndIntensities()
+  {
+    MonitoringFrameMsg msg(TenthOfDegree(from_theta), TenthOfDegree(resolution), scan_counter, {});
+    msg_ = msg;
+  }
+
+  const uint16_t from_theta{ 0x5dc };
+  const uint16_t resolution{ 0x0a };
+  const uint32_t scan_counter{ 0x0661fc };
+
   const std::array<uint8_t, 35> hex_dump = { 0x00, 0x00, 0x00, 0x00, 0xca, 0x00,  // 0020
                                              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00,
                                              0x00, 0xdc, 0x05, 0x0a, 0x00, 0x02, 0x05, 0x00, 0xfc, 0x61,
