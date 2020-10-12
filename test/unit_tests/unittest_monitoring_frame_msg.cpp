@@ -230,8 +230,8 @@ TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)
   std::stringstream output;
   output << msg;
   EXPECT_EQ(output.str(),
-            "MonitoringFrameMsg(fromTheta = TenthOfDegree(1234), resolution = TenthOfDegree(56), scanCounter = 78, "
-            "measures = { 45, 44, 43, 42 })");
+            "MonitoringFrameMsg(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
+            "measures = {45.0, 44.0, 43.0, 42.0})");
 }
 
 }  // namespace psen_scan_v2
