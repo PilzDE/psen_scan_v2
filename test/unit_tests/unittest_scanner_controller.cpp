@@ -27,7 +27,6 @@
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/stop_request.h"
 #include "psen_scan_v2/laserscan.h"
-#include "psen_scan_v2/udp_frame_dumps.h"
 #include "psen_scan_v2/scan_range.h"
 
 using namespace psen_scan_v2_test;
