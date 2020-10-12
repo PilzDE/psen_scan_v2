@@ -111,10 +111,20 @@ MonitoringFrameMsg MonitoringFrameMsg::deserialize(const MaxSizeRawData& data, c
             {
               if (msg.diagnostics_[m][byte_n].test(bit_n))
               {
+                // Print nothing if Error bit on UNUSED field is set
                 if (error_bits[byte_n][bit_n] != DiagnosticCode::UNUSED)
                 {
-                  std::cerr << error_code_to_string.at(error_bits[byte_n][bit_n]) << " byte: " << byte_n
-                            << " bit_n:" << bit_n << "\n";
+                  // Internal and - bits are ambiguous, also print byte and bit
+                  if (error_bits[byte_n][bit_n] == DiagnosticCode::_ ||
+                      error_bits[byte_n][bit_n] == DiagnosticCode::INT)
+                  {
+                    std::cerr << error_code_to_string.at(error_bits[byte_n][bit_n]) << " byte: " << byte_n
+                              << " bit_n:" << bit_n << "\n";
+                  }
+                  else
+                  {
+                    std::cerr << error_code_to_string.at(error_bits[byte_n][bit_n]);
+                  }
                 }
               }
             }
