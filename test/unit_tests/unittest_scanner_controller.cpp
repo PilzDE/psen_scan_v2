@@ -125,7 +125,7 @@ LaserScan ScannerControllerTest::testDataToLaserScan(const TestData& test_data)
   return toLaserScan(frame);
 }
 
-TEST_F(ScannerControllerTest, testSuccessfulStartSequence)
+TEST_F(ScannerControllerTest, successfulStartSequence)
 {
   {
     InSequence seq;
@@ -139,7 +139,7 @@ TEST_F(ScannerControllerTest, testSuccessfulStartSequence)
   EXPECT_TRUE(isFutureReady(start_future));
 }
 
-TEST_F(ScannerControllerTest, testRetryAfterStartReplyTimeout)
+TEST_F(ScannerControllerTest, retryAfterStartReplyTimeout)
 {
   const unsigned int number_of_retries{ 5 };
 
@@ -155,7 +155,7 @@ TEST_F(ScannerControllerTest, testRetryAfterStartReplyTimeout)
   EXPECT_TRUE(isFutureReady(start_future));
 }
 
-TEST_F(ScannerControllerTest, testReceivingMultipleStartReplies)
+TEST_F(ScannerControllerTest, receivingMultipleStartReplies)
 {
   const UDPFrameTestDataWithoutIntensities test_data;
   const LaserScan scan{ testDataToLaserScan(test_data) };
@@ -170,7 +170,7 @@ TEST_F(ScannerControllerTest, testReceivingMultipleStartReplies)
   sendMonitoringFrame(test_data);
 }
 
-TEST_F(ScannerControllerTest, testSuccessfulStopSequence)
+TEST_F(ScannerControllerTest, successfulStopSequence)
 {
   {
     InSequence seq;
@@ -182,7 +182,7 @@ TEST_F(ScannerControllerTest, testSuccessfulStopSequence)
   EXPECT_TRUE(isFutureReady(stop_future));
 }
 
-TEST_F(ScannerControllerTest, testStopWhileWaitingForStartReply)
+TEST_F(ScannerControllerTest, stopWhileWaitingForStartReply)
 {
   {
     InSequence seq;
@@ -196,7 +196,7 @@ TEST_F(ScannerControllerTest, testStopWhileWaitingForStartReply)
   EXPECT_TRUE(isFutureReady(stop_future));
 }
 
-TEST_F(ScannerControllerTest, testStopReplyTimeout)
+TEST_F(ScannerControllerTest, stopReplyTimeout)
 {
   // Has no defined behaviour yet
   {
@@ -210,7 +210,7 @@ TEST_F(ScannerControllerTest, testStopReplyTimeout)
   sendStopReply();
 }
 
-TEST_F(ScannerControllerTest, testHandleMonitoringFrame)
+TEST_F(ScannerControllerTest, handleMonitoringFrame)
 {
   const UDPFrameTestDataWithoutIntensities test_data;
   const LaserScan scan{ testDataToLaserScan(test_data) };
@@ -222,7 +222,7 @@ TEST_F(ScannerControllerTest, testHandleMonitoringFrame)
   sendMonitoringFrame(test_data);
 }
 
-TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
+TEST_F(ScannerControllerTest, handleEmptyMonitoringFrame)
 {
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
@@ -233,7 +233,7 @@ TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
   sendMonitoringFrame(test_data);
 }
 
-TEST_F(ScannerControllerTest, testHandleEarlyMonitoringFrame)
+TEST_F(ScannerControllerTest, handleEarlyMonitoringFrame)
 {
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
@@ -243,7 +243,7 @@ TEST_F(ScannerControllerTest, testHandleEarlyMonitoringFrame)
   sendMonitoringFrame(test_data);
 }
 
-TEST_F(ScannerControllerTest, testHandleLateMonitoringFrame)
+TEST_F(ScannerControllerTest, handleLateMonitoringFrame)
 {
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
@@ -258,12 +258,12 @@ TEST_F(ScannerControllerTest, testHandleLateMonitoringFrame)
   sendStopReply();
 }
 
-TEST_F(ScannerControllerTest, testHandleError)
+TEST_F(ScannerControllerTest, handleError)
 {
   simulateUdpError("Udp error");  // only for coverage for now
 }
 
-TEST_F(ScannerControllerTest, testConstructorInvalidLaserScanCallback)
+TEST_F(ScannerControllerTest, constructorInvalidLaserScanCallback)
 {
   EXPECT_THROW(({
                  ScannerControllerT<ControllerStateMachine, MockUdpClient> scanner_controller_(scanner_config_,

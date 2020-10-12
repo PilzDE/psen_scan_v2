@@ -30,7 +30,7 @@ namespace psen_scan_v2
 {
 using namespace psen_scan_v2_test;
 
-TEST(FieldHeaderTest, testGetIdAndLength)
+TEST(FieldHeaderTest, getIdAndLength)
 {
   uint8_t id = 5;
   uint16_t length = 7;
@@ -39,7 +39,7 @@ TEST(FieldHeaderTest, testGetIdAndLength)
   EXPECT_EQ(length, header.length());
 }
 
-TEST(FieldHeaderTest, testReadSuccess)
+TEST(FieldHeaderTest, readSuccess)
 {
   uint8_t id = 5;
   uint16_t length = 7;
@@ -57,7 +57,7 @@ TEST(FieldHeaderTest, testReadSuccess)
   EXPECT_EQ(expected_length, header_ptr->length());
 }
 
-TEST(FieldHeaderTest, testReadHeaderTooShortFailure)
+TEST(FieldHeaderTest, readHeaderTooShortFailure)
 {
   uint16_t too_short_header;
   uint16_t max_num_bytes = 2;
@@ -118,31 +118,31 @@ TEST_F(MonitoringFrameMsgFromRawTest, testDeserializationSuccess)
   EXPECT_EQ(msg, test_data_.msg_);
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, testWrongOpCode)
+TEST_F(MonitoringFrameMsgFromRawTest, wrongOpCode)
 {
   raw_frame_data_.at(4) += 1;
   EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, testInvalidWorkingMode)
+TEST_F(MonitoringFrameMsgFromRawTest, invalidWorkingMode)
 {
   raw_frame_data_.at(8) = 0x03;
   EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, testInvalidTransactionType)
+TEST_F(MonitoringFrameMsgFromRawTest, invalidTransactionType)
 {
   raw_frame_data_.at(12) = 0x06;
   EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, testInvalidScannerId)
+TEST_F(MonitoringFrameMsgFromRawTest, invalidScannerId)
 {
   raw_frame_data_.at(16) = 0x04;
   EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, testUnknownFieldId)
+TEST_F(MonitoringFrameMsgFromRawTest, unknownFieldId)
 {
   UDPFrameTestDataWithUnknownFieldId test_data;
   const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
@@ -153,7 +153,7 @@ TEST_F(MonitoringFrameMsgFromRawTest, testUnknownFieldId)
                , MonitoringFrameMsg::MonitoringFrameFormatError);
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeFieldLength)
+TEST_F(MonitoringFrameMsgFromRawTest, tooLargeFieldLength)
 {
   UDPFrameTestDataWithTooLargeFieldLength test_data;
   const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
@@ -164,7 +164,7 @@ TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeFieldLength)
                , MonitoringFrameMsg::MonitoringFrameFormatError);
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeScanCounterLength)
+TEST_F(MonitoringFrameMsgFromRawTest, tooLargeScanCounterLength)
 {
   UDPFrameTestDataWithTooLargeScanCounterLength test_data;
   const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);

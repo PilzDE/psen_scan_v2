@@ -95,7 +95,7 @@ void UdpClientTests::sendEmptyTestDataToClient()
   mock_udp_server_.asyncSendEmpty(host_endpoint);
 }
 
-TEST_F(UdpClientTests, testAsyncReadOperation)
+TEST_F(UdpClientTests, asyncReadOperation)
 {
   EXPECT_CALL(*this, handleNewData(_, DATA_SIZE_BYTES)).WillOnce(ACTION_OPEN_BARRIER_VOID(CLIENT_RECEIVED_DATA));
 
@@ -104,7 +104,7 @@ TEST_F(UdpClientTests, testAsyncReadOperation)
   BARRIER(CLIENT_RECEIVED_DATA);
 }
 
-TEST_F(UdpClientTests, testSingleAsyncReadOperation)
+TEST_F(UdpClientTests, singleAsyncReadOperation)
 {
   EXPECT_CALL(*this, handleNewData(_, DATA_SIZE_BYTES)).WillOnce(ACTION_OPEN_BARRIER_VOID(CLIENT_RECEIVED_DATA));
 
@@ -113,7 +113,7 @@ TEST_F(UdpClientTests, testSingleAsyncReadOperation)
   BARRIER(CLIENT_RECEIVED_DATA);
 }
 
-TEST_F(UdpClientTests, testTwoConsecutiveTimeouts)
+TEST_F(UdpClientTests, twoConsecutiveTimeouts)
 {
   EXPECT_CALL(*this, handleTimeout(_))
       .WillOnce(ACTION_OPEN_BARRIER_VOID(TIMEOUT_BARRIER_1))
@@ -128,7 +128,7 @@ TEST_F(UdpClientTests, testTwoConsecutiveTimeouts)
   BARRIER(TIMEOUT_BARRIER_2);
 }
 
-TEST_F(UdpClientTests, testErrorHandlingForReceive)
+TEST_F(UdpClientTests, errorHandlingForReceive)
 {
   EXPECT_CALL(*this, handleError(_)).WillOnce(ACTION_OPEN_BARRIER_VOID(ERROR_HANDLER_CALLED));
   EXPECT_CALL(*this, handleTimeout(_)).Times(0);
@@ -139,7 +139,7 @@ TEST_F(UdpClientTests, testErrorHandlingForReceive)
   BARRIER(ERROR_HANDLER_CALLED);
 }
 
-TEST_F(UdpClientTests, testRestartAfterTimeout)
+TEST_F(UdpClientTests, restartAfterTimeout)
 {
   {
     ::testing::InSequence seq;
@@ -156,7 +156,7 @@ TEST_F(UdpClientTests, testRestartAfterTimeout)
   BARRIER(CLIENT_RECEIVED_DATA);
 }
 
-TEST_F(UdpClientTests, testWriteOperation)
+TEST_F(UdpClientTests, writeOperation)
 {
   std::string str = "Hello!";
   DynamicSizeRawData write_buf;
@@ -170,7 +170,7 @@ TEST_F(UdpClientTests, testWriteOperation)
   BARRIER(CLIENT_RECEIVED_DATA);
 }
 
-TEST_F(UdpClientTests, testWritingWhileReceiving)
+TEST_F(UdpClientTests, writingWhileReceiving)
 {
   std::string str = "Hello!";
   DynamicSizeRawData write_buf;

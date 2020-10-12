@@ -32,19 +32,19 @@ static constexpr uint32_t OP_CODE_START{ 0x35 };
 static constexpr uint32_t OP_CODE_UNKNOWN{ 0x01 };
 static constexpr uint32_t RES_CODE_ACCEPTED{ 0x00 };
 
-TEST(ScannerReplyMsgTest, testTypeStart)
+TEST(ScannerReplyMsgTest, typeStart)
 {
   ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
   EXPECT_EQ(ScannerReplyMsgType::Start, msg.type());
 }
 
-TEST(ScannerReplyMsgTest, testTypeUnknown)
+TEST(ScannerReplyMsgTest, typeUnknown)
 {
   ScannerReplyMsg msg(OP_CODE_UNKNOWN, RES_CODE_ACCEPTED);
   EXPECT_EQ(ScannerReplyMsgType::Unknown, msg.type());
 }
 
-TEST(ScannerReplyMsgTest, testGetStartOpCode)
+TEST(ScannerReplyMsgTest, getStartOpCode)
 {
   EXPECT_EQ(OP_CODE_START, getOpCodeValue(ScannerReplyMsgType::Start));
 }
@@ -68,7 +68,7 @@ TEST(ScannerReplyMsgTest, testserialize)
   DecodingEquals(raw_msg, 0x12, res_code);
 }
 
-TEST(ScannerReplyMsgTest, testCalcCRC)
+TEST(ScannerReplyMsgTest, calcCRC)
 {
   ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
 

@@ -82,7 +82,7 @@ protected:
   ScannerConfiguration scanner_config_;
 };
 
-TEST_F(RosScannerNodeTests, testScannerInvocation)
+TEST_F(RosScannerNodeTests, scannerInvocation)
 {
   ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
@@ -99,7 +99,7 @@ TEST_F(RosScannerNodeTests, testScannerInvocation)
   EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
 }
 
-TEST_F(RosScannerNodeTests, testScanTopicReceived)
+TEST_F(RosScannerNodeTests, scanTopicReceived)
 {
   LaserScan laser_scan_fake(TenthOfDegree(1), TenthOfDegree(3), TenthOfDegree(5));
   laser_scan_fake.getMeasurements().push_back(1);

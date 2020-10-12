@@ -122,8 +122,8 @@ private:
   void checkFixedFields();
 
 private:
-  FRIEND_TEST(FieldHeaderTest, testReadSuccess);
-  FRIEND_TEST(FieldHeaderTest, testReadHeaderTooShortFailure);
+  FRIEND_TEST(FieldHeaderTest, readSuccess);
+  FRIEND_TEST(FieldHeaderTest, readHeaderTooShortFailure);
 
 private:
   uint32_t device_status_fixed_{ 0 };

@@ -31,7 +31,7 @@ MATCHER_P(IsReversed, data_vec, "")
 
 namespace psen_scan_v2_test
 {
-TEST(LaserScanROSConversionsTest, testToLaserScanMsg)
+TEST(LaserScanROSConversionsTest, toLaserScanMsg)
 {
   const std::string frame_id{ "frame_id" };
   constexpr double x_axis_rotation{ 0 };

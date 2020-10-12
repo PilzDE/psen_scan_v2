@@ -24,7 +24,7 @@ using namespace psen_scan_v2;
 
 namespace psen_scan_v2_test
 {
-TEST(MonitoringFrameSerializationTest, testUDPFrameTestDataWithoutIntensitiesSuccess)
+TEST(MonitoringFrameSerializationTest, udpFrameTestDataWithoutIntensitiesSuccess)
 {
   // Load testdata from dump
   UDPFrameTestDataWithoutIntensities test_data;

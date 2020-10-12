@@ -32,7 +32,7 @@ using namespace psen_scan_v2;
 
 namespace psen_scan_v2_test
 {
-TEST(LaserScanConversionsTest, testToLaserScan)
+TEST(LaserScanConversionsTest, toLaserScan)
 {
   UDPFrameTestDataWithoutIntensities test_data;
   const MaxSizeRawData raw_data{ convertToMaxSizeRawData(test_data.hex_dump) };
