@@ -64,6 +64,7 @@ public:
                     const std::chrono::high_resolution_clock::duration& timeout));
   // "Simulates" function call which uses default values
   MOCK_METHOD0(startAsyncReceiving, void());
+  MOCK_METHOD1(startAsyncReceiving, void(const ReceiveMode& modi));
   MOCK_METHOD1(write, void(const DynamicSizeRawData& data));
 
 private:

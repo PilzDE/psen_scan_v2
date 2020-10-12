@@ -40,6 +40,19 @@ static const std::string MOCK_IP_ADDRESS{ "127.0.0.1" };
 class MockUDPServer
 {
 public:
+  /**
+   * @brief Lists the different possible receive modi.
+   */
+  enum class ReceiveMode
+  {
+    //! @brief Wait for one message and then stop listening.
+    single,
+    //! @brief Continuously wait for new messages. In other words, after a message is received, automatically start
+    //! listening for the next message.
+    continuous
+  };
+
+public:
   using NewDataHandler = std::function<void(const udp::endpoint&, const psen_scan_v2::DynamicSizeRawData&)>;
 
 public:
@@ -49,7 +62,7 @@ public:
   MockUDPServer(const unsigned short port, const NewDataHandler& new_data_handler);
 
 public:
-  void asyncReceive();
+  void asyncReceive(const ReceiveMode& modi = ReceiveMode::single);
 
   template <unsigned int N>
   void asyncSend(const udp::endpoint& receiver_of_data, const psen_scan_v2::FixedSizeRawData<N>& data);
@@ -58,7 +71,9 @@ public:
 
 private:
   void handleSend(const boost::system::error_code& error, std::size_t bytes_transferred);
-  void handleReceive(const boost::system::error_code& error, std::size_t /*bytes_transferred*/);
+  void handleReceive(const ReceiveMode& modi,
+                     const boost::system::error_code& error,
+                     std::size_t /*bytes_transferred*/);
 
 private:
   udp::endpoint remote_endpoint_;
@@ -124,7 +139,9 @@ void MockUDPServer::asyncSendEmpty(const udp::endpoint& receiver_of_data)
   asyncSend<0>(receiver_of_data, data);
 }
 
-void MockUDPServer::handleReceive(const boost::system::error_code& error, std::size_t bytes_received)
+void MockUDPServer::handleReceive(const ReceiveMode& modi,
+                                  const boost::system::error_code& error,
+                                  std::size_t bytes_received)
 {
   if (error || bytes_received == 0)
   {
@@ -133,15 +150,20 @@ void MockUDPServer::handleReceive(const boost::system::error_code& error, std::s
   }
   psen_scan_v2::DynamicSizeRawData recv_data(recv_buffer_.cbegin(), recv_buffer_.cbegin() + bytes_received);
   new_data_handler_(remote_endpoint_, recv_data);
+  if (modi == ReceiveMode::continuous)
+  {
+    asyncReceive(ReceiveMode::continuous);
+  }
 }
 
-void MockUDPServer::asyncReceive()
+void MockUDPServer::asyncReceive(const ReceiveMode& modi)
 {
-  io_service_.post([this]() {
+  io_service_.post([this, modi]() {
     socket_.async_receive_from(boost::asio::buffer(recv_buffer_),
                                remote_endpoint_,
                                boost::bind(&MockUDPServer::handleReceive,
                                            this,
+                                           modi,
                                            boost::asio::placeholders::error,
                                            boost::asio::placeholders::bytes_transferred));
   });

@@ -79,7 +79,9 @@ public:
                                                                                             laser_scan_callback_ };
 };
 
-#define EXPECT_START_LISTENING_FOR_CONTROL(scanner_controller)                                                         \
+#define EXPECT_START_LISTENING_FOR_CONTROL1(scanner_controller)                                                        \
+  EXPECT_CALL(scanner_controller.control_udp_client_, startAsyncReceiving(_))
+#define EXPECT_START_LISTENING_FOR_CONTROL3(scanner_controller)                                                        \
   EXPECT_CALL(scanner_controller.control_udp_client_, startAsyncReceiving(_, _, _))
 #define EXPECT_START_LISTENING_FOR_DATA(scanner_controller)                                                            \
   EXPECT_CALL(scanner_controller.data_udp_client_, startAsyncReceiving())
@@ -115,28 +117,12 @@ TEST_F(ScannerControllerTest, successfulStartSequence)
 {
   {
     InSequence seq;
-    EXPECT_START_LISTENING_FOR_CONTROL(scanner_controller_).Times(1);
+    EXPECT_START_LISTENING_FOR_CONTROL1(scanner_controller_).Times(1);
     EXPECT_REQUEST_SEND(scanner_controller_, StartRequest(scanner_config_, DEFAULT_START_REQUEST_SEQ_NUMBER)).Times(1);
   }
   EXPECT_START_LISTENING_FOR_DATA(scanner_controller_).Times(1);
 
   auto start_future = scanner_controller_.start();
-  simulateStartReply();
-  EXPECT_TRUE(isFutureReady(start_future));
-}
-
-TEST_F(ScannerControllerTest, retryAfterStartReplyTimeout)
-{
-  const unsigned int number_of_retries{ 5 };
-
-  EXPECT_REQUEST_SEND(scanner_controller_, StartRequest(scanner_config_, DEFAULT_START_REQUEST_SEQ_NUMBER))
-      .Times(number_of_retries);
-
-  auto start_future = scanner_controller_.start();
-  for (unsigned int i = 0; i < (number_of_retries - 1); ++i)
-  {
-    simulateUdpTimeout("Udp timeout");
-  }
   simulateStartReply();
   EXPECT_TRUE(isFutureReady(start_future));
 }
@@ -149,7 +135,6 @@ TEST_F(ScannerControllerTest, receivingMultipleStartReplies)
   EXPECT_CALL(mock_, laserscan_callback(toLaserScan(msg))).Times(2);
 
   scanner_controller_.start();
-  simulateUdpTimeout("Udp timeout");
   simulateStartReply();
   simulateMonitoringFrame(msg);
   simulateStartReply();
@@ -160,7 +145,7 @@ TEST_F(ScannerControllerTest, successfulStopSequence)
 {
   {
     InSequence seq;
-    EXPECT_START_LISTENING_FOR_CONTROL(scanner_controller_).Times(1);
+    EXPECT_START_LISTENING_FOR_CONTROL3(scanner_controller_).Times(1);
     EXPECT_REQUEST_SEND(scanner_controller_, StopRequest()).Times(1);
   }
   auto stop_future = scanner_controller_.stop();

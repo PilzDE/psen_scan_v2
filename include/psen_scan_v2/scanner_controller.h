@@ -36,6 +36,7 @@
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/stop_request.h"
 #include "psen_scan_v2/udp_client.h"
+#include "psen_scan_v2/async_barrier.h"
 
 namespace psen_scan_v2
 {
@@ -49,6 +50,44 @@ static constexpr std::chrono::milliseconds RECEIVE_TIMEOUT_DATA{ 1000 };
 static constexpr uint32_t DEFAULT_SEQ_NUMBER{ 0 };
 
 using std::placeholders::_1;
+
+using namespace std::chrono_literals;
+class TimeoutTimer
+{
+public:
+  TimeoutTimer(const std::chrono::high_resolution_clock::duration& timeout,
+               const std::function<void()>& timeout_handler,
+               const std::chrono::high_resolution_clock::duration& start_timeout = 10ms)
+    : timer_thread_([this, timeout, timeout_handler]() {
+      thread_startetd_barrier_.release();
+      while (!terminated_ && !barrier_.waitTillRelease(timeout))
+      {
+        timeout_handler();
+      }
+    })
+  {
+    if (!thread_startetd_barrier_.waitTillRelease(start_timeout))
+    {
+      throw std::runtime_error("Timeout while waiting for timer thread to start");
+    }
+  }
+
+  ~TimeoutTimer()
+  {
+    terminated_ = true;
+    barrier_.release();
+    if (timer_thread_.joinable())
+    {
+      timer_thread_.join();
+    }
+  }
+
+private:
+  std::atomic_bool terminated_{ false };
+  Barrier thread_startetd_barrier_;
+  Barrier barrier_;
+  std::thread timer_thread_;
+};
 
 template <typename TCSM = ControllerStateMachine, typename TUCI = UdpClientImpl>
 class ScannerControllerT
@@ -68,7 +107,7 @@ private:
   void sendStopRequest();
 
 private:
-  void handleStartReplyTimeout(const std::string& error_str);
+  void handleStartReplyTimeout();
   void handleStopReplyTimeout(const std::string& error_str);
 
   void notifyStartedState();
@@ -77,8 +116,12 @@ private:
 private:
   ScannerConfiguration scanner_config_;
   TCSM state_machine_;
+
   TUCI control_udp_client_;
   TUCI data_udp_client_;
+
+  std::unique_ptr<TimeoutTimer> start_reply_timer_{};
+
   LaserScanCallback laser_scan_callback_;
 
   std::promise<void> started_;
@@ -154,6 +197,9 @@ void ScannerControllerT<TCSM, TUCI>::handleError(const std::string& error_msg)
 template <typename TCSM, typename TUCI>
 std::future<void> ScannerControllerT<TCSM, TUCI>::start()
 {
+  control_udp_client_.startAsyncReceiving(ReceiveMode::single);
+  data_udp_client_.startAsyncReceiving();
+
   state_machine_.processStartRequestEvent();
   return started_.get_future();
 }
@@ -168,12 +214,12 @@ std::future<void> ScannerControllerT<TCSM, TUCI>::stop()
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::sendStartRequest()
 {
-  control_udp_client_.startAsyncReceiving(
-      ReceiveMode::single, std::bind(&ScannerControllerT::handleStartReplyTimeout, this, _1), RECEIVE_TIMEOUT_CONTROL);
-  data_udp_client_.startAsyncReceiving();
-  StartRequest start_request(scanner_config_, DEFAULT_SEQ_NUMBER);
-
-  control_udp_client_.write(start_request.serialize());
+  control_udp_client_.write(StartRequest(scanner_config_, DEFAULT_SEQ_NUMBER).serialize());
+  if (!start_reply_timer_)
+  {
+    start_reply_timer_ = std::make_unique<TimeoutTimer>(RECEIVE_TIMEOUT_CONTROL,
+                                                        std::bind(&ScannerControllerT::handleStartReplyTimeout, this));
+  }
 }
 
 template <typename TCSM, typename TUCI>
@@ -184,7 +230,7 @@ void ScannerControllerT<TCSM, TUCI>::handleScannerReply(const MaxSizeRawData& da
 }
 
 template <typename TCSM, typename TUCI>
-void ScannerControllerT<TCSM, TUCI>::handleStartReplyTimeout(const std::string& error_str)
+void ScannerControllerT<TCSM, TUCI>::handleStartReplyTimeout()
 {
   PSENSCAN_ERROR("ScannerController",
                  "Timeout while waiting for the scanner to start! Retrying... "
@@ -212,8 +258,11 @@ template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::notifyStartedState()
 {
   PSENSCAN_DEBUG("ScannerController", "Started() called.");
-  started_.set_value();
 
+  // The reset stops the start-reply timeout timer
+  start_reply_timer_.reset(nullptr);
+
+  started_.set_value();
   // Reinitialize
   started_ = std::promise<void>();
 }
