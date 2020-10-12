@@ -76,9 +76,9 @@ public:
   void startListeningForControlMsg();
 
 public:
-  void sendStartReply();
-  void sendStopReply();
-  void sendMonitoringFrame();
+  void simulateStartReply();
+  void simulateStopReply();
+  void simulateMonitoringFrame();
 
 private:
   void sendReply(const uint32_t reply_type);
@@ -107,17 +107,17 @@ void ScannerMock::sendReply(const uint32_t reply_type)
   control_server_.asyncSend<REPLY_MSG_FROM_SCANNER_SIZE>(control_msg_receiver_, msg.serialize());
 }
 
-void ScannerMock::sendStartReply()
+void ScannerMock::simulateStartReply()
 {
   sendReply(getOpCodeValue(ScannerReplyMsgType::Start));
 }
 
-void ScannerMock::sendStopReply()
+void ScannerMock::simulateStopReply()
 {
   sendReply(getOpCodeValue(ScannerReplyMsgType::Stop));
 }
 
-void ScannerMock::sendMonitoringFrame()
+void ScannerMock::simulateMonitoringFrame()
 {
   const UDPFrameTestDataWithoutIntensities raw_scan;
   data_server_.asyncSend<raw_scan.hex_dump.size()>(monitoring_frame_receiver_, transformArray(raw_scan.hex_dump));
@@ -146,7 +146,7 @@ TEST(ScannerAPITests, startFunctionality)
 
   EXPECT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
   EXPECT_EQ(start_future.wait_for(WAIT_TIMEOUT), std::future_status::timeout) << "Scanner::start() finished too early";
-  scanner_mock.sendStartReply();
+  scanner_mock.simulateStartReply();
   EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
 }
 
@@ -158,7 +158,7 @@ TEST(ScannerAPITests, stopFunctionality)
   Scanner scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   EXPECT_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config, DEFAULT_SEQ_NUMBER).serialize()))
-      .WillOnce(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
+      .WillOnce(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.simulateStartReply(); }));
 
   Barrier stop_req_received_barrier;
   EXPECT_CALL(scanner_mock, receiveControlMsg(_, StopRequest().serialize()))
@@ -172,7 +172,7 @@ TEST(ScannerAPITests, stopFunctionality)
 
   EXPECT_TRUE(stop_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Stop request not received";
   EXPECT_EQ(stop_future.wait_for(WAIT_TIMEOUT), std::future_status::timeout) << "Scanner::stop() finished too early";
-  scanner_mock.sendStopReply();
+  scanner_mock.simulateStopReply();
   EXPECT_EQ(stop_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::stop() not finished";
 }
 
@@ -200,7 +200,7 @@ TEST(ScannerAPITests, receivingOfMonitoringFrame)
     InSequence seq;
 
     EXPECT_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config, DEFAULT_SEQ_NUMBER).serialize()))
-        .WillOnce(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
+        .WillOnce(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.simulateStartReply(); }));
 
     EXPECT_CALL(cb, LaserScanCallback(isEqualToRawMeasurements(raw_scan.measures, EPS)))
         .WillOnce(InvokeWithoutArgs([&monitoring_frame_barrier]() { monitoring_frame_barrier.release(); }));
@@ -209,7 +209,7 @@ TEST(ScannerAPITests, receivingOfMonitoringFrame)
   scanner_mock.startListeningForControlMsg();
   scanner.start();
 
-  scanner_mock.sendMonitoringFrame();
+  scanner_mock.simulateMonitoringFrame();
   EXPECT_TRUE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
 }
 

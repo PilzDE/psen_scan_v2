@@ -49,10 +49,10 @@ public:
   };
 
 public:
-  void sendStartReply();
-  void sendStopReply();
+  void simulateStartReply();
+  void simulateStopReply();
   template <typename TestData>
-  void sendMonitoringFrame(const TestData& test_data);
+  void simulateMonitoringFrame(const TestData& test_data);
   void simulateError(const std::string& msg);
   void simulateTimeout(const std::string& msg);
 
@@ -75,7 +75,7 @@ private:
   TimeoutHandler timeout_handler_;
 };
 
-void MockUdpClient::sendStartReply()
+void MockUdpClient::simulateStartReply()
 {
   const ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
   const auto data{ msg.serialize() };
@@ -85,7 +85,7 @@ void MockUdpClient::sendStartReply()
   handleNewData(max_size_data, max_size_data.size());
 }
 
-void MockUdpClient::sendStopReply()
+void MockUdpClient::simulateStopReply()
 {
   const ScannerReplyMsg msg(OP_CODE_STOP, RES_CODE_ACCEPTED);
   const auto data{ msg.serialize() };
@@ -96,7 +96,7 @@ void MockUdpClient::sendStopReply()
 }
 
 template <typename TestData>
-void MockUdpClient::sendMonitoringFrame(const TestData& test_data)
+void MockUdpClient::simulateMonitoringFrame(const TestData& test_data)
 {
   const MaxSizeRawData raw_data = convertToMaxSizeRawData(test_data.hex_dump);
   handleNewData(raw_data, raw_data.size());

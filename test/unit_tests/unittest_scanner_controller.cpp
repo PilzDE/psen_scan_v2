@@ -62,10 +62,10 @@ public:
 class ScannerControllerTest : public ::testing::Test
 {
 public:
-  void sendStartReply();
-  void sendStopReply();
+  void simulateStartReply();
+  void simulateStopReply();
   template <typename TestData>
-  void sendMonitoringFrame(const TestData& test_data);
+  void simulateMonitoringFrame(const TestData& test_data);
   void simulateUdpError(const std::string& msg);
   void simulateUdpTimeout(const std::string& msg);
   template <typename TestData>
@@ -90,20 +90,20 @@ public:
 #define EXPECT_REQUEST_SEND(scanner_controller, request)                                                               \
   EXPECT_CALL(scanner_controller.control_udp_client_, write(request.serialize()))
 
-void ScannerControllerTest::sendStartReply()
+void ScannerControllerTest::simulateStartReply()
 {
-  scanner_controller_.control_udp_client_.sendStartReply();
+  scanner_controller_.control_udp_client_.simulateStartReply();
 }
 
-void ScannerControllerTest::sendStopReply()
+void ScannerControllerTest::simulateStopReply()
 {
-  scanner_controller_.control_udp_client_.sendStopReply();
+  scanner_controller_.control_udp_client_.simulateStopReply();
 }
 
 template <typename TestData>
-void ScannerControllerTest::sendMonitoringFrame(const TestData& test_data)
+void ScannerControllerTest::simulateMonitoringFrame(const TestData& test_data)
 {
-  scanner_controller_.data_udp_client_.sendMonitoringFrame(test_data);
+  scanner_controller_.data_udp_client_.simulateMonitoringFrame(test_data);
 }
 
 void ScannerControllerTest::simulateUdpError(const std::string& msg)
@@ -135,7 +135,7 @@ TEST_F(ScannerControllerTest, successfulStartSequence)
   EXPECT_START_LISTENING_FOR_DATA(scanner_controller_).Times(1);
 
   auto start_future = scanner_controller_.start();
-  sendStartReply();
+  simulateStartReply();
   EXPECT_TRUE(isFutureReady(start_future));
 }
 
@@ -151,7 +151,7 @@ TEST_F(ScannerControllerTest, retryAfterStartReplyTimeout)
   {
     simulateUdpTimeout("Udp timeout");
   }
-  sendStartReply();
+  simulateStartReply();
   EXPECT_TRUE(isFutureReady(start_future));
 }
 
@@ -164,10 +164,10 @@ TEST_F(ScannerControllerTest, receivingMultipleStartReplies)
 
   scanner_controller_.start();
   simulateUdpTimeout("Udp timeout");
-  sendStartReply();
-  sendMonitoringFrame(test_data);
-  sendStartReply();
-  sendMonitoringFrame(test_data);
+  simulateStartReply();
+  simulateMonitoringFrame(test_data);
+  simulateStartReply();
+  simulateMonitoringFrame(test_data);
 }
 
 TEST_F(ScannerControllerTest, successfulStopSequence)
@@ -178,7 +178,7 @@ TEST_F(ScannerControllerTest, successfulStopSequence)
     EXPECT_REQUEST_SEND(scanner_controller_, StopRequest()).Times(1);
   }
   auto stop_future = scanner_controller_.stop();
-  sendStopReply();
+  simulateStopReply();
   EXPECT_TRUE(isFutureReady(stop_future));
 }
 
@@ -192,7 +192,7 @@ TEST_F(ScannerControllerTest, stopWhileWaitingForStartReply)
 
   scanner_controller_.sendStartRequest();
   auto stop_future = scanner_controller_.stop();
-  sendStopReply();
+  simulateStopReply();
   EXPECT_TRUE(isFutureReady(stop_future));
 }
 
@@ -207,7 +207,7 @@ TEST_F(ScannerControllerTest, stopReplyTimeout)
 
   scanner_controller_.stop();
   simulateUdpTimeout("Udp timeout");
-  sendStopReply();
+  simulateStopReply();
 }
 
 TEST_F(ScannerControllerTest, handleMonitoringFrame)
@@ -218,8 +218,8 @@ TEST_F(ScannerControllerTest, handleMonitoringFrame)
   EXPECT_CALL(mock_, laserscan_callback(scan)).Times(1);
 
   scanner_controller_.start();
-  sendStartReply();
-  sendMonitoringFrame(test_data);
+  simulateStartReply();
+  simulateMonitoringFrame(test_data);
 }
 
 TEST_F(ScannerControllerTest, handleEmptyMonitoringFrame)
@@ -227,10 +227,10 @@ TEST_F(ScannerControllerTest, handleEmptyMonitoringFrame)
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
   scanner_controller_.start();
-  sendStartReply();
+  simulateStartReply();
 
   const UDPFrameTestDataWithoutMeasurementsAndIntensities test_data;
-  sendMonitoringFrame(test_data);
+  simulateMonitoringFrame(test_data);
 }
 
 TEST_F(ScannerControllerTest, handleEarlyMonitoringFrame)
@@ -240,7 +240,7 @@ TEST_F(ScannerControllerTest, handleEarlyMonitoringFrame)
   scanner_controller_.start();
 
   const UDPFrameTestDataWithoutIntensities test_data;
-  sendMonitoringFrame(test_data);
+  simulateMonitoringFrame(test_data);
 }
 
 TEST_F(ScannerControllerTest, handleLateMonitoringFrame)
@@ -248,14 +248,14 @@ TEST_F(ScannerControllerTest, handleLateMonitoringFrame)
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
   scanner_controller_.start();
-  sendStartReply();
+  simulateStartReply();
 
   scanner_controller_.stop();
 
   const UDPFrameTestDataWithoutIntensities test_data;
-  sendMonitoringFrame(test_data);
+  simulateMonitoringFrame(test_data);
 
-  sendStopReply();
+  simulateStopReply();
 }
 
 TEST_F(ScannerControllerTest, handleError)
