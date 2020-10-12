@@ -157,7 +157,7 @@ TEST_F(ScannerControllerTest, testStopReplyTimeout)
   sendStopReply();
 }
 
-TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
+TEST_F(ScannerControllerTest, testHandleMonitoringFrame)
 {
   MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(275), 1, { 0.1, 20., 25, 10, 1., 2., 3. });
   MaxSizeRawData serialized_msg = convertToMaxSizeRawData(serialize(msg));
@@ -180,6 +180,35 @@ TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
   sendStartReply();
 
   sendMonitoringFrame(msg);
+}
+
+TEST_F(ScannerControllerTest, testHandleEarlyMonitoringFrame)
+{
+  using ::testing::_;
+
+  EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
+
+  scanner_controller_.start();
+
+  MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(275), 1, { 0.1, 20., 25, 10, 1., 2., 3. });
+  sendMonitoringFrame(msg);
+}
+
+TEST_F(ScannerControllerTest, testHandleLateMonitoringFrame)
+{
+  using ::testing::_;
+
+  EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
+
+  scanner_controller_.start();
+  sendStartReply();
+
+  scanner_controller_.stop();
+
+  MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(275), 1, { 0.1, 20., 25, 10, 1., 2., 3. });
+  sendMonitoringFrame(msg);
+
+  sendStopReply();
 }
 
 TEST_F(ScannerControllerTest, testHandleError)

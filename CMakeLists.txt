@@ -200,6 +200,7 @@ if(CATKIN_ENABLE_TESTING)
   catkin_add_gmock(unittest_controller_state_machine
     test/unit_tests/unittest_controller_state_machine.cpp
     src/controller_state_machine.cpp
+    src/monitoring_frame_msg.cpp
   )
   target_link_libraries(unittest_controller_state_machine
     ${catkin_LIBRARIES}
