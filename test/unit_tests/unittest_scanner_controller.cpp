@@ -67,8 +67,6 @@ protected:
   void sendMonitoringFrame(MonitoringFrameMsg& msg);
   void simulateUdpError(const std::string& msg);
   void simulateUdpTimeout(const std::string& msg);
-  template <typename TestData>
-  LaserScan testDataToLaserScan(const TestData& test_data);
 
 protected:
   MockCallbackHolder mock_;
@@ -106,15 +104,6 @@ void ScannerControllerTest::simulateUdpError(const std::string& msg)
 void ScannerControllerTest::simulateUdpTimeout(const std::string& msg)
 {
   scanner_controller_.control_udp_client_.simulateTimeout(msg);
-}
-
-template <typename TestData>
-LaserScan ScannerControllerTest::testDataToLaserScan(const TestData& test_data)
-{
-  const MaxSizeRawData raw_data = convertToMaxSizeRawData(test_data.hex_dump);
-  const auto num_bytes = 2 * test_data.hex_dump.size();
-  const MonitoringFrameMsg frame{ MonitoringFrameMsg::deserialize(raw_data, num_bytes) };
-  return toLaserScan(frame);
 }
 
 TEST_F(ScannerControllerTest, testSuccessfulStartSequence)
