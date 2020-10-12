@@ -87,7 +87,7 @@ private:
   friend class ScannerControllerTest;
   FRIEND_TEST(ScannerControllerTest, testSuccessfulStartSequence);
   FRIEND_TEST(ScannerControllerTest, testSuccessfulStopSequence);
-  FRIEND_TEST(ScannerControllerTest, testHandleNewMonitoringFrame);
+  FRIEND_TEST(ScannerControllerTest, testHandleMonitoringFrame);
   FRIEND_TEST(ScannerControllerTest, testHandleEmptyMonitoringFrame);
   FRIEND_TEST(ScannerControllerTest, testHandleError);
   FRIEND_TEST(ScannerControllerTest, testResendStartReplyOnTimeout);

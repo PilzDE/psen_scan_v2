@@ -20,7 +20,6 @@
 #include "psen_scan_v2/raw_processing.h"
 
 #include "psen_scan_v2/raw_data_array_conversion.h"
-#include "psen_scan_v2/udp_frame_dumps.h"
 
 using namespace psen_scan_v2;
 
@@ -47,8 +46,6 @@ class ControllerStateMachineTest : public ::testing::Test
 protected:
   ControllerStateMachineTest();
 
-  MonitoringFrameMsg generateMonitoringFrame() const;
-
 protected:
   ControllerMock controller_;
   std::unique_ptr<ControllerStateMachine> state_machine_;
@@ -62,13 +59,6 @@ ControllerStateMachineTest::ControllerStateMachineTest()
                                  std::bind(&ControllerMock::stop_request_cb, &controller_),
                                  std::bind(&ControllerMock::started_cb, &controller_),
                                  std::bind(&ControllerMock::stopped_cb, &controller_)));
-}
-
-MonitoringFrameMsg ControllerStateMachineTest::generateMonitoringFrame() const
-{
-  const UDPFrameTestDataWithoutIntensities test_data;
-  const psen_scan_v2::MaxSizeRawData raw_data = convertToMaxSizeRawData(test_data.hex_dump);
-  return MonitoringFrameMsg::deserialize(raw_data, raw_data.size());
 }
 
 TEST_F(ControllerStateMachineTest, testStartRequestCallbackIsCalled)
@@ -95,7 +85,7 @@ MATCHER_P(MonitoringFrameEq, frame, "")
 
 TEST_F(ControllerStateMachineTest, testMonitoringFrameCallbackIsCalled)
 {
-  const MonitoringFrameMsg frame{ generateMonitoringFrame() };
+  const MonitoringFrameMsg frame(TenthOfDegree(0), TenthOfDegree(275), 1, { 0.1, 20., 25, 10, 1., 2., 3. });
 
   EXPECT_CALL(controller_, start_request_cb()).Times(1);
   EXPECT_CALL(controller_, started_cb()).Times(1);

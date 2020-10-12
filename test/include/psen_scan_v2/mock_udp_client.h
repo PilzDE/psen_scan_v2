@@ -21,6 +21,7 @@
 #include "psen_scan_v2/scanner_reply_msg.h"
 #include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/udp_client.h"
+#include "psen_scan_v2/monitoring_frame_msg.h"
 
 #include "psen_scan_v2/raw_data_array_conversion.h"
 
@@ -51,8 +52,7 @@ public:
 public:
   void sendStartReply();
   void sendStopReply();
-  template <typename TestData>
-  void sendMonitoringFrame(const TestData& test_data);
+  void sendMonitoringFrame(MonitoringFrameMsg& msg);
   void simulateError(const std::string& msg);
   void simulateTimeout(const std::string& msg);
 
@@ -95,11 +95,10 @@ void MockUdpClient::sendStopReply()
   handleNewData(max_size_data, max_size_data.size());
 }
 
-template <typename TestData>
-void MockUdpClient::sendMonitoringFrame(const TestData& test_data)
+void MockUdpClient::sendMonitoringFrame(MonitoringFrameMsg& msg)
 {
-  const MaxSizeRawData raw_data = convertToMaxSizeRawData(test_data.hex_dump);
-  handleNewData(raw_data, raw_data.size());
+  const MaxSizeRawData msg_raw = convertToMaxSizeRawData(serialize(msg));
+  handleNewData(msg_raw, msg_raw.size());
 }
 
 void MockUdpClient::handleNewData(const MaxSizeRawData& received_data, const std::size_t& bytes_received)

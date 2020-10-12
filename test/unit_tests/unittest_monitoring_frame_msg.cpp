@@ -96,10 +96,10 @@ protected:
   const std::array<double, 3> expected_measures_{ 4.4, 4.3, 4.2 };
 };
 
-class MonitoringFrameMsgFromRawTest : public ::testing::Test
+class MonitoringFrameMsgDeserializeTest : public ::testing::Test
 {
 protected:
-  MonitoringFrameMsgFromRawTest()
+  MonitoringFrameMsgDeserializeTest()
   {
     raw_frame_data_ = convertToMaxSizeRawData(test_data_.hex_dump);
   }
@@ -110,7 +110,7 @@ protected:
   std::size_t num_bytes_{ 2 * test_data_.hex_dump.size() };
 };
 
-TEST_F(MonitoringFrameMsgFromRawTest, testDeserializationSuccess)
+TEST_F(MonitoringFrameMsgDeserializeTest, testDeserializationSuccess)
 {
   MonitoringFrameMsg msg;
   ASSERT_NO_THROW(msg = MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
@@ -118,31 +118,31 @@ TEST_F(MonitoringFrameMsgFromRawTest, testDeserializationSuccess)
   EXPECT_EQ(msg, test_data_.msg_);
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, testWrongOpCode)
+TEST_F(MonitoringFrameMsgDeserializeTest, testWrongOpCode)
 {
   raw_frame_data_.at(4) += 1;
   EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, testInvalidWorkingMode)
+TEST_F(MonitoringFrameMsgDeserializeTest, testInvalidWorkingMode)
 {
   raw_frame_data_.at(8) = 0x03;
   EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, testInvalidTransactionType)
+TEST_F(MonitoringFrameMsgDeserializeTest, testInvalidTransactionType)
 {
   raw_frame_data_.at(12) = 0x06;
   EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, testInvalidScannerId)
+TEST_F(MonitoringFrameMsgDeserializeTest, testInvalidScannerId)
 {
   raw_frame_data_.at(16) = 0x04;
   EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, testUnknownFieldId)
+TEST_F(MonitoringFrameMsgDeserializeTest, testUnknownFieldId)
 {
   UDPFrameTestDataWithUnknownFieldId test_data;
   const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
@@ -153,7 +153,7 @@ TEST_F(MonitoringFrameMsgFromRawTest, testUnknownFieldId)
                , MonitoringFrameMsg::MonitoringFrameFormatError);
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeFieldLength)
+TEST_F(MonitoringFrameMsgDeserializeTest, testTooLargeFieldLength)
 {
   UDPFrameTestDataWithTooLargeFieldLength test_data;
   const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
@@ -164,7 +164,7 @@ TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeFieldLength)
                , MonitoringFrameMsg::MonitoringFrameFormatError);
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeScanCounterLength)
+TEST_F(MonitoringFrameMsgDeserializeTest, testTooLargeScanCounterLength)
 {
   UDPFrameTestDataWithTooLargeScanCounterLength test_data;
   const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);

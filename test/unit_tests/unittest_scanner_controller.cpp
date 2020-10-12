@@ -27,7 +27,6 @@
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/stop_request.h"
 #include "psen_scan_v2/laserscan.h"
-#include "psen_scan_v2/udp_frame_dumps.h"
 #include "psen_scan_v2/scan_range.h"
 
 using namespace psen_scan_v2_test;
@@ -64,12 +63,9 @@ class ScannerControllerTest : public ::testing::Test
 protected:
   void sendStartReply();
   void sendStopReply();
-  template <typename TestData>
-  void sendMonitoringFrame(const TestData& test_data);
+  void sendMonitoringFrame(MonitoringFrameMsg& msg);
   void simulateUdpError(const std::string& msg);
   void simulateUdpTimeout(const std::string& msg);
-  template <typename TestData>
-  LaserScan testDataToLaserScan(const TestData& test_data);
 
 protected:
   MockCallbackHolder mock_;
@@ -93,10 +89,9 @@ void ScannerControllerTest::sendStopReply()
   scanner_controller_.control_udp_client_.sendStopReply();
 }
 
-template <typename TestData>
-void ScannerControllerTest::sendMonitoringFrame(const TestData& test_data)
+void ScannerControllerTest::sendMonitoringFrame(MonitoringFrameMsg& msg)
 {
-  scanner_controller_.data_udp_client_.sendMonitoringFrame(test_data);
+  scanner_controller_.data_udp_client_.sendMonitoringFrame(msg);
 }
 
 void ScannerControllerTest::simulateUdpError(const std::string& msg)
@@ -107,15 +102,6 @@ void ScannerControllerTest::simulateUdpError(const std::string& msg)
 void ScannerControllerTest::simulateUdpTimeout(const std::string& msg)
 {
   scanner_controller_.control_udp_client_.simulateTimeout(msg);
-}
-
-template <typename TestData>
-LaserScan ScannerControllerTest::testDataToLaserScan(const TestData& test_data)
-{
-  const MaxSizeRawData raw_data = convertToMaxSizeRawData(test_data.hex_dump);
-  const auto num_bytes = 2 * test_data.hex_dump.size();
-  const MonitoringFrameMsg frame{ MonitoringFrameMsg::deserialize(raw_data, num_bytes) };
-  return toLaserScan(frame);
 }
 
 TEST_F(ScannerControllerTest, testSuccessfulStartSequence)
@@ -171,25 +157,26 @@ TEST_F(ScannerControllerTest, testStopReplyTimeout)
 
 TEST_F(ScannerControllerTest, testHandleMonitoringFrame)
 {
-  const UDPFrameTestDataWithoutIntensities test_data;
-  const LaserScan scan{ testDataToLaserScan(test_data) };
+  MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(275), 1, { 0.1, 20., 25, 10, 1., 2., 3. });
+
+  const LaserScan scan{ toLaserScan(msg) };
 
   EXPECT_CALL(mock_, laserscan_callback(scan)).Times(1);
 
   scanner_controller_.start();
   sendStartReply();
-  sendMonitoringFrame(test_data);
+  scanner_controller_.data_udp_client_.sendMonitoringFrame(msg);
 }
 
 TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
 {
+  MonitoringFrameMsg msg(TenthOfDegree(1), TenthOfDegree(2), 42, {});
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
   scanner_controller_.start();
   sendStartReply();
 
-  const UDPFrameTestDataWithoutMeasurementsAndIntensities test_data;
-  sendMonitoringFrame(test_data);
+  sendMonitoringFrame(msg);
 }
 
 TEST_F(ScannerControllerTest, testHandleEarlyMonitoringFrame)
@@ -200,8 +187,8 @@ TEST_F(ScannerControllerTest, testHandleEarlyMonitoringFrame)
 
   scanner_controller_.start();
 
-  const UDPFrameTestDataWithoutIntensities test_data;
-  sendMonitoringFrame(test_data);
+  MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(275), 1, { 0.1, 20., 25, 10, 1., 2., 3. });
+  sendMonitoringFrame(msg);
 }
 
 TEST_F(ScannerControllerTest, testHandleLateMonitoringFrame)
@@ -215,8 +202,8 @@ TEST_F(ScannerControllerTest, testHandleLateMonitoringFrame)
 
   scanner_controller_.stop();
 
-  const UDPFrameTestDataWithoutIntensities test_data;
-  sendMonitoringFrame(test_data);
+  MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(275), 1, { 0.1, 20., 25, 10, 1., 2., 3. });
+  sendMonitoringFrame(msg);
 
   sendStopReply();
 }
