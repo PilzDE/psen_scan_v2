@@ -64,8 +64,7 @@ class ScannerControllerTest : public ::testing::Test
 protected:
   void sendStartReply();
   void sendStopReply();
-  template <typename TestData>
-  void sendMonitoringFrame(const TestData& test_data);
+  void sendMonitoringFrame(MonitoringFrameMsg& msg);
   void simulateUdpError(const std::string& msg);
   void simulateUdpTimeout(const std::string& msg);
   template <typename TestData>
@@ -93,10 +92,10 @@ void ScannerControllerTest::sendStopReply()
   scanner_controller_.control_udp_client_.sendStopReply();
 }
 
-template <typename TestData>
-void ScannerControllerTest::sendMonitoringFrame(const TestData& test_data)
+void ScannerControllerTest::sendMonitoringFrame(MonitoringFrameMsg& msg)
 {
-  scanner_controller_.data_udp_client_.sendMonitoringFrame(test_data);
+  MaxSizeRawData msg_raw = convertToMaxSizeRawData(serialize(msg));
+  scanner_controller_.data_udp_client_.sendMonitoringFrame(msg_raw);
 }
 
 void ScannerControllerTest::simulateUdpError(const std::string& msg)
@@ -185,13 +184,13 @@ TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
 
 TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
 {
+  MonitoringFrameMsg msg(TenthOfDegree(1), TenthOfDegree(2), 42, {});
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
   scanner_controller_.start();
   sendStartReply();
 
-  const UDPFrameTestDataWithoutMeasurementsAndIntensities test_data;
-  sendMonitoringFrame(test_data);
+  sendMonitoringFrame(msg);
 }
 
 TEST_F(ScannerControllerTest, testHandleError)
