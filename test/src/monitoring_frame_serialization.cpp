@@ -13,10 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <ostream>
-
 #include "psen_scan_v2/monitoring_frame_serialization.h"
-#include "psen_scan_v2/raw_processing.h"
 
 namespace psen_scan_v2
 {

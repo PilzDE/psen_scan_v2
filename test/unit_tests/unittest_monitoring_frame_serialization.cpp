@@ -57,7 +57,7 @@ TEST(MonitoringFrameSerializationTest, testSerializationInvariance)
   UDPFrameTestDataWithoutIntensities test_data;
   DynamicSizeRawData raw = serialize(test_data.msg_);
 
-  MonitoringFrameMsg deserialized_msg = MonitoringFrameMsg::deserialize(convertToMaxSizeRawData(raw), raw.size());
+  MonitoringFrameMsg deserialized_msg = deserialize(convertToMaxSizeRawData(raw), raw.size());
 
   EXPECT_EQ(test_data.msg_, deserialized_msg);
 }
@@ -68,7 +68,7 @@ TEST(MonitoringFrameSerializationTest, testSerializationInvariance2)
 
   DynamicSizeRawData raw = serialize(msg);
 
-  MonitoringFrameMsg deserialized_msg = MonitoringFrameMsg::deserialize(convertToMaxSizeRawData(raw), raw.size());
+  MonitoringFrameMsg deserialized_msg = deserialize(convertToMaxSizeRawData(raw), raw.size());
 
   EXPECT_EQ(msg, deserialized_msg);
 }

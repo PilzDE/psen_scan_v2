@@ -22,6 +22,7 @@
 #include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/istring_stream_builder.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
+#include "psen_scan_v2/monitoring_frame_deserialization.h"
 #include "psen_scan_v2/raw_processing.h"
 #include "psen_scan_v2/udp_frame_dumps.h"
 #include "psen_scan_v2/raw_data_array_conversion.h"
@@ -52,7 +53,7 @@ TEST(FieldHeaderTest, testReadSuccess)
   std::istringstream is{ builder.get() };
 
   std::unique_ptr<FieldHeader> header_ptr;
-  ASSERT_NO_THROW(header_ptr.reset(new FieldHeader{ MonitoringFrameMsg::readFieldHeader(is, max_num_bytes) }););
+  ASSERT_NO_THROW(header_ptr.reset(new FieldHeader{ readFieldHeader(is, max_num_bytes) }););
   EXPECT_EQ(id, header_ptr->id());
   EXPECT_EQ(expected_length, header_ptr->length());
 }
@@ -66,7 +67,7 @@ TEST(FieldHeaderTest, testReadHeaderTooShortFailure)
   builder.add(too_short_header);
   std::istringstream is{ builder.get() };
 
-  EXPECT_THROW(MonitoringFrameMsg::readFieldHeader(is, max_num_bytes);, raw_processing::StringStreamFailure);
+  EXPECT_THROW(readFieldHeader(is, max_num_bytes);, raw_processing::StringStreamFailure);
 }
 
 class MonitoringFrameMsgTest : public ::testing::Test
@@ -113,7 +114,7 @@ protected:
 TEST_F(MonitoringFrameMsgDeserializeTest, testDeserializationSuccess)
 {
   MonitoringFrameMsg msg;
-  ASSERT_NO_THROW(msg = MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
+  ASSERT_NO_THROW(msg = deserialize(raw_frame_data_, num_bytes_););
 
   EXPECT_EQ(msg, test_data_.msg_);
 }
@@ -121,25 +122,25 @@ TEST_F(MonitoringFrameMsgDeserializeTest, testDeserializationSuccess)
 TEST_F(MonitoringFrameMsgDeserializeTest, testWrongOpCode)
 {
   raw_frame_data_.at(4) += 1;
-  EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
+  EXPECT_NO_THROW(deserialize(raw_frame_data_, num_bytes_););
 }
 
 TEST_F(MonitoringFrameMsgDeserializeTest, testInvalidWorkingMode)
 {
   raw_frame_data_.at(8) = 0x03;
-  EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
+  EXPECT_NO_THROW(deserialize(raw_frame_data_, num_bytes_););
 }
 
 TEST_F(MonitoringFrameMsgDeserializeTest, testInvalidTransactionType)
 {
   raw_frame_data_.at(12) = 0x06;
-  EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
+  EXPECT_NO_THROW(deserialize(raw_frame_data_, num_bytes_););
 }
 
 TEST_F(MonitoringFrameMsgDeserializeTest, testInvalidScannerId)
 {
   raw_frame_data_.at(16) = 0x04;
-  EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
+  EXPECT_NO_THROW(deserialize(raw_frame_data_, num_bytes_););
 }
 
 TEST_F(MonitoringFrameMsgDeserializeTest, testUnknownFieldId)
@@ -149,8 +150,7 @@ TEST_F(MonitoringFrameMsgDeserializeTest, testUnknownFieldId)
   const auto num_bytes = 2 * test_data.hex_dump.size();
 
   MonitoringFrameMsg msg;
-  EXPECT_THROW(msg = MonitoringFrameMsg::deserialize(raw_frame_data, num_bytes);
-               , MonitoringFrameMsg::MonitoringFrameFormatError);
+  EXPECT_THROW(msg = deserialize(raw_frame_data, num_bytes);, MonitoringFrameFormatError);
 }
 
 TEST_F(MonitoringFrameMsgDeserializeTest, testTooLargeFieldLength)
@@ -160,8 +160,7 @@ TEST_F(MonitoringFrameMsgDeserializeTest, testTooLargeFieldLength)
   const auto num_bytes = 2 * test_data.hex_dump.size();
 
   MonitoringFrameMsg msg;
-  EXPECT_THROW(msg = MonitoringFrameMsg::deserialize(raw_frame_data, num_bytes);
-               , MonitoringFrameMsg::MonitoringFrameFormatError);
+  EXPECT_THROW(msg = deserialize(raw_frame_data, num_bytes);, MonitoringFrameFormatError);
 }
 
 TEST_F(MonitoringFrameMsgDeserializeTest, testTooLargeScanCounterLength)
@@ -171,8 +170,7 @@ TEST_F(MonitoringFrameMsgDeserializeTest, testTooLargeScanCounterLength)
   const auto num_bytes = 2 * test_data.hex_dump.size();
 
   MonitoringFrameMsg msg;
-  EXPECT_THROW(msg = MonitoringFrameMsg::deserialize(raw_frame_data, num_bytes);
-               , MonitoringFrameMsg::MonitoringFrameFormatErrorScanCounterUnexpectedSize);
+  EXPECT_THROW(msg = deserialize(raw_frame_data, num_bytes);, MonitoringFrameFormatErrorScanCounterUnexpectedSize);
 }
 
 TEST(MonitoringFrameMsgEqualityTest, testCompareEqualSucces)

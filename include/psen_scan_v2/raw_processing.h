@@ -18,6 +18,7 @@
 #include <sstream>
 #include <functional>
 #include <cmath>
+#include <algorithm>
 
 #include <fmt/core.h>
 

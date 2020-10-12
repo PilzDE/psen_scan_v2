@@ -16,6 +16,7 @@
 #define PSEN_SCAN_V2_MONITORING_FRAME_SERIALIZATION_H
 
 #include "psen_scan_v2/raw_scanner_data.h"
+#include "psen_scan_v2/monitoring_frame_deserialization.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
 
 using namespace psen_scan_v2;
