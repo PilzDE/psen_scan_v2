@@ -241,13 +241,15 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
   template <class FSM, class Event>
   void no_transition(Event const& event, FSM&, int state)
   {
-    PSENSCAN_WARN("StateMachine", "No transition in state {} for event {}.", state, classNameShort(event));
+    PSENSCAN_WARN(
+        "StateMachine", "No transition in state {} for event {}.", state, classNameShort(event));
   }
 
   template <class FSM>
   void no_transition(e::monitoring_frame_received const& event, FSM&, int state)
   {
-    PSENSCAN_WARN("StateMachine", "Received monitoring frame despite not waiting for it");
+    PSENSCAN_WARN(
+        "StateMachine", "Received monitoring frame despite not waiting for it (in State {})", state);
   }
 };
 
