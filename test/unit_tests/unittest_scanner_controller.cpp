@@ -91,8 +91,7 @@ void ScannerControllerTest::sendStopReply()
 
 void ScannerControllerTest::sendMonitoringFrame(MonitoringFrameMsg& msg)
 {
-  MaxSizeRawData msg_raw = convertToMaxSizeRawData(serialize(msg));
-  scanner_controller_.data_udp_client_.sendMonitoringFrame(msg_raw);
+  scanner_controller_.data_udp_client_.sendMonitoringFrame(msg);
 }
 
 void ScannerControllerTest::simulateUdpError(const std::string& msg)
@@ -159,7 +158,6 @@ TEST_F(ScannerControllerTest, testStopReplyTimeout)
 TEST_F(ScannerControllerTest, testHandleMonitoringFrame)
 {
   MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(275), 1, { 0.1, 20., 25, 10, 1., 2., 3. });
-  MaxSizeRawData serialized_msg = convertToMaxSizeRawData(serialize(msg));
 
   const LaserScan scan{ toLaserScan(msg) };
 
@@ -167,7 +165,7 @@ TEST_F(ScannerControllerTest, testHandleMonitoringFrame)
 
   scanner_controller_.start();
   sendStartReply();
-  scanner_controller_.data_udp_client_.sendMonitoringFrame(serialized_msg);
+  scanner_controller_.data_udp_client_.sendMonitoringFrame(msg);
 }
 
 TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
