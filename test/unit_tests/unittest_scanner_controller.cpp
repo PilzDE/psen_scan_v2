@@ -136,9 +136,6 @@ TEST_F(ScannerControllerTest, testSuccessfulStartSequence)
 
 TEST_F(ScannerControllerTest, testRetryAfterStartReplyTimeout)
 {
-  using ::testing::_;
-  using ::testing::InSequence;
-
   const StartRequest start_request(scanner_config_, 0);
   const unsigned int number_of_retries{ 5 };
 
@@ -190,9 +187,6 @@ TEST_F(ScannerControllerTest, testSuccessfulStopSequence)
 
 TEST_F(ScannerControllerTest, testStopWhileWaitingForStartReply)
 {
-  using ::testing::_;
-  using ::testing::InSequence;
-
   const StartRequest start_request(scanner_config_, 0);
   const StopRequest stop_request;
 
@@ -247,8 +241,6 @@ TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
 
 TEST_F(ScannerControllerTest, testHandleEarlyMonitoringFrame)
 {
-  using ::testing::_;
-
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
   scanner_controller_.start();
@@ -259,8 +251,6 @@ TEST_F(ScannerControllerTest, testHandleEarlyMonitoringFrame)
 
 TEST_F(ScannerControllerTest, testHandleLateMonitoringFrame)
 {
-  using ::testing::_;
-
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
   scanner_controller_.start();
