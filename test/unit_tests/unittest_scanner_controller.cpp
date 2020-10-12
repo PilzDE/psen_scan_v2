@@ -148,7 +148,7 @@ TEST_F(ScannerControllerTest, testRetryAfterStartReplyTimeout)
     {
       EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _)).Times(1);
       EXPECT_CALL(scanner_controller_.data_udp_client_, startAsyncReceiving()).Times(1);
-      EXPECT_CALL(scanner_controller_.control_udp_client_, write(start_request.toRawData())).Times(1);
+      EXPECT_CALL(scanner_controller_.control_udp_client_, write(start_request.serialize())).Times(1);
     }
   }
 
@@ -198,8 +198,8 @@ TEST_F(ScannerControllerTest, testStopWhileWaitingForStartReply)
 
   {
     InSequence seq;
-    EXPECT_CALL(scanner_controller_.control_udp_client_, write(start_request.toRawData())).Times(1);
-    EXPECT_CALL(scanner_controller_.control_udp_client_, write(stop_request.toRawData())).Times(1);
+    EXPECT_CALL(scanner_controller_.control_udp_client_, write(start_request.serialize())).Times(1);
+    EXPECT_CALL(scanner_controller_.control_udp_client_, write(stop_request.serialize())).Times(1);
   }
 
   scanner_controller_.sendStartRequest();
