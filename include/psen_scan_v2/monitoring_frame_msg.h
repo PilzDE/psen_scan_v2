@@ -88,10 +88,6 @@ public:
   }
 
 private:
-  // FRIEND_TEST(FieldHeaderTest, testReadSuccess);
-  // FRIEND_TEST(FieldHeaderTest, testReadHeaderTooShortFailure);
-
-protected:
   uint32_t device_status_fixed_{ 0 };
   uint32_t op_code_fixed_{ OP_CODE_MONITORING_FRAME };
   uint32_t working_mode_fixed_{ 0 };
