@@ -19,11 +19,12 @@
 
 namespace psen_scan_v2
 {
-ControllerStateMachine::ControllerStateMachine(const SendRequestCallback& start_request_cb,
+ControllerStateMachine::ControllerStateMachine(const MonitoringFrameCallback& monitoring_frame_cb,
+                                               const SendRequestCallback& start_request_cb,
                                                const SendRequestCallback& stop_request_cb,
                                                const StartedCallback& started_cb,
                                                const StoppedCallback& stopped_cb)
-  : sm_(start_request_cb, stop_request_cb, started_cb, stopped_cb)
+  : sm_(monitoring_frame_cb, start_request_cb, stop_request_cb, started_cb, stopped_cb)
 {
   const std::lock_guard<std::mutex> lock(sm_access_mutex_);
   sm_.start();
@@ -50,10 +51,10 @@ void ControllerStateMachine::processReplyReceivedEvent(ScannerReplyMsgType type)
   sm_.process_event(udp_connection_state_machine::events::reply_received(type));
 }
 
-void ControllerStateMachine::processMonitoringFrameReceivedEvent()
+void ControllerStateMachine::processMonitoringFrameReceivedEvent(const MonitoringFrameMsg& frame)
 {
   const std::lock_guard<std::mutex> lock(sm_access_mutex_);
-  sm_.process_event(udp_connection_state_machine::events::monitoring_frame_received());
+  sm_.process_event(udp_connection_state_machine::events::monitoring_frame_received(frame));
 }
 
 void ControllerStateMachine::processStopRequestEvent()

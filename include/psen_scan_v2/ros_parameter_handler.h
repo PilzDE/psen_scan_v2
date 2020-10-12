@@ -35,7 +35,7 @@ boost::optional<T> getParam(const ros::NodeHandle& node_handle, const std::strin
     return boost::none;
   }
 
-  T default_val;
+  T default_val{};
   boost::optional<T> ret_val(default_val);
   if (!node_handle.getParam(key, ret_val.get()))
   {

@@ -169,7 +169,7 @@ TEST_F(ScannerControllerTest, testStopReplyTimeout)
   sendStopReply();
 }
 
-TEST_F(ScannerControllerTest, testHandleNewMonitoringFrame)
+TEST_F(ScannerControllerTest, testHandleMonitoringFrame)
 {
   const UDPFrameTestDataWithoutIntensities test_data;
   const LaserScan scan{ testDataToLaserScan(test_data) };
@@ -190,6 +190,35 @@ TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
 
   const UDPFrameTestDataWithoutMeasurementsAndIntensities test_data;
   sendMonitoringFrame(test_data);
+}
+
+TEST_F(ScannerControllerTest, testHandleEarlyMonitoringFrame)
+{
+  using ::testing::_;
+
+  EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
+
+  scanner_controller_.start();
+
+  const UDPFrameTestDataWithoutIntensities test_data;
+  sendMonitoringFrame(test_data);
+}
+
+TEST_F(ScannerControllerTest, testHandleLateMonitoringFrame)
+{
+  using ::testing::_;
+
+  EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
+
+  scanner_controller_.start();
+  sendStartReply();
+
+  scanner_controller_.stop();
+
+  const UDPFrameTestDataWithoutIntensities test_data;
+  sendMonitoringFrame(test_data);
+
+  sendStopReply();
 }
 
 TEST_F(ScannerControllerTest, testHandleError)

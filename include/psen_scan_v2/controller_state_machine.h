@@ -17,6 +17,7 @@
 #define PSEN_SCAN_V2_CONTROLLER_STATE_MACHINE_H
 
 #include <mutex>
+#include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/udp_connection_state_machine.h"
 
 namespace psen_scan_v2
@@ -27,7 +28,8 @@ namespace psen_scan_v2
 class ControllerStateMachine
 {
 public:
-  explicit ControllerStateMachine(const SendRequestCallback& start_request_cb,
+  explicit ControllerStateMachine(const MonitoringFrameCallback& monitoring_frame_cb,
+                                  const SendRequestCallback& start_request_cb,
                                   const SendRequestCallback& stop_request_cb,
                                   const StartedCallback& started_cb,
                                   const StoppedCallback& stopped_cb);
@@ -35,7 +37,7 @@ public:
 
   void processStartRequestEvent();
   void processReplyReceivedEvent(ScannerReplyMsgType type);
-  void processMonitoringFrameReceivedEvent();
+  void processMonitoringFrameReceivedEvent(const MonitoringFrameMsg& frame);
   void processStopRequestEvent();
 
 private:
