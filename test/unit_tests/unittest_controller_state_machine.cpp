@@ -68,7 +68,7 @@ MonitoringFrameMsg ControllerStateMachineTest::generateMonitoringFrame() const
 {
   const UDPFrameTestDataWithoutIntensities test_data;
   const psen_scan_v2::MaxSizeRawData raw_data = convertToMaxSizeRawData(test_data.hex_dump);
-  return MonitoringFrameMsg::fromRawData(raw_data, raw_data.size());
+  return MonitoringFrameMsg::deserialize(raw_data, raw_data.size());
 }
 
 TEST_F(ControllerStateMachineTest, testStartRequestCallbackIsCalled)
