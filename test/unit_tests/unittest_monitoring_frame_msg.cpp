@@ -175,6 +175,35 @@ TEST_F(MonitoringFrameMsgFromRawTest, testTooLargeScanCounterLength)
                , MonitoringFrameMsg::MonitoringFrameFormatErrorScanCounterUnexpectedSize);
 }
 
+TEST(MonitoringFrameMsgEqualityTest, testCompareEqualSucces)
+{
+  MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, { 1, 2, 3 });
+  MonitoringFrameMsg msg1(TenthOfDegree(100), TenthOfDegree(10), 42, { 1, 2, 3 });
+  EXPECT_EQ(msg0, msg1);
+}
+
+TEST(MonitoringFrameMsgEqualityTest, testCompareEqualEmptySuccess)
+{
+  MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, {});
+  MonitoringFrameMsg msg1(TenthOfDegree(100), TenthOfDegree(10), 42, {});
+  EXPECT_EQ(msg0, msg1);
+}
+
+TEST(MonitoringFrameMsgEqualityTest, testCompareNotEqual)
+{
+  MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(M_PI/1000.), 42, {45, 44., 42, 42});
+  MonitoringFrameMsg msg1(TenthOfDegree(100), TenthOfDegree(M_PI/1000.), 42, {45, 44., 43, 42});
+  EXPECT_FALSE(msg0==msg1);
+}
+
+TEST(MonitoringFrameMsgEqualityTest, testCompareNotEqualEmpty)
+{
+  MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, {});
+  MonitoringFrameMsg msg1(TenthOfDegree(111), TenthOfDegree(10), 42, {});
+  EXPECT_FALSE(msg0==msg1);
+}
+
+
 }  // namespace psen_scan_v2
 
 int main(int argc, char** argv)
