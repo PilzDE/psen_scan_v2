@@ -187,8 +187,8 @@ template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::handleStartReplyTimeout(const std::string& error_str)
 {
   PSENSCAN_ERROR("ScannerController",
-                 "Timeout while waiting for the scanner to start! Retrying..."
-                 "(Eventually check your setup or contact PILZ support)");
+                 "Timeout while waiting for the scanner to start! Retrying... "
+                 "(Please check the ethernet connection or contact PILZ support if the error persists.)");
   state_machine_.processStartReplyTimeoutEvent();
 }
 
