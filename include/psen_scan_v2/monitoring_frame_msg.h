@@ -108,6 +108,30 @@ public:
             measures() == rhs.measures());
   }
 
+  friend std::ostream& operator<<(std::ostream& os, const MonitoringFrameMsg& msg)
+  {
+    os << "MonitoringFrameMsg(fromTheta = TenthOfDegree(" << msg.fromTheta().value() << "),";
+    os << " resolution = TenthOfDegree(" << msg.resolution().value() << "),";
+    os << " scanCounter = " << msg.scanCounter() << ",";
+    os << " measures = { ";
+
+    size_t i = 0;
+    do
+    {
+      os << msg.measures_.at(i);
+      if (msg.measures_.size() - 1 != i)
+      {
+        os << ", ";
+      }
+      else
+      {
+        os << " })";
+      }
+    } while (++i < msg.measures_.size());
+
+    return os;
+  }
+
 private:
   using FieldId = FieldHeader::Id;
   using FieldLength = FieldHeader::Length;
