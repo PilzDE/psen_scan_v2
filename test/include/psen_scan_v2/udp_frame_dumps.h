@@ -65,11 +65,6 @@ struct UDPFrameTestDataWithoutIntensities
 
   const uint16_t number_of_measures{ 50 };
 
-  using MeasuresIndexValuePair = std::pair<std::size_t, uint16_t>;
-  const std::array<MeasuresIndexValuePair, 8> measures{
-    { { 0, 681 }, { 1, 774 }, { 2, 636 }, { 3, 506 }, { 4, 496 }, { 30, 4063 }, { 45, 4074 }, { 49, 4657 } }
-  };
-
   MonitoringFrameMsg msg_;
 };
 

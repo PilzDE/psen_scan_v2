@@ -78,7 +78,7 @@ public:
 public:
   void sendStartReply();
   void sendStopReply();
-  void sendMonitoringFrame();
+  void sendMonitoringFrame(MonitoringFrameMsg& msg);
 
 private:
   void sendReply(const uint32_t reply_type);
@@ -117,11 +117,8 @@ void ScannerMock::sendStopReply()
   sendReply(getOpCodeValue(ScannerReplyMsgType::Stop));
 }
 
-void ScannerMock::sendMonitoringFrame()
+void ScannerMock::sendMonitoringFrame(MonitoringFrameMsg& msg)
 {
-  const UDPFrameTestDataWithoutIntensities test_data;
-  MonitoringFrameMsg msg = test_data.msg_;
-
   DynamicSizeRawData dynamic_raw_scan = serialize(msg);
   MaxSizeRawData max_size_raw_data = convertToMaxSizeRawData(dynamic_raw_scan);
 
@@ -181,17 +178,6 @@ TEST(ScannerAPITests, testStopFunctionality)
   EXPECT_EQ(stop_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::stop() not finished";
 }
 
-MATCHER_P2(isEqualToRawMeasurements, expected_measures, eps_val, "doesn't match with the expected scan measurements")
-{
-  const MeasurementData& scan_data{ arg.getMeasurements() };
-  const double eps{ eps_val };
-  return !std::any_of(expected_measures.cbegin(),
-                      expected_measures.cend(),
-                      [&scan_data, eps](const std::pair<std::size_t, uint16_t>& index_value_pair) {
-                        return std::abs(scan_data.at(index_value_pair.first) - (index_value_pair.second / 1000.)) > eps;
-                      });
-};
-
 TEST(ScannerAPITests, testReceivingOfMonitoringFrame)
 {
   StrictMock<ScannerMock> scanner_mock;
@@ -199,7 +185,9 @@ TEST(ScannerAPITests, testReceivingOfMonitoringFrame)
   UserCallbacks cb;
   Scanner scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
-  UDPFrameTestDataWithoutIntensities raw_scan;
+  std::vector<double> measures = { 1, 2, 3, 4, 5 };
+  MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(1), 0, measures);
+
   Barrier monitoring_frame_barrier;
   {
     InSequence seq;
@@ -207,14 +195,16 @@ TEST(ScannerAPITests, testReceivingOfMonitoringFrame)
     EXPECT_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config, DEFAULT_SEQ_NUMBER).serialize()))
         .WillOnce(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
-    EXPECT_CALL(cb, LaserScanCallback(isEqualToRawMeasurements(raw_scan.measures, EPS)))
-        .WillOnce(InvokeWithoutArgs([&monitoring_frame_barrier]() { monitoring_frame_barrier.release(); }));
+    // Check that toLaserScan(msg) == arg
+    EXPECT_CALL(cb, LaserScanCallback(toLaserScan(msg))).WillOnce(InvokeWithoutArgs([&monitoring_frame_barrier]() {
+      monitoring_frame_barrier.release();
+    }));
   }
 
   scanner_mock.startListeningForControlMsg();
   scanner.start();
 
-  scanner_mock.sendMonitoringFrame();
+  scanner_mock.sendMonitoringFrame(msg);
   EXPECT_TRUE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
 }
 
