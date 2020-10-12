@@ -96,10 +96,10 @@ protected:
   const std::array<double, 3> expected_measures_{ 4.4, 4.3, 4.2 };
 };
 
-class MonitoringFrameMsgFromRawTest : public ::testing::Test
+class MonitoringFrameMsgDeserializeTest : public ::testing::Test
 {
 protected:
-  MonitoringFrameMsgFromRawTest()
+  MonitoringFrameMsgDeserializeTest()
   {
     raw_frame_data_ = convertToMaxSizeRawData(test_data_.hex_dump);
   }
@@ -110,7 +110,7 @@ protected:
   std::size_t num_bytes_{ 2 * test_data_.hex_dump.size() };
 };
 
-TEST_F(MonitoringFrameMsgFromRawTest, testDeserializationSuccess)
+TEST_F(MonitoringFrameMsgDeserializeTest, testDeserializationSuccess)
 {
   MonitoringFrameMsg msg;
   ASSERT_NO_THROW(msg = MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
@@ -118,31 +118,31 @@ TEST_F(MonitoringFrameMsgFromRawTest, testDeserializationSuccess)
   EXPECT_EQ(msg, test_data_.msg_);
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, wrongOpCode)
+TEST_F(MonitoringFrameMsgDeserializeTest, testWrongOpCode)
 {
   raw_frame_data_.at(4) += 1;
   EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, invalidWorkingMode)
+TEST_F(MonitoringFrameMsgDeserializeTest, testInvalidWorkingMode)
 {
   raw_frame_data_.at(8) = 0x03;
   EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, invalidTransactionType)
+TEST_F(MonitoringFrameMsgDeserializeTest, testInvalidTransactionType)
 {
   raw_frame_data_.at(12) = 0x06;
   EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, invalidScannerId)
+TEST_F(MonitoringFrameMsgDeserializeTest, testInvalidScannerId)
 {
   raw_frame_data_.at(16) = 0x04;
   EXPECT_NO_THROW(MonitoringFrameMsg::deserialize(raw_frame_data_, num_bytes_););
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, unknownFieldId)
+TEST_F(MonitoringFrameMsgDeserializeTest, testUnknownFieldId)
 {
   UDPFrameTestDataWithUnknownFieldId test_data;
   const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
@@ -153,7 +153,7 @@ TEST_F(MonitoringFrameMsgFromRawTest, unknownFieldId)
                , MonitoringFrameMsg::MonitoringFrameFormatError);
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, tooLargeFieldLength)
+TEST_F(MonitoringFrameMsgDeserializeTest, testTooLargeFieldLength)
 {
   UDPFrameTestDataWithTooLargeFieldLength test_data;
   const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
@@ -164,7 +164,7 @@ TEST_F(MonitoringFrameMsgFromRawTest, tooLargeFieldLength)
                , MonitoringFrameMsg::MonitoringFrameFormatError);
 }
 
-TEST_F(MonitoringFrameMsgFromRawTest, tooLargeScanCounterLength)
+TEST_F(MonitoringFrameMsgDeserializeTest, testTooLargeScanCounterLength)
 {
   UDPFrameTestDataWithTooLargeScanCounterLength test_data;
   const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
@@ -173,6 +173,55 @@ TEST_F(MonitoringFrameMsgFromRawTest, tooLargeScanCounterLength)
   MonitoringFrameMsg msg;
   EXPECT_THROW(msg = MonitoringFrameMsg::deserialize(raw_frame_data, num_bytes);
                , MonitoringFrameMsg::MonitoringFrameFormatErrorScanCounterUnexpectedSize);
+}
+
+TEST(MonitoringFrameMsgEqualityTest, testCompareEqualSucces)
+{
+  MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, { 1, 2, 3 });
+  MonitoringFrameMsg msg1(TenthOfDegree(100), TenthOfDegree(10), 42, { 1, 2, 3 });
+  EXPECT_EQ(msg0, msg1);
+}
+
+TEST(MonitoringFrameMsgEqualityTest, testCompareEqualEmptySuccess)
+{
+  MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, {});
+  MonitoringFrameMsg msg1(TenthOfDegree(100), TenthOfDegree(10), 42, {});
+  EXPECT_EQ(msg0, msg1);
+}
+
+TEST(MonitoringFrameMsgEqualityTest, testCompareMeasuresNotEqual)
+{
+  MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, { 45, 44, 42, 42 });
+  MonitoringFrameMsg msg1(TenthOfDegree(100), TenthOfDegree(10), 42, { 45, 44, 43, 42 });
+  EXPECT_FALSE(msg0 == msg1);
+}
+
+TEST(MonitoringFrameMsgEqualityTest, testCompareFromThetaNotEqual)
+{
+  MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, { 45, 44, 43, 42 });
+  MonitoringFrameMsg msg1(TenthOfDegree(101), TenthOfDegree(10), 42, { 45, 44, 43, 42 });
+  EXPECT_FALSE(msg0 == msg1);
+}
+
+TEST(MonitoringFrameMsgEqualityTest, testCompareResolutionNotEqual)
+{
+  MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, { 45, 44, 43, 42 });
+  MonitoringFrameMsg msg1(TenthOfDegree(100), TenthOfDegree(11), 42, { 45, 44, 43, 42 });
+  EXPECT_FALSE(msg0 == msg1);
+}
+
+TEST(MonitoringFrameMsgEqualityTest, testCompareScanCounterNotEqual)
+{
+  MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, { 45, 44, 43, 42 });
+  MonitoringFrameMsg msg1(TenthOfDegree(100), TenthOfDegree(10), 43, { 45, 44, 43, 42 });
+  EXPECT_FALSE(msg0 == msg1);
+}
+
+TEST(MonitoringFrameMsgEqualityTest, testCompareNotEqualEmpty)
+{
+  MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, {});
+  MonitoringFrameMsg msg1(TenthOfDegree(111), TenthOfDegree(10), 42, {});
+  EXPECT_FALSE(msg0 == msg1);
 }
 
 }  // namespace psen_scan_v2

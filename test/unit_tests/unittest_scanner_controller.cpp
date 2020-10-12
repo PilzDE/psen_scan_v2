@@ -27,7 +27,6 @@
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/stop_request.h"
 #include "psen_scan_v2/laserscan.h"
-#include "psen_scan_v2/udp_frame_dumps.h"
 #include "psen_scan_v2/scan_range.h"
 
 using namespace psen_scan_v2_test;
@@ -64,12 +63,9 @@ class ScannerControllerTest : public ::testing::Test
 public:
   void simulateStartReply();
   void simulateStopReply();
-  template <typename TestData>
-  void simulateMonitoringFrame(const TestData& test_data);
+  void simulateMonitoringFrame(MonitoringFrameMsg& msg);
   void simulateUdpError(const std::string& msg);
   void simulateUdpTimeout(const std::string& msg);
-  template <typename TestData>
-  LaserScan testDataToLaserScan(const TestData& test_data);
 
 public:
   MockCallbackHolder mock_;
@@ -100,10 +96,9 @@ void ScannerControllerTest::simulateStopReply()
   scanner_controller_.control_udp_client_.simulateStopReply();
 }
 
-template <typename TestData>
-void ScannerControllerTest::simulateMonitoringFrame(const TestData& test_data)
+void ScannerControllerTest::simulateMonitoringFrame(MonitoringFrameMsg& msg)
 {
-  scanner_controller_.data_udp_client_.simulateMonitoringFrame(test_data);
+  scanner_controller_.data_udp_client_.simulateMonitoringFrame(msg);
 }
 
 void ScannerControllerTest::simulateUdpError(const std::string& msg)
@@ -114,15 +109,6 @@ void ScannerControllerTest::simulateUdpError(const std::string& msg)
 void ScannerControllerTest::simulateUdpTimeout(const std::string& msg)
 {
   scanner_controller_.control_udp_client_.simulateTimeout(msg);
-}
-
-template <typename TestData>
-LaserScan ScannerControllerTest::testDataToLaserScan(const TestData& test_data)
-{
-  const MaxSizeRawData raw_data = convertToMaxSizeRawData(test_data.hex_dump);
-  const auto num_bytes = 2 * test_data.hex_dump.size();
-  const MonitoringFrameMsg frame{ MonitoringFrameMsg::deserialize(raw_data, num_bytes) };
-  return toLaserScan(frame);
 }
 
 TEST_F(ScannerControllerTest, successfulStartSequence)
@@ -157,17 +143,17 @@ TEST_F(ScannerControllerTest, retryAfterStartReplyTimeout)
 
 TEST_F(ScannerControllerTest, receivingMultipleStartReplies)
 {
-  const UDPFrameTestDataWithoutIntensities test_data;
-  const LaserScan scan{ testDataToLaserScan(test_data) };
+  MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(275), 1, { 0.1, 20., 25, 10, 1., 2., 3. });
+  const LaserScan scan{ toLaserScan(msg) };
 
-  EXPECT_CALL(mock_, laserscan_callback(scan)).Times(2);
+  EXPECT_CALL(mock_, laserscan_callback(toLaserScan(msg))).Times(2);
 
   scanner_controller_.start();
   simulateUdpTimeout("Udp timeout");
   simulateStartReply();
-  simulateMonitoringFrame(test_data);
+  simulateMonitoringFrame(msg);
   simulateStartReply();
-  simulateMonitoringFrame(test_data);
+  simulateMonitoringFrame(msg);
 }
 
 TEST_F(ScannerControllerTest, successfulStopSequence)
@@ -212,25 +198,26 @@ TEST_F(ScannerControllerTest, stopReplyTimeout)
 
 TEST_F(ScannerControllerTest, handleMonitoringFrame)
 {
-  const UDPFrameTestDataWithoutIntensities test_data;
-  const LaserScan scan{ testDataToLaserScan(test_data) };
+  MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(275), 1, { 0.1, 20., 25, 10, 1., 2., 3. });
+
+  const LaserScan scan{ toLaserScan(msg) };
 
   EXPECT_CALL(mock_, laserscan_callback(scan)).Times(1);
 
   scanner_controller_.start();
   simulateStartReply();
-  simulateMonitoringFrame(test_data);
+  scanner_controller_.data_udp_client_.simulateMonitoringFrame(msg);
 }
 
 TEST_F(ScannerControllerTest, handleEmptyMonitoringFrame)
 {
+  MonitoringFrameMsg msg(TenthOfDegree(1), TenthOfDegree(2), 42, {});
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
   scanner_controller_.start();
   simulateStartReply();
 
-  const UDPFrameTestDataWithoutMeasurementsAndIntensities test_data;
-  simulateMonitoringFrame(test_data);
+  simulateMonitoringFrame(msg);
 }
 
 TEST_F(ScannerControllerTest, handleEarlyMonitoringFrame)
@@ -239,8 +226,8 @@ TEST_F(ScannerControllerTest, handleEarlyMonitoringFrame)
 
   scanner_controller_.start();
 
-  const UDPFrameTestDataWithoutIntensities test_data;
-  simulateMonitoringFrame(test_data);
+  MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(275), 1, { 0.1, 20., 25, 10, 1., 2., 3. });
+  simulateMonitoringFrame(msg);
 }
 
 TEST_F(ScannerControllerTest, handleLateMonitoringFrame)
@@ -252,8 +239,8 @@ TEST_F(ScannerControllerTest, handleLateMonitoringFrame)
 
   scanner_controller_.stop();
 
-  const UDPFrameTestDataWithoutIntensities test_data;
-  simulateMonitoringFrame(test_data);
+  MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(275), 1, { 0.1, 20., 25, 10, 1., 2., 3. });
+  simulateMonitoringFrame(msg);
 
   simulateStopReply();
 }

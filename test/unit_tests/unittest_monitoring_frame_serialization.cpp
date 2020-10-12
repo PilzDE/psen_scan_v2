@@ -28,8 +28,20 @@ TEST(MonitoringFrameSerializationTest, udpFrameTestDataWithoutIntensitiesSuccess
 {
   // Load testdata from dump
   UDPFrameTestDataWithoutIntensities test_data;
+  DynamicSizeRawData serialized_monitoring_frame_message = serialize(test_data.msg_);
 
-  // Serialize the message
+  EXPECT_EQ(test_data.hex_dump.size(), serialized_monitoring_frame_message.size());
+
+  for (size_t i = 0; i < test_data.hex_dump.size(); i++)
+  {
+    EXPECT_EQ((uint8_t)serialized_monitoring_frame_message.at(i), test_data.hex_dump.at(i)) << " index " << i;
+  }
+}
+
+TEST(MonitoringFrameSerializationTest, testUDPFrameTestDataWithoutMeasurementsAndIntensitiesSuccess)
+{
+  // Load testdata from dump
+  UDPFrameTestDataWithoutMeasurementsAndIntensities test_data;
   DynamicSizeRawData serialized_monitoring_frame_message = serialize(test_data.msg_);
 
   EXPECT_EQ(test_data.hex_dump.size(), serialized_monitoring_frame_message.size());

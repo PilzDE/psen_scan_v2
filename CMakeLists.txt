@@ -275,6 +275,7 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gmock(unittest_scanner_controller
     test/unit_tests/unittest_scanner_controller.cpp
+    test/src/monitoring_frame_serialization.cpp
     src/controller_state_machine.cpp
     src/laserscan.cpp
     src/monitoring_frame_msg.cpp
@@ -324,6 +325,7 @@ if(CATKIN_ENABLE_TESTING)
 
 catkin_add_gmock(integrationtest_scanner_api
   test/integration_tests/integrationtest_scanner_api.cpp
+  test/src/monitoring_frame_serialization.cpp
 )
 target_link_libraries(integrationtest_scanner_api
   ${catkin_LIBRARIES}

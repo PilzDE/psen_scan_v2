@@ -26,7 +26,6 @@
 #include "psen_scan_v2/raw_scanner_data.h"
 
 #include "psen_scan_v2/raw_data_array_conversion.h"
-#include "psen_scan_v2/udp_frame_dumps.h"
 
 using namespace psen_scan_v2;
 
@@ -34,11 +33,7 @@ namespace psen_scan_v2_test
 {
 TEST(LaserScanConversionsTest, toLaserScan)
 {
-  UDPFrameTestDataWithoutIntensities test_data;
-  const MaxSizeRawData raw_data{ convertToMaxSizeRawData(test_data.hex_dump) };
-  const auto num_bytes = 2 * test_data.hex_dump.size();
-  MonitoringFrameMsg frame;
-  ASSERT_NO_THROW(frame = MonitoringFrameMsg::deserialize(raw_data, num_bytes););
+  MonitoringFrameMsg frame(TenthOfDegree(10.), TenthOfDegree(3.14 / 2.), 42, { 1., 2., 3., 4.5, 5, 42 });
 
   std::unique_ptr<LaserScan> scan_ptr;
   ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ toLaserScan(frame) }););
