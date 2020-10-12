@@ -111,6 +111,8 @@ public:
             measures() == rhs.measures());
   }
 
+  // LCOV_EXCL_START
+  // No check, it's only printing
   friend std::ostream& operator<<(std::ostream& os, const MonitoringFrameMsg& msg)
   {
     os << fmt::format("MonitoringFrameMsg(fromTheta = {} deg, resolution = {} deg, scanCounter = "
@@ -121,6 +123,7 @@ public:
                       msg.measures_);
     return os;
   }
+  // LCOV_EXCL_STOP
 
 private:
   using FieldId = FieldHeader::Id;

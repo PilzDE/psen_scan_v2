@@ -224,16 +224,6 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareNotEqualEmpty)
   EXPECT_FALSE(msg0 == msg1);
 }
 
-TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)
-{
-  MonitoringFrameMsg msg(TenthOfDegree(1234), TenthOfDegree(56), 78, { 45, 44, 43, 42 });
-  std::stringstream output;
-  output << msg;
-  EXPECT_EQ(output.str(),
-            "MonitoringFrameMsg(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-            "measures = {45.0, 44.0, 43.0, 42.0})");
-}
-
 }  // namespace psen_scan_v2
 
 int main(int argc, char** argv)
