@@ -23,6 +23,9 @@
 #include <string>
 #include <vector>
 
+#include <fmt/core.h>
+#include <fmt/ranges.h>
+
 #include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/tenth_of_degree.h"
 
@@ -65,25 +68,12 @@ public:
 
   friend std::ostream& operator<<(std::ostream& os, const MonitoringFrameMsg& msg)
   {
-    os << "MonitoringFrameMsg(fromTheta = TenthOfDegree(" << msg.fromTheta().value() << "),";
-    os << " resolution = TenthOfDegree(" << msg.resolution().value() << "),";
-    os << " scanCounter = " << msg.scanCounter() << ",";
-    os << " measures = { ";
-
-    size_t i = 0;
-    do
-    {
-      os << msg.measures_.at(i);
-      if (msg.measures_.size() - 1 != i)
-      {
-        os << ", ";
-      }
-      else
-      {
-        os << " })";
-      }
-    } while (++i < msg.measures_.size());
-
+    os << fmt::format("MonitoringFrameMsg(fromTheta = {} deg, resolution = {} deg, scanCounter = "
+                      "{}, measures = {})",
+                      msg.fromTheta().value() / 10.,
+                      msg.resolution().value() / 10.,
+                      msg.scanCounter(),
+                      msg.measures_);
     return os;
   }
 
