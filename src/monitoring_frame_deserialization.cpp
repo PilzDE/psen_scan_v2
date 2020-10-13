@@ -17,6 +17,14 @@
 
 namespace psen_scan_v2
 {
+FieldHeader::FieldHeader(Id id, Length length) : id_(id), length_(length)
+{
+}
+
+constexpr FieldHeader::Id AdditionalFieldIds::SCAN_COUNTER;
+constexpr FieldHeader::Id AdditionalFieldIds::MEASURES;
+constexpr FieldHeader::Id AdditionalFieldIds::END_OF_FRAME;
+
 MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, const std::size_t& num_bytes)
 {
   MonitoringFrameMsg msg;
@@ -114,13 +122,4 @@ void checkFixedFields(MonitoringFrameMsg& msg)
     PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid Scanner id!");
   }
 }
-
-constexpr FieldHeader::Id AdditionalFieldIds::SCAN_COUNTER;
-constexpr FieldHeader::Id AdditionalFieldIds::MEASURES;
-constexpr FieldHeader::Id AdditionalFieldIds::END_OF_FRAME;
-
-FieldHeader::FieldHeader(Id id, Length length) : id_(id), length_(length)
-{
-}
-
 }  // namespace psen_scan_v2

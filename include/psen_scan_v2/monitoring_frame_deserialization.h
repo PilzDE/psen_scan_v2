@@ -55,9 +55,6 @@ struct AdditionalFieldIds
 
 MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, const std::size_t& num_bytes);
 FieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes);
-void readAngle(std::istringstream& is, double& angle);
-void readScanCounter(std::istringstream& is, uint32_t& scan_counter, const FieldLength length);
-void readMeasures(std::istringstream& is, std::vector<double>& measures, const FieldLength length);
 void checkFixedFields(MonitoringFrameMsg& msg);
 
 class MonitoringFrameFormatError : public std::runtime_error
