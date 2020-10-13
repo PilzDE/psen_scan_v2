@@ -27,6 +27,7 @@ FieldHeader::FieldHeader(Id id, Length length) : id_(id), length_(length)
 constexpr FieldHeader::Id AdditionalFieldIds::SCAN_COUNTER;
 constexpr FieldHeader::Id AdditionalFieldIds::MEASURES;
 constexpr FieldHeader::Id AdditionalFieldIds::END_OF_FRAME;
+constexpr FieldHeader::Id AdditionalFieldIds::DIAGNOSTICS;
 
 MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, const std::size_t& num_bytes)
 {
