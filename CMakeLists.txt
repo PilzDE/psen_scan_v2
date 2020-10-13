@@ -312,6 +312,14 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES}
   )
 
+  catkin_add_gmock(unittest_logging
+    test/unit_tests/unittest_logging.cpp
+  )
+  target_link_libraries(unittest_logging
+    ${catkin_LIBRARIES}
+    ${console_bridge_LIBRARIES}
+  )
+
   #########################
   ##  Integration-Tests  ##
   #########################
