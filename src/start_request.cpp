@@ -28,13 +28,13 @@
 
 namespace psen_scan_v2
 {
-static constexpr double MASTER_RESOLUTION_RAD{ degreeToRadian(0.1) };
+static constexpr TenthOfDegree MASTER_RESOLUTION{ TenthOfDegree(1) };
 
 StartRequest::StartRequest(const ScannerConfiguration& scanner_configuration, const uint32_t& seq_number)
   : seq_number_(seq_number)
   , host_ip_(scanner_configuration.hostIp())
   , host_udp_port_data_(scanner_configuration.hostUDPPortData())  // Write is deduced by the scanner
-  , master_(scanner_configuration.scanRange(), MASTER_RESOLUTION_RAD)
+  , master_(scanner_configuration.scanRange(), MASTER_RESOLUTION)
 {
   crc_ = getCRC();
 }
@@ -74,7 +74,7 @@ DynamicSizeRawData StartRequest::serialize() const
 
   uint16_t start_angle{ master_.getScanRange().getStart().value() };
   uint16_t end_angle{ master_.getScanRange().getEnd().value() };
-  uint16_t resolution{ radToTenthDegree(master_.getResolution()) };
+  uint16_t resolution{ master_.getResolution().value() };
   raw_processing::write(os, start_angle);
   raw_processing::write(os, end_angle);
   raw_processing::write(os, resolution);
@@ -83,7 +83,7 @@ DynamicSizeRawData StartRequest::serialize() const
   {
     uint16_t slave_start_angle{ slave.getScanRange().getStart().value() };
     uint16_t slave_end_angle{ slave.getScanRange().getEnd().value() };
-    uint16_t slave_resolution{ radToTenthDegree(slave.getResolution()) };
+    uint16_t slave_resolution{ slave.getResolution().value() };
     raw_processing::write(os, slave_start_angle);
     raw_processing::write(os, slave_end_angle);
     raw_processing::write(os, slave_resolution);
