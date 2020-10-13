@@ -128,7 +128,7 @@ ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& s
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::handleUdpData(const MaxSizeRawData& data, const std::size_t& num_bytes)
 {
-  MonitoringFrameMsg frame{ deserialize(data, num_bytes) };
+  MonitoringFrameMsg frame{ deserialize_monitoring_frame(data, num_bytes) };
   state_machine_.processMonitoringFrameReceivedEvent(frame);
 }
 

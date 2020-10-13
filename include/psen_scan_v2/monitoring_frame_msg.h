@@ -91,7 +91,7 @@ private:
 
 public:
   friend DynamicSizeRawData serialize(MonitoringFrameMsg& frame);
-  friend MonitoringFrameMsg deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
+  friend MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, const std::size_t& num_bytes);
   friend void checkFixedFields(MonitoringFrameMsg& msg);
 };
 

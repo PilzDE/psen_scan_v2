@@ -22,7 +22,6 @@
 #include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/logging.h"
 
-
 namespace psen_scan_v2
 {
 class FieldHeader
@@ -54,7 +53,7 @@ struct AdditionalFieldIds
   static constexpr FieldHeader::Id END_OF_FRAME{ 0x09 };
 };
 
-MonitoringFrameMsg deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
+MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, const std::size_t& num_bytes);
 FieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes);
 void readAngle(std::istringstream& is, double& angle);
 void readScanCounter(std::istringstream& is, uint32_t& scan_counter, const FieldLength length);
@@ -77,7 +76,9 @@ inline MonitoringFrameFormatError::MonitoringFrameFormatError(const std::string&
 {
 }
 
-inline MonitoringFrameFormatErrorScanCounterUnexpectedSize::MonitoringFrameFormatErrorScanCounterUnexpectedSize(const std::string& msg) : std::MonitoringFrameFormatError(msg)
+inline MonitoringFrameFormatErrorScanCounterUnexpectedSize::MonitoringFrameFormatErrorScanCounterUnexpectedSize(
+    const std::string& msg)
+  : MonitoringFrameFormatError(msg)
 {
 }
 

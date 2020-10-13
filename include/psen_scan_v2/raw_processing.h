@@ -19,6 +19,7 @@
 #include <functional>
 #include <cmath>
 #include <algorithm>
+#include <vector>
 
 #include <fmt/core.h>
 

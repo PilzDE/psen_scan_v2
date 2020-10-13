@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "psen_scan_v2/monitoring_frame_serialization.h"
+#include "psen_scan_v2/monitoring_frame_deserialization.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/udp_frame_dumps.h"
 #include "psen_scan_v2/raw_data_array_conversion.h"
@@ -97,7 +98,7 @@ TEST(MonitoringFrameSerializationTest, testSerializationInvariance)
   UDPFrameTestDataWithoutIntensities test_data;
   DynamicSizeRawData raw = serialize(test_data.msg_);
 
-  MonitoringFrameMsg deserialized_msg = deserialize(convertToMaxSizeRawData(raw), raw.size());
+  MonitoringFrameMsg deserialized_msg = deserialize_monitoring_frame(convertToMaxSizeRawData(raw), raw.size());
 
   EXPECT_EQ(test_data.msg_, deserialized_msg);
 }
@@ -108,7 +109,7 @@ TEST(MonitoringFrameSerializationTest, testSerializationInvariance2)
 
   DynamicSizeRawData raw = serialize(msg);
 
-  MonitoringFrameMsg deserialized_msg = deserialize(convertToMaxSizeRawData(raw), raw.size());
+  MonitoringFrameMsg deserialized_msg = deserialize_monitoring_frame(convertToMaxSizeRawData(raw), raw.size());
 
   EXPECT_EQ(msg, deserialized_msg);
 }
@@ -130,7 +131,7 @@ protected:
 TEST_F(MonitoringFrameMsgDeserializeTest, testDeserializationSuccess)
 {
   MonitoringFrameMsg msg;
-  ASSERT_NO_THROW(msg = deserialize(raw_frame_data_, num_bytes_););
+  ASSERT_NO_THROW(msg = deserialize_monitoring_frame(raw_frame_data_, num_bytes_););
 
   EXPECT_EQ(msg, test_data_.msg_);
 }
@@ -138,25 +139,25 @@ TEST_F(MonitoringFrameMsgDeserializeTest, testDeserializationSuccess)
 TEST_F(MonitoringFrameMsgDeserializeTest, testWrongOpCode)
 {
   raw_frame_data_.at(4) += 1;
-  EXPECT_NO_THROW(deserialize(raw_frame_data_, num_bytes_););
+  EXPECT_NO_THROW(deserialize_monitoring_frame(raw_frame_data_, num_bytes_););
 }
 
 TEST_F(MonitoringFrameMsgDeserializeTest, testInvalidWorkingMode)
 {
   raw_frame_data_.at(8) = 0x03;
-  EXPECT_NO_THROW(deserialize(raw_frame_data_, num_bytes_););
+  EXPECT_NO_THROW(deserialize_monitoring_frame(raw_frame_data_, num_bytes_););
 }
 
 TEST_F(MonitoringFrameMsgDeserializeTest, testInvalidTransactionType)
 {
   raw_frame_data_.at(12) = 0x06;
-  EXPECT_NO_THROW(deserialize(raw_frame_data_, num_bytes_););
+  EXPECT_NO_THROW(deserialize_monitoring_frame(raw_frame_data_, num_bytes_););
 }
 
 TEST_F(MonitoringFrameMsgDeserializeTest, testInvalidScannerId)
 {
   raw_frame_data_.at(16) = 0x04;
-  EXPECT_NO_THROW(deserialize(raw_frame_data_, num_bytes_););
+  EXPECT_NO_THROW(deserialize_monitoring_frame(raw_frame_data_, num_bytes_););
 }
 
 TEST_F(MonitoringFrameMsgDeserializeTest, testUnknownFieldId)
@@ -166,7 +167,7 @@ TEST_F(MonitoringFrameMsgDeserializeTest, testUnknownFieldId)
   const auto num_bytes = 2 * test_data.hex_dump.size();
 
   MonitoringFrameMsg msg;
-  EXPECT_THROW(msg = deserialize(raw_frame_data, num_bytes);, MonitoringFrameFormatError);
+  EXPECT_THROW(msg = deserialize_monitoring_frame(raw_frame_data, num_bytes);, MonitoringFrameFormatError);
 }
 
 TEST_F(MonitoringFrameMsgDeserializeTest, testTooLargeFieldLength)
@@ -176,7 +177,7 @@ TEST_F(MonitoringFrameMsgDeserializeTest, testTooLargeFieldLength)
   const auto num_bytes = 2 * test_data.hex_dump.size();
 
   MonitoringFrameMsg msg;
-  EXPECT_THROW(msg = deserialize(raw_frame_data, num_bytes);, MonitoringFrameFormatError);
+  EXPECT_THROW(msg = deserialize_monitoring_frame(raw_frame_data, num_bytes);, MonitoringFrameFormatError);
 }
 
 TEST_F(MonitoringFrameMsgDeserializeTest, testTooLargeScanCounterLength)
@@ -186,7 +187,8 @@ TEST_F(MonitoringFrameMsgDeserializeTest, testTooLargeScanCounterLength)
   const auto num_bytes = 2 * test_data.hex_dump.size();
 
   MonitoringFrameMsg msg;
-  EXPECT_THROW(msg = deserialize(raw_frame_data, num_bytes);, MonitoringFrameFormatErrorScanCounterUnexpectedSize);
+  EXPECT_THROW(msg = deserialize_monitoring_frame(raw_frame_data, num_bytes);
+               , MonitoringFrameFormatErrorScanCounterUnexpectedSize);
 }
 
 }  // namespace psen_scan_v2_test

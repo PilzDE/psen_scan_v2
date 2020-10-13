@@ -17,7 +17,7 @@
 
 namespace psen_scan_v2
 {
-MonitoringFrameMsg deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes)
+MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, const std::size_t& num_bytes)
 {
   MonitoringFrameMsg msg;
 
