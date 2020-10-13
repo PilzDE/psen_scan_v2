@@ -21,9 +21,7 @@
 #include "psen_scan_v2/raw_processing.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/logging.h"
-#include "psen_scan_v2/monitoring_frame_deserialization.h"
 
-using namespace psen_scan_v2;
 
 namespace psen_scan_v2
 {
@@ -47,6 +45,8 @@ private:
   Length length_;
 };
 
+using FieldId = FieldHeader::Id;
+using FieldLength = FieldHeader::Length;
 struct AdditionalFieldIds
 {
   static constexpr FieldHeader::Id SCAN_COUNTER{ 0x02 };
@@ -54,17 +54,12 @@ struct AdditionalFieldIds
   static constexpr FieldHeader::Id END_OF_FRAME{ 0x09 };
 };
 
-using FieldId = FieldHeader::Id;
-using FieldLength = FieldHeader::Length;
-
 MonitoringFrameMsg deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
-void checkFixedFields(MonitoringFrameMsg& msg);
 FieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes);
 void readAngle(std::istringstream& is, double& angle);
-
-FieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes);
 void readScanCounter(std::istringstream& is, uint32_t& scan_counter, const FieldLength length);
 void readMeasures(std::istringstream& is, std::vector<double>& measures, const FieldLength length);
+void checkFixedFields(MonitoringFrameMsg& msg);
 
 class MonitoringFrameFormatError : public std::runtime_error
 {
