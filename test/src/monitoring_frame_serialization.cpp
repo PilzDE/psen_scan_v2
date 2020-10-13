@@ -15,8 +15,9 @@
 
 #include <ostream>
 
-#include "psen_scan_v2/monitoring_frame_serialization.h"
 #include "psen_scan_v2/raw_processing.h"
+#include "psen_scan_v2/monitoring_frame_serialization.h"
+#include "psen_scan_v2/monitoring_frame_deserialization.h"
 
 namespace psen_scan_v2
 {
