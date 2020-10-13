@@ -43,7 +43,7 @@ namespace psen_scan_v2
 {
 #define Return_Future(promise_obj) ::testing::InvokeWithoutArgs([&promise_obj]() { return promise_obj.get_future(); })
 
-static constexpr std::chrono::seconds LOOP_END_TIMEOUT{ 3 };
+static constexpr std::chrono::seconds LOOP_END_TIMEOUT{ 4 };
 
 static constexpr int QUEUE_SIZE{ 10 };
 
@@ -135,6 +135,30 @@ TEST_F(RosScannerNodeTests, scanTopicReceived)
   ros_scanner_node.terminate();
   EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
 }
+
+TEST_F(RosScannerNodeTests, testMissingStopReply)
+{
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", DEFAULT_X_AXIS_ROTATION, scanner_config_);
+
+  std::promise<void> start_barrier;
+  start_barrier.set_value();
+
+  // Stop barrier is unset, in other words the stop()-future object does not finish.
+  std::promise<void> stop_barrier;
+
+  {
+    ::testing::InSequence s;
+    EXPECT_CALL(ros_scanner_node.scanner_, start())
+        .WillOnce(DoAll(ACTION_OPEN_BARRIER_VOID(SCANNER_STARTED), Return_Future(start_barrier)));
+    EXPECT_CALL(ros_scanner_node.scanner_, stop()).WillOnce(Return_Future(stop_barrier));
+  }
+
+  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
+  BARRIER(SCANNER_STARTED, SCANNER_STARTED_TIMEOUT_MS);
+  ros_scanner_node.terminate();
+  EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
+}
+
 }  // namespace psen_scan_v2
 
 int main(int argc, char* argv[])

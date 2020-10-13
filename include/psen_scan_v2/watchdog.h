@@ -57,7 +57,10 @@ Watchdog::Watchdog(const std::chrono::high_resolution_clock::duration& timeout,
   // we wait until the first command of the thread is executed.
   if (!thread_startetd_barrier_.waitTillRelease(timeout))
   {
+    // Difficult to test because this is a timing problem.
+    // LCOV_EXCL_START
     throw std::runtime_error("Timeout while waiting for timer thread to start");
+    // LCOV_EXCL_STOP
   }
 }
 

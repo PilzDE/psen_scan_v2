@@ -76,6 +76,7 @@ private:
   FRIEND_TEST(RosScannerNodeTests, scannerInvocation);
   FRIEND_TEST(RosScannerNodeTests, scanTopicReceived);
   FRIEND_TEST(RosScannerNodeTests, scanBuildFailure);
+  FRIEND_TEST(RosScannerNodeTests, testMissingStopReply);
 };
 
 typedef ROSScannerNodeT<> ROSScannerNode;

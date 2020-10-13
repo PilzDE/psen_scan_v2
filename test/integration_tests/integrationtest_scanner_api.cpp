@@ -151,7 +151,10 @@ TEST(ScannerAPITests, startFunctionality)
       .WillOnce(InvokeWithoutArgs([&start_req_received_barrier]() { start_req_received_barrier.release(); }));
 
   scanner_mock.startListeningForControlMsg();
-  const auto start_future{ std::async(std::launch::async, [&scanner]() { scanner.start(); }) };
+  const auto start_future{ std::async(std::launch::async, [&scanner]() {
+    const auto start_future = scanner.start();
+    start_future.wait();
+  }) };
 
   EXPECT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
   EXPECT_EQ(start_future.wait_for(WAIT_TIMEOUT), std::future_status::timeout) << "Scanner::start() finished too early";
@@ -177,7 +180,10 @@ TEST(ScannerAPITests, stopFunctionality)
   scanner.start();
 
   scanner_mock.startListeningForControlMsg();
-  const auto stop_future{ std::async(std::launch::async, [&scanner]() { scanner.stop(); }) };
+  const auto stop_future{ std::async(std::launch::async, [&scanner]() {
+    const auto stop_future = scanner.stop();
+    stop_future.wait();
+  }) };
 
   EXPECT_TRUE(stop_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Stop request not received";
   EXPECT_EQ(stop_future.wait_for(WAIT_TIMEOUT), std::future_status::timeout) << "Scanner::stop() finished too early";
@@ -195,9 +201,12 @@ TEST(ScannerAPITests, testStartReplyTimeout)
   EXPECT_CALL(scanner_mock, receiveControlMsg(_, _)).Times(AtLeast(2));
 
   scanner_mock.startContinuousListeningForControlMsg();
-  const auto start_future{ std::async(std::launch::async, [&scanner]() { scanner.start(); }) };
+  const auto start_future{ std::async(std::launch::async, [&scanner]() {
+    const auto start_future = scanner.start();
+    start_future.wait();
+  }) };
 
-  EXPECT_EQ(start_future.wait_for(2000ms), std::future_status::timeout) << "Scanner::start() finished too early";
+  EXPECT_EQ(start_future.wait_for(3000ms), std::future_status::timeout) << "Scanner::start() finished too early";
   scanner_mock.simulateStartReply();
   EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
 }
