@@ -52,15 +52,19 @@ static constexpr uint32_t DEFAULT_SEQ_NUMBER{ 0 };
 using std::placeholders::_1;
 
 using namespace std::chrono_literals;
-class TimeoutTimer
+/**
+ * @brief Watchdog which continuously calls the specified timeout handler (after the specified timeout time has passed)
+ * as long as the watchdog exists.
+ */
+class Watchdog
 {
 public:
-  TimeoutTimer(const std::chrono::high_resolution_clock::duration& timeout,
-               const std::function<void()>& timeout_handler,
-               const std::chrono::high_resolution_clock::duration& start_timeout = 10ms)
+  Watchdog(const std::chrono::high_resolution_clock::duration& timeout,
+           const std::function<void()>& timeout_handler,
+           const std::chrono::high_resolution_clock::duration& start_timeout = 10ms)
     : timer_thread_([this, timeout, timeout_handler]() {
       thread_startetd_barrier_.release();
-      while (!terminated_ && !barrier_.waitTillRelease(timeout))
+      while (!barrier_.waitTillRelease(timeout))
       {
         timeout_handler();
       }
@@ -72,9 +76,8 @@ public:
     }
   }
 
-  ~TimeoutTimer()
+  ~Watchdog()
   {
-    terminated_ = true;
     barrier_.release();
     if (timer_thread_.joinable())
     {
@@ -83,7 +86,6 @@ public:
   }
 
 private:
-  std::atomic_bool terminated_{ false };
   Barrier thread_startetd_barrier_;
   Barrier barrier_;
   std::thread timer_thread_;
@@ -120,7 +122,7 @@ private:
   TUCI control_udp_client_;
   TUCI data_udp_client_;
 
-  std::unique_ptr<TimeoutTimer> start_reply_timer_{};
+  std::unique_ptr<Watchdog> start_reply_watchdog_{};
 
   LaserScanCallback laser_scan_callback_;
 
@@ -214,12 +216,12 @@ std::future<void> ScannerControllerT<TCSM, TUCI>::stop()
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::sendStartRequest()
 {
-  control_udp_client_.write(StartRequest(scanner_config_, DEFAULT_SEQ_NUMBER).serialize());
-  if (!start_reply_timer_)
+  if (!start_reply_watchdog_)
   {
-    start_reply_timer_ = std::make_unique<TimeoutTimer>(RECEIVE_TIMEOUT_CONTROL,
-                                                        std::bind(&ScannerControllerT::handleStartReplyTimeout, this));
+    start_reply_watchdog_ = std::make_unique<Watchdog>(RECEIVE_TIMEOUT_CONTROL,
+                                                       std::bind(&ScannerControllerT::handleStartReplyTimeout, this));
   }
+  control_udp_client_.write(StartRequest(scanner_config_, DEFAULT_SEQ_NUMBER).serialize());
 }
 
 template <typename TCSM, typename TUCI>
@@ -260,7 +262,7 @@ void ScannerControllerT<TCSM, TUCI>::notifyStartedState()
   PSENSCAN_DEBUG("ScannerController", "Started() called.");
 
   // The reset stops the start-reply timeout timer
-  start_reply_timer_.reset(nullptr);
+  start_reply_watchdog_.reset(nullptr);
 
   started_.set_value();
   // Reinitialize
