@@ -83,42 +83,25 @@ using system_clock = std::chrono::system_clock;
 using time_point = system_clock::time_point;
 using duration = system_clock::duration;
 
-class SimulatedNowCallable
-{
-public:
-  time_point operator()()
-  {
-    return now_;
-  }
-
-  void incrementByMilliseconds(const int increment)
-  {
-    now_ += std::chrono::milliseconds(increment);
-  }
-
-private:
-  time_point now_{ system_clock::now() };
-};
-
 TEST(LoggingTest, logThrottleInternal)
 {
   INJECT_LOG_MOCK;
 
   const double period{ 0.1 };
-  SimulatedNowCallable now_func;
+  time_point now{ system_clock::now() };
 
   EXPECT_LOG(ERROR, "Name: msg", __FILE__, __LINE__ + 3).Times(1);
   for (unsigned int i = 0; i < 2; ++i)
   {
-    PSENSCAN_LOG_THROTTLE_INTERNAL(now_func, period, "Name", __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, "msg");
-    now_func.incrementByMilliseconds(99);
+    PSENSCAN_LOG_THROTTLE_INTERNAL(now, period, "Name", __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, "msg");
+    now += std::chrono::milliseconds(99);
   }
 
   EXPECT_LOG(ERROR, "Name: msg", __FILE__, __LINE__ + 3).Times(2);
   for (unsigned int i = 0; i < 2; ++i)
   {
-    PSENSCAN_LOG_THROTTLE_INTERNAL(now_func, period, "Name", __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, "msg");
-    now_func.incrementByMilliseconds(101);
+    PSENSCAN_LOG_THROTTLE_INTERNAL(now, period, "Name", __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, "msg");
+    now += std::chrono::milliseconds(101);
   }
 }
 
@@ -128,15 +111,15 @@ TEST(LoggingTest, logThrottleInternalConcurrent)
 
   const double period1{ 0.1 };
   const double period2{ 0.5 };
-  SimulatedNowCallable now_func;
+  time_point now{ system_clock::now() };
 
   EXPECT_LOG(ERROR, "Name: msg1", __FILE__, __LINE__ + 4).Times(2);
   EXPECT_LOG(ERROR, "Name: msg2", __FILE__, __LINE__ + 4).Times(1);
   for (unsigned int i = 0; i < 2; ++i)
   {
-    PSENSCAN_LOG_THROTTLE_INTERNAL(now_func, period1, "Name", __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, "msg1");
-    PSENSCAN_LOG_THROTTLE_INTERNAL(now_func, period2, "Name", __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, "msg2");
-    now_func.incrementByMilliseconds(101);
+    PSENSCAN_LOG_THROTTLE_INTERNAL(now, period1, "Name", __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, "msg1");
+    PSENSCAN_LOG_THROTTLE_INTERNAL(now, period2, "Name", __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, "msg2");
+    now += std::chrono::milliseconds(101);
   }
 }
 
