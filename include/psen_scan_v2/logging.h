@@ -22,9 +22,10 @@
 #include <fmt/core.h>
 
 #define PSENSCAN_LOG(name, file, line, level, ...)                                                                     \
+  do                                                                                                                   \
   {                                                                                                                    \
     console_bridge::getOutputHandler()->log(fmt::format("{}: {}", name, fmt::format(__VA_ARGS__)), level, file, line); \
-  }
+  } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
 
 #define PSENSCAN_LOG_THROTTLE(period, name, file, line, level, ...)                                                    \
   PSENSCAN_LOG_THROTTLE_INTERNAL(std::chrono::system_clock::now, period, name, file, line, level, __VA_ARGS__)
@@ -39,7 +40,7 @@
       throttle_last_hit = throttle_now;                                                                                \
       PSENSCAN_LOG(name, file, line, level, __VA_ARGS__);                                                              \
     }                                                                                                                  \
-  } while (false)
+  } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
 
 using namespace console_bridge;
 
