@@ -27,15 +27,19 @@
   }
 
 #define PSENSCAN_LOG_THROTTLE(period, name, file, line, level, ...)                                                    \
+  PSENSCAN_LOG_THROTTLE_INTERNAL(std::chrono::system_clock::now, period, name, file, line, level, __VA_ARGS__)
+
+#define PSENSCAN_LOG_THROTTLE_INTERNAL(now_func, period, name, file, line, level, ...)                                 \
+  do                                                                                                                   \
   {                                                                                                                    \
     static std::chrono::system_clock::time_point throttle_last_hit;                                                    \
-    auto throttle_now = std::chrono::system_clock::now();                                                              \
+    auto throttle_now = now_func();                                                                                    \
     if (throttle_last_hit + std::chrono::duration<double>(period) < throttle_now)                                      \
     {                                                                                                                  \
       throttle_last_hit = throttle_now;                                                                                \
       PSENSCAN_LOG(name, file, line, level, __VA_ARGS__);                                                              \
     }                                                                                                                  \
-  }
+  } while (false)
 
 using namespace console_bridge;
 
