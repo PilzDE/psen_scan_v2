@@ -23,6 +23,9 @@
 #include <string>
 #include <vector>
 
+#include <fmt/core.h>
+#include <fmt/ranges.h>
+
 #include <gtest/gtest_prod.h>
 
 #include "psen_scan_v2/raw_scanner_data.h"
@@ -107,6 +110,20 @@ public:
     return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
             measures() == rhs.measures());
   }
+
+  // LCOV_EXCL_START
+  // No check, it's only printing
+  friend std::ostream& operator<<(std::ostream& os, const MonitoringFrameMsg& msg)
+  {
+    os << fmt::format("MonitoringFrameMsg(fromTheta = {} deg, resolution = {} deg, scanCounter = "
+                      "{}, measures = {})",
+                      msg.fromTheta().value() / 10.,
+                      msg.resolution().value() / 10.,
+                      msg.scanCounter(),
+                      msg.measures_);
+    return os;
+  }
+  // LCOV_EXCL_STOP
 
 private:
   using FieldId = FieldHeader::Id;

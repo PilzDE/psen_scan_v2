@@ -53,8 +53,6 @@ static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 3 };
 
 static constexpr uint32_t DEFAULT_SEQ_NUMBER{ 0u };
 
-static constexpr double EPS{ 0.001 };
-
 using std::placeholders::_1;
 using std::placeholders::_2;
 

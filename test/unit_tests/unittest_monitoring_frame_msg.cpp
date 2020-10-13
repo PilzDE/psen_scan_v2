@@ -193,35 +193,40 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareMeasuresNotEqual)
 {
   MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, { 45, 44, 42, 42 });
   MonitoringFrameMsg msg1(TenthOfDegree(100), TenthOfDegree(10), 42, { 45, 44, 43, 42 });
-  EXPECT_FALSE(msg0 == msg1);
+  EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
+                             << "\nexpected to be false but was true";
 }
 
 TEST(MonitoringFrameMsgEqualityTest, testCompareFromThetaNotEqual)
 {
   MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, { 45, 44, 43, 42 });
   MonitoringFrameMsg msg1(TenthOfDegree(101), TenthOfDegree(10), 42, { 45, 44, 43, 42 });
-  EXPECT_FALSE(msg0 == msg1);
+  EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
+                             << "\nexpected to be false but was true";
 }
 
 TEST(MonitoringFrameMsgEqualityTest, testCompareResolutionNotEqual)
 {
   MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, { 45, 44, 43, 42 });
   MonitoringFrameMsg msg1(TenthOfDegree(100), TenthOfDegree(11), 42, { 45, 44, 43, 42 });
-  EXPECT_FALSE(msg0 == msg1);
+  EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
+                             << "\nexpected to be false but was true";
 }
 
 TEST(MonitoringFrameMsgEqualityTest, testCompareScanCounterNotEqual)
 {
   MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, { 45, 44, 43, 42 });
   MonitoringFrameMsg msg1(TenthOfDegree(100), TenthOfDegree(10), 43, { 45, 44, 43, 42 });
-  EXPECT_FALSE(msg0 == msg1);
+  EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
+                             << "\nexpected to be false but was true";
 }
 
 TEST(MonitoringFrameMsgEqualityTest, testCompareNotEqualEmpty)
 {
   MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, {});
   MonitoringFrameMsg msg1(TenthOfDegree(111), TenthOfDegree(10), 42, {});
-  EXPECT_FALSE(msg0 == msg1);
+  EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
+                             << "\nexpected to be false but was true";
 }
 
 }  // namespace psen_scan_v2
