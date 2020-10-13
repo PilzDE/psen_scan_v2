@@ -37,6 +37,7 @@
 #include "psen_scan_v2/stop_request.h"
 #include "psen_scan_v2/udp_client.h"
 #include "psen_scan_v2/async_barrier.h"
+#include "psen_scan_v2/watchdog.h"
 
 namespace psen_scan_v2
 {
@@ -50,46 +51,6 @@ static constexpr std::chrono::milliseconds RECEIVE_TIMEOUT_DATA{ 1000 };
 static constexpr uint32_t DEFAULT_SEQ_NUMBER{ 0 };
 
 using std::placeholders::_1;
-
-using namespace std::chrono_literals;
-/**
- * @brief Watchdog which continuously calls the specified timeout handler (after the specified timeout time has passed)
- * as long as the watchdog exists.
- */
-class Watchdog
-{
-public:
-  Watchdog(const std::chrono::high_resolution_clock::duration& timeout,
-           const std::function<void()>& timeout_handler,
-           const std::chrono::high_resolution_clock::duration& start_timeout = 10ms)
-    : timer_thread_([this, timeout, timeout_handler]() {
-      thread_startetd_barrier_.release();
-      while (!barrier_.waitTillRelease(timeout))
-      {
-        timeout_handler();
-      }
-    })
-  {
-    if (!thread_startetd_barrier_.waitTillRelease(start_timeout))
-    {
-      throw std::runtime_error("Timeout while waiting for timer thread to start");
-    }
-  }
-
-  ~Watchdog()
-  {
-    barrier_.release();
-    if (timer_thread_.joinable())
-    {
-      timer_thread_.join();
-    }
-  }
-
-private:
-  Barrier thread_startetd_barrier_;
-  Barrier barrier_;
-  std::thread timer_thread_;
-};
 
 template <typename TCSM = ControllerStateMachine, typename TUCI = UdpClientImpl>
 class ScannerControllerT
