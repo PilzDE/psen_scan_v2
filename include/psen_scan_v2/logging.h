@@ -49,6 +49,15 @@ using namespace console_bridge;
 #define PSENSCAN_WARN(name, ...) PSENSCAN_LOG(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_WARN, __VA_ARGS__)
 #define PSENSCAN_DEBUG(name, ...) PSENSCAN_LOG(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_DEBUG, __VA_ARGS__)
 
+#define PSENSCAN_ERROR_THROTTLE_INTERNAL(now, period, name, ...)                                                       \
+  PSENSCAN_LOG_THROTTLE_INTERNAL(now, period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, __VA_ARGS__)
+#define PSENSCAN_INFO_THROTTLE_INTERNAL(now, period, name, ...)                                                        \
+  PSENSCAN_LOG_THROTTLE_INTERNAL(now, period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_INFO, __VA_ARGS__)
+#define PSENSCAN_WARN_THROTTLE_INTERNAL(now, period, name, ...)                                                        \
+  PSENSCAN_LOG_THROTTLE_INTERNAL(now, period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_WARN, __VA_ARGS__)
+#define PSENSCAN_DEBUG_THROTTLE_INTERNAL(now, period, name, ...)                                                       \
+  PSENSCAN_LOG_THROTTLE_INTERNAL(now, period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_DEBUG, __VA_ARGS__)
+
 #define PSENSCAN_ERROR_THROTTLE(period, name, ...)                                                                     \
   PSENSCAN_LOG_THROTTLE(period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, __VA_ARGS__)
 #define PSENSCAN_INFO_THROTTLE(period, name, ...)                                                                      \

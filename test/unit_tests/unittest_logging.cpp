@@ -93,14 +93,14 @@ TEST(LoggingTest, logThrottleInternal)
   EXPECT_LOG(ERROR, "Name: msg", __FILE__, __LINE__ + 3).Times(1);
   for (unsigned int i = 0; i < 2; ++i)
   {
-    PSENSCAN_LOG_THROTTLE_INTERNAL(now, period, "Name", __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, "msg");
+    PSENSCAN_ERROR_THROTTLE_INTERNAL(now, period, "Name", "msg");
     now += std::chrono::milliseconds(99);
   }
 
   EXPECT_LOG(ERROR, "Name: msg", __FILE__, __LINE__ + 3).Times(2);
   for (unsigned int i = 0; i < 2; ++i)
   {
-    PSENSCAN_LOG_THROTTLE_INTERNAL(now, period, "Name", __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, "msg");
+    PSENSCAN_ERROR_THROTTLE_INTERNAL(now, period, "Name", "msg");
     now += std::chrono::milliseconds(101);
   }
 }
@@ -117,8 +117,8 @@ TEST(LoggingTest, logThrottleInternalConcurrent)
   EXPECT_LOG(ERROR, "Name: msg2", __FILE__, __LINE__ + 4).Times(1);
   for (unsigned int i = 0; i < 2; ++i)
   {
-    PSENSCAN_LOG_THROTTLE_INTERNAL(now, period1, "Name", __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, "msg1");
-    PSENSCAN_LOG_THROTTLE_INTERNAL(now, period2, "Name", __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, "msg2");
+    PSENSCAN_ERROR_THROTTLE_INTERNAL(now, period1, "Name", "msg1");
+    PSENSCAN_ERROR_THROTTLE_INTERNAL(now, period2, "Name", "msg2");
     now += std::chrono::milliseconds(101);
   }
 }
