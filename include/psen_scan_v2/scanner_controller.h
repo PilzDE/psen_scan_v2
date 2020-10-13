@@ -37,7 +37,7 @@
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/stop_request.h"
 #include "psen_scan_v2/udp_client.h"
-#include "psen_scan_v2/async_barrier.h"
+#include "psen_scan_v2/monitoring_frame_deserialization.h"
 #include "psen_scan_v2/watchdog.h"
 
 namespace psen_scan_v2
@@ -141,7 +141,7 @@ ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& s
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::handleUdpData(const MaxSizeRawData& data, const std::size_t& num_bytes)
 {
-  MonitoringFrameMsg frame{ MonitoringFrameMsg::deserialize(data, num_bytes) };
+  MonitoringFrameMsg frame{ deserialize_monitoring_frame(data, num_bytes) };
   state_machine_.processMonitoringFrameReceivedEvent(frame);
 }
 

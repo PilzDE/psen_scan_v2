@@ -103,6 +103,7 @@ set(${PROJECT_NAME}_sources
   src/start_request.cpp
   src/stop_request.cpp
   src/scanner_configuration.cpp
+  src/monitoring_frame_deserialization.cpp
 )
 
 set(${PROJECT_NAME}_node_sources
@@ -279,6 +280,7 @@ if(CATKIN_ENABLE_TESTING)
     src/controller_state_machine.cpp
     src/laserscan.cpp
     src/monitoring_frame_msg.cpp
+    src/monitoring_frame_deserialization.cpp
     src/scanner_configuration.cpp
     src/start_request.cpp
     src/stop_request.cpp
@@ -298,18 +300,28 @@ if(CATKIN_ENABLE_TESTING)
   catkin_add_gtest(unittest_monitoring_frame_msg
     test/unit_tests/unittest_monitoring_frame_msg.cpp
     src/monitoring_frame_msg.cpp
+    src/monitoring_frame_deserialization.cpp
   )
   target_link_libraries(unittest_monitoring_frame_msg
     ${catkin_LIBRARIES}
   )
 
-  catkin_add_gtest(unittest_monitoring_frame_serialization
+  catkin_add_gtest(unittest_monitoring_frame_serialization_deserialization
     src/monitoring_frame_msg.cpp
-    test/unit_tests/unittest_monitoring_frame_serialization.cpp
+    src/monitoring_frame_deserialization.cpp
+    test/unit_tests/unittest_monitoring_frame_serialization_deserialization.cpp
     test/src/monitoring_frame_serialization.cpp
   )
-  target_link_libraries(unittest_monitoring_frame_serialization
+  target_link_libraries(unittest_monitoring_frame_serialization_deserialization
     ${catkin_LIBRARIES}
+  )
+
+  catkin_add_gmock(unittest_logging
+    test/unit_tests/unittest_logging.cpp
+  )
+  target_link_libraries(unittest_logging
+    ${catkin_LIBRARIES}
+    ${console_bridge_LIBRARIES}
   )
 
   #########################
