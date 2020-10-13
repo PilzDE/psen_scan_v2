@@ -33,22 +33,23 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
   raw_processing::write(os, frame.from_theta_fixed_);
   raw_processing::write(os, frame.resolution_fixed_);
 
-  FieldHeader::Id scan_counter_header_id = AdditionalFieldIds::SCAN_COUNTER;
-  FieldHeader::Length scan_counter_header_length = sizeof(frame.scan_counter_) + 1;
+  MonitoringFrameAdditionalFieldHeader::Id scan_counter_header_id = MonitoringFrameAdditionalFieldIds::SCAN_COUNTER;
+  MonitoringFrameAdditionalFieldHeader::Length scan_counter_header_length = sizeof(frame.scan_counter_) + 1;
   uint32_t scan_counter_header_payload = frame.scan_counter_;
   raw_processing::write(os, scan_counter_header_id);
   raw_processing::write(os, scan_counter_header_length);
   raw_processing::write(os, scan_counter_header_payload);
 
-  FieldHeader::Id measures_header_id = AdditionalFieldIds::MEASURES;
-  FieldHeader::Length measures_header_length = frame.measures_.size() * NUMBER_OF_BYTES_SINGLE_MEASURE + 1;
+  MonitoringFrameAdditionalFieldHeader::Id measures_header_id = MonitoringFrameAdditionalFieldIds::MEASURES;
+  MonitoringFrameAdditionalFieldHeader::Length measures_header_length =
+      frame.measures_.size() * NUMBER_OF_BYTES_SINGLE_MEASURE + 1;
   raw_processing::write(os, measures_header_id);
   raw_processing::write(os, measures_header_length);
 
   raw_processing::writeArray<uint16_t, double>(
       os, frame.measures_, [](double elem) { return (static_cast<uint16_t>(std::round(elem * 1000.))); });
 
-  FieldHeader::Id end_of_frame_header_id = AdditionalFieldIds::END_OF_FRAME;
+  MonitoringFrameAdditionalFieldHeader::Id end_of_frame_header_id = MonitoringFrameAdditionalFieldIds::END_OF_FRAME;
   raw_processing::write(os, end_of_frame_header_id);
 
   uint8_t unknown_data_at_the_end_of_frame = 0;

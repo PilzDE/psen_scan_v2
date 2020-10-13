@@ -17,13 +17,14 @@
 
 namespace psen_scan_v2
 {
-FieldHeader::FieldHeader(Id id, Length length) : id_(id), length_(length)
+MonitoringFrameAdditionalFieldHeader::MonitoringFrameAdditionalFieldHeader(Id id, Length length)
+  : id_(id), length_(length)
 {
 }
 
-constexpr FieldHeader::Id AdditionalFieldIds::SCAN_COUNTER;
-constexpr FieldHeader::Id AdditionalFieldIds::MEASURES;
-constexpr FieldHeader::Id AdditionalFieldIds::END_OF_FRAME;
+constexpr MonitoringFrameAdditionalFieldHeader::Id MonitoringFrameAdditionalFieldIds::SCAN_COUNTER;
+constexpr MonitoringFrameAdditionalFieldHeader::Id MonitoringFrameAdditionalFieldIds::MEASURES;
+constexpr MonitoringFrameAdditionalFieldHeader::Id MonitoringFrameAdditionalFieldIds::END_OF_FRAME;
 
 MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, const std::size_t& num_bytes)
 {
@@ -46,11 +47,11 @@ MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, cons
   bool end_of_frame{ false };
   while (!end_of_frame)
   {
-    const FieldHeader header{ readFieldHeader(is, num_bytes) };
+    const MonitoringFrameAdditionalFieldHeader header{ readMonitoringFrameAdditionalFieldHeader(is, num_bytes) };
 
     switch (header.id())
     {
-      case AdditionalFieldIds::SCAN_COUNTER:
+      case MonitoringFrameAdditionalFieldIds::SCAN_COUNTER:
         if (header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
         {
           throw MonitoringFrameFormatErrorScanCounterUnexpectedSize(fmt::format(
@@ -59,14 +60,14 @@ MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, cons
         raw_processing::read(is, msg.scan_counter_);
         break;
 
-      case AdditionalFieldIds::MEASURES:
+      case MonitoringFrameAdditionalFieldIds::MEASURES:
         raw_processing::readArray<uint16_t, double>(is,
                                                     msg.measures_,
                                                     header.length() / NUMBER_OF_BYTES_SINGLE_MEASURE,
                                                     [](uint16_t raw_element) { return raw_element / 1000.; });
         break;
 
-      case AdditionalFieldIds::END_OF_FRAME:
+      case MonitoringFrameAdditionalFieldIds::END_OF_FRAME:
         end_of_frame = true;
         break;
 
@@ -79,10 +80,11 @@ MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, cons
   return msg;
 }
 
-FieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes)
+MonitoringFrameAdditionalFieldHeader readMonitoringFrameAdditionalFieldHeader(std::istringstream& is,
+                                                                              const std::size_t& max_num_bytes)
 {
-  FieldId id;
-  FieldLength length;
+  MonitoringFrameAdditionalFieldId id;
+  MonitoringFrameAdditionalFieldLength length;
   raw_processing::read(is, id);
   raw_processing::read(is, length);
 
@@ -95,7 +97,7 @@ FieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_b
   {
     length--;
   }
-  return FieldHeader(id, length);
+  return MonitoringFrameAdditionalFieldHeader(id, length);
 }
 
 void checkFixedFields(MonitoringFrameMsg& msg)
