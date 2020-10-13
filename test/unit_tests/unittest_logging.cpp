@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <chrono>
+#include <console_bridge/console.h>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -47,6 +49,95 @@ TEST(LoggingTest, logError)
   INJECT_LOG_MOCK;
   EXPECT_LOG(ERROR, "Name: msg", __FILE__, __LINE__ + 1).Times(1);
   PSENSCAN_ERROR("Name", "msg");
+}
+
+TEST(LoggingTest, logInfoThrottle)
+{
+  INJECT_LOG_MOCK;
+  EXPECT_LOG(INFO, "Name: msg", __FILE__, __LINE__ + 1).Times(1);
+  PSENSCAN_INFO_THROTTLE(0.1, "Name", "msg");
+}
+
+TEST(LoggingTest, logDebugThrottle)
+{
+  INJECT_LOG_MOCK;
+  EXPECT_LOG(DEBUG, "Name: msg", __FILE__, __LINE__ + 1).Times(1);
+  PSENSCAN_DEBUG_THROTTLE(0.1, "Name", "msg");
+}
+
+TEST(LoggingTest, logWarnThrottle)
+{
+  INJECT_LOG_MOCK;
+  EXPECT_LOG(WARN, "Name: msg", __FILE__, __LINE__ + 1).Times(1);
+  PSENSCAN_WARN_THROTTLE(0.1, "Name", "msg");
+}
+
+TEST(LoggingTest, logErrorThrottle)
+{
+  INJECT_LOG_MOCK;
+  EXPECT_LOG(ERROR, "Name: msg", __FILE__, __LINE__ + 1).Times(1);
+  PSENSCAN_ERROR_THROTTLE(0.1, "Name", "msg");
+}
+
+using system_clock = std::chrono::system_clock;
+using time_point = system_clock::time_point;
+using duration = system_clock::duration;
+
+class SimulatedNowCallable
+{
+public:
+  time_point operator()()
+  {
+    return now_;
+  }
+
+  void incrementByMilliseconds(const int increment)
+  {
+    now_ += std::chrono::milliseconds(increment);
+  }
+
+private:
+  time_point now_{ system_clock::now() };
+};
+
+TEST(LoggingTest, logThrottleInternal)
+{
+  INJECT_LOG_MOCK;
+
+  const double period{ 0.1 };
+  SimulatedNowCallable now_func;
+
+  EXPECT_LOG(ERROR, "Name: msg", __FILE__, __LINE__ + 3).Times(1);
+  for (unsigned int i = 0; i < 2; ++i)
+  {
+    PSENSCAN_LOG_THROTTLE_INTERNAL(now_func, period, "Name", __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, "msg");
+    now_func.incrementByMilliseconds(99);
+  }
+
+  EXPECT_LOG(ERROR, "Name: msg", __FILE__, __LINE__ + 3).Times(2);
+  for (unsigned int i = 0; i < 2; ++i)
+  {
+    PSENSCAN_LOG_THROTTLE_INTERNAL(now_func, period, "Name", __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, "msg");
+    now_func.incrementByMilliseconds(101);
+  }
+}
+
+TEST(LoggingTest, logThrottleInternalConcurrent)
+{
+  INJECT_LOG_MOCK;
+
+  const double period1{ 0.1 };
+  const double period2{ 0.5 };
+  SimulatedNowCallable now_func;
+
+  EXPECT_LOG(ERROR, "Name: msg1", __FILE__, __LINE__ + 4).Times(2);
+  EXPECT_LOG(ERROR, "Name: msg2", __FILE__, __LINE__ + 4).Times(1);
+  for (unsigned int i = 0; i < 2; ++i)
+  {
+    PSENSCAN_LOG_THROTTLE_INTERNAL(now_func, period1, "Name", __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, "msg1");
+    PSENSCAN_LOG_THROTTLE_INTERNAL(now_func, period2, "Name", __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, "msg2");
+    now_func.incrementByMilliseconds(101);
+  }
 }
 
 int main(int argc, char* argv[])
