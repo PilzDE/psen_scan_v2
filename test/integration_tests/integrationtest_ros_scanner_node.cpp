@@ -36,11 +36,13 @@
 
 using namespace psen_scan_v2;
 using namespace psen_scan_v2_test;
-using ::testing::DoAll;
-using ::testing::Return;
+
+using namespace ::testing;
 
 namespace psen_scan_v2
 {
+#define Return_Future(promise_obj) ::testing::InvokeWithoutArgs([&promise_obj]() { return promise_obj.get_future(); })
+
 static constexpr std::chrono::seconds LOOP_END_TIMEOUT{ 3 };
 
 static constexpr int QUEUE_SIZE{ 10 };
@@ -86,10 +88,15 @@ TEST_F(RosScannerNodeTests, scannerInvocation)
 {
   ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
+  std::promise<void> start_stop_barrier;
+  start_stop_barrier.set_value();
+
   {
     ::testing::InSequence s;
-    EXPECT_CALL(ros_scanner_node.scanner_, start()).WillOnce(ACTION_OPEN_BARRIER_VOID(SCANNER_STARTED));
-    EXPECT_CALL(ros_scanner_node.scanner_, stop()).WillOnce(ACTION_OPEN_BARRIER_VOID(SCANNER_STOPPED));
+    EXPECT_CALL(ros_scanner_node.scanner_, start())
+        .WillOnce(DoAll(ACTION_OPEN_BARRIER_VOID(SCANNER_STARTED), Return_Future(start_stop_barrier)));
+    EXPECT_CALL(ros_scanner_node.scanner_, stop())
+        .WillRepeatedly(DoAll(ACTION_OPEN_BARRIER_VOID(SCANNER_STOPPED), Return_Future(start_stop_barrier)));
   }
 
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
@@ -111,7 +118,10 @@ TEST_F(RosScannerNodeTests, scanTopicReceived)
 
   ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
-  EXPECT_CALL(ros_scanner_node.scanner_, start()).WillOnce(ACTION_OPEN_BARRIER_VOID(SCANNER_STARTED));
+  std::promise<void> start_stop_barrier;
+  start_stop_barrier.set_value();
+  EXPECT_CALL(ros_scanner_node.scanner_, start())
+      .WillOnce(DoAll(ACTION_OPEN_BARRIER_VOID(SCANNER_STARTED), Return_Future(start_stop_barrier)));
 
   subscriber.initialize(nh_priv_);
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
