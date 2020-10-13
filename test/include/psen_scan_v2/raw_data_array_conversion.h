@@ -29,18 +29,6 @@ inline psen_scan_v2::MaxSizeRawData convertToMaxSizeRawData(const T data)
   }
   return ret;
 }
-
-template <std::size_t NumberOfBytes>
-inline psen_scan_v2::FixedSizeRawData<NumberOfBytes> transformArray(const std::array<uint8_t, NumberOfBytes>& data)
-{
-  psen_scan_v2::FixedSizeRawData<NumberOfBytes> ret;
-  for (size_t i = 0; i < NumberOfBytes; ++i)
-  {
-    ret.at(i) = static_cast<char>(data.at(i));
-  }
-  return ret;
-}
-
 }  // namespace psen_scan_v2_test
 
 #endif  // PSEN_SCAN_V2_RAW_DATA_ARRAY_CONVERSION_H
