@@ -55,9 +55,9 @@ public:
    */
   ScannerT(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback);
   //! @brief Starts the scanner.
-  void start();
+  std::future<void> start();
   //! @brief Stops the scanner.
-  void stop();
+  std::future<void> stop();
 
 private:
   SC scanner_controller_;
@@ -82,22 +82,19 @@ ScannerT<SC>::ScannerT(const ScannerConfiguration& scanner_config, const LaserSc
 }
 
 template <typename SC>
-void ScannerT<SC>::start()
+std::future<void> ScannerT<SC>::start()
 {
-  std::future<void> start_future = scanner_controller_.start();
-  PSENSCAN_INFO("Scanner", "Waiting for scanner to start...");
-  start_future.wait();
-  PSENSCAN_INFO("Scanner", "Scanner has started.");
+  PSENSCAN_INFO("Scanner", "Start scanner called.");
+  return scanner_controller_.start();
 }
 
 template <typename SC>
-void ScannerT<SC>::stop()
+std::future<void> ScannerT<SC>::stop()
 {
-  std::future<void> stop_future = scanner_controller_.stop();
-  PSENSCAN_INFO("Scanner", "Waiting for scanner to stop...");
-  stop_future.wait();
-  PSENSCAN_INFO("Scanner", "Scanner has stopped.");
+  PSENSCAN_INFO("Scanner", "Stop scanner called.");
+  return scanner_controller_.stop();
 }
+
 }  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_SCANNER_H
