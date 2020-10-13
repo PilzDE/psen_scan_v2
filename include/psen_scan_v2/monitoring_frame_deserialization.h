@@ -70,12 +70,14 @@ public:
 class MonitoringFrameFormatErrorScanCounterUnexpectedSize : public MonitoringFrameFormatError
 {
 public:
-  MonitoringFrameFormatErrorScanCounterUnexpectedSize(const std::string& msg) : MonitoringFrameFormatError(msg)
-  {
-  }
+  MonitoringFrameFormatErrorScanCounterUnexpectedSize(const std::string& msg);
 };
 
 inline MonitoringFrameFormatError::MonitoringFrameFormatError(const std::string& msg) : std::runtime_error(msg)
+{
+}
+
+inline MonitoringFrameFormatErrorScanCounterUnexpectedSize::MonitoringFrameFormatErrorScanCounterUnexpectedSize(const std::string& msg) : std::MonitoringFrameFormatError(msg)
 {
 }
 
