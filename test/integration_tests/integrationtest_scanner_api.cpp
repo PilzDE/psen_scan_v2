@@ -233,7 +233,8 @@ TEST(ScannerAPITests, receivingOfMonitoringFrame)
   }
 
   scanner_mock.startListeningForControlMsg();
-  scanner.start();
+  auto promis = scanner.start();
+  promis.wait_for(DEFAULT_TIMEOUT);
 
   scanner_mock.simulateMonitoringFrame(msg);
   EXPECT_TRUE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
