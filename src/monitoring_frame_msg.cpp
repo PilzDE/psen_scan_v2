@@ -21,12 +21,12 @@
 #include <string>
 #include <vector>
 
+#include "psen_scan_v2/diagnostics.h"
 #include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/raw_processing.h"
 #include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/logging.h"
-#include "psen_scan_v2/diagnostics.h"
 
 namespace psen_scan_v2
 {

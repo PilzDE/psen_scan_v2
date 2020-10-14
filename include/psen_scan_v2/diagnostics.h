@@ -23,15 +23,17 @@
 #include <fmt/core.h>
 
 #include "psen_scan_v2/monitoring_frame_msg.h"
+#include "psen_scan_v2/scanner_ids.h"
 
 namespace psen_scan_v2
 {
 enum class ScannerId : uint8_t;
+
 static constexpr uint32_t DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES{ 9 };
 static constexpr uint32_t DIAGNOSTIC_MESSAGE_RAW_UNUSED_DATA_OFFSET_IN_BYTES{ 4 };
 static constexpr uint32_t DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BYTES{
   DIAGNOSTIC_MESSAGE_RAW_UNUSED_DATA_OFFSET_IN_BYTES +
-  DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES * MAX_NUMBER_OF_SCANNERS
+  DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES * sizeof(SCANNER_IDS)
 };
 
 enum class DiagnosticCode;

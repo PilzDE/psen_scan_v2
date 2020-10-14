@@ -18,8 +18,8 @@
 
 #include <functional>
 
-#include "psen_scan_v2/laserscan.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
+#include "psen_scan_v2/laserscan.h"
 
 namespace psen_scan_v2
 {

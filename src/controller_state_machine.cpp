@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include "psen_scan_v2/diagnostics.h"
 #include "psen_scan_v2/logging.h"
 #include "psen_scan_v2/controller_state_machine.h"
 #include "psen_scan_v2/scanner_reply_msg.h"

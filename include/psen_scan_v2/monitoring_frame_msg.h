@@ -29,8 +29,9 @@
 #include <fmt/ranges.h>
 
 #include "psen_scan_v2/raw_scanner_data.h"
-#include "psen_scan_v2/tenth_of_degree.h"
 #include "psen_scan_v2/diagnostics.h"
+#include "psen_scan_v2/tenth_of_degree.h"
+#include "psen_scan_v2/scanner_ids.h"
 
 namespace psen_scan_v2
 {
@@ -39,24 +40,10 @@ class MonitoringFrameDiagnosticMessage;
 static constexpr uint32_t OP_CODE_MONITORING_FRAME{ 0xCA };
 static constexpr uint32_t ONLINE_WORKING_MODE{ 0x00 };
 static constexpr uint32_t GUI_MONITORING_TRANSACTION{ 0x05 };
-static constexpr uint8_t MAX_NUMBER_OF_SCANNERS{ 4 };
-static constexpr uint8_t MAX_SCANNER_ID{ MAX_NUMBER_OF_SCANNERS - 1 };
+static constexpr uint8_t MAX_SCANNER_ID{ sizeof(SCANNER_IDS) - 1 };
 
 static constexpr uint16_t NUMBER_OF_BYTES_SCAN_COUNTER{ 4 };
 static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_MEASURE{ 2 };
-
-enum class ScannerId : uint8_t
-{
-  MASTER = 0,
-  SLAVE0 = 1,
-  SLAVE1 = 2,
-  SLAVE2 = 3
-};
-
-static const std::array<ScannerId, MAX_NUMBER_OF_SCANNERS> SCANNER_IDS{ ScannerId::MASTER,
-                                                                        ScannerId::SLAVE0,
-                                                                        ScannerId::SLAVE1,
-                                                                        ScannerId::SLAVE2 };
 
 class MonitoringFrameMsg
 {

@@ -12,19 +12,27 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#ifndef PSEN_SCAN_V2_MONITORING_FRAME_SERIALIZATION_H
-#define PSEN_SCAN_V2_MONITORING_FRAME_SERIALIZATION_H
 
-#include "psen_scan_v2/raw_scanner_data.h"
-#include "psen_scan_v2/monitoring_frame_msg.h"
-#include "psen_scan_v2/monitoring_frame_deserialization.h"
+#ifndef PSEN_SCAN_V2_SCANNER_IDS_H
+#define PSEN_SCAN_V2_SCANNER_IDS_H
 
-using namespace psen_scan_v2;
+#include <array>
 
 namespace psen_scan_v2
 {
-DynamicSizeRawData serialize(MonitoringFrameMsg& frame);
-void writeFieldHeader(std::ostringstream& os, MonitoringFrameAdditionalFieldHeader& header);
-}  // namespace psen_scan_v2
+enum class ScannerId : uint8_t
+{
+  MASTER = 0,
+  SLAVE0 = 1,
+  SLAVE1 = 2,
+  SLAVE2 = 3
+};
 
-#endif  // PSEN_SCAN_V2_MONITORING_FRAME_SERIALIZATION_H
+static constexpr std::array<ScannerId, 4> SCANNER_IDS{ ScannerId::MASTER,
+                                                       ScannerId::SLAVE0,
+                                                       ScannerId::SLAVE1,
+                                                       ScannerId::SLAVE2 };
+
+}  //   namespace psen_scan_v2
+
+#endif  // PSEN_SCAN_V2_SCANNER_IDS_H

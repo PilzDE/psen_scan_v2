@@ -16,8 +16,8 @@
 #include <bitset>
 #include <iostream>
 
-#include "psen_scan_v2/monitoring_frame_deserialization.h"
 #include "psen_scan_v2/diagnostics.h"
+#include "psen_scan_v2/monitoring_frame_deserialization.h"
 
 namespace psen_scan_v2
 {
