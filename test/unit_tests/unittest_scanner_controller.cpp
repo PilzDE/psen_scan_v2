@@ -90,17 +90,17 @@ public:
 
 void ScannerControllerTest::simulateStartReply()
 {
-  scanner_controller_.control_udp_client_.simulateStartReply();
+  scanner_controller_.control_udp_client_.sendStartReply();
 }
 
 void ScannerControllerTest::simulateStopReply()
 {
-  scanner_controller_.control_udp_client_.simulateStopReply();
+  scanner_controller_.control_udp_client_.sendStopReply();
 }
 
 void ScannerControllerTest::simulateMonitoringFrame(MonitoringFrameMsg& msg)
 {
-  scanner_controller_.data_udp_client_.simulateMonitoringFrame(msg);
+  scanner_controller_.data_udp_client_.sendMonitoringFrame(msg);
 }
 
 void ScannerControllerTest::simulateUdpError(const std::string& msg)
@@ -191,7 +191,7 @@ TEST_F(ScannerControllerTest, handleMonitoringFrame)
 
   scanner_controller_.start();
   simulateStartReply();
-  scanner_controller_.data_udp_client_.simulateMonitoringFrame(msg);
+  scanner_controller_.data_udp_client_.sendMonitoringFrame(msg);
 }
 
 TEST_F(ScannerControllerTest, handleEmptyMonitoringFrame)

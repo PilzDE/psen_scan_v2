@@ -50,9 +50,9 @@ public:
   };
 
 public:
-  void simulateStartReply();
-  void simulateStopReply();
-  void simulateMonitoringFrame(MonitoringFrameMsg& msg);
+  void sendStartReply();
+  void sendStopReply();
+  void sendMonitoringFrame(MonitoringFrameMsg& msg);
   void simulateError(const std::string& msg);
   void simulateTimeout(const std::string& msg);
 
@@ -76,7 +76,7 @@ private:
   TimeoutHandler timeout_handler_;
 };
 
-void MockUdpClient::simulateStartReply()
+void MockUdpClient::sendStartReply()
 {
   const ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
   const auto data{ msg.serialize() };
@@ -86,7 +86,7 @@ void MockUdpClient::simulateStartReply()
   handleNewData(max_size_data, max_size_data.size());
 }
 
-void MockUdpClient::simulateStopReply()
+void MockUdpClient::sendStopReply()
 {
   const ScannerReplyMsg msg(OP_CODE_STOP, RES_CODE_ACCEPTED);
   const auto data{ msg.serialize() };
@@ -96,7 +96,7 @@ void MockUdpClient::simulateStopReply()
   handleNewData(max_size_data, max_size_data.size());
 }
 
-void MockUdpClient::simulateMonitoringFrame(MonitoringFrameMsg& msg)
+void MockUdpClient::sendMonitoringFrame(MonitoringFrameMsg& msg)
 {
   const MaxSizeRawData msg_raw = convertToMaxSizeRawData(serialize(msg));
   handleNewData(msg_raw, msg_raw.size());
