@@ -7,6 +7,7 @@ Panels:
         - /Global Options1
         - /Status1
         - /LaserScan1
+        - /TF1
         - /RobotModel1
       Splitter Ratio: 0.5
     Tree Height: 741
@@ -89,44 +90,44 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        laser:
+        my_laser_1:
           Value: true
-        laser_mount_link:
+        my_laser_1_mount_link:
           Value: true
-        laser_scan:
+        my_laser_1_scan:
           Value: true
-      Marker Scale: 1
+      Marker Scale: 0.5
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
       Tree:
-        laser_mount_link:
-          laser:
-            laser_scan:
+        my_laser_1_mount_link:
+          my_laser_1:
+            my_laser_1_scan:
               {}
       Update Interval: 0
       Value: true
-    - Alpha: 1
+    - Alpha: 0.5
       Class: rviz/RobotModel
       Collision Enabled: false
       Enabled: true
       Links:
-        All Links Enabled:
-          {}
+        All Links Enabled: true
         Expand Joint Details: false
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        laser:
+        my_laser_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        laser_mount_link:
+          Value: true
+        my_laser_1_mount_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        laser_scan:
+        my_laser_1_scan:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -140,7 +141,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: laser_mount_link
+    Fixed Frame: my_laser_1_mount_link
     Frame Rate: 30
   Name: root
   Tools:
@@ -164,25 +165,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 3.49979567527771
+      Distance: 1.0916601419448853
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.22468669712543488
-        Y: -0.2306569516658783
-        Z: -0.5309886932373047
+        X: -0.07807696610689163
+        Y: -0.36037150025367737
+        Z: -0.25217440724372864
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.8997969627380371
+      Pitch: 0.5597971081733704
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.8349996209144592
+      Yaw: 1.1799993515014648
     Saved: ~
 Window Geometry:
   Displays:
@@ -200,5 +201,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1920
-  X: 0
+  X: 1920
   Y: 0

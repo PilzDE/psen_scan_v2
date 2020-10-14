@@ -1,67 +1,67 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:macro name="psen_scan" params="name ros_topic">
-    <xacro:property name="min_range" value="0.1" />
-    <xacro:property name="max_range" value="4.0" />
-    <xacro:property name="min_angle" value="3.0" />
-    <xacro:property name="max_angle" value="0.1" />
+  <xacro:macro name="psen_scan" params="prefix ros_topic">
+    <xacro:property name="min_range" value="0.1" /> <!-- TODO correct dimensions -->
+    <xacro:property name="max_range" value="4.0" /> <!-- TODO correct dimensions -->
+    <xacro:property name="min_angle" value="$(eval -137.5 /180.0 * pi)" /> <!-- src datasheet p 91 -->
+    <xacro:property name="max_angle" value="$(eval 137.5 /180.0 * pi)" /> <!-- src datasheet p 91 -->
 
-    <xacro:property name="mass" value="0.5" /> 
-    <xacro:property name="radius" value="0.1" />
-    <xacro:property name="height" value="0.2" /> 
-    <xacro:property name="z_offset" value="0.2" /> 
-    <!-- TODO correct dimensions -->
-    
+    <xacro:property name="mass" value="1.53" /> <!-- src datasheet p 96 -->
+    <xacro:property name="radius" value="0.051" /> <!-- src datasheet p 96 -->
+    <xacro:property name="height" value="0.152" /> <!-- src datasheet p 96 -->
+    <xacro:property name="dist_scanning_plane_top" value="0.0377" /> <!-- src datasheet p 96 -->
+    <xacro:property name="dist_scanning_axis_rear" value="0.0525" /> <!-- src datasheet p 96 -->
+        
     <!-- Location of mounting point at the lower back of device -->
-    <link name="${name}_mount_link">
+    <link name="${prefix}_mount_link">
       <inertial>
         <mass value="0.001" />
         <origin xyz="0 0 0" />
         <inertia ixx="0.000001" ixy="0.0" ixz="0.0"
-          iyy="0.000001" iyz="0.0" izz="0.000001" />
+          iyy="0.000001" iyz="0.0" izz="0.000001" /> <!-- TODO correct dimensions -->
       </inertial>
     </link>
 
-    <joint name="${name}_mount_joint" type="fixed">
-      <parent link="${name}_mount_link" />
-      <child link="${name}" />
-      <origin rpy="0 0 0" xyz="0 0 ${z_offset}"/>
-      <!-- TODO correct dimensions -->
+    <joint name="${prefix}_mount_joint" type="fixed">
+      <parent link="${prefix}_mount_link" />
+      <child link="${prefix}" />
+      <origin rpy="0 0 0" xyz="${radius} 0 ${height / 2}"/>
+      
     </joint>
 
     <!-- Location of scanner body -->
-    <link name="${name}">
+    <link name="${prefix}">
       <visual>
         <geometry>
-            <geometry type="cylinder" radius="${radius}" length="${height}" />
+            <cylinder radius="${radius}" length="${height}" />
         </geometry>
-        <material name="yellow" >
-          <color rgba="0 0 1 1" />
+        <material name="pilz_yellow" >
+          <color rgba="1.0 0.722 0.196 1.0" />
         </material>
       </visual>
       <collision>
         <geometry>
-            <geometry type="cylinder" radius="${radius}" length="${height}" />
+            <cylinder radius="${radius}" length="${height}" />
         </geometry>
       </collision>
       <inertial>
         <mass value="${mass}" />
-        <origin xyz="0 0 -0.026" />
+        <origin xyz="0 0 0" />
         <inertia ixx="${0.0833333 * mass * (radius * radius + height * height)}" ixy="0.0" ixz="0.0"
           iyy="${0.0833333 * mass * (radius * radius + height * height)}" iyz="0.0"
-          izz="${0.0833333 * mass * (radius * radius + radius * radius)}" />
+          izz="${0.0833333 * mass * (radius * radius + radius * radius)}" /> <!-- TODO correct dimensions -->
       </inertial>
     </link>
-    <xacro:psen_scan_gazebo_v0 name="${name}" link="${name}" ros_topic="${ros_topic}" update_rate="15.0" min_angle="${min_angle}" max_angle="${max_angle}" min_range="${min_range}" max_range="${max_range}"/>
+    <xacro:psen_scan_gazebo_v0 name="${prefix}" link="${prefix}" ros_topic="${ros_topic}" update_rate="15.0" min_angle="${min_angle}" max_angle="${max_angle}" min_range="${min_range}" max_range="${max_range}"/>
 
-    <joint name="${name}_scan_joint" type="fixed">
-      <parent link="${name}" />
-      <child link="${name}_scan" />
-      <origin rpy="0 ${pi} 0" xyz="0 0 0"/>
+    <joint name="${prefix}_scan_joint" type="fixed">
+      <parent link="${prefix}" />
+      <child link="${prefix}_scan" />
+      <origin rpy="${pi} 0 0" xyz="0 ${radius - dist_scanning_axis_rear} ${height / 2 - dist_scanning_plane_top}"/>
     </joint>
     
     <!-- This is the location of the laser scan -->
-    <link name="${name}_scan">
+    <link name="${prefix}_scan">
     </link>
   </xacro:macro>
 
@@ -69,7 +69,7 @@
   <xacro:macro name="psen_scan_gazebo_v0" params="name link ros_topic update_rate min_angle max_angle min_range max_range">
     <gazebo reference="${link}">
       <material value="Gazebo/Yellow" />
-      <sensor type="ray" name="${name}">
+      <sensor type="ray" name="${prefix}">
         <always_on>true</always_on>
         <update_rate>${update_rate}</update_rate>
         <pose>0 0 0 0 0 0</pose>
@@ -89,7 +89,7 @@
             <resolution>0.01</resolution>
           </range>
         </ray>
-        <plugin name="gazebo_ros_${name}_controller" filename="libgazebo_ros_laser.so">
+        <plugin name="gazebo_ros_${prefix}_controller" filename="libgazebo_ros_laser.so">
           <gaussianNoise>0.005</gaussianNoise>
           <alwaysOn>true</alwaysOn>
           <updateRate>${update_rate}</updateRate>
