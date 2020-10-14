@@ -76,7 +76,7 @@ private:
   public:
     DeviceField() = default;
 
-    DeviceField(const DefaultScanRange& scan_range, const double resolution)
+    DeviceField(const DefaultScanRange& scan_range, const TenthOfDegree resolution)
       : scan_range_(scan_range), resolution_(resolution)
     {
     }
@@ -87,14 +87,14 @@ private:
       return scan_range_;
     };
 
-    double getResolution() const
+    TenthOfDegree getResolution() const
     {
       return resolution_;
     };
 
   private:
     const DefaultScanRange scan_range_{};
-    double resolution_{ 0. };
+    TenthOfDegree resolution_{ 0 };
   };
 
   DeviceField master_;
