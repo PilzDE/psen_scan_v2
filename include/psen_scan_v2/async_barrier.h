@@ -19,7 +19,7 @@
 #include <thread>
 #include <chrono>
 
-namespace psen_scan_v2_test
+namespace psen_scan_v2
 {
 class Barrier
 {
@@ -44,6 +44,6 @@ bool Barrier::waitTillRelease(const std::chrono::duration<Rep, Period>& timeout)
   return future_.wait_for(timeout) == std::future_status::ready;
 }
 
-}  // namespace psen_scan_v2_test
+}  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_ASYNC_BARRIER_H

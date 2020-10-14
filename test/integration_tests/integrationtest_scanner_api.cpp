@@ -57,6 +57,7 @@ using std::placeholders::_1;
 using std::placeholders::_2;
 
 using namespace ::testing;
+using namespace std::chrono_literals;
 
 class UserCallbacks
 {
@@ -72,6 +73,7 @@ public:
 
 public:
   void startListeningForControlMsg();
+  void startContinuousListeningForControlMsg();
 
 public:
   void sendStartReply();
@@ -97,6 +99,11 @@ private:
 void ScannerMock::startListeningForControlMsg()
 {
   control_server_.asyncReceive();
+}
+
+void ScannerMock::startContinuousListeningForControlMsg()
+{
+  control_server_.asyncReceive(MockUDPServer::ReceiveMode::continuous);
 }
 
 void ScannerMock::sendReply(const uint32_t reply_type)
@@ -142,7 +149,10 @@ TEST(ScannerAPITests, testStartFunctionality)
       .WillOnce(InvokeWithoutArgs([&start_req_received_barrier]() { start_req_received_barrier.release(); }));
 
   scanner_mock.startListeningForControlMsg();
-  const auto start_future{ std::async(std::launch::async, [&scanner]() { scanner.start(); }) };
+  const auto start_future{ std::async(std::launch::async, [&scanner]() {
+    const auto start_future = scanner.start();
+    start_future.wait();
+  }) };
 
   EXPECT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
   EXPECT_EQ(start_future.wait_for(WAIT_TIMEOUT), std::future_status::timeout) << "Scanner::start() finished too early";
@@ -168,12 +178,35 @@ TEST(ScannerAPITests, testStopFunctionality)
   scanner.start();
 
   scanner_mock.startListeningForControlMsg();
-  const auto stop_future{ std::async(std::launch::async, [&scanner]() { scanner.stop(); }) };
+  const auto stop_future{ std::async(std::launch::async, [&scanner]() {
+    const auto stop_future = scanner.stop();
+    stop_future.wait();
+  }) };
 
   EXPECT_TRUE(stop_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Stop request not received";
   EXPECT_EQ(stop_future.wait_for(WAIT_TIMEOUT), std::future_status::timeout) << "Scanner::stop() finished too early";
   scanner_mock.sendStopReply();
   EXPECT_EQ(stop_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::stop() not finished";
+}
+
+TEST(ScannerAPITests, testStartReplyTimeout)
+{
+  StrictMock<ScannerMock> scanner_mock;
+  const ScannerConfiguration config{ createScannerConfig() };
+  UserCallbacks cb;
+  Scanner scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+
+  EXPECT_CALL(scanner_mock, receiveControlMsg(_, _)).Times(AtLeast(2));
+
+  scanner_mock.startContinuousListeningForControlMsg();
+  const auto start_future{ std::async(std::launch::async, [&scanner]() {
+    const auto start_future = scanner.start();
+    start_future.wait();
+  }) };
+
+  EXPECT_EQ(start_future.wait_for(3000ms), std::future_status::timeout) << "Scanner::start() finished too early";
+  scanner_mock.sendStartReply();
+  EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
 }
 
 TEST(ScannerAPITests, testReceivingOfMonitoringFrame)
@@ -200,7 +233,8 @@ TEST(ScannerAPITests, testReceivingOfMonitoringFrame)
   }
 
   scanner_mock.startListeningForControlMsg();
-  scanner.start();
+  auto promis = scanner.start();
+  promis.wait_for(DEFAULT_TIMEOUT);
 
   scanner_mock.sendMonitoringFrame(msg);
   EXPECT_TRUE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
