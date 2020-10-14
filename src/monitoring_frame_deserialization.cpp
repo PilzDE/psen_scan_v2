@@ -38,16 +38,36 @@ MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, cons
   MaxSizeRawData tmp_data{ data };
   std::istringstream is(std::string(tmp_data.data(), tmp_data.size()));
 
-  raw_processing::read(is, msg.device_status_fixed_);
-  raw_processing::read(is, msg.op_code_fixed_);
-  raw_processing::read(is, msg.working_mode_fixed_);
-  raw_processing::read(is, msg.transaction_type_fixed_);
+  raw_processing::read(is, msg.device_status_);
+  raw_processing::read(is, msg.op_code_);
+  raw_processing::read(is, msg.working_mode_);
+  raw_processing::read(is, msg.transaction_type_);
   raw_processing::read(is, msg.scanner_id_);
 
-  raw_processing::read<uint16_t, TenthOfDegree>(is, msg.from_theta_fixed_);
-  raw_processing::read<uint16_t, TenthOfDegree>(is, msg.resolution_fixed_);
+  raw_processing::read<uint16_t, TenthOfDegree>(is, msg.from_theta_);
+  raw_processing::read<uint16_t, TenthOfDegree>(is, msg.resolution_);
 
-  checkFixedFields(msg);
+  if (OP_CODE_MONITORING_FRAME != msg.op_code_)
+  {
+    // TODO: Get rid of the issue not to spam the system with this debug messages
+    //       Would something like  ROS_DEBUG_THROTTLE(period, ...) be a good solution?
+    PSENSCAN_DEBUG("MonitoringFrameMsg", "Wrong Op Code!");
+  }
+
+  if (ONLINE_WORKING_MODE != msg.working_mode_)
+  {
+    PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid working mode!");
+  }
+
+  if (GUI_MONITORING_TRANSACTION != msg.transaction_type_)
+  {
+    PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid transaction type!");
+  }
+
+  if (MAX_SCANNER_ID < static_cast<uint8_t>(msg.scanner_id_))
+  {
+    PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid Scanner id!");
+  }
 
   bool end_of_frame{ false };
   while (!end_of_frame)
@@ -112,45 +132,20 @@ MonitoringFrameAdditionalFieldHeader readFieldHeader(std::istringstream& is, con
   return MonitoringFrameAdditionalFieldHeader(id, length);
 }
 
-void checkFixedFields(MonitoringFrameMsg& msg)
-{
-  if (OP_CODE_MONITORING_FRAME != msg.op_code_fixed_)
-  {
-    // TODO: Get rid of the issue not to spam the system with this debug messages
-    //       Would something like  ROS_DEBUG_THROTTLE(period, ...) be a good solution?
-    PSENSCAN_DEBUG("MonitoringFrameMsg", "Wrong Op Code!");
-  }
-
-  if (ONLINE_WORKING_MODE != msg.working_mode_fixed_)
-  {
-    PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid working mode!");
-  }
-
-  if (GUI_MONITORING_TRANSACTION != msg.transaction_type_fixed_)
-  {
-    PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid transaction type!");
-  }
-
-  if (MAX_SCANNER_ID < static_cast<uint8_t>(msg.scanner_id_))
-  {
-    PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid Scanner id!");
-  }
-}
-
 std::vector<MonitoringFrameDiagnosticMessage> deserializeDiagnosticMessages(std::istringstream& is)
 {
   std::vector<MonitoringFrameDiagnosticMessage> diagnostic_messages;
 
-  std::array<char, 4> reserved_diag_unused;
+  std::array<uint8_t, DIAGNOSTIC_MESSAGE_RAW_UNUSED_DATA_OFFSET_IN_BYTES> reserved_diag_unused;
   raw_processing::read(is, reserved_diag_unused);
 
   for (auto& scanner_id : SCANNER_IDS)
   {
     for (size_t byte_n = 0; byte_n < DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES; byte_n++)
     {
-      uint8_t raw_data;
-      raw_processing::read(is, raw_data);
-      std::bitset<8> raw_bits(raw_data);
+      uint8_t raw_byte;
+      raw_processing::read(is, raw_byte);
+      std::bitset<8> raw_bits(raw_byte);
 
       for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
       {

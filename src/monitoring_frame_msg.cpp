@@ -32,12 +32,12 @@ namespace psen_scan_v2
 {
 TenthOfDegree MonitoringFrameMsg::fromTheta() const
 {
-  return from_theta_fixed_;
+  return from_theta_;
 }
 
 TenthOfDegree MonitoringFrameMsg::resolution() const
 {
-  return resolution_fixed_;
+  return resolution_;
 }
 
 uint32_t MonitoringFrameMsg::scanCounter() const

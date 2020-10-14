@@ -23,6 +23,7 @@ using namespace psen_scan_v2;
 namespace psen_scan_v2
 {
 DynamicSizeRawData serialize(MonitoringFrameMsg& frame);
+void writeFieldHeader(std::ostringstream& os, MonitoringFrameAdditionalFieldHeader& header);
 }  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_MONITORING_FRAME_SERIALIZATION_H

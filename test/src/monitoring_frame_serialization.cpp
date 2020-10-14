@@ -25,27 +25,30 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
 {
   std::ostringstream os;
 
-  raw_processing::write(os, frame.device_status_fixed_);
-  raw_processing::write(os, frame.op_code_fixed_);
-  raw_processing::write(os, frame.working_mode_fixed_);
-  raw_processing::write(os, frame.transaction_type_fixed_);
+  raw_processing::write(os, frame.device_status_);
+  raw_processing::write(os, frame.op_code_);
+  raw_processing::write(os, frame.working_mode_);
+  raw_processing::write(os, frame.transaction_type_);
   raw_processing::write(os, frame.scanner_id_);
-  raw_processing::write(os, frame.from_theta_fixed_);
-  raw_processing::write(os, frame.resolution_fixed_);
+  raw_processing::write(os, frame.from_theta_);
+  raw_processing::write(os, frame.resolution_);
 
-  MonitoringFrameAdditionalFieldHeader::Id scan_counter_header_id = MonitoringFrameAdditionalFieldIds::SCAN_COUNTER;
-  MonitoringFrameAdditionalFieldHeader::Length scan_counter_header_length = sizeof(frame.scan_counter_) + 1;
+  MonitoringFrameAdditionalFieldHeader scan_counter_header(MonitoringFrameAdditionalFieldIds::SCAN_COUNTER,
+                                                           sizeof(frame.scan_counter_));
+  writeFieldHeader(os, scan_counter_header);
   uint32_t scan_counter_header_payload = frame.scan_counter_;
-  raw_processing::write(os, scan_counter_header_id);
-  raw_processing::write(os, scan_counter_header_length);
   raw_processing::write(os, scan_counter_header_payload);
 
-  MonitoringFrameAdditionalFieldHeader::Id measures_header_id = MonitoringFrameAdditionalFieldIds::MEASURES;
-  MonitoringFrameAdditionalFieldHeader::Length measures_header_length =
-      frame.measures_.size() * NUMBER_OF_BYTES_SINGLE_MEASURE + 1;
-  raw_processing::write(os, measures_header_id);
-  raw_processing::write(os, measures_header_length);
+  MonitoringFrameAdditionalFieldHeader diagnostic_data_field_header(
+      MonitoringFrameAdditionalFieldIds::DIAGNOSTICS, DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BYTES);
+  writeFieldHeader(os, diagnostic_data_field_header);
+  std::array<uint8_t, DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BYTES> diagnostic_data_field_payload =
+      serializeDiagnosticMessages(frame.diagnostic_messages_);
+  raw_processing::write(os, diagnostic_data_field_payload);
 
+  MonitoringFrameAdditionalFieldHeader measures_header(MonitoringFrameAdditionalFieldIds::MEASURES,
+                                                       frame.measures_.size() * NUMBER_OF_BYTES_SINGLE_MEASURE);
+  writeFieldHeader(os, measures_header);
   raw_processing::writeArray<uint16_t, double>(
       os, frame.measures_, [](double elem) { return (static_cast<uint16_t>(std::round(elem * 1000.))); });
 
@@ -59,4 +62,26 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
 
   return raw_processing::toArray<DynamicSizeRawData>(os);
 }
+
+std::array<uint8_t, DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BYTES>
+serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnosticMessage>& messages)
+{
+  std::array<uint8_t, DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BYTES> raw_diagnostic_data;
+  raw_diagnostic_data.fill(0);
+
+  for (auto& elem : messages)
+  {
+    raw_diagnostic_data.at(DIAGNOSTIC_MESSAGE_RAW_UNUSED_DATA_OFFSET_IN_BYTES +
+                           static_cast<uint8_t>(elem.id_) * DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES) +=
+        (1 << elem.bit_location_);
+  }
+  return raw_diagnostic_data;
+}
+
+void writeFieldHeader(std::ostringstream& os, MonitoringFrameAdditionalFieldHeader& header)
+{
+  raw_processing::write(os, header.id());
+  raw_processing::write(os, header.length() + 1);
+}
+
 }  // namespace psen_scan_v2

@@ -39,7 +39,8 @@ class MonitoringFrameDiagnosticMessage;
 static constexpr uint32_t OP_CODE_MONITORING_FRAME{ 0xCA };
 static constexpr uint32_t ONLINE_WORKING_MODE{ 0x00 };
 static constexpr uint32_t GUI_MONITORING_TRANSACTION{ 0x05 };
-static constexpr uint8_t MAX_SCANNER_ID{ 0x03 };
+static constexpr uint8_t MAX_NUMBER_OF_SCANNERS{ 4 };
+static constexpr uint8_t MAX_SCANNER_ID{ MAX_NUMBER_OF_SCANNERS - 1 };
 
 static constexpr uint16_t NUMBER_OF_BYTES_SCAN_COUNTER{ 4 };
 static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_MEASURE{ 2 };
@@ -52,10 +53,10 @@ enum class ScannerId : uint8_t
   SLAVE2 = 3
 };
 
-static const std::array<ScannerId, 4> SCANNER_IDS{ ScannerId::MASTER,
-                                                   ScannerId::SLAVE0,
-                                                   ScannerId::SLAVE1,
-                                                   ScannerId::SLAVE2 };
+static const std::array<ScannerId, MAX_NUMBER_OF_SCANNERS> SCANNER_IDS{ ScannerId::MASTER,
+                                                                        ScannerId::SLAVE0,
+                                                                        ScannerId::SLAVE1,
+                                                                        ScannerId::SLAVE2 };
 
 class MonitoringFrameMsg
 {
@@ -65,8 +66,8 @@ public:
                      const TenthOfDegree& resolution,
                      const uint32_t scan_counter,
                      const std::vector<double> measures)
-    : from_theta_fixed_(from_theta)
-    , resolution_fixed_(resolution)
+    : from_theta_(from_theta)
+    , resolution_(resolution)
     , scan_counter_(scan_counter)
     , measures_(measures){
 
@@ -92,13 +93,13 @@ public:
   }
 
 private:
-  uint32_t device_status_fixed_{ 0 };
-  uint32_t op_code_fixed_{ OP_CODE_MONITORING_FRAME };
-  uint32_t working_mode_fixed_{ 0 };
-  uint32_t transaction_type_fixed_{ GUI_MONITORING_TRANSACTION };
+  uint32_t device_status_{ 0 };
+  uint32_t op_code_{ OP_CODE_MONITORING_FRAME };
+  uint32_t working_mode_{ 0 };
+  uint32_t transaction_type_{ GUI_MONITORING_TRANSACTION };
   ScannerId scanner_id_{ ScannerId::MASTER };
-  TenthOfDegree from_theta_fixed_{ 0 };
-  TenthOfDegree resolution_fixed_{ 0 };
+  TenthOfDegree from_theta_{ 0 };
+  TenthOfDegree resolution_{ 0 };
 
   uint32_t scan_counter_{ 0 };
   std::vector<double> measures_;
@@ -107,7 +108,6 @@ private:
 public:
   friend DynamicSizeRawData serialize(MonitoringFrameMsg& frame);
   friend MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, const std::size_t& num_bytes);
-  friend void checkFixedFields(MonitoringFrameMsg& msg);
 };
 }  // namespace psen_scan_v2
 

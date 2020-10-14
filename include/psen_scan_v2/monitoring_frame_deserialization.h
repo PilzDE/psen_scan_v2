@@ -56,7 +56,6 @@ struct MonitoringFrameAdditionalFieldIds
 
 MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, const std::size_t& num_bytes);
 MonitoringFrameAdditionalFieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes);
-void checkFixedFields(MonitoringFrameMsg& msg);
 std::vector<MonitoringFrameDiagnosticMessage> deserializeDiagnosticMessages(std::istringstream& is);
 
 class MonitoringFrameFormatError : public std::runtime_error
