@@ -24,14 +24,14 @@
 
 namespace psen_scan_v2
 {
-class FieldHeader
+class MonitoringFrameAdditionalFieldHeader
 {
 public:
   using Id = uint8_t;
   using Length = uint16_t;
 
 public:
-  FieldHeader(Id id, Length length);
+  MonitoringFrameAdditionalFieldHeader(Id id, Length length);
 
 public:
   Id id() const;
@@ -44,19 +44,20 @@ private:
   Length length_;
 };
 
-using FieldId = FieldHeader::Id;
-using FieldLength = FieldHeader::Length;
-struct AdditionalFieldIds
+using MonitoringFrameAdditionalFieldId = MonitoringFrameAdditionalFieldHeader::Id;
+using MonitoringFrameAdditionalFieldLength = MonitoringFrameAdditionalFieldHeader::Length;
+struct MonitoringFrameAdditionalFieldIds
 {
-  static constexpr FieldHeader::Id SCAN_COUNTER{ 0x02 };
-  static constexpr FieldHeader::Id MEASURES{ 0x05 };
-  static constexpr FieldHeader::Id END_OF_FRAME{ 0x09 };
-  static constexpr FieldHeader::Id DIAGNOSTICS{ 0x04 };
+  static constexpr MonitoringFrameAdditionalFieldHeader::Id SCAN_COUNTER{ 0x02 };
+  static constexpr MonitoringFrameAdditionalFieldHeader::Id MEASURES{ 0x05 };
+  static constexpr MonitoringFrameAdditionalFieldHeader::Id END_OF_FRAME{ 0x09 };
+  static constexpr MonitoringFrameAdditionalFieldHeader::Id DIAGNOSTICS{ 0x04 };
 };
 
 MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, const std::size_t& num_bytes);
-FieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes);
+MonitoringFrameAdditionalFieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes);
 void checkFixedFields(MonitoringFrameMsg& msg);
+std::vector<MonitoringFrameDiagnosticMessage> deserializeDiagnosticMessages(std::istringstream& is);
 
 class MonitoringFrameFormatError : public std::runtime_error
 {
@@ -80,12 +81,12 @@ inline MonitoringFrameFormatErrorScanCounterUnexpectedSize::MonitoringFrameForma
 {
 }
 
-inline FieldHeader::Id FieldHeader::id() const
+inline MonitoringFrameAdditionalFieldHeader::Id MonitoringFrameAdditionalFieldHeader::id() const
 {
   return id_;
 }
 
-inline FieldHeader::Length FieldHeader::length() const
+inline MonitoringFrameAdditionalFieldHeader::Length MonitoringFrameAdditionalFieldHeader::length() const
 {
   return length_;
 }

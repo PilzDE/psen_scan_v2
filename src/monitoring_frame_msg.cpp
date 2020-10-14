@@ -26,7 +26,39 @@
 #include "psen_scan_v2/raw_processing.h"
 #include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/logging.h"
+#include "psen_scan_v2/diagnostics.h"
 
 namespace psen_scan_v2
 {
+TenthOfDegree MonitoringFrameMsg::fromTheta() const
+{
+  return from_theta_fixed_;
+}
+
+TenthOfDegree MonitoringFrameMsg::resolution() const
+{
+  return resolution_fixed_;
+}
+
+uint32_t MonitoringFrameMsg::scanCounter() const
+{
+  return scan_counter_;
+}
+
+std::vector<double> MonitoringFrameMsg::measures() const
+{
+  return measures_;
+}
+
+std::vector<MonitoringFrameDiagnosticMessage> MonitoringFrameMsg::diagnostic_messages() const
+{
+  return diagnostic_messages_;
+}
+
+bool MonitoringFrameMsg::operator==(const MonitoringFrameMsg& rhs) const
+{
+  return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
+          measures() == rhs.measures());
+}
+
 }  // namespace psen_scan_v2

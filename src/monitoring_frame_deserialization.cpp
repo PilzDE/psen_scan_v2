@@ -13,21 +13,23 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <bitset>
 #include <iostream>
 
 #include "psen_scan_v2/monitoring_frame_deserialization.h"
-#include "psen_scan_v2/diagnostic.h"
+#include "psen_scan_v2/diagnostics.h"
 
 namespace psen_scan_v2
 {
-FieldHeader::FieldHeader(Id id, Length length) : id_(id), length_(length)
+MonitoringFrameAdditionalFieldHeader::MonitoringFrameAdditionalFieldHeader(Id id, Length length)
+  : id_(id), length_(length)
 {
 }
 
-constexpr FieldHeader::Id AdditionalFieldIds::SCAN_COUNTER;
-constexpr FieldHeader::Id AdditionalFieldIds::MEASURES;
-constexpr FieldHeader::Id AdditionalFieldIds::END_OF_FRAME;
-constexpr FieldHeader::Id AdditionalFieldIds::DIAGNOSTICS;
+constexpr MonitoringFrameAdditionalFieldHeader::Id MonitoringFrameAdditionalFieldIds::SCAN_COUNTER;
+constexpr MonitoringFrameAdditionalFieldHeader::Id MonitoringFrameAdditionalFieldIds::MEASURES;
+constexpr MonitoringFrameAdditionalFieldHeader::Id MonitoringFrameAdditionalFieldIds::END_OF_FRAME;
+constexpr MonitoringFrameAdditionalFieldHeader::Id MonitoringFrameAdditionalFieldIds::DIAGNOSTICS;
 
 MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, const std::size_t& num_bytes)
 {
@@ -40,7 +42,7 @@ MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, cons
   raw_processing::read(is, msg.op_code_fixed_);
   raw_processing::read(is, msg.working_mode_fixed_);
   raw_processing::read(is, msg.transaction_type_fixed_);
-  raw_processing::read(is, msg.scanner_id_fixed_);
+  raw_processing::read(is, msg.scanner_id_);
 
   raw_processing::read<uint16_t, TenthOfDegree>(is, msg.from_theta_fixed_);
   raw_processing::read<uint16_t, TenthOfDegree>(is, msg.resolution_fixed_);
@@ -50,11 +52,11 @@ MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, cons
   bool end_of_frame{ false };
   while (!end_of_frame)
   {
-    const FieldHeader header{ readFieldHeader(is, num_bytes) };
+    const MonitoringFrameAdditionalFieldHeader header{ readFieldHeader(is, num_bytes) };
 
     switch (header.id())
     {
-      case AdditionalFieldIds::SCAN_COUNTER:
+      case MonitoringFrameAdditionalFieldIds::SCAN_COUNTER:
         if (header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
         {
           throw MonitoringFrameFormatErrorScanCounterUnexpectedSize(fmt::format(
@@ -63,64 +65,23 @@ MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, cons
         raw_processing::read(is, msg.scan_counter_);
         break;
 
-      case AdditionalFieldIds::MEASURES:
+      case MonitoringFrameAdditionalFieldIds::MEASURES:
         raw_processing::readArray<uint16_t, double>(is,
                                                     msg.measures_,
                                                     header.length() / NUMBER_OF_BYTES_SINGLE_MEASURE,
                                                     [](uint16_t raw_element) { return raw_element / 1000.; });
         break;
 
-      case AdditionalFieldIds::END_OF_FRAME:
+      case MonitoringFrameAdditionalFieldIds::END_OF_FRAME:
         end_of_frame = true;
         break;
 
-      case AdditionalFieldIds::DIAGNOSTICS:
-        std::array<char, 4> reserved_diag;
-        raw_processing::read(is, reserved_diag);
-
-        for (size_t m = 0; m < 4; ++m)
+      case MonitoringFrameAdditionalFieldIds::DIAGNOSTICS:
+        msg.diagnostic_messages_ = deserializeDiagnosticMessages(is);
+        // WIP: TODO: Move elsewhere
+        for (auto& elem : msg.diagnostic_messages_)
         {
-          // std::cerr << "Device " << m << "\n";
-          std::array<std::bitset<8>, 9> diagnostics_device_data;
-          raw_processing::read<std::array<char, 9>, std::array<std::bitset<8>, 9> >(
-              is, diagnostics_device_data, [](std::array<char, 9> raw) {
-                std::array<std::bitset<8>, 9> diagnostics;
-                for (size_t i = 0; i < 9; ++i)
-                {
-                  diagnostics[i] = std::bitset<8>(raw[i]);
-
-                  // std::cerr << "[" << i << "]" << diagnostics[i].to_string() << "\n";
-                }
-                // std::cerr << "--------\n";
-
-                return diagnostics;
-              });
-
-          msg.diagnostics_[m] = diagnostics_device_data;
-          for (size_t byte_n = 0; byte_n < 9; ++byte_n)
-          {
-            for (size_t bit_n = 0; bit_n < msg.diagnostics_[m][byte_n].size(); ++bit_n)
-            {
-              if (msg.diagnostics_[m][byte_n].test(bit_n))
-              {
-                // Print nothing if Error bit on UNUSED field is set
-                if (error_bits[byte_n][bit_n] != DiagnosticCode::UNUSED)
-                {
-                  // Internal and - bits are ambiguous, also print byte and bit
-                  if (error_bits[byte_n][bit_n] == DiagnosticCode::_ ||
-                      error_bits[byte_n][bit_n] == DiagnosticCode::INT)
-                  {
-                    std::cerr << error_code_to_string.at(error_bits[byte_n][bit_n]) << " byte: " << byte_n
-                              << " bit_n:" << bit_n << "\n";
-                  }
-                  else
-                  {
-                    std::cerr << error_code_to_string.at(error_bits[byte_n][bit_n]);
-                  }
-                }
-              }
-            }
-          }
+          std::cerr << elem;
         }
         break;
 
@@ -129,14 +90,13 @@ MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, cons
             fmt::format("Header Id {:#04x} unknown. Cannot read additional field of monitoring frame.", header.id()));
     }
   }
-
   return msg;
 }
 
-FieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes)
+MonitoringFrameAdditionalFieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes)
 {
-  FieldId id;
-  FieldLength length;
+  MonitoringFrameAdditionalFieldId id;
+  MonitoringFrameAdditionalFieldLength length;
   raw_processing::read(is, id);
   raw_processing::read(is, length);
 
@@ -149,7 +109,7 @@ FieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_b
   {
     length--;
   }
-  return FieldHeader(id, length);
+  return MonitoringFrameAdditionalFieldHeader(id, length);
 }
 
 void checkFixedFields(MonitoringFrameMsg& msg)
@@ -171,9 +131,37 @@ void checkFixedFields(MonitoringFrameMsg& msg)
     PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid transaction type!");
   }
 
-  if (MAX_SCANNER_ID < msg.scanner_id_fixed_)
+  if (MAX_SCANNER_ID < static_cast<uint8_t>(msg.scanner_id_))
   {
     PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid Scanner id!");
   }
 }
+
+std::vector<MonitoringFrameDiagnosticMessage> deserializeDiagnosticMessages(std::istringstream& is)
+{
+  std::vector<MonitoringFrameDiagnosticMessage> diagnostic_messages;
+
+  std::array<char, 4> reserved_diag_unused;
+  raw_processing::read(is, reserved_diag_unused);
+
+  for (auto& scanner_id : SCANNER_IDS)
+  {
+    for (size_t byte_n = 0; byte_n < DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES; byte_n++)
+    {
+      uint8_t raw_data;
+      raw_processing::read(is, raw_data);
+      std::bitset<8> raw_bits(raw_data);
+
+      for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
+      {
+        if (raw_bits.test(bit_n) && (DiagnosticCode::UNUSED != error_bits[byte_n][bit_n]))
+        {
+          diagnostic_messages.push_back(
+              MonitoringFrameDiagnosticMessage(static_cast<ScannerId>(scanner_id), byte_n, bit_n));
+        }
+      }
+    }
+  }
+  return diagnostic_messages;
+}  // namespace psen_scan_v2
 }  // namespace psen_scan_v2

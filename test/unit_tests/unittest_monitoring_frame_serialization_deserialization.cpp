@@ -30,7 +30,7 @@ TEST(FieldHeaderTest, testGetIdAndLength)
 {
   uint8_t id = 5;
   uint16_t length = 7;
-  FieldHeader header(id, length);
+  MonitoringFrameAdditionalFieldHeader header(id, length);
   EXPECT_EQ(id, header.id());
   EXPECT_EQ(length, header.length());
 }
@@ -47,8 +47,8 @@ TEST(FieldHeaderTest, testReadSuccess)
   builder.add(length);
   std::istringstream is{ builder.get() };
 
-  std::unique_ptr<FieldHeader> header_ptr;
-  ASSERT_NO_THROW(header_ptr.reset(new FieldHeader{ readFieldHeader(is, max_num_bytes) }););
+  std::unique_ptr<MonitoringFrameAdditionalFieldHeader> header_ptr;
+  ASSERT_NO_THROW(header_ptr.reset(new MonitoringFrameAdditionalFieldHeader{ readFieldHeader(is, max_num_bytes) }););
   EXPECT_EQ(id, header_ptr->id());
   EXPECT_EQ(expected_length, header_ptr->length());
 }
