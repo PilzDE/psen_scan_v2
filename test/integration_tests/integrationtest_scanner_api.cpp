@@ -59,6 +59,11 @@ using std::placeholders::_2;
 using namespace ::testing;
 using namespace std::chrono_literals;
 
+ACTION_P(OpenBarrier, barrier)
+{
+  barrier->release();
+}
+
 class UserCallbacks
 {
 public:
@@ -146,7 +151,7 @@ TEST(ScannerAPITests, testStartFunctionality)
 
   Barrier start_req_received_barrier;
   EXPECT_CALL(scanner_mock, receiveControlMsg(_, start_req.serialize()))
-      .WillOnce(InvokeWithoutArgs([&start_req_received_barrier]() { start_req_received_barrier.release(); }));
+      .WillOnce(OpenBarrier(&start_req_received_barrier));
 
   scanner_mock.startListeningForControlMsg();
   const auto start_future{ std::async(std::launch::async, [&scanner]() {
@@ -172,7 +177,7 @@ TEST(ScannerAPITests, testStopFunctionality)
 
   Barrier stop_req_received_barrier;
   EXPECT_CALL(scanner_mock, receiveControlMsg(_, StopRequest().serialize()))
-      .WillOnce(InvokeWithoutArgs([&stop_req_received_barrier]() { stop_req_received_barrier.release(); }));
+      .WillOnce(OpenBarrier(&stop_req_received_barrier));
 
   scanner_mock.startListeningForControlMsg();
   scanner.start();
@@ -227,9 +232,7 @@ TEST(ScannerAPITests, testReceivingOfMonitoringFrame)
         .WillOnce(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
     // Check that toLaserScan(msg) == arg
-    EXPECT_CALL(cb, LaserScanCallback(toLaserScan(msg))).WillOnce(InvokeWithoutArgs([&monitoring_frame_barrier]() {
-      monitoring_frame_barrier.release();
-    }));
+    EXPECT_CALL(cb, LaserScanCallback(toLaserScan(msg))).WillOnce(OpenBarrier(&monitoring_frame_barrier));
   }
 
   scanner_mock.startListeningForControlMsg();
