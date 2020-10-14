@@ -63,10 +63,10 @@ private:
   SC scanner_controller_;
 
   friend class ScannerTest;
-  FRIEND_TEST(ScannerTest, constructorSuccess);
-  FRIEND_TEST(ScannerTest, start);
-  FRIEND_TEST(ScannerTest, stop);
-  FRIEND_TEST(ScannerTest, invokeLaserScanCallback);
+  FRIEND_TEST(ScannerTest, testConstructorSuccess);
+  FRIEND_TEST(ScannerTest, testStart);
+  FRIEND_TEST(ScannerTest, testStop);
+  FRIEND_TEST(ScannerTest, testInvokeLaserScanCallback);
 };
 
 typedef ScannerT<> Scanner;

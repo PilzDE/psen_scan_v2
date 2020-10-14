@@ -62,18 +62,18 @@ protected:
 
 typedef ScannerT<psen_scan_v2_test::ScannerControllerMock> MockedScanner;
 
-TEST_F(ScannerTest, constructorInvalidLaserScanCallback)
+TEST_F(ScannerTest, testConstructorInvalidLaserScanCallback)
 {
   LaserScanCallback laserscan_callback;
   EXPECT_THROW(MockedScanner scanner(scanner_config_, laserscan_callback);, std::invalid_argument);
 }
 
-TEST_F(ScannerTest, constructorSuccess)
+TEST_F(ScannerTest, testConstructorSuccess)
 {
   EXPECT_NO_THROW(MockedScanner scanner(scanner_config_, laserscan_callback_));
 }
 
-TEST_F(ScannerTest, invokeLaserScanCallback)
+TEST_F(ScannerTest, testInvokeLaserScanCallback)
 {
   LaserScan laser_scan_fake(TenthOfDegree(1), TenthOfDegree(3), TenthOfDegree(5));
   laser_scan_fake.getMeasurements().push_back(1);

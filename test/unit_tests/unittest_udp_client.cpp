@@ -41,7 +41,7 @@ public:
   MOCK_METHOD1(handleError, void(const std::string&));
 };
 
-TEST(UdpClientTests, invalidNewDataHandler)
+TEST(UdpClientTests, testInvalidNewDataHandler)
 {
   CallbackHandler handler;
 
@@ -53,7 +53,7 @@ TEST(UdpClientTests, invalidNewDataHandler)
                std::invalid_argument);
 }
 
-TEST(UdpClientTests, invalidErrorHandler)
+TEST(UdpClientTests, testInvalidErrorHandler)
 {
   CallbackHandler handler;
 
@@ -65,14 +65,14 @@ TEST(UdpClientTests, invalidErrorHandler)
                std::invalid_argument);
 }
 
-TEST(UdpClientTests, closeConnectionFailureForCompleteCoverage)
+TEST(UdpClientTests, testCloseConnectionFailureForCompleteCoverage)
 {
   std::unique_ptr<psen_scan_v2::UdpClientImpl::CloseConnectionFailure> ex{
     new psen_scan_v2::UdpClientImpl::CloseConnectionFailure()
   };
 }
 
-TEST(UdpClientTests, openConnectionFailureForCompleteCoverage)
+TEST(UdpClientTests, testOpenConnectionFailureForCompleteCoverage)
 {
   std::unique_ptr<psen_scan_v2::UdpClientImpl::OpenConnectionFailure> ex{
     new psen_scan_v2::UdpClientImpl::OpenConnectionFailure()

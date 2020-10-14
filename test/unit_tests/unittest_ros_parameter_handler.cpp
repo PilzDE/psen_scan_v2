@@ -121,7 +121,7 @@ class ParamTestSuite : public ::testing::Test
 using TypesToTest = ::testing::Types<StringTestItem, IntTestItem, DoubleTestItem>;
 TYPED_TEST_CASE(ParamTestSuite, TypesToTest);
 
-TYPED_TEST(ParamTestSuite, paramNotOnServer)
+TYPED_TEST(ParamTestSuite, testParamNotOnServer)
 {
   TypeParam test_item;
   ros::NodeHandle nh;
@@ -130,7 +130,7 @@ TYPED_TEST(ParamTestSuite, paramNotOnServer)
   ASSERT_EQ(test_item.getDefaultValue(), test_item.callOptionalGetter(nh, param_name)) << "Default value incorrect";
 }
 
-TYPED_TEST(ParamTestSuite, incorrectParamType)
+TYPED_TEST(ParamTestSuite, testIncorrectParamType)
 {
   TypeParam test_item;
   const std::string param_name{ "ParamWithIncorrectType" };
@@ -141,7 +141,7 @@ TYPED_TEST(ParamTestSuite, incorrectParamType)
   ASSERT_THROW(test_item.callOptionalGetter(nh, param_name), WrongParameterType);
 }
 
-TYPED_TEST(ParamTestSuite, gettingOfParam)
+TYPED_TEST(ParamTestSuite, testGettingOfParam)
 {
   TypeParam test_item;
   const std::string param_name{ "CorrectParam" };

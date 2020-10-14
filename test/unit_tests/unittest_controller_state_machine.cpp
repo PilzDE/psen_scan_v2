@@ -61,14 +61,14 @@ ControllerStateMachineTest::ControllerStateMachineTest()
                                  std::bind(&ControllerMock::stopped_cb, &controller_)));
 }
 
-TEST_F(ControllerStateMachineTest, startRequestCallbackIsCalled)
+TEST_F(ControllerStateMachineTest, testStartRequestCallbackIsCalled)
 {
   EXPECT_CALL(controller_, start_request_cb()).Times(1);
 
   state_machine_->processStartRequestEvent();
 }
 
-TEST_F(ControllerStateMachineTest, startedCallbackIsCalled)
+TEST_F(ControllerStateMachineTest, testStartedCallbackIsCalled)
 {
   EXPECT_CALL(controller_, start_request_cb()).Times(1);
   EXPECT_CALL(controller_, started_cb()).Times(1);
@@ -83,7 +83,7 @@ MATCHER_P(MonitoringFrameEq, frame, "")
           arg.scanCounter() == frame.scanCounter() && arg.measures() == arg.measures());
 }
 
-TEST_F(ControllerStateMachineTest, monitoringFrameCallbackIsCalled)
+TEST_F(ControllerStateMachineTest, testMonitoringFrameCallbackIsCalled)
 {
   const MonitoringFrameMsg frame(TenthOfDegree(0), TenthOfDegree(275), 1, { 0.1, 20., 25, 10, 1., 2., 3. });
 
@@ -96,7 +96,7 @@ TEST_F(ControllerStateMachineTest, monitoringFrameCallbackIsCalled)
   state_machine_->processMonitoringFrameReceivedEvent(frame);
 }
 
-TEST_F(ControllerStateMachineTest, stopRequestCallbackIsCalled)
+TEST_F(ControllerStateMachineTest, testStopRequestCallbackIsCalled)
 {
   EXPECT_CALL(controller_, start_request_cb()).Times(1);
   EXPECT_CALL(controller_, started_cb()).Times(1);
@@ -107,7 +107,7 @@ TEST_F(ControllerStateMachineTest, stopRequestCallbackIsCalled)
   state_machine_->processStopRequestEvent();
 }
 
-TEST_F(ControllerStateMachineTest, stoppedCallbackIsCalled)
+TEST_F(ControllerStateMachineTest, testStoppedCallbackIsCalled)
 {
   EXPECT_CALL(controller_, start_request_cb()).Times(1);
   EXPECT_CALL(controller_, started_cb()).Times(1);
@@ -120,7 +120,7 @@ TEST_F(ControllerStateMachineTest, stoppedCallbackIsCalled)
   state_machine_->processReplyReceivedEvent(ScannerReplyMsgType::Stop);
 }
 
-TEST_F(ControllerStateMachineTest, illegalTransitionNotTaken)
+TEST_F(ControllerStateMachineTest, testIllegalTransitionNotTaken)
 {
   EXPECT_CALL(controller_, start_request_cb()).Times(1);
   state_machine_->processStartRequestEvent();

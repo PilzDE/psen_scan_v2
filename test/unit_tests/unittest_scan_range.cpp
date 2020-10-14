@@ -34,32 +34,32 @@ static constexpr TenthOfDegree TOO_LARGE_SCAN_ANGLE{ MAX_ALLOWED_ANGLE.value() +
 
 using TestScanRange = ScanRange<MIN_ALLOWED_ANGLE.value(), MAX_ALLOWED_ANGLE.value()>;
 
-TEST(ScanRangeTest, ctorCallForCoverage)
+TEST(ScanRangeTest, testCtorCallForCoverage)
 {
   std::unique_ptr<DefaultScanRange> ptr{ new DefaultScanRange(MIN_ALLOWED_ANGLE, MAX_ALLOWED_ANGLE) };
 }
 
-TEST(ScanRangeTest, startAngleTooSmall)
+TEST(ScanRangeTest, testStartAngleTooSmall)
 {
   EXPECT_THROW(TestScanRange(TOO_SMALL_SCAN_ANGLE, VALID_END_ANGLE), std::out_of_range);
 }
 
-TEST(ScanRangeTest, startAngleTooLarge)
+TEST(ScanRangeTest, testStartAngleTooLarge)
 {
   EXPECT_THROW(TestScanRange(TOO_LARGE_SCAN_ANGLE, VALID_END_ANGLE), std::out_of_range);
 }
 
-TEST(ScanRangeTest, endAngleTooSmall)
+TEST(ScanRangeTest, testEndAngleTooSmall)
 {
   EXPECT_THROW(TestScanRange(VALID_START_ANGLE, TOO_SMALL_SCAN_ANGLE), std::out_of_range);
 }
 
-TEST(ScanRangeTest, endAngleTooLarge)
+TEST(ScanRangeTest, testEndAngleTooLarge)
 {
   EXPECT_THROW(TestScanRange(VALID_START_ANGLE, TOO_LARGE_SCAN_ANGLE), std::out_of_range);
 }
 
-TEST(ScanRangeTest, endAngleSmallerThanStartAngle)
+TEST(ScanRangeTest, testEndAngleSmallerThanStartAngle)
 {
   EXPECT_THROW(TestScanRange(TenthOfDegree(17u), TenthOfDegree(15u)), std::invalid_argument);
 }

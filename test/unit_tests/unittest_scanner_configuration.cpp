@@ -78,42 +78,42 @@ protected:
   const DefaultScanRange scan_range_{ SCAN_RANGE };
 };
 
-TEST_F(ScannerConfigurationTest, constructorSuccess)
+TEST_F(ScannerConfigurationTest, testConstructorSuccess)
 {
   EXPECT_NO_THROW(ScannerConfigurationBuilder().build());
 }
 
-TEST_F(ScannerConfigurationTest, constructorInvalidHostIp)
+TEST_F(ScannerConfigurationTest, testConstructorInvalidHostIp)
 {
   EXPECT_THROW(ScannerConfigurationBuilder().setHostIp(INVALID_IP).build(), std::invalid_argument);
 }
 
-TEST_F(ScannerConfigurationTest, constructorInvalidClientIp)
+TEST_F(ScannerConfigurationTest, testConstructorInvalidClientIp)
 {
   EXPECT_THROW(ScannerConfigurationBuilder().setClientIp(INVALID_IP).build(), std::invalid_argument);
 }
 
-TEST_F(ScannerConfigurationTest, constructorDataPortTooSmall)
+TEST_F(ScannerConfigurationTest, testConstructorDataPortTooSmall)
 {
   EXPECT_THROW(ScannerConfigurationBuilder().setHostUdpDataPort(-1).build(), std::out_of_range);
 }
 
-TEST_F(ScannerConfigurationTest, constructorDataPortTooLarge)
+TEST_F(ScannerConfigurationTest, testConstructorDataPortTooLarge)
 {
   EXPECT_THROW(ScannerConfigurationBuilder().setHostUdpDataPort(MAXIMAL_PORT_NUMBER + 1).build(), std::out_of_range);
 }
 
-TEST_F(ScannerConfigurationTest, constructorControlPortTooSmall)
+TEST_F(ScannerConfigurationTest, testConstructorControlPortTooSmall)
 {
   EXPECT_THROW(ScannerConfigurationBuilder().setHostUdpControlPort(MINIMAL_PORT_NUMBER - 1).build(), std::out_of_range);
 }
 
-TEST_F(ScannerConfigurationTest, constructorControlPortTooLarge)
+TEST_F(ScannerConfigurationTest, testConstructorControlPortTooLarge)
 {
   EXPECT_THROW(ScannerConfigurationBuilder().setHostUdpControlPort(MAXIMAL_PORT_NUMBER + 1).build(), std::out_of_range);
 }
 
-TEST_F(ScannerConfigurationTest, targetIp)
+TEST_F(ScannerConfigurationTest, testTargetIp)
 {
   ScannerConfiguration sc{ ScannerConfigurationBuilder().build() };
 
@@ -127,7 +127,7 @@ TEST_F(ScannerConfigurationTest, targetIp)
   EXPECT_EQ(VALID_IP, host_ip_string);
 }
 
-TEST_F(ScannerConfigurationTest, clientIp)
+TEST_F(ScannerConfigurationTest, testClientIp)
 {
   ScannerConfiguration sc{ ScannerConfigurationBuilder().build() };
 
@@ -141,7 +141,7 @@ TEST_F(ScannerConfigurationTest, clientIp)
   EXPECT_EQ(VALID_IP, client_ip_string);
 }
 
-TEST_F(ScannerConfigurationTest, udpPorts)
+TEST_F(ScannerConfigurationTest, testUDPPorts)
 {
   ScannerConfiguration sc{ ScannerConfigurationBuilder().build() };
 
@@ -154,14 +154,14 @@ TEST_F(ScannerConfigurationTest, udpPorts)
   EXPECT_EQ(MAXIMAL_PORT_NUMBER, static_cast<int>(host_udp_port_control));
 }
 
-TEST_F(ScannerConfigurationTest, startAngle)
+TEST_F(ScannerConfigurationTest, testStartAngle)
 {
   ScannerConfiguration sc{ ScannerConfigurationBuilder().build() };
 
   EXPECT_EQ(SCAN_RANGE.getStart(), sc.scanRange().getStart());
 }
 
-TEST_F(ScannerConfigurationTest, endAngle)
+TEST_F(ScannerConfigurationTest, testEndAngle)
 {
   ScannerConfiguration sc{ ScannerConfigurationBuilder().build() };
 

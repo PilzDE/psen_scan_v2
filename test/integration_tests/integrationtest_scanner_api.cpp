@@ -136,7 +136,7 @@ ScannerConfiguration createScannerConfig()
       HOST_IP_ADDRESS, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, SCANNER_IP_ADDRESS, SCAN_RANGE);
 }
 
-TEST(ScannerAPITests, startFunctionality)
+TEST(ScannerAPITests, testStartFunctionality)
 {
   StrictMock<ScannerMock> scanner_mock;
   const ScannerConfiguration config{ createScannerConfig() };
@@ -160,7 +160,7 @@ TEST(ScannerAPITests, startFunctionality)
   EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
 }
 
-TEST(ScannerAPITests, stopFunctionality)
+TEST(ScannerAPITests, testStopFunctionality)
 {
   StrictMock<ScannerMock> scanner_mock;
   const ScannerConfiguration config{ createScannerConfig() };
@@ -209,7 +209,7 @@ TEST(ScannerAPITests, testStartReplyTimeout)
   EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
 }
 
-TEST(ScannerAPITests, receivingOfMonitoringFrame)
+TEST(ScannerAPITests, testReceivingOfMonitoringFrame)
 {
   StrictMock<ScannerMock> scanner_mock;
   const ScannerConfiguration config{ createScannerConfig() };

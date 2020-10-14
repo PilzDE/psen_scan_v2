@@ -95,7 +95,7 @@ void UdpClientTests::sendEmptyTestDataToClient()
   mock_udp_server_.asyncSendEmpty(host_endpoint);
 }
 
-TEST_F(UdpClientTests, asyncReadOperation)
+TEST_F(UdpClientTests, testAsyncReadOperation)
 {
   EXPECT_CALL(*this, handleNewData(_, DATA_SIZE_BYTES)).WillOnce(ACTION_OPEN_BARRIER_VOID(CLIENT_RECEIVED_DATA));
 
@@ -104,7 +104,7 @@ TEST_F(UdpClientTests, asyncReadOperation)
   BARRIER(CLIENT_RECEIVED_DATA);
 }
 
-TEST_F(UdpClientTests, singleAsyncReadOperation)
+TEST_F(UdpClientTests, testSingleAsyncReadOperation)
 {
   EXPECT_CALL(*this, handleNewData(_, DATA_SIZE_BYTES)).WillOnce(ACTION_OPEN_BARRIER_VOID(CLIENT_RECEIVED_DATA));
 
@@ -113,7 +113,7 @@ TEST_F(UdpClientTests, singleAsyncReadOperation)
   BARRIER(CLIENT_RECEIVED_DATA);
 }
 
-TEST_F(UdpClientTests, twoConsecutiveTimeouts)
+TEST_F(UdpClientTests, testTwoConsecutiveTimeouts)
 {
   EXPECT_CALL(*this, handleTimeout(_))
       .WillOnce(ACTION_OPEN_BARRIER_VOID(TIMEOUT_BARRIER_1))
@@ -128,7 +128,7 @@ TEST_F(UdpClientTests, twoConsecutiveTimeouts)
   BARRIER(TIMEOUT_BARRIER_2);
 }
 
-TEST_F(UdpClientTests, errorHandlingForReceive)
+TEST_F(UdpClientTests, testErrorHandlingForReceive)
 {
   EXPECT_CALL(*this, handleError(_)).WillOnce(ACTION_OPEN_BARRIER_VOID(ERROR_HANDLER_CALLED));
   EXPECT_CALL(*this, handleTimeout(_)).Times(0);
@@ -139,7 +139,7 @@ TEST_F(UdpClientTests, errorHandlingForReceive)
   BARRIER(ERROR_HANDLER_CALLED);
 }
 
-TEST_F(UdpClientTests, restartAfterTimeout)
+TEST_F(UdpClientTests, testRestartAfterTimeout)
 {
   {
     ::testing::InSequence seq;
@@ -156,7 +156,7 @@ TEST_F(UdpClientTests, restartAfterTimeout)
   BARRIER(CLIENT_RECEIVED_DATA);
 }
 
-TEST_F(UdpClientTests, writeOperation)
+TEST_F(UdpClientTests, testWriteOperation)
 {
   std::string str = "Hello!";
   DynamicSizeRawData write_buf;
@@ -170,7 +170,7 @@ TEST_F(UdpClientTests, writeOperation)
   BARRIER(CLIENT_RECEIVED_DATA);
 }
 
-TEST_F(UdpClientTests, writingWhileReceiving)
+TEST_F(UdpClientTests, testWritingWhileReceiving)
 {
   std::string str = "Hello!";
   DynamicSizeRawData write_buf;

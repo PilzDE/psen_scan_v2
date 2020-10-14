@@ -113,7 +113,7 @@ void ScannerControllerTest::simulateUdpTimeout(const std::string& msg)
   scanner_controller_.control_udp_client_.simulateTimeout(msg);
 }
 
-TEST_F(ScannerControllerTest, successfulStartSequence)
+TEST_F(ScannerControllerTest, testSuccessfulStartSequence)
 {
   {
     InSequence seq;
@@ -127,7 +127,7 @@ TEST_F(ScannerControllerTest, successfulStartSequence)
   EXPECT_TRUE(isFutureReady(start_future));
 }
 
-TEST_F(ScannerControllerTest, receivingMultipleStartReplies)
+TEST_F(ScannerControllerTest, testReceivingMultipleStartReplies)
 {
   MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(275), 1, { 0.1, 20., 25, 10, 1., 2., 3. });
   const LaserScan scan{ toLaserScan(msg) };
@@ -141,7 +141,7 @@ TEST_F(ScannerControllerTest, receivingMultipleStartReplies)
   simulateMonitoringFrame(msg);
 }
 
-TEST_F(ScannerControllerTest, successfulStopSequence)
+TEST_F(ScannerControllerTest, testSuccessfulStopSequence)
 {
   {
     InSequence seq;
@@ -153,7 +153,7 @@ TEST_F(ScannerControllerTest, successfulStopSequence)
   EXPECT_TRUE(isFutureReady(stop_future));
 }
 
-TEST_F(ScannerControllerTest, stopWhileWaitingForStartReply)
+TEST_F(ScannerControllerTest, testStopWhileWaitingForStartReply)
 {
   {
     InSequence seq;
@@ -167,7 +167,7 @@ TEST_F(ScannerControllerTest, stopWhileWaitingForStartReply)
   EXPECT_TRUE(isFutureReady(stop_future));
 }
 
-TEST_F(ScannerControllerTest, stopReplyTimeout)
+TEST_F(ScannerControllerTest, testStopReplyTimeout)
 {
   // Has no defined behaviour yet
   {
@@ -181,7 +181,7 @@ TEST_F(ScannerControllerTest, stopReplyTimeout)
   simulateStopReply();
 }
 
-TEST_F(ScannerControllerTest, handleMonitoringFrame)
+TEST_F(ScannerControllerTest, testHandleMonitoringFrame)
 {
   MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(275), 1, { 0.1, 20., 25, 10, 1., 2., 3. });
 
@@ -191,10 +191,10 @@ TEST_F(ScannerControllerTest, handleMonitoringFrame)
 
   scanner_controller_.start();
   simulateStartReply();
-  scanner_controller_.data_udp_client_.sendMonitoringFrame(msg);
+  simulateMonitoringFrame(msg);
 }
 
-TEST_F(ScannerControllerTest, handleEmptyMonitoringFrame)
+TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
 {
   MonitoringFrameMsg msg(TenthOfDegree(1), TenthOfDegree(2), 42, {});
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
@@ -205,7 +205,7 @@ TEST_F(ScannerControllerTest, handleEmptyMonitoringFrame)
   simulateMonitoringFrame(msg);
 }
 
-TEST_F(ScannerControllerTest, handleEarlyMonitoringFrame)
+TEST_F(ScannerControllerTest, testHandleEarlyMonitoringFrame)
 {
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
@@ -215,7 +215,7 @@ TEST_F(ScannerControllerTest, handleEarlyMonitoringFrame)
   simulateMonitoringFrame(msg);
 }
 
-TEST_F(ScannerControllerTest, handleLateMonitoringFrame)
+TEST_F(ScannerControllerTest, testHandleLateMonitoringFrame)
 {
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
@@ -230,12 +230,12 @@ TEST_F(ScannerControllerTest, handleLateMonitoringFrame)
   simulateStopReply();
 }
 
-TEST_F(ScannerControllerTest, handleError)
+TEST_F(ScannerControllerTest, testHandleError)
 {
   simulateUdpError("Udp error");  // only for coverage for now
 }
 
-TEST_F(ScannerControllerTest, constructorInvalidLaserScanCallback)
+TEST_F(ScannerControllerTest, testConstructorInvalidLaserScanCallback)
 {
   EXPECT_THROW(({
                  ScannerControllerT<ControllerStateMachine, MockUdpClient> scanner_controller_(scanner_config_,

@@ -31,7 +31,7 @@ using namespace psen_scan_v2;
 
 namespace psen_scan_v2_test
 {
-TEST(LaserScanConversionsTest, toLaserScan)
+TEST(LaserScanConversionsTest, testToLaserScan)
 {
   MonitoringFrameMsg frame(TenthOfDegree(10.), TenthOfDegree(3.14 / 2.), 42, { 1., 2., 3., 4.5, 5, 42 });
 

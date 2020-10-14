@@ -98,14 +98,14 @@ private:
   std::promise<void> stopped_;
 
   friend class ScannerControllerTest;
-  FRIEND_TEST(ScannerControllerTest, successfulStartSequence);
-  FRIEND_TEST(ScannerControllerTest, successfulStopSequence);
-  FRIEND_TEST(ScannerControllerTest, handleMonitoringFrame);
-  FRIEND_TEST(ScannerControllerTest, handleEmptyMonitoringFrame);
-  FRIEND_TEST(ScannerControllerTest, handleError);
-  FRIEND_TEST(ScannerControllerTest, retryAfterStartReplyTimeout);
-  FRIEND_TEST(ScannerControllerTest, stopReplyTimeout);
-  FRIEND_TEST(ScannerControllerTest, stopWhileWaitingForStartReply);
+  FRIEND_TEST(ScannerControllerTest, testSuccessfulStartSequence);
+  FRIEND_TEST(ScannerControllerTest, testSuccessfulStopSequence);
+  FRIEND_TEST(ScannerControllerTest, testHandleNewMonitoringFrame);
+  FRIEND_TEST(ScannerControllerTest, testHandleEmptyMonitoringFrame);
+  FRIEND_TEST(ScannerControllerTest, testHandleError);
+  FRIEND_TEST(ScannerControllerTest, testRetryAfterStartReplyTimeout);
+  FRIEND_TEST(ScannerControllerTest, testStopReplyTimeout);
+  FRIEND_TEST(ScannerControllerTest, testStopWhileWaitingForStartReply);
 };
 
 typedef ScannerControllerT<> ScannerController;

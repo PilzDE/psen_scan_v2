@@ -28,23 +28,23 @@ static const TenthOfDegree DEFAULT_RESOLUTION{ 1 };
 static const TenthOfDegree DEFAULT_START_ANGLE{ 1 };
 static const TenthOfDegree DEFAULT_END_ANGLE{ 2 };
 
-TEST(LaserScanTests, invalidZeroResolution)
+TEST(LaserScanTests, testInvalidZeroResolution)
 {
   EXPECT_THROW(LaserScan laser_scan(TenthOfDegree(0), DEFAULT_START_ANGLE, DEFAULT_END_ANGLE), std::invalid_argument);
 }
 
-TEST(LaserScanTests, outOfRangeResolution)
+TEST(LaserScanTests, testOutOfRangeResolution)
 {
   EXPECT_THROW(LaserScan laser_scan(TenthOfDegree(10000), DEFAULT_START_ANGLE, DEFAULT_END_ANGLE),
                std::invalid_argument);
 }
 
-TEST(LaserScanTests, invalidStartEndAngle)
+TEST(LaserScanTests, testInvalidStartEndAngle)
 {
   EXPECT_THROW(LaserScan laser_scan(DEFAULT_RESOLUTION, DEFAULT_END_ANGLE, DEFAULT_START_ANGLE), std::invalid_argument);
 }
 
-TEST(LaserScanTest, getScanResolution)
+TEST(LaserScanTest, testGetScanResolution)
 {
   const TenthOfDegree expected_resolution{ DEFAULT_RESOLUTION };
   std::unique_ptr<LaserScan> laser_scan;
@@ -53,7 +53,7 @@ TEST(LaserScanTest, getScanResolution)
   EXPECT_EQ(expected_resolution, laser_scan->getScanResolution());
 }
 
-TEST(LaserScanTest, getMinScanAngle)
+TEST(LaserScanTest, testGetMinScanAngle)
 {
   const auto expected_min_scan_angle{ DEFAULT_START_ANGLE };
   std::unique_ptr<LaserScan> laser_scan;
@@ -62,7 +62,7 @@ TEST(LaserScanTest, getMinScanAngle)
   EXPECT_EQ(expected_min_scan_angle, laser_scan->getMinScanAngle());
 }
 
-TEST(LaserScanTest, getMaxScanAngle)
+TEST(LaserScanTest, testGetMaxScanAngle)
 {
   const auto expected_max_scan_angle{ DEFAULT_END_ANGLE };
   std::unique_ptr<LaserScan> laser_scan;
