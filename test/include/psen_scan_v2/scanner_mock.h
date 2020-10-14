@@ -20,7 +20,6 @@
 
 #include <gmock/gmock.h>
 
-#include "psen_scan_v2/scanner.h"
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/function_pointers.h"
 #include "psen_scan_v2/laserscan.h"

@@ -39,8 +39,8 @@ private:
   std::thread timer_thread_;
 };
 
-Watchdog::Watchdog(const std::chrono::high_resolution_clock::duration& timeout,
-                   const std::function<void()>& timeout_handler)
+inline Watchdog::Watchdog(const std::chrono::high_resolution_clock::duration& timeout,
+                          const std::function<void()>& timeout_handler)
   : timer_thread_([this, timeout, timeout_handler]() {
     thread_startetd_barrier_.release();
     // Wait until timeout is reached and then call the timeout handler and
@@ -64,7 +64,7 @@ Watchdog::Watchdog(const std::chrono::high_resolution_clock::duration& timeout,
   }
 }
 
-Watchdog::~Watchdog()
+inline Watchdog::~Watchdog()
 {
   barrier_.release();
   if (timer_thread_.joinable())

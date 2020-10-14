@@ -31,13 +31,14 @@
 #include "psen_scan_v2/laserscan.h"
 #include "psen_scan_v2/scanner_mock.h"
 #include "psen_scan_v2/scanner_configuration.h"
-#include "psen_scan_v2/scanner.h"
+#include "psen_scan_v2/default_parameters.h"
 #include "psen_scan_v2/scan_range.h"
 
 using namespace psen_scan_v2;
 using namespace psen_scan_v2_test;
 
 using namespace ::testing;
+using namespace psen_scan_v2::constants;
 
 namespace psen_scan_v2
 {

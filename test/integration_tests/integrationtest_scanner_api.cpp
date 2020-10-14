@@ -32,10 +32,11 @@ REGISTER_ROSCONSOLE_BRIDGE;
 #include "psen_scan_v2/mock_udp_server.h"
 #include "psen_scan_v2/udp_frame_dumps.h"
 #include "psen_scan_v2/raw_data_array_conversion.h"
+#include "psen_scan_v2/logging.h"
 
 // Software under testing
 #include "psen_scan_v2/scanner_configuration.h"
-#include "psen_scan_v2/scanner.h"
+#include "psen_scan_v2/scanner_v2.h"
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/scanner_reply_msg.h"
 #include "psen_scan_v2/scan_range.h"
@@ -73,6 +74,17 @@ ACTION_P(OpenBarrier, barrier)
   barrier->release();
 }
 
+ScannerConfiguration createScannerConfig()
+{
+  return ScannerConfiguration(
+      HOST_IP_ADDRESS, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, SCANNER_IP_ADDRESS, SCAN_RANGE, DIAGNOSTICS_ENABLED);
+}
+
+static MonitoringFrameMsg createValidMonitoringFrameMsg()
+{
+  return MonitoringFrameMsg(TenthOfDegree(0), TenthOfDegree(1), 0, { 1, 2, 3, 4, 5 });
+}
+
 class UserCallbacks
 {
 public:
@@ -93,6 +105,7 @@ public:
   void sendStartReply();
   void sendStopReply();
   void sendMonitoringFrame(const MonitoringFrameMsg& msg);
+  void sendEmptyMonitoringFrame();
 
 private:
   void sendReply(const uint32_t reply_type);
@@ -128,6 +141,7 @@ void ScannerMock::sendReply(const uint32_t reply_type)
 
 void ScannerMock::sendStartReply()
 {
+  std::cout << "ScannerMock: Send start reply..." << std::endl;
   sendReply(getOpCodeValue(ScannerReplyMsgType::Start));
 }
 
@@ -138,16 +152,17 @@ void ScannerMock::sendStopReply()
 
 void ScannerMock::sendMonitoringFrame(const MonitoringFrameMsg& msg)
 {
+  std::cout << "ScannerMock: Send monitoring frame..." << std::endl;
   DynamicSizeRawData dynamic_raw_scan = serialize(msg);
   MaxSizeRawData max_size_raw_data = convertToMaxSizeRawData(dynamic_raw_scan);
 
   data_server_.asyncSend<max_size_raw_data.size()>(monitoring_frame_receiver_, max_size_raw_data);
 }
 
-ScannerConfiguration createScannerConfig()
+void ScannerMock::sendEmptyMonitoringFrame()
 {
-  return ScannerConfiguration(
-      HOST_IP_ADDRESS, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, SCANNER_IP_ADDRESS, SCAN_RANGE, DIAGNOSTICS_ENABLED);
+  const psen_scan_v2::FixedSizeRawData<0> data;
+  data_server_.asyncSend<data.size()>(monitoring_frame_receiver_, data);
 }
 
 TEST(ScannerAPITests, testStartFunctionality)
@@ -155,7 +170,7 @@ TEST(ScannerAPITests, testStartFunctionality)
   StrictMock<ScannerMock> scanner_mock;
   const ScannerConfiguration config{ createScannerConfig() };
   UserCallbacks cb;
-  Scanner scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+  ScannerV2 scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
   const StartRequest start_req(config, DEFAULT_SEQ_NUMBER);
 
   Barrier start_req_received_barrier;
@@ -174,12 +189,52 @@ TEST(ScannerAPITests, testStartFunctionality)
   EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
 }
 
+TEST(ScannerAPITests, shouldThrowWhenStartIsCalledTwice)
+{
+  NiceMock<ScannerMock> scanner_mock;
+  const ScannerConfiguration config{ createScannerConfig() };
+  UserCallbacks cb;
+  ScannerV2 scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+
+  Barrier start_req_received_barrier;
+  ON_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config, DEFAULT_SEQ_NUMBER).serialize()))
+      .WillByDefault(OpenBarrier(&start_req_received_barrier));
+
+  scanner_mock.startListeningForControlMsg();
+  scanner.start();
+  EXPECT_THROW(scanner.start();, std::runtime_error);
+}
+
+TEST(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
+{
+  NiceMock<ScannerMock> scanner_mock;
+  const ScannerConfiguration config{ createScannerConfig() };
+  UserCallbacks cb;
+  ScannerV2 scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+
+  Barrier start_req_received_barrier;
+  ON_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config, DEFAULT_SEQ_NUMBER).serialize()))
+      .WillByDefault(OpenBarrier(&start_req_received_barrier));
+  EXPECT_CALL(cb, LaserScanCallback(_)).Times(0);
+
+  scanner_mock.startListeningForControlMsg();
+  const auto start_future = scanner.start();
+
+  ASSERT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
+
+  scanner_mock.sendMonitoringFrame(createValidMonitoringFrameMsg());
+  ASSERT_EQ(start_future.wait_for(WAIT_TIMEOUT), std::future_status::timeout) << "Scanner::start() finished too early";
+
+  scanner_mock.sendStartReply();
+  EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
+}
+
 TEST(ScannerAPITests, testStopFunctionality)
 {
   StrictMock<ScannerMock> scanner_mock;
   const ScannerConfiguration config{ createScannerConfig() };
   UserCallbacks cb;
-  Scanner scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+  ScannerV2 scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   EXPECT_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config, DEFAULT_SEQ_NUMBER).serialize()))
       .WillOnce(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
@@ -204,22 +259,50 @@ TEST(ScannerAPITests, testStopFunctionality)
   EXPECT_EQ(stop_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::stop() not finished";
 }
 
+TEST(ScannerAPITests, shouldThrowWhenStopIsCalledTwice)
+{
+  StrictMock<ScannerMock> scanner_mock;
+  const ScannerConfiguration config{ createScannerConfig() };
+  UserCallbacks cb;
+  ScannerV2 scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+
+  EXPECT_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config, DEFAULT_SEQ_NUMBER).serialize()))
+      .WillOnce(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
+
+  Barrier stop_req_received_barrier;
+  EXPECT_CALL(scanner_mock, receiveControlMsg(_, StopRequest().serialize()))
+      .WillOnce(OpenBarrier(&stop_req_received_barrier));
+
+  scanner_mock.startListeningForControlMsg();
+  const auto start_future = scanner.start();
+  start_future.wait();
+
+  scanner_mock.startListeningForControlMsg();
+  auto stop_future = scanner.stop();
+  EXPECT_THROW(scanner.stop();, std::runtime_error);
+
+  EXPECT_TRUE(stop_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Stop request not received";
+  scanner_mock.sendStopReply();
+  EXPECT_EQ(stop_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::stop() not finished";
+}
+
 TEST(ScannerAPITests, testStartReplyTimeout)
 {
   StrictMock<ScannerMock> scanner_mock;
   const ScannerConfiguration config{ createScannerConfig() };
   UserCallbacks cb;
-  Scanner scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+  ScannerV2 scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   EXPECT_CALL(scanner_mock, receiveControlMsg(_, _)).Times(AtLeast(2));
 
   scanner_mock.startContinuousListeningForControlMsg();
   const auto start_future{ std::async(std::launch::async, [&scanner]() {
-    const auto start_future = scanner.start();
-    start_future.wait();
+    const auto scanner_start = scanner.start();
+    scanner_start.wait();
   }) };
 
   EXPECT_EQ(start_future.wait_for(3000ms), std::future_status::timeout) << "Scanner::start() finished too early";
+  std::cout << "ScannerAPITests: Send StartReply..." << std::endl;
   scanner_mock.sendStartReply();
   EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
 }
@@ -230,11 +313,10 @@ TEST(ScannerAPITests, testReceivingOfMonitoringFrame)
   StrictMock<ScannerMock> scanner_mock;
   const ScannerConfiguration config{ createScannerConfig() };
   UserCallbacks cb;
-  Scanner scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+  ScannerV2 scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   MonitoringFrameMsg msg(
       TenthOfDegree(0), TenthOfDegree(1), 0, { 1, 2, 3, 4, 5 }, { { ScannerId::MASTER, ErrorLocation(1, 7) } });
-
   Barrier monitoring_frame_barrier;
   Barrier diagnostic_barrier;
   {
@@ -262,6 +344,43 @@ TEST(ScannerAPITests, testReceivingOfMonitoringFrame)
 
   EXPECT_TRUE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
   EXPECT_TRUE(diagnostic_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Diagnostic message not received";
+}
+
+TEST(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFrame)
+{
+  StrictMock<ScannerMock> scanner_mock;
+  const ScannerConfiguration config{ createScannerConfig() };
+  UserCallbacks cb;
+  ScannerV2 scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+
+  Barrier monitoring_frame_barrier;
+  {
+    InSequence seq;
+
+    EXPECT_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config, DEFAULT_SEQ_NUMBER).serialize()))
+        .WillOnce(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
+
+    EXPECT_CALL(cb, LaserScanCallback(_)).WillOnce(OpenBarrier(&monitoring_frame_barrier));
+  }
+
+  scanner_mock.startListeningForControlMsg();
+  auto promis = scanner.start();
+  promis.wait_for(DEFAULT_TIMEOUT);
+
+  std::cout << "ScannerAPITests: Send empty monitoring frame..." << std::endl;
+  scanner_mock.sendEmptyMonitoringFrame();
+  EXPECT_FALSE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT))
+      << "Empty monitoring frame triggered LaserScanCallback";
+
+  std::cout << "ScannerAPITests: Send valid monitoring frame..." << std::endl;
+  scanner_mock.sendMonitoringFrame(createValidMonitoringFrameMsg());
+  EXPECT_TRUE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
+}
+
+TEST(ScannerAPITests, shouldThrowWhenConstructedWithInvalidLaserScanCallback)
+{
+  const ScannerConfiguration config{ createScannerConfig() };
+  EXPECT_THROW(ScannerV2 scanner(config, nullptr);, std::invalid_argument);
 }
 
 }  // namespace psen_scan_v2_test

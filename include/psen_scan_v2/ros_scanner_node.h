@@ -26,7 +26,7 @@
 
 #include <ros/ros.h>
 
-#include "psen_scan_v2/scanner.h"
+#include "psen_scan_v2/scanner_v2.h"
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 
 namespace psen_scan_v2
@@ -37,7 +37,7 @@ using namespace std::chrono_literals;
  * @brief ROS Node for fetching and publishing laserscan data from the scanner.
  *
  */
-template <typename S = Scanner>
+template <typename S = ScannerV2>
 class ROSScannerNodeT
 {
 public:
