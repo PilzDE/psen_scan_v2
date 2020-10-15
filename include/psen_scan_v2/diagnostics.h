@@ -36,14 +36,6 @@ static constexpr uint32_t DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BY
 
 enum class DiagnosticCode;
 
-enum class MonitoringFrameDiagnosticMessageLevel : uint8_t
-{
-  INFO,
-  WARNING,
-  DEBUG,
-  ERROR
-};
-
 class MonitoringFrameDiagnosticMessage
 {
 public:
@@ -66,7 +58,6 @@ private:
   DiagnosticCode code_;
   DiagnoseFieldErrorByteLocation byte_location_;
   DiagnoseFieldErrorBitLocation bit_location_;
-  MonitoringFrameDiagnosticMessageLevel level_;
 };
 
 // clang-format off

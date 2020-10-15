@@ -22,18 +22,14 @@ namespace psen_scan_v2
 MonitoringFrameDiagnosticMessage::MonitoringFrameDiagnosticMessage(ScannerId id,
                                                                    DiagnoseFieldErrorByteLocation byte_location,
                                                                    DiagnoseFieldErrorBitLocation bit_location)
-  : id_(id)
-  , code_(error_bits[byte_location][bit_location])
-  , byte_location_(byte_location)
-  , bit_location_(bit_location)
-  , level_(MonitoringFrameDiagnosticMessageLevel::ERROR)
+  : id_(id), code_(error_bits[byte_location][bit_location]), byte_location_(byte_location), bit_location_(bit_location)
 {
 }
 
 bool MonitoringFrameDiagnosticMessage::operator==(const MonitoringFrameDiagnosticMessage& rhs) const
 {
   return (bit_location_ == rhs.bit_location_ && byte_location_ == rhs.byte_location_ && code_ == rhs.code_ &&
-          id_ == rhs.id_ && level_ == rhs.level_);
+          id_ == rhs.id_);
 }
 
 std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg)
