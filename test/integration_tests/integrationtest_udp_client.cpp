@@ -48,7 +48,6 @@ static const std::string UDP_MOCK_IP_ADDRESS{ "127.0.0.1" };
 static constexpr unsigned short UDP_MOCK_PORT{ HOST_UDP_PORT + 1 };
 
 static constexpr std::size_t DATA_SIZE_BYTES{ 100 };
-static constexpr std::chrono::milliseconds RECEIVE_TIMEOUT{ 50 };
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -59,7 +58,6 @@ public:
   UdpClientTests();
   MOCK_METHOD2(handleNewData, void(const MaxSizeRawData&, const std::size_t&));
   MOCK_METHOD1(handleError, void(const std::string&));
-  MOCK_METHOD1(handleTimeout, void(const std::string&));
 
   MOCK_METHOD2(receivedUdpMsg, void(const udp::endpoint&, const psen_scan_v2::DynamicSizeRawData&));
 
@@ -113,47 +111,13 @@ TEST_F(UdpClientTests, testSingleAsyncReadOperation)
   BARRIER(CLIENT_RECEIVED_DATA);
 }
 
-TEST_F(UdpClientTests, testTwoConsecutiveTimeouts)
-{
-  EXPECT_CALL(*this, handleTimeout(_))
-      .WillOnce(ACTION_OPEN_BARRIER_VOID(TIMEOUT_BARRIER_1))
-      .WillOnce(ACTION_OPEN_BARRIER_VOID(TIMEOUT_BARRIER_2));
-
-  udp_client_.startAsyncReceiving(
-      ReceiveMode::single, std::bind(&UdpClientTests::handleTimeout, this, std::placeholders::_1), RECEIVE_TIMEOUT);
-  BARRIER(TIMEOUT_BARRIER_1);
-
-  udp_client_.startAsyncReceiving(
-      ReceiveMode::single, std::bind(&UdpClientTests::handleTimeout, this, std::placeholders::_1), RECEIVE_TIMEOUT);
-  BARRIER(TIMEOUT_BARRIER_2);
-}
-
 TEST_F(UdpClientTests, testErrorHandlingForReceive)
 {
   EXPECT_CALL(*this, handleError(_)).WillOnce(ACTION_OPEN_BARRIER_VOID(ERROR_HANDLER_CALLED));
-  EXPECT_CALL(*this, handleTimeout(_)).Times(0);
-
-  udp_client_.startAsyncReceiving(
-      ReceiveMode::single, std::bind(&UdpClientTests::handleTimeout, this, std::placeholders::_1), RECEIVE_TIMEOUT);
-  sendEmptyTestDataToClient();
-  BARRIER(ERROR_HANDLER_CALLED);
-}
-
-TEST_F(UdpClientTests, testRestartAfterTimeout)
-{
-  {
-    ::testing::InSequence seq;
-    EXPECT_CALL(*this, handleTimeout(_)).WillOnce(ACTION_OPEN_BARRIER_VOID(TIMEOUT_BARRIER_1));
-    EXPECT_CALL(*this, handleNewData(_, _)).WillOnce(ACTION_OPEN_BARRIER_VOID(CLIENT_RECEIVED_DATA));
-  }
-
-  udp_client_.startAsyncReceiving(
-      ReceiveMode::single, std::bind(&UdpClientTests::handleTimeout, this, std::placeholders::_1), RECEIVE_TIMEOUT);
-  BARRIER(TIMEOUT_BARRIER_1);
 
   udp_client_.startAsyncReceiving(ReceiveMode::single);
-  sendTestDataToClient();
-  BARRIER(CLIENT_RECEIVED_DATA);
+  sendEmptyTestDataToClient();
+  BARRIER(ERROR_HANDLER_CALLED);
 }
 
 TEST_F(UdpClientTests, testWriteOperation)
