@@ -19,6 +19,9 @@
 #include <stdexcept>
 #include <string>
 #include <atomic>
+#include <chrono>
+#include <future>
+
 #include <gtest/gtest_prod.h>
 
 #include <ros/ros.h>
@@ -28,6 +31,8 @@
 
 namespace psen_scan_v2
 {
+using namespace std::chrono_literals;
+
 /**
  * @brief ROS Node for fetching and publishing laserscan data from the scanner.
  *
@@ -71,6 +76,7 @@ private:
   FRIEND_TEST(RosScannerNodeTests, testScannerInvocation);
   FRIEND_TEST(RosScannerNodeTests, testScanTopicReceived);
   FRIEND_TEST(RosScannerNodeTests, testScanBuildFailure);
+  FRIEND_TEST(RosScannerNodeTests, testMissingStopReply);
 };
 
 typedef ROSScannerNodeT<> ROSScannerNode;
@@ -110,7 +116,12 @@ void ROSScannerNodeT<S>::run()
   {
     r.sleep();
   }
-  scanner_.stop();
+  const auto stop_future = scanner_.stop();
+  const auto stop_status = stop_future.wait_for(3s);
+  if (stop_status == std::future_status::timeout)
+  {
+    ROS_ERROR("Scanner did not finish properly");
+  }
 }
 
 }  // namespace psen_scan_v2

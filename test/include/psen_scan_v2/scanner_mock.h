@@ -16,6 +16,8 @@
 #ifndef PSEN_SCAN_V2_TEST_MOCK_SCANNER_IMPL_H
 #define PSEN_SCAN_V2_TEST_MOCK_SCANNER_IMPL_H
 
+#include <future>
+
 #include <gmock/gmock.h>
 
 #include "psen_scan_v2/scanner.h"
@@ -32,8 +34,8 @@ public:
               const psen_scan_v2::LaserScanCallback& laser_scan_callback)
     : laser_scan_callback_(laser_scan_callback){};
 
-  MOCK_METHOD0(start, void());
-  MOCK_METHOD0(stop, void());
+  MOCK_METHOD0(start, std::future<void>());
+  MOCK_METHOD0(stop, std::future<void>());
 
   void invokeLaserScanCallback(const psen_scan_v2::LaserScan& scan);
 

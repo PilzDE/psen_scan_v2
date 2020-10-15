@@ -24,6 +24,7 @@
 #include <string>
 #include <future>
 #include <sstream>
+#include <mutex>
 
 #include <gtest/gtest_prod.h>
 
@@ -37,6 +38,7 @@
 #include "psen_scan_v2/stop_request.h"
 #include "psen_scan_v2/udp_client.h"
 #include "psen_scan_v2/monitoring_frame_deserialization.h"
+#include "psen_scan_v2/watchdog.h"
 #include "psen_scan_v2/logging.h"
 
 namespace psen_scan_v2
@@ -70,17 +72,27 @@ private:
   void sendStopRequest();
 
 private:
-  void handleStartReplyTimeout(const std::string& error_str);
+  void handleStartReplyTimeout();
   void handleStopReplyTimeout(const std::string& error_str);
 
   void notifyStartedState();
   void notifyStoppedState();
 
+  void startStartReplyWatchdog();
+  void stopStartReplyWatchdog();
+
 private:
   ScannerConfiguration scanner_config_;
   TCSM state_machine_;
+
   TUCI control_udp_client_;
   TUCI data_udp_client_;
+
+  // The watchdog pointer is changed by the user-main-thread and by the UDP client callback-thread/io-service-thread,
+  // and, therefore, needs to be protected/sychronized via mutex.
+  std::mutex watchdog_mutex_;
+  std::unique_ptr<Watchdog> start_reply_watchdog_{};
+
   LaserScanCallback laser_scan_callback_;
 
   std::promise<void> started_;
@@ -89,11 +101,12 @@ private:
   friend class ScannerControllerTest;
   FRIEND_TEST(ScannerControllerTest, testSuccessfulStartSequence);
   FRIEND_TEST(ScannerControllerTest, testSuccessfulStopSequence);
-  FRIEND_TEST(ScannerControllerTest, testHandleMonitoringFrame);
+  FRIEND_TEST(ScannerControllerTest, testHandleNewMonitoringFrame);
   FRIEND_TEST(ScannerControllerTest, testHandleEmptyMonitoringFrame);
   FRIEND_TEST(ScannerControllerTest, testHandleError);
-  FRIEND_TEST(ScannerControllerTest, testResendStartReplyOnTimeout);
+  FRIEND_TEST(ScannerControllerTest, testRetryAfterStartReplyTimeout);
   FRIEND_TEST(ScannerControllerTest, testStopReplyTimeout);
+  FRIEND_TEST(ScannerControllerTest, testStopWhileWaitingForStartReply);
 };
 
 typedef ScannerControllerT<> ScannerController;
@@ -163,6 +176,9 @@ void ScannerControllerT<TCSM, TUCI>::handleError(const std::string& error_msg)
 template <typename TCSM, typename TUCI>
 std::future<void> ScannerControllerT<TCSM, TUCI>::start()
 {
+  control_udp_client_.startAsyncReceiving(ReceiveMode::single);
+  data_udp_client_.startAsyncReceiving();
+
   state_machine_.processStartRequestEvent();
   return started_.get_future();
 }
@@ -177,12 +193,8 @@ std::future<void> ScannerControllerT<TCSM, TUCI>::stop()
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::sendStartRequest()
 {
-  control_udp_client_.startAsyncReceiving(
-      ReceiveMode::single, std::bind(&ScannerControllerT::handleStartReplyTimeout, this, _1), RECEIVE_TIMEOUT_CONTROL);
-  data_udp_client_.startAsyncReceiving();
-  StartRequest start_request(scanner_config_, DEFAULT_SEQ_NUMBER);
-
-  control_udp_client_.write(start_request.serialize());
+  startStartReplyWatchdog();
+  control_udp_client_.write(StartRequest(scanner_config_, DEFAULT_SEQ_NUMBER).serialize());
 }
 
 template <typename TCSM, typename TUCI>
@@ -193,10 +205,12 @@ void ScannerControllerT<TCSM, TUCI>::handleScannerReply(const MaxSizeRawData& da
 }
 
 template <typename TCSM, typename TUCI>
-void ScannerControllerT<TCSM, TUCI>::handleStartReplyTimeout(const std::string& error_str)
+void ScannerControllerT<TCSM, TUCI>::handleStartReplyTimeout()
 {
-  PSENSCAN_ERROR(
-      "ScannerController", "Timeout while waiting for start reply message from scanner | Error message: {}", error_str);
+  PSENSCAN_ERROR("ScannerController",
+                 "Timeout while waiting for the scanner to start! Retrying... "
+                 "(Please check the ethernet connection or contact PILZ support if the error persists.)");
+  state_machine_.processStartReplyTimeoutEvent();
 }
 
 template <typename TCSM, typename TUCI>
@@ -209,6 +223,9 @@ void ScannerControllerT<TCSM, TUCI>::handleStopReplyTimeout(const std::string& e
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::sendStopRequest()
 {
+  // Before we send the stop request, we need to ensure that an potentially running start()-loop is stopped.
+  stopStartReplyWatchdog();
+
   control_udp_client_.startAsyncReceiving(
       ReceiveMode::single, std::bind(&ScannerControllerT::handleStopReplyTimeout, this, _1), RECEIVE_TIMEOUT_CONTROL);
   StopRequest stop_request;
@@ -219,8 +236,9 @@ template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::notifyStartedState()
 {
   PSENSCAN_DEBUG("ScannerController", "Started() called.");
-  started_.set_value();
+  stopStartReplyWatchdog();
 
+  started_.set_value();
   // Reinitialize
   started_ = std::promise<void>();
 }
@@ -234,6 +252,28 @@ void ScannerControllerT<TCSM, TUCI>::notifyStoppedState()
   // Reinitialize
   stopped_ = std::promise<void>();
 }
+
+template <typename TCSM, typename TUCI>
+void ScannerControllerT<TCSM, TUCI>::startStartReplyWatchdog()
+{
+  // If the watchdog exists, the watchdog is running and there is nothing to do.
+  if (start_reply_watchdog_)
+  {
+    return;
+  }
+
+  const std::lock_guard<std::mutex> lock(watchdog_mutex_);
+  start_reply_watchdog_ = std::make_unique<Watchdog>(RECEIVE_TIMEOUT_CONTROL,
+                                                     std::bind(&ScannerControllerT::handleStartReplyTimeout, this));
+}
+
+template <typename TCSM, typename TUCI>
+void ScannerControllerT<TCSM, TUCI>::stopStartReplyWatchdog()
+{
+  const std::lock_guard<std::mutex> lock(watchdog_mutex_);
+  start_reply_watchdog_.reset(nullptr);
+}
+
 }  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_SCANNER_CONTROLLER_H

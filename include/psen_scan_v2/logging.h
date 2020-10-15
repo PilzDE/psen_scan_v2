@@ -16,6 +16,7 @@
 #ifndef PSEN_SCAN_V2_LOGGING_H
 #define PSEN_SCAN_V2_LOGGING_H
 
+#include <chrono>
 #include <console_bridge/console.h>
 #include <sstream>
 #include <fmt/core.h>
@@ -23,9 +24,25 @@
 #include <fmt/format.h>
 
 #define PSENSCAN_LOG(name, file, line, level, ...)                                                                     \
+  do                                                                                                                   \
   {                                                                                                                    \
     console_bridge::getOutputHandler()->log(fmt::format("{}: {}", name, fmt::format(__VA_ARGS__)), level, file, line); \
-  }
+  } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
+
+#define PSENSCAN_LOG_THROTTLE(period, name, file, line, level, ...)                                                    \
+  PSENSCAN_LOG_THROTTLE_INTERNAL(std::chrono::system_clock::now(), period, name, file, line, level, __VA_ARGS__)
+
+#define PSENSCAN_LOG_THROTTLE_INTERNAL(now, period, name, file, line, level, ...)                                      \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    static std::chrono::system_clock::time_point throttle_last_hit;                                                    \
+    auto throttle_now = now;                                                                                           \
+    if (throttle_last_hit + std::chrono::duration<double>(period) < throttle_now)                                      \
+    {                                                                                                                  \
+      throttle_last_hit = throttle_now;                                                                                \
+      PSENSCAN_LOG(name, file, line, level, __VA_ARGS__);                                                              \
+    }                                                                                                                  \
+  } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
 
 using namespace console_bridge;
 
@@ -33,5 +50,23 @@ using namespace console_bridge;
 #define PSENSCAN_INFO(name, ...) PSENSCAN_LOG(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_INFO, __VA_ARGS__)
 #define PSENSCAN_WARN(name, ...) PSENSCAN_LOG(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_WARN, __VA_ARGS__)
 #define PSENSCAN_DEBUG(name, ...) PSENSCAN_LOG(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_DEBUG, __VA_ARGS__)
+
+#define PSENSCAN_ERROR_THROTTLE_INTERNAL(now, period, name, ...)                                                       \
+  PSENSCAN_LOG_THROTTLE_INTERNAL(now, period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, __VA_ARGS__)
+#define PSENSCAN_INFO_THROTTLE_INTERNAL(now, period, name, ...)                                                        \
+  PSENSCAN_LOG_THROTTLE_INTERNAL(now, period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_INFO, __VA_ARGS__)
+#define PSENSCAN_WARN_THROTTLE_INTERNAL(now, period, name, ...)                                                        \
+  PSENSCAN_LOG_THROTTLE_INTERNAL(now, period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_WARN, __VA_ARGS__)
+#define PSENSCAN_DEBUG_THROTTLE_INTERNAL(now, period, name, ...)                                                       \
+  PSENSCAN_LOG_THROTTLE_INTERNAL(now, period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_DEBUG, __VA_ARGS__)
+
+#define PSENSCAN_ERROR_THROTTLE(period, name, ...)                                                                     \
+  PSENSCAN_LOG_THROTTLE(period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, __VA_ARGS__)
+#define PSENSCAN_INFO_THROTTLE(period, name, ...)                                                                      \
+  PSENSCAN_LOG_THROTTLE(period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_INFO, __VA_ARGS__)
+#define PSENSCAN_WARN_THROTTLE(period, name, ...)                                                                      \
+  PSENSCAN_LOG_THROTTLE(period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_WARN, __VA_ARGS__)
+#define PSENSCAN_DEBUG_THROTTLE(period, name, ...)                                                                     \
+  PSENSCAN_LOG_THROTTLE(period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_DEBUG, __VA_ARGS__)
 
 #endif  // PSEN_SCAN_V2_LOGGING_H

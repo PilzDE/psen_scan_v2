@@ -33,7 +33,7 @@ using namespace psen_scan_v2_test;
 using ::testing::_;
 using ::testing::InSequence;
 
-using ::testing::StrictMock;
+using ::testing::NiceMock;
 
 namespace psen_scan_v2
 {
@@ -60,14 +60,14 @@ public:
 
 class ScannerControllerTest : public ::testing::Test
 {
-protected:
-  void sendStartReply();
-  void sendStopReply();
-  void sendMonitoringFrame(MonitoringFrameMsg& msg);
+public:
+  void simulateStartReply();
+  void simulateStopReply();
+  void simulateMonitoringFrame(MonitoringFrameMsg& msg);
   void simulateUdpError(const std::string& msg);
   void simulateUdpTimeout(const std::string& msg);
 
-protected:
+public:
   MockCallbackHolder mock_;
   ScannerConfiguration scanner_config_{ HOST_IP, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, DEVICE_IP, SCAN_RANGE };
 
@@ -75,21 +75,30 @@ protected:
     std::bind(&MockCallbackHolder::laserscan_callback, &mock_, std::placeholders::_1)
   };
 
-  ScannerControllerT<ControllerStateMachine, MockUdpClient> scanner_controller_{ scanner_config_,
-                                                                                 laser_scan_callback_ };
+  ScannerControllerT<ControllerStateMachine, NiceMock<MockUdpClient> > scanner_controller_{ scanner_config_,
+                                                                                            laser_scan_callback_ };
 };
 
-void ScannerControllerTest::sendStartReply()
+#define EXPECT_START_LISTENING_FOR_CONTROL1(scanner_controller)                                                        \
+  EXPECT_CALL(scanner_controller.control_udp_client_, startAsyncReceiving(_))
+#define EXPECT_START_LISTENING_FOR_CONTROL3(scanner_controller)                                                        \
+  EXPECT_CALL(scanner_controller.control_udp_client_, startAsyncReceiving(_, _, _))
+#define EXPECT_START_LISTENING_FOR_DATA(scanner_controller)                                                            \
+  EXPECT_CALL(scanner_controller.data_udp_client_, startAsyncReceiving())
+#define EXPECT_REQUEST_SEND(scanner_controller, request)                                                               \
+  EXPECT_CALL(scanner_controller.control_udp_client_, write(request.serialize()))
+
+void ScannerControllerTest::simulateStartReply()
 {
   scanner_controller_.control_udp_client_.sendStartReply();
 }
 
-void ScannerControllerTest::sendStopReply()
+void ScannerControllerTest::simulateStopReply()
 {
   scanner_controller_.control_udp_client_.sendStopReply();
 }
 
-void ScannerControllerTest::sendMonitoringFrame(MonitoringFrameMsg& msg)
+void ScannerControllerTest::simulateMonitoringFrame(MonitoringFrameMsg& msg)
 {
   scanner_controller_.data_udp_client_.sendMonitoringFrame(msg);
 }
@@ -108,36 +117,53 @@ TEST_F(ScannerControllerTest, testSuccessfulStartSequence)
 {
   {
     InSequence seq;
-    EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _)).Times(1);
-    EXPECT_CALL(scanner_controller_.data_udp_client_, startAsyncReceiving()).Times(1);
-    EXPECT_CALL(scanner_controller_.control_udp_client_,
-                write(StartRequest(scanner_config_, DEFAULT_START_REQUEST_SEQ_NUMBER).serialize()))
-        .Times(1);
+    EXPECT_START_LISTENING_FOR_CONTROL1(scanner_controller_).Times(1);
+    EXPECT_REQUEST_SEND(scanner_controller_, StartRequest(scanner_config_, DEFAULT_START_REQUEST_SEQ_NUMBER)).Times(1);
   }
+  EXPECT_START_LISTENING_FOR_DATA(scanner_controller_).Times(1);
 
   auto start_future = scanner_controller_.start();
-  sendStartReply();
+  simulateStartReply();
   EXPECT_TRUE(isFutureReady(start_future));
 }
 
-TEST_F(ScannerControllerTest, testResendStartReplyOnTimeout)
+TEST_F(ScannerControllerTest, testReceivingMultipleStartReplies)
 {
-  EXPECT_CALL(scanner_controller_.control_udp_client_, write(_)).Times(1);  // Should be 2 after feature is implemented
+  MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(275), 1, { 0.1, 20., 25, 10, 1., 2., 3. });
+  const LaserScan scan{ toLaserScan(msg) };
+
+  EXPECT_CALL(mock_, laserscan_callback(toLaserScan(msg))).Times(2);
 
   scanner_controller_.start();
-  simulateUdpTimeout("Udp timeout");
-  sendStartReply();
+  simulateStartReply();
+  simulateMonitoringFrame(msg);
+  simulateStartReply();
+  simulateMonitoringFrame(msg);
 }
 
 TEST_F(ScannerControllerTest, testSuccessfulStopSequence)
 {
   {
     InSequence seq;
-    EXPECT_CALL(scanner_controller_.control_udp_client_, startAsyncReceiving(_, _, _)).Times(1);
-    EXPECT_CALL(scanner_controller_.control_udp_client_, write(StopRequest().serialize())).Times(1);
+    EXPECT_START_LISTENING_FOR_CONTROL3(scanner_controller_).Times(1);
+    EXPECT_REQUEST_SEND(scanner_controller_, StopRequest()).Times(1);
   }
   auto stop_future = scanner_controller_.stop();
-  sendStopReply();
+  simulateStopReply();
+  EXPECT_TRUE(isFutureReady(stop_future));
+}
+
+TEST_F(ScannerControllerTest, testStopWhileWaitingForStartReply)
+{
+  {
+    InSequence seq;
+    EXPECT_REQUEST_SEND(scanner_controller_, StartRequest(scanner_config_, DEFAULT_START_REQUEST_SEQ_NUMBER)).Times(1);
+    EXPECT_REQUEST_SEND(scanner_controller_, StopRequest()).Times(1);
+  }
+
+  scanner_controller_.sendStartRequest();
+  auto stop_future = scanner_controller_.stop();
+  simulateStopReply();
   EXPECT_TRUE(isFutureReady(stop_future));
 }
 
@@ -152,7 +178,7 @@ TEST_F(ScannerControllerTest, testStopReplyTimeout)
 
   scanner_controller_.stop();
   simulateUdpTimeout("Udp timeout");
-  sendStopReply();
+  simulateStopReply();
 }
 
 TEST_F(ScannerControllerTest, testHandleMonitoringFrame)
@@ -164,8 +190,8 @@ TEST_F(ScannerControllerTest, testHandleMonitoringFrame)
   EXPECT_CALL(mock_, laserscan_callback(scan)).Times(1);
 
   scanner_controller_.start();
-  sendStartReply();
-  scanner_controller_.data_udp_client_.sendMonitoringFrame(msg);
+  simulateStartReply();
+  simulateMonitoringFrame(msg);
 }
 
 TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
@@ -174,38 +200,34 @@ TEST_F(ScannerControllerTest, testHandleEmptyMonitoringFrame)
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
   scanner_controller_.start();
-  sendStartReply();
+  simulateStartReply();
 
-  sendMonitoringFrame(msg);
+  simulateMonitoringFrame(msg);
 }
 
 TEST_F(ScannerControllerTest, testHandleEarlyMonitoringFrame)
 {
-  using ::testing::_;
-
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
   scanner_controller_.start();
 
   MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(275), 1, { 0.1, 20., 25, 10, 1., 2., 3. });
-  sendMonitoringFrame(msg);
+  simulateMonitoringFrame(msg);
 }
 
 TEST_F(ScannerControllerTest, testHandleLateMonitoringFrame)
 {
-  using ::testing::_;
-
   EXPECT_CALL(mock_, laserscan_callback(_)).Times(0);
 
   scanner_controller_.start();
-  sendStartReply();
+  simulateStartReply();
 
   scanner_controller_.stop();
 
   MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(275), 1, { 0.1, 20., 25, 10, 1., 2., 3. });
-  sendMonitoringFrame(msg);
+  simulateMonitoringFrame(msg);
 
-  sendStopReply();
+  simulateStopReply();
 }
 
 TEST_F(ScannerControllerTest, testHandleError)

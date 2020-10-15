@@ -36,6 +36,7 @@ public:
   virtual ~ControllerStateMachine();
 
   void processStartRequestEvent();
+  void processStartReplyTimeoutEvent();
   void processReplyReceivedEvent(ScannerReplyMsgType type);
   void processMonitoringFrameReceivedEvent(const MonitoringFrameMsg& frame);
   void processStopRequestEvent();

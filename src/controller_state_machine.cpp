@@ -43,6 +43,12 @@ void ControllerStateMachine::processStartRequestEvent()
   sm_.process_event(udp_connection_state_machine::events::start_request());
 }
 
+void ControllerStateMachine::processStartReplyTimeoutEvent()
+{
+  const std::lock_guard<std::mutex> lock(sm_access_mutex_);
+  sm_.process_event(udp_connection_state_machine::events::start_reply_timeout());
+}
+
 // LCOV_EXCL_START
 // TODO: Add again to coverage when function are actually used.
 void ControllerStateMachine::processReplyReceivedEvent(ScannerReplyMsgType type)
