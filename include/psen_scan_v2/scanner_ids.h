@@ -33,6 +33,11 @@ static constexpr std::array<ScannerId, 4> SCANNER_IDS{ ScannerId::MASTER,
                                                        ScannerId::SLAVE1,
                                                        ScannerId::SLAVE2 };
 
+static const std::map<ScannerId, std::string> scanner_id_to_string{ { ScannerId::MASTER, "Master" },
+                                                                    { ScannerId::SLAVE0, "Slave0" },
+                                                                    { ScannerId::SLAVE1, "Slave1" },
+                                                                    { ScannerId::SLAVE2, "Slave2" } };
+
 }  //   namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_SCANNER_IDS_H

@@ -34,9 +34,8 @@ bool MonitoringFrameDiagnosticMessage::operator==(const MonitoringFrameDiagnosti
 
 std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg)
 {
-  // TODO ID to name (master, slave, ...)
   os << fmt::format(
-      "id:{} {} (Byte: {} Bit:{})", msg.id_, error_code_to_string.at(msg.code_), msg.byte_location_, msg.bit_location_);
+      "id:{} {} (Byte: {} Bit:{})", scanner_id_to_string.at(msg.id_), error_code_to_string.at(msg.code_), msg.byte_location_, msg.bit_location_);
   return os;
 }
 
