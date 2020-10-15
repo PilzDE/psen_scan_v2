@@ -20,8 +20,8 @@ using namespace psen_scan_v2;
 namespace psen_scan_v2
 {
 MonitoringFrameDiagnosticMessage::MonitoringFrameDiagnosticMessage(ScannerId id,
-                                                                   DiagnoseFieldErrorByteLocation byte_location,
-                                                                   DiagnoseFieldErrorBitLocation bit_location)
+                                                                   ErrorByteLocation byte_location,
+                                                                   ErrorBitLocation bit_location)
   : id_(id), code_(error_bits[byte_location][bit_location]), byte_location_(byte_location), bit_location_(bit_location)
 {
 }

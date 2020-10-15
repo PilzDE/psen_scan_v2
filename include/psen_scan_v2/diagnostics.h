@@ -40,12 +40,12 @@ enum class DiagnosticCode;
 class MonitoringFrameDiagnosticMessage
 {
 public:
-  using DiagnoseFieldErrorBitLocation = uint8_t;
-  using DiagnoseFieldErrorByteLocation = uint16_t;
+  using ErrorBitLocation = uint8_t;
+  using ErrorByteLocation = uint16_t;
 
   MonitoringFrameDiagnosticMessage(ScannerId id,
-                                   DiagnoseFieldErrorByteLocation byte_location,
-                                   DiagnoseFieldErrorBitLocation bit_location);
+                                   ErrorByteLocation byte_location,
+                                   ErrorBitLocation bit_location);
 
   bool operator==(const MonitoringFrameDiagnosticMessage& rhs) const;
 
@@ -64,12 +64,12 @@ public:
     return code_;
   }
 
-  DiagnoseFieldErrorByteLocation getDiagnoseFieldErrorByteLocation() const
+  ErrorByteLocation getErrorByteLocation() const
   {
     return byte_location_;
   }
 
-  DiagnoseFieldErrorBitLocation getDiagnoseFieldErrorBitLocation() const
+  ErrorBitLocation getErrorBitLocation() const
   {
     return bit_location_;
   }
@@ -77,8 +77,8 @@ public:
 private:
   ScannerId id_;
   DiagnosticCode code_;
-  DiagnoseFieldErrorByteLocation byte_location_;
-  DiagnoseFieldErrorBitLocation bit_location_;
+  ErrorByteLocation byte_location_;
+  ErrorBitLocation bit_location_;
 };
 
 // clang-format off
@@ -177,8 +177,8 @@ struct fmt::formatter<psen_scan_v2::MonitoringFrameDiagnosticMessage>
                      "id:{} {} (Byte: {} Bit:{})",
                      msg.getScannerId(),
                      psen_scan_v2::error_code_to_string.at(msg.getDiagnosticCode()),
-                     msg.getDiagnoseFieldErrorByteLocation(),
-                     msg.getDiagnoseFieldErrorBitLocation());
+                     msg.getErrorByteLocation(),
+                     msg.getErrorBitLocation());
   }
 };
 
