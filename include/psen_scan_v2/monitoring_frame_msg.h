@@ -64,9 +64,10 @@ public:
     , resolution_(resolution)
     , scan_counter_(scan_counter)
     , diagnostic_messages_(diagnostic_messages)
-    , measures_(measures){
-
-    };
+    , measures_(measures)
+  {
+    diagnostic_data_enabled_ = true;
+  };
 
 public:
   TenthOfDegree fromTheta() const;
@@ -76,20 +77,7 @@ public:
   std::vector<MonitoringFrameDiagnosticMessage> diagnostic_messages() const;
   bool operator==(const MonitoringFrameMsg& rhs) const;
 
-  friend std::ostream& operator<<(std::ostream& os, const MonitoringFrameMsg& msg)
-  {
-    os << fmt::format("MonitoringFrameMsg(fromTheta = {} deg, resolution = {} deg, scanCounter = "
-                      "{}, measures = {})",
-                      msg.fromTheta().value() / 10.,
-                      msg.resolution().value() / 10.,
-                      msg.scanCounter(),
-                      msg.measures_);
-    if (msg.diagnostic_data_enabled_)
-    {
-      os << "Not implemented yet";
-    }
-    return os;
-  }
+  friend std::ostream& operator<<(std::ostream& os, const MonitoringFrameMsg& msg);
 
 private:
   ScannerId scanner_id_{ ScannerId::MASTER };
@@ -97,14 +85,15 @@ private:
   TenthOfDegree resolution_{ 0 };
 
   uint32_t scan_counter_{ 0 };
+  std::vector<MonitoringFrameDiagnosticMessage> diagnostic_messages_;
   std::vector<double> measures_;
   bool diagnostic_data_enabled_{ false };
-  std::vector<MonitoringFrameDiagnosticMessage> diagnostic_messages_;
 
 public:
   friend DynamicSizeRawData serialize(MonitoringFrameMsg& frame);
   friend MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, const std::size_t& num_bytes);
 };
+
 }  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_MONITORING_FRAME_MSG_H
