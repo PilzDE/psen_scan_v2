@@ -58,7 +58,7 @@ std::vector<MonitoringFrameDiagnosticMessage> MonitoringFrameMsg::diagnostic_mes
 bool MonitoringFrameMsg::operator==(const MonitoringFrameMsg& rhs) const
 {
   return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
-          measures() == rhs.measures());
+          measures() == rhs.measures() && diagnostic_messages() == rhs.diagnostic_messages());
 }
 
 std::ostream& operator<<(std::ostream& os, const MonitoringFrameMsg& msg)

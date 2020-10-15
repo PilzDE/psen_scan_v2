@@ -56,6 +56,8 @@ public:
                                    DiagnoseFieldErrorByteLocation byte_location,
                                    DiagnoseFieldErrorBitLocation bit_location);
 
+  bool operator==(const MonitoringFrameDiagnosticMessage& rhs) const;
+
   friend ::std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg);
 
   friend std::array<uint8_t, DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BYTES>

@@ -30,6 +30,12 @@ MonitoringFrameDiagnosticMessage::MonitoringFrameDiagnosticMessage(ScannerId id,
 {
 }
 
+bool MonitoringFrameDiagnosticMessage::operator==(const MonitoringFrameDiagnosticMessage& rhs) const
+{
+  return (bit_location_ == rhs.bit_location_ && byte_location_ == rhs.byte_location_ && code_ == rhs.code_ &&
+          id_ == rhs.id_ && level_ == rhs.level_);
+}
+
 std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg)
 {
   // Not implemented yet
