@@ -50,7 +50,7 @@ std::vector<double> MonitoringFrameMsg::measures() const
   return measures_;
 }
 
-std::vector<MonitoringFrameDiagnosticMessage> MonitoringFrameMsg::diagnostic_messages() const
+std::vector<MonitoringFrameDiagnosticMessage> MonitoringFrameMsg::diagnosticMessages() const
 {
   return diagnostic_messages_;
 }
@@ -58,7 +58,7 @@ std::vector<MonitoringFrameDiagnosticMessage> MonitoringFrameMsg::diagnostic_mes
 bool MonitoringFrameMsg::operator==(const MonitoringFrameMsg& rhs) const
 {
   return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
-          measures() == rhs.measures() && diagnostic_messages() == rhs.diagnostic_messages());
+          measures() == rhs.measures() && diagnosticMessages() == rhs.diagnosticMessages());
 }
 
 std::ostream& operator<<(std::ostream& os, const MonitoringFrameMsg& msg)

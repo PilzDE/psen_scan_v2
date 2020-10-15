@@ -136,7 +136,7 @@ void ScannerControllerT<TCSM, TUCI>::handleUdpData(const MaxSizeRawData& data, c
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::handleMonitoringFrame(const MonitoringFrameMsg& frame)
 {
-  for (const auto& message : frame.diagnostic_messages())
+  for (const auto& message : frame.diagnosticMessages())
   {
     std::ostringstream os;
     os << message;

@@ -74,7 +74,7 @@ public:
   TenthOfDegree resolution() const;
   uint32_t scanCounter() const;
   std::vector<double> measures() const;
-  std::vector<MonitoringFrameDiagnosticMessage> diagnostic_messages() const;
+  std::vector<MonitoringFrameDiagnosticMessage> diagnosticMessages() const;
   bool operator==(const MonitoringFrameMsg& rhs) const;
 
   friend std::ostream& operator<<(std::ostream& os, const MonitoringFrameMsg& msg);

@@ -38,8 +38,9 @@ bool MonitoringFrameDiagnosticMessage::operator==(const MonitoringFrameDiagnosti
 
 std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg)
 {
-  // Not implemented yet
-  // os << fmt::format("{} {} {} {}", msg.id_, msg.code_, msg.byte_location_, msg.bit_location_);
+  // TODO ID to name (master, slave, ...)
+  os << fmt::format(
+      "id:{} {} (Byte: {} Bit:{})", msg.id_, error_code_to_string.at(msg.code_), msg.byte_location_, msg.bit_location_);
   return os;
 }
 
