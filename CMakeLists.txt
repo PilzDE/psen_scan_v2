@@ -203,6 +203,7 @@ if(CATKIN_ENABLE_TESTING)
     test/unit_tests/unittest_controller_state_machine.cpp
     src/controller_state_machine.cpp
     src/monitoring_frame_msg.cpp
+    src/diagnostics.cpp
   )
   target_link_libraries(unittest_controller_state_machine
     ${catkin_LIBRARIES}
@@ -228,6 +229,7 @@ if(CATKIN_ENABLE_TESTING)
     src/scanner_configuration.cpp
     src/laserscan.cpp
     src/monitoring_frame_msg.cpp
+    src/diagnostics.cpp
   )
   target_link_libraries(unittest_scanner
     ${catkin_LIBRARIES}
@@ -263,6 +265,7 @@ if(CATKIN_ENABLE_TESTING)
     test/unit_tests/unittest_laserscan_conversions.cpp
     src/laserscan.cpp
     src/monitoring_frame_msg.cpp
+    src/diagnostics.cpp
   )
   target_link_libraries(unittest_laserscan_conversions
     ${catkin_LIBRARIES}
@@ -272,6 +275,7 @@ if(CATKIN_ENABLE_TESTING)
     test/unit_tests/unittest_laserscan_ros_conversions.cpp
     src/laserscan.cpp
     src/monitoring_frame_msg.cpp
+    src/diagnostics.cpp
   )
   target_link_libraries(unittest_laserscan_ros_conversions
     ${catkin_LIBRARIES}
@@ -357,6 +361,7 @@ target_link_libraries(integrationtest_scanner_api
     src/laserscan.cpp
     src/scanner_configuration.cpp
     src/monitoring_frame_msg.cpp
+    src/diagnostics.cpp
   )
   target_link_libraries(integrationtest_ros_scanner_node
     ${catkin_LIBRARIES}
