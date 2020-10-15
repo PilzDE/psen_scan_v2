@@ -30,8 +30,8 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
   raw_processing::write(os, ONLINE_WORKING_MODE);
   raw_processing::write(os, GUI_MONITORING_TRANSACTION);
   raw_processing::write(os, frame.scanner_id_);
-  raw_processing::write(os, frame.from_theta_);
-  raw_processing::write(os, frame.resolution_);
+  raw_processing::write(os, frame.from_theta_.value());
+  raw_processing::write(os, frame.resolution_.value());
 
   MonitoringFrameAdditionalFieldHeader scan_counter_header(MonitoringFrameAdditionalFieldIds::SCAN_COUNTER,
                                                            sizeof(frame.scan_counter_));
@@ -84,7 +84,7 @@ serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnosticMessage>& messa
 void writeFieldHeader(std::ostringstream& os, MonitoringFrameAdditionalFieldHeader& header)
 {
   raw_processing::write(os, header.id());
-  raw_processing::write(os, header.length() + 1);
+  raw_processing::write<MonitoringFrameAdditionalFieldHeader::Length>(os, header.length() + 1);
 }
 
 }  // namespace psen_scan_v2
