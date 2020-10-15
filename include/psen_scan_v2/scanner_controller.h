@@ -37,6 +37,7 @@
 #include "psen_scan_v2/stop_request.h"
 #include "psen_scan_v2/udp_client.h"
 #include "psen_scan_v2/monitoring_frame_deserialization.h"
+#include "psen_scan_v2/logging.h"
 
 namespace psen_scan_v2
 {
@@ -135,6 +136,14 @@ void ScannerControllerT<TCSM, TUCI>::handleUdpData(const MaxSizeRawData& data, c
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::handleMonitoringFrame(const MonitoringFrameMsg& frame)
 {
+  for (const auto& message : frame.diagnostic_messages())
+  {
+    std::ostringstream os;
+    os << message;
+    PSENSCAN_INFO("ScannerController", "{}", os.str());
+    // std::cerr << message;
+  }
+
   if (frame.measures().empty())
   {
     return;

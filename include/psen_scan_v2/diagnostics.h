@@ -58,7 +58,7 @@ public:
 
   bool operator==(const MonitoringFrameDiagnosticMessage& rhs) const;
 
-  friend ::std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg);
+  friend std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg);
 
   friend std::array<uint8_t, DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BYTES>
   serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnosticMessage>& messages);
@@ -106,7 +106,7 @@ enum class DiagnosticCode
 typedef DiagnosticCode Dc;
 using ErrorCodeName = std::string;
 
-static std::map<DiagnosticCode, ErrorCodeName> error_code_to_string{ { Dc::OSSD1_OC, "OSSD1_OC" },
+static const std::map<DiagnosticCode, ErrorCodeName> error_code_to_string{ { Dc::OSSD1_OC, "OSSD1_OC" },
                                                               { Dc::OSSD_SHRT_C, "OSSD_SHORT_CIRC" },
                                                               { Dc::OSSD_INTEGR, "OSSD_INTEGRITY" },
                                                               { Dc::INT, "INTERNAL" },
@@ -149,6 +149,7 @@ static std::map<DiagnosticCode, ErrorCodeName> error_code_to_string{ { Dc::OSSD1
   { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::UNUSED) },
   }};
 // clang-format on
+
 }  //  namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_DIAGNOSTICS_H

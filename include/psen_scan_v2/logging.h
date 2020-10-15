@@ -19,6 +19,8 @@
 #include <console_bridge/console.h>
 #include <sstream>
 #include <fmt/core.h>
+#include <fmt/ranges.h>
+#include <fmt/format.h>
 
 #define PSENSCAN_LOG(name, file, line, level, ...)                                                                     \
   {                                                                                                                    \

@@ -93,11 +93,6 @@ MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, cons
       case MonitoringFrameAdditionalFieldIds::DIAGNOSTICS:
         msg.diagnostic_messages_ = deserializeDiagnosticMessages(is);
         msg.diagnostic_data_enabled_ = true;
-        // WIP: TODO: Move elsewhere
-        for (auto& elem : msg.diagnostic_messages_)
-        {
-          std::cerr << elem;
-        }
         break;
 
       default:
