@@ -37,13 +37,7 @@ namespace psen_scan_v2
 {
 class MonitoringFrameDiagnosticMessage;
 
-static constexpr uint32_t OP_CODE_MONITORING_FRAME{ 0xCA };
-static constexpr uint32_t ONLINE_WORKING_MODE{ 0x00 };
-static constexpr uint32_t GUI_MONITORING_TRANSACTION{ 0x05 };
 static constexpr uint8_t MAX_SCANNER_ID{ sizeof(SCANNER_IDS) - 1 };
-
-static constexpr uint16_t NUMBER_OF_BYTES_SCAN_COUNTER{ 4 };
-static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_MEASURE{ 2 };
 
 class MonitoringFrameMsg
 {
@@ -80,16 +74,13 @@ public:
   }
 
 private:
-  uint32_t device_status_{ 0 };
-  uint32_t op_code_{ OP_CODE_MONITORING_FRAME };
-  uint32_t working_mode_{ 0 };
-  uint32_t transaction_type_{ GUI_MONITORING_TRANSACTION };
   ScannerId scanner_id_{ ScannerId::MASTER };
   TenthOfDegree from_theta_{ 0 };
   TenthOfDegree resolution_{ 0 };
 
   uint32_t scan_counter_{ 0 };
   std::vector<double> measures_;
+  bool diagnostic_data_enabled_{ false };
   std::vector<MonitoringFrameDiagnosticMessage> diagnostic_messages_;
 
 public:

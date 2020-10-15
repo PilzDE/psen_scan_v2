@@ -24,6 +24,12 @@
 
 namespace psen_scan_v2
 {
+static constexpr uint32_t DEFAULT_DEVICE_STATUS{ 0 };
+static constexpr uint32_t OP_CODE_MONITORING_FRAME{ 0xCA };
+static constexpr uint32_t ONLINE_WORKING_MODE{ 0x00 };
+static constexpr uint32_t GUI_MONITORING_TRANSACTION{ 0x05 };
+static constexpr uint16_t NUMBER_OF_BYTES_SCAN_COUNTER{ 4 };
+static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_MEASURE{ 2 };
 class MonitoringFrameAdditionalFieldHeader
 {
 public:
@@ -44,6 +50,44 @@ private:
   Length length_;
 };
 
+class MonitoringFrameHeader
+{
+public:
+  using DeviceStatus = uint32_t;
+  using OpCode = uint32_t;
+  using WorkingMode = uint32_t;
+  using TransactionType = uint32_t;
+  using FromTheta = TenthOfDegree;
+  using Resolution = TenthOfDegree;
+
+public:
+  MonitoringFrameHeader(DeviceStatus device_status,
+                        OpCode op_code,
+                        WorkingMode working_mode,
+                        TransactionType transaction_type,
+                        ScannerId scanner_id,
+                        FromTheta from_theta,
+                        Resolution resolution);
+
+public:
+  DeviceStatus device_status() const;
+  OpCode op_code() const;
+  WorkingMode working_mode() const;
+  TransactionType transaction_type() const;
+  ScannerId scanner_id() const;
+  FromTheta from_theta() const;
+  Resolution resolution() const;
+
+private:
+  DeviceStatus device_status_;
+  OpCode op_code_;
+  WorkingMode working_mode_;
+  TransactionType transaction_type_;
+  ScannerId scanner_id_;
+  FromTheta from_theta_;
+  Resolution resolution_;
+};
+
 using MonitoringFrameAdditionalFieldId = MonitoringFrameAdditionalFieldHeader::Id;
 using MonitoringFrameAdditionalFieldLength = MonitoringFrameAdditionalFieldHeader::Length;
 struct MonitoringFrameAdditionalFieldIds
@@ -55,6 +99,7 @@ struct MonitoringFrameAdditionalFieldIds
 };
 
 MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, const std::size_t& num_bytes);
+MonitoringFrameHeader readHeader(std::istringstream& is);
 MonitoringFrameAdditionalFieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes);
 std::vector<MonitoringFrameDiagnosticMessage> deserializeDiagnosticMessages(std::istringstream& is);
 
@@ -88,6 +133,41 @@ inline MonitoringFrameAdditionalFieldHeader::Id MonitoringFrameAdditionalFieldHe
 inline MonitoringFrameAdditionalFieldHeader::Length MonitoringFrameAdditionalFieldHeader::length() const
 {
   return length_;
+}
+
+inline MonitoringFrameHeader::DeviceStatus MonitoringFrameHeader::device_status() const
+{
+  return device_status_;
+}
+
+inline MonitoringFrameHeader::OpCode MonitoringFrameHeader::op_code() const
+{
+  return op_code_;
+}
+
+inline MonitoringFrameHeader::WorkingMode MonitoringFrameHeader::working_mode() const
+{
+  return working_mode_;
+}
+
+inline MonitoringFrameHeader::TransactionType MonitoringFrameHeader::transaction_type() const
+{
+  return transaction_type_;
+}
+
+inline ScannerId MonitoringFrameHeader::scanner_id() const
+{
+  return scanner_id_;
+}
+
+inline MonitoringFrameHeader::FromTheta MonitoringFrameHeader::from_theta() const
+{
+  return from_theta_;
+}
+
+inline MonitoringFrameHeader::Resolution MonitoringFrameHeader::resolution() const
+{
+  return resolution_;
 }
 
 }  // namespace psen_scan_v2

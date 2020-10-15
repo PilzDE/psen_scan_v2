@@ -25,10 +25,10 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
 {
   std::ostringstream os;
 
-  raw_processing::write(os, frame.device_status_);
-  raw_processing::write(os, frame.op_code_);
-  raw_processing::write(os, frame.working_mode_);
-  raw_processing::write(os, frame.transaction_type_);
+  raw_processing::write(os, DEFAULT_DEVICE_STATUS);
+  raw_processing::write(os, OP_CODE_MONITORING_FRAME);
+  raw_processing::write(os, ONLINE_WORKING_MODE);
+  raw_processing::write(os, GUI_MONITORING_TRANSACTION);
   raw_processing::write(os, frame.scanner_id_);
   raw_processing::write(os, frame.from_theta_);
   raw_processing::write(os, frame.resolution_);
@@ -39,12 +39,15 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
   uint32_t scan_counter_header_payload = frame.scan_counter_;
   raw_processing::write(os, scan_counter_header_payload);
 
-  MonitoringFrameAdditionalFieldHeader diagnostic_data_field_header(
-      MonitoringFrameAdditionalFieldIds::DIAGNOSTICS, DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BYTES);
-  writeFieldHeader(os, diagnostic_data_field_header);
-  std::array<uint8_t, DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BYTES> diagnostic_data_field_payload =
-      serializeDiagnosticMessages(frame.diagnostic_messages_);
-  raw_processing::write(os, diagnostic_data_field_payload);
+  if (frame.diagnostic_data_enabled_)
+  {
+    MonitoringFrameAdditionalFieldHeader diagnostic_data_field_header(
+        MonitoringFrameAdditionalFieldIds::DIAGNOSTICS, DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BYTES);
+    writeFieldHeader(os, diagnostic_data_field_header);
+    std::array<uint8_t, DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BYTES> diagnostic_data_field_payload =
+        serializeDiagnosticMessages(frame.diagnostic_messages_);
+    raw_processing::write(os, diagnostic_data_field_payload);
+  }
 
   MonitoringFrameAdditionalFieldHeader measures_header(MonitoringFrameAdditionalFieldIds::MEASURES,
                                                        frame.measures_.size() * NUMBER_OF_BYTES_SINGLE_MEASURE);

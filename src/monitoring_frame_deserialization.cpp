@@ -26,6 +26,23 @@ MonitoringFrameAdditionalFieldHeader::MonitoringFrameAdditionalFieldHeader(Id id
 {
 }
 
+MonitoringFrameHeader::MonitoringFrameHeader(DeviceStatus device_status,
+                                             OpCode op_code,
+                                             WorkingMode working_mode,
+                                             TransactionType transaction_type,
+                                             ScannerId scanner_id,
+                                             FromTheta from_theta,
+                                             Resolution resolution)
+  : device_status_(device_status)
+  , op_code_(op_code)
+  , working_mode_(working_mode)
+  , transaction_type_(transaction_type)
+  , scanner_id_(scanner_id)
+  , from_theta_(from_theta)
+  , resolution_(resolution)
+{
+}
+
 constexpr MonitoringFrameAdditionalFieldHeader::Id MonitoringFrameAdditionalFieldIds::SCAN_COUNTER;
 constexpr MonitoringFrameAdditionalFieldHeader::Id MonitoringFrameAdditionalFieldIds::MEASURES;
 constexpr MonitoringFrameAdditionalFieldHeader::Id MonitoringFrameAdditionalFieldIds::END_OF_FRAME;
@@ -38,49 +55,26 @@ MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, cons
   MaxSizeRawData tmp_data{ data };
   std::istringstream is(std::string(tmp_data.data(), tmp_data.size()));
 
-  raw_processing::read(is, msg.device_status_);
-  raw_processing::read(is, msg.op_code_);
-  raw_processing::read(is, msg.working_mode_);
-  raw_processing::read(is, msg.transaction_type_);
-  raw_processing::read(is, msg.scanner_id_);
+  MonitoringFrameHeader frame_header = readHeader(is);
 
-  raw_processing::read<uint16_t, TenthOfDegree>(is, msg.from_theta_);
-  raw_processing::read<uint16_t, TenthOfDegree>(is, msg.resolution_);
-
-  if (OP_CODE_MONITORING_FRAME != msg.op_code_)
-  {
-    // TODO: Get rid of the issue not to spam the system with this debug messages
-    //       Would something like  ROS_DEBUG_THROTTLE(period, ...) be a good solution?
-    PSENSCAN_DEBUG("MonitoringFrameMsg", "Wrong Op Code!");
-  }
-
-  if (ONLINE_WORKING_MODE != msg.working_mode_)
-  {
-    PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid working mode!");
-  }
-
-  if (GUI_MONITORING_TRANSACTION != msg.transaction_type_)
-  {
-    PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid transaction type!");
-  }
-
-  if (MAX_SCANNER_ID < static_cast<uint8_t>(msg.scanner_id_))
-  {
-    PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid Scanner id!");
-  }
+  msg.scanner_id_ = frame_header.scanner_id();
+  msg.from_theta_ = frame_header.from_theta();
+  msg.resolution_ = frame_header.resolution();
 
   bool end_of_frame{ false };
   while (!end_of_frame)
   {
-    const MonitoringFrameAdditionalFieldHeader header{ readFieldHeader(is, num_bytes) };
+    const MonitoringFrameAdditionalFieldHeader additional_header{ readFieldHeader(is, num_bytes) };
 
-    switch (header.id())
+    switch (additional_header.id())
     {
       case MonitoringFrameAdditionalFieldIds::SCAN_COUNTER:
-        if (header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
+        if (additional_header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
         {
-          throw MonitoringFrameFormatErrorScanCounterUnexpectedSize(fmt::format(
-              "Length of scan counter field is {}, but should be {}.", header.length(), NUMBER_OF_BYTES_SCAN_COUNTER));
+          throw MonitoringFrameFormatErrorScanCounterUnexpectedSize(
+              fmt::format("Length of scan counter field is {}, but should be {}.",
+                          additional_header.length(),
+                          NUMBER_OF_BYTES_SCAN_COUNTER));
         }
         raw_processing::read(is, msg.scan_counter_);
         break;
@@ -88,7 +82,7 @@ MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, cons
       case MonitoringFrameAdditionalFieldIds::MEASURES:
         raw_processing::readArray<uint16_t, double>(is,
                                                     msg.measures_,
-                                                    header.length() / NUMBER_OF_BYTES_SINGLE_MEASURE,
+                                                    additional_header.length() / NUMBER_OF_BYTES_SINGLE_MEASURE,
                                                     [](uint16_t raw_element) { return raw_element / 1000.; });
         break;
 
@@ -98,6 +92,7 @@ MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, cons
 
       case MonitoringFrameAdditionalFieldIds::DIAGNOSTICS:
         msg.diagnostic_messages_ = deserializeDiagnosticMessages(is);
+        msg.diagnostic_data_enabled_ = true;
         // WIP: TODO: Move elsewhere
         for (auto& elem : msg.diagnostic_messages_)
         {
@@ -106,8 +101,8 @@ MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, cons
         break;
 
       default:
-        throw MonitoringFrameFormatError(
-            fmt::format("Header Id {:#04x} unknown. Cannot read additional field of monitoring frame.", header.id()));
+        throw MonitoringFrameFormatError(fmt::format(
+            "Header Id {:#04x} unknown. Cannot read additional field of monitoring frame.", additional_header.id()));
     }
   }
   return msg;
@@ -158,5 +153,51 @@ std::vector<MonitoringFrameDiagnosticMessage> deserializeDiagnosticMessages(std:
     }
   }
   return diagnostic_messages;
-}  // namespace psen_scan_v2
+}
+
+MonitoringFrameHeader readHeader(std::istringstream& is)
+{
+  MonitoringFrameHeader::DeviceStatus device_status;
+  MonitoringFrameHeader::OpCode op_code;
+  MonitoringFrameHeader::WorkingMode working_mode;
+  MonitoringFrameHeader::TransactionType transaction_type;
+  ScannerId scanner_id;
+  MonitoringFrameHeader::FromTheta from_theta(0);
+  MonitoringFrameHeader::Resolution resolution(0);
+
+  raw_processing::read(is, device_status);
+  raw_processing::read(is, op_code);
+  raw_processing::read(is, working_mode);
+  raw_processing::read(is, transaction_type);
+  raw_processing::read(is, scanner_id);
+
+  raw_processing::read<uint16_t, TenthOfDegree>(is, from_theta);
+  raw_processing::read<uint16_t, TenthOfDegree>(is, resolution);
+
+  if (OP_CODE_MONITORING_FRAME != op_code)
+  {
+    // TODO: Get rid of the issue not to spam the system with this debug messages
+    //       Would something like  ROS_DEBUG_THROTTLE(period, ...) be a good solution?
+    PSENSCAN_DEBUG("MonitoringFrameMsg", "Wrong Op Code!");
+  }
+
+  if (ONLINE_WORKING_MODE != working_mode)
+  {
+    PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid working mode!");
+  }
+
+  if (GUI_MONITORING_TRANSACTION != transaction_type)
+  {
+    PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid transaction type!");
+  }
+
+  if (MAX_SCANNER_ID < static_cast<uint8_t>(scanner_id))
+  {
+    PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid Scanner id!");
+  }
+
+  return MonitoringFrameHeader(
+      device_status, op_code, working_mode, transaction_type, scanner_id, from_theta, resolution);
+}
+
 }  // namespace psen_scan_v2
