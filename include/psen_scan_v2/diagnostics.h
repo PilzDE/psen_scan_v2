@@ -21,6 +21,7 @@
 #include <map>
 
 #include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/scanner_ids.h"
@@ -52,6 +53,26 @@ public:
 
   friend std::array<uint8_t, DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BYTES>
   serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnosticMessage>& messages);
+
+  ScannerId getScannerId() const
+  {
+    return id_;
+  }
+
+  DiagnosticCode getDiagnosticCode() const
+  {
+    return code_;
+  }
+
+  DiagnoseFieldErrorByteLocation getDiagnoseFieldErrorByteLocation() const
+  {
+    return byte_location_;
+  }
+
+  DiagnoseFieldErrorBitLocation getDiagnoseFieldErrorBitLocation() const
+  {
+    return bit_location_;
+  }
 
 private:
   ScannerId id_;
@@ -140,5 +161,25 @@ static const std::map<DiagnosticCode, ErrorCodeName> error_code_to_string{ { Dc:
 // clang-format on
 
 }  //  namespace psen_scan_v2
+
+template <>
+struct fmt::formatter<psen_scan_v2::MonitoringFrameDiagnosticMessage>
+{
+  constexpr auto parse(format_parse_context& ctx)
+  {
+    return ctx.end();
+  }
+
+  template <typename FormatContext>
+  auto format(const psen_scan_v2::MonitoringFrameDiagnosticMessage& msg, FormatContext& ctx)
+  {
+    return format_to(ctx.out(),
+                     "id:{} {} (Byte: {} Bit:{})",
+                     msg.getScannerId(),
+                     psen_scan_v2::error_code_to_string.at(msg.getDiagnosticCode()),
+                     msg.getDiagnoseFieldErrorByteLocation(),
+                     msg.getDiagnoseFieldErrorBitLocation());
+  }
+};
 
 #endif  // PSEN_SCAN_V2_DIAGNOSTICS_H

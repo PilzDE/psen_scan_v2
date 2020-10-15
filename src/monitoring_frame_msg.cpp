@@ -63,13 +63,13 @@ bool MonitoringFrameMsg::operator==(const MonitoringFrameMsg& rhs) const
 
 std::ostream& operator<<(std::ostream& os, const MonitoringFrameMsg& msg)
 {
-  // os << fmt::format("MonitoringFrameMsg(fromTheta = {} deg, resolution = {} deg, scanCounter = "
-  //                   "{}, measures = {}, diagnostics = {})",
-  //                   msg.fromTheta().value() / 10.,
-  //                   msg.resolution().value() / 10.,
-  //                   msg.scanCounter(),
-  //                   msg.measures_,
-  //                   msg.diagnostic_messages_);
+  os << fmt::format("MonitoringFrameMsg(fromTheta = {} deg, resolution = {} deg, scanCounter = "
+                    "{}, measures = {}, diagnostics = {})",
+                    msg.fromTheta().value() / 10.,
+                    msg.resolution().value() / 10.,
+                    msg.scanCounter(),
+                    msg.measures_,
+                    msg.diagnostic_messages_);
   return os;
 }
 
