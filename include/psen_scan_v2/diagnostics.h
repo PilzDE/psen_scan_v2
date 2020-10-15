@@ -56,7 +56,13 @@ public:
                                    DiagnoseFieldErrorByteLocation byte_location,
                                    DiagnoseFieldErrorBitLocation bit_location);
 
-  friend std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg);
+  friend std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg)
+  {
+    os << "Not implemented yet";
+    // os << fmt::format("{} {} {} {}", msg.id_, msg.code_, msg.byte_location_, msg.bit_location_);
+    return os;
+  }
+
   friend std::array<uint8_t, DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BYTES>
   serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnosticMessage>& messages);
 

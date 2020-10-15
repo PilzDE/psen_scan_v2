@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <functional>
 #include <map>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -70,6 +71,10 @@ public:
                       msg.resolution().value() / 10.,
                       msg.scanCounter(),
                       msg.measures_);
+    if (msg.diagnostic_data_enabled_)
+    {
+      os << "Not implemented yet";
+    }
     return os;
   }
 

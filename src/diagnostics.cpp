@@ -30,12 +30,6 @@ MonitoringFrameDiagnosticMessage::MonitoringFrameDiagnosticMessage(ScannerId id,
 {
 }
 
-std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg)
-{
-  os << fmt::format("{} {} {} {}", msg.id_, msg.code_, msg.byte_location_, msg.bit_location_);
-  return os;
-}
-
 typedef DiagnosticCode Dc;
 
 std::map<DiagnosticCode, ErrorCodeName> error_code_to_string{ { Dc::OSSD1_OC, "OSSD1_OC" },
