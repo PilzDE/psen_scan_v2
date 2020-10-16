@@ -15,12 +15,15 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2/monitoring_frame_serialization.h"
+#include "psen_scan_v2/diagnostics.h"
 #include "psen_scan_v2/monitoring_frame_deserialization.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
-#include "psen_scan_v2/udp_frame_dumps.h"
-#include "psen_scan_v2/raw_data_array_conversion.h"
+#include "psen_scan_v2/scanner_ids.h"
+
 #include "psen_scan_v2/istring_stream_builder.h"
+#include "psen_scan_v2/monitoring_frame_serialization.h"
+#include "psen_scan_v2/raw_data_array_conversion.h"
+#include "psen_scan_v2/udp_frame_dumps.h"
 
 using namespace psen_scan_v2;
 
@@ -105,13 +108,21 @@ TEST(MonitoringFrameSerializationTest, testSerializationInvariance)
 
 TEST(MonitoringFrameSerializationTest, testSerializationInvariance2)
 {
-  MonitoringFrameMsg msg(TenthOfDegree(25), TenthOfDegree(1), 456, { 10, 20, 30, 40 });
+  MonitoringFrameMsg msg(TenthOfDegree(25),
+                         TenthOfDegree(1),
+                         456,
+                         { MonitoringFrameDiagnosticMessage(ScannerId::MASTER, 0u, 0u),
+                           MonitoringFrameDiagnosticMessage(ScannerId::MASTER, 5u, 3u),
+                           MonitoringFrameDiagnosticMessage(ScannerId::SLAVE2, 8u, 7u) },
+                         { 10, 20, 30, 40 });
 
   DynamicSizeRawData raw = serialize(msg);
 
   MonitoringFrameMsg deserialized_msg = deserialize_monitoring_frame(convertToMaxSizeRawData(raw), raw.size());
 
-  EXPECT_EQ(msg, deserialized_msg);
+  // TODO: The following throws an exception "map::at" if the messages differ. Inspect problem and report to googletest if necessary
+  // EXPECT_EQ(msg, deserialized_msg);
+  EXPECT_TRUE(msg==deserialized_msg);
 }
 
 class MonitoringFrameMsgDeserializeTest : public ::testing::Test
