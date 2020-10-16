@@ -16,8 +16,6 @@
 #ifndef PSEN_SCAN_V2_LASERSCAN_ROS_CONVERSIONS_H
 #define PSEN_SCAN_V2_LASERSCAN_ROS_CONVERSIONS_H
 
-#include <boost/math/constants/constants.hpp>
-
 #include <sensor_msgs/LaserScan.h>
 
 #include "psen_scan_v2/scanner.h"
