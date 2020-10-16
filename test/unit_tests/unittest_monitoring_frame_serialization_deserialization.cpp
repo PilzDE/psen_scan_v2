@@ -31,7 +31,7 @@ using namespace psen_scan_v2;
 
 namespace psen_scan_v2_test
 {
-TEST(FieldHeaderTest, testGetIdAndLength)
+TEST(MonitoringFrameFieldHeaderTest, testGetIdAndLength)
 {
   uint8_t id = 5;
   uint16_t length = 7;
@@ -40,7 +40,7 @@ TEST(FieldHeaderTest, testGetIdAndLength)
   EXPECT_EQ(length, header.length());
 }
 
-TEST(FieldHeaderTest, testReadSuccess)
+TEST(MonitoringFrameFieldHeaderTest, testReadSuccess)
 {
   uint8_t id = 5;
   uint16_t length = 7;
@@ -58,7 +58,7 @@ TEST(FieldHeaderTest, testReadSuccess)
   EXPECT_EQ(expected_length, header_ptr->length());
 }
 
-TEST(FieldHeaderTest, testReadHeaderTooShortFailure)
+TEST(MonitoringFrameFieldHeaderTest, testReadHeaderTooShortFailure)
 {
   uint16_t too_short_header;
   uint16_t max_num_bytes = 2;
@@ -83,8 +83,20 @@ TEST(DiagnosticMessagesSerializationTest, shouldSetCorrectBitInSerializedDiagnos
 
 TEST(MonitoringFrameSerializationTest, testUDPFrameTestDataWithoutIntensitiesSuccess)
 {
-  // Load testdata from dump
   UDPFrameTestDataWithoutIntensities test_data;
+  DynamicSizeRawData serialized_monitoring_frame_message = serialize(test_data.msg_);
+
+  EXPECT_EQ(test_data.hex_dump.size(), serialized_monitoring_frame_message.size());
+
+  for (size_t i = 0; i < test_data.hex_dump.size(); i++)
+  {
+    EXPECT_EQ((uint8_t)serialized_monitoring_frame_message.at(i), test_data.hex_dump.at(i)) << " index " << i;
+  }
+}
+
+TEST(MonitoringFrameSerializationTest, testUDPFrameTestDataWitDiagnosticsSuccess)
+{
+  UDPFrameTestDataWithDiagnostics test_data;
   DynamicSizeRawData serialized_monitoring_frame_message = serialize(test_data.msg_);
 
   EXPECT_EQ(test_data.hex_dump.size(), serialized_monitoring_frame_message.size());
@@ -129,7 +141,7 @@ TEST(MonitoringFrameSerializationTest, ShouldSucceedOnMonitoringFrameWithDiagnos
   EXPECT_EQ(test_data.msg_, deserialized_msg);
 }
 
-TEST(MonitoringFrameSerializationTest, Should)
+TEST(MonitoringFrameSerializationTest, ShouldSucceedOnMonitoringFrameWithDiagnosticData)
 {
   std::array<std::pair<uint8_t, uint8_t>, 3> byte_bit = { std::make_pair(0, 0),
                                                           std::make_pair(5, 3),
@@ -183,7 +195,6 @@ TEST_F(MonitoringFrameMsgDeserializeTest, shouldSucceedOnMonitoringFrameWithoutI
 {
   MonitoringFrameMsg msg;
   ASSERT_NO_THROW(msg = deserialize_monitoring_frame(without_intensities_raw_, without_intensities_raw_.size()););
-
   EXPECT_EQ(msg, without_intensities_.msg_);
 }
 
