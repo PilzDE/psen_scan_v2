@@ -43,6 +43,7 @@ static constexpr int HOST_UDP_PORT_CONTROL{ 55055 };
 static const std::string DEVICE_IP{ "127.0.0.100" };
 static constexpr DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(2750) };
 static constexpr uint32_t DEFAULT_START_REQUEST_SEQ_NUMBER{ 0 };
+static constexpr uint32_t DIAGNOSTIC_ENABLED{ false };
 
 static constexpr unsigned int FUTURE_READY_TIMEOUT_SEC{ 0 };
 
@@ -70,7 +71,7 @@ public:
 public:
   MockCallbackHolder mock_;
   ScannerConfiguration scanner_config_{
-    HOST_IP, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, DEVICE_IP, SCAN_RANGE, false
+    HOST_IP, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, DEVICE_IP, SCAN_RANGE, DIAGNOSTIC_ENABLED
   };
 
   LaserScanCallback laser_scan_callback_{

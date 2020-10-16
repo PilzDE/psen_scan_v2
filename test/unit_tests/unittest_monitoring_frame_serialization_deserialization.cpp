@@ -136,10 +136,10 @@ TEST(MonitoringFrameSerializationTest, testSerializationInvariance2)
       TenthOfDegree(25),
       TenthOfDegree(1),
       456,
+      { 10, 20, 30, 40 },
       { MonitoringFrameDiagnosticMessage(ScannerId::MASTER, byte_bit.at(0).first, byte_bit.at(0).second),
         MonitoringFrameDiagnosticMessage(ScannerId::MASTER, byte_bit.at(1).first, byte_bit.at(1).second),
-        MonitoringFrameDiagnosticMessage(ScannerId::SLAVE2, byte_bit.at(2).first, byte_bit.at(2).second) },
-      { 10, 20, 30, 40 });
+        MonitoringFrameDiagnosticMessage(ScannerId::SLAVE2, byte_bit.at(2).first, byte_bit.at(2).second) });
 
   DynamicSizeRawData raw = serialize(msg);
 
@@ -150,7 +150,7 @@ TEST(MonitoringFrameSerializationTest, testSerializationInvariance2)
   // EXPECT_EQ(msg, deserialized_msg);
 
   EXPECT_EQ(msg, deserialized_msg);
-}
+}  // namespace psen_scan_v2_test
 
 class MonitoringFrameMsgDeserializeTest : public ::testing::Test
 {

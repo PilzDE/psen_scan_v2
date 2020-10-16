@@ -58,13 +58,13 @@ public:
   MonitoringFrameMsg(const TenthOfDegree& from_theta,
                      const TenthOfDegree& resolution,
                      const uint32_t scan_counter,
-                     const std::vector<MonitoringFrameDiagnosticMessage> diagnostic_messages,
-                     const std::vector<double> measures)
+                     const std::vector<double> measures,
+                     const std::vector<MonitoringFrameDiagnosticMessage> diagnostic_messages)
     : from_theta_(from_theta)
     , resolution_(resolution)
     , scan_counter_(scan_counter)
-    , diagnostic_messages_(diagnostic_messages)
     , measures_(measures)
+    , diagnostic_messages_(diagnostic_messages)
   {
     diagnostic_data_enabled_ = true;
   };
@@ -83,8 +83,8 @@ private:
   TenthOfDegree resolution_{ 0 };
 
   uint32_t scan_counter_{ 0 };
-  std::vector<MonitoringFrameDiagnosticMessage> diagnostic_messages_;
   std::vector<double> measures_;
+  std::vector<MonitoringFrameDiagnosticMessage> diagnostic_messages_;
   bool diagnostic_data_enabled_{ false };
 
 public:
