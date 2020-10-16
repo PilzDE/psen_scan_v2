@@ -189,7 +189,8 @@ TEST(ScannerAPITests, testStopFunctionality)
       .WillOnce(OpenBarrier(&stop_req_received_barrier));
 
   scanner_mock.startListeningForControlMsg();
-  scanner.start();
+  const auto scanner_start = scanner.start();
+  scanner_start.wait();
 
   scanner_mock.startListeningForControlMsg();
   const auto stop_future{ std::async(std::launch::async, [&scanner]() {
