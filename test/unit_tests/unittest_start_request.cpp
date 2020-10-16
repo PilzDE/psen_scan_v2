@@ -113,7 +113,7 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::SLAVE_THREE_ANGLE_RESOLUTION), 0));
 }
 
-TEST_F(StartRequestTest, regressionForRealSystem)
+TEST_F(StartRequestTest, regressionForRealSystemNoDiagnostic)
 {
   ScannerConfiguration sc(
       "192.168.0.50", 55115, 0, "192.168.0.10", DefaultScanRange(TenthOfDegree(0), TenthOfDegree(2750)), false);

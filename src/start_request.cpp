@@ -36,11 +36,11 @@ StartRequest::StartRequest(const ScannerConfiguration& scanner_configuration, co
   , host_udp_port_data_(scanner_configuration.hostUDPPortData())  // Write is deduced by the scanner
   , master_(scanner_configuration.scanRange(), MASTER_RESOLUTION)
 {
-  crc_ = getCRC();
   if (scanner_configuration.diagnostics_enabled())
   {
     diagnostics_enabled_ = 0b00001000;
   }
+  crc_ = getCRC();
 }
 
 uint32_t StartRequest::getCRC() const
