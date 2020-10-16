@@ -236,7 +236,7 @@ void ScannerControllerT<TCSM, TUCI>::sendStopRequest()
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::notifyStartedState()
 {
-  PSENSCAN_DEBUG("ScannerController", "Started() called.");
+  PSENSCAN_INFO("ScannerController", "Scanner started successfully.");
   stopStartReplyWatchdog();
 
   started_.set_value();
