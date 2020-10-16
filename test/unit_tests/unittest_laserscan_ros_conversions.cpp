@@ -29,7 +29,7 @@ MATCHER_P(IsReversed, data_vec, "")
   return arg == data_vec_copy;
 }
 
-const double EPSILON{1.0e-8};
+const double EPSILON{ 1.0e-8 };
 
 namespace psen_scan_v2_test
 {
