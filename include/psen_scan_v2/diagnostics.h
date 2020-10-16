@@ -29,9 +29,9 @@
 namespace psen_scan_v2
 {
 static constexpr uint32_t DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES{ 9 };
-static constexpr uint32_t DIAGNOSTIC_MESSAGE_RAW_UNUSED_DATA_OFFSET_IN_BYTES{ 4 };
-static constexpr uint32_t DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BYTES{
-  DIAGNOSTIC_MESSAGE_RAW_UNUSED_DATA_OFFSET_IN_BYTES +
+static constexpr uint32_t DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES{ 4 };
+static constexpr uint32_t DIAGNOSTIC_DATA_LENGTH_IN_BYTES{
+  DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES +
   DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES * sizeof(SCANNER_IDS)
 };
 
@@ -51,7 +51,7 @@ public:
 
   friend std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg);
 
-  friend std::array<uint8_t, DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BYTES>
+  friend std::array<uint8_t, DIAGNOSTIC_DATA_LENGTH_IN_BYTES>
   serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnosticMessage>& messages);
 
   ScannerId getScannerId() const

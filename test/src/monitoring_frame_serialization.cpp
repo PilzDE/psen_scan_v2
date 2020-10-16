@@ -42,9 +42,9 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
   if (frame.diagnostic_data_enabled_)
   {
     MonitoringFrameAdditionalFieldHeader diagnostic_data_field_header(
-        MonitoringFrameAdditionalFieldIds::DIAGNOSTICS, DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BYTES);
+        MonitoringFrameAdditionalFieldIds::DIAGNOSTICS, DIAGNOSTIC_DATA_LENGTH_IN_BYTES);
     writeFieldHeader(os, diagnostic_data_field_header);
-    std::array<uint8_t, DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BYTES> diagnostic_data_field_payload =
+    std::array<uint8_t, DIAGNOSTIC_DATA_LENGTH_IN_BYTES> diagnostic_data_field_payload =
         serializeDiagnosticMessages(frame.diagnostic_messages_);
     raw_processing::write(os, diagnostic_data_field_payload);
   }
@@ -66,17 +66,17 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
   return raw_processing::toArray<DynamicSizeRawData>(os);
 }
 
-std::array<uint8_t, DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BYTES>
+std::array<uint8_t, DIAGNOSTIC_DATA_LENGTH_IN_BYTES>
 serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnosticMessage>& messages)
 {
-  std::array<uint8_t, DIAGNOSTIC_DATA_FIELD_IN_MONITORING_FRAME_LENGTH_IN_BYTES> raw_diagnostic_data;
+  std::array<uint8_t, DIAGNOSTIC_DATA_LENGTH_IN_BYTES> raw_diagnostic_data;
   raw_diagnostic_data.fill(0);
 
   for (auto& elem : messages)
   {
-    raw_diagnostic_data.at(DIAGNOSTIC_MESSAGE_RAW_UNUSED_DATA_OFFSET_IN_BYTES +
-                           static_cast<uint8_t>(elem.id_) * DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES) +=
-        (1 << elem.bit_location_);
+    raw_diagnostic_data.at(DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES +
+                           static_cast<uint8_t>(elem.id_) * DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES +
+                           elem.byte_location_) += (1 << elem.bit_location_);
   }
   return raw_diagnostic_data;
 }

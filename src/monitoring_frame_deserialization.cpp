@@ -126,7 +126,7 @@ std::vector<MonitoringFrameDiagnosticMessage> deserializeDiagnosticMessages(std:
 {
   std::vector<MonitoringFrameDiagnosticMessage> diagnostic_messages;
 
-  std::array<uint8_t, DIAGNOSTIC_MESSAGE_RAW_UNUSED_DATA_OFFSET_IN_BYTES> reserved_diag_unused;
+  std::array<uint8_t, DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES> reserved_diag_unused;
   raw_processing::read(is, reserved_diag_unused);
 
   for (auto& scanner_id : SCANNER_IDS)
