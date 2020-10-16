@@ -143,7 +143,9 @@ TEST(MonitoringFrameSerializationTest, testSerializationInvariance2)
 
   // TODO: The following throws an exception "map::at" if the messages differ. Inspect problem and report to googletest
   // if necessary
-  EXPECT_TRUE(msg == deserialized_msg);
+  // EXPECT_EQ(msg, deserialized_msg);
+
+  EXPECT_EQ(msg, deserialized_msg);
 }
 
 class MonitoringFrameMsgDeserializeTest : public ::testing::Test
