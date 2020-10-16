@@ -29,6 +29,8 @@ MATCHER_P(IsReversed, data_vec, "")
   return arg == data_vec_copy;
 }
 
+const double EPSILON{1.0e-8};
+
 namespace psen_scan_v2_test
 {
 TEST(LaserScanROSConversionsTest, testToLaserScanMsg)
@@ -50,26 +52,25 @@ TEST(LaserScanROSConversionsTest, testToLaserScanMsg)
   EXPECT_EQ(laserscan_msg.header.stamp, now);
   EXPECT_EQ(laserscan_msg.header.frame_id, frame_id);
 
-  EXPECT_NEAR(laserscan_msg.angle_min, x_axis_rotation - angle_max_raw.toRad(), 1.0e-8);
-  EXPECT_NEAR(laserscan_msg.angle_max, x_axis_rotation - angle_min_raw.toRad(), 1.0e-8);
+  EXPECT_NEAR(laserscan_msg.angle_min, x_axis_rotation - angle_max_raw.toRad(), EPSILON);
+  EXPECT_NEAR(laserscan_msg.angle_max, x_axis_rotation - angle_min_raw.toRad(), EPSILON);
 
-  EXPECT_NEAR(laserscan_msg.angle_increment, angle_increment.toRad(), 1.0e-8);
-  std::cerr << laserscan_msg.angle_increment << " " << angle_increment.toRad() << "\n";
-  EXPECT_EQ(laserscan_msg.time_increment, 0);
+  EXPECT_NEAR(laserscan_msg.angle_increment, angle_increment.toRad(), EPSILON);
+  EXPECT_NEAR(laserscan_msg.time_increment, TIME_PER_SCAN_IN_S / measures.size(), EPSILON);
 
-  EXPECT_NEAR(laserscan_msg.scan_time, TIME_PER_SCAN_IN_S, 1.0e-8);
+  EXPECT_NEAR(laserscan_msg.scan_time, TIME_PER_SCAN_IN_S, EPSILON);
 
   EXPECT_EQ(laserscan_msg.range_min, RANGE_MIN_IN_M);
   EXPECT_EQ(laserscan_msg.range_max, RANGE_MAX_IN_M);
 
   ASSERT_EQ(laserscan_msg.ranges.size(), measures.size());
 
-  // Check that the ranges in the ROS msg is reversed in comparision to the laserscan and given in meters
-  auto reverse_it_measures = measures.crbegin();
+  // Check that the ranges in the ROS msg is the same order as the laserscan and given in meters
+  auto reverse_it_measures = measures.cbegin();
   auto iter_ranges = laserscan_msg.ranges.cbegin();
-  while (reverse_it_measures != measures.rend() && iter_ranges != laserscan_msg.ranges.end())
+  while (reverse_it_measures != measures.end() && iter_ranges != laserscan_msg.ranges.end())
   {
-    EXPECT_NEAR(*iter_ranges, *reverse_it_measures, 1.0e-8);
+    EXPECT_NEAR(*iter_ranges, *reverse_it_measures, EPSILON);
     iter_ranges++;
     reverse_it_measures++;
   }
