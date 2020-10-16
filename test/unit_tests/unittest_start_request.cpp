@@ -113,7 +113,7 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::SLAVE_THREE_ANGLE_RESOLUTION), 0));
 }
 
-TEST_F(StartRequestTest, regressionForRealSystemNoDiagnostic)
+TEST_F(StartRequestTest, regressionForRealSystem)
 {
   ScannerConfiguration sc(
       "192.168.0.50", 55115, 0, "192.168.0.10", DefaultScanRange(TenthOfDegree(0), TenthOfDegree(2750)), false);
@@ -122,6 +122,22 @@ TEST_F(StartRequestTest, regressionForRealSystemNoDiagnostic)
   auto data = sr.serialize();
 
   unsigned char expected_crc[4] = { 0xed, 0xc3, 0x48, 0xa1 };  // see wireshark for this number
+
+  for (size_t i = 0; i < sizeof(expected_crc); i++)
+  {
+    EXPECT_EQ(static_cast<unsigned int>(static_cast<unsigned char>(data[i])), expected_crc[i]);
+  }
+}
+
+TEST_F(StartRequestTest, regressionForRealSystemWithDiagnostic)
+{
+  ScannerConfiguration sc(
+      "192.168.0.50", 55115, 0, "192.168.0.10", DefaultScanRange(TenthOfDegree(0), TenthOfDegree(2750)), true);
+  StartRequest sr(sc, 0);
+
+  auto data = sr.serialize();
+
+  unsigned char expected_crc[4] = { 0x5a, 0x50, 0x43, 0x8d };  // see wireshark for this number
 
   for (size_t i = 0; i < sizeof(expected_crc); i++)
   {
