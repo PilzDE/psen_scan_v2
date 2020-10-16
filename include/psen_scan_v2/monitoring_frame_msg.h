@@ -77,8 +77,6 @@ public:
   std::vector<MonitoringFrameDiagnosticMessage> diagnosticMessages() const;
   bool operator==(const MonitoringFrameMsg& rhs) const;
 
-  friend std::ostream& operator<<(std::ostream& os, const MonitoringFrameMsg& msg);
-
 private:
   ScannerId scanner_id_{ ScannerId::MASTER };
   TenthOfDegree from_theta_{ 0 };
@@ -95,5 +93,7 @@ public:
 };
 
 }  // namespace psen_scan_v2
+
+std::ostream& operator<<(std::ostream& os, const psen_scan_v2::MonitoringFrameMsg& msg);
 
 #endif  // PSEN_SCAN_V2_MONITORING_FRAME_MSG_H

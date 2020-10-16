@@ -61,16 +61,16 @@ bool MonitoringFrameMsg::operator==(const MonitoringFrameMsg& rhs) const
           measures() == rhs.measures() && diagnosticMessages() == rhs.diagnosticMessages());
 }
 
-std::ostream& operator<<(std::ostream& os, const MonitoringFrameMsg& msg)
+}  // namespace psen_scan_v2
+
+std::ostream& operator<<(std::ostream& os, const psen_scan_v2::MonitoringFrameMsg& msg)
 {
   os << fmt::format("MonitoringFrameMsg(fromTheta = {} deg, resolution = {} deg, scanCounter = "
                     "{}, measures = {}, diagnostics = {})",
                     msg.fromTheta().value() / 10.,
                     msg.resolution().value() / 10.,
                     msg.scanCounter(),
-                    msg.measures_,
-                    msg.diagnostic_messages_);
+                    msg.measures(),
+                    msg.diagnosticMessages());
   return os;
 }
-
-}  // namespace psen_scan_v2

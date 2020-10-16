@@ -22,6 +22,7 @@
 
 #include <fmt/core.h>
 #include <fmt/format.h>
+#include <fmt/ostream.h>
 
 #include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/scanner_ids.h"
@@ -157,26 +158,8 @@ static const std::map<DiagnosticCode, ErrorCodeName> error_code_to_string{ { Dc:
   }};
 // clang-format on
 
+std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg);
+
 }  //  namespace psen_scan_v2
-
-template <>
-struct fmt::formatter<psen_scan_v2::MonitoringFrameDiagnosticMessage>
-{
-  constexpr auto parse(format_parse_context& ctx)
-  {
-    return ctx.end();
-  }
-
-  template <typename FormatContext>
-  auto format(const psen_scan_v2::MonitoringFrameDiagnosticMessage& msg, FormatContext& ctx)
-  {
-    return format_to(ctx.out(),
-                     "id:{} {} (Byte: {} Bit:{})",
-                     msg.getScannerId(),
-                     psen_scan_v2::error_code_to_string.at(msg.getDiagnosticCode()),
-                     msg.getErrorByteLocation(),
-                     msg.getErrorBitLocation());
-  }
-};
 
 #endif  // PSEN_SCAN_V2_DIAGNOSTICS_H

@@ -28,6 +28,8 @@
 
 #include <gtest/gtest_prod.h>
 
+#include <fmt/ostream.h>
+
 #include "psen_scan_v2/controller_state_machine.h"
 #include "psen_scan_v2/function_pointers.h"
 #include "psen_scan_v2/laserscan_conversions.h"

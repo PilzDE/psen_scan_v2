@@ -35,10 +35,10 @@ bool MonitoringFrameDiagnosticMessage::operator==(const MonitoringFrameDiagnosti
 std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg)
 {
   os << fmt::format("id:{} {} (Byte: {} Bit:{})",
-                    scanner_id_to_string.at(msg.id_),
-                    error_code_to_string.at(msg.code_),
-                    msg.byte_location_,
-                    msg.bit_location_);
+                    msg.getScannerId(),
+                    psen_scan_v2::error_code_to_string.at(msg.getDiagnosticCode()),
+                    msg.getErrorByteLocation(),
+                    msg.getErrorBitLocation());
   return os;
 }
 
