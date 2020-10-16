@@ -21,6 +21,12 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include <pilz_testutils/mock_appender.h>
+#include <pilz_testutils/logger_mock.h>
+
+#include <rosconsole_bridge/bridge.h>
+REGISTER_ROSCONSOLE_BRIDGE;
+
 // Test frameworks
 #include "psen_scan_v2/async_barrier.h"
 #include "psen_scan_v2/mock_udp_server.h"
@@ -33,6 +39,7 @@
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/scanner_reply_msg.h"
 #include "psen_scan_v2/scan_range.h"
+#include "psen_scan_v2/diagnostics.h"
 
 namespace psen_scan_v2_test
 {
@@ -59,6 +66,7 @@ using std::placeholders::_2;
 
 using namespace ::testing;
 using namespace std::chrono_literals;
+using namespace pilz_testutils;
 
 ACTION_P(OpenBarrier, barrier)
 {
@@ -217,15 +225,18 @@ TEST(ScannerAPITests, testStartReplyTimeout)
 
 TEST(ScannerAPITests, testReceivingOfMonitoringFrame)
 {
+  pilz_testutils::LoggerMock ros_log_mock;
   StrictMock<ScannerMock> scanner_mock;
   const ScannerConfiguration config{ createScannerConfig() };
   UserCallbacks cb;
   Scanner scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   std::vector<double> measures = { 1, 2, 3, 4, 5 };
-  MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(1), 0, measures);
+  std::vector<MonitoringFrameDiagnosticMessage> diagnostics = { { ScannerId::MASTER, 1, 7 } };
+  MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(1), 0, measures, diagnostics);
 
   Barrier monitoring_frame_barrier;
+  Barrier diagnostic_barrier;
   {
     InSequence seq;
 
@@ -236,12 +247,19 @@ TEST(ScannerAPITests, testReceivingOfMonitoringFrame)
     EXPECT_CALL(cb, LaserScanCallback(toLaserScan(msg))).WillOnce(OpenBarrier(&monitoring_frame_barrier));
   }
 
+  EXPECT_LOG(*ros_log_mock, INFO, "Start scanner called.").Times(1);
+  EXPECT_LOG(*ros_log_mock, WARN, "{id:0 WIN_CLN_AL (Byte: 1 Bit:7)}")
+      .Times(1)
+      .WillOnce(OpenBarrier(&diagnostic_barrier));
+
   scanner_mock.startListeningForControlMsg();
   auto promis = scanner.start();
   promis.wait_for(DEFAULT_TIMEOUT);
 
   scanner_mock.sendMonitoringFrame(msg);
+
   EXPECT_TRUE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
+  EXPECT_TRUE(diagnostic_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Diagnostic message not received";
 }
 
 }  // namespace psen_scan_v2_test
