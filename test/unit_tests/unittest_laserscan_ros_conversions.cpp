@@ -57,7 +57,9 @@ TEST(LaserScanROSConversionsTest, testToLaserScanMsg)
   EXPECT_NEAR(laserscan_msg.angle_max, angle_max_raw.toRad() - x_axis_rotation, EPSILON);
 
   EXPECT_NEAR(laserscan_msg.angle_increment, angle_increment.toRad(), EPSILON);
-  EXPECT_NEAR(laserscan_msg.time_increment, TIME_PER_SCAN_IN_S / 2 / boost::math::double_constants::pi * laserscan.getScanResolution().toRad(), EPSILON);
+
+  const double time_per_rad = TIME_PER_SCAN_IN_S / (2 * M_PI);  // angle speed
+  EXPECT_NEAR(laserscan_msg.time_increment, time_per_rad * angle_increment.toRad(), EPSILON);
 
   EXPECT_NEAR(laserscan_msg.scan_time, TIME_PER_SCAN_IN_S, EPSILON);
 

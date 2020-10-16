@@ -36,7 +36,7 @@ sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
   ros_message.angle_max = laserscan.getMaxScanAngle().toRad() - x_axis_rotation;
   ros_message.angle_increment = laserscan.getScanResolution().toRad();
 
-  ros_message.time_increment = TIME_PER_SCAN_IN_S / 2 / boost::math::double_constants::pi * laserscan.getScanResolution().toRad();
+  ros_message.time_increment = TIME_PER_SCAN_IN_S / (2 * M_PI) * laserscan.getScanResolution().toRad();
 
   ros_message.scan_time = TIME_PER_SCAN_IN_S;
   ros_message.range_min = RANGE_MIN_IN_M;
