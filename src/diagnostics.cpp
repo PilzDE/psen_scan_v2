@@ -34,9 +34,9 @@ bool MonitoringFrameDiagnosticMessage::operator==(const MonitoringFrameDiagnosti
 
 std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg)
 {
-  os << fmt::format("id:{} {} (Byte: {} Bit:{})",
-                    msg.getScannerId(),
-                    psen_scan_v2::error_code_to_string.at(msg.getDiagnosticCode()),
+  os << fmt::format("Device: {} - {} (Byte:{} Bit:{})",
+                    scanner_id_to_string.at(msg.getScannerId()),
+                    error_code_to_string.at(msg.getDiagnosticCode()),
                     msg.getErrorByteLocation(),
                     msg.getErrorBitLocation());
   return os;
