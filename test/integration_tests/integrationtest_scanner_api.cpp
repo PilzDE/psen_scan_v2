@@ -249,6 +249,7 @@ TEST(ScannerAPITests, testReceivingOfMonitoringFrame)
   }
 
   EXPECT_LOG(*ros_log_mock, INFO, "Start scanner called.").Times(1);
+  EXPECT_LOG(*ros_log_mock, INFO, "Scanner started successfully.").Times(1);
   EXPECT_LOG(*ros_log_mock, WARN, "{id:0 WIN_CLN_AL (Byte: 1 Bit:7)}")
       .Times(1)
       .WillOnce(OpenBarrier(&diagnostic_barrier));
