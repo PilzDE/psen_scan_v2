@@ -34,20 +34,15 @@ sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
   ros_message.angle_max = -(laserscan.getMinScanAngle().toRad() - x_axis_rotation);
   ros_message.angle_increment = laserscan.getScanResolution().toRad();
 
-  // For now we set this to zero to hint that the ranges are actually ordered
-  // from new to old. Thus applying some sort of interpolation using time_increment
-  // could lead to unwanted results.
-  ros_message.time_increment = 0;
+  // TODO: can we get a better value?
+  ros_message.time_increment = TIME_PER_SCAN_IN_S / laserscan.getMeasurements().size();
 
   ros_message.scan_time = TIME_PER_SCAN_IN_S;
   ros_message.range_min = RANGE_MIN_IN_M;
   ros_message.range_max = RANGE_MAX_IN_M;
 
-  // Note that the ranges field from the laserscan msg is field in reverse order
-  // from the actual measurements. Thus the first element is the newest measurement and the last
-  // element is the oldest
   ros_message.ranges.insert(
-      ros_message.ranges.end(), laserscan.getMeasurements().crbegin(), laserscan.getMeasurements().crend());
+      ros_message.ranges.begin(), laserscan.getMeasurements().cbegin(), laserscan.getMeasurements().cend());
 
   return ros_message;
 }

@@ -54,5 +54,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <param name="angle_start" value="$(arg angle_start)" />
     <param name="angle_end" value="$(arg angle_end)" />
   </node>
+
+  <!-- GUI ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
   <node name="rviz" type="rviz" pkg="rviz" args="-d $(find psen_scan_v2)/config/config.rviz" />
 </launch>
