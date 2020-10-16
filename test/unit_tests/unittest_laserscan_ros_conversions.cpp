@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <boost/math/constants/constants.hpp>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -56,7 +57,7 @@ TEST(LaserScanROSConversionsTest, testToLaserScanMsg)
   EXPECT_NEAR(laserscan_msg.angle_max, angle_max_raw.toRad() - x_axis_rotation, EPSILON);
 
   EXPECT_NEAR(laserscan_msg.angle_increment, angle_increment.toRad(), EPSILON);
-  EXPECT_NEAR(laserscan_msg.time_increment, TIME_PER_SCAN_IN_S / measures.size(), EPSILON);
+  EXPECT_NEAR(laserscan_msg.time_increment, TIME_PER_SCAN_IN_S / 2 / boost::math::double_constants::pi * laserscan.getScanResolution().toRad(), EPSILON);
 
   EXPECT_NEAR(laserscan_msg.scan_time, TIME_PER_SCAN_IN_S, EPSILON);
 

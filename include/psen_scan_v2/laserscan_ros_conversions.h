@@ -16,6 +16,8 @@
 #ifndef PSEN_SCAN_V2_LASERSCAN_ROS_CONVERSIONS_H
 #define PSEN_SCAN_V2_LASERSCAN_ROS_CONVERSIONS_H
 
+#include <boost/math/constants/constants.hpp>
+
 #include <sensor_msgs/LaserScan.h>
 
 #include "psen_scan_v2/scanner.h"
@@ -34,8 +36,7 @@ sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
   ros_message.angle_max = laserscan.getMaxScanAngle().toRad() - x_axis_rotation;
   ros_message.angle_increment = laserscan.getScanResolution().toRad();
 
-  // TODO: can we get a better value?
-  ros_message.time_increment = TIME_PER_SCAN_IN_S / laserscan.getMeasurements().size();
+  ros_message.time_increment = TIME_PER_SCAN_IN_S / 2 / boost::math::double_constants::pi * laserscan.getScanResolution().toRad();
 
   ros_message.scan_time = TIME_PER_SCAN_IN_S;
   ros_message.range_min = RANGE_MIN_IN_M;
