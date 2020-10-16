@@ -68,13 +68,9 @@ TEST(LaserScanROSConversionsTest, testToLaserScanMsg)
   ASSERT_EQ(laserscan_msg.ranges.size(), measures.size());
 
   // Check that the ranges in the ROS msg is the same order as the laserscan and given in meters
-  auto reverse_it_measures = measures.cbegin();
-  auto iter_ranges = laserscan_msg.ranges.cbegin();
-  while (reverse_it_measures != measures.end() && iter_ranges != laserscan_msg.ranges.end())
+  for (size_t i = 0; i < laserscan_msg.ranges.size(); ++i)
   {
-    EXPECT_NEAR(*iter_ranges, *reverse_it_measures, EPSILON);
-    iter_ranges++;
-    reverse_it_measures++;
+    EXPECT_NEAR(laserscan_msg.ranges.at(i), measures.at(i), EPSILON);
   }
 
   EXPECT_TRUE(laserscan_msg.intensities.empty());
