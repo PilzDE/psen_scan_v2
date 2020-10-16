@@ -119,13 +119,23 @@ TEST(MonitoringFrameSerializationTest, testSerializationInvariance)
 
 TEST(MonitoringFrameSerializationTest, testSerializationInvariance2)
 {
-  MonitoringFrameMsg msg(TenthOfDegree(25),
-                         TenthOfDegree(1),
-                         456,
-                         { MonitoringFrameDiagnosticMessage(ScannerId::MASTER, 0u, 0u),
-                           MonitoringFrameDiagnosticMessage(ScannerId::MASTER, 5u, 3u),
-                           MonitoringFrameDiagnosticMessage(ScannerId::SLAVE2, 8u, 7u) },
-                         { 10, 20, 30, 40 });
+  std::array<std::pair<uint8_t, uint8_t>, 3> byte_bit = { std::make_pair(0, 0),
+                                                          std::make_pair(5, 3),
+                                                          std::make_pair(4, 7) };
+
+  for (const auto& elem : byte_bit)
+  {
+    ASSERT_NE(error_bits.at(elem.first).at(elem.second), Dc::UNUSED) << "The unused diagnostic bits are discarded during deserialization. You should use different test data for this test.";
+  }
+
+  MonitoringFrameMsg msg(
+      TenthOfDegree(25),
+      TenthOfDegree(1),
+      456,
+      { MonitoringFrameDiagnosticMessage(ScannerId::MASTER, byte_bit.at(0).first, byte_bit.at(0).second),
+        MonitoringFrameDiagnosticMessage(ScannerId::MASTER, byte_bit.at(1).first, byte_bit.at(1).second),
+        MonitoringFrameDiagnosticMessage(ScannerId::SLAVE2, byte_bit.at(2).first, byte_bit.at(2).second) },
+      { 10, 20, 30, 40 });
 
   DynamicSizeRawData raw = serialize(msg);
 
@@ -133,7 +143,6 @@ TEST(MonitoringFrameSerializationTest, testSerializationInvariance2)
 
   // TODO: The following throws an exception "map::at" if the messages differ. Inspect problem and report to googletest
   // if necessary
-  // EXPECT_EQ(msg, deserialized_msg);
   EXPECT_TRUE(msg == deserialized_msg);
 }
 
