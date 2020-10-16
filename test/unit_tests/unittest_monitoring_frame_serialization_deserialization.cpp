@@ -109,7 +109,7 @@ TEST(MonitoringFrameSerializationTest, testUDPFrameTestDataWithoutMeasurementsAn
   }
 }
 
-TEST(MonitoringFrameSerializationTest, testSerializationInvariance)
+TEST(MonitoringFrameSerializationTest, shouldSucceedOnMonitoringFrameWithoutIntensities)
 {
   UDPFrameTestDataWithoutIntensities test_data;
   DynamicSizeRawData raw = serialize(test_data.msg_);
@@ -119,7 +119,17 @@ TEST(MonitoringFrameSerializationTest, testSerializationInvariance)
   EXPECT_EQ(test_data.msg_, deserialized_msg);
 }
 
-TEST(MonitoringFrameSerializationTest, testSerializationInvariance2)
+TEST(MonitoringFrameSerializationTest, ShouldSucceedOnMonitoringFrameWithDiagnosticHexdump)
+{
+  UDPFrameTestDataWithDiagnostics test_data;
+  DynamicSizeRawData raw = serialize(test_data.msg_);
+
+  MonitoringFrameMsg deserialized_msg = deserialize_monitoring_frame(convertToMaxSizeRawData(raw), raw.size());
+
+  EXPECT_EQ(test_data.msg_, deserialized_msg);
+}
+
+TEST(MonitoringFrameSerializationTest, Should)
 {
   std::array<std::pair<uint8_t, uint8_t>, 3> byte_bit = { std::make_pair(0, 0),
                                                           std::make_pair(5, 3),
@@ -150,52 +160,62 @@ TEST(MonitoringFrameSerializationTest, testSerializationInvariance2)
   // EXPECT_EQ(msg, deserialized_msg);
 
   EXPECT_EQ(msg, deserialized_msg);
-}  // namespace psen_scan_v2_test
+}
 
 class MonitoringFrameMsgDeserializeTest : public ::testing::Test
 {
 protected:
   MonitoringFrameMsgDeserializeTest()
   {
-    raw_frame_data_ = convertToMaxSizeRawData(test_data_.hex_dump);
+    without_intensities_raw_ = convertToMaxSizeRawData(without_intensities_.hex_dump);
+    with_diagnostics_raw_ = convertToMaxSizeRawData(with_diagnostics_.hex_dump);
   }
 
 protected:
-  UDPFrameTestDataWithoutIntensities test_data_;
-  MaxSizeRawData raw_frame_data_;
-  std::size_t num_bytes_{ 2 * test_data_.hex_dump.size() };
+  UDPFrameTestDataWithoutIntensities without_intensities_;
+  MaxSizeRawData without_intensities_raw_;
+
+  UDPFrameTestDataWithDiagnostics with_diagnostics_;
+  MaxSizeRawData with_diagnostics_raw_;
 };
 
-TEST_F(MonitoringFrameMsgDeserializeTest, testDeserializationSuccess)
+TEST_F(MonitoringFrameMsgDeserializeTest, shouldSucceedOnMonitoringFrameWithoutIntensities)
 {
   MonitoringFrameMsg msg;
-  ASSERT_NO_THROW(msg = deserialize_monitoring_frame(raw_frame_data_, num_bytes_););
+  ASSERT_NO_THROW(msg = deserialize_monitoring_frame(without_intensities_raw_, without_intensities_raw_.size()););
 
-  EXPECT_EQ(msg, test_data_.msg_);
+  EXPECT_EQ(msg, without_intensities_.msg_);
+}
+
+TEST_F(MonitoringFrameMsgDeserializeTest, shouldSucceedOnMonitoringFrameWithDiagnostics)
+{
+  MonitoringFrameMsg msg;
+  ASSERT_NO_THROW(msg = deserialize_monitoring_frame(with_diagnostics_raw_, with_diagnostics_raw_.size()));
+  EXPECT_TRUE(msg == with_diagnostics_.msg_);
 }
 
 TEST_F(MonitoringFrameMsgDeserializeTest, testWrongOpCode)
 {
-  raw_frame_data_.at(4) += 1;
-  EXPECT_NO_THROW(deserialize_monitoring_frame(raw_frame_data_, num_bytes_););
+  without_intensities_raw_.at(4) += 1;
+  EXPECT_NO_THROW(deserialize_monitoring_frame(without_intensities_raw_, without_intensities_raw_.size()););
 }
 
 TEST_F(MonitoringFrameMsgDeserializeTest, testInvalidWorkingMode)
 {
-  raw_frame_data_.at(8) = 0x03;
-  EXPECT_NO_THROW(deserialize_monitoring_frame(raw_frame_data_, num_bytes_););
+  without_intensities_raw_.at(8) = 0x03;
+  EXPECT_NO_THROW(deserialize_monitoring_frame(without_intensities_raw_, without_intensities_raw_.size()););
 }
 
 TEST_F(MonitoringFrameMsgDeserializeTest, testInvalidTransactionType)
 {
-  raw_frame_data_.at(12) = 0x06;
-  EXPECT_NO_THROW(deserialize_monitoring_frame(raw_frame_data_, num_bytes_););
+  without_intensities_raw_.at(12) = 0x06;
+  EXPECT_NO_THROW(deserialize_monitoring_frame(without_intensities_raw_, without_intensities_raw_.size()););
 }
 
 TEST_F(MonitoringFrameMsgDeserializeTest, testInvalidScannerId)
 {
-  raw_frame_data_.at(16) = 0x04;
-  EXPECT_NO_THROW(deserialize_monitoring_frame(raw_frame_data_, num_bytes_););
+  without_intensities_raw_.at(16) = 0x04;
+  EXPECT_NO_THROW(deserialize_monitoring_frame(without_intensities_raw_, without_intensities_raw_.size()););
 }
 
 TEST_F(MonitoringFrameMsgDeserializeTest, testUnknownFieldId)
