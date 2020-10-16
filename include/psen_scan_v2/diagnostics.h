@@ -30,10 +30,9 @@ namespace psen_scan_v2
 {
 static constexpr uint32_t DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES{ 9 };
 static constexpr uint32_t DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES{ 4 };
-static constexpr uint32_t DIAGNOSTIC_DATA_LENGTH_IN_BYTES{
-  DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES +
-  DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES * sizeof(SCANNER_IDS)
-};
+static constexpr uint32_t DIAGNOSTIC_DATA_LENGTH_IN_BYTES{ DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES +
+                                                           DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES *
+                                                               sizeof(SCANNER_IDS) };
 
 enum class DiagnosticCode;
 
@@ -43,9 +42,7 @@ public:
   using ErrorBitLocation = uint8_t;
   using ErrorByteLocation = uint16_t;
 
-  MonitoringFrameDiagnosticMessage(ScannerId id,
-                                   ErrorByteLocation byte_location,
-                                   ErrorBitLocation bit_location);
+  MonitoringFrameDiagnosticMessage(ScannerId id, ErrorByteLocation byte_location, ErrorBitLocation bit_location);
 
   bool operator==(const MonitoringFrameDiagnosticMessage& rhs) const;
 

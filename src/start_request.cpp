@@ -37,6 +37,10 @@ StartRequest::StartRequest(const ScannerConfiguration& scanner_configuration, co
   , master_(scanner_configuration.scanRange(), MASTER_RESOLUTION)
 {
   crc_ = getCRC();
+  if (scanner_configuration.diagnostics_enabled())
+  {
+    diagnostics_enabled_ = 0b00001000;
+  }
 }
 
 uint32_t StartRequest::getCRC() const

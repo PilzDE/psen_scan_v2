@@ -75,11 +75,13 @@ static constexpr DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(27
 static constexpr int SCANNER_STARTED_TIMEOUT_MS{ 3000 };
 static constexpr int SCANNER_STOPPED_TIMEOUT_MS{ 3000 };
 static constexpr int LASERSCAN_RECEIVED_TIMEOUT{ 3000 };
+static constexpr bool DIAGNOSTICS_ENABLED{ false };
 
 class RosScannerNodeTests : public testing::Test, public testing::AsyncTest
 {
 protected:
-  RosScannerNodeTests() : scanner_config_(HOST_IP, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, DEVICE_IP, SCAN_RANGE){};
+  RosScannerNodeTests()
+    : scanner_config_(HOST_IP, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, DEVICE_IP, SCAN_RANGE, DIAGNOSTICS_ENABLED){};
   ros::NodeHandle nh_priv_{ "~" };
   ScannerConfiguration scanner_config_;
 };

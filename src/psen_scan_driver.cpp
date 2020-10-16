@@ -80,7 +80,8 @@ int main(int argc, char** argv)
                                                getRequiredParamFromServer<int>(pnh, PARAM_HOST_DATA_PORT),
                                                getRequiredParamFromServer<int>(pnh, PARAM_HOST_CONTROL_PORT),
                                                getRequiredParamFromServer<std::string>(pnh, PARAM_SCANNER_IP),
-                                               scan_range);
+                                               scan_range,
+                                               true);
 
     ROSScannerNode ros_scanner_node(pnh,
                                     DEFAULT_PUBLISH_TOPIC,

@@ -125,7 +125,9 @@ TEST(MonitoringFrameSerializationTest, testSerializationInvariance2)
 
   for (const auto& elem : byte_bit)
   {
-    ASSERT_NE(error_bits.at(elem.first).at(elem.second), Dc::UNUSED) << "The unused diagnostic bits are discarded during deserialization. You should use different test data for this test.";
+    ASSERT_NE(error_bits.at(elem.first).at(elem.second), Dc::UNUSED)
+        << "The unused diagnostic bits are discarded during deserialization. You should use different test data for "
+           "this test.";
   }
 
   MonitoringFrameMsg msg(

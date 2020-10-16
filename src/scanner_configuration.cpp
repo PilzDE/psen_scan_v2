@@ -29,8 +29,9 @@ ScannerConfiguration::ScannerConfiguration(const std::string& host_ip,
                                            const int& host_udp_port_data,
                                            const int& host_udp_port_control,
                                            const std::string& client_ip,
-                                           const DefaultScanRange& scan_range)
-  : scan_range_(scan_range)
+                                           const DefaultScanRange& scan_range,
+                                           const bool diagnostics_enabled)
+  : scan_range_(scan_range), diagnostics_enabled_(diagnostics_enabled)
 {
   const auto host_ip_number = inet_network(host_ip.c_str());
   if (static_cast<in_addr_t>(-1) == host_ip_number)
@@ -86,6 +87,11 @@ uint32_t ScannerConfiguration::clientIp() const
 const DefaultScanRange& ScannerConfiguration::scanRange() const
 {
   return scan_range_;
+}
+
+bool ScannerConfiguration::diagnostics_enabled() const
+{
+  return diagnostics_enabled_;
 }
 
 }  // namespace psen_scan_v2

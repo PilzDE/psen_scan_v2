@@ -41,8 +41,8 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
 
   if (frame.diagnostic_data_enabled_)
   {
-    MonitoringFrameAdditionalFieldHeader diagnostic_data_field_header(
-        MonitoringFrameAdditionalFieldIds::DIAGNOSTICS, DIAGNOSTIC_DATA_LENGTH_IN_BYTES);
+    MonitoringFrameAdditionalFieldHeader diagnostic_data_field_header(MonitoringFrameAdditionalFieldIds::DIAGNOSTICS,
+                                                                      DIAGNOSTIC_DATA_LENGTH_IN_BYTES);
     writeFieldHeader(os, diagnostic_data_field_header);
     std::array<uint8_t, DIAGNOSTIC_DATA_LENGTH_IN_BYTES> diagnostic_data_field_payload =
         serializeDiagnosticMessages(frame.diagnostic_messages_);

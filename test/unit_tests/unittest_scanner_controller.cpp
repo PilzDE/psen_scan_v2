@@ -69,7 +69,9 @@ public:
 
 public:
   MockCallbackHolder mock_;
-  ScannerConfiguration scanner_config_{ HOST_IP, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, DEVICE_IP, SCAN_RANGE };
+  ScannerConfiguration scanner_config_{
+    HOST_IP, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, DEVICE_IP, SCAN_RANGE, false
+  };
 
   LaserScanCallback laser_scan_callback_{
     std::bind(&MockCallbackHolder::laserscan_callback, &mock_, std::placeholders::_1)

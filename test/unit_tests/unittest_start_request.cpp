@@ -68,7 +68,7 @@ TEST_F(StartRequestTest, constructorTest)
 
   const DefaultScanRange scan_range{ TenthOfDegree(0), TenthOfDegree::fromRad(4.71) };
 
-  ScannerConfiguration sc(host_ip, host_udp_port_data, 0 /* irrelevant */, "192.168.0.50", scan_range);
+  ScannerConfiguration sc(host_ip, host_udp_port_data, 0 /* irrelevant */, "192.168.0.50", scan_range, false);
 
   uint32_t sequence_number{ 123 };
   StartRequest sr(sc, sequence_number);
@@ -116,7 +116,7 @@ TEST_F(StartRequestTest, constructorTest)
 TEST_F(StartRequestTest, regressionForRealSystem)
 {
   ScannerConfiguration sc(
-      "192.168.0.50", 55115, 0, "192.168.0.10", DefaultScanRange(TenthOfDegree(0), TenthOfDegree(2750)));
+      "192.168.0.50", 55115, 0, "192.168.0.10", DefaultScanRange(TenthOfDegree(0), TenthOfDegree(2750)), false);
   StartRequest sr(sc, 0);
 
   auto data = sr.serialize();

@@ -52,6 +52,7 @@ static constexpr std::chrono::milliseconds WAIT_TIMEOUT{ 10 };
 static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 3 };
 
 static constexpr uint32_t DEFAULT_SEQ_NUMBER{ 0u };
+static constexpr bool DIAGNOSTICS_ENABLED{ false };
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -138,7 +139,7 @@ void ScannerMock::sendMonitoringFrame(MonitoringFrameMsg& msg)
 ScannerConfiguration createScannerConfig()
 {
   return ScannerConfiguration(
-      HOST_IP_ADDRESS, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, SCANNER_IP_ADDRESS, SCAN_RANGE);
+      HOST_IP_ADDRESS, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, SCANNER_IP_ADDRESS, SCAN_RANGE, DIAGNOSTICS_ENABLED);
 }
 
 TEST(ScannerAPITests, testStartFunctionality)
