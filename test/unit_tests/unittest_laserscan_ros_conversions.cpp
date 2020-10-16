@@ -52,8 +52,8 @@ TEST(LaserScanROSConversionsTest, testToLaserScanMsg)
   EXPECT_EQ(laserscan_msg.header.stamp, now);
   EXPECT_EQ(laserscan_msg.header.frame_id, frame_id);
 
-  EXPECT_NEAR(laserscan_msg.angle_min, x_axis_rotation - angle_max_raw.toRad(), EPSILON);
-  EXPECT_NEAR(laserscan_msg.angle_max, x_axis_rotation - angle_min_raw.toRad(), EPSILON);
+  EXPECT_NEAR(laserscan_msg.angle_min, angle_min_raw.toRad() - x_axis_rotation, EPSILON);
+  EXPECT_NEAR(laserscan_msg.angle_max, angle_max_raw.toRad() - x_axis_rotation, EPSILON);
 
   EXPECT_NEAR(laserscan_msg.angle_increment, angle_increment.toRad(), EPSILON);
   EXPECT_NEAR(laserscan_msg.time_increment, TIME_PER_SCAN_IN_S / measures.size(), EPSILON);
