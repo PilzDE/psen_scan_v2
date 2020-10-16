@@ -68,6 +68,17 @@ TEST(FieldHeaderTest, testReadHeaderTooShortFailure)
   EXPECT_THROW(readFieldHeader(is, max_num_bytes);, raw_processing::StringStreamFailure);
 }
 
+TEST(DiagnosticMessagesSerializationTest, shouldSetCorrectBitInSerializedDiagnosticData)
+{
+  const uint8_t byte_location{ 5 };
+  const uint8_t bit_location{ 3 };
+  std::vector<MonitoringFrameDiagnosticMessage> diagnostic_data{ { ScannerId::MASTER, byte_location, bit_location } };
+  auto diagnostic_data_serialized = serializeDiagnosticMessages(diagnostic_data);
+
+  EXPECT_EQ(diagnostic_data_serialized.size(), DIAGNOSTIC_DATA_LENGTH_IN_BYTES);
+  EXPECT_EQ(diagnostic_data_serialized.at(DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES + byte_location), 0b1000);
+}
+
 TEST(MonitoringFrameSerializationTest, testUDPFrameTestDataWithoutIntensitiesSuccess)
 {
   // Load testdata from dump
@@ -120,9 +131,10 @@ TEST(MonitoringFrameSerializationTest, testSerializationInvariance2)
 
   MonitoringFrameMsg deserialized_msg = deserialize_monitoring_frame(convertToMaxSizeRawData(raw), raw.size());
 
-  // TODO: The following throws an exception "map::at" if the messages differ. Inspect problem and report to googletest if necessary
+  // TODO: The following throws an exception "map::at" if the messages differ. Inspect problem and report to googletest
+  // if necessary
   // EXPECT_EQ(msg, deserialized_msg);
-  EXPECT_TRUE(msg==deserialized_msg);
+  EXPECT_TRUE(msg == deserialized_msg);
 }
 
 class MonitoringFrameMsgDeserializeTest : public ::testing::Test
