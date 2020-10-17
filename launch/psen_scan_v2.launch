@@ -37,7 +37,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <arg name="sensor_ip" default="192.168.0.10" />
 
   <!-- TF Frame ID -->
-  <arg name="frame_id" default="my_laser_1_scan" />
+  <arg name="frame_id" default="laser_1_scan" />
 
   <!-- Start angle of measurement in radian -->
   <arg name="angle_start" default="$(eval -137.5 /180.0 * pi)" />

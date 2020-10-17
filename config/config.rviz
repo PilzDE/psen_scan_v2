@@ -90,11 +90,11 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        my_laser_1:
+        laser_1:
           Value: true
-        my_laser_1_mount_link:
+        laser_1_mount_link:
           Value: true
-        my_laser_1_scan:
+        laser_1_scan:
           Value: true
       Marker Scale: 0.5
       Name: TF
@@ -102,9 +102,9 @@ Visualization Manager:
       Show Axes: true
       Show Names: true
       Tree:
-        my_laser_1_mount_link:
-          my_laser_1:
-            my_laser_1_scan:
+        laser_1_mount_link:
+          laser_1:
+            laser_1_scan:
               {}
       Update Interval: 0
       Value: true
@@ -118,16 +118,16 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        my_laser_1:
+        laser_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        my_laser_1_mount_link:
+        laser_1_mount_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        my_laser_1_scan:
+        laser_1_scan:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -141,7 +141,7 @@ Visualization Manager:
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: my_laser_1_mount_link
+    Fixed Frame: laser_1_mount_link
     Frame Rate: 30
   Name: root
   Tools:
