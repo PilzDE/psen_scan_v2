@@ -18,7 +18,7 @@
     <joint name="${prefix}_mount_joint" type="fixed">
       <parent link="${prefix}_mount_link" />
       <child link="${prefix}" />
-      <origin rpy="0 0 0" xyz="${radius} 0 ${height / 2}"/>
+      <origin rpy="0 0 0" xyz="${radius} 0 0"/>
     </joint>
 
     <!-- Location of scanner body -->
