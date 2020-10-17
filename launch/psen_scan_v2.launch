@@ -20,10 +20,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <param name="robot_description" command="$(find xacro)/xacro '$(find psen_scan_v2)/urdf/example.urdf.xacro'" />
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
-  <!-- DRIVER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-  <!-- Password for Laserscanner -->
-  <arg name="password" default="ac0d68d033" />
-
   <!-- IP-Address of host machine -->
   <arg name="host_ip" default="192.168.0.50" />
 
