@@ -16,10 +16,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <launch>
-  <!-- DESCRIPTION ~~~~~~~~~~~~~~~~~~~~~~~~ -->
-  <param name="robot_description" command="$(find xacro)/xacro '$(find psen_scan_v2)/urdf/example.urdf.xacro'" />
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-
   <!-- IP-Address of host machine -->
   <arg name="host_ip" default="192.168.0.50" />
 
@@ -51,6 +47,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <param name="angle_end" value="$(arg angle_end)" />
   </node>
 
-  <!-- GUI ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+  <!-- Publish tf frames for the device -->
+  <param name="robot_description" command="$(find xacro)/xacro '$(find psen_scan_v2)/urdf/example.urdf.xacro'" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+  <!-- Start rviz -->
   <node name="rviz" type="rviz" pkg="rviz" args="-d $(find psen_scan_v2)/config/config.rviz" />
 </launch>
