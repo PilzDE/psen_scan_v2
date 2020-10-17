@@ -106,6 +106,15 @@ The location of the frames is shown in the image below.
 <img src="img/frames.png" width="800px" alt="PILZ safety laser scanner frames" title="frames">
 </p>
 
+## Defining the scan range
+You can adjust the scan field to your needs by changing _angle_start_ and _angle_end_.
+The published ([sensor_msgs/LaserScan][]) will only contain data within the given angle limits.
+Both limits are defined within the _laser_1_scan_ frame as shown in the image below.
+
+<p align="center">
+<img src="img/angle_limits.png" width="800px" alt="Limit visualization" title="Limit visualization">
+</p>
+
 ### Adjust expert parameters
 If you've created an application package with your own launch file as described in the
 [tutorials](http://wiki.ros.org/psen_scan_v2/Tutorials/),
