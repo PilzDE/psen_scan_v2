@@ -27,10 +27,11 @@ using namespace psen_scan_v2;
 
 namespace psen_scan_v2_test
 {
+namespace scanner_udp_datagram_hexdumps
+{
 template <size_t ARRAY_SIZE>
-inline std::vector<double> readMeasuresFromHexDump(const std::array<uint8_t, ARRAY_SIZE> hex_dump,
-                                                   const size_t offset_measures,
-                                                   const size_t n_measures)
+inline std::vector<double>
+readMeasures(const std::array<uint8_t, ARRAY_SIZE> hex_dump, const size_t offset_measures, const size_t n_measures)
 {
   std::vector<double> measures;
   for (size_t idx = offset_measures; idx < (offset_measures + (n_measures * 2)); idx = idx + 2)
@@ -41,15 +42,15 @@ inline std::vector<double> readMeasuresFromHexDump(const std::array<uint8_t, ARR
   return measures;
 }
 
-class UDPFrameTestDataWithoutIntensities
+class WithoutIntensities
 {
 public:
-  UDPFrameTestDataWithoutIntensities()
+  WithoutIntensities()
   {
     MonitoringFrameMsg msg(TenthOfDegree(from_theta),
                            TenthOfDegree(resolution),
                            scan_counter,
-                           readMeasuresFromHexDump(hex_dump, offset_measures, n_measures));
+                           readMeasures(hex_dump, offset_measures, n_measures));
     msg_ = msg;
   };
 
@@ -78,15 +79,15 @@ private:
   const uint16_t resolution{ 0x0a };
   const uint32_t scan_counter{ 0x00000678 };
 };
-class UDPFrameTestDataWithDiagnostics
+class WithDiagnostics
 {
 public:
-  UDPFrameTestDataWithDiagnostics()
+  WithDiagnostics()
   {
     MonitoringFrameMsg msg(TenthOfDegree(from_theta),
                            TenthOfDegree(resolution),
                            scan_counter,
-                           readMeasuresFromHexDump(hex_dump, offset_measures, n_measures),
+                           readMeasures(hex_dump, offset_measures, n_measures),
                            { MonitoringFrameDiagnosticMessage(ScannerId::MASTER, diagnostic_byte0, diagnostic_bit0),
                              MonitoringFrameDiagnosticMessage(ScannerId::MASTER, diagnostic_byte1, diagnostic_bit1) });
     msg_ = msg;
@@ -180,10 +181,10 @@ private:
   const size_t diagnostic_bit1 = 3;
 };
 
-class UDPFrameTestDataWithoutMeasurementsAndIntensities
+class WithoutMeasurementsAndIntensities
 {
 public:
-  UDPFrameTestDataWithoutMeasurementsAndIntensities()
+  WithoutMeasurementsAndIntensities()
   {
     MonitoringFrameMsg msg(TenthOfDegree(from_theta), TenthOfDegree(resolution), scan_counter, {});
     msg_ = msg;
@@ -202,7 +203,7 @@ private:
   const uint32_t scan_counter{ 0x0661fc };
 };
 
-class UDPFrameTestDataWithUnknownFieldId
+class WithUnknownFieldId
 {
 public:
   const std::array<uint8_t, 35> hex_dump = { 0x00, 0x00, 0x00, 0x00, 0xca, 0x00,  // 0020
@@ -211,7 +212,7 @@ public:
                                              0x06, 0x00, 0x0a, 0x01, 0x00, 0x09, 0x00, 0x00, 0x00 };
 };
 
-class UDPFrameTestDataWithTooLargeFieldLength
+class WithTooLargeFieldLength
 {
 public:
   const std::array<uint8_t, 35> hex_dump = { 0x00, 0x00, 0x00, 0x00, 0xca, 0x00,  // 0020
@@ -220,7 +221,7 @@ public:
                                              0x06, 0x00, 0x05, 0xcf, 0xff, 0x09, 0x00, 0x00, 0x00 };
 };
 
-class UDPFrameTestDataWithTooLargeScanCounterLength
+class WithTooLargeScanCounterLength
 {
 public:
   const std::array<uint8_t, 35> hex_dump = { 0x00, 0x00, 0x00, 0x00, 0xca, 0x00,  // 0020
@@ -231,6 +232,7 @@ public:
 private:
   unsigned char modv = 0x06;
 };
+}  // namespace scanner_udp_datagram_hexdumps
 }  // namespace psen_scan_v2_test
 
 #endif  // PSEN_SCAN_V2_UDP_FRAME_DUMPS_H

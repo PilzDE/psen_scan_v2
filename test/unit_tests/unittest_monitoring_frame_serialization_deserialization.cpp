@@ -31,117 +31,67 @@ using namespace psen_scan_v2;
 
 namespace psen_scan_v2_test
 {
-TEST(MonitoringFrameFieldHeaderTest, testGetIdAndLength)
+TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithoutIntensitiesCorrectly)
 {
-  uint8_t id = 5;
-  uint16_t length = 7;
-  MonitoringFrameAdditionalFieldHeader header(id, length);
-  EXPECT_EQ(id, header.id());
-  EXPECT_EQ(length, header.length());
-}
+  scanner_udp_datagram_hexdumps::WithoutIntensities without_intensities;
+  DynamicSizeRawData serialized_monitoring_frame_message = serialize(without_intensities.msg_);
 
-TEST(MonitoringFrameFieldHeaderTest, testReadSuccess)
-{
-  uint8_t id = 5;
-  uint16_t length = 7;
-  uint16_t expected_length = length - 1;
-  uint16_t max_num_bytes = 9;
+  EXPECT_EQ(without_intensities.hex_dump.size(), serialized_monitoring_frame_message.size());
 
-  IStringStreamBuilder builder;
-  builder.add(id);
-  builder.add(length);
-  std::istringstream is{ builder.get() };
-
-  std::unique_ptr<MonitoringFrameAdditionalFieldHeader> header_ptr;
-  ASSERT_NO_THROW(header_ptr.reset(new MonitoringFrameAdditionalFieldHeader{ readFieldHeader(is, max_num_bytes) }););
-  EXPECT_EQ(id, header_ptr->id());
-  EXPECT_EQ(expected_length, header_ptr->length());
-}
-
-TEST(MonitoringFrameFieldHeaderTest, testReadHeaderTooShortFailure)
-{
-  uint16_t too_short_header;
-  uint16_t max_num_bytes = 2;
-
-  IStringStreamBuilder builder;
-  builder.add(too_short_header);
-  std::istringstream is{ builder.get() };
-
-  EXPECT_THROW(readFieldHeader(is, max_num_bytes);, raw_processing::StringStreamFailure);
-}
-
-TEST(DiagnosticMessagesSerializationTest, shouldSetCorrectBitInSerializedDiagnosticData)
-{
-  const uint8_t byte_location{ 5 };
-  const uint8_t bit_location{ 3 };
-  std::vector<MonitoringFrameDiagnosticMessage> diagnostic_data{ { ScannerId::MASTER, byte_location, bit_location } };
-  auto diagnostic_data_serialized = serializeDiagnosticMessages(diagnostic_data);
-
-  EXPECT_EQ(diagnostic_data_serialized.size(), DIAGNOSTIC_DATA_LENGTH_IN_BYTES);
-  EXPECT_EQ(diagnostic_data_serialized.at(DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES + byte_location), 0b1000);
-}
-
-TEST(MonitoringFrameSerializationTest, testUDPFrameTestDataWithoutIntensitiesSuccess)
-{
-  UDPFrameTestDataWithoutIntensities test_data;
-  DynamicSizeRawData serialized_monitoring_frame_message = serialize(test_data.msg_);
-
-  EXPECT_EQ(test_data.hex_dump.size(), serialized_monitoring_frame_message.size());
-
-  for (size_t i = 0; i < test_data.hex_dump.size(); i++)
+  for (size_t i = 0; i < without_intensities.hex_dump.size(); i++)
   {
-    EXPECT_EQ((uint8_t)serialized_monitoring_frame_message.at(i), test_data.hex_dump.at(i)) << " index " << i;
+    EXPECT_EQ((uint8_t)serialized_monitoring_frame_message.at(i), without_intensities.hex_dump.at(i)) << " index " << i;
   }
 }
 
-TEST(MonitoringFrameSerializationTest, testUDPFrameTestDataWitDiagnosticsSuccess)
+TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithDiagnosticsCorrectly)
 {
-  UDPFrameTestDataWithDiagnostics test_data;
-  DynamicSizeRawData serialized_monitoring_frame_message = serialize(test_data.msg_);
+  scanner_udp_datagram_hexdumps::WithDiagnostics with_diagnostics;
+  DynamicSizeRawData serialized_monitoring_frame_message = serialize(with_diagnostics.msg_);
 
-  EXPECT_EQ(test_data.hex_dump.size(), serialized_monitoring_frame_message.size());
+  EXPECT_EQ(with_diagnostics.hex_dump.size(), serialized_monitoring_frame_message.size());
 
-  for (size_t i = 0; i < test_data.hex_dump.size(); i++)
+  for (size_t i = 0; i < with_diagnostics.hex_dump.size(); i++)
   {
-    EXPECT_EQ((uint8_t)serialized_monitoring_frame_message.at(i), test_data.hex_dump.at(i)) << " index " << i;
+    EXPECT_EQ((uint8_t)serialized_monitoring_frame_message.at(i), with_diagnostics.hex_dump.at(i)) << " index " << i;
   }
 }
 
-TEST(MonitoringFrameSerializationTest, testUDPFrameTestDataWithoutMeasurementsAndIntensitiesSuccess)
+TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithoutMeasurementsAndIntensitiesCorrectly)
 {
-  // Load testdata from dump
-  UDPFrameTestDataWithoutMeasurementsAndIntensities test_data;
-  DynamicSizeRawData serialized_monitoring_frame_message = serialize(test_data.msg_);
+  scanner_udp_datagram_hexdumps::WithoutMeasurementsAndIntensities without_measurements_and_intensities;
+  DynamicSizeRawData serialized_monitoring_frame_message = serialize(without_measurements_and_intensities.msg_);
 
-  EXPECT_EQ(test_data.hex_dump.size(), serialized_monitoring_frame_message.size());
+  EXPECT_EQ(without_measurements_and_intensities.hex_dump.size(), serialized_monitoring_frame_message.size());
 
-  for (size_t i = 0; i < test_data.hex_dump.size(); i++)
+  for (size_t i = 0; i < without_measurements_and_intensities.hex_dump.size(); i++)
   {
-    EXPECT_EQ((uint8_t)serialized_monitoring_frame_message.at(i), test_data.hex_dump.at(i)) << " index " << i;
+    EXPECT_EQ((uint8_t)serialized_monitoring_frame_message.at(i), without_measurements_and_intensities.hex_dump.at(i))
+        << " index " << i;
   }
 }
 
-TEST(MonitoringFrameSerializationTest, shouldSucceedOnMonitoringFrameWithoutIntensities)
+TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameWithoutIntensitiesConsistently)
 {
-  UDPFrameTestDataWithoutIntensities test_data;
-  DynamicSizeRawData raw = serialize(test_data.msg_);
+  scanner_udp_datagram_hexdumps::WithoutIntensities without_intensities;
+  DynamicSizeRawData raw = serialize(without_intensities.msg_);
 
   MonitoringFrameMsg deserialized_msg = deserialize_monitoring_frame(convertToMaxSizeRawData(raw), raw.size());
 
-  EXPECT_EQ(test_data.msg_, deserialized_msg);
+  EXPECT_EQ(without_intensities.msg_, deserialized_msg);
 }
 
-TEST(MonitoringFrameSerializationTest, ShouldSucceedOnMonitoringFrameWithDiagnosticHexdump)
+TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameWithDiagnosticsConsistently)
 {
-  UDPFrameTestDataWithDiagnostics test_data;
-  DynamicSizeRawData raw = serialize(test_data.msg_);
+  scanner_udp_datagram_hexdumps::WithDiagnostics with_diagnostics;
+  DynamicSizeRawData raw = serialize(with_diagnostics.msg_);
 
   MonitoringFrameMsg deserialized_msg = deserialize_monitoring_frame(convertToMaxSizeRawData(raw), raw.size());
 
-  EXPECT_EQ(test_data.msg_, deserialized_msg);
+  EXPECT_EQ(with_diagnostics.msg_, deserialized_msg);
 }
 
-TEST(MonitoringFrameSerializationTest, ShouldSucceedOnMonitoringFrameWithDiagnosticData)
+TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstructedFrameWithDiagnosticsConsistently)
 {
   std::array<std::pair<uint8_t, uint8_t>, 3> byte_bit = { std::make_pair(0, 0),
                                                           std::make_pair(5, 3),
@@ -174,86 +124,135 @@ TEST(MonitoringFrameSerializationTest, ShouldSucceedOnMonitoringFrameWithDiagnos
   EXPECT_EQ(msg, deserialized_msg);
 }
 
-class MonitoringFrameMsgDeserializeTest : public ::testing::Test
+TEST(MonitoringFrameSerializationDiagnosticMessagesTest, shouldSetCorrectBitInSerializedDiagnosticData)
+{
+  const uint8_t byte_location{ 5 };
+  const uint8_t bit_location{ 3 };
+  std::vector<MonitoringFrameDiagnosticMessage> diagnostic_data{ { ScannerId::MASTER, byte_location, bit_location } };
+  auto diagnostic_data_serialized = serializeDiagnosticMessages(diagnostic_data);
+
+  EXPECT_EQ(diagnostic_data_serialized.size(), DIAGNOSTIC_DATA_LENGTH_IN_BYTES);
+  EXPECT_EQ(diagnostic_data_serialized.at(DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES + byte_location), 0b1000);
+}
+
+TEST(MonitoringFrameDeserializationFieldHeaderTest, shouldGetIdAndLengthCorrectly)
+{
+  uint8_t id = 5;
+  uint16_t length = 7;
+  MonitoringFrameAdditionalFieldHeader header(id, length);
+  EXPECT_EQ(id, header.id());
+  EXPECT_EQ(length, header.length());
+}
+
+TEST(MonitoringFrameDeserializationFieldHeaderTest, shouldDeserializeMonitoringFrameAdditionalFieldHeaderCorrectly)
+{
+  uint8_t id = 5;
+  uint16_t length = 7;
+  uint16_t expected_length = length - 1;
+  uint16_t max_num_bytes = 9;
+
+  IStringStreamBuilder builder;
+  builder.add(id);
+  builder.add(length);
+  std::istringstream is{ builder.get() };
+
+  std::unique_ptr<MonitoringFrameAdditionalFieldHeader> header_ptr;
+  ASSERT_NO_THROW(header_ptr.reset(new MonitoringFrameAdditionalFieldHeader{ readFieldHeader(is, max_num_bytes) }););
+  EXPECT_EQ(id, header_ptr->id());
+  EXPECT_EQ(expected_length, header_ptr->length());
+}
+
+TEST(MonitoringFrameDeserializationFieldHeaderTest, shouldFailOnReadHeaderWhichIsTooShort)
+{
+  uint16_t too_short_header;
+  uint16_t max_num_bytes = 2;
+
+  IStringStreamBuilder builder;
+  builder.add(too_short_header);
+  std::istringstream is{ builder.get() };
+
+  EXPECT_THROW(readFieldHeader(is, max_num_bytes);, raw_processing::StringStreamFailure);
+}
+class MonitoringFrameDeserializationTest : public ::testing::Test
 {
 protected:
-  MonitoringFrameMsgDeserializeTest()
+  MonitoringFrameDeserializationTest()
   {
     without_intensities_raw_ = convertToMaxSizeRawData(without_intensities_.hex_dump);
     with_diagnostics_raw_ = convertToMaxSizeRawData(with_diagnostics_.hex_dump);
   }
 
 protected:
-  UDPFrameTestDataWithoutIntensities without_intensities_;
+  scanner_udp_datagram_hexdumps::WithoutIntensities without_intensities_;
   MaxSizeRawData without_intensities_raw_;
 
-  UDPFrameTestDataWithDiagnostics with_diagnostics_;
+  scanner_udp_datagram_hexdumps::WithDiagnostics with_diagnostics_;
   MaxSizeRawData with_diagnostics_raw_;
 };
 
-TEST_F(MonitoringFrameMsgDeserializeTest, shouldSucceedOnMonitoringFrameWithoutIntensities)
+TEST_F(MonitoringFrameDeserializationTest, shouldDeserializeMonitoringFrameWithoutIntensitiesCorrectly)
 {
   MonitoringFrameMsg msg;
   ASSERT_NO_THROW(msg = deserialize_monitoring_frame(without_intensities_raw_, without_intensities_raw_.size()););
   EXPECT_EQ(msg, without_intensities_.msg_);
 }
 
-TEST_F(MonitoringFrameMsgDeserializeTest, shouldSucceedOnMonitoringFrameWithDiagnostics)
+TEST_F(MonitoringFrameDeserializationTest, shouldDeserializeMonitoringFrameWithDiagnosticsCorrectly)
 {
   MonitoringFrameMsg msg;
   ASSERT_NO_THROW(msg = deserialize_monitoring_frame(with_diagnostics_raw_, with_diagnostics_raw_.size()));
   EXPECT_TRUE(msg == with_diagnostics_.msg_);
 }
 
-TEST_F(MonitoringFrameMsgDeserializeTest, testWrongOpCode)
+TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnWrongOpCode)
 {
   without_intensities_raw_.at(4) += 1;
   EXPECT_NO_THROW(deserialize_monitoring_frame(without_intensities_raw_, without_intensities_raw_.size()););
 }
 
-TEST_F(MonitoringFrameMsgDeserializeTest, testInvalidWorkingMode)
+TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnInvalidWorkingMode)
 {
   without_intensities_raw_.at(8) = 0x03;
   EXPECT_NO_THROW(deserialize_monitoring_frame(without_intensities_raw_, without_intensities_raw_.size()););
 }
 
-TEST_F(MonitoringFrameMsgDeserializeTest, testInvalidTransactionType)
+TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnInvalidTransactionType)
 {
   without_intensities_raw_.at(12) = 0x06;
   EXPECT_NO_THROW(deserialize_monitoring_frame(without_intensities_raw_, without_intensities_raw_.size()););
 }
 
-TEST_F(MonitoringFrameMsgDeserializeTest, testInvalidScannerId)
+TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnInvalidScannerId)
 {
   without_intensities_raw_.at(16) = 0x04;
   EXPECT_NO_THROW(deserialize_monitoring_frame(without_intensities_raw_, without_intensities_raw_.size()););
 }
 
-TEST_F(MonitoringFrameMsgDeserializeTest, testUnknownFieldId)
+TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnUnknownFieldId)
 {
-  UDPFrameTestDataWithUnknownFieldId test_data;
-  const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
-  const auto num_bytes = 2 * test_data.hex_dump.size();
+  scanner_udp_datagram_hexdumps::WithUnknownFieldId with_unknown_field_id;
+  const auto raw_frame_data = convertToMaxSizeRawData(with_unknown_field_id.hex_dump);
+  const auto num_bytes = 2 * with_unknown_field_id.hex_dump.size();
 
   MonitoringFrameMsg msg;
   EXPECT_THROW(msg = deserialize_monitoring_frame(raw_frame_data, num_bytes);, MonitoringFrameFormatError);
 }
 
-TEST_F(MonitoringFrameMsgDeserializeTest, testTooLargeFieldLength)
+TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeFieldLength)
 {
-  UDPFrameTestDataWithTooLargeFieldLength test_data;
-  const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
-  const auto num_bytes = 2 * test_data.hex_dump.size();
+  scanner_udp_datagram_hexdumps::WithTooLargeFieldLength with_too_large_field_length;
+  const auto raw_frame_data = convertToMaxSizeRawData(with_too_large_field_length.hex_dump);
+  const auto num_bytes = 2 * with_too_large_field_length.hex_dump.size();
 
   MonitoringFrameMsg msg;
   EXPECT_THROW(msg = deserialize_monitoring_frame(raw_frame_data, num_bytes);, MonitoringFrameFormatError);
 }
 
-TEST_F(MonitoringFrameMsgDeserializeTest, testTooLargeScanCounterLength)
+TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeScanCounterLength)
 {
-  UDPFrameTestDataWithTooLargeScanCounterLength test_data;
-  const auto raw_frame_data = convertToMaxSizeRawData(test_data.hex_dump);
-  const auto num_bytes = 2 * test_data.hex_dump.size();
+  scanner_udp_datagram_hexdumps::WithTooLargeScanCounterLength with_too_large_scan_counter_length;
+  const auto raw_frame_data = convertToMaxSizeRawData(with_too_large_scan_counter_length.hex_dump);
+  const auto num_bytes = 2 * with_too_large_scan_counter_length.hex_dump.size();
 
   MonitoringFrameMsg msg;
   EXPECT_THROW(msg = deserialize_monitoring_frame(raw_frame_data, num_bytes);
