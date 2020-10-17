@@ -11,22 +11,14 @@
     <xacro:property name="height" value="0.152" /> <!-- src datasheet p 96 -->
     <xacro:property name="dist_scanning_plane_top" value="0.0377" /> <!-- src datasheet p 96 -->
     <xacro:property name="dist_scanning_axis_rear" value="0.0525" /> <!-- src datasheet p 96 -->
-        
+
     <!-- Location of mounting point at the lower back of device -->
-    <link name="${prefix}_mount_link">
-      <inertial>
-        <mass value="0.001" />
-        <origin xyz="0 0 0" />
-        <inertia ixx="0.000001" ixy="0.0" ixz="0.0"
-          iyy="0.000001" iyz="0.0" izz="0.000001" /> <!-- TODO correct dimensions -->
-      </inertial>
-    </link>
+    <link name="${prefix}_mount_link"/>
 
     <joint name="${prefix}_mount_joint" type="fixed">
       <parent link="${prefix}_mount_link" />
       <child link="${prefix}" />
       <origin rpy="0 0 0" xyz="${radius} 0 ${height / 2}"/>
-      
     </joint>
 
     <!-- Location of scanner body -->
@@ -59,7 +51,7 @@
       <child link="${prefix}_scan" />
       <origin rpy="${pi} 0 0" xyz="0 ${radius - dist_scanning_axis_rear} ${height / 2 - dist_scanning_plane_top}"/>
     </joint>
-    
+
     <!-- This is the location of the laser scan -->
     <link name="${prefix}_scan">
     </link>
