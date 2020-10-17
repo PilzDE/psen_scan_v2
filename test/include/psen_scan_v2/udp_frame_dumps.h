@@ -170,7 +170,6 @@ public:
 
 private:
   const int n_measures{ 500 };
-  const size_t offset_diagnostic{ 31 };
   const size_t offset_measures{ 74 };
   const uint16_t from_theta{ 0x03e8 };
   const uint16_t resolution{ 0x01 };
@@ -223,14 +222,14 @@ public:
 
 class WithTooLargeScanCounterLength
 {
+private:
+  unsigned char modv{ 0x06 };
+
 public:
   const std::array<uint8_t, 35> hex_dump = { 0x00, 0x00, 0x00, 0x00, 0xca, 0x00,  // 0020
                                              0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00,
                                              0x00, 0xdc, 0x05, 0x0a, 0x00, 0x02, modv, 0x00, 0xfc, 0x61,
                                              0x06, 0x00, 0x05, 0xcf, 0xff, 0x09, 0x00, 0x00, 0x00 };
-
-private:
-  unsigned char modv = 0x06;
 };
 }  // namespace scanner_udp_datagram_hexdumps
 }  // namespace psen_scan_v2_test

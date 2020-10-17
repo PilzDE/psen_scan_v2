@@ -89,7 +89,7 @@ const DefaultScanRange& ScannerConfiguration::scanRange() const
   return scan_range_;
 }
 
-bool ScannerConfiguration::diagnostics_enabled() const
+bool ScannerConfiguration::diagnosticsEnabled() const
 {
   return diagnostics_enabled_;
 }

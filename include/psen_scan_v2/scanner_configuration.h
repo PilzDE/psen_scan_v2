@@ -57,7 +57,7 @@ public:
 
   const DefaultScanRange& scanRange() const;
 
-  bool diagnostics_enabled() const;
+  bool diagnosticsEnabled() const;
 
 private:
   uint32_t host_ip_;

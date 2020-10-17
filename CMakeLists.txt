@@ -336,6 +336,15 @@ if(CATKIN_ENABLE_TESTING)
     ${console_bridge_LIBRARIES}
   )
 
+    catkin_add_gmock(unittest_diagnostics
+    src/diagnostics.cpp
+    test/unit_tests/unittest_diagnostics.cpp
+  )
+  target_link_libraries(unittest_diagnostics
+    ${catkin_LIBRARIES}
+    ${console_bridge_LIBRARIES}
+  )
+
   #########################
   ##  Integration-Tests  ##
   #########################
