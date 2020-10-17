@@ -100,6 +100,12 @@ roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10 host_ip:=192.
 ```
 This example configures the safety laser scanner at 192.168.0.10 to send it´s frames to 192.168.0.20:3050.
 
+## Frames
+The location of the frames is shown in the image below.
+<p align="center">
+<img src="img/frames.png" width="800px" alt="PILZ safety laser scanner frames" title="frames">
+</p>
+
 ### Adjust expert parameters
 If you've created an application package with your own launch file as described in the
 [tutorials](http://wiki.ros.org/psen_scan_v2/Tutorials/),
