@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 <launch>
   <!-- DESCRIPTION ~~~~~~~~~~~~~~~~~~~~~~~~ -->
   <param name="robot_description" command="$(find xacro)/xacro '$(find psen_scan_v2)/urdf/example.urdf.xacro'" />
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
   <!-- DRIVER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
   <!-- Password for Laserscanner -->
