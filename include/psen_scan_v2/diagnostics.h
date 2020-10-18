@@ -35,7 +35,36 @@ static constexpr uint32_t DIAGNOSTIC_DATA_LENGTH_IN_BYTES{ DIAGNOSTIC_MESSAGE_UN
                                                            DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES *
                                                                sizeof(SCANNER_IDS) };
 
-enum class DiagnosticCode;
+enum class DiagnosticCode
+{
+  OSSD1_OC,
+  OSSD_SHRT_C,
+  OSSD_INTEGR,
+  INT,
+  WIN_CLN_AL,
+  POWER_SUPPLY,
+  NETW_PRB,
+  DUST_CRC_FL,
+  OSSD2_OVERCUR,
+  MEAS_PROB,
+  INCOHERENCE,
+  ZONE_INVAL_TRANS,
+  ZONE_INVALID_CONF,
+  WIN_CLN_WARN,
+  INT_COM_PRB,
+  GENERIC_ERR,
+  DISP_COM_PRB,
+  TEMP_MEAS_PROB,
+  ENCOD_OOR,
+  EDM2_ERR,
+  EDM1_ERR,
+  CONF_ERR,
+  OUT_OF_RANGE_ERR,
+  TEMP_RANGE_ERR,
+  ENCODER_GENERIC_ERR,
+  _,
+  UNUSED
+};
 
 class MonitoringFrameDiagnosticMessage
 {
@@ -78,36 +107,6 @@ private:
 };
 
 // clang-format off
-enum class DiagnosticCode
-{
-  OSSD1_OC,
-  OSSD_SHRT_C,
-  OSSD_INTEGR,
-  INT,
-  WIN_CLN_AL,
-  POWER_SUPPLY,
-  NETW_PRB,
-  DUST_CRC_FL,
-  OSSD2_OVERCUR,
-  MEAS_PROB,
-  INCOHERENCE,
-  ZONE_INVAL_TRANS,
-  ZONE_INVALID_CONF,
-  WIN_CLN_WARN,
-  INT_COM_PRB,
-  GENERIC_ERR,
-  DISP_COM_PRB,
-  TEMP_MEAS_PROB,
-  ENCOD_OOR,
-  EDM2_ERR,
-  EDM1_ERR,
-  CONF_ERR,
-  OUT_OF_RANGE_ERR,
-  TEMP_RANGE_ERR,
-  ENCODER_GENERIC_ERR,
-  _,
-  UNUSED
-};
 
 typedef DiagnosticCode Dc;
 using ErrorCodeName = std::string;
