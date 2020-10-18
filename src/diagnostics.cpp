@@ -34,11 +34,14 @@ bool MonitoringFrameDiagnosticMessage::operator==(const MonitoringFrameDiagnosti
 
 std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg)
 {
-  os << fmt::format("Device: {} - {} (Byte:{} Bit:{})",
-                    scanner_id_to_string.at(msg.getScannerId()),
-                    error_code_to_string.at(msg.getDiagnosticCode()),
-                    msg.getErrorByteLocation(),
-                    msg.getErrorBitLocation());
+  os << fmt::format(
+      "Device: {} - {}", scanner_id_to_string.at(msg.getScannerId()), error_code_to_string.at(msg.getDiagnosticCode()));
+
+  if (ambiguous_diagnostic_codes.find(msg.getDiagnosticCode()) != ambiguous_diagnostic_codes.end())
+  {
+    os << fmt::format(" (Byte:{} Bit:{})", msg.getErrorByteLocation(), msg.getErrorBitLocation());
+  }
+
   return os;
 }
 

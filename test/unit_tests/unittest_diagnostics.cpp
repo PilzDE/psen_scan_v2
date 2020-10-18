@@ -61,10 +61,9 @@ TEST(MonitoringFrameDiagnosticMessageTest, shouldBeNotEqualOnDifferentErrorBitLo
 TEST(MonitoringFrameDiagnosticMessageTest, shouldOutputTheRightDiagnosticMessage)
 {
   MonitoringFrameDiagnosticMessage msg = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE1, 1, 0);
-  ;
   std::ostringstream os;
   os << msg;
-  EXPECT_EQ(os.str(), "Device: Slave1 - OSSD2_OVERCUR (Byte:1 Bit:0)");
+  EXPECT_EQ(os.str(), "Device: Slave1 - OSSD2 Overcurrent / Short circuit. (Byte:1 Bit:0)");
 }
 }  // namespace psen_scan_v2_test
 

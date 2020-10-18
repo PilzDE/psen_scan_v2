@@ -250,7 +250,8 @@ TEST(ScannerAPITests, testReceivingOfMonitoringFrame)
 
   EXPECT_LOG(*ros_log_mock, INFO, "Start scanner called.").Times(1);
   EXPECT_LOG(*ros_log_mock, INFO, "Scanner started successfully.").Times(1);
-  EXPECT_LOG(*ros_log_mock, WARN, "{Device: Master - WIN_CLN_AL (Byte:1 Bit:7)}")
+  EXPECT_LOG(
+      *ros_log_mock, WARN, "{Device: Master - Alarm: The front panel of the safety laser scanner must be cleaned.}")
       .Times(1)
       .WillOnce(OpenBarrier(&diagnostic_barrier));
 
