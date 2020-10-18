@@ -19,12 +19,12 @@
 #include <array>
 #include <string>
 #include <map>
+#include <vector>
 
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
-#include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/scanner_ids.h"
 
 namespace psen_scan_v2

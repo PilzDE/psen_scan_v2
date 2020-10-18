@@ -36,8 +36,6 @@
 
 namespace psen_scan_v2
 {
-class MonitoringFrameDiagnosticMessage;
-
 static constexpr uint8_t MAX_SCANNER_ID{ sizeof(SCANNER_IDS) - 1 };
 
 class MonitoringFrameMsg
