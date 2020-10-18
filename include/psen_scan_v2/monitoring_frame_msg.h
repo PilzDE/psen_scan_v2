@@ -26,7 +26,7 @@
 #include <array>
 #include <bitset>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <fmt/ranges.h>
 
 #include "psen_scan_v2/raw_scanner_data.h"
