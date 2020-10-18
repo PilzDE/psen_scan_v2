@@ -60,10 +60,20 @@ TEST(MonitoringFrameDiagnosticMessageTest, shouldBeNotEqualOnDifferentErrorBitLo
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldOutputTheRightDiagnosticMessage)
 {
-  MonitoringFrameDiagnosticMessage msg = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE1, 1, 0);
+  MonitoringFrameDiagnosticMessage msg = MonitoringFrameDiagnosticMessage(ScannerId::MASTER, 3, 3);
   std::ostringstream os;
   os << msg;
-  EXPECT_EQ(os.str(), "Device: Slave1 - OSSD2 Overcurrent / Short circuit. (Byte:1 Bit:0)");
+  EXPECT_EQ(os.str(), "Device: Master - Display communication problem.");
+}
+
+TEST(MonitoringFrameDiagnosticMessageTest, shouldOutputTheRightDiagnosticMessageWithBitandBytes)
+{
+  MonitoringFrameDiagnosticMessage msg = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE1, 2, 5);
+  std::ostringstream os;
+  os << msg;
+
+  // Output with byte/bit information since error internal error is ambiguous
+  EXPECT_EQ(os.str(), "Device: Slave1 - Internal error. (Byte:2 Bit:5)");
 }
 }  // namespace psen_scan_v2_test
 
