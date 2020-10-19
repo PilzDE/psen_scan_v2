@@ -23,31 +23,25 @@
 namespace psen_scan_v2
 {
 sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
-                                      const std::string& frame_id,
+                                      const std::string& prefix,
                                       const double x_axis_rotation,
                                       const ros::Time& timestamp = ros::Time::now())
 {
   sensor_msgs::LaserScan ros_message;
   ros_message.header.stamp = timestamp;
-  ros_message.header.frame_id = frame_id;
-  ros_message.angle_min = -(laserscan.getMaxScanAngle().toRad() - x_axis_rotation);
-  ros_message.angle_max = -(laserscan.getMinScanAngle().toRad() - x_axis_rotation);
+  ros_message.header.frame_id = prefix + SCAN_FRAME_ID_SUFFIX;
+  ros_message.angle_min = laserscan.getMinScanAngle().toRad() - x_axis_rotation;
+  ros_message.angle_max = laserscan.getMaxScanAngle().toRad() - x_axis_rotation;
   ros_message.angle_increment = laserscan.getScanResolution().toRad();
 
-  // For now we set this to zero to hint that the ranges are actually ordered
-  // from new to old. Thus applying some sort of interpolation using time_increment
-  // could lead to unwanted results.
-  ros_message.time_increment = 0;
+  ros_message.time_increment = TIME_PER_SCAN_IN_S / (2 * M_PI) * laserscan.getScanResolution().toRad();
 
   ros_message.scan_time = TIME_PER_SCAN_IN_S;
   ros_message.range_min = RANGE_MIN_IN_M;
   ros_message.range_max = RANGE_MAX_IN_M;
 
-  // Note that the ranges field from the laserscan msg is field in reverse order
-  // from the actual measurements. Thus the first element is the newest measurement and the last
-  // element is the oldest
   ros_message.ranges.insert(
-      ros_message.ranges.end(), laserscan.getMeasurements().crbegin(), laserscan.getMeasurements().crend());
+      ros_message.ranges.begin(), laserscan.getMeasurements().cbegin(), laserscan.getMeasurements().cend());
 
   return ros_message;
 }

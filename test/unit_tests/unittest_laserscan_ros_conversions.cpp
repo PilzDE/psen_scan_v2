@@ -29,11 +29,14 @@ MATCHER_P(IsReversed, data_vec, "")
   return arg == data_vec_copy;
 }
 
+const double EPSILON{ 1.0e-8 };
+
 namespace psen_scan_v2_test
 {
 TEST(LaserScanROSConversionsTest, testToLaserScanMsg)
 {
-  const std::string frame_id{ "frame_id" };
+  const std::string prefix{ "prefix" };
+  const std::string frame_id{ prefix + "_scan" };
   constexpr double x_axis_rotation{ 0 };
 
   const TenthOfDegree angle_min_raw{ 0 };
@@ -44,34 +47,31 @@ TEST(LaserScanROSConversionsTest, testToLaserScanMsg)
   laserscan.setMeasurements(measures);
 
   ros::Time now = ros::Time::now();
-  sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(laserscan, frame_id, x_axis_rotation, now);
+  sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(laserscan, prefix, x_axis_rotation, now);
 
   EXPECT_EQ(laserscan_msg.header.seq, 0u);
   EXPECT_EQ(laserscan_msg.header.stamp, now);
   EXPECT_EQ(laserscan_msg.header.frame_id, frame_id);
 
-  EXPECT_NEAR(laserscan_msg.angle_min, x_axis_rotation - angle_max_raw.toRad(), 1.0e-8);
-  EXPECT_NEAR(laserscan_msg.angle_max, x_axis_rotation - angle_min_raw.toRad(), 1.0e-8);
+  EXPECT_NEAR(laserscan_msg.angle_min, angle_min_raw.toRad() - x_axis_rotation, EPSILON);
+  EXPECT_NEAR(laserscan_msg.angle_max, angle_max_raw.toRad() - x_axis_rotation, EPSILON);
 
-  EXPECT_NEAR(laserscan_msg.angle_increment, angle_increment.toRad(), 1.0e-8);
-  std::cerr << laserscan_msg.angle_increment << " " << angle_increment.toRad() << "\n";
-  EXPECT_EQ(laserscan_msg.time_increment, 0);
+  EXPECT_NEAR(laserscan_msg.angle_increment, angle_increment.toRad(), EPSILON);
 
-  EXPECT_NEAR(laserscan_msg.scan_time, TIME_PER_SCAN_IN_S, 1.0e-8);
+  const double time_per_rad = TIME_PER_SCAN_IN_S / (2 * M_PI);  // angle speed
+  EXPECT_NEAR(laserscan_msg.time_increment, time_per_rad * angle_increment.toRad(), EPSILON);
+
+  EXPECT_NEAR(laserscan_msg.scan_time, TIME_PER_SCAN_IN_S, EPSILON);
 
   EXPECT_EQ(laserscan_msg.range_min, RANGE_MIN_IN_M);
   EXPECT_EQ(laserscan_msg.range_max, RANGE_MAX_IN_M);
 
   ASSERT_EQ(laserscan_msg.ranges.size(), measures.size());
 
-  // Check that the ranges in the ROS msg is reversed in comparision to the laserscan and given in meters
-  auto reverse_it_measures = measures.crbegin();
-  auto iter_ranges = laserscan_msg.ranges.cbegin();
-  while (reverse_it_measures != measures.rend() && iter_ranges != laserscan_msg.ranges.end())
+  // Check that the ranges in the ROS msg is the same order as the laserscan and given in meters
+  for (size_t i = 0; i < laserscan_msg.ranges.size(); ++i)
   {
-    EXPECT_NEAR(*iter_ranges, *reverse_it_measures, 1.0e-8);
-    iter_ranges++;
-    reverse_it_measures++;
+    EXPECT_NEAR(laserscan_msg.ranges.at(i), measures.at(i), EPSILON);
   }
 
   EXPECT_TRUE(laserscan_msg.intensities.empty());

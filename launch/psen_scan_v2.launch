@@ -16,7 +16,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <launch>
-
   <!-- IP-Address of host machine -->
   <arg name="host_ip" default="192.168.0.50" />
 
@@ -29,8 +28,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- IP-Address of Safety laser scanner -->
   <arg name="sensor_ip" default="192.168.0.10" />
 
-  <!-- ROS Frame ID -->
-  <arg name="frame_id" default="scanner" />
+  <!-- Prefix i. e. name of the scanner (required to run multiple scanners) -->
+  <arg name="prefix" default="laser_1" />
 
   <!-- Start angle of measurement in radian -->
   <arg name="angle_start" default="$(eval -137.5 /180.0 * pi)" />
@@ -43,9 +42,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <param name="host_udp_port_data" value="$(arg host_udp_port_data)" />
     <param name="host_udp_port_control" value="$(arg host_udp_port_control)" />
     <param name="sensor_ip" value="$(arg sensor_ip)" />
-    <param name="frame_id" value="$(arg frame_id)" />
+    <param name="prefix" value="$(arg prefix)" />
     <param name="angle_start" value="$(arg angle_start)" />
     <param name="angle_end" value="$(arg angle_end)" />
   </node>
+
+  <!-- Publish tf frames for the device -->
+  <param name="robot_description" command="$(find xacro)/xacro
+    '$(find psen_scan_v2)/urdf/example.urdf.xacro' prefix:=$(arg prefix)" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+  <!-- Start rviz -->
   <node name="rviz" type="rviz" pkg="rviz" args="-d $(find psen_scan_v2)/config/config.rviz" />
 </launch>
