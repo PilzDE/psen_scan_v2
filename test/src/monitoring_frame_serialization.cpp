@@ -72,7 +72,7 @@ serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnosticMessage>& messa
   std::array<uint8_t, DIAGNOSTIC_DATA_LENGTH_IN_BYTES> raw_diagnostic_data;
   raw_diagnostic_data.fill(0);
 
-  for (auto& elem : messages)
+  for (const auto& elem : messages)
   {
     raw_diagnostic_data.at(DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES +
                            static_cast<uint8_t>(elem.id_) * DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES +
