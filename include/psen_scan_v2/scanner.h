@@ -40,7 +40,7 @@ static constexpr double RANGE_MAX_IN_M{ 10. };
 
 static constexpr double DEFAULT_X_AXIS_ROTATION(degreeToRadian(137.5));
 
-static std::string SCAN_FRAME_ID_SUFFIX{"_scan"};
+static std::string SCAN_FRAME_ID_SUFFIX{ "_scan" };
 
 /**
  * @brief API to control and to fetch measurements from the scanner.
