@@ -28,8 +28,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- IP-Address of Safety laser scanner -->
   <arg name="sensor_ip" default="192.168.0.10" />
 
+  <!-- Prefix i. e. name of the scanner (required to run multiple scanners) -->
+  <arg name="prefix" default="laser_1" />
+
   <!-- TF Frame ID -->
-  <arg name="frame_id" default="laser_1_scan" />
+  <arg name="frame_id" default="$(arg prefix)_scan" />
 
   <!-- Start angle of measurement in radian -->
   <arg name="angle_start" default="$(eval -137.5 /180.0 * pi)" />
@@ -45,10 +48,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <param name="frame_id" value="$(arg frame_id)" />
     <param name="angle_start" value="$(arg angle_start)" />
     <param name="angle_end" value="$(arg angle_end)" />
+    <remap from="/laser_scanner/scan" to="/$(arg prefix)/scan" />
   </node>
 
   <!-- Publish tf frames for the device -->
-  <param name="robot_description" command="$(find xacro)/xacro '$(find psen_scan_v2)/urdf/example.urdf.xacro'" />
+  <param name="robot_description" command="$(find xacro)/xacro
+    '$(find psen_scan_v2)/urdf/example.urdf.xacro' prefix:=$(arg prefix)" />
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
   <!-- Start rviz -->

@@ -81,7 +81,10 @@ UDP Port used to send commands (start/stop) and receive the corresponding replie
 _sensor_ip_ (_string_, default: "192.168.0.10")<br/>
 IP-Address of safety laser scanner.
 
-_frame_id_ (_string_, default: "scanner")<br/>
+_prefix_ (_string_, default: "laser_1")<br/>
+Name of this scanner that can be changed to differentiate between multiple units.
+
+_frame_id_ (_string_, default: "laser_1_scan")<br/>
 Identifier used for transformations within ROS environment.
 
 _angle_start_ (_double_, default: -2.40 (= -137.5 deg))<br/>
@@ -102,6 +105,9 @@ This example configures the safety laser scanner at 192.168.0.10 to send it´s f
 
 ## Frames
 The location of the frames is shown in the image below.
+Note that these are the names for defined by the `prefix` parameter.
+This can be changed with aforementioned launchfile parameters.
+For example when you are running multiple scanners.
 <p align="center">
 <img src="img/frames.png" width="800px" alt="PILZ safety laser scanner frames" title="frames">
 </p>
