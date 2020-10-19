@@ -76,7 +76,7 @@ public:
 
   bool operator==(const MonitoringFrameDiagnosticMessage& rhs) const;
 
-  friend std::array<uint8_t, DIAGNOSTIC_DATA_LENGTH_IN_BYTES>
+  std::array<uint8_t, DIAGNOSTIC_DATA_LENGTH_IN_BYTES>
   serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnosticMessage>& messages);
 
   ScannerId getScannerId() const

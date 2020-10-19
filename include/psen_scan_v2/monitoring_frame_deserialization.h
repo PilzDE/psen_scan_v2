@@ -50,7 +50,7 @@ private:
   Length length_;
 };
 
-class MonitoringFrameHeader
+class MonitoringFrameFixedFields
 {
 public:
   using DeviceStatus = uint32_t;
@@ -61,13 +61,13 @@ public:
   using Resolution = TenthOfDegree;
 
 public:
-  MonitoringFrameHeader(DeviceStatus device_status,
-                        OpCode op_code,
-                        WorkingMode working_mode,
-                        TransactionType transaction_type,
-                        ScannerId scanner_id,
-                        FromTheta from_theta,
-                        Resolution resolution);
+  MonitoringFrameFixedFields(DeviceStatus device_status,
+                             OpCode op_code,
+                             WorkingMode working_mode,
+                             TransactionType transaction_type,
+                             ScannerId scanner_id,
+                             FromTheta from_theta,
+                             Resolution resolution);
 
 public:
   DeviceStatus device_status() const;
@@ -88,18 +88,18 @@ private:
   Resolution resolution_;
 };
 
-using MonitoringFrameAdditionalFieldId = MonitoringFrameAdditionalFieldHeader::Id;
-using MonitoringFrameAdditionalFieldLength = MonitoringFrameAdditionalFieldHeader::Length;
-struct MonitoringFrameAdditionalFieldIds
+using MonitoringFrameAdditionalFieldHeaderId = MonitoringFrameAdditionalFieldHeader::Id;
+using MonitoringFrameAdditionalFieldHeaderLength = MonitoringFrameAdditionalFieldHeader::Length;
+struct MonitoringFrameAdditionalFieldHeaderIds
 {
-  static constexpr MonitoringFrameAdditionalFieldHeader::Id SCAN_COUNTER{ 0x02 };
-  static constexpr MonitoringFrameAdditionalFieldHeader::Id MEASURES{ 0x05 };
-  static constexpr MonitoringFrameAdditionalFieldHeader::Id END_OF_FRAME{ 0x09 };
-  static constexpr MonitoringFrameAdditionalFieldHeader::Id DIAGNOSTICS{ 0x04 };
+  static constexpr MonitoringFrameAdditionalFieldHeaderId SCAN_COUNTER{ 0x02 };
+  static constexpr MonitoringFrameAdditionalFieldHeaderId MEASURES{ 0x05 };
+  static constexpr MonitoringFrameAdditionalFieldHeaderId END_OF_FRAME{ 0x09 };
+  static constexpr MonitoringFrameAdditionalFieldHeaderId DIAGNOSTICS{ 0x04 };
 };
 
 MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, const std::size_t& num_bytes);
-MonitoringFrameHeader readHeader(std::istringstream& is);
+MonitoringFrameFixedFields readHeader(std::istringstream& is);
 MonitoringFrameAdditionalFieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes);
 std::vector<MonitoringFrameDiagnosticMessage> deserializeDiagnosticMessages(std::istringstream& is);
 
@@ -130,42 +130,42 @@ inline MonitoringFrameAdditionalFieldHeader::Id MonitoringFrameAdditionalFieldHe
   return id_;
 }
 
-inline MonitoringFrameAdditionalFieldHeader::Length MonitoringFrameAdditionalFieldHeader::length() const
+inline MonitoringFrameAdditionalFieldHeaderLength MonitoringFrameAdditionalFieldHeader::length() const
 {
   return length_;
 }
 
-inline MonitoringFrameHeader::DeviceStatus MonitoringFrameHeader::device_status() const
+inline MonitoringFrameFixedFields::DeviceStatus MonitoringFrameFixedFields::device_status() const
 {
   return device_status_;
 }
 
-inline MonitoringFrameHeader::OpCode MonitoringFrameHeader::op_code() const
+inline MonitoringFrameFixedFields::OpCode MonitoringFrameFixedFields::op_code() const
 {
   return op_code_;
 }
 
-inline MonitoringFrameHeader::WorkingMode MonitoringFrameHeader::working_mode() const
+inline MonitoringFrameFixedFields::WorkingMode MonitoringFrameFixedFields::working_mode() const
 {
   return working_mode_;
 }
 
-inline MonitoringFrameHeader::TransactionType MonitoringFrameHeader::transaction_type() const
+inline MonitoringFrameFixedFields::TransactionType MonitoringFrameFixedFields::transaction_type() const
 {
   return transaction_type_;
 }
 
-inline ScannerId MonitoringFrameHeader::scanner_id() const
+inline ScannerId MonitoringFrameFixedFields::scanner_id() const
 {
   return scanner_id_;
 }
 
-inline MonitoringFrameHeader::FromTheta MonitoringFrameHeader::from_theta() const
+inline MonitoringFrameFixedFields::FromTheta MonitoringFrameFixedFields::from_theta() const
 {
   return from_theta_;
 }
 
-inline MonitoringFrameHeader::Resolution MonitoringFrameHeader::resolution() const
+inline MonitoringFrameFixedFields::Resolution MonitoringFrameFixedFields::resolution() const
 {
   return resolution_;
 }

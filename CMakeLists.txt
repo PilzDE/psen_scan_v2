@@ -310,7 +310,6 @@ if(CATKIN_ENABLE_TESTING)
     src/monitoring_frame_msg.cpp
     src/diagnostics.cpp
     src/monitoring_frame_deserialization.cpp
-    src/monitoring_frame_msg.cpp
   )
   target_link_libraries(unittest_monitoring_frame_msg
     ${catkin_LIBRARIES}
@@ -320,7 +319,6 @@ if(CATKIN_ENABLE_TESTING)
     src/monitoring_frame_msg.cpp
     src/monitoring_frame_deserialization.cpp
     src/diagnostics.cpp
-    src/monitoring_frame_msg.cpp
     test/unit_tests/unittest_monitoring_frame_serialization_deserialization.cpp
     test/src/monitoring_frame_serialization.cpp
   )
@@ -336,7 +334,7 @@ if(CATKIN_ENABLE_TESTING)
     ${console_bridge_LIBRARIES}
   )
 
-    catkin_add_gmock(unittest_diagnostics
+  catkin_add_gmock(unittest_diagnostics
     src/diagnostics.cpp
     test/unit_tests/unittest_diagnostics.cpp
   )
