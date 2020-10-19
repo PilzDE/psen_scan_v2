@@ -1,11 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:macro name="psen_scan" params="prefix">
-    <xacro:property name="min_range" value="0.1" /> <!-- TODO correct dimensions -->
-    <xacro:property name="max_range" value="4.0" /> <!-- TODO correct dimensions -->
-    <xacro:property name="min_angle" value="$(eval -137.5 /180.0 * pi)" /> <!-- src datasheet p 91 -->
-    <xacro:property name="max_angle" value="$(eval 137.5 /180.0 * pi)" /> <!-- src datasheet p 91 -->
-
     <xacro:property name="mass" value="1.53" /> <!-- src datasheet p 96 -->
     <xacro:property name="radius" value="0.051" /> <!-- src datasheet p 96 -->
     <xacro:property name="height" value="0.152" /> <!-- src datasheet p 96 -->

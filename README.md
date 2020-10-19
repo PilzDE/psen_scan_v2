@@ -102,9 +102,8 @@ This example configures the safety laser scanner at 192.168.0.10 to send it´s f
 
 ## TF Frames
 The location of the TF frames is shown in the image below.
-Note that these names defined by the `prefix` parameter.
-This can be changed with aforementioned launchfile parameters.
-For example when you are running multiple scanners.
+These names are defined by the aforementioned launchfile parameter `prefix`.
+Changing them is necessary for instance when running multiple scanners.
 <p align="center">
 <img src="img/frames.png" width="800px" alt="PILZ safety laser scanner frames" title="frames">
 </p>
