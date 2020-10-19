@@ -36,7 +36,7 @@
 
 namespace psen_scan_v2
 {
-static constexpr uint8_t MAX_SCANNER_ID{ sizeof(VALID_SCANNER_IDS) - 1 };
+static constexpr uint8_t MAX_SCANNER_ID{ VALID_SCANNER_IDS.size() - 1 };
 
 class MonitoringFrameMsg
 {
