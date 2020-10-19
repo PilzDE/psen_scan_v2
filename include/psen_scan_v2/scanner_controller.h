@@ -156,7 +156,7 @@ void ScannerControllerT<TCSM, TUCI>::handleMonitoringFrame(const MonitoringFrame
   // {
   //   os << message;
   // }
-  PSENSCAN_WARN_THROTTLE(1, "ScannerController", "{}", frame.diagnosticMessages());
+  PSENSCAN_WARN_THROTTLE(1 /* sec */, "ScannerController", "{}", frame.diagnosticMessages());
 
   if (frame.measures().empty())
   {
