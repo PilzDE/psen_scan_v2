@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:macro name="psen_scan" params="prefix ros_topic">
+  <xacro:macro name="psen_scan" params="prefix">
     <xacro:property name="min_range" value="0.1" /> <!-- TODO correct dimensions -->
     <xacro:property name="max_range" value="4.0" /> <!-- TODO correct dimensions -->
     <xacro:property name="min_angle" value="$(eval -137.5 /180.0 * pi)" /> <!-- src datasheet p 91 -->
@@ -44,7 +44,6 @@
           izz="${.5 * mass * (radius * radius)}" />
       </inertial>
     </link>
-    <xacro:psen_scan_gazebo_v0 name="${prefix}" link="${prefix}" ros_topic="${ros_topic}" update_rate="15.0" min_angle="${min_angle}" max_angle="${max_angle}" min_range="${min_range}" max_range="${max_range}"/>
 
     <joint name="${prefix}_scan_joint" type="fixed">
       <parent link="${prefix}" />
@@ -55,40 +54,5 @@
     <!-- This is the location of the laser scan -->
     <link name="${prefix}_scan">
     </link>
-  </xacro:macro>
-
-
-  <xacro:macro name="psen_scan_gazebo_v0" params="name link ros_topic update_rate min_angle max_angle min_range max_range">
-    <gazebo reference="${link}">
-      <material value="Gazebo/Yellow" />
-      <sensor type="ray" name="${prefix}">
-        <always_on>true</always_on>
-        <update_rate>${update_rate}</update_rate>
-        <pose>0 0 0 0 0 0</pose>
-        <visualize>false</visualize>
-        <ray>
-          <scan>
-            <horizontal>
-              <samples>271</samples>
-              <resolution>1</resolution>
-              <min_angle>${min_angle}</min_angle>
-              <max_angle>${max_angle}</max_angle>
-            </horizontal>
-          </scan>
-          <range>
-            <min>${min_range}</min>
-            <max>${max_range}</max>
-            <resolution>0.01</resolution>
-          </range>
-        </ray>
-        <plugin name="gazebo_ros_${prefix}_controller" filename="libgazebo_ros_laser.so">
-          <gaussianNoise>0.005</gaussianNoise>
-          <alwaysOn>true</alwaysOn>
-          <updateRate>${update_rate}</updateRate>
-          <topicName>${ros_topic}</topicName>
-          <frameName>${link}</frameName>
-        </plugin>
-      </sensor>
-    </gazebo>
   </xacro:macro>
 </robot>

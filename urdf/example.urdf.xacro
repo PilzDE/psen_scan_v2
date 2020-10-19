@@ -5,5 +5,5 @@
 
   <xacro:include filename="$(find psen_scan_v2)/urdf/psen_scan.urdf.xacro" />
 
-  <xacro:psen_scan prefix="$(arg prefix)" ros_topic="scan" />
+  <xacro:psen_scan prefix="$(arg prefix)" />
 </robot>
