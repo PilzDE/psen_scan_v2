@@ -216,7 +216,7 @@ void ScannerControllerT<TCSM, TUCI>::sendStopRequest()
 {
   // Before we send the stop request, we need to ensure that an potentially running start()-loop is stopped.
   stopStartReplyWatchdog();
-
+  data_udp_client_.close();
   control_udp_client_.startAsyncReceiving(
       ReceiveMode::single, std::bind(&ScannerControllerT::handleStopReplyTimeout, this, _1), RECEIVE_TIMEOUT_CONTROL);
   StopRequest stop_request;
