@@ -33,7 +33,7 @@ static constexpr uint32_t DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES{
 static constexpr uint32_t DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES{ 4 };
 static constexpr uint32_t DIAGNOSTIC_DATA_LENGTH_IN_BYTES{ DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES +
                                                            DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES *
-                                                               sizeof(SCANNER_IDS) };
+                                                               sizeof(VALID_SCANNER_IDS) };
 
 enum class DiagnosticCode
 {

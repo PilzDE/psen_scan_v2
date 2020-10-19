@@ -28,7 +28,7 @@ enum class ScannerId : uint8_t
   SLAVE2 = 3
 };
 
-static constexpr std::array<ScannerId, 4> SCANNER_IDS{ ScannerId::MASTER,
+static constexpr std::array<ScannerId, 4> VALID_SCANNER_IDS{ ScannerId::MASTER,
                                                        ScannerId::SLAVE0,
                                                        ScannerId::SLAVE1,
                                                        ScannerId::SLAVE2 };
