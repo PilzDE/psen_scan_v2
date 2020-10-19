@@ -18,14 +18,14 @@
     <joint name="${prefix}_mount_joint" type="fixed">
       <parent link="${prefix}_mount_link" />
       <child link="${prefix}" />
-      <origin rpy="0 0 0" xyz="${radius} 0 0"/>
+      <origin rpy="0 0 0" xyz="${radius} 0 ${height / 2}"/>
     </joint>
 
     <!-- Location of scanner body -->
     <link name="${prefix}">
       <visual>
         <geometry>
-            <cylinder radius="${radius}" length="${height}" />
+          <cylinder radius="${radius}" length="${height}" />
         </geometry>
         <material name="pilz_yellow" >
           <color rgba="1.0 0.722 0.196 1.0" />
@@ -33,15 +33,15 @@
       </visual>
       <collision>
         <geometry>
-            <cylinder radius="${radius}" length="${height}" />
+          <cylinder radius="${radius}" length="${height}" />
         </geometry>
       </collision>
       <inertial>
         <mass value="${mass}" />
         <origin xyz="0 0 0" />
-        <inertia ixx="${0.0833333 * mass * (radius * radius + height * height)}" ixy="0.0" ixz="0.0"
-          iyy="${0.0833333 * mass * (radius * radius + height * height)}" iyz="0.0"
-          izz="${0.0833333 * mass * (radius * radius + radius * radius)}" /> <!-- TODO correct dimensions -->
+        <inertia ixx="${1 / 12 * mass * (3 * radius * radius + height * height)}" ixy="0.0" ixz="0.0"
+          iyy="${1 / 12 * mass * (3 * radius * radius + height * height)}" iyz="0.0"
+          izz="${.5 * mass * (radius * radius)}" />
       </inertial>
     </link>
     <xacro:psen_scan_gazebo_v0 name="${prefix}" link="${prefix}" ros_topic="${ros_topic}" update_rate="15.0" min_angle="${min_angle}" max_angle="${max_angle}" min_range="${min_range}" max_range="${max_range}"/>
