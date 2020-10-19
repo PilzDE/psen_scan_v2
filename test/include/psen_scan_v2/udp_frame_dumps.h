@@ -36,7 +36,7 @@ readMeasures(const std::array<uint8_t, ARRAY_SIZE> hex_dump, const size_t offset
   std::vector<double> measures;
   for (size_t idx = offset_measures; idx < (offset_measures + (n_measures * 2)); idx = idx + 2)
   {
-    uint16_t raw_value = (((uint16_t)hex_dump.at(idx + 1)) << 8) + (uint16_t)hex_dump.at(idx);
+    uint16_t raw_value = ((static_cast<uint16_t>(hex_dump.at(idx + 1))) << 8) + static_cast<uint16_t>(hex_dump.at(idx));
     measures.push_back(raw_value / 1000.);
   }
   return measures;

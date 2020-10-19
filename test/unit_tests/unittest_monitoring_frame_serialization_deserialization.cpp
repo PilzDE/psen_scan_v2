@@ -121,7 +121,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstruc
   // if necessary
   // EXPECT_EQ(msg, deserialized_msg);
 
-  EXPECT_EQ(msg, deserialized_msg);
+  EXPECT_TRUE(msg == deserialized_msg);
 }
 
 TEST(MonitoringFrameSerializationDiagnosticMessagesTest, shouldSetCorrectBitInSerializedDiagnosticData)

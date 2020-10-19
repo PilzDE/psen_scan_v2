@@ -232,9 +232,7 @@ TEST(ScannerAPITests, testReceivingOfMonitoringFrame)
   UserCallbacks cb;
   Scanner scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
-  std::vector<double> measures = { 1, 2, 3, 4, 5 };
-  std::vector<MonitoringFrameDiagnosticMessage> diagnostics = { { ScannerId::MASTER, 1, 7 } };
-  MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(1), 0, measures, diagnostics);
+  MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(1), 0, { 1, 2, 3, 4, 5 }, { { ScannerId::MASTER, 1, 7 } });
 
   Barrier monitoring_frame_barrier;
   Barrier diagnostic_barrier;

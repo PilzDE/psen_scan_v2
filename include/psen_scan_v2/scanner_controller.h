@@ -151,7 +151,7 @@ void ScannerControllerT<TCSM, TUCI>::handleUdpData(const MaxSizeRawData& data, c
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::handleMonitoringFrame(const MonitoringFrameMsg& frame)
 {
-  PSENSCAN_WARN_THROTTLE(1, "ScannerController", "{}", frame.diagnosticMessages());
+  PSENSCAN_WARN_THROTTLE(1 /* sec */, "ScannerController", "{}", frame.diagnosticMessages());
 
   if (frame.measures().empty())
   {

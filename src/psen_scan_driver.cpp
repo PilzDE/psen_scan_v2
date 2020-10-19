@@ -18,8 +18,6 @@
 #include <future>
 #include <string>
 
-//#include <fmt/ostream.h>
-
 #include <ros/ros.h>
 
 #include "psen_scan_v2/function_pointers.h"

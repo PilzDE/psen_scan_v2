@@ -37,7 +37,7 @@ std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessag
   os << fmt::format(
       "Device: {} - {}", scanner_id_to_string.at(msg.getScannerId()), error_code_to_string.at(msg.getDiagnosticCode()));
 
-  if (ambiguous_diagnostic_codes.find(msg.getDiagnosticCode()) != ambiguous_diagnostic_codes.end())
+  if (isAmbiguous(msg.getDiagnosticCode()))
   {
     os << fmt::format(" (Byte:{} Bit:{})", msg.getErrorByteLocation(), msg.getErrorBitLocation());
   }
