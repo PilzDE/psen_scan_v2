@@ -31,9 +31,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- Prefix i. e. name of the scanner (required to run multiple scanners) -->
   <arg name="prefix" default="laser_1" />
 
-  <!-- TF Frame ID -->
-  <arg name="frame_id" default="$(arg prefix)_scan" />
-
   <!-- Start angle of measurement in radian -->
   <arg name="angle_start" default="$(eval -137.5 /180.0 * pi)" />
 
@@ -45,10 +42,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <param name="host_udp_port_data" value="$(arg host_udp_port_data)" />
     <param name="host_udp_port_control" value="$(arg host_udp_port_control)" />
     <param name="sensor_ip" value="$(arg sensor_ip)" />
-    <param name="frame_id" value="$(arg frame_id)" />
+    <param name="prefix" value="$(arg prefix)" />
     <param name="angle_start" value="$(arg angle_start)" />
     <param name="angle_end" value="$(arg angle_end)" />
-    <remap from="/laser_scanner/scan" to="/$(arg prefix)/scan" />
   </node>
 
   <!-- Publish tf frames for the device -->

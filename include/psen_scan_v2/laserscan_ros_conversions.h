@@ -23,13 +23,13 @@
 namespace psen_scan_v2
 {
 sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
-                                      const std::string& frame_id,
+                                      const std::string& prefix,
                                       const double x_axis_rotation,
                                       const ros::Time& timestamp = ros::Time::now())
 {
   sensor_msgs::LaserScan ros_message;
   ros_message.header.stamp = timestamp;
-  ros_message.header.frame_id = frame_id;
+  ros_message.header.frame_id = prefix + SCAN_FRAME_ID_SUFFIX;
   ros_message.angle_min = laserscan.getMinScanAngle().toRad() - x_axis_rotation;
   ros_message.angle_max = laserscan.getMaxScanAngle().toRad() - x_axis_rotation;
   ros_message.angle_increment = laserscan.getScanResolution().toRad();

@@ -35,7 +35,8 @@ namespace psen_scan_v2_test
 {
 TEST(LaserScanROSConversionsTest, testToLaserScanMsg)
 {
-  const std::string frame_id{ "frame_id" };
+  const std::string prefix{ "prefix" };
+  const std::string frame_id{ prefix + "_scan" };
   constexpr double x_axis_rotation{ 0 };
 
   const TenthOfDegree angle_min_raw{ 0 };
@@ -46,7 +47,7 @@ TEST(LaserScanROSConversionsTest, testToLaserScanMsg)
   laserscan.setMeasurements(measures);
 
   ros::Time now = ros::Time::now();
-  sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(laserscan, frame_id, x_axis_rotation, now);
+  sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(laserscan, prefix, x_axis_rotation, now);
 
   EXPECT_EQ(laserscan_msg.header.seq, 0u);
   EXPECT_EQ(laserscan_msg.header.stamp, now);

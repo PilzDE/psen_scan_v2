@@ -84,9 +84,6 @@ IP-Address of safety laser scanner.
 _prefix_ (_string_, default: "laser_1")<br/>
 Name of this scanner that can be changed to differentiate between multiple units.
 
-_frame_id_ (_string_, default: "laser_1_scan")<br/>
-Identifier used for transformations within ROS environment.
-
 _angle_start_ (_double_, default: -2.40 (= -137.5 deg))<br/>
 Start angle of measurement. (Radian)
 
@@ -103,9 +100,9 @@ roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10 host_ip:=192.
 ```
 This example configures the safety laser scanner at 192.168.0.10 to send it´s frames to 192.168.0.20:3050.
 
-## Frames
-The location of the frames is shown in the image below.
-Note that these are the names for defined by the `prefix` parameter.
+## TF Frames
+The location of the TF frames is shown in the image below.
+Note that these names defined by the `prefix` parameter.
 This can be changed with aforementioned launchfile parameters.
 For example when you are running multiple scanners.
 <p align="center">
