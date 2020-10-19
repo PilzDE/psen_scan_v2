@@ -137,7 +137,7 @@ std::vector<MonitoringFrameDiagnosticMessage> deserializeDiagnosticMessages(std:
         if (raw_bits.test(bit_n) && (DiagnosticCode::UNUSED != error_bits[byte_n][bit_n]))
         {
           diagnostic_messages.push_back(
-              MonitoringFrameDiagnosticMessage(static_cast<ScannerId>(scanner_id), byte_n, bit_n));
+              MonitoringFrameDiagnosticMessage(static_cast<ScannerId>(scanner_id), ErrorLocation(byte_n, bit_n)));
         }
       }
     }

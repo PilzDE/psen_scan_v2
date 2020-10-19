@@ -334,11 +334,11 @@ if(CATKIN_ENABLE_TESTING)
     ${console_bridge_LIBRARIES}
   )
 
-  catkin_add_gmock(unittest_diagnostics
+  catkin_add_gmock(unittest_monitoring_frame_diagnostic_message
     src/diagnostics.cpp
-    test/unit_tests/unittest_diagnostics.cpp
+    test/unit_tests/unittest_monitoring_frame_diagnostic_message.cpp
   )
-  target_link_libraries(unittest_diagnostics
+  target_link_libraries(unittest_monitoring_frame_diagnostic_message
     ${catkin_LIBRARIES}
     ${console_bridge_LIBRARIES}
   )

@@ -34,7 +34,7 @@ namespace psen_scan_v2_test
 TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithoutIntensitiesCorrectly)
 {
   scanner_udp_datagram_hexdumps::WithoutIntensities without_intensities;
-  DynamicSizeRawData serialized_monitoring_frame_message = serialize(without_intensities.msg_);
+  DynamicSizeRawData serialized_monitoring_frame_message = serialize(without_intensities.expected_msg_);
 
   EXPECT_EQ(without_intensities.hex_dump.size(), serialized_monitoring_frame_message.size());
 
@@ -47,7 +47,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithoutIntensitiesCor
 TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithDiagnosticsCorrectly)
 {
   scanner_udp_datagram_hexdumps::WithDiagnostics with_diagnostics;
-  DynamicSizeRawData serialized_monitoring_frame_message = serialize(with_diagnostics.msg_);
+  DynamicSizeRawData serialized_monitoring_frame_message = serialize(with_diagnostics.expected_msg_);
 
   EXPECT_EQ(with_diagnostics.hex_dump.size(), serialized_monitoring_frame_message.size());
 
@@ -60,7 +60,8 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithDiagnosticsCorrec
 TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithoutMeasurementsAndIntensitiesCorrectly)
 {
   scanner_udp_datagram_hexdumps::WithoutMeasurementsAndIntensities without_measurements_and_intensities;
-  DynamicSizeRawData serialized_monitoring_frame_message = serialize(without_measurements_and_intensities.msg_);
+  DynamicSizeRawData serialized_monitoring_frame_message =
+      serialize(without_measurements_and_intensities.expected_msg_);
 
   EXPECT_EQ(without_measurements_and_intensities.hex_dump.size(), serialized_monitoring_frame_message.size());
 
@@ -74,44 +75,41 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithoutMeasurementsAn
 TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameWithoutIntensitiesConsistently)
 {
   scanner_udp_datagram_hexdumps::WithoutIntensities without_intensities;
-  DynamicSizeRawData raw = serialize(without_intensities.msg_);
+  DynamicSizeRawData raw = serialize(without_intensities.expected_msg_);
 
   MonitoringFrameMsg deserialized_msg = deserialize_monitoring_frame(convertToMaxSizeRawData(raw), raw.size());
 
-  EXPECT_EQ(without_intensities.msg_, deserialized_msg);
+  EXPECT_EQ(without_intensities.expected_msg_, deserialized_msg);
 }
 
 TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameWithDiagnosticsConsistently)
 {
   scanner_udp_datagram_hexdumps::WithDiagnostics with_diagnostics;
-  DynamicSizeRawData raw = serialize(with_diagnostics.msg_);
+  DynamicSizeRawData raw = serialize(with_diagnostics.expected_msg_);
 
   MonitoringFrameMsg deserialized_msg = deserialize_monitoring_frame(convertToMaxSizeRawData(raw), raw.size());
 
-  EXPECT_EQ(with_diagnostics.msg_, deserialized_msg);
+  EXPECT_EQ(deserialized_msg, with_diagnostics.expected_msg_);
 }
 
 TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstructedFrameWithDiagnosticsConsistently)
 {
-  std::array<std::pair<uint8_t, uint8_t>, 3> byte_bit = { std::make_pair(0, 0),
-                                                          std::make_pair(5, 3),
-                                                          std::make_pair(4, 7) };
+  std::array<ErrorLocation, 3> error_locations = { ErrorLocation(0, 0), ErrorLocation(5, 3), ErrorLocation(4, 7) };
 
-  for (const auto& elem : byte_bit)
+  for (const auto& elem : error_locations)
   {
-    ASSERT_NE(error_bits.at(elem.first).at(elem.second), Dc::UNUSED)
+    ASSERT_NE(error_bits.at(elem.getByte()).at(elem.getBit()), Dc::UNUSED)
         << "The unused diagnostic bits are discarded during deserialization. You should use different test data for "
            "this test.";
   }
 
-  MonitoringFrameMsg msg(
-      TenthOfDegree(25),
-      TenthOfDegree(1),
-      456,
-      { 10, 20, 30, 40 },
-      { MonitoringFrameDiagnosticMessage(ScannerId::MASTER, byte_bit.at(0).first, byte_bit.at(0).second),
-        MonitoringFrameDiagnosticMessage(ScannerId::MASTER, byte_bit.at(1).first, byte_bit.at(1).second),
-        MonitoringFrameDiagnosticMessage(ScannerId::SLAVE2, byte_bit.at(2).first, byte_bit.at(2).second) });
+  MonitoringFrameMsg msg(TenthOfDegree(25),
+                         TenthOfDegree(1),
+                         456,
+                         { 10, 20, 30, 40 },
+                         { MonitoringFrameDiagnosticMessage(ScannerId::MASTER, error_locations.at(0)),
+                           MonitoringFrameDiagnosticMessage(ScannerId::MASTER, error_locations.at(1)),
+                           MonitoringFrameDiagnosticMessage(ScannerId::SLAVE2, error_locations.at(2)) });
 
   DynamicSizeRawData raw = serialize(msg);
 
@@ -126,13 +124,11 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstruc
 
 TEST(MonitoringFrameSerializationDiagnosticMessagesTest, shouldSetCorrectBitInSerializedDiagnosticData)
 {
-  const uint8_t byte_location{ 5 };
-  const uint8_t bit_location{ 3 };
-  std::vector<MonitoringFrameDiagnosticMessage> diagnostic_data{ { ScannerId::MASTER, byte_location, bit_location } };
+  std::vector<MonitoringFrameDiagnosticMessage> diagnostic_data{ { ScannerId::MASTER, ErrorLocation(5, 3) } };
   auto diagnostic_data_serialized = serializeDiagnosticMessages(diagnostic_data);
 
   EXPECT_EQ(diagnostic_data_serialized.size(), DIAGNOSTIC_DATA_LENGTH_IN_BYTES);
-  EXPECT_EQ(diagnostic_data_serialized.at(DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES + byte_location), 0b1000);
+  EXPECT_EQ(diagnostic_data_serialized.at(DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES + 5), 0b1000);
 }
 
 TEST(MonitoringFrameDeserializationFieldHeaderTest, shouldGetIdAndLengthCorrectly)
@@ -194,14 +190,14 @@ TEST_F(MonitoringFrameDeserializationTest, shouldDeserializeMonitoringFrameWitho
 {
   MonitoringFrameMsg msg;
   ASSERT_NO_THROW(msg = deserialize_monitoring_frame(without_intensities_raw_, without_intensities_raw_.size()););
-  EXPECT_EQ(msg, without_intensities_.msg_);
+  EXPECT_EQ(msg, without_intensities_.expected_msg_);
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldDeserializeMonitoringFrameWithDiagnosticsCorrectly)
 {
   MonitoringFrameMsg msg;
   ASSERT_NO_THROW(msg = deserialize_monitoring_frame(with_diagnostics_raw_, with_diagnostics_raw_.size()));
-  EXPECT_TRUE(msg == with_diagnostics_.msg_);
+  EXPECT_TRUE(msg == with_diagnostics_.expected_msg_);
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnWrongOpCode)

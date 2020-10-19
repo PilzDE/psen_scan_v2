@@ -49,7 +49,8 @@ public:
     : from_theta_(from_theta)
     , resolution_(resolution)
     , scan_counter_(scan_counter)
-    , measures_(measures){
+    , measures_(measures)
+    , diagnostic_data_enabled_(false){
 
     };
 

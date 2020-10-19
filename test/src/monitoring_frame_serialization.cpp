@@ -77,7 +77,7 @@ serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnosticMessage>& messa
   {
     raw_diagnostic_data.at(DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES +
                            static_cast<uint8_t>(elem.id_) * DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES +
-                           elem.byte_location_) += (1 << elem.bit_location_);
+                           elem.getErrorLocation().getByte()) += (1 << elem.getErrorLocation().getBit());
   }
   return raw_diagnostic_data;
 }

@@ -47,11 +47,8 @@ class WithoutIntensities
 public:
   WithoutIntensities()
   {
-    MonitoringFrameMsg msg(TenthOfDegree(from_theta),
-                           TenthOfDegree(resolution),
-                           scan_counter,
-                           readMeasures(hex_dump, offset_measures, n_measures));
-    msg_ = msg;
+    MonitoringFrameMsg msg(TenthOfDegree(0x03e8), TenthOfDegree(0x0a), 0x00000678, readMeasures(hex_dump, 31, 50));
+    expected_msg_ = msg;
   };
 
   // clang-format off
@@ -69,28 +66,20 @@ public:
   };
   // clang-format on
 
-  MonitoringFrameMsg msg_;
-
-private:
-  const int n_measures{ 50 };
-  const size_t offset_measures{ 31 };
-
-  const uint16_t from_theta{ 0x03e8 };
-  const uint16_t resolution{ 0x0a };
-  const uint32_t scan_counter{ 0x00000678 };
+  MonitoringFrameMsg expected_msg_;
 };
 class WithDiagnostics
 {
 public:
   WithDiagnostics()
   {
-    MonitoringFrameMsg msg(TenthOfDegree(from_theta),
-                           TenthOfDegree(resolution),
-                           scan_counter,
-                           readMeasures(hex_dump, offset_measures, n_measures),
-                           { MonitoringFrameDiagnosticMessage(ScannerId::MASTER, diagnostic_byte0, diagnostic_bit0),
-                             MonitoringFrameDiagnosticMessage(ScannerId::MASTER, diagnostic_byte1, diagnostic_bit1) });
-    msg_ = msg;
+    MonitoringFrameMsg msg(TenthOfDegree(0x03e8),
+                           TenthOfDegree(0x01),
+                           0x000a6f10,
+                           readMeasures(hex_dump, 74, 500),
+                           { MonitoringFrameDiagnosticMessage(ScannerId::MASTER, ErrorLocation(1, 7)),
+                             MonitoringFrameDiagnosticMessage(ScannerId::MASTER, ErrorLocation(4, 3)) });
+    expected_msg_ = msg;
   };
 
   // clang-format off
@@ -166,18 +155,7 @@ public:
   };
   // clang-format on
 
-  MonitoringFrameMsg msg_;
-
-private:
-  const int n_measures{ 500 };
-  const size_t offset_measures{ 74 };
-  const uint16_t from_theta{ 0x03e8 };
-  const uint16_t resolution{ 0x01 };
-  const uint32_t scan_counter{ 0x000a6f10 };
-  const size_t diagnostic_byte0 = 1;
-  const size_t diagnostic_bit0 = 7;
-  const size_t diagnostic_byte1 = 4;
-  const size_t diagnostic_bit1 = 3;
+  MonitoringFrameMsg expected_msg_;
 };
 
 class WithoutMeasurementsAndIntensities
@@ -185,8 +163,8 @@ class WithoutMeasurementsAndIntensities
 public:
   WithoutMeasurementsAndIntensities()
   {
-    MonitoringFrameMsg msg(TenthOfDegree(from_theta), TenthOfDegree(resolution), scan_counter, {});
-    msg_ = msg;
+    MonitoringFrameMsg msg(TenthOfDegree(0x5dc), TenthOfDegree(0x0a), 0x0661fc, {});
+    expected_msg_ = msg;
   }
 
   const std::array<uint8_t, 35> hex_dump = { 0x00, 0x00, 0x00, 0x00, 0xca, 0x00,  // 0020
@@ -194,12 +172,7 @@ public:
                                              0x00, 0xdc, 0x05, 0x0a, 0x00, 0x02, 0x05, 0x00, 0xfc, 0x61,
                                              0x06, 0x00, 0x05, 0x01, 0x00, 0x09, 0x00, 0x00, 0x00 };
 
-  MonitoringFrameMsg msg_;
-
-private:
-  const uint16_t from_theta{ 0x5dc };
-  const uint16_t resolution{ 0x0a };
-  const uint32_t scan_counter{ 0x0661fc };
+  MonitoringFrameMsg expected_msg_;
 };
 
 class WithUnknownFieldId

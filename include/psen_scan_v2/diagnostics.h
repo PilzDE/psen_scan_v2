@@ -66,13 +66,30 @@ enum class DiagnosticCode
   UNUSED
 };
 
+class ErrorLocation
+{
+public:
+  using Byte_Location = size_t;
+  using Bit_Location = size_t;
+  ErrorLocation(Byte_Location byte, Bit_Location bit) : byte_(byte), bit_(bit){};
+  inline Byte_Location getByte() const
+  {
+    return byte_;
+  };
+  inline Bit_Location getBit() const
+  {
+    return bit_;
+  };
+
+private:
+  Byte_Location byte_;
+  Bit_Location bit_;
+};
+
 class MonitoringFrameDiagnosticMessage
 {
 public:
-  using ErrorBitLocation = uint8_t;
-  using ErrorByteLocation = uint16_t;
-
-  MonitoringFrameDiagnosticMessage(ScannerId id, ErrorByteLocation byte_location, ErrorBitLocation bit_location);
+  MonitoringFrameDiagnosticMessage(ScannerId id, ErrorLocation location_);
 
   bool operator==(const MonitoringFrameDiagnosticMessage& rhs) const;
 
@@ -89,21 +106,15 @@ public:
     return code_;
   }
 
-  ErrorByteLocation getErrorByteLocation() const
+  ErrorLocation getErrorLocation() const
   {
-    return byte_location_;
-  }
-
-  ErrorBitLocation getErrorBitLocation() const
-  {
-    return bit_location_;
+    return error_location_;
   }
 
 private:
   ScannerId id_;
   DiagnosticCode code_;
-  ErrorByteLocation byte_location_;
-  ErrorBitLocation bit_location_;
+  ErrorLocation error_location_;
 };
 
 // clang-format off

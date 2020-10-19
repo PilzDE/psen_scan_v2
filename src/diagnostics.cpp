@@ -19,17 +19,15 @@ using namespace psen_scan_v2;
 
 namespace psen_scan_v2
 {
-MonitoringFrameDiagnosticMessage::MonitoringFrameDiagnosticMessage(ScannerId id,
-                                                                   ErrorByteLocation byte_location,
-                                                                   ErrorBitLocation bit_location)
-  : id_(id), code_(error_bits[byte_location][bit_location]), byte_location_(byte_location), bit_location_(bit_location)
+MonitoringFrameDiagnosticMessage::MonitoringFrameDiagnosticMessage(ScannerId id, ErrorLocation location)
+  : id_(id), code_(error_bits[location.getByte()][location.getBit()]), error_location_(location)
 {
 }
 
 bool MonitoringFrameDiagnosticMessage::operator==(const MonitoringFrameDiagnosticMessage& rhs) const
 {
-  return (bit_location_ == rhs.bit_location_ && byte_location_ == rhs.byte_location_ && code_ == rhs.code_ &&
-          id_ == rhs.id_);
+  return (error_location_.getBit() == rhs.error_location_.getBit() &&
+          error_location_.getByte() == rhs.error_location_.getByte() && code_ == rhs.code_ && id_ == rhs.id_);
 }
 
 std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg)
@@ -39,7 +37,7 @@ std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessag
 
   if (isAmbiguous(msg.getDiagnosticCode()))
   {
-    os << fmt::format(" (Byte:{} Bit:{})", msg.getErrorByteLocation(), msg.getErrorBitLocation());
+    os << fmt::format(" (Byte:{} Bit:{})", msg.getErrorLocation().getByte(), msg.getErrorLocation().getBit());
   }
 
   return os;
