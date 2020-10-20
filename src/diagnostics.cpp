@@ -20,7 +20,7 @@ using namespace psen_scan_v2;
 namespace psen_scan_v2
 {
 MonitoringFrameDiagnosticMessage::MonitoringFrameDiagnosticMessage(ScannerId id, ErrorLocation location)
-  : id_(id), code_(error_bits[location.getByte()][location.getBit()]), error_location_(location)
+  : id_(id), code_(error_bits.at(location.getByte()).at(location.getBit())), error_location_(location)
 {
 }
 

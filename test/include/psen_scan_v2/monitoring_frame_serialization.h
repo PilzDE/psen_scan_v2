@@ -25,8 +25,7 @@ using namespace psen_scan_v2;
 namespace psen_scan_v2
 {
 DynamicSizeRawData serialize(MonitoringFrameMsg& frame);
-std::array<uint8_t, DIAGNOSTIC_DATA_LENGTH_IN_BYTES>
-serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnosticMessage>& messages);
+RawDiagnosticMsg serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnosticMessage>& messages);
 void writeFieldHeader(std::ostringstream& os, MonitoringFrameAdditionalFieldHeader& header);
 }  // namespace psen_scan_v2
 

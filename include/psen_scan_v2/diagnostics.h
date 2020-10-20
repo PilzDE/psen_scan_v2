@@ -33,7 +33,9 @@ static constexpr uint32_t DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES{
 static constexpr uint32_t DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES{ 4 };
 static constexpr uint32_t DIAGNOSTIC_DATA_LENGTH_IN_BYTES{ DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES +
                                                            DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES *
-                                                               sizeof(VALID_SCANNER_IDS) };
+                                                               VALID_SCANNER_IDS.size() };
+
+using RawDiagnosticMsg = std::array<uint8_t, DIAGNOSTIC_DATA_LENGTH_IN_BYTES>;
 
 enum class DiagnosticCode
 {
@@ -93,8 +95,7 @@ public:
 
   bool operator==(const MonitoringFrameDiagnosticMessage& rhs) const;
 
-  friend std::array<uint8_t, DIAGNOSTIC_DATA_LENGTH_IN_BYTES>
-  serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnosticMessage>& messages);
+  friend RawDiagnosticMsg serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnosticMessage>& messages);
 
   ScannerId getScannerId() const
   {
