@@ -43,7 +43,7 @@ MonitoringFrameFixedFields::MonitoringFrameFixedFields(DeviceStatus device_statu
 {
 }
 
-MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, const std::size_t& num_bytes)
+MonitoringFrameMsg deserializeMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes)
 {
   MonitoringFrameMsg msg;
 

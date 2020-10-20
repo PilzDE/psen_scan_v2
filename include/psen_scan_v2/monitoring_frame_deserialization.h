@@ -99,7 +99,7 @@ static constexpr MonitoringFrameAdditionalFieldHeaderId END_OF_FRAME{ 0x09 };
 static constexpr MonitoringFrameAdditionalFieldHeaderId DIAGNOSTICS{ 0x04 };
 };  // namespace monitoring_frame_additional_field_header_ids
 
-MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, const std::size_t& num_bytes);
+MonitoringFrameMsg deserializeMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes);
 MonitoringFrameFixedFields readHeader(std::istringstream& is);
 MonitoringFrameAdditionalFieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes);
 std::vector<MonitoringFrameDiagnosticMessage> deserializeDiagnosticMessages(std::istringstream& is);

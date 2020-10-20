@@ -77,7 +77,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameWithout
   scanner_udp_datagram_hexdumps::WithoutIntensities without_intensities;
   DynamicSizeRawData raw = serialize(without_intensities.expected_msg_);
 
-  MonitoringFrameMsg deserialized_msg = deserialize_monitoring_frame(convertToMaxSizeRawData(raw), raw.size());
+  MonitoringFrameMsg deserialized_msg = deserializeMonitoringFrame(convertToMaxSizeRawData(raw), raw.size());
 
   EXPECT_EQ(without_intensities.expected_msg_, deserialized_msg);
 }
@@ -87,7 +87,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameWithDia
   scanner_udp_datagram_hexdumps::WithDiagnostics with_diagnostics;
   DynamicSizeRawData raw = serialize(with_diagnostics.expected_msg_);
 
-  MonitoringFrameMsg deserialized_msg = deserialize_monitoring_frame(convertToMaxSizeRawData(raw), raw.size());
+  MonitoringFrameMsg deserialized_msg = deserializeMonitoringFrame(convertToMaxSizeRawData(raw), raw.size());
 
   EXPECT_EQ(deserialized_msg, with_diagnostics.expected_msg_);
 }
@@ -113,7 +113,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstruc
 
   DynamicSizeRawData raw = serialize(msg);
 
-  MonitoringFrameMsg deserialized_msg = deserialize_monitoring_frame(convertToMaxSizeRawData(raw), raw.size());
+  MonitoringFrameMsg deserialized_msg = deserializeMonitoringFrame(convertToMaxSizeRawData(raw), raw.size());
 
   // TODO: The following throws an exception "map::at" if the messages differ. Inspect problem and report to googletest
   // if necessary
@@ -189,39 +189,39 @@ protected:
 TEST_F(MonitoringFrameDeserializationTest, shouldDeserializeMonitoringFrameWithoutIntensitiesCorrectly)
 {
   MonitoringFrameMsg msg;
-  ASSERT_NO_THROW(msg = deserialize_monitoring_frame(without_intensities_raw_, without_intensities_raw_.size()););
+  ASSERT_NO_THROW(msg = deserializeMonitoringFrame(without_intensities_raw_, without_intensities_raw_.size()););
   EXPECT_EQ(msg, without_intensities_.expected_msg_);
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldDeserializeMonitoringFrameWithDiagnosticsCorrectly)
 {
   MonitoringFrameMsg msg;
-  ASSERT_NO_THROW(msg = deserialize_monitoring_frame(with_diagnostics_raw_, with_diagnostics_raw_.size()));
+  ASSERT_NO_THROW(msg = deserializeMonitoringFrame(with_diagnostics_raw_, with_diagnostics_raw_.size()));
   EXPECT_TRUE(msg == with_diagnostics_.expected_msg_);
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnWrongOpCode)
 {
   without_intensities_raw_.at(4) += 1;
-  EXPECT_NO_THROW(deserialize_monitoring_frame(without_intensities_raw_, without_intensities_raw_.size()););
+  EXPECT_NO_THROW(deserializeMonitoringFrame(without_intensities_raw_, without_intensities_raw_.size()););
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnInvalidWorkingMode)
 {
   without_intensities_raw_.at(8) = 0x03;
-  EXPECT_NO_THROW(deserialize_monitoring_frame(without_intensities_raw_, without_intensities_raw_.size()););
+  EXPECT_NO_THROW(deserializeMonitoringFrame(without_intensities_raw_, without_intensities_raw_.size()););
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnInvalidTransactionType)
 {
   without_intensities_raw_.at(12) = 0x06;
-  EXPECT_NO_THROW(deserialize_monitoring_frame(without_intensities_raw_, without_intensities_raw_.size()););
+  EXPECT_NO_THROW(deserializeMonitoringFrame(without_intensities_raw_, without_intensities_raw_.size()););
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnInvalidScannerId)
 {
   without_intensities_raw_.at(16) = 0x04;
-  EXPECT_NO_THROW(deserialize_monitoring_frame(without_intensities_raw_, without_intensities_raw_.size()););
+  EXPECT_NO_THROW(deserializeMonitoringFrame(without_intensities_raw_, without_intensities_raw_.size()););
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnUnknownFieldId)
@@ -231,7 +231,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
   const auto num_bytes = 2 * with_unknown_field_id.hex_dump.size();
 
   MonitoringFrameMsg msg;
-  EXPECT_THROW(msg = deserialize_monitoring_frame(raw_frame_data, num_bytes);, MonitoringFrameFormatError);
+  EXPECT_THROW(msg = deserializeMonitoringFrame(raw_frame_data, num_bytes);, MonitoringFrameFormatError);
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeFieldLength)
@@ -241,7 +241,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
   const auto num_bytes = 2 * with_too_large_field_length.hex_dump.size();
 
   MonitoringFrameMsg msg;
-  EXPECT_THROW(msg = deserialize_monitoring_frame(raw_frame_data, num_bytes);, MonitoringFrameFormatError);
+  EXPECT_THROW(msg = deserializeMonitoringFrame(raw_frame_data, num_bytes);, MonitoringFrameFormatError);
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeScanCounterLength)
@@ -251,7 +251,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
   const auto num_bytes = 2 * with_too_large_scan_counter_length.hex_dump.size();
 
   MonitoringFrameMsg msg;
-  EXPECT_THROW(msg = deserialize_monitoring_frame(raw_frame_data, num_bytes);
+  EXPECT_THROW(msg = deserializeMonitoringFrame(raw_frame_data, num_bytes);
                , MonitoringFrameFormatErrorScanCounterUnexpectedSize);
 }
 

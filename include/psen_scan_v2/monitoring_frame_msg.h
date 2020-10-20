@@ -88,7 +88,7 @@ private:
 
 public:
   friend DynamicSizeRawData serialize(MonitoringFrameMsg& frame);
-  friend MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, const std::size_t& num_bytes);
+  friend MonitoringFrameMsg deserializeMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes);
 };
 
 }  // namespace psen_scan_v2
