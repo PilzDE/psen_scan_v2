@@ -23,18 +23,17 @@ namespace psen_scan_v2
 {
 namespace monitoring_frame
 {
-MonitoringFrameAdditionalFieldHeader::MonitoringFrameAdditionalFieldHeader(Id id, Length length)
-  : id_(id), length_(length)
+AdditionalFieldHeader::AdditionalFieldHeader(Id id, Length length) : id_(id), length_(length)
 {
 }
 
-MonitoringFrameFixedFields::MonitoringFrameFixedFields(DeviceStatus device_status,
-                                                       OpCode op_code,
-                                                       WorkingMode working_mode,
-                                                       TransactionType transaction_type,
-                                                       ScannerId scanner_id,
-                                                       FromTheta from_theta,
-                                                       Resolution resolution)
+FixedFields::FixedFields(DeviceStatus device_status,
+                         OpCode op_code,
+                         WorkingMode working_mode,
+                         TransactionType transaction_type,
+                         ScannerId scanner_id,
+                         FromTheta from_theta,
+                         Resolution resolution)
   : device_status_(device_status)
   , op_code_(op_code)
   , working_mode_(working_mode)
@@ -45,14 +44,14 @@ MonitoringFrameFixedFields::MonitoringFrameFixedFields(DeviceStatus device_statu
 {
 }
 
-Message deserializeMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes)
+Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes)
 {
   Message msg;
 
   MaxSizeRawData tmp_data{ data };
   std::istringstream is(std::string(tmp_data.data(), tmp_data.size()));
 
-  MonitoringFrameFixedFields frame_header = readHeader(is);
+  FixedFields frame_header = readHeader(is);
 
   msg.scanner_id_ = frame_header.scanner_id();
   msg.from_theta_ = frame_header.from_theta();
@@ -61,14 +60,14 @@ Message deserializeMonitoringFrame(const MaxSizeRawData& data, const std::size_t
   bool end_of_frame{ false };
   while (!end_of_frame)
   {
-    const MonitoringFrameAdditionalFieldHeader additional_header{ readFieldHeader(is, num_bytes) };
+    const AdditionalFieldHeader additional_header{ readFieldHeader(is, num_bytes) };
 
-    switch (static_cast<monitoring_frame_additional_field_header_ids::HeaderID>(additional_header.id()))
+    switch (static_cast<additional_field_header_ids::HeaderID>(additional_header.id()))
     {
-      case monitoring_frame_additional_field_header_ids::HeaderID::SCAN_COUNTER:
+      case additional_field_header_ids::HeaderID::SCAN_COUNTER:
         if (additional_header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
         {
-          throw MonitoringFrameFormatErrorScanCounterUnexpectedSize(
+          throw FormatErrorScanCounterUnexpectedSize(
               fmt::format("Length of scan counter field is {}, but should be {}.",
                           additional_header.length(),
                           NUMBER_OF_BYTES_SCAN_COUNTER));
@@ -76,47 +75,47 @@ Message deserializeMonitoringFrame(const MaxSizeRawData& data, const std::size_t
         raw_processing::read(is, msg.scan_counter_);
         break;
 
-      case monitoring_frame_additional_field_header_ids::HeaderID::MEASURES:
+      case additional_field_header_ids::HeaderID::MEASURES:
         raw_processing::readArray<uint16_t, double>(is,
                                                     msg.measures_,
                                                     additional_header.length() / NUMBER_OF_BYTES_SINGLE_MEASURE,
                                                     [](uint16_t raw_element) { return raw_element / 1000.; });
         break;
 
-      case monitoring_frame_additional_field_header_ids::HeaderID::END_OF_FRAME:
+      case additional_field_header_ids::HeaderID::END_OF_FRAME:
         end_of_frame = true;
         break;
 
-      case monitoring_frame_additional_field_header_ids::HeaderID::DIAGNOSTICS:
+      case additional_field_header_ids::HeaderID::DIAGNOSTICS:
         msg.diagnostic_messages_ = deserializeDiagnosticMessages(is);
         msg.diagnostic_data_enabled_ = true;
         break;
 
       default:
-        throw MonitoringFrameFormatError(fmt::format(
-            "Header Id {:#04x} unknown. Cannot read additional field of monitoring frame.", additional_header.id()));
+        throw FormatError(fmt::format("Header Id {:#04x} unknown. Cannot read additional field of monitoring frame.",
+                                      additional_header.id()));
     }
   }
   return msg;
 }
 
-MonitoringFrameAdditionalFieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes)
+AdditionalFieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes)
 {
-  MonitoringFrameAdditionalFieldHeader::Id id;
-  MonitoringFrameAdditionalFieldHeader::Length length;
+  AdditionalFieldHeader::Id id;
+  AdditionalFieldHeader::Length length;
   raw_processing::read(is, id);
   raw_processing::read(is, length);
 
   if (length >= max_num_bytes)
   {
-    throw MonitoringFrameFormatError(
+    throw FormatError(
         fmt::format("Length given in header of additional field is too large: {}, id: {:#04x}", length, id));
   }
   if (length > 0)
   {
     length--;
   }
-  return MonitoringFrameAdditionalFieldHeader(id, length);
+  return AdditionalFieldHeader(id, length);
 }
 
 std::vector<DiagnosticMessage> deserializeDiagnosticMessages(std::istringstream& is)
@@ -147,15 +146,15 @@ std::vector<DiagnosticMessage> deserializeDiagnosticMessages(std::istringstream&
   return diagnostic_messages;
 }
 
-MonitoringFrameFixedFields readHeader(std::istringstream& is)
+FixedFields readHeader(std::istringstream& is)
 {
-  MonitoringFrameFixedFields::DeviceStatus device_status;
-  MonitoringFrameFixedFields::OpCode op_code;
-  MonitoringFrameFixedFields::WorkingMode working_mode;
-  MonitoringFrameFixedFields::TransactionType transaction_type;
+  FixedFields::DeviceStatus device_status;
+  FixedFields::OpCode op_code;
+  FixedFields::WorkingMode working_mode;
+  FixedFields::TransactionType transaction_type;
   ScannerId scanner_id;
-  MonitoringFrameFixedFields::FromTheta from_theta(0);
-  MonitoringFrameFixedFields::Resolution resolution(0);
+  FixedFields::FromTheta from_theta(0);
+  FixedFields::Resolution resolution(0);
 
   raw_processing::read(is, device_status);
   raw_processing::read(is, op_code);
@@ -188,8 +187,7 @@ MonitoringFrameFixedFields readHeader(std::istringstream& is)
     PSENSCAN_DEBUG("monitoring_frame::Message", "Invalid Scanner id!");
   }
 
-  return MonitoringFrameFixedFields(
-      device_status, op_code, working_mode, transaction_type, scanner_id, from_theta, resolution);
+  return FixedFields(device_status, op_code, working_mode, transaction_type, scanner_id, from_theta, resolution);
 }
 }  // namespace monitoring_frame
 }  // namespace psen_scan_v2

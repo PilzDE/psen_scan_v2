@@ -32,14 +32,14 @@ static constexpr uint32_t ONLINE_WORKING_MODE{ 0x00 };
 static constexpr uint32_t GUI_MONITORING_TRANSACTION{ 0x05 };
 static constexpr uint16_t NUMBER_OF_BYTES_SCAN_COUNTER{ 4 };
 static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_MEASURE{ 2 };
-class MonitoringFrameAdditionalFieldHeader
+class AdditionalFieldHeader
 {
 public:
   using Id = uint8_t;
   using Length = uint16_t;
 
 public:
-  MonitoringFrameAdditionalFieldHeader(Id id, Length length);
+  AdditionalFieldHeader(Id id, Length length);
 
 public:
   Id id() const;
@@ -52,7 +52,7 @@ private:
   Length length_;
 };
 
-class MonitoringFrameFixedFields
+class FixedFields
 {
 public:
   using DeviceStatus = uint32_t;
@@ -63,13 +63,13 @@ public:
   using Resolution = TenthOfDegree;
 
 public:
-  MonitoringFrameFixedFields(DeviceStatus device_status,
-                             OpCode op_code,
-                             WorkingMode working_mode,
-                             TransactionType transaction_type,
-                             ScannerId scanner_id,
-                             FromTheta from_theta,
-                             Resolution resolution);
+  FixedFields(DeviceStatus device_status,
+              OpCode op_code,
+              WorkingMode working_mode,
+              TransactionType transaction_type,
+              ScannerId scanner_id,
+              FromTheta from_theta,
+              Resolution resolution);
 
 public:
   DeviceStatus device_status() const;
@@ -89,85 +89,84 @@ private:
   FromTheta from_theta_;
   Resolution resolution_;
 };
-namespace monitoring_frame_additional_field_header_ids
+namespace additional_field_header_ids
 {
-enum class HeaderID : MonitoringFrameAdditionalFieldHeader::Id
+enum class HeaderID : AdditionalFieldHeader::Id
 {
   SCAN_COUNTER = 0x02,
   DIAGNOSTICS = 0x04,
   MEASURES = 0x05,
   END_OF_FRAME = 0x09
 };
-};  // namespace monitoring_frame_additional_field_header_ids
+};  // namespace additional_field_header_ids
 
-Message deserializeMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes);
-MonitoringFrameFixedFields readHeader(std::istringstream& is);
-MonitoringFrameAdditionalFieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes);
+Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
+FixedFields readHeader(std::istringstream& is);
+AdditionalFieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes);
 std::vector<DiagnosticMessage> deserializeDiagnosticMessages(std::istringstream& is);
 
-class MonitoringFrameFormatError : public std::runtime_error
+class FormatError : public std::runtime_error
 {
 public:
-  MonitoringFrameFormatError(const std::string& msg = "Error while decoding laser scanner measurement data");
+  FormatError(const std::string& msg = "Error while decoding laser scanner measurement data");
 };
 
-class MonitoringFrameFormatErrorScanCounterUnexpectedSize : public MonitoringFrameFormatError
+class FormatErrorScanCounterUnexpectedSize : public FormatError
 {
 public:
-  MonitoringFrameFormatErrorScanCounterUnexpectedSize(const std::string& msg);
+  FormatErrorScanCounterUnexpectedSize(const std::string& msg);
 };
 
-inline MonitoringFrameFormatError::MonitoringFrameFormatError(const std::string& msg) : std::runtime_error(msg)
+inline FormatError::FormatError(const std::string& msg) : std::runtime_error(msg)
 {
 }
 
-inline MonitoringFrameFormatErrorScanCounterUnexpectedSize::MonitoringFrameFormatErrorScanCounterUnexpectedSize(
-    const std::string& msg)
-  : MonitoringFrameFormatError(msg)
+inline FormatErrorScanCounterUnexpectedSize::FormatErrorScanCounterUnexpectedSize(const std::string& msg)
+  : FormatError(msg)
 {
 }
 
-inline MonitoringFrameAdditionalFieldHeader::Id MonitoringFrameAdditionalFieldHeader::id() const
+inline AdditionalFieldHeader::Id AdditionalFieldHeader::id() const
 {
   return id_;
 }
 
-inline MonitoringFrameAdditionalFieldHeader::Length MonitoringFrameAdditionalFieldHeader::length() const
+inline AdditionalFieldHeader::Length AdditionalFieldHeader::length() const
 {
   return length_;
 }
 
-inline MonitoringFrameFixedFields::DeviceStatus MonitoringFrameFixedFields::device_status() const
+inline FixedFields::DeviceStatus FixedFields::device_status() const
 {
   return device_status_;
 }
 
-inline MonitoringFrameFixedFields::OpCode MonitoringFrameFixedFields::op_code() const
+inline FixedFields::OpCode FixedFields::op_code() const
 {
   return op_code_;
 }
 
-inline MonitoringFrameFixedFields::WorkingMode MonitoringFrameFixedFields::working_mode() const
+inline FixedFields::WorkingMode FixedFields::working_mode() const
 {
   return working_mode_;
 }
 
-inline MonitoringFrameFixedFields::TransactionType MonitoringFrameFixedFields::transaction_type() const
+inline FixedFields::TransactionType FixedFields::transaction_type() const
 {
   return transaction_type_;
 }
 
-inline ScannerId MonitoringFrameFixedFields::scanner_id() const
+inline ScannerId FixedFields::scanner_id() const
 {
   return scanner_id_;
 }
 
-inline MonitoringFrameFixedFields::FromTheta MonitoringFrameFixedFields::from_theta() const
+inline FixedFields::FromTheta FixedFields::from_theta() const
 {
   return from_theta_;
 }
 
-inline MonitoringFrameFixedFields::Resolution MonitoringFrameFixedFields::resolution() const
+inline FixedFields::Resolution FixedFields::resolution() const
 {
   return resolution_;
 }
