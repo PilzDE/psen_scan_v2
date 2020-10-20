@@ -147,7 +147,7 @@ public:
 
   bool operator==(const MonitoringFrameDiagnosticMessage& rhs) const;
 
-  friend RawDiagnosticMsg serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnosticMessage>& messages);
+  friend RawDiagnosticMsg serializeDiagnosticMessages(const std::vector<MonitoringFrameDiagnosticMessage>& messages);
 
   ScannerId getScannerId() const
   {
