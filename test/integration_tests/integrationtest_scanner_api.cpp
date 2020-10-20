@@ -80,9 +80,9 @@ ScannerConfiguration createScannerConfig()
       HOST_IP_ADDRESS, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, SCANNER_IP_ADDRESS, SCAN_RANGE, DIAGNOSTICS_ENABLED);
 }
 
-static monitoring_frame::MonitoringFrameMsg createValidMonitoringFrameMsg()
+static monitoring_frame::Message createValidMonitoringFrameMsg()
 {
-  return monitoring_frame::MonitoringFrameMsg(TenthOfDegree(0), TenthOfDegree(1), 0, { 1, 2, 3, 4, 5 });
+  return monitoring_frame::Message(TenthOfDegree(0), TenthOfDegree(1), 0, { 1, 2, 3, 4, 5 });
 }
 
 class UserCallbacks
@@ -104,7 +104,7 @@ public:
 public:
   void sendStartReply();
   void sendStopReply();
-  void sendMonitoringFrame(const monitoring_frame::MonitoringFrameMsg& msg);
+  void sendMonitoringFrame(const monitoring_frame::Message& msg);
   void sendEmptyMonitoringFrame();
 
 private:
@@ -150,7 +150,7 @@ void ScannerMock::sendStopReply()
   sendReply(getOpCodeValue(ScannerReplyMsgType::Stop));
 }
 
-void ScannerMock::sendMonitoringFrame(const monitoring_frame::MonitoringFrameMsg& msg)
+void ScannerMock::sendMonitoringFrame(const monitoring_frame::Message& msg)
 {
   std::cout << "ScannerMock: Send monitoring frame..." << std::endl;
   DynamicSizeRawData dynamic_raw_scan = serialize(msg);
@@ -315,11 +315,11 @@ TEST(ScannerAPITests, testReceivingOfMonitoringFrame)
   UserCallbacks cb;
   ScannerV2 scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
-  monitoring_frame::MonitoringFrameMsg msg(TenthOfDegree(0),
-                                           TenthOfDegree(1),
-                                           0,
-                                           { 1, 2, 3, 4, 5 },
-                                           { { ScannerId::MASTER, monitoring_frame::ErrorLocation(1, 7) } });
+  monitoring_frame::Message msg(TenthOfDegree(0),
+                                TenthOfDegree(1),
+                                0,
+                                { 1, 2, 3, 4, 5 },
+                                { { ScannerId::MASTER, monitoring_frame::ErrorLocation(1, 7) } });
   Barrier monitoring_frame_barrier;
   Barrier diagnostic_barrier;
   {

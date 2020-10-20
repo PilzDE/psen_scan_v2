@@ -45,9 +45,9 @@ MonitoringFrameFixedFields::MonitoringFrameFixedFields(DeviceStatus device_statu
 {
 }
 
-MonitoringFrameMsg deserializeMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes)
+Message deserializeMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes)
 {
-  MonitoringFrameMsg msg;
+  Message msg;
 
   MaxSizeRawData tmp_data{ data };
   std::istringstream is(std::string(tmp_data.data(), tmp_data.size()));
@@ -170,22 +170,22 @@ MonitoringFrameFixedFields readHeader(std::istringstream& is)
   {
     // TODO: Get rid of the issue not to spam the system with this debug messages
     //       Would something like  ROS_DEBUG_THROTTLE(period, ...) be a good solution?
-    PSENSCAN_DEBUG("monitoring_frame::MonitoringFrameMsg", "Wrong Op Code!");
+    PSENSCAN_DEBUG("monitoring_frame::Message", "Wrong Op Code!");
   }
 
   if (ONLINE_WORKING_MODE != working_mode)
   {
-    PSENSCAN_DEBUG("monitoring_frame::MonitoringFrameMsg", "Invalid working mode!");
+    PSENSCAN_DEBUG("monitoring_frame::Message", "Invalid working mode!");
   }
 
   if (GUI_MONITORING_TRANSACTION != transaction_type)
   {
-    PSENSCAN_DEBUG("monitoring_frame::MonitoringFrameMsg", "Invalid transaction type!");
+    PSENSCAN_DEBUG("monitoring_frame::Message", "Invalid transaction type!");
   }
 
   if (MAX_SCANNER_ID < static_cast<uint8_t>(scanner_id))
   {
-    PSENSCAN_DEBUG("monitoring_frame::MonitoringFrameMsg", "Invalid Scanner id!");
+    PSENSCAN_DEBUG("monitoring_frame::Message", "Invalid Scanner id!");
   }
 
   return MonitoringFrameFixedFields(

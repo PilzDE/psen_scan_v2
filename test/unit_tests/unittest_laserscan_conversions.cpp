@@ -33,8 +33,7 @@ namespace psen_scan_v2_test
 {
 TEST(LaserScanConversionsTest, testToLaserScan)
 {
-  monitoring_frame::MonitoringFrameMsg frame(
-      TenthOfDegree(10.), TenthOfDegree(3.14 / 2.), 42, { 1., 2., 3., 4.5, 5, 42 });
+  monitoring_frame::Message frame(TenthOfDegree(10.), TenthOfDegree(3.14 / 2.), 42, { 1., 2., 3., 4.5, 5, 42 });
 
   std::unique_ptr<LaserScan> scan_ptr;
   ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ toLaserScan(frame) }););

@@ -31,32 +31,32 @@ namespace psen_scan_v2
 {
 using namespace monitoring_frame;
 
-TenthOfDegree MonitoringFrameMsg::fromTheta() const
+TenthOfDegree Message::fromTheta() const
 {
   return from_theta_;
 }
 
-TenthOfDegree MonitoringFrameMsg::resolution() const
+TenthOfDegree Message::resolution() const
 {
   return resolution_;
 }
 
-uint32_t MonitoringFrameMsg::scanCounter() const
+uint32_t Message::scanCounter() const
 {
   return scan_counter_;
 }
 
-std::vector<double> MonitoringFrameMsg::measures() const
+std::vector<double> Message::measures() const
 {
   return measures_;
 }
 
-std::vector<MonitoringFrameDiagnosticMessage> MonitoringFrameMsg::diagnosticMessages() const
+std::vector<MonitoringFrameDiagnosticMessage> Message::diagnosticMessages() const
 {
   return diagnostic_messages_;
 }
 
-bool MonitoringFrameMsg::operator==(const MonitoringFrameMsg& rhs) const
+bool Message::operator==(const Message& rhs) const
 {
   return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
           measures() == rhs.measures() && diagnosticMessages() == rhs.diagnosticMessages());
@@ -64,9 +64,9 @@ bool MonitoringFrameMsg::operator==(const MonitoringFrameMsg& rhs) const
 
 }  // namespace psen_scan_v2
 
-std::ostream& operator<<(std::ostream& os, const psen_scan_v2::monitoring_frame::MonitoringFrameMsg& msg)
+std::ostream& operator<<(std::ostream& os, const psen_scan_v2::monitoring_frame::Message& msg)
 {
-  os << fmt::format("monitoring_frame::MonitoringFrameMsg(fromTheta = {} deg, resolution = {} deg, scanCounter = "
+  os << fmt::format("monitoring_frame::Message(fromTheta = {} deg, resolution = {} deg, scanCounter = "
                     "{}, measures = {}, diagnostics = {})",
                     msg.fromTheta().value() / 10.,
                     msg.resolution().value() / 10.,

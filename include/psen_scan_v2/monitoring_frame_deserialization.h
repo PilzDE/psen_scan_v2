@@ -100,7 +100,7 @@ enum class HeaderID : MonitoringFrameAdditionalFieldHeader::Id
 };
 };  // namespace monitoring_frame_additional_field_header_ids
 
-MonitoringFrameMsg deserializeMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes);
+Message deserializeMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes);
 MonitoringFrameFixedFields readHeader(std::istringstream& is);
 MonitoringFrameAdditionalFieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes);
 std::vector<MonitoringFrameDiagnosticMessage> deserializeDiagnosticMessages(std::istringstream& is);
