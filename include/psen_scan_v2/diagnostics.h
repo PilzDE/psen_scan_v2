@@ -142,7 +142,7 @@ private:
 class MonitoringFrameDiagnosticMessage
 {
 public:
-  MonitoringFrameDiagnosticMessage(ScannerId id, ErrorLocation location);
+  MonitoringFrameDiagnosticMessage(const ScannerId& id, const ErrorLocation& location);
 
   bool operator==(const MonitoringFrameDiagnosticMessage& rhs) const;
 
