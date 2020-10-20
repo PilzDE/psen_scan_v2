@@ -49,7 +49,7 @@ std::vector<double> monitoring_frame::Message::measures() const
   return measures_;
 }
 
-std::vector<monitoring_frame::MonitoringFrameDiagnosticMessage> monitoring_frame::Message::diagnosticMessages() const
+std::vector<monitoring_frame::DiagnosticMessage> monitoring_frame::Message::diagnosticMessages() const
 {
   return diagnostic_messages_;
 }

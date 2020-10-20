@@ -142,14 +142,14 @@ private:
   BitLocation bit_;
 };
 
-class MonitoringFrameDiagnosticMessage
+class DiagnosticMessage
 {
 public:
-  constexpr MonitoringFrameDiagnosticMessage(const ScannerId& id, const ErrorLocation& location);
+  constexpr DiagnosticMessage(const ScannerId& id, const ErrorLocation& location);
 
-  constexpr bool operator==(const MonitoringFrameDiagnosticMessage& rhs) const;
+  constexpr bool operator==(const DiagnosticMessage& rhs) const;
 
-  friend RawDiagnosticMsg serializeDiagnosticMessages(const std::vector<MonitoringFrameDiagnosticMessage>& messages);
+  friend RawDiagnosticMsg serializeDiagnosticMessages(const std::vector<DiagnosticMessage>& messages);
 
   constexpr ScannerId getScannerId() const
   {
@@ -171,13 +171,12 @@ private:
   ErrorLocation error_location_;
 };
 
-constexpr inline MonitoringFrameDiagnosticMessage::MonitoringFrameDiagnosticMessage(const ScannerId& id,
-                                                                                    const ErrorLocation& location)
+constexpr inline DiagnosticMessage::DiagnosticMessage(const ScannerId& id, const ErrorLocation& location)
   : id_(id), error_location_(location)
 {
 }
 
-constexpr inline bool MonitoringFrameDiagnosticMessage::operator==(const MonitoringFrameDiagnosticMessage& rhs) const
+constexpr inline bool DiagnosticMessage::operator==(const DiagnosticMessage& rhs) const
 {
   return (error_location_.getBit() == rhs.error_location_.getBit() &&
           error_location_.getByte() == rhs.error_location_.getByte() && id_ == rhs.id_);
@@ -191,7 +190,7 @@ inline bool isAmbiguous(const DiagnosticCode& code)
   return ambiguous_diagnostic_codes.find(code) != ambiguous_diagnostic_codes.end();
 }
 
-std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg);
+std::ostream& operator<<(std::ostream& os, const DiagnosticMessage& msg);
 
 }  // namespace monitoring_frame
 }  // namespace psen_scan_v2

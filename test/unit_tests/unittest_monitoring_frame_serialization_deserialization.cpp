@@ -108,14 +108,13 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstruc
            "this test.";
   }
 
-  monitoring_frame::Message msg(
-      TenthOfDegree(25),
-      TenthOfDegree(1),
-      456,
-      { 10, 20, 30, 40 },
-      { monitoring_frame::MonitoringFrameDiagnosticMessage(ScannerId::MASTER, error_locations.at(0)),
-        monitoring_frame::MonitoringFrameDiagnosticMessage(ScannerId::MASTER, error_locations.at(1)),
-        monitoring_frame::MonitoringFrameDiagnosticMessage(ScannerId::SLAVE2, error_locations.at(2)) });
+  monitoring_frame::Message msg(TenthOfDegree(25),
+                                TenthOfDegree(1),
+                                456,
+                                { 10, 20, 30, 40 },
+                                { monitoring_frame::DiagnosticMessage(ScannerId::MASTER, error_locations.at(0)),
+                                  monitoring_frame::DiagnosticMessage(ScannerId::MASTER, error_locations.at(1)),
+                                  monitoring_frame::DiagnosticMessage(ScannerId::SLAVE2, error_locations.at(2)) });
 
   DynamicSizeRawData raw = serialize(msg);
 
@@ -127,9 +126,8 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstruc
 
 TEST(MonitoringFrameSerializationDiagnosticMessagesTest, shouldSetCorrectBitInSerializedDiagnosticData)
 {
-  std::vector<monitoring_frame::MonitoringFrameDiagnosticMessage> diagnostic_data{
-    { ScannerId::MASTER, monitoring_frame::ErrorLocation(5, 3) }
-  };
+  std::vector<monitoring_frame::DiagnosticMessage> diagnostic_data{ { ScannerId::MASTER,
+                                                                      monitoring_frame::ErrorLocation(5, 3) } };
   auto diagnostic_data_serialized = monitoring_frame::serializeDiagnosticMessages(diagnostic_data);
 
   EXPECT_EQ(diagnostic_data_serialized.size(), monitoring_frame::RAW_DIAGNOSTIC_MESSAGE_LENGTH_IN_BYTES);

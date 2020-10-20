@@ -21,7 +21,7 @@ namespace psen_scan_v2
 {
 namespace monitoring_frame
 {
-std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg)
+std::ostream& operator<<(std::ostream& os, const DiagnosticMessage& msg)
 {
   os << fmt::format(
       "Device: {} - {}", scanner_id_to_string.at(msg.getScannerId()), error_code_to_string.at(msg.getDiagnosticCode()));

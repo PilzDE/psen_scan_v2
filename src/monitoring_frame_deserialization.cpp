@@ -119,9 +119,9 @@ MonitoringFrameAdditionalFieldHeader readFieldHeader(std::istringstream& is, con
   return MonitoringFrameAdditionalFieldHeader(id, length);
 }
 
-std::vector<MonitoringFrameDiagnosticMessage> deserializeDiagnosticMessages(std::istringstream& is)
+std::vector<DiagnosticMessage> deserializeDiagnosticMessages(std::istringstream& is)
 {
-  std::vector<MonitoringFrameDiagnosticMessage> diagnostic_messages;
+  std::vector<DiagnosticMessage> diagnostic_messages;
 
   std::array<uint8_t, RAW_DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES> reserved_diag_unused;
   raw_processing::read(is, reserved_diag_unused);
@@ -139,7 +139,7 @@ std::vector<MonitoringFrameDiagnosticMessage> deserializeDiagnosticMessages(std:
         if (raw_bits.test(bit_n) && (DiagnosticCode::UNUSED != error_bits[byte_n][bit_n]))
         {
           diagnostic_messages.push_back(
-              MonitoringFrameDiagnosticMessage(static_cast<ScannerId>(scanner_id), ErrorLocation(byte_n, bit_n)));
+              DiagnosticMessage(static_cast<ScannerId>(scanner_id), ErrorLocation(byte_n, bit_n)));
         }
       }
     }

@@ -81,7 +81,7 @@ constexpr size_t calculateIndexInRawDiagnosticData(const ScannerId& id, const Er
          (static_cast<uint8_t>(id) * RAW_DIAGNOSTIC_MESSAGE_LENGTH_FOR_ONE_DEVICE_IN_BYTES) + location.getByte();
 }
 
-RawDiagnosticMsg serializeDiagnosticMessages(const std::vector<MonitoringFrameDiagnosticMessage>& messages)
+RawDiagnosticMsg serializeDiagnosticMessages(const std::vector<DiagnosticMessage>& messages)
 {
   RawDiagnosticMsg raw_diagnostic_data{};
 

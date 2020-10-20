@@ -103,7 +103,7 @@ enum class HeaderID : MonitoringFrameAdditionalFieldHeader::Id
 Message deserializeMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes);
 MonitoringFrameFixedFields readHeader(std::istringstream& is);
 MonitoringFrameAdditionalFieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes);
-std::vector<MonitoringFrameDiagnosticMessage> deserializeDiagnosticMessages(std::istringstream& is);
+std::vector<DiagnosticMessage> deserializeDiagnosticMessages(std::istringstream& is);
 
 class MonitoringFrameFormatError : public std::runtime_error
 {
