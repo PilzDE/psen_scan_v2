@@ -66,7 +66,7 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
   return raw_processing::toArray<DynamicSizeRawData>(os);
 }
 
-RawDiagnosticMsg serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnosticMessage>& messages)
+RawDiagnosticMsg serializeDiagnosticMessages(const std::vector<MonitoringFrameDiagnosticMessage>& messages)
 {
   RawDiagnosticMsg raw_diagnostic_data{};
 
