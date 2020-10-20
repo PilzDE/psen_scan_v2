@@ -125,7 +125,7 @@ class ErrorLocation
 public:
   using ByteLocation = size_t;
   using BitLocation = size_t;
-  constexpr ErrorLocation(ByteLocation byte, BitLocation bit) : byte_(byte), bit_(bit){};
+  constexpr ErrorLocation(const ByteLocation& byte, const BitLocation& bit) : byte_(byte), bit_(bit){};
   inline constexpr ByteLocation getByte() const
   {
     return byte_;
