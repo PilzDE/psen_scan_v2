@@ -39,7 +39,7 @@ static constexpr uint32_t LENGTH_FOR_ONE_DEVICE_IN_BYTES{ 9 };
 static constexpr uint32_t UNUSED_OFFSET_IN_BYTES{ 4 };
 static constexpr uint32_t LENGTH_IN_BYTES{ UNUSED_OFFSET_IN_BYTES +
                                            LENGTH_FOR_ONE_DEVICE_IN_BYTES * VALID_SCANNER_IDS.size() };
-using RawDiagnosticMsg = std::array<uint8_t, diagnostics::raw_message::LENGTH_IN_BYTES>;
+using Type = std::array<uint8_t, diagnostics::raw_message::LENGTH_IN_BYTES>;
 }  // namespace raw_message
 
 enum class DiagnosticCode
@@ -151,7 +151,7 @@ public:
 
   constexpr bool operator==(const Message& rhs) const;
 
-  friend diagnostics::raw_message::RawDiagnosticMsg
+  friend diagnostics::raw_message::Type
   psen_scan_v2::monitoring_frame::diagnostics::serializeMessages(const std::vector<diagnostics::Message>& messages);
 
   constexpr ScannerId getScannerId() const
