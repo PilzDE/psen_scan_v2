@@ -19,17 +19,6 @@ using namespace psen_scan_v2;
 
 namespace psen_scan_v2
 {
-MonitoringFrameDiagnosticMessage::MonitoringFrameDiagnosticMessage(const ScannerId& id, const ErrorLocation& location)
-  : id_(id), error_location_(location)
-{
-}
-
-bool MonitoringFrameDiagnosticMessage::operator==(const MonitoringFrameDiagnosticMessage& rhs) const
-{
-  return (error_location_.getBit() == rhs.error_location_.getBit() &&
-          error_location_.getByte() == rhs.error_location_.getByte() && id_ == rhs.id_);
-}
-
 std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg)
 {
   os << fmt::format(
