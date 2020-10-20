@@ -36,6 +36,8 @@
 
 namespace psen_scan_v2
 {
+namespace monitoring_frame
+{
 static constexpr uint8_t MAX_SCANNER_ID{ VALID_SCANNER_IDS.size() - 1 };
 
 class MonitoringFrameMsg
@@ -88,11 +90,13 @@ private:
 
 public:
   friend DynamicSizeRawData serialize(const MonitoringFrameMsg& frame);
-  friend MonitoringFrameMsg deserializeMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes);
+  friend MonitoringFrameMsg psen_scan_v2::monitoring_frame::deserializeMonitoringFrame(const MaxSizeRawData& data,
+                                                                                       const std::size_t& num_bytes);
 };
 
+}  // namespace monitoring_frame
 }  // namespace psen_scan_v2
 
-std::ostream& operator<<(std::ostream& os, const psen_scan_v2::MonitoringFrameMsg& msg);
+std::ostream& operator<<(std::ostream& os, const psen_scan_v2::monitoring_frame::MonitoringFrameMsg& msg);
 
 #endif  // PSEN_SCAN_V2_MONITORING_FRAME_MSG_H

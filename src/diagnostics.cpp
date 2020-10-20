@@ -19,6 +19,8 @@ using namespace psen_scan_v2;
 
 namespace psen_scan_v2
 {
+namespace monitoring_frame
+{
 std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg)
 {
   os << fmt::format(
@@ -32,4 +34,5 @@ std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessag
   return os;
 }
 
+}  // namespace monitoring_frame
 }  // namespace psen_scan_v2

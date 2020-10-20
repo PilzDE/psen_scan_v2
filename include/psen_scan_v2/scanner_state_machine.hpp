@@ -91,7 +91,8 @@ inline void ScannerProtocolDef::sendStopRequest(const scanner_events::StopReques
 inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawMonitoringFrameReceived& event)
 {
   PSENSCAN_DEBUG("StateMachine", "Action: handleMonitoringFrame");
-  const MonitoringFrameMsg frame{ deserializeMonitoringFrame(event.data_, event.num_bytes_) };
+  const monitoring_frame::MonitoringFrameMsg frame{ monitoring_frame::deserializeMonitoringFrame(event.data_,
+                                                                                                 event.num_bytes_) };
   PSENSCAN_WARN_THROTTLE(1 /* sec */, "ScannerController", "{}", frame.diagnosticMessages());
   args_->inform_user_about_laser_scan_cb(toLaserScan(frame));
 }

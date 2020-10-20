@@ -18,7 +18,7 @@
 #include "psen_scan_v2/diagnostics.h"
 
 using namespace psen_scan_v2;
-
+using namespace monitoring_frame;
 namespace psen_scan_v2_test
 {
 TEST(MonitoringFrameDiagnosticMessageTest, shouldConstructMonitoringFrameDiagnosticMessageAsExpected)

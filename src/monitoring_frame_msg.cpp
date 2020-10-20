@@ -27,9 +27,10 @@
 #include "psen_scan_v2/raw_processing.h"
 #include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/logging.h"
-
 namespace psen_scan_v2
 {
+using namespace monitoring_frame;
+
 TenthOfDegree MonitoringFrameMsg::fromTheta() const
 {
   return from_theta_;
@@ -63,9 +64,9 @@ bool MonitoringFrameMsg::operator==(const MonitoringFrameMsg& rhs) const
 
 }  // namespace psen_scan_v2
 
-std::ostream& operator<<(std::ostream& os, const psen_scan_v2::MonitoringFrameMsg& msg)
+std::ostream& operator<<(std::ostream& os, const psen_scan_v2::monitoring_frame::MonitoringFrameMsg& msg)
 {
-  os << fmt::format("MonitoringFrameMsg(fromTheta = {} deg, resolution = {} deg, scanCounter = "
+  os << fmt::format("monitoring_frame::MonitoringFrameMsg(fromTheta = {} deg, resolution = {} deg, scanCounter = "
                     "{}, measures = {}, diagnostics = {})",
                     msg.fromTheta().value() / 10.,
                     msg.resolution().value() / 10.,

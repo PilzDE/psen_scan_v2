@@ -21,6 +21,8 @@
 
 namespace psen_scan_v2
 {
+namespace monitoring_frame
+{
 DynamicSizeRawData serialize(const MonitoringFrameMsg& frame)
 {
   std::ostringstream os;
@@ -97,4 +99,5 @@ void writeFieldHeader(std::ostringstream& os, const MonitoringFrameAdditionalFie
   raw_processing::write<MonitoringFrameAdditionalFieldHeader::Length>(os, header.length() + 1);
 }
 
+}  // namespace monitoring_frame
 }  // namespace psen_scan_v2

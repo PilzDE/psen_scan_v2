@@ -52,7 +52,8 @@ class WithoutIntensities
 public:
   WithoutIntensities()
   {
-    MonitoringFrameMsg msg(TenthOfDegree(0x03e8), TenthOfDegree(0x0a), 0x00000678, readMeasures(hex_dump, 31, 50));
+    monitoring_frame::MonitoringFrameMsg msg(
+        TenthOfDegree(0x03e8), TenthOfDegree(0x0a), 0x00000678, readMeasures(hex_dump, 31, 50));
     expected_msg_ = msg;
   };
 
@@ -71,19 +72,21 @@ public:
   };
   // clang-format on
 
-  MonitoringFrameMsg expected_msg_;
+  monitoring_frame::MonitoringFrameMsg expected_msg_;
 };
 class WithDiagnostics
 {
 public:
   WithDiagnostics()
   {
-    MonitoringFrameMsg msg(TenthOfDegree(0x03e8),
-                           TenthOfDegree(0x01),
-                           0x000a6f10,
-                           readMeasures(hex_dump, 74, 500),
-                           { MonitoringFrameDiagnosticMessage(ScannerId::MASTER, ErrorLocation(1, 7)),
-                             MonitoringFrameDiagnosticMessage(ScannerId::MASTER, ErrorLocation(4, 3)) });
+    monitoring_frame::MonitoringFrameMsg msg(
+        TenthOfDegree(0x03e8),
+        TenthOfDegree(0x01),
+        0x000a6f10,
+        readMeasures(hex_dump, 74, 500),
+        { monitoring_frame::MonitoringFrameDiagnosticMessage(ScannerId::MASTER, monitoring_frame::ErrorLocation(1, 7)),
+          monitoring_frame::MonitoringFrameDiagnosticMessage(ScannerId::MASTER,
+                                                             monitoring_frame::ErrorLocation(4, 3)) });
     expected_msg_ = msg;
   };
 
@@ -160,7 +163,7 @@ public:
   };
   // clang-format on
 
-  MonitoringFrameMsg expected_msg_;
+  monitoring_frame::MonitoringFrameMsg expected_msg_;
 };
 
 class WithoutMeasurementsAndIntensities
@@ -168,7 +171,7 @@ class WithoutMeasurementsAndIntensities
 public:
   WithoutMeasurementsAndIntensities()
   {
-    MonitoringFrameMsg msg(TenthOfDegree(0x5dc), TenthOfDegree(0x0a), 0x0661fc, {});
+    monitoring_frame::MonitoringFrameMsg msg(TenthOfDegree(0x5dc), TenthOfDegree(0x0a), 0x0661fc, {});
     expected_msg_ = msg;
   }
 
@@ -177,7 +180,7 @@ public:
                                              0x00, 0xdc, 0x05, 0x0a, 0x00, 0x02, 0x05, 0x00, 0xfc, 0x61,
                                              0x06, 0x00, 0x05, 0x01, 0x00, 0x09, 0x00, 0x00, 0x00 };
 
-  MonitoringFrameMsg expected_msg_;
+  monitoring_frame::MonitoringFrameMsg expected_msg_;
 };
 
 class WithUnknownFieldId

@@ -24,6 +24,8 @@
 
 namespace psen_scan_v2
 {
+namespace monitoring_frame
+{
 static constexpr uint32_t DEFAULT_DEVICE_STATUS{ 0 };
 static constexpr uint32_t OP_CODE_MONITORING_FRAME{ 0xCA };
 static constexpr uint32_t ONLINE_WORKING_MODE{ 0x00 };
@@ -170,6 +172,7 @@ inline MonitoringFrameFixedFields::Resolution MonitoringFrameFixedFields::resolu
   return resolution_;
 }
 
+}  // namespace monitoring_frame
 }  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_MONITORING_FRAME_DESERIALIZATION_H

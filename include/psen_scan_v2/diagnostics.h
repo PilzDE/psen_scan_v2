@@ -29,6 +29,8 @@
 
 namespace psen_scan_v2
 {
+namespace monitoring_frame
+{
 static constexpr uint32_t RAW_DIAGNOSTIC_MESSAGE_LENGTH_FOR_ONE_DEVICE_IN_BYTES{ 9 };
 static constexpr uint32_t RAW_DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES{ 4 };
 static constexpr uint32_t RAW_DIAGNOSTIC_MESSAGE_LENGTH_IN_BYTES{
@@ -191,6 +193,7 @@ inline bool isAmbiguous(const DiagnosticCode& code)
 
 std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg);
 
-}  //  namespace psen_scan_v2
+}  // namespace monitoring_frame
+}  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_DIAGNOSTICS_H

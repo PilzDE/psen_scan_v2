@@ -21,6 +21,8 @@
 
 namespace psen_scan_v2
 {
+namespace monitoring_frame
+{
 MonitoringFrameAdditionalFieldHeader::MonitoringFrameAdditionalFieldHeader(Id id, Length length)
   : id_(id), length_(length)
 {
@@ -168,26 +170,26 @@ MonitoringFrameFixedFields readHeader(std::istringstream& is)
   {
     // TODO: Get rid of the issue not to spam the system with this debug messages
     //       Would something like  ROS_DEBUG_THROTTLE(period, ...) be a good solution?
-    PSENSCAN_DEBUG("MonitoringFrameMsg", "Wrong Op Code!");
+    PSENSCAN_DEBUG("monitoring_frame::MonitoringFrameMsg", "Wrong Op Code!");
   }
 
   if (ONLINE_WORKING_MODE != working_mode)
   {
-    PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid working mode!");
+    PSENSCAN_DEBUG("monitoring_frame::MonitoringFrameMsg", "Invalid working mode!");
   }
 
   if (GUI_MONITORING_TRANSACTION != transaction_type)
   {
-    PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid transaction type!");
+    PSENSCAN_DEBUG("monitoring_frame::MonitoringFrameMsg", "Invalid transaction type!");
   }
 
   if (MAX_SCANNER_ID < static_cast<uint8_t>(scanner_id))
   {
-    PSENSCAN_DEBUG("MonitoringFrameMsg", "Invalid Scanner id!");
+    PSENSCAN_DEBUG("monitoring_frame::MonitoringFrameMsg", "Invalid Scanner id!");
   }
 
   return MonitoringFrameFixedFields(
       device_status, op_code, working_mode, transaction_type, scanner_id, from_theta, resolution);
 }
-
+}  // namespace monitoring_frame
 }  // namespace psen_scan_v2
