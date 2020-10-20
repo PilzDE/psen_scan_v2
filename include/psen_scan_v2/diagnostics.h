@@ -31,6 +31,8 @@ namespace psen_scan_v2
 {
 namespace monitoring_frame
 {
+namespace diagnostics
+{
 namespace raw_diagnostic_message
 {
 static constexpr uint32_t LENGTH_FOR_ONE_DEVICE_IN_BYTES{ 9 };
@@ -38,7 +40,7 @@ static constexpr uint32_t UNUSED_OFFSET_IN_BYTES{ 4 };
 static constexpr uint32_t LENGTH_IN_BYTES{ UNUSED_OFFSET_IN_BYTES +
                                            LENGTH_FOR_ONE_DEVICE_IN_BYTES * VALID_SCANNER_IDS.size() };
 }  // namespace raw_diagnostic_message
-using RawDiagnosticMsg = std::array<uint8_t, raw_diagnostic_message::LENGTH_IN_BYTES>;
+using RawDiagnosticMsg = std::array<uint8_t, diagnostics::raw_diagnostic_message::LENGTH_IN_BYTES>;
 
 enum class DiagnosticCode
 {
@@ -149,7 +151,8 @@ public:
 
   constexpr bool operator==(const DiagnosticMessage& rhs) const;
 
-  friend RawDiagnosticMsg serializeDiagnosticMessages(const std::vector<DiagnosticMessage>& messages);
+  friend diagnostics::RawDiagnosticMsg psen_scan_v2::monitoring_frame::diagnostics::serializeDiagnosticMessages(
+      const std::vector<diagnostics::DiagnosticMessage>& messages);
 
   constexpr ScannerId getScannerId() const
   {
@@ -192,6 +195,7 @@ inline bool isAmbiguous(const DiagnosticCode& code)
 
 std::ostream& operator<<(std::ostream& os, const DiagnosticMessage& msg);
 
+}  // namespace diagnostics
 }  // namespace monitoring_frame
 }  // namespace psen_scan_v2
 

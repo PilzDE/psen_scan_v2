@@ -27,7 +27,10 @@ namespace psen_scan_v2
 namespace monitoring_frame
 {
 DynamicSizeRawData serialize(const monitoring_frame::Message& frame);
+namespace diagnostics
+{
 RawDiagnosticMsg serializeDiagnosticMessages(const std::vector<DiagnosticMessage>& messages);
+}  // namespace diagnostics
 void writeFieldHeader(std::ostringstream& os, const monitoring_frame::AdditionalFieldHeader& header);
 }  // namespace monitoring_frame
 }  // namespace psen_scan_v2
