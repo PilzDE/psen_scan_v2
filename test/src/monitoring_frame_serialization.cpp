@@ -33,7 +33,7 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
   raw_processing::write(os, frame.from_theta_.value());
   raw_processing::write(os, frame.resolution_.value());
 
-  MonitoringFrameAdditionalFieldHeader scan_counter_header(MonitoringFrameAdditionalFieldHeaderIds::SCAN_COUNTER,
+  MonitoringFrameAdditionalFieldHeader scan_counter_header(monitoring_frame_additional_field_header_ids::SCAN_COUNTER,
                                                            sizeof(frame.scan_counter_));
   writeFieldHeader(os, scan_counter_header);
   uint32_t scan_counter_header_payload = frame.scan_counter_;
@@ -42,20 +42,20 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
   if (frame.diagnostic_data_enabled_)
   {
     MonitoringFrameAdditionalFieldHeader diagnostic_data_field_header(
-        MonitoringFrameAdditionalFieldHeaderIds::DIAGNOSTICS, DIAGNOSTIC_DATA_LENGTH_IN_BYTES);
+        monitoring_frame_additional_field_header_ids::DIAGNOSTICS, DIAGNOSTIC_DATA_LENGTH_IN_BYTES);
     writeFieldHeader(os, diagnostic_data_field_header);
     RawDiagnosticMsg diagnostic_data_field_payload = serializeDiagnosticMessages(frame.diagnostic_messages_);
     raw_processing::write(os, diagnostic_data_field_payload);
   }
 
-  MonitoringFrameAdditionalFieldHeader measures_header(MonitoringFrameAdditionalFieldHeaderIds::MEASURES,
+  MonitoringFrameAdditionalFieldHeader measures_header(monitoring_frame_additional_field_header_ids::MEASURES,
                                                        frame.measures_.size() * NUMBER_OF_BYTES_SINGLE_MEASURE);
   writeFieldHeader(os, measures_header);
   raw_processing::writeArray<uint16_t, double>(
       os, frame.measures_, [](double elem) { return (static_cast<uint16_t>(std::round(elem * 1000.))); });
 
   MonitoringFrameAdditionalFieldHeader::Id end_of_frame_header_id =
-      MonitoringFrameAdditionalFieldHeaderIds::END_OF_FRAME;
+      monitoring_frame_additional_field_header_ids::END_OF_FRAME;
   raw_processing::write(os, end_of_frame_header_id);
 
   uint8_t unknown_data_at_the_end_of_frame = 0;

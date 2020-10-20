@@ -90,13 +90,14 @@ private:
 
 using MonitoringFrameAdditionalFieldHeaderId = MonitoringFrameAdditionalFieldHeader::Id;
 using MonitoringFrameAdditionalFieldHeaderLength = MonitoringFrameAdditionalFieldHeader::Length;
-struct MonitoringFrameAdditionalFieldHeaderIds
+
+namespace monitoring_frame_additional_field_header_ids
 {
-  static constexpr MonitoringFrameAdditionalFieldHeaderId SCAN_COUNTER{ 0x02 };
-  static constexpr MonitoringFrameAdditionalFieldHeaderId MEASURES{ 0x05 };
-  static constexpr MonitoringFrameAdditionalFieldHeaderId END_OF_FRAME{ 0x09 };
-  static constexpr MonitoringFrameAdditionalFieldHeaderId DIAGNOSTICS{ 0x04 };
-};
+static constexpr MonitoringFrameAdditionalFieldHeaderId SCAN_COUNTER{ 0x02 };
+static constexpr MonitoringFrameAdditionalFieldHeaderId MEASURES{ 0x05 };
+static constexpr MonitoringFrameAdditionalFieldHeaderId END_OF_FRAME{ 0x09 };
+static constexpr MonitoringFrameAdditionalFieldHeaderId DIAGNOSTICS{ 0x04 };
+};  // namespace monitoring_frame_additional_field_header_ids
 
 MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, const std::size_t& num_bytes);
 MonitoringFrameFixedFields readHeader(std::istringstream& is);
