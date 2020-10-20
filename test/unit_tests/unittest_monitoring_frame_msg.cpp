@@ -19,6 +19,8 @@
 
 #include <gtest/gtest.h>
 
+#include <fmt/core.h>
+#include <fmt/format.h>
 #include <fmt/ostream.h>
 
 #include "psen_scan_v2/angle_conversions.h"
