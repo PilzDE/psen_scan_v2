@@ -28,6 +28,8 @@
 
 #include <gtest/gtest_prod.h>
 
+#include <fmt/ostream.h>
+
 #include "psen_scan_v2/controller_state_machine.h"
 #include "psen_scan_v2/function_pointers.h"
 #include "psen_scan_v2/laserscan_conversions.h"
@@ -39,6 +41,7 @@
 #include "psen_scan_v2/udp_client.h"
 #include "psen_scan_v2/monitoring_frame_deserialization.h"
 #include "psen_scan_v2/watchdog.h"
+#include "psen_scan_v2/logging.h"
 
 namespace psen_scan_v2
 {
@@ -141,13 +144,15 @@ ScannerControllerT<TCSM, TUCI>::ScannerControllerT(const ScannerConfiguration& s
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::handleUdpData(const MaxSizeRawData& data, const std::size_t& num_bytes)
 {
-  MonitoringFrameMsg frame{ deserialize_monitoring_frame(data, num_bytes) };
+  MonitoringFrameMsg frame{ deserializeMonitoringFrame(data, num_bytes) };
   state_machine_.processMonitoringFrameReceivedEvent(frame);
 }
 
 template <typename TCSM, typename TUCI>
 void ScannerControllerT<TCSM, TUCI>::handleMonitoringFrame(const MonitoringFrameMsg& frame)
 {
+  PSENSCAN_WARN_THROTTLE(1 /* sec */, "ScannerController", "{}", frame.diagnosticMessages());
+
   if (frame.measures().empty())
   {
     return;

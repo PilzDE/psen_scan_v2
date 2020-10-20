@@ -68,7 +68,7 @@ TEST_F(StartRequestTest, constructorTest)
 
   const DefaultScanRange scan_range{ TenthOfDegree(0), TenthOfDegree::fromRad(4.71) };
 
-  ScannerConfiguration sc(host_ip, host_udp_port_data, 0 /* irrelevant */, "192.168.0.50", scan_range);
+  ScannerConfiguration sc(host_ip, host_udp_port_data, 0 /* irrelevant */, "192.168.0.50", scan_range, false);
 
   uint32_t sequence_number{ 123 };
   StartRequest sr(sc, sequence_number);
@@ -116,12 +116,28 @@ TEST_F(StartRequestTest, constructorTest)
 TEST_F(StartRequestTest, regressionForRealSystem)
 {
   ScannerConfiguration sc(
-      "192.168.0.50", 55115, 0, "192.168.0.10", DefaultScanRange(TenthOfDegree(0), TenthOfDegree(2750)));
+      "192.168.0.50", 55115, 0, "192.168.0.10", DefaultScanRange(TenthOfDegree(0), TenthOfDegree(2750)), false);
   StartRequest sr(sc, 0);
 
   auto data = sr.serialize();
 
   unsigned char expected_crc[4] = { 0xed, 0xc3, 0x48, 0xa1 };  // see wireshark for this number
+
+  for (size_t i = 0; i < sizeof(expected_crc); i++)
+  {
+    EXPECT_EQ(static_cast<unsigned int>(static_cast<unsigned char>(data[i])), expected_crc[i]);
+  }
+}
+
+TEST_F(StartRequestTest, regressionForRealSystemWithDiagnostic)
+{
+  ScannerConfiguration sc(
+      "192.168.0.50", 55115, 0, "192.168.0.10", DefaultScanRange(TenthOfDegree(0), TenthOfDegree(2750)), true);
+  StartRequest sr(sc, 0);
+
+  auto data = sr.serialize();
+
+  unsigned char expected_crc[4] = { 0x5a, 0x50, 0x43, 0x8d };  // see wireshark for this number
 
   for (size_t i = 0; i < sizeof(expected_crc); i++)
   {

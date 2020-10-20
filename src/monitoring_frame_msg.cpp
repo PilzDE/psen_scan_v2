@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include "psen_scan_v2/diagnostics.h"
 #include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/raw_processing.h"
@@ -29,4 +30,47 @@
 
 namespace psen_scan_v2
 {
+TenthOfDegree MonitoringFrameMsg::fromTheta() const
+{
+  return from_theta_;
+}
+
+TenthOfDegree MonitoringFrameMsg::resolution() const
+{
+  return resolution_;
+}
+
+uint32_t MonitoringFrameMsg::scanCounter() const
+{
+  return scan_counter_;
+}
+
+std::vector<double> MonitoringFrameMsg::measures() const
+{
+  return measures_;
+}
+
+std::vector<MonitoringFrameDiagnosticMessage> MonitoringFrameMsg::diagnosticMessages() const
+{
+  return diagnostic_messages_;
+}
+
+bool MonitoringFrameMsg::operator==(const MonitoringFrameMsg& rhs) const
+{
+  return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
+          measures() == rhs.measures() && diagnosticMessages() == rhs.diagnosticMessages());
+}
+
 }  // namespace psen_scan_v2
+
+std::ostream& operator<<(std::ostream& os, const psen_scan_v2::MonitoringFrameMsg& msg)
+{
+  os << fmt::format("MonitoringFrameMsg(fromTheta = {} deg, resolution = {} deg, scanCounter = "
+                    "{}, measures = {}, diagnostics = {})",
+                    msg.fromTheta().value() / 10.,
+                    msg.resolution().value() / 10.,
+                    msg.scanCounter(),
+                    msg.measures(),
+                    msg.diagnosticMessages());
+  return os;
+}

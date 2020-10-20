@@ -21,6 +21,12 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include <pilz_testutils/mock_appender.h>
+#include <pilz_testutils/logger_mock.h>
+
+#include <rosconsole_bridge/bridge.h>
+REGISTER_ROSCONSOLE_BRIDGE;
+
 // Test frameworks
 #include "psen_scan_v2/async_barrier.h"
 #include "psen_scan_v2/mock_udp_server.h"
@@ -33,6 +39,7 @@
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/scanner_reply_msg.h"
 #include "psen_scan_v2/scan_range.h"
+#include "psen_scan_v2/diagnostics.h"
 
 namespace psen_scan_v2_test
 {
@@ -52,12 +59,14 @@ static constexpr std::chrono::milliseconds WAIT_TIMEOUT{ 10 };
 static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 3 };
 
 static constexpr uint32_t DEFAULT_SEQ_NUMBER{ 0u };
+static constexpr bool DIAGNOSTICS_ENABLED{ false };
 
 using std::placeholders::_1;
 using std::placeholders::_2;
 
 using namespace ::testing;
 using namespace std::chrono_literals;
+using namespace pilz_testutils;
 
 ACTION_P(OpenBarrier, barrier)
 {
@@ -83,7 +92,7 @@ public:
 public:
   void sendStartReply();
   void sendStopReply();
-  void sendMonitoringFrame(MonitoringFrameMsg& msg);
+  void sendMonitoringFrame(const MonitoringFrameMsg& msg);
 
 private:
   void sendReply(const uint32_t reply_type);
@@ -127,7 +136,7 @@ void ScannerMock::sendStopReply()
   sendReply(getOpCodeValue(ScannerReplyMsgType::Stop));
 }
 
-void ScannerMock::sendMonitoringFrame(MonitoringFrameMsg& msg)
+void ScannerMock::sendMonitoringFrame(const MonitoringFrameMsg& msg)
 {
   DynamicSizeRawData dynamic_raw_scan = serialize(msg);
   MaxSizeRawData max_size_raw_data = convertToMaxSizeRawData(dynamic_raw_scan);
@@ -138,7 +147,7 @@ void ScannerMock::sendMonitoringFrame(MonitoringFrameMsg& msg)
 ScannerConfiguration createScannerConfig()
 {
   return ScannerConfiguration(
-      HOST_IP_ADDRESS, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, SCANNER_IP_ADDRESS, SCAN_RANGE);
+      HOST_IP_ADDRESS, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, SCANNER_IP_ADDRESS, SCAN_RANGE, DIAGNOSTICS_ENABLED);
 }
 
 TEST(ScannerAPITests, testStartFunctionality)
@@ -217,15 +226,17 @@ TEST(ScannerAPITests, testStartReplyTimeout)
 
 TEST(ScannerAPITests, testReceivingOfMonitoringFrame)
 {
+  pilz_testutils::LoggerMock ros_log_mock;
   StrictMock<ScannerMock> scanner_mock;
   const ScannerConfiguration config{ createScannerConfig() };
   UserCallbacks cb;
   Scanner scanner(config, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
-  std::vector<double> measures = { 1, 2, 3, 4, 5 };
-  MonitoringFrameMsg msg(TenthOfDegree(0), TenthOfDegree(1), 0, measures);
+  MonitoringFrameMsg msg(
+      TenthOfDegree(0), TenthOfDegree(1), 0, { 1, 2, 3, 4, 5 }, { { ScannerId::MASTER, ErrorLocation(1, 7) } });
 
   Barrier monitoring_frame_barrier;
+  Barrier diagnostic_barrier;
   {
     InSequence seq;
 
@@ -236,12 +247,21 @@ TEST(ScannerAPITests, testReceivingOfMonitoringFrame)
     EXPECT_CALL(cb, LaserScanCallback(toLaserScan(msg))).WillOnce(OpenBarrier(&monitoring_frame_barrier));
   }
 
+  EXPECT_LOG(*ros_log_mock, INFO, "Start scanner called.").Times(1);
+  EXPECT_LOG(*ros_log_mock, INFO, "Scanner started successfully.").Times(1);
+  EXPECT_LOG(
+      *ros_log_mock, WARN, "{Device: Master - Alarm: The front panel of the safety laser scanner must be cleaned.}")
+      .Times(1)
+      .WillOnce(OpenBarrier(&diagnostic_barrier));
+
   scanner_mock.startListeningForControlMsg();
   auto promis = scanner.start();
   promis.wait_for(DEFAULT_TIMEOUT);
 
   scanner_mock.sendMonitoringFrame(msg);
+
   EXPECT_TRUE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
+  EXPECT_TRUE(diagnostic_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Diagnostic message not received";
 }
 
 }  // namespace psen_scan_v2_test

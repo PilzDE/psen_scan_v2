@@ -67,7 +67,8 @@ public:
 
   ScannerConfiguration build()
   {
-    return ScannerConfiguration(host_ip_, host_udp_port_data_, host_udp_port_control_, client_ip_, scan_range_);
+    return ScannerConfiguration(
+        host_ip_, host_udp_port_data_, host_udp_port_control_, client_ip_, scan_range_, diagnostic_enabled_);
   }
 
 protected:
@@ -76,6 +77,7 @@ protected:
   int host_udp_port_data_{ MAXIMAL_PORT_NUMBER - 1 };
   int host_udp_port_control_{ MAXIMAL_PORT_NUMBER };
   const DefaultScanRange scan_range_{ SCAN_RANGE };
+  const bool diagnostic_enabled_{ false };
 };
 
 TEST_F(ScannerConfigurationTest, testConstructorSuccess)

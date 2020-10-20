@@ -13,21 +13,23 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef PSEN_SCAN_V2_FUNCTION_POINTERS_H
-#define PSEN_SCAN_V2_FUNCTION_POINTERS_H
+#include "psen_scan_v2/diagnostics.h"
 
-#include <functional>
-
-#include "psen_scan_v2/monitoring_frame_msg.h"
-#include "psen_scan_v2/laserscan.h"
+using namespace psen_scan_v2;
 
 namespace psen_scan_v2
 {
-using SendRequestCallback = std::function<void()>;
-using ReplyCallback = std::function<void()>;
-using MonitoringFrameCallback = std::function<void(const MonitoringFrameMsg&)>;
-using ErrorCallback = std::function<void(const std::string&)>;
-using LaserScanCallback = std::function<void(const LaserScan&)>;
-}  // namespace psen_scan_v2
+std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg)
+{
+  os << fmt::format(
+      "Device: {} - {}", scanner_id_to_string.at(msg.getScannerId()), error_code_to_string.at(msg.getDiagnosticCode()));
 
-#endif  // PSEN_SCAN_V2_FUNCTION_POINTERS_H
+  if (isAmbiguous(msg.getDiagnosticCode()))
+  {
+    os << fmt::format(" (Byte:{} Bit:{})", msg.getErrorLocation().getByte(), msg.getErrorLocation().getBit());
+  }
+
+  return os;
+}
+
+}  // namespace psen_scan_v2

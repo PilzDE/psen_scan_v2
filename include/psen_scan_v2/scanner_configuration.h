@@ -38,12 +38,14 @@ public:
    * @param host_udp_port_control Port used to send commands (start/stop) and receive the corresponding replies.
    * @param device_ip IP address of the scanner.
    * @param scan_range Range in which measurements are taken.
+   * @param diagnostics_enabled Request diagnostic data from the scanner?
    */
   ScannerConfiguration(const std::string& host_ip,
                        const int& host_udp_port_data,
                        const int& host_udp_port_control,
                        const std::string& device_ip,
-                       const DefaultScanRange& scan_range);
+                       const DefaultScanRange& scan_range,
+                       const bool diagnostics_enabled);
 
 public:
   uint32_t hostIp() const;
@@ -55,6 +57,8 @@ public:
 
   const DefaultScanRange& scanRange() const;
 
+  bool diagnosticsEnabled() const;
+
 private:
   uint32_t host_ip_;
   uint16_t host_udp_port_data_;
@@ -63,6 +67,7 @@ private:
   uint32_t client_ip_;
 
   const DefaultScanRange scan_range_;
+  bool diagnostics_enabled_{ false };
 };
 
 }  // namespace psen_scan_v2

@@ -19,25 +19,24 @@
 #include <cstdint>
 #include <functional>
 #include <map>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
+#include <array>
+#include <bitset>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <fmt/ranges.h>
 
 #include "psen_scan_v2/raw_scanner_data.h"
+#include "psen_scan_v2/diagnostics.h"
 #include "psen_scan_v2/tenth_of_degree.h"
+#include "psen_scan_v2/scanner_ids.h"
 
 namespace psen_scan_v2
 {
-static constexpr uint32_t OP_CODE_MONITORING_FRAME{ 0xCA };
-static constexpr uint32_t ONLINE_WORKING_MODE{ 0x00 };
-static constexpr uint32_t GUI_MONITORING_TRANSACTION{ 0x05 };
-static constexpr uint32_t MAX_SCANNER_ID{ 0x03 };
-
-static constexpr uint16_t NUMBER_OF_BYTES_SCAN_COUNTER{ 4 };
-static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_MEASURE{ 2 };
+static constexpr uint8_t MAX_SCANNER_ID{ VALID_SCANNER_IDS.size() - 1 };
 
 class MonitoringFrameMsg
 {
@@ -46,11 +45,26 @@ public:
   MonitoringFrameMsg(const TenthOfDegree& from_theta,
                      const TenthOfDegree& resolution,
                      const uint32_t scan_counter,
-                     const std::vector<double> measures)
-    : from_theta_fixed_(from_theta)
-    , resolution_fixed_(resolution)
+                     const std::vector<double>& measures)
+    : from_theta_(from_theta)
+    , resolution_(resolution)
     , scan_counter_(scan_counter)
-    , measures_(measures){
+    , measures_(measures)
+    , diagnostic_data_enabled_(false){
+
+    };
+
+  MonitoringFrameMsg(const TenthOfDegree& from_theta,
+                     const TenthOfDegree& resolution,
+                     const uint32_t scan_counter,
+                     const std::vector<double>& measures,
+                     const std::vector<MonitoringFrameDiagnosticMessage>& diagnostic_messages)
+    : from_theta_(from_theta)
+    , resolution_(resolution)
+    , scan_counter_(scan_counter)
+    , measures_(measures)
+    , diagnostic_messages_(diagnostic_messages)
+    , diagnostic_data_enabled_(true){
 
     };
 
@@ -59,61 +73,26 @@ public:
   TenthOfDegree resolution() const;
   uint32_t scanCounter() const;
   std::vector<double> measures() const;
-
-  bool operator==(const MonitoringFrameMsg& rhs) const
-  {
-    return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
-            measures() == rhs.measures());
-  }
-
-  friend std::ostream& operator<<(std::ostream& os, const MonitoringFrameMsg& msg)
-  {
-    os << fmt::format("MonitoringFrameMsg(fromTheta = {} deg, resolution = {} deg, scanCounter = "
-                      "{}, measures = {})",
-                      msg.fromTheta().value() / 10.,
-                      msg.resolution().value() / 10.,
-                      msg.scanCounter(),
-                      msg.measures_);
-    return os;
-  }
+  std::vector<MonitoringFrameDiagnosticMessage> diagnosticMessages() const;
+  bool operator==(const MonitoringFrameMsg& rhs) const;
 
 private:
-  uint32_t device_status_fixed_{ 0 };
-  uint32_t op_code_fixed_{ OP_CODE_MONITORING_FRAME };
-  uint32_t working_mode_fixed_{ 0 };
-  uint32_t transaction_type_fixed_{ GUI_MONITORING_TRANSACTION };
-  uint8_t scanner_id_fixed_{ 0 };
-  TenthOfDegree from_theta_fixed_{ 0 };
-  TenthOfDegree resolution_fixed_{ 0 };
+  ScannerId scanner_id_{ ScannerId::MASTER };
+  TenthOfDegree from_theta_{ 0 };
+  TenthOfDegree resolution_{ 0 };
 
   uint32_t scan_counter_{ 0 };
   std::vector<double> measures_;
+  std::vector<MonitoringFrameDiagnosticMessage> diagnostic_messages_;
+  bool diagnostic_data_enabled_{ false };
 
 public:
-  friend DynamicSizeRawData serialize(MonitoringFrameMsg& frame);
-  friend MonitoringFrameMsg deserialize_monitoring_frame(const MaxSizeRawData& data, const std::size_t& num_bytes);
-  friend void checkFixedFields(MonitoringFrameMsg& msg);
+  friend DynamicSizeRawData serialize(const MonitoringFrameMsg& frame);
+  friend MonitoringFrameMsg deserializeMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes);
 };
 
-inline TenthOfDegree MonitoringFrameMsg::fromTheta() const
-{
-  return from_theta_fixed_;
-}
-
-inline TenthOfDegree MonitoringFrameMsg::resolution() const
-{
-  return resolution_fixed_;
-}
-
-inline uint32_t MonitoringFrameMsg::scanCounter() const
-{
-  return scan_counter_;
-}
-
-inline std::vector<double> MonitoringFrameMsg::measures() const
-{
-  return measures_;
-}
 }  // namespace psen_scan_v2
+
+std::ostream& operator<<(std::ostream& os, const psen_scan_v2::MonitoringFrameMsg& msg);
 
 #endif  // PSEN_SCAN_V2_MONITORING_FRAME_MSG_H
