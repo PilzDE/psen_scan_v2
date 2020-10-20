@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:macro name="psen_scan" params="prefix">
+    <xacro:property name="mass" value="1.53" /> <!-- src datasheet p 96 -->
+    <xacro:property name="radius" value="0.051" /> <!-- src datasheet p 96 -->
+    <xacro:property name="height" value="0.152" /> <!-- src datasheet p 96 -->
+    <xacro:property name="dist_scanning_plane_top" value="0.0377" /> <!-- src datasheet p 96 -->
+    <xacro:property name="dist_scanning_axis_rear" value="0.0525" /> <!-- src datasheet p 96 -->
+
+    <!-- Location of mounting point at the lower back of device -->
+    <link name="${prefix}_mount_link"/>
+
+    <joint name="${prefix}_mount_joint" type="fixed">
+      <parent link="${prefix}_mount_link" />
+      <child link="${prefix}" />
+      <origin rpy="0 0 0" xyz="${radius} 0 0"/>
+    </joint>
+
+    <!-- Location of scanner body -->
+    <link name="${prefix}">
+      <visual>
+        <geometry>
+          <cylinder radius="${radius}" length="${height}" />
+        </geometry>
+        <material name="pilz_yellow" >
+          <color rgba="1.0 0.722 0.196 1.0" />
+        </material>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder radius="${radius}" length="${height}" />
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="${mass}" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="${1 / 12 * mass * (3 * radius * radius + height * height)}" ixy="0.0" ixz="0.0"
+          iyy="${1 / 12 * mass * (3 * radius * radius + height * height)}" iyz="0.0"
+          izz="${.5 * mass * (radius * radius)}" />
+      </inertial>
+    </link>
+
+    <joint name="${prefix}_scan_joint" type="fixed">
+      <parent link="${prefix}" />
+      <child link="${prefix}_scan" />
+      <origin rpy="${pi} 0 0" xyz="0 ${radius - dist_scanning_axis_rear} ${height / 2 - dist_scanning_plane_top}"/>
+    </joint>
+
+    <!-- This is the location of the laser scan -->
+    <link name="${prefix}_scan">
+    </link>
+  </xacro:macro>
+</robot>
