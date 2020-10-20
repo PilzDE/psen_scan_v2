@@ -142,9 +142,9 @@ private:
 class MonitoringFrameDiagnosticMessage
 {
 public:
-  MonitoringFrameDiagnosticMessage(const ScannerId& id, const ErrorLocation& location);
+  constexpr MonitoringFrameDiagnosticMessage(const ScannerId& id, const ErrorLocation& location);
 
-  bool operator==(const MonitoringFrameDiagnosticMessage& rhs) const;
+  constexpr bool operator==(const MonitoringFrameDiagnosticMessage& rhs) const;
 
   friend RawDiagnosticMsg serializeDiagnosticMessages(const std::vector<MonitoringFrameDiagnosticMessage>& messages);
 
@@ -167,6 +167,18 @@ private:
   ScannerId id_;
   ErrorLocation error_location_;
 };
+
+constexpr inline MonitoringFrameDiagnosticMessage::MonitoringFrameDiagnosticMessage(const ScannerId& id,
+                                                                                    const ErrorLocation& location)
+  : id_(id), error_location_(location)
+{
+}
+
+constexpr inline bool MonitoringFrameDiagnosticMessage::operator==(const MonitoringFrameDiagnosticMessage& rhs) const
+{
+  return (error_location_.getBit() == rhs.error_location_.getBit() &&
+          error_location_.getByte() == rhs.error_location_.getByte() && id_ == rhs.id_);
+}
 
 // Store ambiguous errors for additional output
 static const std::set<Dc> ambiguous_diagnostic_codes = { Dc::UNUSED, Dc::INT };
