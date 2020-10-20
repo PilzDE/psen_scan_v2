@@ -69,16 +69,16 @@ private:
   FromTheta from_theta_;
   Resolution resolution_;
 };
-namespace additional_field_header_ids
+namespace additional_field
 {
-class AdditionalFieldHeader
+class Header
 {
 public:
   using Id = uint8_t;
   using Length = uint16_t;
 
 public:
-  AdditionalFieldHeader(Id id, Length length);
+  Header(Id id, Length length);
 
 public:
   Id id() const;
@@ -91,7 +91,7 @@ private:
   Length length_;
 };
 
-enum class HeaderID : AdditionalFieldHeader::Id
+enum class HeaderID : Header::Id
 {
   SCAN_COUNTER = 0x02,
   DIAGNOSTICS = 0x04,
@@ -99,12 +99,11 @@ enum class HeaderID : AdditionalFieldHeader::Id
   END_OF_FRAME = 0x09
 };
 
-}  // namespace additional_field_header_ids
+Header read(std::istringstream& is, const std::size_t& max_num_bytes);
+}  // namespace additional_field
 
 Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
-FixedFields readHeader(std::istringstream& is);
-additional_field_header_ids::AdditionalFieldHeader readFieldHeader(std::istringstream& is,
-                                                                   const std::size_t& max_num_bytes);
+FixedFields readFixedFields(std::istringstream& is);
 std::vector<diagnostics::Message> deserializeDiagnosticMessages(std::istringstream& is);
 
 class FormatError : public std::runtime_error
@@ -128,14 +127,12 @@ inline FormatErrorScanCounterUnexpectedSize::FormatErrorScanCounterUnexpectedSiz
 {
 }
 
-inline additional_field_header_ids::AdditionalFieldHeader::Id
-additional_field_header_ids::AdditionalFieldHeader::id() const
+inline additional_field::Header::Id additional_field::Header::id() const
 {
   return id_;
 }
 
-inline additional_field_header_ids::AdditionalFieldHeader::Length
-additional_field_header_ids::AdditionalFieldHeader::length() const
+inline additional_field::Header::Length additional_field::Header::length() const
 {
   return length_;
 }

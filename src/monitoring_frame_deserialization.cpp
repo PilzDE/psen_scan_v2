@@ -23,8 +23,7 @@ namespace psen_scan_v2
 {
 namespace monitoring_frame
 {
-additional_field_header_ids::AdditionalFieldHeader::AdditionalFieldHeader(Id id, Length length)
-  : id_(id), length_(length)
+additional_field::Header::Header(Id id, Length length) : id_(id), length_(length)
 {
 }
 
@@ -52,7 +51,7 @@ Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes)
   MaxSizeRawData tmp_data{ data };
   std::istringstream is(std::string(tmp_data.data(), tmp_data.size()));
 
-  FixedFields frame_header = readHeader(is);
+  FixedFields frame_header = readFixedFields(is);
 
   msg.scanner_id_ = frame_header.scanner_id();
   msg.from_theta_ = frame_header.from_theta();
@@ -61,11 +60,11 @@ Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes)
   bool end_of_frame{ false };
   while (!end_of_frame)
   {
-    const additional_field_header_ids::AdditionalFieldHeader additional_header{ readFieldHeader(is, num_bytes) };
+    const additional_field::Header additional_header{ additional_field::read(is, num_bytes) };
 
-    switch (static_cast<additional_field_header_ids::HeaderID>(additional_header.id()))
+    switch (static_cast<additional_field::HeaderID>(additional_header.id()))
     {
-      case additional_field_header_ids::HeaderID::SCAN_COUNTER:
+      case additional_field::HeaderID::SCAN_COUNTER:
         if (additional_header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
         {
           throw FormatErrorScanCounterUnexpectedSize(
@@ -76,18 +75,18 @@ Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes)
         raw_processing::read(is, msg.scan_counter_);
         break;
 
-      case additional_field_header_ids::HeaderID::MEASURES:
+      case additional_field::HeaderID::MEASURES:
         raw_processing::readArray<uint16_t, double>(is,
                                                     msg.measures_,
                                                     additional_header.length() / NUMBER_OF_BYTES_SINGLE_MEASURE,
                                                     [](uint16_t raw_element) { return raw_element / 1000.; });
         break;
 
-      case additional_field_header_ids::HeaderID::END_OF_FRAME:
+      case additional_field::HeaderID::END_OF_FRAME:
         end_of_frame = true;
         break;
 
-      case additional_field_header_ids::HeaderID::DIAGNOSTICS:
+      case additional_field::HeaderID::DIAGNOSTICS:
         msg.diagnostic_messages_ = deserializeDiagnosticMessages(is);
         msg.diagnostic_data_enabled_ = true;
         break;
@@ -100,11 +99,10 @@ Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes)
   return msg;
 }
 
-additional_field_header_ids::AdditionalFieldHeader readFieldHeader(std::istringstream& is,
-                                                                   const std::size_t& max_num_bytes)
+additional_field::Header additional_field::read(std::istringstream& is, const std::size_t& max_num_bytes)
 {
-  additional_field_header_ids::AdditionalFieldHeader::Id id;
-  additional_field_header_ids::AdditionalFieldHeader::Length length;
+  additional_field::Header::Id id;
+  additional_field::Header::Length length;
   raw_processing::read(is, id);
   raw_processing::read(is, length);
 
@@ -117,7 +115,7 @@ additional_field_header_ids::AdditionalFieldHeader readFieldHeader(std::istrings
   {
     length--;
   }
-  return additional_field_header_ids::AdditionalFieldHeader(id, length);
+  return additional_field::Header(id, length);
 }
 
 std::vector<diagnostics::Message> deserializeDiagnosticMessages(std::istringstream& is)
@@ -148,7 +146,7 @@ std::vector<diagnostics::Message> deserializeDiagnosticMessages(std::istringstre
   return diagnostic_messages;
 }
 
-FixedFields readHeader(std::istringstream& is)
+FixedFields readFixedFields(std::istringstream& is)
 {
   FixedFields::DeviceStatus device_status;
   FixedFields::OpCode op_code;

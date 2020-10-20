@@ -140,7 +140,7 @@ TEST(MonitoringFrameDeserializationFieldHeaderTest, shouldGetIdAndLengthCorrectl
 {
   uint8_t id = 5;
   uint16_t length = 7;
-  monitoring_frame::additional_field_header_ids::AdditionalFieldHeader header(id, length);
+  monitoring_frame::additional_field::Header header(id, length);
   EXPECT_EQ(id, header.id());
   EXPECT_EQ(length, header.length());
 }
@@ -157,9 +157,9 @@ TEST(MonitoringFrameDeserializationFieldHeaderTest, shouldDeserializeMonitoringF
   builder.add(length);
   std::istringstream is{ builder.get() };
 
-  std::unique_ptr<monitoring_frame::additional_field_header_ids::AdditionalFieldHeader> header_ptr;
-  ASSERT_NO_THROW(header_ptr.reset(new monitoring_frame::additional_field_header_ids::AdditionalFieldHeader{
-      monitoring_frame::readFieldHeader(is, max_num_bytes) }););
+  std::unique_ptr<monitoring_frame::additional_field::Header> header_ptr;
+  ASSERT_NO_THROW(header_ptr.reset(
+      new monitoring_frame::additional_field::Header{ monitoring_frame::additional_field::read(is, max_num_bytes) }););
   EXPECT_EQ(id, header_ptr->id());
   EXPECT_EQ(expected_length, header_ptr->length());
 }
@@ -173,7 +173,7 @@ TEST(MonitoringFrameDeserializationFieldHeaderTest, shouldFailOnReadHeaderWhichI
   builder.add(too_short_header);
   std::istringstream is{ builder.get() };
 
-  EXPECT_THROW(monitoring_frame::readFieldHeader(is, max_num_bytes);, raw_processing::StringStreamFailure);
+  EXPECT_THROW(monitoring_frame::additional_field::read(is, max_num_bytes);, raw_processing::StringStreamFailure);
 }
 class MonitoringFrameDeserializationTest : public ::testing::Test
 {
