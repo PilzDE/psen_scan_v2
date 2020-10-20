@@ -125,12 +125,12 @@ class ErrorLocation
 public:
   using byteLocation = size_t;
   using bitLocation = size_t;
-  ErrorLocation(byteLocation byte, bitLocation bit) : byte_(byte), bit_(bit){};
-  inline byteLocation getByte() const
+  constexpr ErrorLocation(byteLocation byte, bitLocation bit) : byte_(byte), bit_(bit){};
+  inline constexpr byteLocation getByte() const
   {
     return byte_;
   };
-  inline bitLocation getBit() const
+  inline constexpr bitLocation getBit() const
   {
     return bit_;
   };
@@ -149,17 +149,17 @@ public:
 
   friend RawDiagnosticMsg serializeDiagnosticMessages(const std::vector<MonitoringFrameDiagnosticMessage>& messages);
 
-  ScannerId getScannerId() const
+  constexpr ScannerId getScannerId() const
   {
     return id_;
   }
 
-  ErrorLocation getErrorLocation() const
+  constexpr ErrorLocation getErrorLocation() const
   {
     return error_location_;
   }
 
-  DiagnosticCode getDiagnosticCode() const
+  constexpr DiagnosticCode getDiagnosticCode() const
   {
     return error_bits.at(error_location_.getByte()).at(error_location_.getBit());
   }
