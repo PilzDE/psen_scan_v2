@@ -109,14 +109,13 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstruc
            "this test.";
   }
 
-  monitoring_frame::Message msg(
-      TenthOfDegree(25),
-      TenthOfDegree(1),
-      456,
-      { 10, 20, 30, 40 },
-      { monitoring_frame::diagnostics::DiagnosticMessage(ScannerId::MASTER, error_locations.at(0)),
-        monitoring_frame::diagnostics::DiagnosticMessage(ScannerId::MASTER, error_locations.at(1)),
-        monitoring_frame::diagnostics::DiagnosticMessage(ScannerId::SLAVE2, error_locations.at(2)) });
+  monitoring_frame::Message msg(TenthOfDegree(25),
+                                TenthOfDegree(1),
+                                456,
+                                { 10, 20, 30, 40 },
+                                { monitoring_frame::diagnostics::Message(ScannerId::MASTER, error_locations.at(0)),
+                                  monitoring_frame::diagnostics::Message(ScannerId::MASTER, error_locations.at(1)),
+                                  monitoring_frame::diagnostics::Message(ScannerId::SLAVE2, error_locations.at(2)) });
 
   DynamicSizeRawData raw = serialize(msg);
 
@@ -127,15 +126,14 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstruc
 
 TEST(MonitoringFrameSerializationDiagnosticMessagesTest, shouldSetCorrectBitInSerializedDiagnosticData)
 {
-  std::vector<monitoring_frame::diagnostics::DiagnosticMessage> diagnostic_data{
+  std::vector<monitoring_frame::diagnostics::Message> diagnostic_data{
     { ScannerId::MASTER, monitoring_frame::diagnostics::ErrorLocation(5, 3) }
   };
-  auto diagnostic_data_serialized = monitoring_frame::diagnostics::serializeDiagnosticMessages(diagnostic_data);
+  auto diagnostic_data_serialized = monitoring_frame::diagnostics::serializeMessages(diagnostic_data);
 
-  EXPECT_EQ(diagnostic_data_serialized.size(), monitoring_frame::diagnostics::raw_diagnostic_message::LENGTH_IN_BYTES);
-  EXPECT_EQ(
-      diagnostic_data_serialized.at(monitoring_frame::diagnostics::raw_diagnostic_message::UNUSED_OFFSET_IN_BYTES + 5),
-      0b1000);
+  EXPECT_EQ(diagnostic_data_serialized.size(), monitoring_frame::diagnostics::raw_message::LENGTH_IN_BYTES);
+  EXPECT_EQ(diagnostic_data_serialized.at(monitoring_frame::diagnostics::raw_message::UNUSED_OFFSET_IN_BYTES + 5),
+            0b1000);
 }
 
 TEST(MonitoringFrameDeserializationFieldHeaderTest, shouldGetIdAndLengthCorrectly)

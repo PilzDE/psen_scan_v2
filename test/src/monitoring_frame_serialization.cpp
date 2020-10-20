@@ -46,10 +46,10 @@ DynamicSizeRawData serialize(const Message& frame)
   {
     AdditionalFieldHeader diagnostic_data_field_header(
         static_cast<AdditionalFieldHeader::Id>(additional_field_header_ids::HeaderID::DIAGNOSTICS),
-        diagnostics::raw_diagnostic_message::LENGTH_IN_BYTES);
+        diagnostics::raw_message::LENGTH_IN_BYTES);
     writeFieldHeader(os, diagnostic_data_field_header);
-    diagnostics::RawDiagnosticMsg diagnostic_data_field_payload =
-        diagnostics::serializeDiagnosticMessages(frame.diagnostic_messages_);
+    diagnostics::raw_message::RawDiagnosticMsg diagnostic_data_field_payload =
+        diagnostics::serializeMessages(frame.diagnostic_messages_);
     raw_processing::write(os, diagnostic_data_field_payload);
   }
 
@@ -74,16 +74,15 @@ DynamicSizeRawData serialize(const Message& frame)
 
 constexpr size_t calculateIndexInRawDiagnosticData(const ScannerId& id, const diagnostics::ErrorLocation& location)
 {
-  return diagnostics::raw_diagnostic_message::UNUSED_OFFSET_IN_BYTES +
-         (static_cast<uint8_t>(id) * diagnostics::raw_diagnostic_message::LENGTH_FOR_ONE_DEVICE_IN_BYTES) +
-         location.getByte();
+  return diagnostics::raw_message::UNUSED_OFFSET_IN_BYTES +
+         (static_cast<uint8_t>(id) * diagnostics::raw_message::LENGTH_FOR_ONE_DEVICE_IN_BYTES) + location.getByte();
 }
 
 namespace diagnostics
 {
-RawDiagnosticMsg serializeDiagnosticMessages(const std::vector<DiagnosticMessage>& messages)
+raw_message::RawDiagnosticMsg serializeMessages(const std::vector<Message>& messages)
 {
-  RawDiagnosticMsg raw_diagnostic_data{};
+  raw_message::RawDiagnosticMsg raw_diagnostic_data{};
 
   for (const auto& elem : messages)
   {

@@ -118,16 +118,16 @@ AdditionalFieldHeader readFieldHeader(std::istringstream& is, const std::size_t&
   return AdditionalFieldHeader(id, length);
 }
 
-std::vector<diagnostics::DiagnosticMessage> deserializeDiagnosticMessages(std::istringstream& is)
+std::vector<diagnostics::Message> deserializeDiagnosticMessages(std::istringstream& is)
 {
-  std::vector<diagnostics::DiagnosticMessage> diagnostic_messages;
+  std::vector<diagnostics::Message> diagnostic_messages;
 
-  std::array<uint8_t, diagnostics::raw_diagnostic_message::UNUSED_OFFSET_IN_BYTES> reserved_diag_unused;
+  std::array<uint8_t, diagnostics::raw_message::UNUSED_OFFSET_IN_BYTES> reserved_diag_unused;
   raw_processing::read(is, reserved_diag_unused);
 
   for (auto& scanner_id : VALID_SCANNER_IDS)
   {
-    for (size_t byte_n = 0; byte_n < diagnostics::raw_diagnostic_message::LENGTH_FOR_ONE_DEVICE_IN_BYTES; byte_n++)
+    for (size_t byte_n = 0; byte_n < diagnostics::raw_message::LENGTH_FOR_ONE_DEVICE_IN_BYTES; byte_n++)
     {
       uint8_t raw_byte;
       raw_processing::read(is, raw_byte);
@@ -137,8 +137,8 @@ std::vector<diagnostics::DiagnosticMessage> deserializeDiagnosticMessages(std::i
       {
         if (raw_bits.test(bit_n) && (diagnostics::DiagnosticCode::UNUSED != diagnostics::error_bits[byte_n][bit_n]))
         {
-          diagnostic_messages.push_back(diagnostics::DiagnosticMessage(static_cast<ScannerId>(scanner_id),
-                                                                       diagnostics::ErrorLocation(byte_n, bit_n)));
+          diagnostic_messages.push_back(
+              diagnostics::Message(static_cast<ScannerId>(scanner_id), diagnostics::ErrorLocation(byte_n, bit_n)));
         }
       }
     }

@@ -79,14 +79,14 @@ class WithDiagnostics
 public:
   WithDiagnostics()
   {
-    monitoring_frame::Message msg(TenthOfDegree(0x03e8),
-                                  TenthOfDegree(0x01),
-                                  0x000a6f10,
-                                  readMeasures(hex_dump, 74, 500),
-                                  { monitoring_frame::diagnostics::DiagnosticMessage(
-                                        ScannerId::MASTER, monitoring_frame::diagnostics::ErrorLocation(1, 7)),
-                                    monitoring_frame::diagnostics::DiagnosticMessage(
-                                        ScannerId::MASTER, monitoring_frame::diagnostics::ErrorLocation(4, 3)) });
+    monitoring_frame::Message msg(
+        TenthOfDegree(0x03e8),
+        TenthOfDegree(0x01),
+        0x000a6f10,
+        readMeasures(hex_dump, 74, 500),
+        { monitoring_frame::diagnostics::Message(ScannerId::MASTER, monitoring_frame::diagnostics::ErrorLocation(1, 7)),
+          monitoring_frame::diagnostics::Message(ScannerId::MASTER,
+                                                 monitoring_frame::diagnostics::ErrorLocation(4, 3)) });
     expected_msg_ = msg;
   };
 

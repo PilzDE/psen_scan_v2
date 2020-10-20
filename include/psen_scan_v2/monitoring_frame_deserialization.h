@@ -103,7 +103,7 @@ enum class HeaderID : AdditionalFieldHeader::Id
 Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
 FixedFields readHeader(std::istringstream& is);
 AdditionalFieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes);
-std::vector<diagnostics::DiagnosticMessage> deserializeDiagnosticMessages(std::istringstream& is);
+std::vector<diagnostics::Message> deserializeDiagnosticMessages(std::istringstream& is);
 
 class FormatError : public std::runtime_error
 {

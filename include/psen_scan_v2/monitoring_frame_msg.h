@@ -60,7 +60,7 @@ public:
           const TenthOfDegree& resolution,
           const uint32_t scan_counter,
           const std::vector<double>& measures,
-          const std::vector<diagnostics::DiagnosticMessage>& diagnostic_messages)
+          const std::vector<diagnostics::Message>& diagnostic_messages)
     : from_theta_(from_theta)
     , resolution_(resolution)
     , scan_counter_(scan_counter)
@@ -75,7 +75,7 @@ public:
   TenthOfDegree resolution() const;
   uint32_t scanCounter() const;
   std::vector<double> measures() const;
-  std::vector<diagnostics::DiagnosticMessage> diagnosticMessages() const;
+  std::vector<diagnostics::Message> diagnosticMessages() const;
   bool operator==(const Message& rhs) const;
 
 private:
@@ -85,7 +85,7 @@ private:
 
   uint32_t scan_counter_{ 0 };
   std::vector<double> measures_;
-  std::vector<diagnostics::DiagnosticMessage> diagnostic_messages_;
+  std::vector<diagnostics::Message> diagnostic_messages_;
   bool diagnostic_data_enabled_{ false };
 
 public:

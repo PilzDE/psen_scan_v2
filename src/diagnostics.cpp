@@ -23,7 +23,7 @@ namespace monitoring_frame
 {
 namespace diagnostics
 {
-std::ostream& operator<<(std::ostream& os, const DiagnosticMessage& msg)
+std::ostream& operator<<(std::ostream& os, const Message& msg)
 {
   os << fmt::format(
       "Device: {} - {}", scanner_id_to_string.at(msg.getScannerId()), error_code_to_string.at(msg.getDiagnosticCode()));

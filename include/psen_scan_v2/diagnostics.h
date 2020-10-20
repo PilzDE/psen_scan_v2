@@ -33,14 +33,14 @@ namespace monitoring_frame
 {
 namespace diagnostics
 {
-namespace raw_diagnostic_message
+namespace raw_message
 {
 static constexpr uint32_t LENGTH_FOR_ONE_DEVICE_IN_BYTES{ 9 };
 static constexpr uint32_t UNUSED_OFFSET_IN_BYTES{ 4 };
 static constexpr uint32_t LENGTH_IN_BYTES{ UNUSED_OFFSET_IN_BYTES +
                                            LENGTH_FOR_ONE_DEVICE_IN_BYTES * VALID_SCANNER_IDS.size() };
-}  // namespace raw_diagnostic_message
-using RawDiagnosticMsg = std::array<uint8_t, diagnostics::raw_diagnostic_message::LENGTH_IN_BYTES>;
+using RawDiagnosticMsg = std::array<uint8_t, diagnostics::raw_message::LENGTH_IN_BYTES>;
+}  // namespace raw_message
 
 enum class DiagnosticCode
 {
@@ -144,15 +144,15 @@ private:
   BitLocation bit_;
 };
 
-class DiagnosticMessage
+class Message
 {
 public:
-  constexpr DiagnosticMessage(const ScannerId& id, const ErrorLocation& location);
+  constexpr Message(const ScannerId& id, const ErrorLocation& location);
 
-  constexpr bool operator==(const DiagnosticMessage& rhs) const;
+  constexpr bool operator==(const Message& rhs) const;
 
-  friend diagnostics::RawDiagnosticMsg psen_scan_v2::monitoring_frame::diagnostics::serializeDiagnosticMessages(
-      const std::vector<diagnostics::DiagnosticMessage>& messages);
+  friend diagnostics::raw_message::RawDiagnosticMsg
+  psen_scan_v2::monitoring_frame::diagnostics::serializeMessages(const std::vector<diagnostics::Message>& messages);
 
   constexpr ScannerId getScannerId() const
   {
@@ -174,12 +174,12 @@ private:
   ErrorLocation error_location_;
 };
 
-constexpr inline DiagnosticMessage::DiagnosticMessage(const ScannerId& id, const ErrorLocation& location)
+constexpr inline Message::Message(const ScannerId& id, const ErrorLocation& location)
   : id_(id), error_location_(location)
 {
 }
 
-constexpr inline bool DiagnosticMessage::operator==(const DiagnosticMessage& rhs) const
+constexpr inline bool Message::operator==(const Message& rhs) const
 {
   return (error_location_.getBit() == rhs.error_location_.getBit() &&
           error_location_.getByte() == rhs.error_location_.getByte() && id_ == rhs.id_);
@@ -193,7 +193,7 @@ inline bool isAmbiguous(const DiagnosticCode& code)
   return ambiguous_diagnostic_codes.find(code) != ambiguous_diagnostic_codes.end();
 }
 
-std::ostream& operator<<(std::ostream& os, const DiagnosticMessage& msg);
+std::ostream& operator<<(std::ostream& os, const Message& msg);
 
 }  // namespace diagnostics
 }  // namespace monitoring_frame
