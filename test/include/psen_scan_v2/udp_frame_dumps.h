@@ -29,7 +29,7 @@ namespace psen_scan_v2_test
 {
 namespace scanner_udp_datagram_hexdumps
 {
-constexpr uint16_t convertHecdumpBytesToUint16_t(uint8_t msbyte, uint8_t lsbyte)
+constexpr uint16_t convertHexdumpBytesToUint16_t(uint8_t msbyte, uint8_t lsbyte)
 {
   return static_cast<uint16_t>(msbyte << 8) + static_cast<uint16_t>(lsbyte);
 }
@@ -41,7 +41,7 @@ readMeasures(const std::array<uint8_t, ARRAY_SIZE> hex_dump, const size_t offset
   std::vector<double> measures;
   for (size_t idx = offset_measures; idx < (offset_measures + (n_measures * 2)); idx = idx + 2)
   {
-    uint16_t raw_value = convertHecdumpBytesToUint16_t(hex_dump.at(idx + 1), hex_dump.at(idx));
+    uint16_t raw_value = convertHexdumpBytesToUint16_t(hex_dump.at(idx + 1), hex_dump.at(idx));
     measures.push_back(raw_value / 1000.);
   }
   return measures;
