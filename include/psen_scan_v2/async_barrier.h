@@ -33,13 +33,13 @@ private:
   const std::future<void> future_{ barrier_.get_future() };
 };
 
-void Barrier::release()
+inline void Barrier::release()
 {
   barrier_.set_value();
 }
 
 template <class Rep, class Period>
-bool Barrier::waitTillRelease(const std::chrono::duration<Rep, Period>& timeout) const
+inline bool Barrier::waitTillRelease(const std::chrono::duration<Rep, Period>& timeout) const
 {
   return future_.wait_for(timeout) == std::future_status::ready;
 }

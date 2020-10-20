@@ -17,10 +17,11 @@
 #include <gmock/gmock.h>
 
 #include "psen_scan_v2/laserscan.h"
-#include "psen_scan_v2/scanner.h"
 #include "psen_scan_v2/laserscan_ros_conversions.h"
+#include "psen_scan_v2/default_parameters.h"
 
 using namespace psen_scan_v2;
+using namespace psen_scan_v2::constants;
 
 MATCHER_P(IsReversed, data_vec, "")
 {

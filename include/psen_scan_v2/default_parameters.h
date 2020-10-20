@@ -16,16 +16,28 @@
 #ifndef PSEN_SCAN_V2_DEFAULT_PARAMETERS_H
 #define PSEN_SCAN_V2_DEFAULT_PARAMETERS_H
 
-#include <string>
-
 #include "psen_scan_v2/angle_conversions.h"
 
 namespace psen_scan_v2
+{
+namespace constants
 {
 //! @brief Start angle of measurement.
 static constexpr double DEFAULT_ANGLE_START(-degreeToRadian(137.5));
 //! @brief  End angle of measurement.
 static constexpr double DEFAULT_ANGLE_END(degreeToRadian(137.5));
+
+static constexpr uint16_t NUMBER_OF_SAMPLES_FULL_SCAN_MASTER{ 2750 };
+
+static constexpr double TIME_PER_SCAN_IN_S{ 0.03 };
+
+static constexpr double RANGE_MIN_IN_M{ 0. };
+static constexpr double RANGE_MAX_IN_M{ 10. };
+
+static constexpr double DEFAULT_X_AXIS_ROTATION(degreeToRadian(137.5));
+
+static std::string SCAN_FRAME_ID_SUFFIX{ "_scan" };
+}  // namespace constants
 
 }  // namespace psen_scan_v2
 #endif  // PSEN_SCAN_V2_DEFAULT_PARAMETERS_H

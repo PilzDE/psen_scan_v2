@@ -67,8 +67,6 @@ public:
   template <unsigned int N>
   void asyncSend(const udp::endpoint& receiver_of_data, const psen_scan_v2::FixedSizeRawData<N>& data);
 
-  void asyncSendEmpty(const udp::endpoint& receiver_of_data);
-
 private:
   void handleSend(const boost::system::error_code& error, std::size_t bytes_transferred);
   void handleReceive(const ReceiveMode& modi,
@@ -114,10 +112,11 @@ MockUDPServer::~MockUDPServer()
 
 void MockUDPServer::handleSend(const boost::system::error_code& error, std::size_t bytes_transferred)
 {
-  if (error || bytes_transferred == 0)
+  if (error)
   {
     std::cerr << "UDP server mock failed to send data. Error msg: " << error.message() << std::endl;
   }
+  std::cout << "MockUDPServer:: Data successfully send" << std::endl;
 }
 
 template <unsigned int N>
@@ -131,12 +130,6 @@ void MockUDPServer::asyncSend(const udp::endpoint& receiver_of_data, const psen_
                                       boost::asio::placeholders::error,
                                       boost::asio::placeholders::bytes_transferred));
   });
-}
-
-void MockUDPServer::asyncSendEmpty(const udp::endpoint& receiver_of_data)
-{
-  const psen_scan_v2::FixedSizeRawData<0> data;
-  asyncSend<0>(receiver_of_data, data);
 }
 
 void MockUDPServer::handleReceive(const ReceiveMode& modi,

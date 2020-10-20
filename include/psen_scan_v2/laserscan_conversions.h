@@ -22,7 +22,7 @@
 
 namespace psen_scan_v2
 {
-LaserScan toLaserScan(const MonitoringFrameMsg& frame)
+static LaserScan toLaserScan(const MonitoringFrameMsg& frame)
 {
   const auto resolution = frame.resolution();
   const auto min_angle = frame.fromTheta();

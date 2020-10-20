@@ -97,7 +97,7 @@ include_directories(
 )
 
 set(${PROJECT_NAME}_sources
-  src/controller_state_machine.cpp
+  src/scanner_v2.cpp
   src/laserscan.cpp
   src/monitoring_frame_msg.cpp
   src/start_request.cpp
@@ -114,6 +114,7 @@ set(${PROJECT_NAME}_node_sources
 add_library(${PROJECT_NAME} ${${PROJECT_NAME}_sources})
 target_link_libraries(${PROJECT_NAME}
   ${console_bridge_LIBRARIES}
+  ${rosfmt_LIBRARIES}
 )
 
 add_executable(${PROJECT_NAME}_node ${${PROJECT_NAME}_node_sources})
@@ -199,16 +200,6 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES}
   )
 
-  catkin_add_gmock(unittest_controller_state_machine
-    test/unit_tests/unittest_controller_state_machine.cpp
-    src/controller_state_machine.cpp
-    src/monitoring_frame_msg.cpp
-    src/diagnostics.cpp
-  )
-  target_link_libraries(unittest_controller_state_machine
-    ${catkin_LIBRARIES}
-  )
-
   catkin_add_gtest(unittest_scan_range
     test/unit_tests/unittest_scan_range.cpp
   )
@@ -221,17 +212,6 @@ if(CATKIN_ENABLE_TESTING)
     src/scanner_configuration.cpp
   )
   target_link_libraries(unittest_scanner_configuration
-    ${catkin_LIBRARIES}
-  )
-
-  catkin_add_gmock(unittest_scanner
-    test/unit_tests/unittest_scanner.cpp
-    src/scanner_configuration.cpp
-    src/laserscan.cpp
-    src/monitoring_frame_msg.cpp
-    src/diagnostics.cpp
-  )
-  target_link_libraries(unittest_scanner
     ${catkin_LIBRARIES}
   )
 
@@ -278,23 +258,6 @@ if(CATKIN_ENABLE_TESTING)
     src/diagnostics.cpp
   )
   target_link_libraries(unittest_laserscan_ros_conversions
-    ${catkin_LIBRARIES}
-  )
-
-  catkin_add_gmock(unittest_scanner_controller
-    test/unit_tests/unittest_scanner_controller.cpp
-    test/src/monitoring_frame_serialization.cpp
-    src/controller_state_machine.cpp
-    src/laserscan.cpp
-    src/monitoring_frame_msg.cpp
-    src/monitoring_frame_deserialization.cpp
-    src/scanner_configuration.cpp
-    src/start_request.cpp
-    src/stop_request.cpp
-    src/diagnostics.cpp
-  )
-
-  target_link_libraries(unittest_scanner_controller
     ${catkin_LIBRARIES}
   )
 
@@ -357,10 +320,17 @@ if(CATKIN_ENABLE_TESTING)
 catkin_add_gmock(integrationtest_scanner_api
   test/integration_tests/integrationtest_scanner_api.cpp
   test/src/monitoring_frame_serialization.cpp
+  src/scanner_v2.cpp
+  src/laserscan.cpp
+  src/monitoring_frame_msg.cpp
+  src/monitoring_frame_deserialization.cpp
+  src/scanner_configuration.cpp
+  src/start_request.cpp
+  src/stop_request.cpp
+  src/diagnostics.cpp
 )
 target_link_libraries(integrationtest_scanner_api
   ${catkin_LIBRARIES}
-  ${PROJECT_NAME}
   ${pilz_testutils_LIBRARIES}
   )
 
