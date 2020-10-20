@@ -73,16 +73,20 @@ DynamicSizeRawData serialize(const MonitoringFrameMsg& frame)
   return raw_processing::toArray<DynamicSizeRawData>(os);
 }
 
+constexpr size_t calculateIndexInRawDiagnosticData(const ScannerId& id, const ErrorLocation& location)
+{
+  return DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES +
+         (static_cast<uint8_t>(id) * DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES) + location.getByte();
+}
+
 RawDiagnosticMsg serializeDiagnosticMessages(const std::vector<MonitoringFrameDiagnosticMessage>& messages)
 {
   RawDiagnosticMsg raw_diagnostic_data{};
 
   for (const auto& elem : messages)
   {
-    raw_diagnostic_data.at(DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES +
-                           static_cast<uint8_t>(elem.getScannerId()) *
-                               DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES +
-                           elem.getErrorLocation().getByte()) += (1 << elem.getErrorLocation().getBit());
+    raw_diagnostic_data.at(calculateIndexInRawDiagnosticData(elem.getScannerId(), elem.getErrorLocation())) +=
+        (1 << elem.getErrorLocation().getBit());
   }
   return raw_diagnostic_data;
 }
