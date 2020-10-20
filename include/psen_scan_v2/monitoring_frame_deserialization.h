@@ -93,10 +93,13 @@ using MonitoringFrameAdditionalFieldHeaderLength = MonitoringFrameAdditionalFiel
 
 namespace monitoring_frame_additional_field_header_ids
 {
-static constexpr MonitoringFrameAdditionalFieldHeaderId SCAN_COUNTER{ 0x02 };
-static constexpr MonitoringFrameAdditionalFieldHeaderId MEASURES{ 0x05 };
-static constexpr MonitoringFrameAdditionalFieldHeaderId END_OF_FRAME{ 0x09 };
-static constexpr MonitoringFrameAdditionalFieldHeaderId DIAGNOSTICS{ 0x04 };
+enum class HeaderID : MonitoringFrameAdditionalFieldHeaderId
+{
+  SCAN_COUNTER = 0x02,
+  DIAGNOSTICS = 0x04,
+  MEASURES = 0x05,
+  END_OF_FRAME = 0x09
+};
 };  // namespace monitoring_frame_additional_field_header_ids
 
 MonitoringFrameMsg deserializeMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes);

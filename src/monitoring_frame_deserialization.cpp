@@ -61,9 +61,9 @@ MonitoringFrameMsg deserializeMonitoringFrame(const MaxSizeRawData& data, const 
   {
     const MonitoringFrameAdditionalFieldHeader additional_header{ readFieldHeader(is, num_bytes) };
 
-    switch (additional_header.id())
+    switch (static_cast<monitoring_frame_additional_field_header_ids::HeaderID>(additional_header.id()))
     {
-      case monitoring_frame_additional_field_header_ids::SCAN_COUNTER:
+      case monitoring_frame_additional_field_header_ids::HeaderID::SCAN_COUNTER:
         if (additional_header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
         {
           throw MonitoringFrameFormatErrorScanCounterUnexpectedSize(
@@ -74,18 +74,18 @@ MonitoringFrameMsg deserializeMonitoringFrame(const MaxSizeRawData& data, const 
         raw_processing::read(is, msg.scan_counter_);
         break;
 
-      case monitoring_frame_additional_field_header_ids::MEASURES:
+      case monitoring_frame_additional_field_header_ids::HeaderID::MEASURES:
         raw_processing::readArray<uint16_t, double>(is,
                                                     msg.measures_,
                                                     additional_header.length() / NUMBER_OF_BYTES_SINGLE_MEASURE,
                                                     [](uint16_t raw_element) { return raw_element / 1000.; });
         break;
 
-      case monitoring_frame_additional_field_header_ids::END_OF_FRAME:
+      case monitoring_frame_additional_field_header_ids::HeaderID::END_OF_FRAME:
         end_of_frame = true;
         break;
 
-      case monitoring_frame_additional_field_header_ids::DIAGNOSTICS:
+      case monitoring_frame_additional_field_header_ids::HeaderID::DIAGNOSTICS:
         msg.diagnostic_messages_ = deserializeDiagnosticMessages(is);
         msg.diagnostic_data_enabled_ = true;
         break;
