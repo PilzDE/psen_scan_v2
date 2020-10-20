@@ -32,26 +32,6 @@ static constexpr uint32_t ONLINE_WORKING_MODE{ 0x00 };
 static constexpr uint32_t GUI_MONITORING_TRANSACTION{ 0x05 };
 static constexpr uint16_t NUMBER_OF_BYTES_SCAN_COUNTER{ 4 };
 static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_MEASURE{ 2 };
-class AdditionalFieldHeader
-{
-public:
-  using Id = uint8_t;
-  using Length = uint16_t;
-
-public:
-  AdditionalFieldHeader(Id id, Length length);
-
-public:
-  Id id() const;
-  Length length() const;
-
-  static std::string idToString(Id id);
-
-private:
-  Id id_;
-  Length length_;
-};
-
 class FixedFields
 {
 public:
@@ -91,6 +71,26 @@ private:
 };
 namespace additional_field_header_ids
 {
+class AdditionalFieldHeader
+{
+public:
+  using Id = uint8_t;
+  using Length = uint16_t;
+
+public:
+  AdditionalFieldHeader(Id id, Length length);
+
+public:
+  Id id() const;
+  Length length() const;
+
+  static std::string idToString(Id id);
+
+private:
+  Id id_;
+  Length length_;
+};
+
 enum class HeaderID : AdditionalFieldHeader::Id
 {
   SCAN_COUNTER = 0x02,
@@ -98,11 +98,13 @@ enum class HeaderID : AdditionalFieldHeader::Id
   MEASURES = 0x05,
   END_OF_FRAME = 0x09
 };
-};  // namespace additional_field_header_ids
+
+}  // namespace additional_field_header_ids
 
 Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
 FixedFields readHeader(std::istringstream& is);
-AdditionalFieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes);
+additional_field_header_ids::AdditionalFieldHeader readFieldHeader(std::istringstream& is,
+                                                                   const std::size_t& max_num_bytes);
 std::vector<diagnostics::Message> deserializeDiagnosticMessages(std::istringstream& is);
 
 class FormatError : public std::runtime_error
@@ -126,12 +128,14 @@ inline FormatErrorScanCounterUnexpectedSize::FormatErrorScanCounterUnexpectedSiz
 {
 }
 
-inline AdditionalFieldHeader::Id AdditionalFieldHeader::id() const
+inline additional_field_header_ids::AdditionalFieldHeader::Id
+additional_field_header_ids::AdditionalFieldHeader::id() const
 {
   return id_;
 }
 
-inline AdditionalFieldHeader::Length AdditionalFieldHeader::length() const
+inline additional_field_header_ids::AdditionalFieldHeader::Length
+additional_field_header_ids::AdditionalFieldHeader::length() const
 {
   return length_;
 }

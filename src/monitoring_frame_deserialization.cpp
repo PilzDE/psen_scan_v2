@@ -23,7 +23,8 @@ namespace psen_scan_v2
 {
 namespace monitoring_frame
 {
-AdditionalFieldHeader::AdditionalFieldHeader(Id id, Length length) : id_(id), length_(length)
+additional_field_header_ids::AdditionalFieldHeader::AdditionalFieldHeader(Id id, Length length)
+  : id_(id), length_(length)
 {
 }
 
@@ -60,7 +61,7 @@ Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes)
   bool end_of_frame{ false };
   while (!end_of_frame)
   {
-    const AdditionalFieldHeader additional_header{ readFieldHeader(is, num_bytes) };
+    const additional_field_header_ids::AdditionalFieldHeader additional_header{ readFieldHeader(is, num_bytes) };
 
     switch (static_cast<additional_field_header_ids::HeaderID>(additional_header.id()))
     {
@@ -99,10 +100,11 @@ Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes)
   return msg;
 }
 
-AdditionalFieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes)
+additional_field_header_ids::AdditionalFieldHeader readFieldHeader(std::istringstream& is,
+                                                                   const std::size_t& max_num_bytes)
 {
-  AdditionalFieldHeader::Id id;
-  AdditionalFieldHeader::Length length;
+  additional_field_header_ids::AdditionalFieldHeader::Id id;
+  additional_field_header_ids::AdditionalFieldHeader::Length length;
   raw_processing::read(is, id);
   raw_processing::read(is, length);
 
@@ -115,7 +117,7 @@ AdditionalFieldHeader readFieldHeader(std::istringstream& is, const std::size_t&
   {
     length--;
   }
-  return AdditionalFieldHeader(id, length);
+  return additional_field_header_ids::AdditionalFieldHeader(id, length);
 }
 
 std::vector<diagnostics::Message> deserializeDiagnosticMessages(std::istringstream& is)

@@ -35,8 +35,9 @@ DynamicSizeRawData serialize(const Message& frame)
   raw_processing::write(os, frame.from_theta_.value());
   raw_processing::write(os, frame.resolution_.value());
 
-  AdditionalFieldHeader scan_counter_header(
-      static_cast<AdditionalFieldHeader::Id>(additional_field_header_ids::HeaderID::SCAN_COUNTER),
+  additional_field_header_ids::AdditionalFieldHeader scan_counter_header(
+      static_cast<additional_field_header_ids::AdditionalFieldHeader::Id>(
+          additional_field_header_ids::HeaderID::SCAN_COUNTER),
       sizeof(frame.scan_counter_));
   writeFieldHeader(os, scan_counter_header);
   uint32_t scan_counter_header_payload = frame.scan_counter_;
@@ -44,8 +45,9 @@ DynamicSizeRawData serialize(const Message& frame)
 
   if (frame.diagnostic_data_enabled_)
   {
-    AdditionalFieldHeader diagnostic_data_field_header(
-        static_cast<AdditionalFieldHeader::Id>(additional_field_header_ids::HeaderID::DIAGNOSTICS),
+    additional_field_header_ids::AdditionalFieldHeader diagnostic_data_field_header(
+        static_cast<additional_field_header_ids::AdditionalFieldHeader::Id>(
+            additional_field_header_ids::HeaderID::DIAGNOSTICS),
         diagnostics::raw_message::LENGTH_IN_BYTES);
     writeFieldHeader(os, diagnostic_data_field_header);
     diagnostics::raw_message::Type diagnostic_data_field_payload =
@@ -53,15 +55,17 @@ DynamicSizeRawData serialize(const Message& frame)
     raw_processing::write(os, diagnostic_data_field_payload);
   }
 
-  AdditionalFieldHeader measures_header(
-      static_cast<AdditionalFieldHeader::Id>(additional_field_header_ids::HeaderID::MEASURES),
+  additional_field_header_ids::AdditionalFieldHeader measures_header(
+      static_cast<additional_field_header_ids::AdditionalFieldHeader::Id>(
+          additional_field_header_ids::HeaderID::MEASURES),
       frame.measures_.size() * NUMBER_OF_BYTES_SINGLE_MEASURE);
   writeFieldHeader(os, measures_header);
   raw_processing::writeArray<uint16_t, double>(
       os, frame.measures_, [](double elem) { return (static_cast<uint16_t>(std::round(elem * 1000.))); });
 
-  AdditionalFieldHeader::Id end_of_frame_header_id =
-      static_cast<AdditionalFieldHeader::Id>(additional_field_header_ids::HeaderID::END_OF_FRAME);
+  additional_field_header_ids::AdditionalFieldHeader::Id end_of_frame_header_id =
+      static_cast<additional_field_header_ids::AdditionalFieldHeader::Id>(
+          additional_field_header_ids::HeaderID::END_OF_FRAME);
   raw_processing::write(os, end_of_frame_header_id);
 
   uint8_t unknown_data_at_the_end_of_frame = 0;
@@ -93,10 +97,10 @@ raw_message::Type serializeMessages(const std::vector<Message>& messages)
 }
 }  // namespace diagnostics
 
-void writeFieldHeader(std::ostringstream& os, const AdditionalFieldHeader& header)
+void writeFieldHeader(std::ostringstream& os, const additional_field_header_ids::AdditionalFieldHeader& header)
 {
   raw_processing::write(os, header.id());
-  raw_processing::write<AdditionalFieldHeader::Length>(os, header.length() + 1);
+  raw_processing::write<additional_field_header_ids::AdditionalFieldHeader::Length>(os, header.length() + 1);
 }
 
 }  // namespace monitoring_frame

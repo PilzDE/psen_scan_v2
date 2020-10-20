@@ -31,7 +31,8 @@ namespace diagnostics
 {
 raw_message::Type serializeMessages(const std::vector<Message>& messages);
 }  // namespace diagnostics
-void writeFieldHeader(std::ostringstream& os, const monitoring_frame::AdditionalFieldHeader& header);
+void writeFieldHeader(std::ostringstream& os,
+                      const monitoring_frame::additional_field_header_ids::AdditionalFieldHeader& header);
 }  // namespace monitoring_frame
 }  // namespace psen_scan_v2
 
