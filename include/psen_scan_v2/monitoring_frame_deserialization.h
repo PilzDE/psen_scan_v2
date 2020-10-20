@@ -87,13 +87,9 @@ private:
   FromTheta from_theta_;
   Resolution resolution_;
 };
-
-using MonitoringFrameAdditionalFieldHeaderId = MonitoringFrameAdditionalFieldHeader::Id;
-using MonitoringFrameAdditionalFieldHeaderLength = MonitoringFrameAdditionalFieldHeader::Length;
-
 namespace monitoring_frame_additional_field_header_ids
 {
-enum class HeaderID : MonitoringFrameAdditionalFieldHeaderId
+enum class HeaderID : MonitoringFrameAdditionalFieldHeader::Id
 {
   SCAN_COUNTER = 0x02,
   DIAGNOSTICS = 0x04,
@@ -134,7 +130,7 @@ inline MonitoringFrameAdditionalFieldHeader::Id MonitoringFrameAdditionalFieldHe
   return id_;
 }
 
-inline MonitoringFrameAdditionalFieldHeaderLength MonitoringFrameAdditionalFieldHeader::length() const
+inline MonitoringFrameAdditionalFieldHeader::Length MonitoringFrameAdditionalFieldHeader::length() const
 {
   return length_;
 }

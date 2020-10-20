@@ -34,7 +34,7 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
   raw_processing::write(os, frame.resolution_.value());
 
   MonitoringFrameAdditionalFieldHeader scan_counter_header(
-      static_cast<MonitoringFrameAdditionalFieldHeaderId>(
+      static_cast<MonitoringFrameAdditionalFieldHeader::Id>(
           monitoring_frame_additional_field_header_ids::HeaderID::SCAN_COUNTER),
       sizeof(frame.scan_counter_));
   writeFieldHeader(os, scan_counter_header);
@@ -44,7 +44,7 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
   if (frame.diagnostic_data_enabled_)
   {
     MonitoringFrameAdditionalFieldHeader diagnostic_data_field_header(
-        static_cast<MonitoringFrameAdditionalFieldHeaderId>(
+        static_cast<MonitoringFrameAdditionalFieldHeader::Id>(
             monitoring_frame_additional_field_header_ids::HeaderID::DIAGNOSTICS),
         DIAGNOSTIC_DATA_LENGTH_IN_BYTES);
     writeFieldHeader(os, diagnostic_data_field_header);
@@ -53,15 +53,16 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
   }
 
   MonitoringFrameAdditionalFieldHeader measures_header(
-      static_cast<MonitoringFrameAdditionalFieldHeaderId>(
+      static_cast<MonitoringFrameAdditionalFieldHeader::Id>(
           monitoring_frame_additional_field_header_ids::HeaderID::MEASURES),
       frame.measures_.size() * NUMBER_OF_BYTES_SINGLE_MEASURE);
   writeFieldHeader(os, measures_header);
   raw_processing::writeArray<uint16_t, double>(
       os, frame.measures_, [](double elem) { return (static_cast<uint16_t>(std::round(elem * 1000.))); });
 
-  MonitoringFrameAdditionalFieldHeader::Id end_of_frame_header_id = static_cast<MonitoringFrameAdditionalFieldHeaderId>(
-      monitoring_frame_additional_field_header_ids::HeaderID::END_OF_FRAME);
+  MonitoringFrameAdditionalFieldHeader::Id end_of_frame_header_id =
+      static_cast<MonitoringFrameAdditionalFieldHeader::Id>(
+          monitoring_frame_additional_field_header_ids::HeaderID::END_OF_FRAME);
   raw_processing::write(os, end_of_frame_header_id);
 
   uint8_t unknown_data_at_the_end_of_frame = 0;

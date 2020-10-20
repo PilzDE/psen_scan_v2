@@ -100,8 +100,8 @@ MonitoringFrameMsg deserializeMonitoringFrame(const MaxSizeRawData& data, const 
 
 MonitoringFrameAdditionalFieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes)
 {
-  MonitoringFrameAdditionalFieldHeaderId id;
-  MonitoringFrameAdditionalFieldHeaderLength length;
+  MonitoringFrameAdditionalFieldHeader::Id id;
+  MonitoringFrameAdditionalFieldHeader::Length length;
   raw_processing::read(is, id);
   raw_processing::read(is, length);
 
