@@ -29,34 +29,32 @@
 #include "psen_scan_v2/logging.h"
 namespace psen_scan_v2
 {
-using namespace monitoring_frame;
-
-TenthOfDegree Message::fromTheta() const
+TenthOfDegree monitoring_frame::Message::fromTheta() const
 {
   return from_theta_;
 }
 
-TenthOfDegree Message::resolution() const
+TenthOfDegree monitoring_frame::Message::resolution() const
 {
   return resolution_;
 }
 
-uint32_t Message::scanCounter() const
+uint32_t monitoring_frame::Message::scanCounter() const
 {
   return scan_counter_;
 }
 
-std::vector<double> Message::measures() const
+std::vector<double> monitoring_frame::Message::measures() const
 {
   return measures_;
 }
 
-std::vector<MonitoringFrameDiagnosticMessage> Message::diagnosticMessages() const
+std::vector<monitoring_frame::MonitoringFrameDiagnosticMessage> monitoring_frame::Message::diagnosticMessages() const
 {
   return diagnostic_messages_;
 }
 
-bool Message::operator==(const Message& rhs) const
+bool monitoring_frame::Message::operator==(const Message& rhs) const
 {
   return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
           measures() == rhs.measures() && diagnosticMessages() == rhs.diagnosticMessages());
