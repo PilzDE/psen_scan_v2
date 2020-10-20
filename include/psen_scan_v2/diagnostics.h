@@ -122,21 +122,21 @@ static const std::map<DiagnosticCode, ErrorMessage> error_code_to_string
 class ErrorLocation
 {
 public:
-  using byteLocation = size_t;
-  using bitLocation = size_t;
-  constexpr ErrorLocation(byteLocation byte, bitLocation bit) : byte_(byte), bit_(bit){};
-  inline constexpr byteLocation getByte() const
+  using ByteLocation = size_t;
+  using BitLocation = size_t;
+  constexpr ErrorLocation(const ByteLocation& byte, const BitLocation& bit) : byte_(byte), bit_(bit){};
+  inline constexpr ByteLocation getByte() const
   {
     return byte_;
   };
-  inline constexpr bitLocation getBit() const
+  inline constexpr BitLocation getBit() const
   {
     return bit_;
   };
 
 private:
-  byteLocation byte_;
-  bitLocation bit_;
+  ByteLocation byte_;
+  BitLocation bit_;
 };
 
 class MonitoringFrameDiagnosticMessage
