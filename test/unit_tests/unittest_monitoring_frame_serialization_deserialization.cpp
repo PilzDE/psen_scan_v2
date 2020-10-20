@@ -127,8 +127,9 @@ TEST(MonitoringFrameSerializationDiagnosticMessagesTest, shouldSetCorrectBitInSe
                                                                       monitoring_frame::ErrorLocation(5, 3) } };
   auto diagnostic_data_serialized = monitoring_frame::serializeDiagnosticMessages(diagnostic_data);
 
-  EXPECT_EQ(diagnostic_data_serialized.size(), monitoring_frame::RAW_DIAGNOSTIC_MESSAGE_LENGTH_IN_BYTES);
-  EXPECT_EQ(diagnostic_data_serialized.at(monitoring_frame::RAW_DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES + 5), 0b1000);
+  EXPECT_EQ(diagnostic_data_serialized.size(), monitoring_frame::raw_diagnostic_message::LENGTH_IN_BYTES);
+  EXPECT_EQ(diagnostic_data_serialized.at(monitoring_frame::raw_diagnostic_message::UNUSED_OFFSET_IN_BYTES + 5),
+            0b1000);
 }
 
 TEST(MonitoringFrameDeserializationFieldHeaderTest, shouldGetIdAndLengthCorrectly)

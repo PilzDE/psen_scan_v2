@@ -31,14 +31,14 @@ namespace psen_scan_v2
 {
 namespace monitoring_frame
 {
-static constexpr uint32_t RAW_DIAGNOSTIC_MESSAGE_LENGTH_FOR_ONE_DEVICE_IN_BYTES{ 9 };
-static constexpr uint32_t RAW_DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES{ 4 };
-static constexpr uint32_t RAW_DIAGNOSTIC_MESSAGE_LENGTH_IN_BYTES{
-  RAW_DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES +
-  RAW_DIAGNOSTIC_MESSAGE_LENGTH_FOR_ONE_DEVICE_IN_BYTES * VALID_SCANNER_IDS.size()
-};
-
-using RawDiagnosticMsg = std::array<uint8_t, RAW_DIAGNOSTIC_MESSAGE_LENGTH_IN_BYTES>;
+namespace raw_diagnostic_message
+{
+static constexpr uint32_t LENGTH_FOR_ONE_DEVICE_IN_BYTES{ 9 };
+static constexpr uint32_t UNUSED_OFFSET_IN_BYTES{ 4 };
+static constexpr uint32_t LENGTH_IN_BYTES{ UNUSED_OFFSET_IN_BYTES +
+                                           LENGTH_FOR_ONE_DEVICE_IN_BYTES * VALID_SCANNER_IDS.size() };
+}  // namespace raw_diagnostic_message
+using RawDiagnosticMsg = std::array<uint8_t, raw_diagnostic_message::LENGTH_IN_BYTES>;
 
 enum class DiagnosticCode
 {
