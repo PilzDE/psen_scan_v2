@@ -19,7 +19,7 @@ using namespace psen_scan_v2;
 
 namespace psen_scan_v2
 {
-MonitoringFrameDiagnosticMessage::MonitoringFrameDiagnosticMessage(ScannerId id, ErrorLocation location)
+MonitoringFrameDiagnosticMessage::MonitoringFrameDiagnosticMessage(const ScannerId& id, const ErrorLocation& location)
   : id_(id), error_location_(location)
 {
 }

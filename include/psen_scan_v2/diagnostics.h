@@ -64,7 +64,6 @@ enum class DiagnosticCode
   OUT_OF_RANGE_ERR,
   TEMP_RANGE_ERR,
   ENCODER_GENERIC_ERR,
-  _,
   UNUSED
 };
 
@@ -100,7 +99,7 @@ static const std::map<DiagnosticCode, ErrorMessage> error_code_to_string
   { Dc::OUT_OF_RANGE_ERR, "Out of range error." },
   { Dc::TEMP_RANGE_ERR, "Temperature out of range." },
   { Dc::ENCODER_GENERIC_ERR, "Encoder: Generic error." },
-  { Dc::_, "Unexpected error" } \
+  { Dc::UNUSED, "Unexpected error" } \
 };
 
 // clang-format off
@@ -109,11 +108,11 @@ static const std::map<DiagnosticCode, ErrorMessage> error_code_to_string
   static constexpr std::array<std::array<DiagnosticCode, 8>, 9> error_bits{{
   //Bit7                 Bit6              Bit5              Bit4              Bit3              Bit2                  Bit1                   Bit0
   { REV(Dc::OSSD1_OC,    Dc::OSSD_SHRT_C,  Dc::OSSD_INTEGR,  Dc::INT,          Dc::INT,          Dc::INT,              Dc::INT,               Dc::INT) },
-  { REV(Dc::WIN_CLN_AL,  Dc::POWER_SUPPLY, Dc::NETW_PRB,     Dc::DUST_CRC_FL,  Dc::INT,          Dc::INT,              Dc::_,                 Dc::OSSD2_OVERCUR) },
+  { REV(Dc::WIN_CLN_AL,  Dc::POWER_SUPPLY, Dc::NETW_PRB,     Dc::DUST_CRC_FL,  Dc::INT,          Dc::INT,              Dc::UNUSED,            Dc::OSSD2_OVERCUR) },
   { REV(Dc::MEAS_PROB,   Dc::INT,          Dc::INT,          Dc::INT,          Dc::INCOHERENCE,  Dc::ZONE_INVAL_TRANS, Dc::ZONE_INVALID_CONF, Dc::WIN_CLN_WARN) },
   { REV(Dc::INT_COM_PRB, Dc::INT,          Dc::INT,          Dc::GENERIC_ERR,  Dc::DISP_COM_PRB, Dc::INT,              Dc::INT,               Dc::TEMP_MEAS_PROB) },
-  { REV(Dc::ENCOD_OOR,   Dc::_,            Dc::_,            Dc::EDM2_ERR,     Dc::EDM1_ERR,     Dc::CONF_ERR,         Dc::OUT_OF_RANGE_ERR,  Dc::TEMP_RANGE_ERR) },
-  { REV(Dc::_,           Dc::_,            Dc::_,            Dc::_,            Dc::_,            Dc::_,                Dc::_,                 Dc::ENCODER_GENERIC_ERR) },
+  { REV(Dc::ENCOD_OOR,   Dc::UNUSED,       Dc::UNUSED,       Dc::EDM2_ERR,     Dc::EDM1_ERR,     Dc::CONF_ERR,         Dc::OUT_OF_RANGE_ERR,  Dc::TEMP_RANGE_ERR) },
+  { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::ENCODER_GENERIC_ERR) },
   { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::UNUSED) },
   { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::UNUSED) },
   { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::UNUSED) },
@@ -123,43 +122,43 @@ static const std::map<DiagnosticCode, ErrorMessage> error_code_to_string
 class ErrorLocation
 {
 public:
-  using byteLocation = size_t;
-  using bitLocation = size_t;
-  ErrorLocation(byteLocation byte, bitLocation bit) : byte_(byte), bit_(bit){};
-  inline byteLocation getByte() const
+  using ByteLocation = size_t;
+  using BitLocation = size_t;
+  constexpr ErrorLocation(const ByteLocation& byte, const BitLocation& bit) : byte_(byte), bit_(bit){};
+  inline constexpr ByteLocation getByte() const
   {
     return byte_;
   };
-  inline bitLocation getBit() const
+  inline constexpr BitLocation getBit() const
   {
     return bit_;
   };
 
 private:
-  byteLocation byte_;
-  bitLocation bit_;
+  ByteLocation byte_;
+  BitLocation bit_;
 };
 
 class MonitoringFrameDiagnosticMessage
 {
 public:
-  MonitoringFrameDiagnosticMessage(ScannerId id, ErrorLocation location);
+  MonitoringFrameDiagnosticMessage(const ScannerId& id, const ErrorLocation& location);
 
   bool operator==(const MonitoringFrameDiagnosticMessage& rhs) const;
 
   friend RawDiagnosticMsg serializeDiagnosticMessages(const std::vector<MonitoringFrameDiagnosticMessage>& messages);
 
-  ScannerId getScannerId() const
+  constexpr ScannerId getScannerId() const
   {
     return id_;
   }
 
-  ErrorLocation getErrorLocation() const
+  constexpr ErrorLocation getErrorLocation() const
   {
     return error_location_;
   }
 
-  DiagnosticCode getDiagnosticCode() const
+  constexpr DiagnosticCode getDiagnosticCode() const
   {
     return error_bits.at(error_location_.getByte()).at(error_location_.getBit());
   }
@@ -170,7 +169,7 @@ private:
 };
 
 // Store ambiguous errors for additional output
-static const std::set<Dc> ambiguous_diagnostic_codes = { Dc::_, Dc::UNUSED, Dc::INT };
+static const std::set<Dc> ambiguous_diagnostic_codes = { Dc::UNUSED, Dc::INT };
 
 inline bool isAmbiguous(const DiagnosticCode& code)
 {

@@ -94,7 +94,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameWithDia
 
 TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstructedFrameWithDiagnosticsConsistently)
 {
-  std::array<ErrorLocation, 3> error_locations = { ErrorLocation(0, 0), ErrorLocation(5, 3), ErrorLocation(4, 7) };
+  std::array<ErrorLocation, 3> error_locations = { ErrorLocation(0, 0), ErrorLocation(5, 0), ErrorLocation(4, 7) };
 
   for (const auto& elem : error_locations)
   {
@@ -115,11 +115,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstruc
 
   MonitoringFrameMsg deserialized_msg = deserializeMonitoringFrame(convertToMaxSizeRawData(raw), raw.size());
 
-  // TODO: The following throws an exception "map::at" if the messages differ. Inspect problem and report to googletest
-  // if necessary
-  // EXPECT_EQ(msg, deserialized_msg);
-
-  EXPECT_TRUE(msg == deserialized_msg);
+  EXPECT_EQ(msg, deserialized_msg);
 }
 
 TEST(MonitoringFrameSerializationDiagnosticMessagesTest, shouldSetCorrectBitInSerializedDiagnosticData)
