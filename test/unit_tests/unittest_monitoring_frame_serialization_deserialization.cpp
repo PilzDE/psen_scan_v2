@@ -123,8 +123,8 @@ TEST(MonitoringFrameSerializationDiagnosticMessagesTest, shouldSetCorrectBitInSe
   std::vector<MonitoringFrameDiagnosticMessage> diagnostic_data{ { ScannerId::MASTER, ErrorLocation(5, 3) } };
   auto diagnostic_data_serialized = serializeDiagnosticMessages(diagnostic_data);
 
-  EXPECT_EQ(diagnostic_data_serialized.size(), DIAGNOSTIC_DATA_LENGTH_IN_BYTES);
-  EXPECT_EQ(diagnostic_data_serialized.at(DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES + 5), 0b1000);
+  EXPECT_EQ(diagnostic_data_serialized.size(), RAW_DIAGNOSTIC_MESSAGE_LENGTH_IN_BYTES);
+  EXPECT_EQ(diagnostic_data_serialized.at(RAW_DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES + 5), 0b1000);
 }
 
 TEST(MonitoringFrameDeserializationFieldHeaderTest, shouldGetIdAndLengthCorrectly)

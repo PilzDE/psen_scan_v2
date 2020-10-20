@@ -46,7 +46,7 @@ DynamicSizeRawData serialize(const MonitoringFrameMsg& frame)
     MonitoringFrameAdditionalFieldHeader diagnostic_data_field_header(
         static_cast<MonitoringFrameAdditionalFieldHeader::Id>(
             monitoring_frame_additional_field_header_ids::HeaderID::DIAGNOSTICS),
-        DIAGNOSTIC_DATA_LENGTH_IN_BYTES);
+        RAW_DIAGNOSTIC_MESSAGE_LENGTH_IN_BYTES);
     writeFieldHeader(os, diagnostic_data_field_header);
     RawDiagnosticMsg diagnostic_data_field_payload = serializeDiagnosticMessages(frame.diagnostic_messages_);
     raw_processing::write(os, diagnostic_data_field_payload);
@@ -75,8 +75,8 @@ DynamicSizeRawData serialize(const MonitoringFrameMsg& frame)
 
 constexpr size_t calculateIndexInRawDiagnosticData(const ScannerId& id, const ErrorLocation& location)
 {
-  return DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES +
-         (static_cast<uint8_t>(id) * DIAGNOSTIC_MESSAGE_RAW_LENGTH_FOR_ONE_DEVICE_IN_BYTES) + location.getByte();
+  return RAW_DIAGNOSTIC_MESSAGE_UNUSED_OFFSET_IN_BYTES +
+         (static_cast<uint8_t>(id) * RAW_DIAGNOSTIC_MESSAGE_LENGTH_FOR_ONE_DEVICE_IN_BYTES) + location.getByte();
 }
 
 RawDiagnosticMsg serializeDiagnosticMessages(const std::vector<MonitoringFrameDiagnosticMessage>& messages)
