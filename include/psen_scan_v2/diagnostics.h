@@ -64,7 +64,6 @@ enum class DiagnosticCode
   OUT_OF_RANGE_ERR,
   TEMP_RANGE_ERR,
   ENCODER_GENERIC_ERR,
-  _,
   UNUSED
 };
 
@@ -100,7 +99,7 @@ static const std::map<DiagnosticCode, ErrorMessage> error_code_to_string
   { Dc::OUT_OF_RANGE_ERR, "Out of range error." },
   { Dc::TEMP_RANGE_ERR, "Temperature out of range." },
   { Dc::ENCODER_GENERIC_ERR, "Encoder: Generic error." },
-  { Dc::_, "Unexpected error" } \
+  { Dc::UNUSED, "Unexpected error" } \
 };
 
 // clang-format off
@@ -109,11 +108,11 @@ static const std::map<DiagnosticCode, ErrorMessage> error_code_to_string
   static constexpr std::array<std::array<DiagnosticCode, 8>, 9> error_bits{{
   //Bit7                 Bit6              Bit5              Bit4              Bit3              Bit2                  Bit1                   Bit0
   { REV(Dc::OSSD1_OC,    Dc::OSSD_SHRT_C,  Dc::OSSD_INTEGR,  Dc::INT,          Dc::INT,          Dc::INT,              Dc::INT,               Dc::INT) },
-  { REV(Dc::WIN_CLN_AL,  Dc::POWER_SUPPLY, Dc::NETW_PRB,     Dc::DUST_CRC_FL,  Dc::INT,          Dc::INT,              Dc::_,                 Dc::OSSD2_OVERCUR) },
+  { REV(Dc::WIN_CLN_AL,  Dc::POWER_SUPPLY, Dc::NETW_PRB,     Dc::DUST_CRC_FL,  Dc::INT,          Dc::INT,              Dc::UNUSED,            Dc::OSSD2_OVERCUR) },
   { REV(Dc::MEAS_PROB,   Dc::INT,          Dc::INT,          Dc::INT,          Dc::INCOHERENCE,  Dc::ZONE_INVAL_TRANS, Dc::ZONE_INVALID_CONF, Dc::WIN_CLN_WARN) },
   { REV(Dc::INT_COM_PRB, Dc::INT,          Dc::INT,          Dc::GENERIC_ERR,  Dc::DISP_COM_PRB, Dc::INT,              Dc::INT,               Dc::TEMP_MEAS_PROB) },
-  { REV(Dc::ENCOD_OOR,   Dc::_,            Dc::_,            Dc::EDM2_ERR,     Dc::EDM1_ERR,     Dc::CONF_ERR,         Dc::OUT_OF_RANGE_ERR,  Dc::TEMP_RANGE_ERR) },
-  { REV(Dc::_,           Dc::_,            Dc::_,            Dc::_,            Dc::_,            Dc::_,                Dc::_,                 Dc::ENCODER_GENERIC_ERR) },
+  { REV(Dc::ENCOD_OOR,   Dc::UNUSED,       Dc::UNUSED,       Dc::EDM2_ERR,     Dc::EDM1_ERR,     Dc::CONF_ERR,         Dc::OUT_OF_RANGE_ERR,  Dc::TEMP_RANGE_ERR) },
+  { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::ENCODER_GENERIC_ERR) },
   { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::UNUSED) },
   { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::UNUSED) },
   { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::UNUSED) },
@@ -170,7 +169,7 @@ private:
 };
 
 // Store ambiguous errors for additional output
-static const std::set<Dc> ambiguous_diagnostic_codes = { Dc::_, Dc::UNUSED, Dc::INT };
+static const std::set<Dc> ambiguous_diagnostic_codes = { Dc::UNUSED, Dc::INT };
 
 inline bool isAmbiguous(const DiagnosticCode& code)
 {
