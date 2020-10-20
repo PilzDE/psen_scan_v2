@@ -20,14 +20,14 @@ using namespace psen_scan_v2;
 namespace psen_scan_v2
 {
 MonitoringFrameDiagnosticMessage::MonitoringFrameDiagnosticMessage(ScannerId id, ErrorLocation location)
-  : id_(id), code_(error_bits.at(location.getByte()).at(location.getBit())), error_location_(location)
+  : id_(id), error_location_(location)
 {
 }
 
 bool MonitoringFrameDiagnosticMessage::operator==(const MonitoringFrameDiagnosticMessage& rhs) const
 {
   return (error_location_.getBit() == rhs.error_location_.getBit() &&
-          error_location_.getByte() == rhs.error_location_.getByte() && code_ == rhs.code_ && id_ == rhs.id_);
+          error_location_.getByte() == rhs.error_location_.getByte() && id_ == rhs.id_);
 }
 
 std::ostream& operator<<(std::ostream& os, const MonitoringFrameDiagnosticMessage& msg)

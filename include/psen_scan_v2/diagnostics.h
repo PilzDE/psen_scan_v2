@@ -68,56 +68,6 @@ enum class DiagnosticCode
   UNUSED
 };
 
-class ErrorLocation
-{
-public:
-  using Byte_Location = size_t;
-  using Bit_Location = size_t;
-  ErrorLocation(Byte_Location byte, Bit_Location bit) : byte_(byte), bit_(bit){};
-  inline Byte_Location getByte() const
-  {
-    return byte_;
-  };
-  inline Bit_Location getBit() const
-  {
-    return bit_;
-  };
-
-private:
-  Byte_Location byte_;
-  Bit_Location bit_;
-};
-
-class MonitoringFrameDiagnosticMessage
-{
-public:
-  MonitoringFrameDiagnosticMessage(ScannerId id, ErrorLocation location_);
-
-  bool operator==(const MonitoringFrameDiagnosticMessage& rhs) const;
-
-  friend RawDiagnosticMsg serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnosticMessage>& messages);
-
-  ScannerId getScannerId() const
-  {
-    return id_;
-  }
-
-  DiagnosticCode getDiagnosticCode() const
-  {
-    return code_;
-  }
-
-  ErrorLocation getErrorLocation() const
-  {
-    return error_location_;
-  }
-
-private:
-  ScannerId id_;
-  DiagnosticCode code_;
-  ErrorLocation error_location_;
-};
-
 // clang-format off
 
 using Dc = DiagnosticCode;
@@ -169,6 +119,55 @@ static const std::map<DiagnosticCode, ErrorMessage> error_code_to_string
   { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::UNUSED) },
   }};
 // clang-format on
+
+class ErrorLocation
+{
+public:
+  using Byte_Location = size_t;
+  using Bit_Location = size_t;
+  ErrorLocation(Byte_Location byte, Bit_Location bit) : byte_(byte), bit_(bit){};
+  inline Byte_Location getByte() const
+  {
+    return byte_;
+  };
+  inline Bit_Location getBit() const
+  {
+    return bit_;
+  };
+
+private:
+  Byte_Location byte_;
+  Bit_Location bit_;
+};
+
+class MonitoringFrameDiagnosticMessage
+{
+public:
+  MonitoringFrameDiagnosticMessage(ScannerId id, ErrorLocation location);
+
+  bool operator==(const MonitoringFrameDiagnosticMessage& rhs) const;
+
+  friend RawDiagnosticMsg serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnosticMessage>& messages);
+
+  ScannerId getScannerId() const
+  {
+    return id_;
+  }
+
+  ErrorLocation getErrorLocation() const
+  {
+    return error_location_;
+  }
+
+  DiagnosticCode getDiagnosticCode() const
+  {
+    return error_bits.at(error_location_.getByte()).at(error_location_.getBit());
+  }
+
+private:
+  ScannerId id_;
+  ErrorLocation error_location_;
+};
 
 // Store ambiguous errors for additional output
 static const std::set<Dc> ambiguous_diagnostic_codes = { Dc::_, Dc::UNUSED, Dc::INT };
