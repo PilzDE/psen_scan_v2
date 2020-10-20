@@ -92,7 +92,7 @@ public:
 public:
   void sendStartReply();
   void sendStopReply();
-  void sendMonitoringFrame(MonitoringFrameMsg& msg);
+  void sendMonitoringFrame(const MonitoringFrameMsg& msg);
 
 private:
   void sendReply(const uint32_t reply_type);
@@ -136,7 +136,7 @@ void ScannerMock::sendStopReply()
   sendReply(getOpCodeValue(ScannerReplyMsgType::Stop));
 }
 
-void ScannerMock::sendMonitoringFrame(MonitoringFrameMsg& msg)
+void ScannerMock::sendMonitoringFrame(const MonitoringFrameMsg& msg)
 {
   DynamicSizeRawData dynamic_raw_scan = serialize(msg);
   MaxSizeRawData max_size_raw_data = convertToMaxSizeRawData(dynamic_raw_scan);

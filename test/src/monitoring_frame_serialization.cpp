@@ -21,7 +21,7 @@
 
 namespace psen_scan_v2
 {
-DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
+DynamicSizeRawData serialize(const MonitoringFrameMsg& frame)
 {
   std::ostringstream os;
 

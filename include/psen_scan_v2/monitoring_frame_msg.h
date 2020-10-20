@@ -87,7 +87,7 @@ private:
   bool diagnostic_data_enabled_{ false };
 
 public:
-  friend DynamicSizeRawData serialize(MonitoringFrameMsg& frame);
+  friend DynamicSizeRawData serialize(const MonitoringFrameMsg& frame);
   friend MonitoringFrameMsg deserializeMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes);
 };
 
