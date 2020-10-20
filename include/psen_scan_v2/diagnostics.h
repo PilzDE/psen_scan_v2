@@ -120,10 +120,10 @@ private:
 
 // clang-format off
 
-typedef DiagnosticCode Dc;
-using ErrorCodeName = std::string;
+using Dc = DiagnosticCode;
+using ErrorMessage = std::string;
 
-static const std::map<DiagnosticCode, ErrorCodeName> error_code_to_string
+static const std::map<DiagnosticCode, ErrorMessage> error_code_to_string
 {
   { Dc::OSSD1_OC, "OSSD1 Overcurrent / Short circuit." },
   { Dc::OSSD_SHRT_C, "Short circuit between at least two OSSDs." },

@@ -68,8 +68,7 @@ DynamicSizeRawData serialize(MonitoringFrameMsg& frame)
 
 RawDiagnosticMsg serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnosticMessage>& messages)
 {
-  RawDiagnosticMsg raw_diagnostic_data;
-  raw_diagnostic_data.fill(0);
+  RawDiagnosticMsg raw_diagnostic_data{};
 
   for (const auto& elem : messages)
   {
