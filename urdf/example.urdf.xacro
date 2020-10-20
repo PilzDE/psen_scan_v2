@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="psen_scan">
+  <!-- Example on how to use the psen_scan scanner within your robots urdf -->
+  <xacro:arg name="prefix" default="laser_1"/>
+
+  <xacro:include filename="$(find psen_scan_v2)/urdf/psen_scan.urdf.xacro" />
+
+  <xacro:psen_scan prefix="$(arg prefix)" />
+</robot>

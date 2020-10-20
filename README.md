@@ -81,8 +81,8 @@ UDP Port used to send commands (start/stop) and receive the corresponding replie
 _sensor_ip_ (_string_, default: "192.168.0.10")<br/>
 IP-Address of safety laser scanner.
 
-_frame_id_ (_string_, default: "scanner")<br/>
-Identifier used for transformations within ROS environment.
+_prefix_ (_string_, default: "laser_1")<br/>
+Name of this scanner that can be changed to differentiate between multiple units.
 
 _angle_start_ (_double_, default: -2.40 (= -137.5 deg))<br/>
 Start angle of measurement. (Radian)
@@ -99,6 +99,23 @@ If you wish to set parameters from the command line, add them to the end of the 
 roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10 host_ip:=192.168.0.20 host_udp_port_data:=3050
 ```
 This example configures the safety laser scanner at 192.168.0.10 to send it´s frames to 192.168.0.20:3050.
+
+## TF Frames
+The location of the TF frames is shown in the image below.
+These names are defined by the aforementioned launchfile parameter `prefix`.
+Changing them is necessary for instance when running multiple scanners.
+<p align="center">
+<img src="img/frames.png" width="800px" alt="PILZ safety laser scanner frames" title="frames">
+</p>
+
+## Defining the scan range
+You can adjust the scan field to your needs by changing _angle_start_ and _angle_end_.
+The published ([sensor_msgs/LaserScan][]) will only contain data within the given angle limits.
+Both limits are defined within the _laser_1_scan_ frame as shown in the image below.
+
+<p align="center">
+<img src="img/angle_limits.png" width="800px" alt="Limit visualization" title="Limit visualization">
+</p>
 
 ### Adjust expert parameters
 If you've created an application package with your own launch file as described in the
