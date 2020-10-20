@@ -80,7 +80,7 @@ RawDiagnosticMsg serializeDiagnosticMessages(std::vector<MonitoringFrameDiagnost
   return raw_diagnostic_data;
 }
 
-void writeFieldHeader(std::ostringstream& os, MonitoringFrameAdditionalFieldHeader& header)
+void writeFieldHeader(std::ostringstream& os, const MonitoringFrameAdditionalFieldHeader& header)
 {
   raw_processing::write(os, header.id());
   raw_processing::write<MonitoringFrameAdditionalFieldHeader::Length>(os, header.length() + 1);
