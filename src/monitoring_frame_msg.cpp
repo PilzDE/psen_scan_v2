@@ -23,6 +23,7 @@
 
 #include <fmt/core.h>
 #include <fmt/ostream.h>
+#include <fmt/ranges.h>
 
 #include "psen_scan_v2/diagnostics.h"
 #include "psen_scan_v2/angle_conversions.h"
