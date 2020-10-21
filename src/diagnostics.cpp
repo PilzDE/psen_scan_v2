@@ -21,7 +21,7 @@ namespace psen_scan_v2
 {
 namespace monitoring_frame
 {
-namespace diagnostics
+namespace diagnostic
 {
 std::ostream& operator<<(std::ostream& os, const Message& msg)
 {
@@ -36,6 +36,6 @@ std::ostream& operator<<(std::ostream& os, const Message& msg)
   return os;
 }
 
-}  // namespace diagnostics
+}  // namespace diagnostic
 }  // namespace monitoring_frame
 }  // namespace psen_scan_v2

@@ -319,7 +319,7 @@ TEST(ScannerAPITests, testReceivingOfMonitoringFrame)
                                 TenthOfDegree(1),
                                 0,
                                 { 1, 2, 3, 4, 5 },
-                                { { ScannerId::MASTER, monitoring_frame::diagnostics::ErrorLocation(1, 7) } });
+                                { { ScannerId::MASTER, monitoring_frame::diagnostic::ErrorLocation(1, 7) } });
   Barrier monitoring_frame_barrier;
   Barrier diagnostic_barrier;
   {

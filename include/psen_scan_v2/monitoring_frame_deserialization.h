@@ -104,7 +104,7 @@ Header read(std::istringstream& is, const std::size_t& max_num_bytes);
 
 Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
 FixedFields readFixedFields(std::istringstream& is);
-std::vector<diagnostics::Message> deserializeDiagnosticMessages(std::istringstream& is);
+std::vector<diagnostic::Message> deserializeDiagnosticMessages(std::istringstream& is);
 
 class FormatError : public std::runtime_error
 {

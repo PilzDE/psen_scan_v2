@@ -95,16 +95,16 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameWithDia
 
 TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstructedFrameWithDiagnosticsConsistently)
 {
-  std::array<monitoring_frame::diagnostics::ErrorLocation, 3> error_locations = {
-    monitoring_frame::diagnostics::ErrorLocation(0, 0),
-    monitoring_frame::diagnostics::ErrorLocation(5, 0),
-    monitoring_frame::diagnostics::ErrorLocation(4, 7)
+  std::array<monitoring_frame::diagnostic::ErrorLocation, 3> error_locations = {
+    monitoring_frame::diagnostic::ErrorLocation(0, 0),
+    monitoring_frame::diagnostic::ErrorLocation(5, 0),
+    monitoring_frame::diagnostic::ErrorLocation(4, 7)
   };
 
   for (const auto& elem : error_locations)
   {
-    ASSERT_NE(monitoring_frame::diagnostics::error_bits.at(elem.getByte()).at(elem.getBit()),
-              monitoring_frame::diagnostics::Dc::UNUSED)
+    ASSERT_NE(monitoring_frame::diagnostic::error_bits.at(elem.getByte()).at(elem.getBit()),
+              monitoring_frame::diagnostic::Dc::UNUSED)
         << "The unused diagnostic bits are discarded during deserialization. You should use different test data for "
            "this test.";
   }
@@ -113,9 +113,9 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstruc
                                 TenthOfDegree(1),
                                 456,
                                 { 10, 20, 30, 40 },
-                                { monitoring_frame::diagnostics::Message(ScannerId::MASTER, error_locations.at(0)),
-                                  monitoring_frame::diagnostics::Message(ScannerId::MASTER, error_locations.at(1)),
-                                  monitoring_frame::diagnostics::Message(ScannerId::SLAVE2, error_locations.at(2)) });
+                                { monitoring_frame::diagnostic::Message(ScannerId::MASTER, error_locations.at(0)),
+                                  monitoring_frame::diagnostic::Message(ScannerId::MASTER, error_locations.at(1)),
+                                  monitoring_frame::diagnostic::Message(ScannerId::SLAVE2, error_locations.at(2)) });
 
   DynamicSizeRawData raw = serialize(msg);
 
@@ -126,13 +126,13 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstruc
 
 TEST(MonitoringFrameSerializationDiagnosticMessagesTest, shouldSetCorrectBitInSerializedDiagnosticData)
 {
-  std::vector<monitoring_frame::diagnostics::Message> diagnostic_data{
-    { ScannerId::MASTER, monitoring_frame::diagnostics::ErrorLocation(5, 3) }
+  std::vector<monitoring_frame::diagnostic::Message> diagnostic_data{
+    { ScannerId::MASTER, monitoring_frame::diagnostic::ErrorLocation(5, 3) }
   };
-  auto diagnostic_data_serialized = monitoring_frame::diagnostics::serializeMessages(diagnostic_data);
+  auto diagnostic_data_serialized = monitoring_frame::diagnostic::serializeMessages(diagnostic_data);
 
-  EXPECT_EQ(diagnostic_data_serialized.size(), monitoring_frame::diagnostics::raw_message::LENGTH_IN_BYTES);
-  EXPECT_EQ(diagnostic_data_serialized.at(monitoring_frame::diagnostics::raw_message::UNUSED_OFFSET_IN_BYTES + 5),
+  EXPECT_EQ(diagnostic_data_serialized.size(), monitoring_frame::diagnostic::raw_message::LENGTH_IN_BYTES);
+  EXPECT_EQ(diagnostic_data_serialized.at(monitoring_frame::diagnostic::raw_message::UNUSED_OFFSET_IN_BYTES + 5),
             0b1000);
 }
 
