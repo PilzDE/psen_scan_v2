@@ -237,7 +237,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
   const auto num_bytes = 2 * with_unknown_field_id.hex_dump.size();
 
   monitoring_frame::Message msg;
-  EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);, monitoring_frame::FormatError);
+  EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);, monitoring_frame::format_error::Common);
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeFieldLength)
@@ -247,7 +247,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
   const auto num_bytes = 2 * with_too_large_field_length.hex_dump.size();
 
   monitoring_frame::Message msg;
-  EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);, monitoring_frame::FormatError);
+  EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);, monitoring_frame::format_error::Common);
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeScanCounterLength)
@@ -258,7 +258,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
 
   monitoring_frame::Message msg;
   EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);
-               , monitoring_frame::FormatErrorScanCounterUnexpectedSize);
+               , monitoring_frame::format_error::ScanCounterUnexpectedSize);
 }
 
 }  // namespace psen_scan_v2_test

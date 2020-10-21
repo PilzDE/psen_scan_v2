@@ -106,26 +106,28 @@ Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
 FixedFields readFixedFields(std::istringstream& is);
 std::vector<diagnostic::Message> deserializeDiagnosticMessages(std::istringstream& is);
 
-class FormatError : public std::runtime_error
+namespace format_error
+{
+class Common : public std::runtime_error
 {
 public:
-  FormatError(const std::string& msg = "Error while decoding laser scanner measurement data");
+  Common(const std::string& msg = "Error while decoding laser scanner measurement data");
 };
 
-class FormatErrorScanCounterUnexpectedSize : public FormatError
+class ScanCounterUnexpectedSize : public Common
 {
 public:
-  FormatErrorScanCounterUnexpectedSize(const std::string& msg);
+  ScanCounterUnexpectedSize(const std::string& msg);
 };
 
-inline FormatError::FormatError(const std::string& msg) : std::runtime_error(msg)
+inline Common::Common(const std::string& msg) : std::runtime_error(msg)
 {
 }
 
-inline FormatErrorScanCounterUnexpectedSize::FormatErrorScanCounterUnexpectedSize(const std::string& msg)
-  : FormatError(msg)
+inline ScanCounterUnexpectedSize::ScanCounterUnexpectedSize(const std::string& msg) : Common(msg)
 {
 }
+}  // namespace format_error
 
 inline additional_field::Header::Id additional_field::Header::id() const
 {

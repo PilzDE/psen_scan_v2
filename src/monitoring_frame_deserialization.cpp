@@ -67,7 +67,7 @@ Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes)
       case additional_field::HeaderID::SCAN_COUNTER:
         if (additional_header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
         {
-          throw FormatErrorScanCounterUnexpectedSize(
+          throw format_error::ScanCounterUnexpectedSize(
               fmt::format("Length of scan counter field is {}, but should be {}.",
                           additional_header.length(),
                           NUMBER_OF_BYTES_SCAN_COUNTER));
@@ -92,8 +92,8 @@ Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes)
         break;
 
       default:
-        throw FormatError(fmt::format("Header Id {:#04x} unknown. Cannot read additional field of monitoring frame.",
-                                      additional_header.id()));
+        throw format_error::Common(fmt::format(
+            "Header Id {:#04x} unknown. Cannot read additional field of monitoring frame.", additional_header.id()));
     }
   }
   return msg;
@@ -108,7 +108,7 @@ additional_field::Header additional_field::read(std::istringstream& is, const st
 
   if (length >= max_num_bytes)
   {
-    throw FormatError(
+    throw format_error::Common(
         fmt::format("Length given in header of additional field is too large: {}, id: {:#04x}", length, id));
   }
   if (length > 0)
