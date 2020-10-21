@@ -82,8 +82,8 @@ public:
                            TenthOfDegree(0x01),
                            0x000a6f10,
                            readMeasures(hex_dump, 74, 500),
-                           { MonitoringFrameDiagnosticMessage(ScannerId::MASTER, ErrorLocation(1, 7)),
-                             MonitoringFrameDiagnosticMessage(ScannerId::MASTER, ErrorLocation(4, 3)) });
+                           { MonitoringFrameDiagnosticMessage(ScannerId::master, ErrorLocation(1, 7)),
+                             MonitoringFrameDiagnosticMessage(ScannerId::master, ErrorLocation(4, 3)) });
     expected_msg_ = msg;
   };
 

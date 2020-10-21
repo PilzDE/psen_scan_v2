@@ -96,7 +96,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstruc
 
   for (const auto& elem : error_locations)
   {
-    ASSERT_NE(error_bits.at(elem.getByte()).at(elem.getBit()), Dc::UNUSED)
+    ASSERT_NE(error_bits.at(elem.getByte()).at(elem.getBit()), Dc::unused)
         << "The unused diagnostic bits are discarded during deserialization. You should use different test data for "
            "this test.";
   }
@@ -105,9 +105,9 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstruc
                          TenthOfDegree(1),
                          456,
                          { 10, 20, 30, 40 },
-                         { MonitoringFrameDiagnosticMessage(ScannerId::MASTER, error_locations.at(0)),
-                           MonitoringFrameDiagnosticMessage(ScannerId::MASTER, error_locations.at(1)),
-                           MonitoringFrameDiagnosticMessage(ScannerId::SLAVE2, error_locations.at(2)) });
+                         { MonitoringFrameDiagnosticMessage(ScannerId::master, error_locations.at(0)),
+                           MonitoringFrameDiagnosticMessage(ScannerId::master, error_locations.at(1)),
+                           MonitoringFrameDiagnosticMessage(ScannerId::salve2, error_locations.at(2)) });
 
   DynamicSizeRawData raw = serialize(msg);
 
@@ -118,7 +118,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstruc
 
 TEST(MonitoringFrameSerializationDiagnosticMessagesTest, shouldSetCorrectBitInSerializedDiagnosticData)
 {
-  std::vector<MonitoringFrameDiagnosticMessage> diagnostic_data{ { ScannerId::MASTER, ErrorLocation(5, 3) } };
+  std::vector<MonitoringFrameDiagnosticMessage> diagnostic_data{ { ScannerId::master, ErrorLocation(5, 3) } };
   auto diagnostic_data_serialized = serializeDiagnosticMessages(diagnostic_data);
 
   EXPECT_EQ(diagnostic_data_serialized.size(), RAW_DIAGNOSTIC_MESSAGE_LENGTH_IN_BYTES);

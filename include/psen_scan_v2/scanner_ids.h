@@ -22,21 +22,21 @@ namespace psen_scan_v2
 {
 enum class ScannerId : uint8_t
 {
-  MASTER = 0,
-  SLAVE0 = 1,
-  SLAVE1 = 2,
-  SLAVE2 = 3
+  master = 0,
+  slave0 = 1,
+  slave1 = 2,
+  salve2 = 3
 };
 
-static constexpr std::array<ScannerId, 4> VALID_SCANNER_IDS{ ScannerId::MASTER,
-                                                             ScannerId::SLAVE0,
-                                                             ScannerId::SLAVE1,
-                                                             ScannerId::SLAVE2 };
+static constexpr std::array<ScannerId, 4> VALID_SCANNER_IDS{ ScannerId::master,
+                                                             ScannerId::slave0,
+                                                             ScannerId::slave1,
+                                                             ScannerId::salve2 };
 
-static const std::map<ScannerId, std::string> scanner_id_to_string{ { ScannerId::MASTER, "Master" },
-                                                                    { ScannerId::SLAVE0, "Slave0" },
-                                                                    { ScannerId::SLAVE1, "Slave1" },
-                                                                    { ScannerId::SLAVE2, "Slave2" } };
+static const std::map<ScannerId, std::string> scanner_id_to_string{ { ScannerId::master, "Master" },
+                                                                    { ScannerId::slave0, "Slave0" },
+                                                                    { ScannerId::slave1, "Slave1" },
+                                                                    { ScannerId::salve2, "Slave2" } };
 
 }  //   namespace psen_scan_v2
 

@@ -207,12 +207,12 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
 
   bool guard_is_start_reply(events::reply_received const& reply_event)
   {
-    return reply_event.type_ == ScannerReplyMsgType::Start;
+    return reply_event.type_ == ScannerReplyMsgType::start;
   }
 
   bool guard_is_stop_reply(events::reply_received const& reply_event)
   {
-    return reply_event.type_ == ScannerReplyMsgType::Stop;
+    return reply_event.type_ == ScannerReplyMsgType::stop;
   }
 
   typedef states::idle initial_state;

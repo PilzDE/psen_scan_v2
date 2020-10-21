@@ -91,10 +91,10 @@ namespace monitoring_frame_additional_field_header_ids
 {
 enum class HeaderID : MonitoringFrameAdditionalFieldHeader::Id
 {
-  SCAN_COUNTER = 0x02,
-  DIAGNOSTICS = 0x04,
-  MEASURES = 0x05,
-  END_OF_FRAME = 0x09
+  scan_counter = 0x02,
+  diagnostics = 0x04,
+  measures = 0x05,
+  end_of_frame = 0x09
 };
 };  // namespace monitoring_frame_additional_field_header_ids
 

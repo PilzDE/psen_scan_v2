@@ -35,7 +35,7 @@ DynamicSizeRawData serialize(const MonitoringFrameMsg& frame)
 
   MonitoringFrameAdditionalFieldHeader scan_counter_header(
       static_cast<MonitoringFrameAdditionalFieldHeader::Id>(
-          monitoring_frame_additional_field_header_ids::HeaderID::SCAN_COUNTER),
+          monitoring_frame_additional_field_header_ids::HeaderID::scan_counter),
       sizeof(frame.scan_counter_));
   writeFieldHeader(os, scan_counter_header);
   uint32_t scan_counter_header_payload = frame.scan_counter_;
@@ -45,7 +45,7 @@ DynamicSizeRawData serialize(const MonitoringFrameMsg& frame)
   {
     MonitoringFrameAdditionalFieldHeader diagnostic_data_field_header(
         static_cast<MonitoringFrameAdditionalFieldHeader::Id>(
-            monitoring_frame_additional_field_header_ids::HeaderID::DIAGNOSTICS),
+            monitoring_frame_additional_field_header_ids::HeaderID::diagnostics),
         RAW_DIAGNOSTIC_MESSAGE_LENGTH_IN_BYTES);
     writeFieldHeader(os, diagnostic_data_field_header);
     RawDiagnosticMsg diagnostic_data_field_payload = serializeDiagnosticMessages(frame.diagnostic_messages_);
@@ -54,7 +54,7 @@ DynamicSizeRawData serialize(const MonitoringFrameMsg& frame)
 
   MonitoringFrameAdditionalFieldHeader measures_header(
       static_cast<MonitoringFrameAdditionalFieldHeader::Id>(
-          monitoring_frame_additional_field_header_ids::HeaderID::MEASURES),
+          monitoring_frame_additional_field_header_ids::HeaderID::measures),
       frame.measures_.size() * NUMBER_OF_BYTES_SINGLE_MEASURE);
   writeFieldHeader(os, measures_header);
   raw_processing::writeArray<uint16_t, double>(
@@ -62,7 +62,7 @@ DynamicSizeRawData serialize(const MonitoringFrameMsg& frame)
 
   MonitoringFrameAdditionalFieldHeader::Id end_of_frame_header_id =
       static_cast<MonitoringFrameAdditionalFieldHeader::Id>(
-          monitoring_frame_additional_field_header_ids::HeaderID::END_OF_FRAME);
+          monitoring_frame_additional_field_header_ids::HeaderID::end_of_frame);
   raw_processing::write(os, end_of_frame_header_id);
 
   uint8_t unknown_data_at_the_end_of_frame = 0;

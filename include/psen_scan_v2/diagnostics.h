@@ -37,32 +37,32 @@ using RawDiagnosticMsg = std::array<uint8_t, RAW_DIAGNOSTIC_MESSAGE_LENGTH_IN_BY
 
 enum class DiagnosticCode
 {
-  OSSD1_OC,
-  OSSD_SHRT_C,
-  OSSD_INTEGR,
-  INT,
-  WIN_CLN_AL,
-  POWER_SUPPLY,
-  NETW_PRB,
-  DUST_CRC_FL,
-  OSSD2_OVERCUR,
-  MEAS_PROB,
-  INCOHERENCE,
-  ZONE_INVAL_TRANS,
-  ZONE_INVALID_CONF,
-  WIN_CLN_WARN,
-  INT_COM_PRB,
-  GENERIC_ERR,
-  DISP_COM_PRB,
-  TEMP_MEAS_PROB,
-  ENCOD_OOR,
-  EDM2_ERR,
-  EDM1_ERR,
-  CONF_ERR,
-  OUT_OF_RANGE_ERR,
-  TEMP_RANGE_ERR,
-  ENCODER_GENERIC_ERR,
-  UNUSED
+  ossd1_oc,
+  ossd_shrt_c,
+  ossd_integr,
+  intern,
+  win_cln_al,
+  power_supply,
+  netw_prb,
+  dust_crc_fl,
+  ossd2_overcur,
+  meas_prob,
+  incoherence,
+  zone_inval_trans,
+  zone_invalid_conf,
+  win_cln_warn,
+  int_com_prb,
+  generic_err,
+  disp_com_prb,
+  temp_meas_prob,
+  encod_oor,
+  edm2_err,
+  edm1_err,
+  conf_err,
+  out_of_range_err,
+  temp_range_err,
+  encoder_generic_err,
+  unused
 };
 
 // clang-format off
@@ -72,32 +72,32 @@ using ErrorMessage = std::string;
 
 static const std::map<DiagnosticCode, ErrorMessage> error_code_to_string
 {
-  { Dc::OSSD1_OC, "OSSD1 Overcurrent / Short circuit." },
-  { Dc::OSSD_SHRT_C, "Short circuit between at least two OSSDs." },
-  { Dc::OSSD_INTEGR, "Integrity check problem on any OSSD" },
-  { Dc::INT, "Internal error." },
-  { Dc::WIN_CLN_AL, "Alarm: The front panel of the safety laser scanner must be cleaned." },
-  { Dc::POWER_SUPPLY, "Power supply problem." },
-  { Dc::NETW_PRB, "Network problem." },
-  { Dc::DUST_CRC_FL, "Dust circuit failure" },
-  { Dc::OSSD2_OVERCUR, "OSSD2 Overcurrent / Short circuit." },
-  { Dc::MEAS_PROB, "Measurement Problem." },
-  { Dc::INCOHERENCE, "Incoherence Error" },
-  { Dc::ZONE_INVAL_TRANS, "Zone: Invalid input - transition or integrity." },
-  { Dc::ZONE_INVALID_CONF, "Zone: Invalid input configuration / connection." },
-  { Dc::WIN_CLN_WARN, "Warning: The front panel of the safety laser scanner must be cleaned." },
-  { Dc::INT_COM_PRB, "Internal communication problem." },
-  { Dc::GENERIC_ERR, "Generic Error." },
-  { Dc::DISP_COM_PRB, "Display communication problem." },
-  { Dc::TEMP_MEAS_PROB, "Temperature measurement problem." },
-  { Dc::ENCOD_OOR, "Encoder: Out of range." },
-  { Dc::EDM2_ERR, "Error in the External Device Monitoring (EDM2_ERR)." },
-  { Dc::EDM1_ERR, "Error in the External Device Monitoring (EDM1_ERR)." },
-  { Dc::CONF_ERR, "Configuration Error." },
-  { Dc::OUT_OF_RANGE_ERR, "Out of range error." },
-  { Dc::TEMP_RANGE_ERR, "Temperature out of range." },
-  { Dc::ENCODER_GENERIC_ERR, "Encoder: Generic error." },
-  { Dc::UNUSED, "Unexpected error" } \
+  { Dc::ossd1_oc, "OSSD1 Overcurrent / Short circuit." },
+  { Dc::ossd_shrt_c, "Short circuit between at least two OSSDs." },
+  { Dc::ossd_integr, "Integrity check problem on any OSSD" },
+  { Dc::intern, "Internal error." },
+  { Dc::win_cln_al, "Alarm: The front panel of the safety laser scanner must be cleaned." },
+  { Dc::power_supply, "Power supply problem." },
+  { Dc::netw_prb, "Network problem." },
+  { Dc::dust_crc_fl, "Dust circuit failure" },
+  { Dc::ossd2_overcur, "OSSD2 Overcurrent / Short circuit." },
+  { Dc::meas_prob, "Measurement Problem." },
+  { Dc::incoherence, "Incoherence Error" },
+  { Dc::zone_inval_trans, "Zone: Invalid input - transition or integrity." },
+  { Dc::zone_invalid_conf, "Zone: Invalid input configuration / connection." },
+  { Dc::win_cln_warn, "Warning: The front panel of the safety laser scanner must be cleaned." },
+  { Dc::int_com_prb, "Internal communication problem." },
+  { Dc::generic_err, "Generic Error." },
+  { Dc::disp_com_prb, "Display communication problem." },
+  { Dc::temp_meas_prob, "Temperature measurement problem." },
+  { Dc::encod_oor, "Encoder: Out of range." },
+  { Dc::edm2_err, "Error in the External Device Monitoring (edm2_err)." },
+  { Dc::edm1_err, "Error in the External Device Monitoring (edm1_err)." },
+  { Dc::conf_err, "Configuration Error." },
+  { Dc::out_of_range_err, "Out of range error." },
+  { Dc::temp_range_err, "Temperature out of range." },
+  { Dc::encoder_generic_err, "Encoder: Generic error." },
+  { Dc::unused, "Unexpected error" } \
 };
 
 // clang-format off
@@ -105,15 +105,15 @@ static const std::map<DiagnosticCode, ErrorMessage> error_code_to_string
 
   static constexpr std::array<std::array<DiagnosticCode, 8>, 9> error_bits{{
   //Bit7                 Bit6              Bit5              Bit4              Bit3              Bit2                  Bit1                   Bit0
-  { REV(Dc::OSSD1_OC,    Dc::OSSD_SHRT_C,  Dc::OSSD_INTEGR,  Dc::INT,          Dc::INT,          Dc::INT,              Dc::INT,               Dc::INT) },
-  { REV(Dc::WIN_CLN_AL,  Dc::POWER_SUPPLY, Dc::NETW_PRB,     Dc::DUST_CRC_FL,  Dc::INT,          Dc::INT,              Dc::UNUSED,            Dc::OSSD2_OVERCUR) },
-  { REV(Dc::MEAS_PROB,   Dc::INT,          Dc::INT,          Dc::INT,          Dc::INCOHERENCE,  Dc::ZONE_INVAL_TRANS, Dc::ZONE_INVALID_CONF, Dc::WIN_CLN_WARN) },
-  { REV(Dc::INT_COM_PRB, Dc::INT,          Dc::INT,          Dc::GENERIC_ERR,  Dc::DISP_COM_PRB, Dc::INT,              Dc::INT,               Dc::TEMP_MEAS_PROB) },
-  { REV(Dc::ENCOD_OOR,   Dc::UNUSED,       Dc::UNUSED,       Dc::EDM2_ERR,     Dc::EDM1_ERR,     Dc::CONF_ERR,         Dc::OUT_OF_RANGE_ERR,  Dc::TEMP_RANGE_ERR) },
-  { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::ENCODER_GENERIC_ERR) },
-  { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::UNUSED) },
-  { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::UNUSED) },
-  { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::UNUSED) },
+  { REV(Dc::ossd1_oc,    Dc::ossd_shrt_c,  Dc::ossd_integr,  Dc::intern,       Dc::intern,       Dc::intern,           Dc::intern,            Dc::intern) },
+  { REV(Dc::win_cln_al,  Dc::power_supply, Dc::netw_prb,     Dc::dust_crc_fl,  Dc::intern,       Dc::intern,           Dc::unused,            Dc::ossd2_overcur) },
+  { REV(Dc::meas_prob,   Dc::intern,       Dc::intern,       Dc::intern,       Dc::incoherence,  Dc::zone_inval_trans, Dc::zone_invalid_conf, Dc::win_cln_warn) },
+  { REV(Dc::int_com_prb, Dc::intern,       Dc::intern,       Dc::generic_err,  Dc::disp_com_prb, Dc::intern,           Dc::intern,            Dc::temp_meas_prob) },
+  { REV(Dc::encod_oor,   Dc::unused,       Dc::unused,       Dc::edm2_err,     Dc::edm1_err,     Dc::conf_err,         Dc::out_of_range_err,  Dc::temp_range_err) },
+  { REV(Dc::unused,      Dc::unused,       Dc::unused,       Dc::unused,       Dc::unused,       Dc::unused,           Dc::unused,            Dc::encoder_generic_err) },
+  { REV(Dc::unused,      Dc::unused,       Dc::unused,       Dc::unused,       Dc::unused,       Dc::unused,           Dc::unused,            Dc::unused) },
+  { REV(Dc::unused,      Dc::unused,       Dc::unused,       Dc::unused,       Dc::unused,       Dc::unused,           Dc::unused,            Dc::unused) },
+  { REV(Dc::unused,      Dc::unused,       Dc::unused,       Dc::unused,       Dc::unused,       Dc::unused,           Dc::unused,            Dc::unused) },
   }};
 // clang-format on
 
@@ -179,7 +179,7 @@ constexpr inline bool MonitoringFrameDiagnosticMessage::operator==(const Monitor
 }
 
 // Store ambiguous errors for additional output
-static const std::set<Dc> ambiguous_diagnostic_codes = { Dc::UNUSED, Dc::INT };
+static const std::set<Dc> ambiguous_diagnostic_codes = { Dc::unused, Dc::intern };
 
 inline bool isAmbiguous(const DiagnosticCode& code)
 {

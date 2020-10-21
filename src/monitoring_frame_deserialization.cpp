@@ -65,7 +65,7 @@ MonitoringFrameMsg deserializeMonitoringFrame(const MaxSizeRawData& data, const 
 
     switch (static_cast<monitoring_frame_additional_field_header_ids::HeaderID>(additional_header.id()))
     {
-      case monitoring_frame_additional_field_header_ids::HeaderID::SCAN_COUNTER:
+      case monitoring_frame_additional_field_header_ids::HeaderID::scan_counter:
         if (additional_header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
         {
           throw MonitoringFrameFormatErrorScanCounterUnexpectedSize(
@@ -76,18 +76,18 @@ MonitoringFrameMsg deserializeMonitoringFrame(const MaxSizeRawData& data, const 
         raw_processing::read(is, msg.scan_counter_);
         break;
 
-      case monitoring_frame_additional_field_header_ids::HeaderID::MEASURES:
+      case monitoring_frame_additional_field_header_ids::HeaderID::measures:
         raw_processing::readArray<uint16_t, double>(is,
                                                     msg.measures_,
                                                     additional_header.length() / NUMBER_OF_BYTES_SINGLE_MEASURE,
                                                     [](uint16_t raw_element) { return raw_element / 1000.; });
         break;
 
-      case monitoring_frame_additional_field_header_ids::HeaderID::END_OF_FRAME:
+      case monitoring_frame_additional_field_header_ids::HeaderID::end_of_frame:
         end_of_frame = true;
         break;
 
-      case monitoring_frame_additional_field_header_ids::HeaderID::DIAGNOSTICS:
+      case monitoring_frame_additional_field_header_ids::HeaderID::diagnostics:
         msg.diagnostic_messages_ = deserializeDiagnosticMessages(is);
         msg.diagnostic_data_enabled_ = true;
         break;
@@ -136,7 +136,7 @@ std::vector<MonitoringFrameDiagnosticMessage> deserializeDiagnosticMessages(std:
 
       for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
       {
-        if (raw_bits.test(bit_n) && (DiagnosticCode::UNUSED != error_bits[byte_n][bit_n]))
+        if (raw_bits.test(bit_n) && (DiagnosticCode::unused != error_bits[byte_n][bit_n]))
         {
           diagnostic_messages.push_back(
               MonitoringFrameDiagnosticMessage(static_cast<ScannerId>(scanner_id), ErrorLocation(byte_n, bit_n)));
