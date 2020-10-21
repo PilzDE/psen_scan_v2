@@ -34,7 +34,7 @@ namespace psen_scan_v2_test
 TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithoutIntensitiesCorrectly)
 {
   scanner_udp_datagram_hexdumps::WithoutIntensities without_intensities;
-  DynamicSizeRawData serialized_monitoring_frame_message = serialize(without_intensities.expected_msg_);
+  auto serialized_monitoring_frame_message = serialize(without_intensities.expected_msg_);
 
   EXPECT_EQ(without_intensities.hex_dump.size(), serialized_monitoring_frame_message.size());
 
@@ -47,7 +47,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithoutIntensitiesCor
 TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithDiagnosticsCorrectly)
 {
   scanner_udp_datagram_hexdumps::WithDiagnostics with_diagnostics;
-  DynamicSizeRawData serialized_monitoring_frame_message = serialize(with_diagnostics.expected_msg_);
+  auto serialized_monitoring_frame_message = serialize(with_diagnostics.expected_msg_);
 
   EXPECT_EQ(with_diagnostics.hex_dump.size(), serialized_monitoring_frame_message.size());
 
@@ -60,8 +60,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithDiagnosticsCorrec
 TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithoutMeasurementsAndIntensitiesCorrectly)
 {
   scanner_udp_datagram_hexdumps::WithoutMeasurementsAndIntensities without_measurements_and_intensities;
-  DynamicSizeRawData serialized_monitoring_frame_message =
-      serialize(without_measurements_and_intensities.expected_msg_);
+  auto serialized_monitoring_frame_message = serialize(without_measurements_and_intensities.expected_msg_);
 
   EXPECT_EQ(without_measurements_and_intensities.hex_dump.size(), serialized_monitoring_frame_message.size());
 
@@ -75,9 +74,9 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithoutMeasurementsAn
 TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameWithoutIntensitiesConsistently)
 {
   scanner_udp_datagram_hexdumps::WithoutIntensities without_intensities;
-  DynamicSizeRawData raw = serialize(without_intensities.expected_msg_);
+  auto raw = serialize(without_intensities.expected_msg_);
 
-  MonitoringFrameMsg deserialized_msg = deserializeMonitoringFrame(convertToMaxSizeRawData(raw), raw.size());
+  auto deserialized_msg = deserializeMonitoringFrame(convertToMaxSizeRawData(raw), raw.size());
 
   EXPECT_EQ(without_intensities.expected_msg_, deserialized_msg);
 }
@@ -85,9 +84,9 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameWithout
 TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameWithDiagnosticsConsistently)
 {
   scanner_udp_datagram_hexdumps::WithDiagnostics with_diagnostics;
-  DynamicSizeRawData raw = serialize(with_diagnostics.expected_msg_);
+  auto raw = serialize(with_diagnostics.expected_msg_);
 
-  MonitoringFrameMsg deserialized_msg = deserializeMonitoringFrame(convertToMaxSizeRawData(raw), raw.size());
+  auto deserialized_msg = deserializeMonitoringFrame(convertToMaxSizeRawData(raw), raw.size());
 
   EXPECT_EQ(deserialized_msg, with_diagnostics.expected_msg_);
 }
@@ -111,9 +110,9 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstruc
                            MonitoringFrameDiagnosticMessage(ScannerId::MASTER, error_locations.at(1)),
                            MonitoringFrameDiagnosticMessage(ScannerId::SLAVE2, error_locations.at(2)) });
 
-  DynamicSizeRawData raw = serialize(msg);
+  auto raw = serialize(msg);
 
-  MonitoringFrameMsg deserialized_msg = deserializeMonitoringFrame(convertToMaxSizeRawData(raw), raw.size());
+  auto deserialized_msg = deserializeMonitoringFrame(convertToMaxSizeRawData(raw), raw.size());
 
   EXPECT_EQ(msg, deserialized_msg);
 }

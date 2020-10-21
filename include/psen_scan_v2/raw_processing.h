@@ -87,7 +87,7 @@ inline void writeArray(std::ostringstream& os,
 {
   for (auto& elem : array)
   {
-    RawType raw = conversion_fcn(elem);
+    auto raw = conversion_fcn(elem);
     raw_processing::write(os, raw);
   }
 }
