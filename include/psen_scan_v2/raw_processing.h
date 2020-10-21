@@ -22,7 +22,6 @@
 #include <vector>
 
 #include <fmt/core.h>
-#include <fmt/format.h>
 
 namespace psen_scan_v2
 {
