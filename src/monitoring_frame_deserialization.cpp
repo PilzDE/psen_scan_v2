@@ -87,7 +87,7 @@ Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes)
         break;
 
       case additional_field::HeaderID::DIAGNOSTICS:
-        msg.diagnostic_messages_ = deserializeDiagnosticMessages(is);
+        msg.diagnostic_messages_ = diagnostic::deserializeDiagnosticMessages(is);
         msg.diagnostic_data_enabled_ = true;
         break;
 
@@ -118,6 +118,8 @@ additional_field::Header additional_field::read(std::istringstream& is, const st
   return additional_field::Header(id, length);
 }
 
+namespace diagnostic
+{
 std::vector<diagnostic::Message> deserializeDiagnosticMessages(std::istringstream& is)
 {
   std::vector<diagnostic::Message> diagnostic_messages;
@@ -145,6 +147,7 @@ std::vector<diagnostic::Message> deserializeDiagnosticMessages(std::istringstrea
   }
   return diagnostic_messages;
 }
+}  // namespace diagnostic
 
 FixedFields readFixedFields(std::istringstream& is)
 {
