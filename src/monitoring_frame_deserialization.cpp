@@ -93,11 +93,11 @@ MonitoringFrameMsg deserializeMonitoringFrame(const MaxSizeRawData& data, const 
         break;
 
       case monitoring_frame_additional_field_header_ids::HeaderID::INTENSITIES:
-        raw_processing::readArray<uint16_t, uint16_t>(
+        raw_processing::readArray<uint16_t, double>(
             is,
             msg.intensities_,
             additional_header.length() / NUMBER_OF_BYTES_SINGLE_MEASURE,
-            [](uint16_t raw_element) { return (raw_element & 0b0011111111111111); });
+            [](uint16_t raw_element) { return static_cast<double>(raw_element & 0b0011111111111111); });
         break;
 
       default:

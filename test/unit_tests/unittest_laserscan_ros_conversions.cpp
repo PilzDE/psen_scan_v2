@@ -44,7 +44,7 @@ TEST(LaserScanROSConversionsTest, testToLaserScanMsg)
   const TenthOfDegree angle_max_raw{ 20 };
   const TenthOfDegree angle_increment{ 1 };
   LaserScan laserscan{ angle_increment, angle_min_raw, angle_max_raw };
-  const MeasurementData measures{ 1, 2, 3 };
+  const LaserScan::MeasurementData measures{ 1, 2, 3 };
   laserscan.setMeasurements(measures);
 
   ros::Time now = ros::Time::now();
