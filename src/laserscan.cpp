@@ -59,7 +59,7 @@ TenthOfDegree LaserScan::getMaxScanAngle() const
   return max_scan_angle_;
 }
 
-const MeasurementData& LaserScan::getMeasurements() const
+const LaserScan::MeasurementData& LaserScan::getMeasurements() const
 {
   return measures_;
 }
@@ -69,17 +69,17 @@ void LaserScan::setMeasurements(const MeasurementData& measures)
   measures_ = measures;
 }
 
-MeasurementData& LaserScan::getMeasurements()
+LaserScan::MeasurementData& LaserScan::getMeasurements()
 {
   return measures_;
 }
 
-const std::vector<uint16_t>& LaserScan::getIntensities() const
+const LaserScan::IntensityData& LaserScan::getIntensities() const
 {
   return intensities_;
 }
 
-void LaserScan::setIntensities(const std::vector<uint16_t>& intensities)
+void LaserScan::LaserScan::setIntensities(const IntensityData& intensities)
 {
   intensities_ = intensities;
 }

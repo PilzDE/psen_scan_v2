@@ -54,7 +54,7 @@ std::vector<double> MonitoringFrameMsg::measures() const
   return measures_;
 }
 
-std::vector<uint16_t> MonitoringFrameMsg::intensities() const
+std::vector<double> MonitoringFrameMsg::intensities() const
 {
   return intensities_;
 }

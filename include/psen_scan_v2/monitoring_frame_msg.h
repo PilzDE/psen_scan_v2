@@ -70,7 +70,7 @@ public:
   TenthOfDegree resolution() const;
   uint32_t scanCounter() const;
   std::vector<double> measures() const;
-  std::vector<uint16_t> intensities() const;
+  std::vector<double> intensities() const;
   std::vector<MonitoringFrameDiagnosticMessage> diagnosticMessages() const;
   bool operator==(const MonitoringFrameMsg& rhs) const;
 
@@ -81,7 +81,7 @@ private:
 
   uint32_t scan_counter_{ 0 };
   std::vector<double> measures_;
-  std::vector<uint16_t> intensities_;
+  std::vector<double> intensities_;
   std::vector<MonitoringFrameDiagnosticMessage> diagnostic_messages_;
   bool diagnostic_data_enabled_{ false };
 
