@@ -74,6 +74,16 @@ MeasurementData& LaserScan::getMeasurements()
   return measures_;
 }
 
+const std::vector<uint16_t>& LaserScan::getIntensities() const
+{
+  return intensities_;
+}
+
+void LaserScan::setIntensities(const std::vector<uint16_t>& intensities)
+{
+  intensities_ = intensities;
+}
+
 bool LaserScan::operator==(const LaserScan& scan) const
 {
   return ((max_scan_angle_ == scan.max_scan_angle_) && (min_scan_angle_ == scan.min_scan_angle_) &&

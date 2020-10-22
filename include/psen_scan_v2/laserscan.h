@@ -47,11 +47,16 @@ public:
   MeasurementData& getMeasurements();
   void setMeasurements(const MeasurementData&);
 
+  const std::vector<uint16_t>& getIntensities() const;
+  void setIntensities(const std::vector<uint16_t>&);
+
   bool operator==(const LaserScan& scan) const;
 
 private:
   //! Measurement data of the laserscan (in Millimeters).
   MeasurementData measures_;
+  //! Measurement data of the laserscan (in Millimeters).
+  std::vector<uint16_t> intensities_;
   //! Distance of angle between the measurements (in radian).
   const TenthOfDegree resolution_;
   //! Lowest angle the scanner is scanning (in radian).
