@@ -21,7 +21,7 @@
 #include <algorithm>
 #include <vector>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 
 namespace psen_scan_v2
 {

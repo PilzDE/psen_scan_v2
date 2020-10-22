@@ -15,8 +15,6 @@
 
 #include <gtest/gtest.h>
 
-#include <fmt/ostream.h>
-
 #include "psen_scan_v2/diagnostics.h"
 #include "psen_scan_v2/monitoring_frame_deserialization.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
