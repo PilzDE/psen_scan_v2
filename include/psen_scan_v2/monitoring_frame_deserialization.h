@@ -94,6 +94,7 @@ enum class HeaderID : MonitoringFrameAdditionalFieldHeader::Id
   SCAN_COUNTER = 0x02,
   DIAGNOSTICS = 0x04,
   MEASURES = 0x05,
+  INTENSITIES = 0x06,
   END_OF_FRAME = 0x09
 };
 };  // namespace monitoring_frame_additional_field_header_ids
