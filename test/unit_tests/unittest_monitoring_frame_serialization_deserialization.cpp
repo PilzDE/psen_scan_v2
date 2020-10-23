@@ -29,29 +29,32 @@ using namespace psen_scan_v2;
 
 namespace psen_scan_v2_test
 {
-TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithoutIntensitiesCorrectly)
+uint8_t clearIntensityChannelBits(size_t index, size_t begin, size_t n, uint8_t hexdump_byte)
 {
-  scanner_udp_datagram_hexdumps::WithoutIntensities without_intensities;
-  DynamicSizeRawData serialized_monitoring_frame_message = serialize(without_intensities.expected_msg_);
-
-  EXPECT_EQ(without_intensities.hex_dump.size(), serialized_monitoring_frame_message.size());
-
-  for (size_t i = 0; i < without_intensities.hex_dump.size(); i++)
+  if ((index >= begin) && (index < begin + n) && (0 == index % 2))
   {
-    EXPECT_EQ((uint8_t)serialized_monitoring_frame_message.at(i), without_intensities.hex_dump.at(i)) << " index " << i;
+    return 0b00111111 & hexdump_byte;
+  }
+  else
+  {
+    return hexdump_byte;
   }
 }
 
-TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithDiagnosticsCorrectly)
+TEST(MonitoringFrameSerializationTest, shouldSerializeFrameCorrectly)
 {
-  scanner_udp_datagram_hexdumps::WithDiagnostics with_diagnostics;
-  DynamicSizeRawData serialized_monitoring_frame_message = serialize(with_diagnostics.expected_msg_);
+  scanner_udp_datagram_hexdumps::WithIntensitiesAndDiagnostics with_intensities;
+  DynamicSizeRawData serialized_monitoring_frame_message = serialize(with_intensities.expected_msg_);
 
-  EXPECT_EQ(with_diagnostics.hex_dump.size(), serialized_monitoring_frame_message.size());
+  EXPECT_EQ(with_intensities.hex_dump.size(), serialized_monitoring_frame_message.size());
 
-  for (size_t i = 0; i < with_diagnostics.hex_dump.size(); i++)
+  for (size_t i = 0; i < with_intensities.hex_dump.size(); i++)
   {
-    EXPECT_EQ((uint8_t)serialized_monitoring_frame_message.at(i), with_diagnostics.hex_dump.at(i)) << " index " << i;
+    uint8_t expected_byte = clearIntensityChannelBits(i,
+                                                      with_intensities.intensities_offset,
+                                                      2 * with_intensities.expected_msg_.intensities().size(),
+                                                      with_intensities.hex_dump.at(i));
+    EXPECT_EQ((uint8_t)serialized_monitoring_frame_message.at(i), expected_byte) << " index " << i;
   }
 }
 
@@ -70,27 +73,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithoutMeasurementsAn
   }
 }
 
-TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameWithoutIntensitiesConsistently)
-{
-  scanner_udp_datagram_hexdumps::WithoutIntensities without_intensities;
-  DynamicSizeRawData raw = serialize(without_intensities.expected_msg_);
-
-  MonitoringFrameMsg deserialized_msg = deserializeMonitoringFrame(convertToMaxSizeRawData(raw), raw.size());
-
-  EXPECT_EQ(without_intensities.expected_msg_, deserialized_msg);
-}
-
-TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameWithDiagnosticsConsistently)
-{
-  scanner_udp_datagram_hexdumps::WithDiagnostics with_diagnostics;
-  DynamicSizeRawData raw = serialize(with_diagnostics.expected_msg_);
-
-  MonitoringFrameMsg deserialized_msg = deserializeMonitoringFrame(convertToMaxSizeRawData(raw), raw.size());
-
-  EXPECT_EQ(deserialized_msg, with_diagnostics.expected_msg_);
-}
-
-TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstructedFrameWithDiagnosticsConsistently)
+TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstructedFrameConsistently)
 {
   std::array<ErrorLocation, 3> error_locations = { ErrorLocation(0, 0), ErrorLocation(5, 0), ErrorLocation(4, 7) };
 
@@ -105,6 +88,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstruc
                          TenthOfDegree(1),
                          456,
                          { 10, 20, 30, 40 },
+                         { 15, 25, 35, 45 },
                          { MonitoringFrameDiagnosticMessage(ScannerId::MASTER, error_locations.at(0)),
                            MonitoringFrameDiagnosticMessage(ScannerId::MASTER, error_locations.at(1)),
                            MonitoringFrameDiagnosticMessage(ScannerId::SLAVE2, error_locations.at(2)) });
@@ -168,54 +152,43 @@ class MonitoringFrameDeserializationTest : public ::testing::Test
 protected:
   MonitoringFrameDeserializationTest()
   {
-    without_intensities_raw_ = convertToMaxSizeRawData(without_intensities_.hex_dump);
-    with_diagnostics_raw_ = convertToMaxSizeRawData(with_diagnostics_.hex_dump);
+    with_intensities_raw_ = convertToMaxSizeRawData(with_intensities_.hex_dump);
   }
 
 protected:
-  scanner_udp_datagram_hexdumps::WithoutIntensities without_intensities_;
-  MaxSizeRawData without_intensities_raw_;
-
-  scanner_udp_datagram_hexdumps::WithDiagnostics with_diagnostics_;
-  MaxSizeRawData with_diagnostics_raw_;
+  MaxSizeRawData with_intensities_raw_;
+  scanner_udp_datagram_hexdumps::WithIntensitiesAndDiagnostics with_intensities_;
 };
 
-TEST_F(MonitoringFrameDeserializationTest, shouldDeserializeMonitoringFrameWithoutIntensitiesCorrectly)
+TEST_F(MonitoringFrameDeserializationTest, shouldDeserializeMonitoringFrameCorrectly)
 {
   MonitoringFrameMsg msg;
-  ASSERT_NO_THROW(msg = deserializeMonitoringFrame(without_intensities_raw_, without_intensities_raw_.size()););
-  EXPECT_EQ(msg, without_intensities_.expected_msg_);
-}
-
-TEST_F(MonitoringFrameDeserializationTest, shouldDeserializeMonitoringFrameWithDiagnosticsCorrectly)
-{
-  MonitoringFrameMsg msg;
-  ASSERT_NO_THROW(msg = deserializeMonitoringFrame(with_diagnostics_raw_, with_diagnostics_raw_.size()));
-  EXPECT_TRUE(msg == with_diagnostics_.expected_msg_);
+  ASSERT_NO_THROW(msg = deserializeMonitoringFrame(with_intensities_raw_, with_intensities_raw_.size()););
+  EXPECT_EQ(msg, with_intensities_.expected_msg_);
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnWrongOpCode)
 {
-  without_intensities_raw_.at(4) += 1;
-  EXPECT_NO_THROW(deserializeMonitoringFrame(without_intensities_raw_, without_intensities_raw_.size()););
+  with_intensities_raw_.at(4) += 1;
+  EXPECT_NO_THROW(deserializeMonitoringFrame(with_intensities_raw_, with_intensities_raw_.size()););
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnInvalidWorkingMode)
 {
-  without_intensities_raw_.at(8) = 0x03;
-  EXPECT_NO_THROW(deserializeMonitoringFrame(without_intensities_raw_, without_intensities_raw_.size()););
+  with_intensities_raw_.at(8) = 0x03;
+  EXPECT_NO_THROW(deserializeMonitoringFrame(with_intensities_raw_, with_intensities_raw_.size()););
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnInvalidTransactionType)
 {
-  without_intensities_raw_.at(12) = 0x06;
-  EXPECT_NO_THROW(deserializeMonitoringFrame(without_intensities_raw_, without_intensities_raw_.size()););
+  with_intensities_raw_.at(12) = 0x06;
+  EXPECT_NO_THROW(deserializeMonitoringFrame(with_intensities_raw_, with_intensities_raw_.size()););
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnInvalidScannerId)
 {
-  without_intensities_raw_.at(16) = 0x04;
-  EXPECT_NO_THROW(deserializeMonitoringFrame(without_intensities_raw_, without_intensities_raw_.size()););
+  with_intensities_raw_.at(16) = 0x04;
+  EXPECT_NO_THROW(deserializeMonitoringFrame(with_intensities_raw_, with_intensities_raw_.size()););
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnUnknownFieldId)

@@ -413,8 +413,12 @@ TEST_F(ScannerAPITests, testReceivingOfMonitoringFrame)
                     port_holder_.data_port_scanner,
                     port_holder_.control_port_scanner);
 
-  MonitoringFrameMsg msg(
-      TenthOfDegree(0), TenthOfDegree(1), 0, { 1, 2, 3, 4, 5 }, { { ScannerId::MASTER, ErrorLocation(1, 7) } });
+  MonitoringFrameMsg msg(TenthOfDegree(0),
+                         TenthOfDegree(1),
+                         0,
+                         { 1, 2, 3, 4, 5 },
+                         { 10, 20, 30, 40, 50 },
+                         { { ScannerId::MASTER, ErrorLocation(1, 7) } });
   Barrier monitoring_frame_barrier;
   Barrier diagnostic_barrier;
   {
