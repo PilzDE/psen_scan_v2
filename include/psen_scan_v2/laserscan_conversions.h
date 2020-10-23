@@ -31,6 +31,7 @@ static LaserScan toLaserScan(const MonitoringFrameMsg& frame)
 
   LaserScan scan(resolution, min_angle, max_angle);
   scan.setMeasurements(frame.measures());
+  scan.setIntensities(frame.intensities());
 
   return scan;
 }

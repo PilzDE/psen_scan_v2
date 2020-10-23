@@ -23,11 +23,13 @@
 
 namespace psen_scan_v2
 {
-using MeasurementData = std::vector<double>;
-
 //! @brief Holds the measurement data for one laserscan.
 class LaserScan
 {
+public:
+  using MeasurementData = std::vector<double>;
+  using IntensityData = std::vector<double>;
+
 public:
   /**
    * @brief Construct a new Laser Scan object.
@@ -39,19 +41,24 @@ public:
   LaserScan(const TenthOfDegree& resolution, const TenthOfDegree& min_scan_angle, const TenthOfDegree& max_scan_angle);
 
 public:
-  TenthOfDegree getScanResolution() const;
-  TenthOfDegree getMinScanAngle() const;
-  TenthOfDegree getMaxScanAngle() const;
+  const TenthOfDegree& getScanResolution() const;
+  const TenthOfDegree& getMinScanAngle() const;
+  const TenthOfDegree& getMaxScanAngle() const;
 
   const MeasurementData& getMeasurements() const;
   MeasurementData& getMeasurements();
   void setMeasurements(const MeasurementData&);
+
+  const IntensityData& getIntensities() const;
+  void setIntensities(const IntensityData&);
 
   bool operator==(const LaserScan& scan) const;
 
 private:
   //! Measurement data of the laserscan (in Millimeters).
   MeasurementData measures_;
+  //! Stores the received normalized signal intensities.
+  IntensityData intensities_;
   //! Distance of angle between the measurements (in radian).
   const TenthOfDegree resolution_;
   //! Lowest angle the scanner is scanning (in radian).
