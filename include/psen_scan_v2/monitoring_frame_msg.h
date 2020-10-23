@@ -55,11 +55,13 @@ public:
                      const TenthOfDegree& resolution,
                      const uint32_t scan_counter,
                      const std::vector<double>& measures,
+                     const std::vector<double>& intensities,
                      const std::vector<MonitoringFrameDiagnosticMessage>& diagnostic_messages)
     : from_theta_(from_theta)
     , resolution_(resolution)
     , scan_counter_(scan_counter)
     , measures_(measures)
+    , intensities_(intensities)
     , diagnostic_messages_(diagnostic_messages)
     , diagnostic_data_enabled_(true){
 
