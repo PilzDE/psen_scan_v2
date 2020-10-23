@@ -408,6 +408,7 @@ TEST_F(ScannerAPITests, testReceivingOfMonitoringFrame)
   pilz_testutils::LoggerMock ros_log_mock;
   StrictMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
+
   ScannerV2 scanner(config_,
                     std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1),
                     port_holder_.data_port_scanner,
