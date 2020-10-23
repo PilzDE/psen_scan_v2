@@ -57,7 +57,7 @@ public:
 private:
   //! Measurement data of the laserscan (in Millimeters).
   MeasurementData measures_;
-  //! Measurement data of the laserscan (in Millimeters).
+  //! Stores the received normalized signal intensities.
   IntensityData intensities_;
   //! Distance of angle between the measurements (in radian).
   const TenthOfDegree resolution_;
