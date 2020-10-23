@@ -27,6 +27,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   rosfmt
+  rosbag
 )
 
 ## System dependencies are found with CMake's conventions
@@ -358,6 +359,19 @@ target_link_libraries(integrationtest_scanner_api
     ${catkin_LIBRARIES}
     ${pilz_testutils_LIBRARIES}
   )
+
+
+  if(DEFINED ENV{HW_TESTING})
+    add_rostest_gtest(scan_compare
+        test/hw_tests/scan_compare.test
+        test/hw_tests/scan_compare.cpp
+    )
+    target_link_libraries(scan_compare
+      ${catkin_LIBRARIES}
+      ${pilz_testutils_LIBRARIES}
+    )
+  endif()
+
 
   # generate coverage report using CATKIN_MAKE:
   # catkin_make -DENABLE_COVERAGE_TESTING=ON -DCMAKE_BUILD_TYPE=Debug psen_scan_v2_coverage (adding -j1 recommended)
