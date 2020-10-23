@@ -71,8 +71,8 @@ public:
   TenthOfDegree fromTheta() const;
   TenthOfDegree resolution() const;
   uint32_t scanCounter() const;
-  std::vector<double> measures() const;
-  std::vector<double> intensities() const;
+  const std::vector<double>& measures() const;
+  const std::vector<double>& intensities() const;
   std::vector<MonitoringFrameDiagnosticMessage> diagnosticMessages() const;
   bool operator==(const MonitoringFrameMsg& rhs) const;
 

@@ -49,12 +49,12 @@ uint32_t MonitoringFrameMsg::scanCounter() const
   return scan_counter_;
 }
 
-std::vector<double> MonitoringFrameMsg::measures() const
+const std::vector<double>& MonitoringFrameMsg::measures() const
 {
   return measures_;
 }
 
-std::vector<double> MonitoringFrameMsg::intensities() const
+const std::vector<double>& MonitoringFrameMsg::intensities() const
 {
   return intensities_;
 }

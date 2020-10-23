@@ -31,26 +31,70 @@ using namespace psen_scan_v2;
 
 namespace psen_scan_v2_test
 {
-TEST(LaserScanConversionsTest, testToLaserScan)
+static MonitoringFrameMsg createMsg()
 {
-  MonitoringFrameMsg frame(TenthOfDegree(10.), TenthOfDegree(3.14 / 2.), 42, { 1., 2., 3., 4.5, 5, 42 });
+  const auto from_theta{ TenthOfDegree(10.) };
+  const auto resolution{ TenthOfDegree(3.14 / 2.) };
+  const uint32_t scan_counter{ 42 };
+  const std::vector<double> measurements{ 1., 2., 3., 4.5, 5., 42. };
+  const std::vector<double> intensities{ 0., 4., 3., 1007., 508., 14000. };
+  const std::vector<MonitoringFrameDiagnosticMessage> diagnosticMessages{};
 
+  return MonitoringFrameMsg(from_theta, resolution, scan_counter, measurements, intensities, diagnosticMessages);
+}
+
+TEST(LaserScanConversionsTest, laserScanShouldContainCorrectScanResolutionAfterConversion)
+{
+  const MonitoringFrameMsg frame{ createMsg() };
   std::unique_ptr<LaserScan> scan_ptr;
   ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ toLaserScan(frame) }););
 
-  EXPECT_EQ(frame.fromTheta(), scan_ptr->getMinScanAngle());
-  EXPECT_EQ(frame.resolution(), scan_ptr->getScanResolution());
+  EXPECT_EQ(frame.resolution(), scan_ptr->getScanResolution()) << "Resolution incorrect in LaserScan";
+}
 
-  const TenthOfDegree max_scan_angle{ (frame.fromTheta() + frame.resolution() * (frame.measures().size() - 1)) };
-  EXPECT_EQ(max_scan_angle, scan_ptr->getMaxScanAngle());
+TEST(LaserScanConversionsTest, laserScanShouldContainCorrectMinMaxScanAngleAfterConversion)
+{
+  const MonitoringFrameMsg frame{ createMsg() };
+  std::unique_ptr<LaserScan> scan_ptr;
+  ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ toLaserScan(frame) }););
+
+  const TenthOfDegree expected_max_scan_angle{ (frame.fromTheta() +
+                                                frame.resolution() * (frame.measures().size() - 1)) };
+
+  EXPECT_EQ(frame.fromTheta(), scan_ptr->getMinScanAngle()) << "Min scan-angle incorrect in LaserScan";
+  EXPECT_EQ(expected_max_scan_angle, scan_ptr->getMaxScanAngle()) << "Max scan-angle incorrect in LaserScan";
+}
+
+TEST(LaserScanConversionsTest, laserScanShouldContainCorrectMeasurementsAfterConversion)
+{
+  const MonitoringFrameMsg frame{ createMsg() };
+
+  std::unique_ptr<LaserScan> scan_ptr;
+  ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ toLaserScan(frame) }););
 
   EXPECT_EQ(frame.measures().size(), scan_ptr->getMeasurements().size());
   const auto mismatch_pair =
       std::mismatch(scan_ptr->getMeasurements().begin(), scan_ptr->getMeasurements().end(), frame.measures().begin());
   EXPECT_EQ(scan_ptr->getMeasurements().end(), mismatch_pair.first)
-      << "Measure number " << std::distance(scan_ptr->getMeasurements().begin(), mismatch_pair.first)
+      << "Measure #" << std::distance(scan_ptr->getMeasurements().begin(), mismatch_pair.first)
       << " in LaserScan is: " << *(mismatch_pair.first) << ", but expected: " << *(mismatch_pair.second);
 }
+
+TEST(LaserScanConversionsTest, laserScanShouldContainCorrectIntensitiesAfterConversion)
+{
+  const MonitoringFrameMsg frame{ createMsg() };
+
+  std::unique_ptr<LaserScan> scan_ptr;
+  ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ toLaserScan(frame) }););
+
+  EXPECT_EQ(frame.intensities().size(), scan_ptr->getIntensities().size());
+  const auto mismatch_pair =
+      std::mismatch(scan_ptr->getIntensities().begin(), scan_ptr->getIntensities().end(), frame.intensities().begin());
+  EXPECT_EQ(scan_ptr->getIntensities().end(), mismatch_pair.first)
+      << "Intensity #" << std::distance(scan_ptr->getIntensities().begin(), mismatch_pair.first)
+      << " in LaserScan is: " << *(mismatch_pair.first) << ", but expected: " << *(mismatch_pair.second);
+}
+
 }  // namespace psen_scan_v2_test
 
 int main(int argc, char* argv[])
