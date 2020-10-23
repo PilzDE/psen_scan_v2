@@ -60,13 +60,16 @@ DynamicSizeRawData serialize(const MonitoringFrameMsg& frame)
   raw_processing::writeArray<uint16_t, double>(
       os, frame.measures_, [](double elem) { return (static_cast<uint16_t>(std::round(elem * 1000.))); });
 
-  MonitoringFrameAdditionalFieldHeader intensities_header(
-      static_cast<MonitoringFrameAdditionalFieldHeader::Id>(
-          monitoring_frame_additional_field_header_ids::HeaderID::INTENSITIES),
-      frame.intensities_.size() * NUMBER_OF_BYTES_SINGLE_INTENSITY);
-  writeFieldHeader(os, intensities_header);
-  raw_processing::writeArray<uint16_t, double>(
-      os, frame.intensities_, [](double elem) { return static_cast<uint16_t>(std::round(elem)); });
+  if (!frame.intensities_.empty())
+  {
+    MonitoringFrameAdditionalFieldHeader intensities_header(
+        static_cast<MonitoringFrameAdditionalFieldHeader::Id>(
+            monitoring_frame_additional_field_header_ids::HeaderID::INTENSITIES),
+        frame.intensities_.size() * NUMBER_OF_BYTES_SINGLE_INTENSITY);
+    writeFieldHeader(os, intensities_header);
+    raw_processing::writeArray<uint16_t, double>(
+        os, frame.intensities_, [](double elem) { return static_cast<uint16_t>(std::round(elem)); });
+  }
 
   MonitoringFrameAdditionalFieldHeader::Id end_of_frame_header_id =
       static_cast<MonitoringFrameAdditionalFieldHeader::Id>(
