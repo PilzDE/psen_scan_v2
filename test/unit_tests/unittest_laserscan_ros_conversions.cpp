@@ -64,8 +64,8 @@ TEST(LaserScanROSConversionsTest, testToLaserScanMsg)
 
   EXPECT_NEAR(laserscan_msg.scan_time, TIME_PER_SCAN_IN_S, EPSILON);
 
-  EXPECT_EQ(laserscan_msg.range_min, RANGE_MIN_IN_M);
-  EXPECT_EQ(laserscan_msg.range_max, RANGE_MAX_IN_M);
+  EXPECT_NEAR(laserscan_msg.range_min, RANGE_MIN_IN_M, EPSILON);
+  EXPECT_NEAR(laserscan_msg.range_max, RANGE_MAX_IN_M, EPSILON);
 
   ASSERT_EQ(laserscan_msg.ranges.size(), measures.size());
 
