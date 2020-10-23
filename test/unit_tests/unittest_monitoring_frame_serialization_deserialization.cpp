@@ -47,7 +47,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeHexdumpFrameCorrectly)
   }
 }
 
-TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithoutMeasurementsAndIntensitiesCorrectly)
+TEST(MonitoringFrameSerializationTest, shouldSerializeHexdumpFrameWithoutMeasurementsAndIntensitiesCorrectly)
 {
   scanner_udp_datagram_hexdumps::WithoutMeasurementsAndIntensities without_measurements_and_intensities;
   DynamicSizeRawData serialized_monitoring_frame_message =
@@ -87,6 +87,17 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
   MonitoringFrameMsg deserialized_msg = deserializeMonitoringFrame(convertToMaxSizeRawData(raw), raw.size());
 
   EXPECT_EQ(msg, deserialized_msg);
+}
+
+TEST(MonitoringFrameSerializationTest, shouldFailOnSerializeAndDeserializeFrameWithIntensityChannelBits)
+{
+  MonitoringFrameMsg msg(TenthOfDegree(25), TenthOfDegree(1), 1, { 0 }, { 70045 }, {});
+
+  DynamicSizeRawData raw = serialize(msg);
+  MonitoringFrameMsg deserialized_msg = deserializeMonitoringFrame(convertToMaxSizeRawData(raw), raw.size());
+
+  EXPECT_FALSE(msg == deserialized_msg);
+  EXPECT_EQ(deserialized_msg.intensities().at(0), 0b0011111111111111 & 70045);
 }
 
 TEST(MonitoringFrameSerializationDiagnosticMessagesTest, shouldSetCorrectBitInSerializedDiagnosticData)
