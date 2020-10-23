@@ -41,7 +41,7 @@ uint8_t clearIntensityChannelBits(size_t index, size_t begin, size_t n, uint8_t 
   }
 }
 
-TEST(MonitoringFrameSerializationTest, shouldSerializeFrameCorrectly)
+TEST(MonitoringFrameSerializationTest, shouldSerializeHexdumpFrameCorrectly)
 {
   scanner_udp_datagram_hexdumps::WithIntensitiesAndDiagnostics with_intensities;
   DynamicSizeRawData serialized_monitoring_frame_message = serialize(with_intensities.expected_msg_);
@@ -73,7 +73,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeFrameWithoutMeasurementsAn
   }
 }
 
-TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeSelfConstructedFrameConsistently)
+TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsistently)
 {
   std::array<ErrorLocation, 3> error_locations = { ErrorLocation(0, 0), ErrorLocation(5, 0), ErrorLocation(4, 7) };
 
