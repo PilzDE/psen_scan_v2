@@ -73,7 +73,8 @@ std::future<void> ScannerV2::start()
   std::future<void> retval_future;
   try
   {
-    retval_future = scanner_has_started_.get_future();
+    scanner_has_started_.emplace_back();
+    retval_future = scanner_has_started_.back().get_future();
   }
   // TODO: Temporarily disabled until fix of segfault if start() is called twice
   // LCOV_EXCL_START
@@ -111,10 +112,10 @@ void ScannerV2::scannerStartedCB()
   PSENSCAN_INFO("ScannerController", "Scanner started successfully.");
   stopStartWatchdog();
   PSENSCAN_DEBUG("Scanner", "Inform user that scanner start is finsihed.");
-  scanner_has_started_.set_value();
+  std::for_each(scanner_has_started_.begin(), scanner_has_started_.end(), [](auto& promise) { promise.set_value(); });
 
   // Reinitialize
-  scanner_has_started_ = std::promise<void>();
+  scanner_has_started_.clear();
 }
 
 void ScannerV2::scannerStoppedCB()
@@ -129,7 +130,10 @@ void ScannerV2::scannerStoppedCB()
 void ScannerV2::startStartWatchdog()
 {
   const std::lock_guard<std::mutex> lock(start_watchdog_mutex_);
-  start_watchdog_ = std::make_unique<Watchdog>(REPLY_TIMEOUT, BIND_EVENT(scanner_events::StartTimeout));
+  if (start_watchdog_ == nullptr)
+  {
+    start_watchdog_ = std::make_unique<Watchdog>(REPLY_TIMEOUT, BIND_EVENT(scanner_events::StartTimeout));
+  }
 }
 
 void ScannerV2::stopStartWatchdog()

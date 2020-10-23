@@ -76,7 +76,7 @@ private:
   void stopStartWatchdog();
 
 private:
-  std::promise<void> scanner_has_started_;
+  std::vector<std::promise<void>> scanner_has_started_;
   std::promise<void> scanner_has_stopped_;
 
   // The watchdog pointer is changed by the user-main-thread and by the UDP client callback-thread/io-service-thread,

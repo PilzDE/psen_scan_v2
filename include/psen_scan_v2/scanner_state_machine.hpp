@@ -106,6 +106,11 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
   args_->inform_user_about_laser_scan_cb(toLaserScan(frame));
 }
 
+inline void ScannerProtocolDef::notifyAlreadyStarted(const scanner_events::StartRequest& event)
+{
+  PSENSCAN_WARN("StateMachine", "Start called on running scanner.");
+}
+
 //+++++++++++++++++++++++++++++++++ Guards ++++++++++++++++++++++++++++++++++++
 
 inline bool ScannerProtocolDef::isStartReply(scanner_events::RawReplyReceived const& reply_event)
