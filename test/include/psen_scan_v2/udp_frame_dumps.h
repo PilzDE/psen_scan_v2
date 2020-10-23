@@ -29,7 +29,20 @@ namespace psen_scan_v2_test
 {
 namespace scanner_udp_datagram_hexdumps
 {
-constexpr uint16_t convertHexdumpBytesToUint16_t(uint8_t msbyte, uint8_t lsbyte)
+constexpr uint8_t
+clearIntensityChannelBits(const size_t index, const size_t begin, const size_t n, const uint8_t hexdump_byte)
+{
+  if ((index >= begin) && (index < begin + n) && (0 == index % 2))
+  {
+    return 0b00111111 & hexdump_byte;
+  }
+  else
+  {
+    return hexdump_byte;
+  }
+}
+
+constexpr uint16_t convertHexdumpBytesToUint16_t(const uint8_t msbyte, const uint8_t lsbyte)
 {
   return static_cast<uint16_t>(msbyte << 8) + static_cast<uint16_t>(lsbyte);
 }

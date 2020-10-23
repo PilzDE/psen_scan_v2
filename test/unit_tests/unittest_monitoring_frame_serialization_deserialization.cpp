@@ -29,18 +29,6 @@ using namespace psen_scan_v2;
 
 namespace psen_scan_v2_test
 {
-uint8_t clearIntensityChannelBits(size_t index, size_t begin, size_t n, uint8_t hexdump_byte)
-{
-  if ((index >= begin) && (index < begin + n) && (0 == index % 2))
-  {
-    return 0b00111111 & hexdump_byte;
-  }
-  else
-  {
-    return hexdump_byte;
-  }
-}
-
 TEST(MonitoringFrameSerializationTest, shouldSerializeHexdumpFrameCorrectly)
 {
   scanner_udp_datagram_hexdumps::WithIntensitiesAndDiagnostics with_intensities;
@@ -50,10 +38,11 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeHexdumpFrameCorrectly)
 
   for (size_t i = 0; i < with_intensities.hex_dump.size(); i++)
   {
-    uint8_t expected_byte = clearIntensityChannelBits(i,
-                                                      with_intensities.intensities_offset,
-                                                      2 * with_intensities.expected_msg_.intensities().size(),
-                                                      with_intensities.hex_dump.at(i));
+    uint8_t expected_byte = scanner_udp_datagram_hexdumps::clearIntensityChannelBits(
+        i,
+        with_intensities.intensities_offset,
+        2 * with_intensities.expected_msg_.intensities().size(),
+        with_intensities.hex_dump.at(i));
     EXPECT_EQ((uint8_t)serialized_monitoring_frame_message.at(i), expected_byte) << " index " << i;
   }
 }
