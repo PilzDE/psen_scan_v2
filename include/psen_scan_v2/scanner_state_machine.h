@@ -118,6 +118,8 @@ public:  // States
 public:  // Action methods
   template <class T>
   void sendStartRequest(const T& event);
+  template <class T>
+  void handleStartRequestTimeout(const T& event);
   void sendStopRequest(const scanner_events::StopRequest& event);
   void handleMonitoringFrame(const scanner_events::RawMonitoringFrameReceived& event);
 
@@ -143,7 +145,7 @@ public:  // Definition of state machine via table
       a_row  < Idle,                      e::StartRequest,              WaitForStartReply,          &m::sendStartRequest                                      >,
       a_row  < Idle,                      e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                       >,
       g_row  < WaitForStartReply,         e::RawReplyReceived,          WaitForMonitoringFrame,                                   &m::isStartReply            >,
-      a_irow < WaitForStartReply,         e::StartTimeout,                                          &m::sendStartRequest                                      >,
+      a_irow < WaitForStartReply,         e::StartTimeout,                                          &m::handleStartRequestTimeout                             >,
       a_irow < WaitForMonitoringFrame,    e::RawMonitoringFrameReceived,                            &m::handleMonitoringFrame                                 >,
       a_row  < WaitForStartReply,         e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                       >,
       a_row  < WaitForMonitoringFrame,    e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                       >,
