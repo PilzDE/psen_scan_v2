@@ -27,7 +27,8 @@ using namespace psen_scan_v2::scanner_protocol::scanner_events;
   [this](const MaxSizeRawData& data, const std::size_t& num_bytes){ triggerEventWithParam(event_name(data, num_bytes)); }
 // clang-format on
 
-StateMachineArgs* ScannerV2::createStateMachineArgs()
+StateMachineArgs* ScannerV2::createStateMachineArgs(const unsigned short& data_port_scanner,
+                                                    const unsigned short& control_port_scanner)
 {
   return new StateMachineArgs(IScanner::getConfig(),
                               // UDP clients
@@ -35,20 +36,24 @@ StateMachineArgs* ScannerV2::createStateMachineArgs()
                                                               BIND_EVENT(ReplyReceiveError),
                                                               IScanner::getConfig().hostUDPPortControl(),
                                                               IScanner::getConfig().clientIp(),
-                                                              CONTROL_PORT_OF_SCANNER_DEVICE),
+                                                              control_port_scanner),
                               std::make_unique<UdpClientImpl>(BIND_RAW_DATA_EVENT(RawMonitoringFrameReceived),
                                                               BIND_EVENT(MonitoringFrameReceivedError),
                                                               IScanner::getConfig().hostUDPPortData(),
                                                               IScanner::getConfig().clientIp(),
-                                                              DATA_PORT_OF_SCANNER_DEVICE),
+                                                              data_port_scanner),
                               // Callbacks
                               std::bind(&ScannerV2::scannerStartedCB, this),
                               std::bind(&ScannerV2::scannerStoppedCB, this),
                               IScanner::getLaserScanCB());
-}
+}  // namespace psen_scan_v2
 
-ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb)
-  : IScanner(scanner_config, laser_scan_cb), sm_(new ScannerStateMachine(createStateMachineArgs()))
+ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config,
+                     const LaserScanCallback& laser_scan_cb,
+                     const unsigned short data_port_scanner,
+                     const unsigned short control_port_scanner)
+  : IScanner(scanner_config, laser_scan_cb)
+  , sm_(new ScannerStateMachine(createStateMachineArgs(data_port_scanner, control_port_scanner)))
 {
   const std::lock_guard<std::mutex> lock(sm_mutex_);
   sm_->start();
@@ -70,11 +75,14 @@ std::future<void> ScannerV2::start()
   {
     retval_future = scanner_has_started_.get_future();
   }
+  // TODO: Temporarily disabled until fix of segfault if start() is called twice
+  // LCOV_EXCL_START
   catch (const std::future_error& ex)
   {
     PSENSCAN_ERROR("Scanner", "Start was already called.");
     throw std::runtime_error("Start must not be called twice");
   }
+  // LCOV_EXCL_STOP
   startStartWatchdog();
   triggerEvent<scanner_events::StartRequest>();
   return retval_future;

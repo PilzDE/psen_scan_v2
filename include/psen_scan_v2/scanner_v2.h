@@ -47,7 +47,10 @@ static constexpr std::chrono::milliseconds REPLY_TIMEOUT{ 1000 };
 class ScannerV2 : public IScanner
 {
 public:
-  ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb);
+  ScannerV2(const ScannerConfiguration& scanner_config,
+            const LaserScanCallback& laser_scan_cb,
+            const unsigned short data_port_scanner = DATA_PORT_OF_SCANNER_DEVICE,
+            const unsigned short control_port_scanner = CONTROL_PORT_OF_SCANNER_DEVICE);
   ~ScannerV2();
 
 public:
@@ -57,7 +60,8 @@ public:
 private:
   // Raw pointer used here because "msm::back::state_machine" cannot properly pass
   // a "std::unique_ptr" to "msm::front::state_machine_def".
-  StateMachineArgs* createStateMachineArgs();
+  StateMachineArgs* createStateMachineArgs(const unsigned short& data_port_scanner,
+                                           const unsigned short& control_port_scanner);
 
   template <class T>
   void triggerEventWithParam(const T& event);
