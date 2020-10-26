@@ -81,8 +81,7 @@ inline void ScannerProtocolDef::sendStartRequest(const T& event)
   args_->control_client_->write(StartRequest(args_->config_, DEFAULT_SEQ_NUMBER).serialize());
 }
 
-template <class T>
-inline void ScannerProtocolDef::handleStartRequestTimeout(const T& event)
+inline void ScannerProtocolDef::handleStartRequestTimeout(const scanner_events::StartTimeout& event)
 {
   PSENSCAN_DEBUG("StateMachine", "Action: handleStartRequestTimeout");
   PSENSCAN_ERROR("StateMachine",

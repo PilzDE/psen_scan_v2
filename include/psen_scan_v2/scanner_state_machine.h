@@ -118,8 +118,7 @@ public:  // States
 public:  // Action methods
   template <class T>
   void sendStartRequest(const T& event);
-  template <class T>
-  void handleStartRequestTimeout(const T& event);
+  void handleStartRequestTimeout(const scanner_events::StartTimeout& event);
   void sendStopRequest(const scanner_events::StopRequest& event);
   void handleMonitoringFrame(const scanner_events::RawMonitoringFrameReceived& event);
 
