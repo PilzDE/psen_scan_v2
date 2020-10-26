@@ -83,71 +83,72 @@ ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config,
   : IScanner(scanner_config, laser_scan_cb)
   , sm_(new ScannerStateMachine(createStateMachineArgs(data_port_scanner, control_port_scanner)))
 {
-  const std::lock_guard<std::mutex> lock(sm_mutex_);
+  const std::lock_guard<std::mutex> lock(member_mutex_);
   sm_->start();
 }
 
 ScannerV2::~ScannerV2()
 {
   PSENSCAN_DEBUG("Scanner", "Destruction called.");
-  const std::lock_guard<std::mutex> lock(sm_mutex_);
+
+  const std::lock_guard<std::mutex> lock(member_mutex_);
   sm_->stop();
 }
 
 std::future<void> ScannerV2::start()
 {
   PSENSCAN_INFO("Scanner", "Start scanner called.");
-  std::future<void> retval_future;
-  try
+
+  const std::lock_guard<std::mutex> lock(member_mutex_);
+  if (scanner_has_started_)
   {
-    retval_future = scanner_has_started_.get_future();
+    return std::future<void>();
   }
-  // TODO: Temporarily disabled until fix of segfault if start() is called twice
-  // LCOV_EXCL_START
-  catch (const std::future_error& ex)
-  {
-    PSENSCAN_ERROR("Scanner", "Start was already called.");
-    throw std::runtime_error("Start must not be called twice");
-  }
-  // LCOV_EXCL_STOP
-  triggerEvent<scanner_events::StartRequest>();
-  return retval_future;
+
+  // No call to triggerEvent() because lock already taken
+  sm_->process_event(scanner_events::StartRequest());
+  // Due to the fact that the getting of the future should always succeed (because of the
+  // protected check and replacement of the promise), the std::future_error exception is not caught here.
+  scanner_has_started_ = std::promise<void>();
+  return scanner_has_started_.value().get_future();
 }
 
 std::future<void> ScannerV2::stop()
 {
   PSENSCAN_INFO("Scanner", "Stop scanner called.");
-  std::future<void> retval_future;
-  try
+
+  const std::lock_guard<std::mutex> lock(member_mutex_);
+  if (scanner_has_stopped_)
   {
-    retval_future = scanner_has_stopped_.get_future();
+    return std::future<void>();
   }
-  catch (const std::future_error& ex)
-  {
-    PSENSCAN_ERROR("Scanner", "Stop was already called.");
-    throw std::runtime_error("Stop must not be called twice");
-  }
-  triggerEvent<scanner_events::StopRequest>();
-  return retval_future;
+
+  // No call to triggerEvent() because lock already taken
+  sm_->process_event(scanner_events::StopRequest());
+  // Due to the fact that the getting of the future should always succeed (because of the
+  // protected check and replacement of the promise), the std::future_error exception is not caught here.
+  scanner_has_stopped_ = std::promise<void>();
+  return scanner_has_stopped_.value().get_future();
 }
 
+// PLEASE NOTE:
+// The callback does not take a member lock because the callback is always called
+// via call to triggerEvent() or triggerEventWithParam() which already take the mutex.
 void ScannerV2::scannerStartedCB()
 {
   PSENSCAN_INFO("ScannerController", "Scanner started successfully.");
-  PSENSCAN_DEBUG("Scanner", "Inform user that scanner start is finsihed.");
-  scanner_has_started_.set_value();
-
-  // Reinitialize
-  scanner_has_started_ = std::promise<void>();
+  scanner_has_started_.value().set_value();
+  scanner_has_started_ = boost::none;
 }
 
+// PLEASE NOTE:
+// The callback does not take a member lock because the callback is always called
+// via call to triggerEvent() or triggerEventWithParam() which already take the mutex.
 void ScannerV2::scannerStoppedCB()
 {
   PSENSCAN_INFO("ScannerController", "Scanner stopped successfully.");
-  scanner_has_stopped_.set_value();
-
-  // Reinitialize
-  scanner_has_stopped_ = std::promise<void>();
+  scanner_has_stopped_.value().set_value();
+  scanner_has_stopped_ = boost::none;
 }
 
 }  // namespace psen_scan_v2
