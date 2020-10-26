@@ -61,22 +61,20 @@ private:
 class Comparator
 {
 public:
-  Comparator(ros::NodeHandle& nh, std::map<int16_t, Dist>& dists) : nh_(nh), dists_(dists)
-  {
-    sub_ = nh_.subscribe("/laser_scanner/scan", 1000, &Comparator::scanCb, this);
-  };
+  Comparator(ros::NodeHandle& nh) : nh_(nh){};
 
   void scanCb(const sensor_msgs::LaserScanConstPtr& scan)
   {
-    // TODO compare scan!
-
+    scans_.push_back(scan);
     counter_++;
   }
 
-  void run()
+  void collectScans(size_t sample_size)
   {
+    sub_ = nh_.subscribe("/laser_scanner/scan", 1000, &Comparator::scanCb, this);
+
     ros::Rate r(10);
-    while (ros::ok() && counter_ < 100)
+    while (ros::ok() && counter_ < sample_size)
     {
       r.sleep();
     }
@@ -84,10 +82,40 @@ public:
     std::cerr << counter_ << "Scans received. Run stoped\n";
   }
 
+  std::map<int16_t, Dist> getBins()
+  {
+    std::map<int16_t, Dist> bins;
+
+    for (const auto& scan : scans_)
+    {
+      if (scan == nullptr)
+      {
+        continue;
+      }
+
+      std::cout << scan->angle_min << " " << scan->angle_max << " " << (int)toTenthDegree(scan->angle_min) << " "
+                << (int)toTenthDegree(scan->angle_max) << std::endl;
+
+      for (size_t i = 0; i < scan->ranges.size(); ++i)
+      {
+        auto bin_addr = toTenthDegree(scan->angle_min + scan->angle_increment * i);
+
+        if (bins.find(bin_addr) == bins.end())
+        {
+          bins.emplace(bin_addr, Dist{});
+          // Create bin
+        }
+        bins[bin_addr].update(scan->ranges[i]);
+      }
+    }
+
+    return bins;
+  }
+
 private:
   ros::NodeHandle nh_;
   ros::Subscriber sub_;
-  std::map<int16_t, Dist> dists_;
+  std::vector<sensor_msgs::LaserScanConstPtr> scans_;
   size_t counter_{ 0 };
 };
 
@@ -134,9 +162,28 @@ TEST(CompareTest, simpleCompare)
 {
   ros::NodeHandle nh;
 
-  auto bins = loadBin(filepath);
-  Comparator cp(nh, bins);
-  cp.run();
+  auto bins_expected = loadBin(filepath);
+
+  size_t sample_size = 100;
+
+  Comparator cp(nh);
+  cp.collectScans(sample_size);  // This is not exact, ok for now...
+  auto bins_actual = cp.getBins();
+
+  for (const auto& bin : bins_actual)
+  {
+    if (bins_expected.find(bin.first) == bins_expected.end())
+    {
+      std::cerr << "Did not find expected value for " << bin.first / 10. << "\n";
+      continue;
+    }
+
+    const auto bin_expect = bins_expected.at(bin.first);
+
+    std::cerr << "Comparing degree [" << bin.first / 10. << "] \n"
+              << "actual: mean: " << bin.second.mean() << " stdev:" << bin.second.stdev() << "\n"
+              << "expect: mean: " << bin_expect.mean() << " stdev:" << bin_expect.stdev() << "\n\n";
+  }
 
   std::cerr << "Test done!\n";
 }

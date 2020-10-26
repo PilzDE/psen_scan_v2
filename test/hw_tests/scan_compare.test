@@ -2,6 +2,6 @@
   <!--<node pkg="mypkg" type="mynode" name="mynode" />-->
   <include file="$(find psen_scan_v2)/launch/psen_scan_v2.launch" />
   <test test-name="scan_compare" pkg="psen_scan_v2" type="scan_compare">
-    <param name="testfile" value="$(find psen_scan_v2)/test/hw_tests/template2.bag"/>
+    <param name="testfile" value="$(find psen_scan_v2)/test/hw_tests/template.bag"/>
   </test>
 </launch>
