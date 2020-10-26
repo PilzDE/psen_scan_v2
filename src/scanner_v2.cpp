@@ -55,91 +55,81 @@ ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config,
   : IScanner(scanner_config, laser_scan_cb)
   , sm_(new ScannerStateMachine(createStateMachineArgs(data_port_scanner, control_port_scanner)))
 {
-  const std::lock_guard<std::mutex> lock(sm_mutex_);
+  const std::lock_guard<std::recursive_mutex> lock(member_mutex_);
   sm_->start();
 }
 
 ScannerV2::~ScannerV2()
 {
   PSENSCAN_DEBUG("Scanner", "Destruction called.");
-  stopStartWatchdog();
-  const std::lock_guard<std::mutex> lock(sm_mutex_);
+
+  const std::lock_guard<std::recursive_mutex> lock(member_mutex_);
+  start_watchdog_.reset();  // Stops watchdog from running
   sm_->stop();
 }
 
 std::future<void> ScannerV2::start()
 {
   PSENSCAN_INFO("Scanner", "Start scanner called.");
-  std::future<void> retval_future;
-  try
+
+  const std::lock_guard<std::recursive_mutex> lock(member_mutex_);
+  std::future<void> retval;
+  if (!scanner_has_started_)
   {
-    scanner_has_started_.emplace_back();
-    retval_future = scanner_has_started_.back().get_future();
+    scanner_has_started_ = std::promise<void>();
+    // Due to the fact that the getting of the future should always succeed (because of the
+    // protected check and replacement of the promise), the std::future_error exception is not caught here.
+    retval = scanner_has_started_.value().get_future();
   }
-  // TODO: Temporarily disabled until fix of segfault if start() is called twice
-  // LCOV_EXCL_START
-  catch (const std::future_error& ex)
+  else
   {
-    PSENSCAN_ERROR("Scanner", "Start was already called.");
-    throw std::runtime_error("Start must not be called twice");
+    return std::future<void>();
   }
-  // LCOV_EXCL_STOP
-  startStartWatchdog();
+  // Start watchdog
+  start_watchdog_ = std::make_unique<Watchdog>(REPLY_TIMEOUT, BIND_EVENT(scanner_events::StartTimeout));
   triggerEvent<scanner_events::StartRequest>();
-  return retval_future;
+  return retval;
 }
 
 std::future<void> ScannerV2::stop()
 {
   PSENSCAN_INFO("Scanner", "Stop scanner called.");
-  std::future<void> retval_future;
-  try
+
+  const std::lock_guard<std::recursive_mutex> lock(member_mutex_);
+  std::future<void> retval;
+  if (!scanner_has_stopped_)
   {
-    retval_future = scanner_has_stopped_.get_future();
+    scanner_has_stopped_ = std::promise<void>();
+    // Due to the fact that the getting of the future should always succeed (because of the
+    // protected check and replacement of the promise), the std::future_error exception is not caught here.
+    retval = scanner_has_stopped_.value().get_future();
   }
-  catch (const std::future_error& ex)
+  else
   {
-    PSENSCAN_ERROR("Scanner", "Stop was already called.");
-    throw std::runtime_error("Stop must not be called twice");
+    return std::future<void>();
   }
-  stopStartWatchdog();
+  start_watchdog_.reset();  // Stops watchdog from running
   triggerEvent<scanner_events::StopRequest>();
-  return retval_future;
+  return retval;
 }
 
 void ScannerV2::scannerStartedCB()
 {
   PSENSCAN_INFO("ScannerController", "Scanner started successfully.");
-  stopStartWatchdog();
-  PSENSCAN_DEBUG("Scanner", "Inform user that scanner start is finsihed.");
-  std::for_each(scanner_has_started_.begin(), scanner_has_started_.end(), [](auto& promise) { promise.set_value(); });
 
-  // Reinitialize
-  scanner_has_started_.clear();
+  const std::lock_guard<std::recursive_mutex> lock(member_mutex_);
+  start_watchdog_.reset();  // Stops watchdog from running
+  scanner_has_started_.value().set_value();
+  scanner_has_started_ = boost::none;
 }
 
 void ScannerV2::scannerStoppedCB()
 {
   PSENSCAN_INFO("ScannerController", "Scanner stopped successfully.");
-  scanner_has_stopped_.set_value();
 
-  // Reinitialize
-  scanner_has_stopped_ = std::promise<void>();
-}
-
-void ScannerV2::startStartWatchdog()
-{
-  const std::lock_guard<std::mutex> lock(start_watchdog_mutex_);
-  if (start_watchdog_ == nullptr)
-  {
-    start_watchdog_ = std::make_unique<Watchdog>(REPLY_TIMEOUT, BIND_EVENT(scanner_events::StartTimeout));
-  }
-}
-
-void ScannerV2::stopStartWatchdog()
-{
-  const std::lock_guard<std::mutex> lock(start_watchdog_mutex_);
-  start_watchdog_.reset(nullptr);
+  const std::lock_guard<std::recursive_mutex> lock(member_mutex_);
+  scanner_has_stopped_.value().set_value();
+  scanner_has_stopped_ = boost::none;
 }
 
 }  // namespace psen_scan_v2

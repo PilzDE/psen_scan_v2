@@ -275,58 +275,27 @@ TEST_F(ScannerAPITests, testStartFunctionality)
   EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
 }
 
-TEST_F(ScannerAPITests, testCallingStartTwice)
+TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStartIsCalledSecondTime)
 {
-  StrictMock<ScannerMock> scanner_mock{ port_holder_ };
+  NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
   ScannerV2 scanner(config_,
                     std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1),
                     port_holder_.data_port_scanner,
                     port_holder_.control_port_scanner);
-  const StartRequest start_req(config_, DEFAULT_SEQ_NUMBER);
 
   Barrier start_req_received_barrier;
-  EXPECT_CALL(scanner_mock, receiveControlMsg(_, start_req.serialize()))
-      .WillOnce(OpenBarrier(&start_req_received_barrier));
+  ON_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config_, DEFAULT_SEQ_NUMBER).serialize()))
+      .WillByDefault(OpenBarrier(&start_req_received_barrier));
 
   scanner_mock.startListeningForControlMsg();
-  const auto start_future1{ std::async(std::launch::async, [&scanner]() {
-    const auto start_future1 = scanner.start();
-    start_future1.wait();
-  }) };
+  const auto start_future = scanner.start();
+  EXPECT_TRUE(start_future.valid()) << "First call too Scanner::start() should return valid std::future object";
+  EXPECT_FALSE(scanner.start().valid()) << "Second call too Scanner::start() should return invalid std::future object";
 
-  const auto start_future2{ std::async(std::launch::async, [&scanner]() {
-    const auto start_future2 = scanner.start();
-    start_future2.wait();
-  }) };
-
-  EXPECT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
-  EXPECT_EQ(start_future1.wait_for(WAIT_TIMEOUT), std::future_status::timeout) << "Scanner::start() finished too early";
-  EXPECT_EQ(start_future2.wait_for(WAIT_TIMEOUT), std::future_status::timeout) << "Scanner::start() finished too early";
   scanner_mock.sendStartReply();
-  EXPECT_EQ(start_future1.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
-  EXPECT_EQ(start_future2.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
+  EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
 }
-
-// TEST_F(ScannerAPITests, shouldThrowWhenStartIsCalledTwice)
-//{
-//  NiceMock<ScannerMock> scanner_mock{ port_holder_ };
-//  UserCallbacks cb;
-//  ScannerV2 scanner(config_,
-//                    std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1),
-//                    port_holder_.data_port_scanner,
-//                    port_holder_.control_port_scanner);
-
-//  Barrier start_req_received_barrier;
-//  ON_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config_, DEFAULT_SEQ_NUMBER).serialize()))
-//      .WillByDefault(OpenBarrier(&start_req_received_barrier));
-
-//  scanner_mock.startListeningForControlMsg();
-//  const auto start_future = scanner.start();
-//  EXPECT_THROW(scanner.start();, std::runtime_error);
-
-//  // EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
-//}
 
 TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
 {
@@ -386,7 +355,7 @@ TEST_F(ScannerAPITests, testStopFunctionality)
   EXPECT_EQ(stop_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::stop() not finished";
 }
 
-TEST_F(ScannerAPITests, shouldThrowWhenStopIsCalledTwice)
+TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStopIsCalledSecondTime)
 {
   StrictMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
@@ -404,12 +373,12 @@ TEST_F(ScannerAPITests, shouldThrowWhenStopIsCalledTwice)
 
   scanner_mock.startListeningForControlMsg();
   const auto start_future = scanner.start();
-  std::cout << "Start() function finished" << std::endl;
   start_future.wait();
 
   scanner_mock.startListeningForControlMsg();
   auto stop_future = scanner.stop();
-  EXPECT_THROW(scanner.stop();, std::runtime_error);
+  EXPECT_TRUE(stop_future.valid()) << "First call too Scanner::stop() should return valid std::future object";
+  EXPECT_FALSE(scanner.stop().valid()) << "Second call too Scanner::stop() should return invalid std::future object";
 
   EXPECT_TRUE(stop_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Stop request not received";
   scanner_mock.sendStopReply();

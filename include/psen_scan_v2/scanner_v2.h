@@ -21,6 +21,9 @@
 #include <future>
 #include <chrono>
 #include <functional>
+#include <atomic>
+
+#include <boost/optional.hpp>
 
 #include "psen_scan_v2/scanner_interface.h"
 #include "psen_scan_v2/scanner_events.h"
@@ -72,26 +75,31 @@ private:
   void scannerStartedCB();
   void scannerStoppedCB();
 
-  void startStartWatchdog();
-  void stopStartWatchdog();
+private:
+  using OptionalPromise = boost::optional<std::promise<void>>;
 
 private:
-  std::vector<std::promise<void>> scanner_has_started_;
-  std::promise<void> scanner_has_stopped_;
+  OptionalPromise scanner_has_started_{ boost::none };
+  OptionalPromise scanner_has_stopped_;
+
+  //! @brief This Mutex protects ALL members of the Scanner against concurrent access.
+  //! So far there exist at least the following threads, potentially causing concurrent access to the members:
+  //! - user-main-thread
+  //! - io_service thread of UDPClient
+  //! - watchdog threads
+  std::recursive_mutex member_mutex_;
 
   // The watchdog pointer is changed by the user-main-thread and by the UDP client callback-thread/io-service-thread,
   // and, therefore, needs to be protected/sychronized via mutex.
-  std::mutex start_watchdog_mutex_;
   std::unique_ptr<Watchdog> start_watchdog_{};
 
-  std::mutex sm_mutex_;
   std::unique_ptr<ScannerStateMachine> sm_;
 };
 
 template <class T>
 void ScannerV2::triggerEventWithParam(const T& event)
 {
-  const std::lock_guard<std::mutex> lock(sm_mutex_);
+  const std::lock_guard<std::recursive_mutex> lock(member_mutex_);
   sm_->process_event(event);
 }
 
