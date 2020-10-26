@@ -158,6 +158,15 @@ std::map<int16_t, Dist> loadBin(std::string filepath)
   return bins;
 }
 
+double bhattacharyya_distance(const Dist& dist1, const Dist& dist2)
+{
+  const double sigma1_sqr = pow(dist1.stdev(), 2);
+  const double sigma2_sqr = pow(dist2.stdev(), 2);
+
+  return 0.25 * log(0.25 * ((sigma1_sqr / sigma2_sqr) + (sigma2_sqr / sigma1_sqr) + 2)) +
+         0.25 * ((pow(dist1.mean() - dist2.mean(), 2) / (sigma1_sqr + sigma2_sqr)));
+}
+
 TEST(CompareTest, simpleCompare)
 {
   ros::NodeHandle nh;
@@ -170,6 +179,8 @@ TEST(CompareTest, simpleCompare)
   cp.collectScans(sample_size);  // This is not exact, ok for now...
   auto bins_actual = cp.getBins();
 
+  std::vector<double> distances_;
+
   for (const auto& bin : bins_actual)
   {
     if (bins_expected.find(bin.first) == bins_expected.end())
@@ -180,10 +191,20 @@ TEST(CompareTest, simpleCompare)
 
     const auto bin_expect = bins_expected.at(bin.first);
 
+    auto distance = bhattacharyya_distance(bin.second, bin_expect);
+    distances_.push_back(distance);
+
     std::cerr << "Comparing degree [" << bin.first / 10. << "] \n"
               << "actual: mean: " << bin.second.mean() << " stdev:" << bin.second.stdev() << "\n"
-              << "expect: mean: " << bin_expect.mean() << " stdev:" << bin_expect.stdev() << "\n\n";
+              << "expect: mean: " << bin_expect.mean() << " stdev:" << bin_expect.stdev() << "\n"
+              << "distance: " << distance << "\n\n";
   }
+
+  double worst_deviation = *std::max_element(distances_.begin(), distances_.end());
+
+  std::cerr << "Worst distance: " << worst_deviation << "\n";
+
+  EXPECT_LE(worst_deviation, 1000.);
 
   std::cerr << "Test done!\n";
 }
