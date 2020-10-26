@@ -378,6 +378,7 @@ TEST_F(ScannerAPITests, shouldThrowWhenStopIsCalledTwice)
 
 TEST_F(ScannerAPITests, testStartReplyTimeout)
 {
+  NiceMock<pilz_testutils::LoggerMock> ros_log_mock;
   StrictMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
   ScannerV2 scanner(config_,
@@ -385,12 +386,21 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
                     port_holder_.data_port_scanner,
                     port_holder_.control_port_scanner);
 
+  Barrier error_msg_barrier;
   Barrier twice_called_barrier;
   {
     InSequence seq;
     EXPECT_CALL(scanner_mock, receiveControlMsg(_, _)).Times(1);
     EXPECT_CALL(scanner_mock, receiveControlMsg(_, _)).Times(1).WillOnce(OpenBarrier(&twice_called_barrier));
   }
+  EXPECT_LOG(*ros_log_mock, INFO, "Start scanner called.").Times(1);
+  EXPECT_LOG(*ros_log_mock,
+             ERROR,
+             "Timeout while waiting for the scanner to start! Retrying... "
+             "(Please check the ethernet connection or contact PILZ support if the error persists.)")
+      .Times(AtLeast(1))
+      .WillOnce(OpenBarrier(&error_msg_barrier));
+  EXPECT_LOG(*ros_log_mock, INFO, "Scanner started successfully.").Times(1);
 
   scanner_mock.startContinuousListeningForControlMsg();
   const auto start_future{ std::async(std::launch::async, [&scanner]() {
@@ -398,6 +408,7 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
     scanner_start.wait();
   }) };
 
+  EXPECT_TRUE(error_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Error message not received";
   EXPECT_TRUE(twice_called_barrier.waitTillRelease(5000ms)) << "Start reply not send at least twice in time";
   scanner_mock.sendStartReply();
   EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
