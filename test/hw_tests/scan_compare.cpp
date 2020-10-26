@@ -2,6 +2,12 @@
 #include <gtest/gtest.h>
 
 #include <boost/filesystem.hpp>
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
+#include <functional>
+
+#include <future>
+#include <iostream>
 
 #include <numeric>
 #include <math.h>
@@ -11,105 +17,49 @@
 #include <sensor_msgs/LaserScan.h>
 
 #include "psen_scan_v2/angle_conversions.h"
+#include "psen_scan_v2/dist.h"
 
-static std::string filepath;
-
+namespace psen_scan_v2_test
+{
 int16_t toTenthDegree(const double& rad)
 {
   return (rad / (2.0 * M_PI)) * 360 * 10;
 }
 
-class Dist
+class LaserScanCollector
 {
 public:
-  Dist(){};
-  void update(const double& range)
+  LaserScanCollector(ros::NodeHandle& nh) : nh_(nh){};
+
+  void scanCb(const sensor_msgs::LaserScanConstPtr& scan, size_t n_scans)
   {
-    data_.push_back(range);
-  };
-
-  double mean() const
-  {
-    double sum = std::accumulate(data_.begin(), data_.end(), 0.0);
-    double mean = sum / data_.size();
-
-    return mean;
-  }
-
-  double stdev() const
-  {
-    double sq_sum = std::inner_product(data_.begin(), data_.end(), data_.begin(), 0.0);
-    double stdev = std::sqrt(sq_sum / data_.size() - mean() * mean());
-
-    return stdev;
-  }
-
-  double pdf(const double& v) const
-  {
-    return (1.0 / (mean() * sqrt(2 * M_PI))) * exp(-0.5 * pow((v - mean()) / stdev(), 2));
-  }
-
-  double last() const
-  {
-    return data_.back();
-  }
-
-private:
-  std::vector<double> data_;
-};
-
-class Comparator
-{
-public:
-  Comparator(ros::NodeHandle& nh) : nh_(nh){};
-
-  void scanCb(const sensor_msgs::LaserScanConstPtr& scan)
-  {
-    scans_.push_back(scan);
-    counter_++;
-  }
-
-  void collectScans(size_t sample_size)
-  {
-    sub_ = nh_.subscribe("/laser_scanner/scan", 1000, &Comparator::scanCb, this);
-
-    ros::Rate r(10);
-    while (ros::ok() && counter_ < sample_size)
+    if (scans_.size() < n_scans - 1)
     {
-      r.sleep();
+      scans_.push_back(scan);
     }
 
-    std::cerr << counter_ << "Scans received. Run stoped\n";
+    if (scans_.size() == n_scans - 1)
+    {
+      scans_.push_back(scan);
+      scans_collected_.set_value();
+    }
   }
 
-  std::map<int16_t, Dist> getBins()
+  std::vector<sensor_msgs::LaserScanConstPtr> collectScans(size_t sample_size)
   {
-    std::map<int16_t, Dist> bins;
+    scans_.clear();
 
-    for (const auto& scan : scans_)
-    {
-      if (scan == nullptr)
-      {
-        continue;
-      }
+    scans_collected_ = std::promise<void>();
 
-      std::cout << scan->angle_min << " " << scan->angle_max << " " << (int)toTenthDegree(scan->angle_min) << " "
-                << (int)toTenthDegree(scan->angle_max) << std::endl;
+    auto future = scans_collected_.get_future();
+    auto sub = nh_.subscribe<sensor_msgs::LaserScan>(
+        "/laser_scanner/scan",
+        1000,
+        boost::bind(&LaserScanCollector::scanCb, this, boost::placeholders::_1, sample_size));
 
-      for (size_t i = 0; i < scan->ranges.size(); ++i)
-      {
-        auto bin_addr = toTenthDegree(scan->angle_min + scan->angle_increment * i);
+    future.wait();
 
-        if (bins.find(bin_addr) == bins.end())
-        {
-          bins.emplace(bin_addr, Dist{});
-          // Create bin
-        }
-        bins[bin_addr].update(scan->ranges[i]);
-      }
-    }
-
-    return bins;
+    return scans_;
   }
 
 private:
@@ -117,11 +67,39 @@ private:
   ros::Subscriber sub_;
   std::vector<sensor_msgs::LaserScanConstPtr> scans_;
   size_t counter_{ 0 };
+  std::promise<void> scans_collected_;
 };
 
-std::map<int16_t, Dist> loadBin(std::string filepath)
+std::map<int16_t, NormalDist> binsFromScans(std::vector<sensor_msgs::LaserScanConstPtr> scans)
 {
-  std::map<int16_t, Dist> bins;
+  std::map<int16_t, NormalDist> bins;
+
+  for (const auto& scan : scans)
+  {
+    if (scan == nullptr)
+    {
+      continue;
+    }
+
+    for (size_t i = 0; i < scan->ranges.size(); ++i)
+    {
+      auto bin_addr = toTenthDegree(scan->angle_min + scan->angle_increment * i);
+
+      if (bins.find(bin_addr) == bins.end())
+      {
+        bins.emplace(bin_addr, NormalDist{});
+        // Create bin
+      }
+      bins[bin_addr].update(scan->ranges[i]);
+    }
+  }
+
+  return bins;
+}
+
+std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
+{
+  std::map<int16_t, NormalDist> bins;
 
   rosbag::Bag bag;
   bag.open(filepath, rosbag::bagmode::Read);
@@ -136,16 +114,13 @@ std::map<int16_t, Dist> loadBin(std::string filepath)
     sensor_msgs::LaserScanConstPtr scan = m.instantiate<sensor_msgs::LaserScan>();
     if (scan != nullptr)
     {
-      std::cout << scan->angle_min << " " << scan->angle_max << " " << (int)toTenthDegree(scan->angle_min) << " "
-                << (int)toTenthDegree(scan->angle_max) << std::endl;
-
       for (size_t i = 0; i < scan->ranges.size(); ++i)
       {
         auto bin_addr = toTenthDegree(scan->angle_min + scan->angle_increment * i);
 
         if (bins.find(bin_addr) == bins.end())
         {
-          bins.emplace(bin_addr, Dist{});
+          bins.emplace(bin_addr, NormalDist{});
           // Create bin
         }
         bins[bin_addr].update(scan->ranges[i]);
@@ -158,84 +133,61 @@ std::map<int16_t, Dist> loadBin(std::string filepath)
   return bins;
 }
 
-double bhattacharyya_distance(const Dist& dist1, const Dist& dist2)
+class ScanComparisionTests : public ::testing::Test
 {
-  const double sigma1_sqr = pow(dist1.stdev(), 2);
-  const double sigma2_sqr = pow(dist2.stdev(), 2);
+public:
+  static void SetUpTestCase()
+  {
+    ros::NodeHandle pnh{ "~" };
 
-  return 0.25 * log(0.25 * ((sigma1_sqr / sigma2_sqr) + (sigma2_sqr / sigma1_sqr) + 2)) +
-         0.25 * ((pow(dist1.mean() - dist2.mean(), 2) / (sigma1_sqr + sigma2_sqr)));
-}
+    std::string filepath;
+    pnh.getParam("testfile", filepath);
 
-TEST(CompareTest, simpleCompare)
+    ROS_INFO_STREAM("Using testfile " << filepath);
+    if (!boost::filesystem::exists(filepath))
+    {
+      ROS_ERROR_STREAM("File " << filepath << " not found!");
+      FAIL();
+    }
+
+    bins_set_expected_ = binsFromRosbag(filepath);
+  }
+
+  static std::map<int16_t, NormalDist> bins_set_expected_;
+};
+
+std::map<int16_t, NormalDist> ScanComparisionTests::bins_set_expected_{};
+
+TEST_F(ScanComparisionTests, simpleCompare)
 {
   ros::NodeHandle nh;
 
-  auto bins_expected = loadBin(filepath);
+  size_t sample_size = 200;
 
-  size_t sample_size = 100;
-
-  Comparator cp(nh);
-  cp.collectScans(sample_size);  // This is not exact, ok for now...
-  auto bins_actual = cp.getBins();
-
-  std::vector<double> distances_;
+  auto scans = LaserScanCollector(nh).collectScans(sample_size);
+  auto bins_actual = binsFromScans(scans);
 
   for (const auto& bin : bins_actual)
   {
-    if (bins_expected.find(bin.first) == bins_expected.end())
+    if (bins_set_expected_.find(bin.first) == bins_set_expected_.end())
     {
-      std::cerr << "Did not find expected value for " << bin.first / 10. << "\n";
-      continue;
+      FAIL() << "Did not find expected value for angle " << bin.first / 10. << " in the given reference scan\n";
     }
 
-    const auto bin_expect = bins_expected.at(bin.first);
-
-    auto distance = bhattacharyya_distance(bin.second, bin_expect);
-    distances_.push_back(distance);
-
-    std::cerr << "Comparing degree [" << bin.first / 10. << "] \n"
-              << "actual: mean: " << bin.second.mean() << " stdev:" << bin.second.stdev() << "\n"
-              << "expect: mean: " << bin_expect.mean() << " stdev:" << bin_expect.stdev() << "\n"
-              << "distance: " << distance << "\n\n";
+    auto distance = bhattacharyya_distance(bin.second, bins_set_expected_.at(bin.first));
+    EXPECT_LE(distance, 2.) << " on angle " << bin.first / 10.0 << " deg the measured value " << bin.second
+                            << "deviates from value obtained from the reference " << bins_set_expected_.at(bin.first);
   }
-
-  double worst_deviation = *std::max_element(distances_.begin(), distances_.end());
-
-  std::cerr << "Worst distance: " << worst_deviation << "\n";
-
-  EXPECT_LE(worst_deviation, 1000.);
-
-  std::cerr << "Test done!\n";
 }
+
+}  // namespace psen_scan_v2_test
 
 int main(int argc, char** argv)
 {
   testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, "scan_compare_test");
-  ros::NodeHandle nh("~");
 
-  std::string testfile_path;
-  nh.getParam("testfile", testfile_path);
-
-  ROS_ERROR_STREAM("Using testfile " << testfile_path);
-
-  if (!boost::filesystem::exists(testfile_path))
-  {
-    ROS_ERROR_STREAM("File " << testfile_path << " not found!");
-    return -1;
-  }
-
-  filepath = testfile_path;
-
-  auto bins = loadBin(filepath);
-
-  for (auto const& bin : bins)
-  {
-    std::cout << (int)bin.first << " mean: " << bin.second.mean() << " std: " << bin.second.stdev()
-              << "  last: " << bin.second.last() << "  pdf:" << bin.second.pdf(bin.second.last()) << "\n";
-  }
-
+  // Needed since we use a subscriber
   ros::AsyncSpinner spinner{ 1 };
   spinner.start();
 

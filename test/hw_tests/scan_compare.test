@@ -1,6 +1,11 @@
 <launch>
   <!--<node pkg="mypkg" type="mynode" name="mynode" />-->
   <include file="$(find psen_scan_v2)/launch/psen_scan_v2.launch" />
+
+ <node pkg="rosbag" type="play" name="playback" ns="myNamespace" args="-l $(find psen_scan_v2)/test/hw_tests/template.bag">
+    <remap from="/laser_scanner/scan" to="/laser_scanner/scan_reference"/>
+  </node>
+
   <test test-name="scan_compare" pkg="psen_scan_v2" type="scan_compare">
     <param name="testfile" value="$(find psen_scan_v2)/test/hw_tests/template.bag"/>
   </test>
