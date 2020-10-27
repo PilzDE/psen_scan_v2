@@ -73,8 +73,7 @@ TEST(LaserScanTest, testGetMaxScanAngle)
 
 TEST(LaserScanTest, testMinEqualsMax)
 {
-  std::unique_ptr<LaserScan> laser_scan;
-  ASSERT_NO_THROW(laser_scan.reset(new LaserScan(DEFAULT_RESOLUTION, TenthOfDegree(1000u), TenthOfDegree(1000u))););
+ASSERT_NO_THROW(LaserScan(DEFAULT_RESOLUTION, TenthOfDegree(1000u), TenthOfDegree(1000u)););
 }
 
 }  // namespace psen_scan_v2_test
