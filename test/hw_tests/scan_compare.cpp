@@ -18,6 +18,7 @@
 
 #include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/dist.h"
+#include "psen_scan_v2/message_collector.h"
 
 namespace psen_scan_v2_test
 {
@@ -25,50 +26,6 @@ int16_t toTenthDegree(const double& rad)
 {
   return (rad / (2.0 * M_PI)) * 360 * 10;
 }
-
-class LaserScanCollector
-{
-public:
-  LaserScanCollector(ros::NodeHandle& nh) : nh_(nh){};
-
-  void scanCb(const sensor_msgs::LaserScanConstPtr& scan, size_t n_scans)
-  {
-    if (scans_.size() < n_scans - 1)
-    {
-      scans_.push_back(scan);
-    }
-
-    if (scans_.size() == n_scans - 1)
-    {
-      scans_.push_back(scan);
-      scans_collected_.set_value();
-    }
-  }
-
-  std::vector<sensor_msgs::LaserScanConstPtr> collectScans(size_t sample_size)
-  {
-    scans_.clear();
-
-    scans_collected_ = std::promise<void>();
-
-    auto future = scans_collected_.get_future();
-    auto sub = nh_.subscribe<sensor_msgs::LaserScan>(
-        "/laser_scanner/scan",
-        1000,
-        boost::bind(&LaserScanCollector::scanCb, this, boost::placeholders::_1, sample_size));
-
-    future.wait();
-
-    return scans_;
-  }
-
-private:
-  ros::NodeHandle nh_;
-  ros::Subscriber sub_;
-  std::vector<sensor_msgs::LaserScanConstPtr> scans_;
-  size_t counter_{ 0 };
-  std::promise<void> scans_collected_;
-};
 
 std::map<int16_t, NormalDist> binsFromScans(std::vector<sensor_msgs::LaserScanConstPtr> scans)
 {
@@ -164,7 +121,7 @@ TEST_F(ScanComparisionTests, simpleCompare)
 
   size_t sample_size = 200;
 
-  auto scans = LaserScanCollector(nh).collectScans(sample_size);
+  auto scans = MessageCollector<sensor_msgs::LaserScan>(nh).collectScans(sample_size, "/laser_scanner/scan");
   auto bins_actual = binsFromScans(scans);
 
   for (const auto& bin : bins_actual)
