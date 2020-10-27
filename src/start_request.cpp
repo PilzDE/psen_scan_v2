@@ -76,18 +76,18 @@ DynamicSizeRawData StartRequest::serialize() const
   raw_processing::write(os, speed_encoder_enabled_);
   raw_processing::write(os, diagnostics_enabled_);
 
-  uint16_t start_angle{ master_.getScanRange().getStart().value() };
-  uint16_t end_angle{ master_.getScanRange().getEnd().value() };
-  uint16_t resolution{ master_.getResolution().value() };
+  int16_t start_angle{ master_.getScanRange().getStart().value() };
+  int16_t end_angle{ master_.getScanRange().getEnd().value() };
+  int16_t resolution{ master_.getResolution().value() };
   raw_processing::write(os, start_angle);
   raw_processing::write(os, end_angle);
   raw_processing::write(os, resolution);
 
   for (const auto& slave : slaves_)
   {
-    uint16_t slave_start_angle{ slave.getScanRange().getStart().value() };
-    uint16_t slave_end_angle{ slave.getScanRange().getEnd().value() };
-    uint16_t slave_resolution{ slave.getResolution().value() };
+    int16_t slave_start_angle{ slave.getScanRange().getStart().value() };
+    int16_t slave_end_angle{ slave.getScanRange().getEnd().value() };
+    int16_t slave_resolution{ slave.getResolution().value() };
     raw_processing::write(os, slave_start_angle);
     raw_processing::write(os, slave_end_angle);
     raw_processing::write(os, slave_resolution);

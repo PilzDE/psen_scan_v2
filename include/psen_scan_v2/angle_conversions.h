@@ -16,6 +16,9 @@
 #ifndef PSEN_SCAN_V2_ANGLE_CONVERSIONS_H
 #define PSEN_SCAN_V2_ANGLE_CONVERSIONS_H
 
+#include <sstream>
+#include <stdexcept>
+
 #include <boost/math/constants/constants.hpp>
 
 namespace psen_scan_v2
@@ -30,25 +33,25 @@ inline static constexpr double degreeToRadian(const double& angle_in_degree)
   return (angle_in_degree / 180.) * boost::math::double_constants::pi;
 }
 
-inline static uint16_t degreeToTenthDegree(const double& angle_in_degree)
+inline static int16_t degreeToTenthDegree(const double& angle_in_degree)
 {
   const double tenth_degree_rounded{ std::round(10. * angle_in_degree) };
-  if (tenth_degree_rounded < std::numeric_limits<uint16_t>::min() ||
-      tenth_degree_rounded > std::numeric_limits<uint16_t>::max())
+  if (tenth_degree_rounded < std::numeric_limits<int16_t>::min() ||
+      tenth_degree_rounded > std::numeric_limits<int16_t>::max())
   {
     std::stringstream exception_msg;
     exception_msg << "Angle " << tenth_degree_rounded << " (tenth of degree) is out of range.";
     throw std::invalid_argument(exception_msg.str());
   }
-  return static_cast<uint16_t>(tenth_degree_rounded);
+  return static_cast<int16_t>(tenth_degree_rounded);
 }
 
-inline static uint16_t radToTenthDegree(const double& angle_in_rad)
+inline static int16_t radToTenthDegree(const double& angle_in_rad)
 {
   return degreeToTenthDegree(radianToDegree(angle_in_rad));
 }
 
-inline static double constexpr tenthDegreeToRad(const uint16_t& angle_in_tenth_degree)
+inline static double constexpr tenthDegreeToRad(const int16_t& angle_in_tenth_degree)
 {
   return degreeToRadian(static_cast<double>(angle_in_tenth_degree) / 10.);
 }

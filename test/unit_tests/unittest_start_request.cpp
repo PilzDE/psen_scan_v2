@@ -100,7 +100,7 @@ TEST_F(StartRequestTest, constructorTest)
 
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::MASTER_START_ANGLE), scan_range.getStart().value()));
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::MASTER_END_ANGLE), scan_range.getEnd().value()));
-  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::MASTER_ANGLE_RESOLUTION), degreeToTenthDegree(0.2)));
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::MASTER_ANGLE_RESOLUTION), static_cast<int16_t>(2)));
 
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::SLAVE_ONE_START_ANGLE), 0));
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::SLAVE_ONE_END_ANGLE), 0));
