@@ -23,7 +23,7 @@ namespace psen_scan_v2
 {
 namespace monitoring_frame
 {
-DynamicSizeRawData serialize(const Message& frame)
+DynamicSizeRawData serialize(const monitoring_frame::Message& frame)
 {
   std::ostringstream os;
 
@@ -37,7 +37,7 @@ DynamicSizeRawData serialize(const Message& frame)
 
   additional_field::Header scan_counter_header(
       static_cast<additional_field::Header::Id>(additional_field::HeaderID::SCAN_COUNTER), sizeof(frame.scan_counter_));
-  writeFieldHeader(os, scan_counter_header);
+  write(os, scan_counter_header);
   uint32_t scan_counter_header_payload = frame.scan_counter_;
   raw_processing::write(os, scan_counter_header_payload);
 
@@ -46,16 +46,15 @@ DynamicSizeRawData serialize(const Message& frame)
     additional_field::Header diagnostic_data_field_header(
         static_cast<additional_field::Header::Id>(additional_field::HeaderID::DIAGNOSTICS),
         diagnostic::raw_message::LENGTH_IN_BYTES);
-    writeFieldHeader(os, diagnostic_data_field_header);
-    diagnostic::raw_message::Type diagnostic_data_field_payload =
-        diagnostic::serializeMessages(frame.diagnostic_messages_);
+    write(os, diagnostic_data_field_header);
+    diagnostic::raw_message::Field diagnostic_data_field_payload = diagnostic::serialize(frame.diagnostic_messages_);
     raw_processing::write(os, diagnostic_data_field_payload);
   }
 
   additional_field::Header measures_header(
       static_cast<additional_field::Header::Id>(additional_field::HeaderID::MEASURES),
       frame.measures_.size() * NUMBER_OF_BYTES_SINGLE_MEASURE);
-  writeFieldHeader(os, measures_header);
+  write(os, measures_header);
   raw_processing::writeArray<uint16_t, double>(
       os, frame.measures_, [](double elem) { return (static_cast<uint16_t>(std::round(elem * 1000.))); });
 
@@ -64,7 +63,7 @@ DynamicSizeRawData serialize(const Message& frame)
     additional_field::Header intensities_header(
         static_cast<additional_field::Header::Id>(additional_field::HeaderID::INTENSITIES),
         frame.intensities_.size() * NUMBER_OF_BYTES_SINGLE_INTENSITY);
-    writeFieldHeader(os, intensities_header);
+    write(os, intensities_header);
     raw_processing::writeArray<uint16_t, double>(
         os, frame.intensities_, [](double elem) { return (static_cast<uint16_t>(std::round(elem))); });
   }
@@ -89,9 +88,9 @@ constexpr size_t calculateIndexInRawDiagnosticData(const ScannerId& id, const di
 
 namespace diagnostic
 {
-raw_message::Type serializeMessages(const std::vector<Message>& messages)
+raw_message::Field serialize(const std::vector<monitoring_frame::diagnostic::Message>& messages)
 {
-  raw_message::Type raw_diagnostic_data{};
+  raw_message::Field raw_diagnostic_data{};
 
   for (const auto& elem : messages)
   {
@@ -102,7 +101,7 @@ raw_message::Type serializeMessages(const std::vector<Message>& messages)
 }
 }  // namespace diagnostic
 
-void writeFieldHeader(std::ostringstream& os, const additional_field::Header& header)
+void write(std::ostringstream& os, const additional_field::Header& header)
 {
   raw_processing::write(os, header.id());
   raw_processing::write<additional_field::Header::Length>(os, header.length() + 1);

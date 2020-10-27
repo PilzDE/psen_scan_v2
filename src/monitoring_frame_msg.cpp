@@ -63,7 +63,7 @@ std::vector<monitoring_frame::diagnostic::Message> monitoring_frame::Message::di
   return diagnostic_messages_;
 }
 
-bool monitoring_frame::Message::operator==(const Message& rhs) const
+bool monitoring_frame::Message::operator==(const monitoring_frame::Message& rhs) const
 {
   return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
           measures() == rhs.measures() && intensities() == rhs.intensities() &&

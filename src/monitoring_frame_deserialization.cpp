@@ -46,9 +46,9 @@ FixedFields::FixedFields(DeviceStatus device_status,
 {
 }
 
-Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes)
+monitoring_frame::Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes)
 {
-  Message msg;
+  monitoring_frame::Message msg;
 
   MaxSizeRawData tmp_data{ data };
   std::istringstream is(std::string(tmp_data.data(), tmp_data.size()));
@@ -89,7 +89,7 @@ Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes)
         break;
 
       case additional_field::HeaderID::DIAGNOSTICS:
-        msg.diagnostic_messages_ = diagnostic::deserializeDiagnosticMessages(is);
+        msg.diagnostic_messages_ = diagnostic::deserializeMessages(is);
         msg.diagnostic_data_enabled_ = true;
         break;
 
@@ -102,7 +102,7 @@ Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes)
         break;
 
       default:
-        throw format_error::Common(fmt::format(
+        throw format_error::DecodingFailure(fmt::format(
             "Header Id {:#04x} unknown. Cannot read additional field of monitoring frame.", additional_header.id()));
     }
   }
@@ -118,7 +118,7 @@ additional_field::Header additional_field::read(std::istringstream& is, const st
 
   if (length >= max_num_bytes)
   {
-    throw format_error::Common(
+    throw format_error::DecodingFailure(
         fmt::format("Length given in header of additional field is too large: {}, id: {:#04x}", length, id));
   }
   if (length > 0)
@@ -130,7 +130,7 @@ additional_field::Header additional_field::read(std::istringstream& is, const st
 
 namespace diagnostic
 {
-std::vector<diagnostic::Message> deserializeDiagnosticMessages(std::istringstream& is)
+std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is)
 {
   std::vector<diagnostic::Message> diagnostic_messages;
 

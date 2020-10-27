@@ -108,7 +108,7 @@ TEST(MonitoringFrameSerializationDiagnosticMessagesTest, shouldSetCorrectBitInSe
   std::vector<monitoring_frame::diagnostic::Message> diagnostic_data{
     { ScannerId::MASTER, monitoring_frame::diagnostic::ErrorLocation(5, 3) }
   };
-  auto diagnostic_data_serialized = monitoring_frame::diagnostic::serializeMessages(diagnostic_data);
+  auto diagnostic_data_serialized = monitoring_frame::diagnostic::serialize(diagnostic_data);
 
   EXPECT_EQ(diagnostic_data_serialized.size(), monitoring_frame::diagnostic::raw_message::LENGTH_IN_BYTES);
   EXPECT_EQ(diagnostic_data_serialized.at(monitoring_frame::diagnostic::raw_message::UNUSED_OFFSET_IN_BYTES + 5),
@@ -205,7 +205,8 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
   const auto num_bytes = 2 * with_unknown_field_id.hex_dump.size();
 
   monitoring_frame::Message msg;
-  EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);, monitoring_frame::format_error::Common);
+  EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);
+               , monitoring_frame::format_error::DecodingFailure);
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeFieldLength)
@@ -215,7 +216,8 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
   const auto num_bytes = 2 * with_too_large_field_length.hex_dump.size();
 
   monitoring_frame::Message msg;
-  EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);, monitoring_frame::format_error::Common);
+  EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);
+               , monitoring_frame::format_error::DecodingFailure);
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeScanCounterLength)

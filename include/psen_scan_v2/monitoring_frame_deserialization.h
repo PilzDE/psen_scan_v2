@@ -105,32 +105,32 @@ enum class HeaderID : Header::Id
 Header read(std::istringstream& is, const std::size_t& max_num_bytes);
 }  // namespace additional_field
 
-Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
+monitoring_frame::Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
 FixedFields readFixedFields(std::istringstream& is);
 namespace diagnostic
 {
-std::vector<diagnostic::Message> deserializeDiagnosticMessages(std::istringstream& is);
+std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is);
 }
 
 namespace format_error
 {
-class Common : public std::runtime_error
+class DecodingFailure : public std::runtime_error
 {
 public:
-  Common(const std::string& msg = "Error while decoding laser scanner measurement data");
+  DecodingFailure(const std::string& msg = "Error while decoding laser scanner measurement data");
 };
 
-class ScanCounterUnexpectedSize : public Common
+class ScanCounterUnexpectedSize : public DecodingFailure
 {
 public:
   ScanCounterUnexpectedSize(const std::string& msg);
 };
 
-inline Common::Common(const std::string& msg) : std::runtime_error(msg)
+inline DecodingFailure::DecodingFailure(const std::string& msg) : std::runtime_error(msg)
 {
 }
 
-inline ScanCounterUnexpectedSize::ScanCounterUnexpectedSize(const std::string& msg) : Common(msg)
+inline ScanCounterUnexpectedSize::ScanCounterUnexpectedSize(const std::string& msg) : DecodingFailure(msg)
 {
 }
 }  // namespace format_error

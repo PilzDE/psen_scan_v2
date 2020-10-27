@@ -36,7 +36,7 @@ static constexpr uint32_t LENGTH_FOR_ONE_DEVICE_IN_BYTES{ 9 };
 static constexpr uint32_t UNUSED_OFFSET_IN_BYTES{ 4 };
 static constexpr uint32_t LENGTH_IN_BYTES{ UNUSED_OFFSET_IN_BYTES +
                                            LENGTH_FOR_ONE_DEVICE_IN_BYTES * VALID_SCANNER_IDS.size() };
-using Type = std::array<uint8_t, diagnostic::raw_message::LENGTH_IN_BYTES>;
+using Field = std::array<uint8_t, diagnostic::raw_message::LENGTH_IN_BYTES>;
 }  // namespace raw_message
 
 enum class DiagnosticCode
@@ -144,12 +144,10 @@ private:
 class Message
 {
 public:
-  constexpr Message(const ScannerId& id, const ErrorLocation& location);
+  constexpr Message(const ScannerId& id, const diagnostic::ErrorLocation& location);
+  constexpr bool operator==(const diagnostic::Message& rhs) const;
 
-  constexpr bool operator==(const Message& rhs) const;
-
-  friend diagnostic::raw_message::Type
-  psen_scan_v2::monitoring_frame::diagnostic::serializeMessages(const std::vector<diagnostic::Message>& messages);
+  friend diagnostic::raw_message::Field diagnostic::serialize(const std::vector<diagnostic::Message>& messages);
 
   constexpr ScannerId getScannerId() const
   {
@@ -190,7 +188,7 @@ inline bool isAmbiguous(const DiagnosticCode& code)
   return ambiguous_diagnostic_codes.find(code) != ambiguous_diagnostic_codes.end();
 }
 
-std::ostream& operator<<(std::ostream& os, const Message& msg);
+std::ostream& operator<<(std::ostream& os, const diagnostic::Message& msg);
 
 }  // namespace diagnostic
 }  // namespace monitoring_frame

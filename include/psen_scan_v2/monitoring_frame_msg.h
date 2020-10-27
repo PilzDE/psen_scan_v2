@@ -90,8 +90,9 @@ private:
   bool diagnostic_data_enabled_{ false };
 
 public:
-  friend DynamicSizeRawData serialize(const Message& frame);
-  friend Message psen_scan_v2::monitoring_frame::deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
+  friend DynamicSizeRawData serialize(const monitoring_frame::Message& frame);
+  friend monitoring_frame::Message psen_scan_v2::monitoring_frame::deserialize(const MaxSizeRawData& data,
+                                                                               const std::size_t& num_bytes);
 };
 
 }  // namespace monitoring_frame
