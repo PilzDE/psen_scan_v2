@@ -43,6 +43,9 @@ sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
   ros_message.ranges.insert(
       ros_message.ranges.begin(), laserscan.getMeasurements().cbegin(), laserscan.getMeasurements().cend());
 
+  ros_message.intensities.insert(
+      ros_message.intensities.begin(), laserscan.getIntensities().cbegin(), laserscan.getIntensities().cend());
+
   return ros_message;
 }
 

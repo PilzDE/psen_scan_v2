@@ -59,6 +59,16 @@ DynamicSizeRawData serialize(const Message& frame)
   raw_processing::writeArray<uint16_t, double>(
       os, frame.measures_, [](double elem) { return (static_cast<uint16_t>(std::round(elem * 1000.))); });
 
+  if (!frame.intensities_.empty())
+  {
+    additional_field::Header intensities_header(
+        static_cast<additional_field::Header::Id>(additional_field::HeaderID::INTENSITIES),
+        frame.intensities_.size() * NUMBER_OF_BYTES_SINGLE_INTENSITY);
+    writeFieldHeader(os, intensities_header);
+    raw_processing::writeArray<uint16_t, double>(
+        os, frame.intensities_, [](double elem) { return (static_cast<uint16_t>(std::round(elem))); });
+  }
+
   additional_field::Header::Id end_of_frame_header_id =
       static_cast<additional_field::Header::Id>(additional_field::HeaderID::END_OF_FRAME);
   raw_processing::write(os, end_of_frame_header_id);

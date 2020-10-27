@@ -32,6 +32,8 @@ static constexpr uint32_t ONLINE_WORKING_MODE{ 0x00 };
 static constexpr uint32_t GUI_MONITORING_TRANSACTION{ 0x05 };
 static constexpr uint16_t NUMBER_OF_BYTES_SCAN_COUNTER{ 4 };
 static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_MEASURE{ 2 };
+static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_INTENSITY{ 2 };
+
 class FixedFields
 {
 public:
@@ -96,6 +98,7 @@ enum class HeaderID : Header::Id
   SCAN_COUNTER = 0x02,
   DIAGNOSTICS = 0x04,
   MEASURES = 0x05,
+  INTENSITIES = 0x06,
   END_OF_FRAME = 0x09
 };
 
