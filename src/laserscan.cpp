@@ -44,22 +44,22 @@ LaserScan::LaserScan(const TenthOfDegree& resolution,
   }
 }
 
-TenthOfDegree LaserScan::getScanResolution() const
+const TenthOfDegree& LaserScan::getScanResolution() const
 {
   return resolution_;
 }
 
-TenthOfDegree LaserScan::getMinScanAngle() const
+const TenthOfDegree& LaserScan::getMinScanAngle() const
 {
   return min_scan_angle_;
 }
 
-TenthOfDegree LaserScan::getMaxScanAngle() const
+const TenthOfDegree& LaserScan::getMaxScanAngle() const
 {
   return max_scan_angle_;
 }
 
-const MeasurementData& LaserScan::getMeasurements() const
+const LaserScan::MeasurementData& LaserScan::getMeasurements() const
 {
   return measures_;
 }
@@ -69,9 +69,19 @@ void LaserScan::setMeasurements(const MeasurementData& measures)
   measures_ = measures;
 }
 
-MeasurementData& LaserScan::getMeasurements()
+LaserScan::MeasurementData& LaserScan::getMeasurements()
 {
   return measures_;
+}
+
+const LaserScan::IntensityData& LaserScan::getIntensities() const
+{
+  return intensities_;
+}
+
+void LaserScan::LaserScan::setIntensities(const IntensityData& intensities)
+{
+  intensities_ = intensities;
 }
 
 bool LaserScan::operator==(const LaserScan& scan) const

@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <string>
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -34,49 +36,102 @@ const double EPSILON{ 1.0e-8 };
 
 namespace psen_scan_v2_test
 {
-TEST(LaserScanROSConversionsTest, testToLaserScanMsg)
+static LaserScan createScan()
 {
-  const std::string prefix{ "prefix" };
-  const std::string frame_id{ prefix + "_scan" };
-  constexpr double x_axis_rotation{ 0 };
-
   const TenthOfDegree angle_min_raw{ 0 };
   const TenthOfDegree angle_max_raw{ 20 };
   const TenthOfDegree angle_increment{ 1 };
-  LaserScan laserscan{ angle_increment, angle_min_raw, angle_max_raw };
-  const MeasurementData measures{ 1, 2, 3 };
+
+  LaserScan laserscan(angle_increment, angle_min_raw, angle_max_raw);
+  const LaserScan::MeasurementData measures{ 1., 2., 3. };
   laserscan.setMeasurements(measures);
 
-  ros::Time now = ros::Time::now();
-  sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(laserscan, prefix, x_axis_rotation, now);
+  const LaserScan::IntensityData intensities{ 707., 304., 0. };
+  laserscan.setIntensities(intensities);
+
+  return laserscan;
+}
+
+TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectHeaderAfterConversion)
+{
+  const std::string prefix{ "prefix" };
+  const std::string frame_id{ prefix + "_scan" };
+  const ros::Time now = ros::Time::now();
+  const sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(createScan(), prefix, 0, now);
 
   EXPECT_EQ(laserscan_msg.header.seq, 0u);
   EXPECT_EQ(laserscan_msg.header.stamp, now);
   EXPECT_EQ(laserscan_msg.header.frame_id, frame_id);
+}
 
-  EXPECT_NEAR(laserscan_msg.angle_min, angle_min_raw.toRad() - x_axis_rotation, EPSILON);
-  EXPECT_NEAR(laserscan_msg.angle_max, angle_max_raw.toRad() - x_axis_rotation, EPSILON);
+TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectScanResolutionAfterConversion)
+{
+  const LaserScan laserscan{ createScan() };
+  const sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(laserscan, "", 0, ros::Time::now());
 
-  EXPECT_NEAR(laserscan_msg.angle_increment, angle_increment.toRad(), EPSILON);
+  EXPECT_NEAR(laserscan_msg.angle_increment, laserscan.getScanResolution().toRad(), EPSILON)
+      << "Resolution incorrect in sensor_msgs::LaserScan";
+}
+
+TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectMinMaxScanAngleAfterConversion)
+{
+  const LaserScan laserscan{ createScan() };
+  constexpr double x_axis_rotation{ 0 };
+  const sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(laserscan, "", x_axis_rotation, ros::Time::now());
+
+  EXPECT_NEAR(laserscan_msg.angle_min, laserscan.getMinScanAngle().toRad() - x_axis_rotation, EPSILON);
+  EXPECT_NEAR(laserscan_msg.angle_max, laserscan.getMaxScanAngle().toRad() - x_axis_rotation, EPSILON);
+}
+
+TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectTimePerRadAfterConversion)
+{
+  const LaserScan laserscan{ createScan() };
+  const sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(laserscan, "", 0, ros::Time::now());
 
   const double time_per_rad = TIME_PER_SCAN_IN_S / (2 * M_PI);  // angle speed
-  EXPECT_NEAR(laserscan_msg.time_increment, time_per_rad * angle_increment.toRad(), EPSILON);
+  EXPECT_NEAR(laserscan_msg.time_increment, time_per_rad * laserscan.getScanResolution().toRad(), EPSILON);
+}
 
-  EXPECT_NEAR(laserscan_msg.scan_time, TIME_PER_SCAN_IN_S, EPSILON);
+TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectMinMaxRangeAfterConversion)
+{
+  const sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(createScan(), "", 0, ros::Time::now());
 
   EXPECT_NEAR(laserscan_msg.range_min, RANGE_MIN_IN_M, EPSILON);
   EXPECT_NEAR(laserscan_msg.range_max, RANGE_MAX_IN_M, EPSILON);
+}
 
-  ASSERT_EQ(laserscan_msg.ranges.size(), measures.size());
+TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectScanTimeAfterConversion)
+{
+  const sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(createScan(), "", 0, ros::Time::now());
 
+  EXPECT_NEAR(laserscan_msg.scan_time, TIME_PER_SCAN_IN_S, EPSILON);
+}
+
+TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectRangesAfterConversion)
+{
+  const LaserScan laserscan{ createScan() };
+  const sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(laserscan, "", 0, ros::Time::now());
+
+  ASSERT_EQ(laserscan_msg.ranges.size(), laserscan.getMeasurements().size());
   // Check that the ranges in the ROS msg is the same order as the laserscan and given in meters
   for (size_t i = 0; i < laserscan_msg.ranges.size(); ++i)
   {
-    EXPECT_NEAR(laserscan_msg.ranges.at(i), measures.at(i), EPSILON);
+    EXPECT_NEAR(laserscan_msg.ranges.at(i), laserscan.getMeasurements().at(i), EPSILON);
   }
-
-  EXPECT_TRUE(laserscan_msg.intensities.empty());
 }
+
+TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectIntensitiesAfterConversion)
+{
+  const LaserScan laserscan{ createScan() };
+  const sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(laserscan, "", 0, ros::Time::now());
+
+  ASSERT_EQ(laserscan_msg.intensities.size(), laserscan.getIntensities().size());
+  for (size_t i = 0; i < laserscan_msg.intensities.size(); ++i)
+  {
+    EXPECT_NEAR(laserscan_msg.intensities.at(i), laserscan.getIntensities().at(i), EPSILON);
+  }
+}
+
 }  // namespace psen_scan_v2_test
 
 int main(int argc, char* argv[])

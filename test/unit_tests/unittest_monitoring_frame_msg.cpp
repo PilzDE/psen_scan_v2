@@ -68,6 +68,23 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareEqualSucces)
   EXPECT_EQ(msg0, msg1);
 }
 
+TEST(MonitoringFrameMsgEqualityTest, testCompareEqualIntensitiesSucces)
+{
+  const MonitoringFrameMsg msg0(TenthOfDegree(100),
+                                TenthOfDegree(10),
+                                42,
+                                { 1, 2, 3 },
+                                { 10, 20, 30 },
+                                { MonitoringFrameDiagnosticMessage(ScannerId::master, ErrorLocation(5, 3)) });
+  const MonitoringFrameMsg msg1(TenthOfDegree(100),
+                                TenthOfDegree(10),
+                                42,
+                                { 1, 2, 3 },
+                                { 10, 20, 30 },
+                                { MonitoringFrameDiagnosticMessage(ScannerId::master, ErrorLocation(5, 3)) });
+  EXPECT_EQ(msg0, msg1);
+}
+
 TEST(MonitoringFrameMsgEqualityTest, testCompareEqualEmptySuccess)
 {
   const MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, {});
@@ -75,42 +92,107 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareEqualEmptySuccess)
   EXPECT_EQ(msg0, msg1);
 }
 
+TEST(MonitoringFrameMsgEqualityTest, testCompareEqualIntensitiesEmptySucces)
+{
+  const MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, {}, {}, {});
+  const MonitoringFrameMsg msg1(TenthOfDegree(100), TenthOfDegree(10), 42, {}, {}, {});
+  EXPECT_EQ(msg0, msg1);
+}
+
 TEST(MonitoringFrameMsgEqualityTest, testCompareMeasuresNotEqual)
 {
-  const MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, { 45, 44, 42, 42 });
-  const MonitoringFrameMsg msg1(TenthOfDegree(100), TenthOfDegree(10), 42, { 45, 44, 43, 42 });
+  const MonitoringFrameMsg msg0(TenthOfDegree(100),
+                                TenthOfDegree(10),
+                                42,
+                                { 1, 42, 3 },
+                                { 10, 20, 30 },
+                                { MonitoringFrameDiagnosticMessage(ScannerId::master, ErrorLocation(5, 3)) });
+  const MonitoringFrameMsg msg1(TenthOfDegree(100),
+                                TenthOfDegree(10),
+                                42,
+                                { 1, 2, 3 },
+                                { 10, 20, 30 },
+                                { MonitoringFrameDiagnosticMessage(ScannerId::master, ErrorLocation(5, 3)) });
+  EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
+                             << "\nexpected to be false but was true";
+}
+
+TEST(MonitoringFrameMsgEqualityTest, testCompareIntensitiesNotEqual)
+{
+  const MonitoringFrameMsg msg0(TenthOfDegree(100),
+                                TenthOfDegree(10),
+                                42,
+                                { 1, 2, 3 },
+                                { 10, 42, 30 },
+                                { MonitoringFrameDiagnosticMessage(ScannerId::master, ErrorLocation(5, 3)) });
+  const MonitoringFrameMsg msg1(TenthOfDegree(100),
+                                TenthOfDegree(10),
+                                42,
+                                { 1, 2, 3 },
+                                { 10, 20, 30 },
+                                { MonitoringFrameDiagnosticMessage(ScannerId::master, ErrorLocation(5, 3)) });
   EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
                              << "\nexpected to be false but was true";
 }
 
 TEST(MonitoringFrameMsgEqualityTest, testCompareFromThetaNotEqual)
 {
-  const MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, { 45, 44, 43, 42 });
-  const MonitoringFrameMsg msg1(TenthOfDegree(101), TenthOfDegree(10), 42, { 45, 44, 43, 42 });
+  const MonitoringFrameMsg msg0(TenthOfDegree(42),
+                                TenthOfDegree(10),
+                                42,
+                                { 1, 2, 3 },
+                                { 10, 20, 30 },
+                                { MonitoringFrameDiagnosticMessage(ScannerId::master, ErrorLocation(5, 3)) });
+  const MonitoringFrameMsg msg1(TenthOfDegree(100),
+                                TenthOfDegree(10),
+                                42,
+                                { 1, 2, 3 },
+                                { 10, 20, 30 },
+                                { MonitoringFrameDiagnosticMessage(ScannerId::master, ErrorLocation(5, 3)) });
   EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
                              << "\nexpected to be false but was true";
 }
 
 TEST(MonitoringFrameMsgEqualityTest, testCompareResolutionNotEqual)
 {
-  const MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, { 45, 44, 43, 42 });
-  const MonitoringFrameMsg msg1(TenthOfDegree(100), TenthOfDegree(11), 42, { 45, 44, 43, 42 });
+  const MonitoringFrameMsg msg0(TenthOfDegree(100),
+                                TenthOfDegree(42),
+                                42,
+                                { 1, 2, 3 },
+                                { 10, 20, 30 },
+                                { MonitoringFrameDiagnosticMessage(ScannerId::master, ErrorLocation(5, 3)) });
+  const MonitoringFrameMsg msg1(TenthOfDegree(100),
+                                TenthOfDegree(10),
+                                42,
+                                { 1, 2, 3 },
+                                { 10, 20, 30 },
+                                { MonitoringFrameDiagnosticMessage(ScannerId::master, ErrorLocation(5, 3)) });
   EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
                              << "\nexpected to be false but was true";
 }
 
 TEST(MonitoringFrameMsgEqualityTest, testCompareScanCounterNotEqual)
 {
-  MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, { 45, 44, 43, 42 });
-  MonitoringFrameMsg msg1(TenthOfDegree(100), TenthOfDegree(10), 43, { 45, 44, 43, 42 });
+  const MonitoringFrameMsg msg0(TenthOfDegree(100),
+                                TenthOfDegree(10),
+                                42,
+                                { 1, 2, 3 },
+                                { 10, 20, 30 },
+                                { MonitoringFrameDiagnosticMessage(ScannerId::master, ErrorLocation(5, 3)) });
+  const MonitoringFrameMsg msg1(TenthOfDegree(100),
+                                TenthOfDegree(10),
+                                1,
+                                { 1, 2, 3 },
+                                { 10, 20, 30 },
+                                { MonitoringFrameDiagnosticMessage(ScannerId::master, ErrorLocation(5, 3)) });
   EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
                              << "\nexpected to be false but was true";
 }
 
 TEST(MonitoringFrameMsgEqualityTest, testCompareNotEqualEmpty)
 {
-  MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(10), 42, {});
-  MonitoringFrameMsg msg1(TenthOfDegree(111), TenthOfDegree(10), 42, {});
+  const MonitoringFrameMsg msg0(TenthOfDegree(100), TenthOfDegree(42), 42, {}, {}, {});
+  const MonitoringFrameMsg msg1(TenthOfDegree(100), TenthOfDegree(42), 0, {}, {}, {});
   EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
                              << "\nexpected to be false but was true";
 }
@@ -120,7 +202,7 @@ TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)
   MonitoringFrameMsg msg(TenthOfDegree(1234), TenthOfDegree(56), 78, { 45, 44, 43, 42 });
   EXPECT_EQ(fmt::format("{}", msg),
             "MonitoringFrameMsg(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-            "measures = {45.0, 44.0, 43.0, 42.0}, diagnostics = {})");
+            "measures = {45.0, 44.0, 43.0, 42.0}, intensities = {}, diagnostics = {})");
 }
 
 }  // namespace psen_scan_v2
