@@ -49,9 +49,14 @@ uint32_t MonitoringFrameMsg::scanCounter() const
   return scan_counter_;
 }
 
-std::vector<double> MonitoringFrameMsg::measures() const
+const std::vector<double>& MonitoringFrameMsg::measures() const
 {
   return measures_;
+}
+
+const std::vector<double>& MonitoringFrameMsg::intensities() const
+{
+  return intensities_;
 }
 
 std::vector<MonitoringFrameDiagnosticMessage> MonitoringFrameMsg::diagnosticMessages() const
@@ -62,7 +67,8 @@ std::vector<MonitoringFrameDiagnosticMessage> MonitoringFrameMsg::diagnosticMess
 bool MonitoringFrameMsg::operator==(const MonitoringFrameMsg& rhs) const
 {
   return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
-          measures() == rhs.measures() && diagnosticMessages() == rhs.diagnosticMessages());
+          measures() == rhs.measures() && intensities() == rhs.intensities() &&
+          diagnosticMessages() == rhs.diagnosticMessages());
 }
 
 }  // namespace psen_scan_v2
@@ -70,11 +76,12 @@ bool MonitoringFrameMsg::operator==(const MonitoringFrameMsg& rhs) const
 std::ostream& operator<<(std::ostream& os, const psen_scan_v2::MonitoringFrameMsg& msg)
 {
   os << fmt::format("MonitoringFrameMsg(fromTheta = {} deg, resolution = {} deg, scanCounter = "
-                    "{}, measures = {}, diagnostics = {})",
+                    "{}, measures = {}, intensities = {}, diagnostics = {})",
                     msg.fromTheta().value() / 10.,
                     msg.resolution().value() / 10.,
                     msg.scanCounter(),
                     msg.measures(),
+                    msg.intensities(),
                     msg.diagnosticMessages());
   return os;
 }
