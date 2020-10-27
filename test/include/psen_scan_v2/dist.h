@@ -15,6 +15,8 @@
 #ifndef PSEN_SCAN_V2_DIST_H
 #define PSEN_SCAN_V2_DIST_H
 
+#include <fmt/core.h>
+
 #include <vector>
 
 namespace psen_scan_v2_test
@@ -22,7 +24,6 @@ namespace psen_scan_v2_test
 class NormalDist
 {
 public:
-  NormalDist(){};
   void update(const double& value)
   {
     values_.push_back(value);
@@ -61,7 +62,7 @@ double bhattacharyya_distance(const NormalDist& dist1, const NormalDist& dist2)
 
 std::ostream& operator<<(std::ostream& os, const psen_scan_v2_test::NormalDist& dist)
 {
-  os << "NormalDistribution(mean: " << dist.mean() << " stdev: " << dist.stdev() << ")";
+  os << fmt::format("NormalDist(mean: {:+.3f}, stdev: {:+.3f})", dist.mean(), dist.stdev());
   return os;
 }
 
