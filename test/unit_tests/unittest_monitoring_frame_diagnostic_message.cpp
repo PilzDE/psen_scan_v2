@@ -22,7 +22,7 @@ namespace psen_scan_v2_test
 {
 TEST(MonitoringFrameDiagnosticMessageTest, shouldConstructMonitoringFrameDiagnosticMessageAsExpected)
 {
-  monitoring_frame::diagnostic::Message msg =
+  auto msg =
       monitoring_frame::diagnostic::Message(ScannerId::SLAVE0, monitoring_frame::diagnostic::ErrorLocation(4, 2));
   EXPECT_EQ(msg.getDiagnosticCode(), monitoring_frame::diagnostic::DiagnosticCode::CONF_ERR);
   EXPECT_EQ(msg.getErrorLocation().getByte(), static_cast<size_t>(4));
@@ -32,43 +32,43 @@ TEST(MonitoringFrameDiagnosticMessageTest, shouldConstructMonitoringFrameDiagnos
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldBeEqualOnSameInputData)
 {
-  monitoring_frame::diagnostic::Message msg0 =
+  auto msg0 =
       monitoring_frame::diagnostic::Message(ScannerId::SLAVE1, monitoring_frame::diagnostic::ErrorLocation(3, 0));
-  monitoring_frame::diagnostic::Message msg1 =
+  auto msg1 =
       monitoring_frame::diagnostic::Message(ScannerId::SLAVE1, monitoring_frame::diagnostic::ErrorLocation(3, 0));
   EXPECT_EQ(msg0, msg1);
 }
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldBeNotEqualOnDifferentScannerId)
 {
-  monitoring_frame::diagnostic::Message msg0 =
+  auto msg0 =
       monitoring_frame::diagnostic::Message(ScannerId::SLAVE0, monitoring_frame::diagnostic::ErrorLocation(3, 0));
-  monitoring_frame::diagnostic::Message msg1 =
+  auto msg1 =
       monitoring_frame::diagnostic::Message(ScannerId::SLAVE1, monitoring_frame::diagnostic::ErrorLocation(3, 0));
   EXPECT_FALSE(msg0 == msg1);
 }
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldBeNotEqualOnErrorByteLocation)
 {
-  monitoring_frame::diagnostic::Message msg0 =
+  auto msg0 =
       monitoring_frame::diagnostic::Message(ScannerId::SLAVE1, monitoring_frame::diagnostic::ErrorLocation(0, 0));
-  monitoring_frame::diagnostic::Message msg1 =
+  auto msg1 =
       monitoring_frame::diagnostic::Message(ScannerId::SLAVE1, monitoring_frame::diagnostic::ErrorLocation(1, 0));
   EXPECT_FALSE(msg0 == msg1);
 }
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldBeNotEqualOnDifferentErrorBitLocation)
 {
-  monitoring_frame::diagnostic::Message msg0 =
+  auto msg0 =
       monitoring_frame::diagnostic::Message(ScannerId::SLAVE1, monitoring_frame::diagnostic::ErrorLocation(1, 0));
-  monitoring_frame::diagnostic::Message msg1 =
+  auto msg1 =
       monitoring_frame::diagnostic::Message(ScannerId::SLAVE1, monitoring_frame::diagnostic::ErrorLocation(1, 1));
   EXPECT_FALSE(msg0 == msg1);
 }
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldOutputTheRightDiagnosticMessage)
 {
-  monitoring_frame::diagnostic::Message msg =
+  auto msg =
       monitoring_frame::diagnostic::Message(ScannerId::MASTER, monitoring_frame::diagnostic::ErrorLocation(3, 3));
   std::ostringstream os;
   os << msg;
@@ -77,7 +77,7 @@ TEST(MonitoringFrameDiagnosticMessageTest, shouldOutputTheRightDiagnosticMessage
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldOutputTheRightDiagnosticMessageWithBitandBytes)
 {
-  monitoring_frame::diagnostic::Message msg =
+  auto msg =
       monitoring_frame::diagnostic::Message(ScannerId::SLAVE1, monitoring_frame::diagnostic::ErrorLocation(2, 5));
   std::ostringstream os;
   os << msg;
