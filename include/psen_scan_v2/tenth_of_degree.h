@@ -16,6 +16,8 @@
 #ifndef PSEN_SCAN_V2_TENTH_OF_DEGREE_H
 #define PSEN_SCAN_V2_TENTH_OF_DEGREE_H
 
+#include <sstream>
+
 #include "psen_scan_v2/angle_conversions.h"
 
 namespace psen_scan_v2
@@ -28,12 +30,24 @@ public:
     return TenthOfDegree(radToTenthDegree(angle_in_rad));
   }
 
+  static uint16_t toPositiveValue(const TenthOfDegree& tenth_of_degree)
+  {
+    const auto value{ tenth_of_degree.value() };
+    if (value < std::numeric_limits<uint16_t>::min() || value > std::numeric_limits<uint16_t>::max())
+    {
+      std::stringstream exception_msg;
+      exception_msg << "Angle " << value << " (tenth of degree) out of range in conversion to positive value.";
+      throw std::out_of_range(exception_msg.str());
+    }
+    return static_cast<uint16_t>(value);
+  }
+
 public:
-  explicit constexpr TenthOfDegree(const uint16_t& tenth_of_degree) : tenth_of_degree_(tenth_of_degree)
+  explicit constexpr TenthOfDegree(const int32_t& tenth_of_degree) : tenth_of_degree_(tenth_of_degree)
   {
   }
 
-  constexpr uint16_t value() const
+  constexpr int32_t value() const
   {
     return tenth_of_degree_;
   }
@@ -49,7 +63,7 @@ public:
     return *this;
   }
 
-  constexpr TenthOfDegree& operator*(const unsigned int& rhs)
+  constexpr TenthOfDegree& operator*(const int& rhs)
   {
     tenth_of_degree_ = value() * rhs;
     return *this;
@@ -87,7 +101,7 @@ public:
   }
 
 private:
-  uint16_t tenth_of_degree_{ 0 };
+  int32_t tenth_of_degree_{ 0 };
 };
 }  // namespace psen_scan_v2
 
