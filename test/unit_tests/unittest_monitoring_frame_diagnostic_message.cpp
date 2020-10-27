@@ -23,7 +23,7 @@ namespace psen_scan_v2_test
 {
 TEST(MonitoringFrameDiagnosticMessageTest, shouldConstructMonitoringFrameDiagnosticMessageAsExpected)
 {
-  MonitoringFrameDiagnosticMessage msg = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE0, ErrorLocation(4, 2));
+  auto msg = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE0, ErrorLocation(4, 2));
   EXPECT_EQ(msg.getDiagnosticCode(), DiagnosticCode::CONF_ERR);
   EXPECT_EQ(msg.getErrorLocation().getByte(), static_cast<size_t>(4));
   EXPECT_EQ(msg.getErrorLocation().getBit(), static_cast<size_t>(2));
@@ -32,35 +32,35 @@ TEST(MonitoringFrameDiagnosticMessageTest, shouldConstructMonitoringFrameDiagnos
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldBeEqualOnSameInputData)
 {
-  MonitoringFrameDiagnosticMessage msg0 = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE1, ErrorLocation(3, 0));
-  MonitoringFrameDiagnosticMessage msg1 = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE1, ErrorLocation(3, 0));
+  auto msg0 = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE1, ErrorLocation(3, 0));
+  auto msg1 = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE1, ErrorLocation(3, 0));
   EXPECT_EQ(msg0, msg1);
 }
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldBeNotEqualOnDifferentScannerId)
 {
-  MonitoringFrameDiagnosticMessage msg0 = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE0, ErrorLocation(3, 0));
-  MonitoringFrameDiagnosticMessage msg1 = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE1, ErrorLocation(3, 0));
+  auto msg0 = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE0, ErrorLocation(3, 0));
+  auto msg1 = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE1, ErrorLocation(3, 0));
   EXPECT_FALSE(msg0 == msg1);
 }
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldBeNotEqualOnErrorByteLocation)
 {
-  MonitoringFrameDiagnosticMessage msg0 = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE1, ErrorLocation(0, 0));
-  MonitoringFrameDiagnosticMessage msg1 = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE1, ErrorLocation(1, 0));
+  auto msg0 = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE1, ErrorLocation(0, 0));
+  auto msg1 = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE1, ErrorLocation(1, 0));
   EXPECT_FALSE(msg0 == msg1);
 }
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldBeNotEqualOnDifferentErrorBitLocation)
 {
-  MonitoringFrameDiagnosticMessage msg0 = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE1, ErrorLocation(1, 0));
-  MonitoringFrameDiagnosticMessage msg1 = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE1, ErrorLocation(1, 1));
+  auto msg0 = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE1, ErrorLocation(1, 0));
+  auto msg1 = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE1, ErrorLocation(1, 1));
   EXPECT_FALSE(msg0 == msg1);
 }
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldOutputTheRightDiagnosticMessage)
 {
-  MonitoringFrameDiagnosticMessage msg = MonitoringFrameDiagnosticMessage(ScannerId::MASTER, ErrorLocation(3, 3));
+  auto msg = MonitoringFrameDiagnosticMessage(ScannerId::MASTER, ErrorLocation(3, 3));
   std::ostringstream os;
   os << msg;
   EXPECT_EQ(os.str(), "Device: Master - Display communication problem.");
@@ -68,7 +68,7 @@ TEST(MonitoringFrameDiagnosticMessageTest, shouldOutputTheRightDiagnosticMessage
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldOutputTheRightDiagnosticMessageWithBitandBytes)
 {
-  MonitoringFrameDiagnosticMessage msg = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE1, ErrorLocation(2, 5));
+  auto msg = MonitoringFrameDiagnosticMessage(ScannerId::SLAVE1, ErrorLocation(2, 5));
   std::ostringstream os;
   os << msg;
 
