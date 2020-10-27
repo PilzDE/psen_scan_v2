@@ -32,7 +32,7 @@ namespace psen_scan_v2_test
 TEST(MonitoringFrameSerializationTest, shouldSerializeHexdumpFrameCorrectly)
 {
   scanner_udp_datagram_hexdumps::WithIntensitiesAndDiagnostics with_intensities;
-  DynamicSizeRawData serialized_monitoring_frame_message = serialize(with_intensities.expected_msg_);
+  auto serialized_monitoring_frame_message = serialize(with_intensities.expected_msg_);
 
   EXPECT_EQ(with_intensities.hex_dump.size(), serialized_monitoring_frame_message.size());
 
@@ -50,8 +50,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeHexdumpFrameCorrectly)
 TEST(MonitoringFrameSerializationTest, shouldSerializeHexdumpFrameWithoutMeasurementsAndIntensitiesCorrectly)
 {
   scanner_udp_datagram_hexdumps::WithoutMeasurementsAndIntensities without_measurements_and_intensities;
-  DynamicSizeRawData serialized_monitoring_frame_message =
-      serialize(without_measurements_and_intensities.expected_msg_);
+  auto serialized_monitoring_frame_message = serialize(without_measurements_and_intensities.expected_msg_);
 
   EXPECT_EQ(without_measurements_and_intensities.hex_dump.size(), serialized_monitoring_frame_message.size());
 
@@ -82,9 +81,9 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
                            MonitoringFrameDiagnosticMessage(ScannerId::master, error_locations.at(1)),
                            MonitoringFrameDiagnosticMessage(ScannerId::slave2, error_locations.at(2)) });
 
-  DynamicSizeRawData raw = serialize(msg);
+  auto raw = serialize(msg);
 
-  MonitoringFrameMsg deserialized_msg = deserializeMonitoringFrame(convertToMaxSizeRawData(raw), raw.size());
+  auto deserialized_msg = deserializeMonitoringFrame(convertToMaxSizeRawData(raw), raw.size());
 
   EXPECT_EQ(msg, deserialized_msg);
 }
@@ -93,8 +92,8 @@ TEST(MonitoringFrameSerializationTest, shouldFailOnSerializeAndDeserializeFrameW
 {
   MonitoringFrameMsg msg(TenthOfDegree(25), TenthOfDegree(1), 1, { 0 }, { 70045 }, {});
 
-  DynamicSizeRawData raw = serialize(msg);
-  MonitoringFrameMsg deserialized_msg = deserializeMonitoringFrame(convertToMaxSizeRawData(raw), raw.size());
+  auto raw = serialize(msg);
+  auto deserialized_msg = deserializeMonitoringFrame(convertToMaxSizeRawData(raw), raw.size());
 
   EXPECT_FALSE(msg == deserialized_msg);
   EXPECT_EQ(deserialized_msg.intensities().at(0), 0b0011111111111111 & 70045);
