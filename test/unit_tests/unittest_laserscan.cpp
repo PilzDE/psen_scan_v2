@@ -73,7 +73,7 @@ TEST(LaserScanTest, testGetMaxScanAngle)
 
 TEST(LaserScanTest, testMinEqualsMax)
 {
-ASSERT_NO_THROW(LaserScan(DEFAULT_RESOLUTION, TenthOfDegree(1000u), TenthOfDegree(1000u)););
+  ASSERT_NO_THROW(LaserScan(DEFAULT_RESOLUTION, TenthOfDegree(1000u), TenthOfDegree(1000u)););
 }
 
 }  // namespace psen_scan_v2_test
