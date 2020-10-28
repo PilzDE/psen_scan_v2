@@ -98,9 +98,11 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::SPEED_ENCODER_ENABLED), 0));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::DIAGNOSTICS_ENABLED), 0));
 
-  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::MASTER_START_ANGLE), scan_range.getStart().value()));
-  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::MASTER_END_ANGLE), scan_range.getEnd().value()));
-  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::MASTER_ANGLE_RESOLUTION), degreeToTenthDegree(0.1)));
+  EXPECT_TRUE(
+      DecodingEquals(data, static_cast<size_t>(Offset::MASTER_START_ANGLE), (uint16_t)scan_range.getStart().value()));
+  EXPECT_TRUE(
+      DecodingEquals(data, static_cast<size_t>(Offset::MASTER_END_ANGLE), (uint16_t)scan_range.getEnd().value()));
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::MASTER_ANGLE_RESOLUTION), (uint16_t)1));
 
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::SLAVE_ONE_START_ANGLE), 0));
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::SLAVE_ONE_END_ANGLE), 0));

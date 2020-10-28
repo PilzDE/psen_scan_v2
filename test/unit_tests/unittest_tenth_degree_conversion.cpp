@@ -27,24 +27,24 @@ namespace psen_scan_v2_test
 {
 TEST(TenthDegreeConversionTests, testInTenthDegree)
 {
-  const uint16_t expected_tenth_degree{ 11 };
+  const int32_t expected_tenth_degree{ 11 };
   const double angle_in_rad{ (static_cast<double>(expected_tenth_degree) / 1800.) * boost::math::double_constants::pi };
   EXPECT_EQ(expected_tenth_degree, psen_scan_v2::radToTenthDegree(angle_in_rad));
 }
 
 TEST(TenthDegreeConversionTests, testOutOfRangeAngle)
 {
-  const double max_exceeding_angle_in_rad{ static_cast<double>(std::numeric_limits<uint16_t>::max()) + .1 };
+  const double max_exceeding_angle_in_rad{ static_cast<double>(std::numeric_limits<int32_t>::max()) + .1 };
   EXPECT_THROW(psen_scan_v2::radToTenthDegree(max_exceeding_angle_in_rad), std::invalid_argument);
 
-  const double min_exceeding_angle_in_rad{ static_cast<double>(std::numeric_limits<uint16_t>::min()) - .1 };
+  const double min_exceeding_angle_in_rad{ static_cast<double>(std::numeric_limits<int32_t>::min()) - .1 };
   EXPECT_THROW(psen_scan_v2::radToTenthDegree(min_exceeding_angle_in_rad), std::invalid_argument);
 }
 
 TEST(TenthDegreeConversionTests, testInRadian)
 {
   const double expected_radian{ 0.01 * boost::math::double_constants::pi };
-  const uint16_t angle_in_tenth_degree{ 18 };
+  const int32_t angle_in_tenth_degree{ 18 };
   EXPECT_DOUBLE_EQ(expected_radian, psen_scan_v2::tenthDegreeToRad(angle_in_tenth_degree));
 }
 
