@@ -19,6 +19,7 @@
 #include <string>
 #include <memory>
 #include <mutex>
+#include <chrono>
 
 // back-end
 #include <boost/msm/back/state_machine.hpp>
@@ -41,6 +42,8 @@
 #include "psen_scan_v2/scanner_reply_msg.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/monitoring_frame_deserialization.h"
+#include "psen_scan_v2/complete_scan_validator.h"
+#include "psen_scan_v2/watchdog.h"
 
 namespace psen_scan_v2
 {
@@ -64,9 +67,21 @@ namespace e = psen_scan_v2::scanner_protocol::scanner_events;
 }
 // clang-format on
 
+static constexpr std::chrono::milliseconds WATCHDOG_TIMEOUT{ 1000 };
+static constexpr uint32_t DEFAULT_NUM_MSG_PER_ROUND{ 6 };
+
 using ScannerStartedCB = std::function<void()>;
 using ScannerStoppedCB = std::function<void()>;
 using InformUserAboutLaserScanCB = std::function<void(const LaserScan&)>;
+
+class IWatchdogFactory
+{
+public:
+  virtual ~IWatchdogFactory() = default;
+
+public:
+  virtual std::unique_ptr<Watchdog> create(const Watchdog::Timeout& timeout, const std::string& event_type) = 0;
+};
 
 struct StateMachineArgs
 {
@@ -75,11 +90,13 @@ struct StateMachineArgs
                    std::unique_ptr<UdpClientImpl> data_client,
                    const ScannerStartedCB& started_cb,
                    const ScannerStoppedCB& stopped_cb,
-                   const InformUserAboutLaserScanCB& laser_scan_cb)
+                   const InformUserAboutLaserScanCB& laser_scan_cb,
+                   std::unique_ptr<IWatchdogFactory> watchdog_factory)
     : config_(scanner_config)
     , scanner_started_cb(started_cb)
     , scanner_stopped_cb(stopped_cb)
     , inform_user_about_laser_scan_cb(laser_scan_cb)
+    , watchdog_factory_(std::move(watchdog_factory))
     , control_client_(std::move(control_client))
     , data_client_(std::move(data_client))
   {
@@ -91,6 +108,9 @@ struct StateMachineArgs
   const ScannerStartedCB scanner_started_cb{};
   const ScannerStoppedCB scanner_stopped_cb{};
   const InformUserAboutLaserScanCB inform_user_about_laser_scan_cb{};
+
+  // Factories
+  std::unique_ptr<IWatchdogFactory> watchdog_factory_{};
 
   // UDP clients
   // Note: The clients must be declared last, to ensure that they are desroyed first.
@@ -121,6 +141,7 @@ public:  // Action methods
   void handleStartRequestTimeout(const scanner_events::StartTimeout& event);
   void sendStopRequest(const scanner_events::StopRequest& event);
   void handleMonitoringFrame(const scanner_events::RawMonitoringFrameReceived& event);
+  void handleMonitoringFrameTimeout(const scanner_events::MonitoringFrameTimeout& event);
 
 public:  // Guards
   bool isStartReply(scanner_events::RawReplyReceived const& reply_event);
@@ -146,6 +167,7 @@ public:  // Definition of state machine via table
       g_row  < WaitForStartReply,         e::RawReplyReceived,          WaitForMonitoringFrame,                                   &m::isStartReply            >,
       a_irow < WaitForStartReply,         e::StartTimeout,                                          &m::handleStartRequestTimeout                             >,
       a_irow < WaitForMonitoringFrame,    e::RawMonitoringFrameReceived,                            &m::handleMonitoringFrame                                 >,
+      a_irow < WaitForMonitoringFrame,    e::MonitoringFrameTimeout,                                &m::handleMonitoringFrameTimeout                          >,
       a_row  < WaitForStartReply,         e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                       >,
       a_row  < WaitForMonitoringFrame,    e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                       >,
       g_row  < WaitForStopReply,          e::RawReplyReceived,          Stopped,                                                  &m::isStopReply             >
@@ -154,7 +176,16 @@ public:  // Definition of state machine via table
   // clang-format on
 
 private:
+  using ScanValidatorResult = monitoring_frame::ScanValidator::OptionalResult;
+  void printUserMsgFor(const ScanValidatorResult& validation_result);
+
+private:
   const std::unique_ptr<StateMachineArgs> args_;
+
+  std::unique_ptr<Watchdog> start_reply_watchdog_{};
+
+  std::unique_ptr<Watchdog> monitoring_frame_watchdog_{};
+  monitoring_frame::ScanValidator complete_scan_validator_;
 };
 
 #include "psen_scan_v2/scanner_state_machine.hpp"

@@ -4,6 +4,8 @@ Changelog for package psen_scan_v2
 Forthcoming
 -----------
 * Add intensity data to LaserScan
+* Print user message if dropped MonitoringFrames are detected
+* Print user message in case of timeout while waiting for MonitoringFrames
 * Contributors: Pilz GmbH and Co. KG
 
 0.1.0 (2020-10-19)
