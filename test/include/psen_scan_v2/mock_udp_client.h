@@ -52,7 +52,7 @@ public:
 public:
   void sendStartReply();
   void sendStopReply();
-  void sendMonitoringFrame(MonitoringFrameMsg& msg);
+  void sendMonitoringFrame(monitoring_frame::Message& msg);
   void simulateError(const std::string& msg);
   void simulateTimeout(const std::string& msg);
 
@@ -96,7 +96,7 @@ void MockUdpClient::sendStopReply()
   handleNewData(max_size_data, max_size_data.size());
 }
 
-void MockUdpClient::sendMonitoringFrame(MonitoringFrameMsg& msg)
+void MockUdpClient::sendMonitoringFrame(monitoring_frame::Message& msg)
 {
   const MaxSizeRawData msg_raw = convertToMaxSizeRawData(serialize(msg));
   handleNewData(msg_raw, msg_raw.size());

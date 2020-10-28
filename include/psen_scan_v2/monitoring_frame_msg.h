@@ -33,16 +33,18 @@
 
 namespace psen_scan_v2
 {
+namespace monitoring_frame
+{
 static constexpr uint8_t MAX_SCANNER_ID{ VALID_SCANNER_IDS.size() - 1 };
 
-class MonitoringFrameMsg
+class Message
 {
 public:
-  MonitoringFrameMsg() = default;
-  MonitoringFrameMsg(const TenthOfDegree& from_theta,
-                     const TenthOfDegree& resolution,
-                     const uint32_t scan_counter,
-                     const std::vector<double>& measures)
+  Message() = default;
+  Message(const TenthOfDegree& from_theta,
+          const TenthOfDegree& resolution,
+          const uint32_t scan_counter,
+          const std::vector<double>& measures)
     : from_theta_(from_theta)
     , resolution_(resolution)
     , scan_counter_(scan_counter)
@@ -51,12 +53,12 @@ public:
 
     };
 
-  MonitoringFrameMsg(const TenthOfDegree& from_theta,
-                     const TenthOfDegree& resolution,
-                     const uint32_t scan_counter,
-                     const std::vector<double>& measures,
-                     const std::vector<double>& intensities,
-                     const std::vector<MonitoringFrameDiagnosticMessage>& diagnostic_messages)
+  Message(const TenthOfDegree& from_theta,
+          const TenthOfDegree& resolution,
+          const uint32_t scan_counter,
+          const std::vector<double>& measures,
+          const std::vector<double>& intensities,
+          const std::vector<monitoring_frame::diagnostic::Message>& diagnostic_messages)
     : from_theta_(from_theta)
     , resolution_(resolution)
     , scan_counter_(scan_counter)
@@ -73,8 +75,8 @@ public:
   uint32_t scanCounter() const;
   const std::vector<double>& measures() const;
   const std::vector<double>& intensities() const;
-  std::vector<MonitoringFrameDiagnosticMessage> diagnosticMessages() const;
-  bool operator==(const MonitoringFrameMsg& rhs) const;
+  std::vector<monitoring_frame::diagnostic::Message> diagnosticMessages() const;
+  bool operator==(const monitoring_frame::Message& rhs) const;
 
 private:
   ScannerId scanner_id_{ ScannerId::MASTER };
@@ -84,16 +86,18 @@ private:
   uint32_t scan_counter_{ 0 };
   std::vector<double> measures_;
   std::vector<double> intensities_;
-  std::vector<MonitoringFrameDiagnosticMessage> diagnostic_messages_;
+  std::vector<monitoring_frame::diagnostic::Message> diagnostic_messages_;
   bool diagnostic_data_enabled_{ false };
 
 public:
-  friend DynamicSizeRawData serialize(const MonitoringFrameMsg& frame);
-  friend MonitoringFrameMsg deserializeMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes);
+  friend DynamicSizeRawData serialize(const monitoring_frame::Message& frame);
+  friend monitoring_frame::Message psen_scan_v2::monitoring_frame::deserialize(const MaxSizeRawData& data,
+                                                                               const std::size_t& num_bytes);
 };
 
+}  // namespace monitoring_frame
 }  // namespace psen_scan_v2
 
-std::ostream& operator<<(std::ostream& os, const psen_scan_v2::MonitoringFrameMsg& msg);
+std::ostream& operator<<(std::ostream& os, const psen_scan_v2::monitoring_frame::Message& msg);
 
 #endif  // PSEN_SCAN_V2_MONITORING_FRAME_MSG_H
