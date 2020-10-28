@@ -147,7 +147,7 @@ std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is)
 
       for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
       {
-        if (raw_bits.test(bit_n) && (diagnostic::DiagnosticCode::UNUSED != diagnostic::error_bits[byte_n][bit_n]))
+        if (raw_bits.test(bit_n) && (diagnostic::ErrorType::UNUSED != diagnostic::error_bits[byte_n][bit_n]))
         {
           diagnostic_messages.push_back(
               diagnostic::Message(static_cast<ScannerId>(scanner_id), diagnostic::ErrorLocation(byte_n, bit_n)));

@@ -39,7 +39,7 @@ static constexpr uint32_t LENGTH_IN_BYTES{ UNUSED_OFFSET_IN_BYTES +
 using Field = std::array<uint8_t, diagnostic::raw_message::LENGTH_IN_BYTES>;
 }  // namespace raw_message
 
-enum class DiagnosticCode
+enum class ErrorType
 {
   OSSD1_OC,
   OSSD_SHRT_C,
@@ -71,53 +71,53 @@ enum class DiagnosticCode
 
 // clang-format off
 
-using Dc = DiagnosticCode;
+using Et = ErrorType;
 using ErrorMessage = std::string;
 
-static const std::map<DiagnosticCode, ErrorMessage> error_code_to_string
+static const std::map<ErrorType, ErrorMessage> error_code_to_string
 {
-  { Dc::OSSD1_OC, "OSSD1 Overcurrent / Short circuit." },
-  { Dc::OSSD_SHRT_C, "Short circuit between at least two OSSDs." },
-  { Dc::OSSD_INTEGR, "Integrity check problem on any OSSD" },
-  { Dc::INT, "Internal error." },
-  { Dc::WIN_CLN_AL, "Alarm: The front panel of the safety laser scanner must be cleaned." },
-  { Dc::POWER_SUPPLY, "Power supply problem." },
-  { Dc::NETW_PRB, "Network problem." },
-  { Dc::DUST_CRC_FL, "Dust circuit failure" },
-  { Dc::OSSD2_OVERCUR, "OSSD2 Overcurrent / Short circuit." },
-  { Dc::MEAS_PROB, "Measurement Problem." },
-  { Dc::INCOHERENCE, "Incoherence Error" },
-  { Dc::ZONE_INVAL_TRANS, "Zone: Invalid input - transition or integrity." },
-  { Dc::ZONE_INVALID_CONF, "Zone: Invalid input configuration / connection." },
-  { Dc::WIN_CLN_WARN, "Warning: The front panel of the safety laser scanner must be cleaned." },
-  { Dc::INT_COM_PRB, "Internal communication problem." },
-  { Dc::GENERIC_ERR, "Generic Error." },
-  { Dc::DISP_COM_PRB, "Display communication problem." },
-  { Dc::TEMP_MEAS_PROB, "Temperature measurement problem." },
-  { Dc::ENCOD_OOR, "Encoder: Out of range." },
-  { Dc::EDM2_ERR, "Error in the External Device Monitoring (EDM2_ERR)." },
-  { Dc::EDM1_ERR, "Error in the External Device Monitoring (EDM1_ERR)." },
-  { Dc::CONF_ERR, "Configuration Error." },
-  { Dc::OUT_OF_RANGE_ERR, "Out of range error." },
-  { Dc::TEMP_RANGE_ERR, "Temperature out of range." },
-  { Dc::ENCODER_GENERIC_ERR, "Encoder: Generic error." },
-  { Dc::UNUSED, "Unexpected error" } \
+  { Et::OSSD1_OC, "OSSD1 Overcurrent / Short circuit." },
+  { Et::OSSD_SHRT_C, "Short circuit between at least two OSSDs." },
+  { Et::OSSD_INTEGR, "Integrity check problem on any OSSD" },
+  { Et::INT, "Internal error." },
+  { Et::WIN_CLN_AL, "Alarm: The front panel of the safety laser scanner must be cleaned." },
+  { Et::POWER_SUPPLY, "Power supply problem." },
+  { Et::NETW_PRB, "Network problem." },
+  { Et::DUST_CRC_FL, "Dust circuit failure" },
+  { Et::OSSD2_OVERCUR, "OSSD2 Overcurrent / Short circuit." },
+  { Et::MEAS_PROB, "Measurement Problem." },
+  { Et::INCOHERENCE, "Incoherence Error" },
+  { Et::ZONE_INVAL_TRANS, "Zone: Invalid input - transition or integrity." },
+  { Et::ZONE_INVALID_CONF, "Zone: Invalid input configuration / connection." },
+  { Et::WIN_CLN_WARN, "Warning: The front panel of the safety laser scanner must be cleaned." },
+  { Et::INT_COM_PRB, "Internal communication problem." },
+  { Et::GENERIC_ERR, "Generic Error." },
+  { Et::DISP_COM_PRB, "Display communication problem." },
+  { Et::TEMP_MEAS_PROB, "Temperature measurement problem." },
+  { Et::ENCOD_OOR, "Encoder: Out of range." },
+  { Et::EDM2_ERR, "Error in the External Device Monitoring (EDM2_ERR)." },
+  { Et::EDM1_ERR, "Error in the External Device Monitoring (EDM1_ERR)." },
+  { Et::CONF_ERR, "Configuration Error." },
+  { Et::OUT_OF_RANGE_ERR, "Out of range error." },
+  { Et::TEMP_RANGE_ERR, "Temperature out of range." },
+  { Et::ENCODER_GENERIC_ERR, "Encoder: Generic error." },
+  { Et::UNUSED, "Unexpected error" } \
 };
 
 // clang-format off
   #define REV(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) arg8, arg7, arg6, arg5, arg4, arg3, arg2, arg1
 
-  static constexpr std::array<std::array<DiagnosticCode, 8>, 9> error_bits{{
+  static constexpr std::array<std::array<ErrorType, 8>, 9> error_bits{{
   //Bit7                 Bit6              Bit5              Bit4              Bit3              Bit2                  Bit1                   Bit0
-  { REV(Dc::OSSD1_OC,    Dc::OSSD_SHRT_C,  Dc::OSSD_INTEGR,  Dc::INT,          Dc::INT,          Dc::INT,              Dc::INT,               Dc::INT) },
-  { REV(Dc::WIN_CLN_AL,  Dc::POWER_SUPPLY, Dc::NETW_PRB,     Dc::DUST_CRC_FL,  Dc::INT,          Dc::INT,              Dc::UNUSED,            Dc::OSSD2_OVERCUR) },
-  { REV(Dc::MEAS_PROB,   Dc::INT,          Dc::INT,          Dc::INT,          Dc::INCOHERENCE,  Dc::ZONE_INVAL_TRANS, Dc::ZONE_INVALID_CONF, Dc::WIN_CLN_WARN) },
-  { REV(Dc::INT_COM_PRB, Dc::INT,          Dc::INT,          Dc::GENERIC_ERR,  Dc::DISP_COM_PRB, Dc::INT,              Dc::INT,               Dc::TEMP_MEAS_PROB) },
-  { REV(Dc::ENCOD_OOR,   Dc::UNUSED,       Dc::UNUSED,       Dc::EDM2_ERR,     Dc::EDM1_ERR,     Dc::CONF_ERR,         Dc::OUT_OF_RANGE_ERR,  Dc::TEMP_RANGE_ERR) },
-  { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::ENCODER_GENERIC_ERR) },
-  { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::UNUSED) },
-  { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::UNUSED) },
-  { REV(Dc::UNUSED,      Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,       Dc::UNUSED,           Dc::UNUSED,            Dc::UNUSED) },
+  { REV(Et::OSSD1_OC,    Et::OSSD_SHRT_C,  Et::OSSD_INTEGR,  Et::INT,          Et::INT,          Et::INT,              Et::INT,               Et::INT) },
+  { REV(Et::WIN_CLN_AL,  Et::POWER_SUPPLY, Et::NETW_PRB,     Et::DUST_CRC_FL,  Et::INT,          Et::INT,              Et::UNUSED,            Et::OSSD2_OVERCUR) },
+  { REV(Et::MEAS_PROB,   Et::INT,          Et::INT,          Et::INT,          Et::INCOHERENCE,  Et::ZONE_INVAL_TRANS, Et::ZONE_INVALID_CONF, Et::WIN_CLN_WARN) },
+  { REV(Et::INT_COM_PRB, Et::INT,          Et::INT,          Et::GENERIC_ERR,  Et::DISP_COM_PRB, Et::INT,              Et::INT,               Et::TEMP_MEAS_PROB) },
+  { REV(Et::ENCOD_OOR,   Et::UNUSED,       Et::UNUSED,       Et::EDM2_ERR,     Et::EDM1_ERR,     Et::CONF_ERR,         Et::OUT_OF_RANGE_ERR,  Et::TEMP_RANGE_ERR) },
+  { REV(Et::UNUSED,      Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,           Et::UNUSED,            Et::ENCODER_GENERIC_ERR) },
+  { REV(Et::UNUSED,      Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,           Et::UNUSED,            Et::UNUSED) },
+  { REV(Et::UNUSED,      Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,           Et::UNUSED,            Et::UNUSED) },
+  { REV(Et::UNUSED,      Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,           Et::UNUSED,            Et::UNUSED) },
   }};
 // clang-format on
 
@@ -159,7 +159,7 @@ public:
     return error_location_;
   }
 
-  constexpr DiagnosticCode getDiagnosticCode() const
+  constexpr ErrorType getDiagnosticCode() const
   {
     return error_bits.at(error_location_.getByte()).at(error_location_.getBit());
   }
@@ -181,9 +181,9 @@ constexpr inline bool Message::operator==(const Message& rhs) const
 }
 
 // Store ambiguous errors for additional output
-static const std::set<Dc> ambiguous_diagnostic_codes = { Dc::UNUSED, Dc::INT };
+static const std::set<Et> ambiguous_diagnostic_codes = { Et::UNUSED, Et::INT };
 
-inline bool isAmbiguous(const DiagnosticCode& code)
+inline bool isAmbiguous(const ErrorType& code)
 {
   return ambiguous_diagnostic_codes.find(code) != ambiguous_diagnostic_codes.end();
 }

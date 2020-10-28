@@ -24,7 +24,7 @@ TEST(MonitoringFrameDiagnosticMessageTest, shouldConstructMonitoringFrameDiagnos
 {
   auto msg =
       monitoring_frame::diagnostic::Message(ScannerId::SLAVE0, monitoring_frame::diagnostic::ErrorLocation(4, 2));
-  EXPECT_EQ(msg.getDiagnosticCode(), monitoring_frame::diagnostic::DiagnosticCode::CONF_ERR);
+  EXPECT_EQ(msg.getDiagnosticCode(), monitoring_frame::diagnostic::ErrorType::CONF_ERR);
   EXPECT_EQ(msg.getErrorLocation().getByte(), static_cast<size_t>(4));
   EXPECT_EQ(msg.getErrorLocation().getBit(), static_cast<size_t>(2));
   EXPECT_EQ(msg.getScannerId(), ScannerId::SLAVE0);

@@ -72,7 +72,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
   for (const auto& elem : error_locations)
   {
     ASSERT_NE(monitoring_frame::diagnostic::error_bits.at(elem.getByte()).at(elem.getBit()),
-              monitoring_frame::diagnostic::DiagnosticCode::UNUSED)
+              monitoring_frame::diagnostic::ErrorType::UNUSED)
         << "The unused diagnostic bits are discarded during deserialization. You should use different test data for "
            "this test.";
   }
