@@ -77,6 +77,7 @@ private:
   FRIEND_TEST(RosScannerNodeTests, testScanTopicReceived);
   FRIEND_TEST(RosScannerNodeTests, testScanBuildFailure);
   FRIEND_TEST(RosScannerNodeTests, testMissingStopReply);
+  FRIEND_TEST(RosScannerNodeTests, shouldNotInvokeUserCallbackInCaseOfEmptyLaserScan);
 };
 
 typedef ROSScannerNodeT<> ROSScannerNode;
@@ -98,6 +99,11 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
 template <typename S>
 void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
 {
+  if (scan.getMeasurements().empty())
+  {
+    return;
+  }
+
   pub_.publish(toLaserScanMsg(scan, prefix_, x_axis_rotation_));
 }
 

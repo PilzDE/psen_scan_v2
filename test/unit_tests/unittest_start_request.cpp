@@ -79,9 +79,9 @@ TEST_F(StartRequestTest, constructorTest)
 
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::CRC), (uint32_t)result.checksum()));
 
-  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::CRC), 0xd6224cb9));  // CRC - Fixed for now, Note:
-                                                                                    // Other byte order as in
-                                                                                    // wireshark
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::CRC), 0xeb447fb));  // CRC - Fixed for now, Note:
+                                                                                   // Other byte order as in
+                                                                                   // wireshark
 
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::SEQ_NUMBER), (uint32_t)sequence_number));
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::RESERVED), (uint64_t)0));
@@ -90,7 +90,7 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::UDP_PORT), host_udp_port_data));
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::DEVICE_ENABLED), (uint8_t)0b00001000));
 
-  EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::INTENSITIES_ENABLED), 0));
+  EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::INTENSITIES_ENABLED), 0b00001000));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::POINT_IN_SAFETY_ENABLED), 0));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::ACTIVE_ZONE_SET_ENABLED), 0));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::IO_PIN_ENABLED), 0));
@@ -102,7 +102,7 @@ TEST_F(StartRequestTest, constructorTest)
       DecodingEquals(data, static_cast<size_t>(Offset::MASTER_START_ANGLE), (uint16_t)scan_range.getStart().value()));
   EXPECT_TRUE(
       DecodingEquals(data, static_cast<size_t>(Offset::MASTER_END_ANGLE), (uint16_t)scan_range.getEnd().value()));
-  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::MASTER_ANGLE_RESOLUTION), (uint16_t)1));
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::MASTER_ANGLE_RESOLUTION), (uint16_t)2));
 
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::SLAVE_ONE_START_ANGLE), 0));
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::SLAVE_ONE_END_ANGLE), 0));
@@ -123,7 +123,7 @@ TEST_F(StartRequestTest, regressionForRealSystem)
 
   auto data = sr.serialize();
 
-  unsigned char expected_crc[4] = { 0xed, 0xc3, 0x48, 0xa1 };  // see wireshark for this number
+  unsigned char expected_crc[4] = { 0xaf, 0xc8, 0xde, 0x79 };  // see wireshark for this number
 
   for (size_t i = 0; i < sizeof(expected_crc); i++)
   {
@@ -139,7 +139,7 @@ TEST_F(StartRequestTest, regressionForRealSystemWithDiagnostic)
 
   auto data = sr.serialize();
 
-  unsigned char expected_crc[4] = { 0x5a, 0x50, 0x43, 0x8d };  // see wireshark for this number
+  unsigned char expected_crc[4] = { 0x18, 0x5b, 0xd5, 0x55 };  // see wireshark for this number
 
   for (size_t i = 0; i < sizeof(expected_crc); i++)
   {

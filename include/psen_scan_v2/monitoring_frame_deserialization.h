@@ -24,33 +24,17 @@
 
 namespace psen_scan_v2
 {
+namespace monitoring_frame
+{
 static constexpr uint32_t DEFAULT_DEVICE_STATUS{ 0 };
 static constexpr uint32_t OP_CODE_MONITORING_FRAME{ 0xCA };
 static constexpr uint32_t ONLINE_WORKING_MODE{ 0x00 };
 static constexpr uint32_t GUI_MONITORING_TRANSACTION{ 0x05 };
 static constexpr uint16_t NUMBER_OF_BYTES_SCAN_COUNTER{ 4 };
 static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_MEASURE{ 2 };
-class MonitoringFrameAdditionalFieldHeader
-{
-public:
-  using Id = uint8_t;
-  using Length = uint16_t;
+static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_INTENSITY{ 2 };
 
-public:
-  MonitoringFrameAdditionalFieldHeader(Id id, Length length);
-
-public:
-  Id id() const;
-  Length length() const;
-
-  static std::string idToString(Id id);
-
-private:
-  Id id_;
-  Length length_;
-};
-
-class MonitoringFrameFixedFields
+class FixedFields
 {
 public:
   using DeviceStatus = uint32_t;
@@ -61,13 +45,13 @@ public:
   using Resolution = TenthOfDegree;
 
 public:
-  MonitoringFrameFixedFields(DeviceStatus device_status,
-                             OpCode op_code,
-                             WorkingMode working_mode,
-                             TransactionType transaction_type,
-                             ScannerId scanner_id,
-                             FromTheta from_theta,
-                             Resolution resolution);
+  FixedFields(DeviceStatus device_status,
+              OpCode op_code,
+              WorkingMode working_mode,
+              TransactionType transaction_type,
+              ScannerId scanner_id,
+              FromTheta from_theta,
+              Resolution resolution);
 
 public:
   DeviceStatus device_status() const;
@@ -87,89 +71,116 @@ private:
   FromTheta from_theta_;
   Resolution resolution_;
 };
-namespace monitoring_frame_additional_field_header_ids
+namespace additional_field
 {
-enum class HeaderID : MonitoringFrameAdditionalFieldHeader::Id
+class Header
+{
+public:
+  using Id = uint8_t;
+  using Length = uint16_t;
+
+public:
+  Header(Id id, Length length);
+
+public:
+  Id id() const;
+  Length length() const;
+
+  static std::string idToString(Id id);
+
+private:
+  Id id_;
+  Length length_;
+};
+
+enum class HeaderID : Header::Id
 {
   SCAN_COUNTER = 0x02,
   DIAGNOSTICS = 0x04,
   MEASURES = 0x05,
+  INTENSITIES = 0x06,
   END_OF_FRAME = 0x09
 };
-};  // namespace monitoring_frame_additional_field_header_ids
 
-MonitoringFrameMsg deserializeMonitoringFrame(const MaxSizeRawData& data, const std::size_t& num_bytes);
-MonitoringFrameFixedFields readHeader(std::istringstream& is);
-MonitoringFrameAdditionalFieldHeader readFieldHeader(std::istringstream& is, const std::size_t& max_num_bytes);
-std::vector<MonitoringFrameDiagnosticMessage> deserializeDiagnosticMessages(std::istringstream& is);
+Header read(std::istringstream& is, const std::size_t& max_num_bytes);
+}  // namespace additional_field
 
-class MonitoringFrameFormatError : public std::runtime_error
+monitoring_frame::Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
+FixedFields readFixedFields(std::istringstream& is);
+namespace diagnostic
+{
+std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is);
+}
+
+namespace format_error
+{
+class DecodingFailure : public std::runtime_error
 {
 public:
-  MonitoringFrameFormatError(const std::string& msg = "Error while decoding laser scanner measurement data");
+  DecodingFailure(const std::string& msg = "Error while decoding laser scanner measurement data");
 };
 
-class MonitoringFrameFormatErrorScanCounterUnexpectedSize : public MonitoringFrameFormatError
+class ScanCounterUnexpectedSize : public DecodingFailure
 {
 public:
-  MonitoringFrameFormatErrorScanCounterUnexpectedSize(const std::string& msg);
+  ScanCounterUnexpectedSize(const std::string& msg);
 };
 
-inline MonitoringFrameFormatError::MonitoringFrameFormatError(const std::string& msg) : std::runtime_error(msg)
+inline DecodingFailure::DecodingFailure(const std::string& msg) : std::runtime_error(msg)
 {
 }
 
-inline MonitoringFrameFormatErrorScanCounterUnexpectedSize::MonitoringFrameFormatErrorScanCounterUnexpectedSize(
-    const std::string& msg)
-  : MonitoringFrameFormatError(msg)
+inline ScanCounterUnexpectedSize::ScanCounterUnexpectedSize(const std::string& msg) : DecodingFailure(msg)
 {
 }
+}  // namespace format_error
 
-inline MonitoringFrameAdditionalFieldHeader::Id MonitoringFrameAdditionalFieldHeader::id() const
+inline additional_field::Header::Id additional_field::Header::id() const
 {
   return id_;
 }
 
-inline MonitoringFrameAdditionalFieldHeader::Length MonitoringFrameAdditionalFieldHeader::length() const
+inline additional_field::Header::Length additional_field::Header::length() const
 {
   return length_;
 }
 
-inline MonitoringFrameFixedFields::DeviceStatus MonitoringFrameFixedFields::device_status() const
+inline FixedFields::DeviceStatus FixedFields::device_status() const
 {
   return device_status_;
 }
 
-inline MonitoringFrameFixedFields::OpCode MonitoringFrameFixedFields::op_code() const
+inline FixedFields::OpCode FixedFields::op_code() const
 {
   return op_code_;
 }
 
-inline MonitoringFrameFixedFields::WorkingMode MonitoringFrameFixedFields::working_mode() const
+inline FixedFields::WorkingMode FixedFields::working_mode() const
 {
   return working_mode_;
 }
 
-inline MonitoringFrameFixedFields::TransactionType MonitoringFrameFixedFields::transaction_type() const
+inline FixedFields::TransactionType FixedFields::transaction_type() const
 {
   return transaction_type_;
 }
 
-inline ScannerId MonitoringFrameFixedFields::scanner_id() const
+inline ScannerId FixedFields::scanner_id() const
 {
   return scanner_id_;
 }
 
-inline MonitoringFrameFixedFields::FromTheta MonitoringFrameFixedFields::from_theta() const
+inline FixedFields::FromTheta FixedFields::from_theta() const
 {
   return from_theta_;
 }
 
-inline MonitoringFrameFixedFields::Resolution MonitoringFrameFixedFields::resolution() const
+inline FixedFields::Resolution FixedFields::resolution() const
 {
   return resolution_;
 }
 
+}  // namespace monitoring_frame
 }  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_MONITORING_FRAME_DESERIALIZATION_H

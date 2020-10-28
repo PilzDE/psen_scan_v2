@@ -81,6 +81,15 @@ inline void ScannerProtocolDef::sendStartRequest(const T& event)
   args_->control_client_->write(StartRequest(args_->config_, DEFAULT_SEQ_NUMBER).serialize());
 }
 
+inline void ScannerProtocolDef::handleStartRequestTimeout(const scanner_events::StartTimeout& event)
+{
+  PSENSCAN_DEBUG("StateMachine", "Action: handleStartRequestTimeout");
+  PSENSCAN_ERROR("StateMachine",
+                 "Timeout while waiting for the scanner to start! Retrying... "
+                 "(Please check the ethernet connection or contact PILZ support if the error persists.)");
+  sendStartRequest(event);
+}
+
 inline void ScannerProtocolDef::sendStopRequest(const scanner_events::StopRequest& event)
 {
   PSENSCAN_DEBUG("StateMachine", "Action: sendStopRequest");
@@ -91,7 +100,7 @@ inline void ScannerProtocolDef::sendStopRequest(const scanner_events::StopReques
 inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawMonitoringFrameReceived& event)
 {
   PSENSCAN_DEBUG("StateMachine", "Action: handleMonitoringFrame");
-  const MonitoringFrameMsg frame{ deserializeMonitoringFrame(event.data_, event.num_bytes_) };
+  const monitoring_frame::Message frame{ monitoring_frame::deserialize(event.data_, event.num_bytes_) };
   PSENSCAN_WARN_THROTTLE(
       1 /* sec */, "ScannerController", "The scanner reports an error: {}", frame.diagnosticMessages());
   args_->inform_user_about_laser_scan_cb(toLaserScan(frame));

@@ -28,7 +28,7 @@
 
 namespace psen_scan_v2
 {
-static constexpr TenthOfDegree MASTER_RESOLUTION{ TenthOfDegree(1) };
+static constexpr TenthOfDegree MASTER_RESOLUTION{ TenthOfDegree(2) };
 
 StartRequest::StartRequest(const ScannerConfiguration& scanner_configuration, const uint32_t& seq_number)
   : seq_number_(seq_number)

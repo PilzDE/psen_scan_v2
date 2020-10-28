@@ -46,7 +46,7 @@ namespace mpl = boost::mpl;
 // clang-format off
 
 
-using MonitoringFrameCallback = std::function<void(const MonitoringFrameMsg& msg)>;
+using MonitoringFrameCallback = std::function<void(const monitoring_frame::Message& msg)>;
 using SendRequestCallback = std::function<void()>;
 using StartedCallback = std::function<void()>;
 using StoppedCallback = std::function<void()>;
@@ -87,9 +87,9 @@ struct udp_connection_state_machine_ : public msm::front::state_machine_def<udp_
     };
     struct monitoring_frame_received
     {
-      monitoring_frame_received(const MonitoringFrameMsg& frame) : frame_(frame) {}
+      monitoring_frame_received(const monitoring_frame::Message& frame) : frame_(frame) {}
 
-      MonitoringFrameMsg frame_;
+      monitoring_frame::Message frame_;
     };
     struct start_reply_timeout {};
     struct stop_request {};
