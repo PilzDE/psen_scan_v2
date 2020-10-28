@@ -64,16 +64,19 @@ using namespace ::testing;
 using namespace std::chrono_literals;
 using namespace pilz_testutils;
 
-static MonitoringFrameMsg createValidMonitoringFrameMsg()
+static monitoring_frame::Message createValidMonitoringFrameMsg()
 {
   const auto from_theta{ TenthOfDegree(10.) };
   const auto resolution{ TenthOfDegree(3.14 / 2.) };
   const uint32_t scan_counter{ 42 };
   const std::vector<double> measurements{ 1., 2., 3., 4.5, 5., 42. };
   const std::vector<double> intensities{ 0., 4., 3., 1007., 508., 14000. };
-  const std::vector<MonitoringFrameDiagnosticMessage> diagnostic_messages{ { ScannerId::master, ErrorLocation(1, 7) } };
+  const std::vector<monitoring_frame::diagnostic::Message> diagnostic_messages{
+    { ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(1, 7) }
+  };
 
-  return MonitoringFrameMsg(from_theta, resolution, scan_counter, measurements, intensities, diagnostic_messages);
+  return monitoring_frame::Message(
+      from_theta, resolution, scan_counter, measurements, intensities, diagnostic_messages);
 }
 
 struct PortHolder
@@ -174,7 +177,7 @@ public:
 public:
   void sendStartReply();
   void sendStopReply();
-  void sendMonitoringFrame(const MonitoringFrameMsg& msg);
+  void sendMonitoringFrame(const monitoring_frame::Message& msg);
   void sendEmptyMonitoringFrame();
 
 private:
@@ -234,7 +237,7 @@ void ScannerMock::sendStopReply()
   sendReply(getOpCodeValue(ScannerReplyMsgType::stop));
 }
 
-void ScannerMock::sendMonitoringFrame(const MonitoringFrameMsg& msg)
+void ScannerMock::sendMonitoringFrame(const monitoring_frame::Message& msg)
 {
   std::cout << "ScannerMock: Send monitoring frame..." << std::endl;
   DynamicSizeRawData dynamic_raw_scan = serialize(msg);
@@ -432,8 +435,7 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
                     port_holder_.data_port_scanner,
                     port_holder_.control_port_scanner);
 
-  MonitoringFrameMsg msg{ createValidMonitoringFrameMsg() };
-
+  monitoring_frame::Message msg{ createValidMonitoringFrameMsg() };
   Barrier monitoring_frame_barrier;
   Barrier diagnostic_barrier;
   {

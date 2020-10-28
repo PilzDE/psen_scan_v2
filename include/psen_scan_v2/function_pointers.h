@@ -25,7 +25,7 @@ namespace psen_scan_v2
 {
 using SendRequestCallback = std::function<void()>;
 using ReplyCallback = std::function<void()>;
-using MonitoringFrameCallback = std::function<void(const MonitoringFrameMsg&)>;
+using MonitoringFrameCallback = std::function<void(const monitoring_frame::Message&)>;
 using ErrorCallback = std::function<void(const std::string&)>;
 using LaserScanCallback = std::function<void(const LaserScan&)>;
 }  // namespace psen_scan_v2

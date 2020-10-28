@@ -78,13 +78,15 @@ class WithIntensitiesAndDiagnostics
 public:
   WithIntensitiesAndDiagnostics()
   {
-    MonitoringFrameMsg msg(TenthOfDegree(0x3e8),
-                           TenthOfDegree(0x02),
-                           0x00008894,
-                           readMeasures(hex_dump, 74, 250),
-                           readIntensities(hex_dump, intensities_offset, 250),
-                           { MonitoringFrameDiagnosticMessage(ScannerId::master, ErrorLocation(2, 0)),
-                             MonitoringFrameDiagnosticMessage(ScannerId::master, ErrorLocation(4, 3)) });
+    monitoring_frame::Message msg(
+        TenthOfDegree(0x3e8),
+        TenthOfDegree(0x02),
+        0x00008894,
+        readMeasures(hex_dump, 74, 250),
+        readIntensities(hex_dump, intensities_offset, 250),
+        { monitoring_frame::diagnostic::Message(ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(2, 0)),
+          monitoring_frame::diagnostic::Message(ScannerId::master,
+                                                monitoring_frame::diagnostic::ErrorLocation(4, 3)) });
     expected_msg_ = msg;
   };
 
@@ -163,7 +165,7 @@ public:
   };
   // clang-format on
 
-  MonitoringFrameMsg expected_msg_;
+  monitoring_frame::Message expected_msg_;
 };
 
 class WithoutMeasurementsAndIntensities
@@ -171,7 +173,7 @@ class WithoutMeasurementsAndIntensities
 public:
   WithoutMeasurementsAndIntensities()
   {
-    MonitoringFrameMsg msg(TenthOfDegree(0x5dc), TenthOfDegree(0x0a), 0x0661fc, {});
+    monitoring_frame::Message msg(TenthOfDegree(0x5dc), TenthOfDegree(0x0a), 0x0661fc, {});
     expected_msg_ = msg;
   }
 
@@ -180,7 +182,7 @@ public:
                                              0x00, 0xdc, 0x05, 0x0a, 0x00, 0x02, 0x05, 0x00, 0xfc, 0x61,
                                              0x06, 0x00, 0x05, 0x01, 0x00, 0x09, 0x00, 0x00, 0x00 };
 
-  MonitoringFrameMsg expected_msg_;
+  monitoring_frame::Message expected_msg_;
 };
 
 class WithUnknownFieldId

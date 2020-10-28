@@ -31,21 +31,22 @@ using namespace psen_scan_v2;
 
 namespace psen_scan_v2_test
 {
-static MonitoringFrameMsg createMsg()
+static monitoring_frame::Message createMsg()
 {
   const TenthOfDegree from_theta{ 10 };
   const TenthOfDegree resolution{ 90 };
   const uint32_t scan_counter{ 42 };
   const std::vector<double> measurements{ 1., 2., 3., 4.5, 5., 42. };
   const std::vector<double> intensities{ 0., 4., 3., 1007., 508., 14000. };
-  const std::vector<MonitoringFrameDiagnosticMessage> diagnostic_messages{};
+  const std::vector<monitoring_frame::diagnostic::Message> diagnostic_messages{};
 
-  return MonitoringFrameMsg(from_theta, resolution, scan_counter, measurements, intensities, diagnostic_messages);
+  return monitoring_frame::Message(
+      from_theta, resolution, scan_counter, measurements, intensities, diagnostic_messages);
 }
 
 TEST(LaserScanConversionsTest, laserScanShouldContainCorrectScanResolutionAfterConversion)
 {
-  const MonitoringFrameMsg frame{ createMsg() };
+  const monitoring_frame::Message frame{ createMsg() };
   std::unique_ptr<LaserScan> scan_ptr;
   ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ toLaserScan(frame) }););
 
@@ -54,7 +55,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectScanResolutionAfterC
 
 TEST(LaserScanConversionsTest, laserScanShouldContainCorrectMinMaxScanAngleAfterConversion)
 {
-  const MonitoringFrameMsg frame{ createMsg() };
+  const monitoring_frame::Message frame{ createMsg() };
   std::unique_ptr<LaserScan> scan_ptr;
   ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ toLaserScan(frame) }););
 
@@ -67,7 +68,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectMinMaxScanAngleAfter
 
 TEST(LaserScanConversionsTest, laserScanShouldContainCorrectMeasurementsAfterConversion)
 {
-  const MonitoringFrameMsg frame{ createMsg() };
+  const monitoring_frame::Message frame{ createMsg() };
 
   std::unique_ptr<LaserScan> scan_ptr;
   ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ toLaserScan(frame) }););
@@ -82,7 +83,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectMeasurementsAfterCon
 
 TEST(LaserScanConversionsTest, laserScanShouldContainCorrectIntensitiesAfterConversion)
 {
-  const MonitoringFrameMsg frame{ createMsg() };
+  const monitoring_frame::Message frame{ createMsg() };
 
   std::unique_ptr<LaserScan> scan_ptr;
   ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ toLaserScan(frame) }););

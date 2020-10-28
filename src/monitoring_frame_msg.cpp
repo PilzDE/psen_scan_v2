@@ -31,40 +31,39 @@
 #include "psen_scan_v2/raw_processing.h"
 #include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/logging.h"
-
 namespace psen_scan_v2
 {
-TenthOfDegree MonitoringFrameMsg::fromTheta() const
+TenthOfDegree monitoring_frame::Message::fromTheta() const
 {
   return from_theta_;
 }
 
-TenthOfDegree MonitoringFrameMsg::resolution() const
+TenthOfDegree monitoring_frame::Message::resolution() const
 {
   return resolution_;
 }
 
-uint32_t MonitoringFrameMsg::scanCounter() const
+uint32_t monitoring_frame::Message::scanCounter() const
 {
   return scan_counter_;
 }
 
-const std::vector<double>& MonitoringFrameMsg::measures() const
+const std::vector<double>& monitoring_frame::Message::measures() const
 {
   return measures_;
 }
 
-const std::vector<double>& MonitoringFrameMsg::intensities() const
+const std::vector<double>& monitoring_frame::Message::intensities() const
 {
   return intensities_;
 }
 
-std::vector<MonitoringFrameDiagnosticMessage> MonitoringFrameMsg::diagnosticMessages() const
+std::vector<monitoring_frame::diagnostic::Message> monitoring_frame::Message::diagnosticMessages() const
 {
   return diagnostic_messages_;
 }
 
-bool MonitoringFrameMsg::operator==(const MonitoringFrameMsg& rhs) const
+bool monitoring_frame::Message::operator==(const monitoring_frame::Message& rhs) const
 {
   return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
           measures() == rhs.measures() && intensities() == rhs.intensities() &&
@@ -73,9 +72,9 @@ bool MonitoringFrameMsg::operator==(const MonitoringFrameMsg& rhs) const
 
 }  // namespace psen_scan_v2
 
-std::ostream& operator<<(std::ostream& os, const psen_scan_v2::MonitoringFrameMsg& msg)
+std::ostream& operator<<(std::ostream& os, const psen_scan_v2::monitoring_frame::Message& msg)
 {
-  os << fmt::format("MonitoringFrameMsg(fromTheta = {} deg, resolution = {} deg, scanCounter = "
+  os << fmt::format("monitoring_frame::Message(fromTheta = {} deg, resolution = {} deg, scanCounter = "
                     "{}, measures = {}, intensities = {}, diagnostics = {})",
                     msg.fromTheta().value() / 10.,
                     msg.resolution().value() / 10.,
