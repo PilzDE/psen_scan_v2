@@ -56,7 +56,7 @@ inline static double constexpr tenthDegreeToRad(const int32_t& angle_in_tenth_de
   return degreeToRadian(static_cast<double>(angle_in_tenth_degree) / 10.);
 }
 
-inline static uint16_t tenthDegreeToPositiveTenthDegree(const uint32_t& angle_in_tenth_degree)
+inline static uint16_t tenthDegreeToPositiveTenthDegree(const int32_t& angle_in_tenth_degree)
 {
   if (angle_in_tenth_degree < std::numeric_limits<uint16_t>::min() ||
       angle_in_tenth_degree > std::numeric_limits<uint16_t>::max())
