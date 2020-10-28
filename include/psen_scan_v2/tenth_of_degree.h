@@ -16,8 +16,6 @@
 #ifndef PSEN_SCAN_V2_TENTH_OF_DEGREE_H
 #define PSEN_SCAN_V2_TENTH_OF_DEGREE_H
 
-#include <sstream>
-
 #include "psen_scan_v2/angle_conversions.h"
 
 namespace psen_scan_v2
@@ -32,14 +30,7 @@ public:
 
   static uint16_t toPositiveValue(const TenthOfDegree& tenth_of_degree)
   {
-    const auto value{ tenth_of_degree.value() };
-    if (value < std::numeric_limits<uint16_t>::min() || value > std::numeric_limits<uint16_t>::max())
-    {
-      std::stringstream exception_msg;
-      exception_msg << "Angle " << value << " (tenth of degree) out of range in conversion to positive value.";
-      throw std::out_of_range(exception_msg.str());
-    }
-    return static_cast<uint16_t>(value);
+    return tenthDegreeToPositiveTenthDegree(tenth_of_degree.value());
   }
 
 public:
