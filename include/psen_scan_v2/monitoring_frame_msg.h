@@ -97,8 +97,8 @@ private:
   bool diagnostic_data_enabled_{ false };
 
 public:
-  friend DynamicSizeRawData serialize(const monitoring_frame::Message& frame);
-  friend monitoring_frame::Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
+  friend RawData serialize(const monitoring_frame::Message& frame);
+  friend monitoring_frame::Message deserialize(const RawData& data, const std::size_t& num_bytes);
 };
 
 std::ostream& operator<<(std::ostream& os, const psen_scan_v2::monitoring_frame::Message& msg);

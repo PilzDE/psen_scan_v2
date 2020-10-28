@@ -140,7 +140,7 @@ enum class HeaderID : Header::Id
 Header read(std::istringstream& is, const std::size_t& max_num_bytes);
 }  // namespace additional_field
 
-monitoring_frame::Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
+monitoring_frame::Message deserialize(const RawData& data, const std::size_t& num_bytes);
 FixedFields readFixedFields(std::istringstream& is);
 namespace diagnostic
 {
