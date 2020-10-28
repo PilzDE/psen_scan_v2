@@ -68,7 +68,7 @@ constexpr ScanRange<min_angle, max_angle>::ScanRange(const TenthOfDegree& start_
 
   if (start_angle > end_angle)
   {
-    throw std::invalid_argument("End angle must not be smaller than start angle");
+    throw std::invalid_argument("Start angle must be smaller or equal to end angle");
   }
 }
 
