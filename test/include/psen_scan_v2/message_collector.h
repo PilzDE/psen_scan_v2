@@ -31,16 +31,15 @@ public:
 
   void scanCb(const MsgTypeConstPtr scan, size_t n_msgs)
   {
-    if (msgs_.size() < n_msgs - 1)
+    if (msgs_.size() < n_msgs)
     {
       msgs_.push_back(scan);
     }
 
-    // To have only on call on the promise this is done with the last received message
-    // further messages are simply ignored
-    if (msgs_.size() == n_msgs - 1)
+    // To have only one call on the promise the subscriber is shut down
+    if (msgs_.size() == n_msgs)
     {
-      msgs_.push_back(scan);
+      sub_.shutdown();
       msgs_collected_.set_value();
     }
   }
@@ -52,7 +51,7 @@ public:
     msgs_collected_ = std::promise<void>();
 
     auto future = msgs_collected_.get_future();
-    auto sub = nh_.subscribe<MsgType>(
+    sub_ = nh_.subscribe<MsgType>(
         topic, 1000, boost::bind(&MessageCollector::scanCb, this, boost::placeholders::_1, n_msgs));
 
     future.wait();
