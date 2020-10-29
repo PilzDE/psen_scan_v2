@@ -124,7 +124,7 @@ TEST_F(ScanComparisionTests, simpleCompare)
 
   size_t sample_size = 200;
 
-  auto scans = MessageCollector<sensor_msgs::LaserScan>(nh).collectScans(sample_size, "/laser_scanner/scan");
+  auto scans = MessageCollector<sensor_msgs::LaserScan>(nh).collectScans(sample_size, "/laser_scanner/scan_reference");
   auto bins_actual = binsFromScans(scans);
 
   std::string error_string;
