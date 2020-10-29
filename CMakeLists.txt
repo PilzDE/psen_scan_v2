@@ -360,13 +360,16 @@ target_link_libraries(integrationtest_scanner_api
     ${pilz_testutils_LIBRARIES}
   )
 
+  ######################
+  ##  Hardware-Tests  ##
+  ######################
 
   if(DEFINED ENV{HW_TESTING})
-    add_rostest_gtest(scan_compare
-        test/hw_tests/scan_compare.test
-        test/hw_tests/scan_compare.cpp
+    add_rostest_gtest(hwtest_scan_compare
+        test/hw_tests/hwtest_scan_compare.test
+        test/hw_tests/hwtest_scan_compare.cpp
     )
-    target_link_libraries(scan_compare
+    target_link_libraries(hwtest_scan_compare
       ${catkin_LIBRARIES}
       ${pilz_testutils_LIBRARIES}
     )

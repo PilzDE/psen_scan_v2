@@ -9,7 +9,7 @@
 
 
 
-  <test test-name="scan_compare" pkg="psen_scan_v2" type="scan_compare">
+  <test test-name="scan_compare" pkg="psen_scan_v2" type="hwtest_scan_compare">
     <param name="testfile" value="$(find psen_scan_v2)/test/hw_tests/template.bag"/>
   </test>
 </launch>
