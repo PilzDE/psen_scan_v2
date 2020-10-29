@@ -30,28 +30,33 @@ int16_t toTenthDegree(const double& rad)
   return (rad / (2.0 * M_PI)) * 360 * 10;
 }
 
+void addScanToBin(const sensor_msgs::LaserScanConstPtr& scan, std::map<int16_t, NormalDist>& bin)
+{
+  if (scan == nullptr)
+  {
+    throw;
+  }
+
+  for (size_t i = 0; i < scan->ranges.size(); ++i)
+  {
+    auto bin_addr = toTenthDegree(scan->angle_min + scan->angle_increment * i);
+
+    if (bin.find(bin_addr) == bin.end())
+    {
+      bin.emplace(bin_addr, NormalDist{});
+      // Create bin
+    }
+    bin[bin_addr].update(scan->ranges[i]);
+  }
+}
+
 std::map<int16_t, NormalDist> binsFromScans(std::vector<sensor_msgs::LaserScanConstPtr> scans)
 {
   std::map<int16_t, NormalDist> bins;
 
   for (const auto& scan : scans)
   {
-    if (scan == nullptr)
-    {
-      continue;
-    }
-
-    for (size_t i = 0; i < scan->ranges.size(); ++i)
-    {
-      auto bin_addr = toTenthDegree(scan->angle_min + scan->angle_increment * i);
-
-      if (bins.find(bin_addr) == bins.end())
-      {
-        bins.emplace(bin_addr, NormalDist{});
-        // Create bin
-      }
-      bins[bin_addr].update(scan->ranges[i]);
-    }
+    addScanToBin(scan, bins);
   }
 
   return bins;
@@ -72,20 +77,7 @@ std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
   for (rosbag::MessageInstance const m : view)
   {
     sensor_msgs::LaserScanConstPtr scan = m.instantiate<sensor_msgs::LaserScan>();
-    if (scan != nullptr)
-    {
-      for (size_t i = 0; i < scan->ranges.size(); ++i)
-      {
-        auto bin_addr = toTenthDegree(scan->angle_min + scan->angle_increment * i);
-
-        if (bins.find(bin_addr) == bins.end())
-        {
-          bins.emplace(bin_addr, NormalDist{});
-          // Create bin
-        }
-        bins[bin_addr].update(scan->ranges[i]);
-      }
-    }
+    addScanToBin(scan, bins);
   }
 
   bag.close();
