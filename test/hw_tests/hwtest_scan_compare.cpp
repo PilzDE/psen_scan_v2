@@ -85,7 +85,7 @@ std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
   return bins;
 }
 
-class ScanComparisionTests : public ::testing::Test
+class ScanComparisonTests : public ::testing::Test
 {
 public:
   static void SetUpTestCase()
@@ -108,9 +108,9 @@ public:
   static std::map<int16_t, NormalDist> bins_expected_;
 };
 
-std::map<int16_t, NormalDist> ScanComparisionTests::bins_expected_{};
+std::map<int16_t, NormalDist> ScanComparisonTests::bins_expected_{};
 
-TEST_F(ScanComparisionTests, simpleCompare)
+TEST_F(ScanComparisonTests, simpleCompare)
 {
   ros::NodeHandle nh;
 
