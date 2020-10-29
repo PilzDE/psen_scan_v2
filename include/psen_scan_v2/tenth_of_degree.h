@@ -28,9 +28,9 @@ public:
     return TenthOfDegree(radToTenthDegree(angle_in_rad));
   }
 
-  static uint16_t toPositiveValue(const TenthOfDegree& tenth_of_degree)
+  static uint16_t toUnsigned(const TenthOfDegree& tenth_of_degree)
   {
-    return tenthDegreeToPositiveTenthDegree(tenth_of_degree.value());
+    return tenthDegreeToUnsignedTenthDegree(tenth_of_degree.value());
   }
 
 public:

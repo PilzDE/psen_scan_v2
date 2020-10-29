@@ -32,8 +32,8 @@ DynamicSizeRawData serialize(const monitoring_frame::Message& frame)
   raw_processing::write(os, ONLINE_WORKING_MODE);
   raw_processing::write(os, GUI_MONITORING_TRANSACTION);
   raw_processing::write(os, frame.scanner_id_);
-  raw_processing::write(os, TenthOfDegree::toPositiveValue(frame.from_theta_));
-  raw_processing::write(os, TenthOfDegree::toPositiveValue(frame.resolution_));
+  raw_processing::write(os, TenthOfDegree::toUnsigned(frame.from_theta_));
+  raw_processing::write(os, TenthOfDegree::toUnsigned(frame.resolution_));
 
   additional_field::Header scan_counter_header(
       static_cast<additional_field::Header::Id>(additional_field::HeaderID::SCAN_COUNTER), sizeof(frame.scan_counter_));

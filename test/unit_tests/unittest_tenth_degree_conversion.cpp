@@ -48,17 +48,16 @@ TEST(TenthDegreeConversionTests, testInRadian)
   EXPECT_DOUBLE_EQ(expected_radian, psen_scan_v2::tenthDegreeToRad(angle_in_tenth_degree));
 }
 
-TEST(tenthDegreeConversionTest, tenthDegreeToPositiveTenthDegreeShouldPreservePositiveValue)
+TEST(TenthDegreeConversionTests, tenthDegreeToUnsignedShouldPreservePositiveValue)
 {
-  const int32_t angle_in_tenth_degree{ 18 };
-  EXPECT_EQ(angle_in_tenth_degree,
-            static_cast<int32_t>(psen_scan_v2::tenthDegreeToPositiveTenthDegree(angle_in_tenth_degree)));
+  int32_t angle_in_tenth_degree{ 18 };
+  EXPECT_EQ(18u, psen_scan_v2::tenthDegreeToUnsignedTenthDegree(angle_in_tenth_degree));
 }
 
-TEST(TenthDegreeConversionTests, tenthDegreeToPositiveTenthDegreeShouldThrowWhenNegative)
+TEST(TenthDegreeConversionTests, tenthDegreeToUnsignedShouldThrowWhenNegative)
 {
-  const int32_t angle_in_tenth_degree{ -1 };
-  EXPECT_THROW(psen_scan_v2::tenthDegreeToPositiveTenthDegree(angle_in_tenth_degree), std::out_of_range);
+  int32_t angle_in_tenth_degree{ -1 };
+  EXPECT_THROW(psen_scan_v2::tenthDegreeToUnsignedTenthDegree(angle_in_tenth_degree), std::out_of_range);
 }
 
 }  // namespace psen_scan_v2_test

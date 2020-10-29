@@ -76,18 +76,18 @@ DynamicSizeRawData StartRequest::serialize() const
   raw_processing::write(os, speed_encoder_enabled_);
   raw_processing::write(os, diagnostics_enabled_);
 
-  uint16_t start_angle{ TenthOfDegree::toPositiveValue(master_.getScanRange().getStart()) };
-  uint16_t end_angle{ TenthOfDegree::toPositiveValue(master_.getScanRange().getEnd()) };
-  uint16_t resolution{ TenthOfDegree::toPositiveValue(master_.getResolution()) };
+  uint16_t start_angle{ TenthOfDegree::toUnsigned(master_.getScanRange().getStart()) };
+  uint16_t end_angle{ TenthOfDegree::toUnsigned(master_.getScanRange().getEnd()) };
+  uint16_t resolution{ TenthOfDegree::toUnsigned(master_.getResolution()) };
   raw_processing::write(os, start_angle);
   raw_processing::write(os, end_angle);
   raw_processing::write(os, resolution);
 
   for (const auto& slave : slaves_)
   {
-    uint16_t slave_start_angle{ TenthOfDegree::toPositiveValue(slave.getScanRange().getStart()) };
-    uint16_t slave_end_angle{ TenthOfDegree::toPositiveValue(slave.getScanRange().getEnd()) };
-    uint16_t slave_resolution{ TenthOfDegree::toPositiveValue(slave.getResolution()) };
+    uint16_t slave_start_angle{ TenthOfDegree::toUnsigned(slave.getScanRange().getStart()) };
+    uint16_t slave_end_angle{ TenthOfDegree::toUnsigned(slave.getScanRange().getEnd()) };
+    uint16_t slave_resolution{ TenthOfDegree::toUnsigned(slave.getResolution()) };
     raw_processing::write(os, slave_start_angle);
     raw_processing::write(os, slave_end_angle);
     raw_processing::write(os, slave_resolution);

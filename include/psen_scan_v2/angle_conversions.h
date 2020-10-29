@@ -56,18 +56,18 @@ inline static double constexpr tenthDegreeToRad(const int32_t& angle_in_tenth_de
   return degreeToRadian(static_cast<double>(angle_in_tenth_degree) / 10.);
 }
 
-inline static uint16_t tenthDegreeToPositiveTenthDegree(const int32_t& angle_in_tenth_degree)
+inline static uint16_t tenthDegreeToUnsignedTenthDegree(const int32_t& angle_in_tenth_degree)
 {
   if (angle_in_tenth_degree < std::numeric_limits<uint16_t>::min() ||
       angle_in_tenth_degree > std::numeric_limits<uint16_t>::max())
   {
     std::stringstream exception_msg;
     exception_msg << "Angle " << angle_in_tenth_degree
-                  << " (tenth of degree) out of range in conversion to positive value.";
+                  << " (tenth of degree) out of range in conversion to unsigned value.";
     throw std::out_of_range(exception_msg.str());
   }
   return static_cast<uint16_t>(angle_in_tenth_degree);
-}
+};
 
 }  // namespace psen_scan_v2
 
