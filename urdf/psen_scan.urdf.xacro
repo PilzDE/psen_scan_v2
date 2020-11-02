@@ -20,7 +20,8 @@
     <link name="${prefix}_body_link">
       <visual>
         <geometry>
-          <cylinder radius="${radius}" length="${height}" />
+          <!-- <cylinder radius="${radius}" length="${height}" /> -->
+          <mesh filename="package://psen_scan_v2/meshes/psenscan_smaller.stl" />
         </geometry>
         <material name="pilz_yellow" >
           <color rgba="1.0 0.722 0.196 1.0" />
