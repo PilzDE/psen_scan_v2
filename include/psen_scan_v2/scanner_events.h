@@ -70,6 +70,11 @@ public:
   const std::size_t num_bytes_;
 };
 
+//! @brief Timeout while waiting for MonitoringFrame.
+class MonitoringFrameTimeout
+{
+};
+
 //! @brief Triggered whenever the receiving of a monitoring frame failes.
 class MonitoringFrameReceivedError
 {

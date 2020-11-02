@@ -15,6 +15,9 @@
 
 #include "psen_scan_v2/scanner_v2.h"
 
+#include <cassert>
+#include <stdexcept>
+
 namespace psen_scan_v2
 {
 using namespace psen_scan_v2::scanner_protocol::scanner_events;
@@ -26,6 +29,30 @@ using namespace psen_scan_v2::scanner_protocol::scanner_events;
 #define BIND_RAW_DATA_EVENT(event_name)\
   [this](const MaxSizeRawData& data, const std::size_t& num_bytes){ triggerEventWithParam(event_name(data, num_bytes)); }
 // clang-format on
+
+ScannerV2::WatchdogFactory::WatchdogFactory(ScannerV2* scanner) : IWatchdogFactory(), scanner_(scanner)
+{
+  assert(scanner);
+}
+
+std::unique_ptr<Watchdog> ScannerV2::WatchdogFactory::create(const Watchdog::Timeout& timeout,
+                                                             const std::string& event_type)
+{
+  if (event_type == "StartReplyTimeout")
+  {
+    return std::unique_ptr<Watchdog>(
+        new Watchdog(timeout, std::bind(&ScannerV2::triggerEvent<scanner_events::StartTimeout>, scanner_)));
+  }
+  if (event_type == "MonitoringFrameTimeout")
+  {
+    return std::unique_ptr<Watchdog>(
+        new Watchdog(timeout, std::bind(&ScannerV2::triggerEvent<scanner_events::MonitoringFrameTimeout>, scanner_)));
+  }
+
+  // LCOV_EXCL_START
+  throw std::runtime_error("WatchdogFactory called with event for which no creation process existiert.");
+  // LCOV_EXCL_STOP
+}
 
 StateMachineArgs* ScannerV2::createStateMachineArgs(const unsigned short& data_port_scanner,
                                                     const unsigned short& control_port_scanner)
@@ -45,7 +72,8 @@ StateMachineArgs* ScannerV2::createStateMachineArgs(const unsigned short& data_p
                               // Callbacks
                               std::bind(&ScannerV2::scannerStartedCB, this),
                               std::bind(&ScannerV2::scannerStoppedCB, this),
-                              IScanner::getLaserScanCB());
+                              IScanner::getLaserScanCB(),
+                              std::unique_ptr<IWatchdogFactory>(new WatchdogFactory(this)));
 }  // namespace psen_scan_v2
 
 ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config,
@@ -62,7 +90,6 @@ ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config,
 ScannerV2::~ScannerV2()
 {
   PSENSCAN_DEBUG("Scanner", "Destruction called.");
-  stopStartWatchdog();
   const std::lock_guard<std::mutex> lock(sm_mutex_);
   sm_->stop();
 }
@@ -83,7 +110,6 @@ std::future<void> ScannerV2::start()
     throw std::runtime_error("Start must not be called twice");
   }
   // LCOV_EXCL_STOP
-  startStartWatchdog();
   triggerEvent<scanner_events::StartRequest>();
   return retval_future;
 }
@@ -101,7 +127,6 @@ std::future<void> ScannerV2::stop()
     PSENSCAN_ERROR("Scanner", "Stop was already called.");
     throw std::runtime_error("Stop must not be called twice");
   }
-  stopStartWatchdog();
   triggerEvent<scanner_events::StopRequest>();
   return retval_future;
 }
@@ -109,7 +134,6 @@ std::future<void> ScannerV2::stop()
 void ScannerV2::scannerStartedCB()
 {
   PSENSCAN_INFO("ScannerController", "Scanner started successfully.");
-  stopStartWatchdog();
   PSENSCAN_DEBUG("Scanner", "Inform user that scanner start is finsihed.");
   scanner_has_started_.set_value();
 
@@ -124,18 +148,6 @@ void ScannerV2::scannerStoppedCB()
 
   // Reinitialize
   scanner_has_stopped_ = std::promise<void>();
-}
-
-void ScannerV2::startStartWatchdog()
-{
-  const std::lock_guard<std::mutex> lock(start_watchdog_mutex_);
-  start_watchdog_ = std::make_unique<Watchdog>(REPLY_TIMEOUT, BIND_EVENT(scanner_events::StartTimeout));
-}
-
-void ScannerV2::stopStartWatchdog()
-{
-  const std::lock_guard<std::mutex> lock(start_watchdog_mutex_);
-  start_watchdog_.reset(nullptr);
 }
 
 }  // namespace psen_scan_v2
