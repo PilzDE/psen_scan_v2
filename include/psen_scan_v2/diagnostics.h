@@ -90,7 +90,6 @@ static const std::map<ErrorType, ErrorMessage> error_code_to_string
   { Et::zone_inval_trans, "Zone: Invalid input - transition or integrity." },
   { Et::zone_invalid_conf, "Zone: Invalid input configuration / connection." },
   { Et::win_cln_warn, "Warning: The front panel of the safety laser scanner must be cleaned." },
-  { Et::int_com_prb, "Internal communication problem." },
   { Et::generic_err, "Generic Error." },
   { Et::disp_com_prb, "Display communication problem." },
   { Et::temp_meas_prob, "Temperature measurement problem." },
@@ -109,15 +108,15 @@ static const std::map<ErrorType, ErrorMessage> error_code_to_string
 
   static constexpr std::array<std::array<ErrorType, 8>, 9> error_bits{{
   //Bit7                 Bit6              Bit5              Bit4              Bit3              Bit2                  Bit1                   Bit0
-  { REV(Et::ossd1_oc,    Et::ossd_shrt_c,  Et::ossd_integr,  Et::intern,       Et::intern,       Et::intern,           Et::intern,            Et::intern) },
-  { REV(Et::win_cln_al,  Et::power_supply, Et::netw_prb,     Et::dust_crc_fl,  Et::intern,       Et::intern,           Et::unused,            Et::ossd2_overcur) },
-  { REV(Et::meas_prob,   Et::intern,       Et::intern,       Et::intern,       Et::incoherence,  Et::zone_inval_trans, Et::zone_invalid_conf, Et::win_cln_warn) },
-  { REV(Et::int_com_prb, Et::intern,       Et::intern,       Et::generic_err,  Et::disp_com_prb, Et::intern,           Et::intern,            Et::temp_meas_prob) },
-  { REV(Et::encod_oor,   Et::unused,       Et::unused,       Et::edm2_err,     Et::edm1_err,     Et::conf_err,         Et::out_of_range_err,  Et::temp_range_err) },
-  { REV(Et::unused,      Et::unused,       Et::unused,       Et::unused,       Et::unused,       Et::unused,           Et::unused,            Et::encoder_generic_err) },
-  { REV(Et::unused,      Et::unused,       Et::unused,       Et::unused,       Et::unused,       Et::unused,           Et::unused,            Et::unused) },
-  { REV(Et::unused,      Et::unused,       Et::unused,       Et::unused,       Et::unused,       Et::unused,           Et::unused,            Et::unused) },
-  { REV(Et::unused,      Et::unused,       Et::unused,       Et::unused,       Et::unused,       Et::unused,           Et::unused,            Et::unused) },
+  { REV(Et::ossd1_oc,    Et::ossd_shrt_c,  Et::ossd_integr,  Et::intern,       Et::intern,       Et::intern,           Et::intern,              Et::intern) },
+  { REV(Et::win_cln_al,  Et::power_supply, Et::netw_prb,     Et::dust_crc_fl,  Et::intern,       Et::intern,           Et::unused,              Et::ossd2_overcur) },
+  { REV(Et::meas_prob,   Et::intern,       Et::intern,       Et::intern,       Et::incoherence,  Et::zone_inval_trans, Et::zone_invalid_conf,   Et::win_cln_warn) },
+  { REV(Et::intern,      Et::intern,       Et::intern,       Et::generic_err,  Et::disp_com_prb, Et::intern,           Et::intern,              Et::temp_meas_prob) },
+  { REV(Et::intern,      Et::intern,       Et::edm2_err,     Et::edm1_err,     Et::conf_err,     Et::out_of_range_err, Et::temp_range_err,      Et::intern) },
+  { REV(Et::unused,      Et::unused,       Et::unused,       Et::unused,       Et::intern,       Et::intern,           Et::encoder_generic_err, Et::encod_oor) },
+  { REV(Et::unused,      Et::unused,       Et::unused,       Et::unused,       Et::unused,       Et::unused,           Et::unused,              Et::unused) },
+  { REV(Et::unused,      Et::unused,       Et::unused,       Et::unused,       Et::unused,       Et::unused,           Et::unused,              Et::unused) },
+  { REV(Et::unused,      Et::unused,       Et::unused,       Et::unused,       Et::unused,       Et::unused,           Et::unused,              Et::unused) },
   }};
 // clang-format on
 
