@@ -1,6 +1,7 @@
 <launch>
   <arg name="continuous_run" default="false"/>
-  <arg name="time_limit" value="$(eval inf if continuous_run else 60)"/>
+  <arg name="number_of_days" default="1"/>
+  <arg name="time_limit" value="$(eval number_of_days*86400 if continuous_run else 10)"/>
 
   <!--<include file="$(find psen_scan_v2)/launch/psen_scan_v2.launch" />-->
 

@@ -26,6 +26,7 @@
 
 namespace psen_scan_v2_test
 {
+// TODO: use radToTenthDegree() from angle_conversions.h
 int16_t toTenthDegree(const double& rad)
 {
   return (rad / (2.0 * M_PI)) * 360 * 10;
@@ -99,12 +100,17 @@ public:
     }
 
     bins_expected_ = binsFromRosbag(filepath);
+
+    ASSERT_TRUE(pnh.getParam("continuous_run", continuous_run_));
   }
 
+protected:
   static std::map<int16_t, NormalDist> bins_expected_;
+  static bool continuous_run_;
 };
 
 std::map<int16_t, NormalDist> ScanComparisonTests::bins_expected_{};
+bool ScanComparisonTests::continuous_run_{ false };
 
 TEST_F(ScanComparisonTests, simpleCompare)
 {
@@ -112,40 +118,48 @@ TEST_F(ScanComparisonTests, simpleCompare)
 
   size_t sample_size = 200;
 
-  auto scans = MessageCollector<sensor_msgs::LaserScan>(nh).collectScans(sample_size, "/laser_scanner/scan_reference");
-  auto bins_actual = binsFromScans(scans);
-
-  std::string error_string;
-  size_t counter_deviations{ 0 };
-
-  for (const auto& bin_actual : bins_actual)
+  bool test_completed{ false };
+  while (!test_completed && ros::ok())
   {
-    auto bin_expected = bins_expected_.find(bin_actual.first);
+    auto scans =
+        MessageCollector<sensor_msgs::LaserScan>(nh).collectScans(sample_size, "/laser_scanner/scan_reference");
+    auto bins_actual = binsFromScans(scans);
 
-    auto dist_actual = bin_actual.second;
-    auto dist_expected = bin_expected->second;
+    std::string error_string;
+    size_t counter_deviations{ 0 };
 
-    if (bin_expected == bins_expected_.end())
+    for (const auto& bin_actual : bins_actual)
     {
-      FAIL() << "Did not find expected value for angle " << bin_actual.first / 10. << " in the given reference scan\n";
+      auto bin_expected = bins_expected_.find(bin_actual.first);
+
+      auto dist_actual = bin_actual.second;
+      auto dist_expected = bin_expected->second;
+
+      if (bin_expected == bins_expected_.end())
+      {
+        FAIL() << "Did not find expected value for angle " << bin_actual.first / 10.
+               << " in the given reference scan\n";
+      }
+
+      auto distance = bhattacharyya_distance(dist_actual, dist_expected);
+      if (distance > 10.)
+      {
+        error_string +=
+            fmt::format("On {:+.1f} deg  expected: {} actual: {} | dist: {:.1f}, dmean: {:.3f}, dstdev: {:.3f}\n",
+                        bin_actual.first / 10.,
+                        dist_expected,
+                        dist_actual,
+                        distance,
+                        abs(dist_expected.mean() - dist_actual.mean()),
+                        abs(dist_expected.stdev() - dist_actual.stdev()));
+        counter_deviations++;
+      }
     }
 
-    auto distance = bhattacharyya_distance(dist_actual, dist_expected);
-    if (distance > 10.)
-    {
-      error_string +=
-          fmt::format("On {:+.1f} deg  expected: {} actual: {} | dist: {:.1f}, dmean: {:.3f}, dstdev: {:.3f}\n",
-                      bin_actual.first / 10.,
-                      dist_expected,
-                      dist_actual,
-                      distance,
-                      abs(dist_expected.mean() - dist_actual.mean()),
-                      abs(dist_expected.stdev() - dist_actual.stdev()));
-      counter_deviations++;
-    }
+    ASSERT_EQ(counter_deviations, 0u) << error_string;
+
+    test_completed = !continuous_run_;
   }
-
-  EXPECT_EQ(counter_deviations, 0u) << error_string;
 }
 
 }  // namespace psen_scan_v2_test
