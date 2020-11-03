@@ -123,11 +123,9 @@ inline void ScanValidator::reset()
 inline ScanValidator::OptionalResult ScanValidator::validate(const monitoring_frame::Message& msg,
                                                              const uint32_t& num_expected_msgs)
 {
-  if (!curr_scan_round_)
+  if (curr_scan_round_ == boost::none)
   {
     curr_scan_round_ = ScanRoundInfo(msg.scanCounter());
-    ++(curr_scan_round_.value());
-    return boost::none;
   }
 
   auto& curr_info = curr_scan_round_.value();
@@ -139,6 +137,7 @@ inline ScanValidator::OptionalResult ScanValidator::validate(const monitoring_fr
 
   const auto old_info = curr_info;
   curr_scan_round_ = ScanRoundInfo(msg.scanCounter());
+  ++(curr_scan_round_.value());
   return old_info.validate(num_expected_msgs);
 }
 
