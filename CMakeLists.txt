@@ -364,7 +364,8 @@ target_link_libraries(integrationtest_scanner_api
   ##  Hardware-Tests  ##
   ######################
 
-  if(DEFINED ENV{HW_TESTING})
+  # build this using catkin_make -DENABLE_HARDWARE_TESTING=ON
+  if(ENABLE_HARDWARE_TESTING)
     add_rostest_gtest(hwtest_scan_compare
         test/hw_tests/hwtest_scan_compare.test
         test/hw_tests/hwtest_scan_compare.cpp
