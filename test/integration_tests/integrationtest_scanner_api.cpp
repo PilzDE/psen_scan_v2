@@ -145,13 +145,13 @@ struct PortHolder
     control_port_scanner = (control_port_scanner + 1) % MAX_CONTROL_PORT_SCANNER;
     if (control_port_scanner == 0)
     {
-      control_port_scanner = MIN_CONTROL_PORT_HOST;
+      control_port_scanner = MIN_CONTROL_PORT_SCANNER;
     }
 
     data_port_scanner = (data_port_scanner + 1) % MAX_DATA_PORT_SCANNER;
     if (data_port_scanner == 0)
     {
-      data_port_scanner = MIN_CONTROL_PORT_HOST;
+      data_port_scanner = MIN_DATA_PORT_SCANNER;
     }
 
     return *this;
