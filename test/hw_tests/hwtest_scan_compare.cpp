@@ -6,6 +6,7 @@
 #include <boost/bind.hpp>
 #include <functional>
 
+#include <algorithm>
 #include <future>
 #include <iostream>
 
@@ -53,12 +54,8 @@ void addScanToBin(const sensor_msgs::LaserScanConstPtr& scan, std::map<int16_t, 
 std::map<int16_t, NormalDist> binsFromScans(std::vector<sensor_msgs::LaserScanConstPtr> scans)
 {
   std::map<int16_t, NormalDist> bins;
-
-  for (const auto& scan : scans)
-  {
-    addScanToBin(scan, bins);
-  }
-
+  std::for_each(
+      scans.cbegin(), scans.cend(), [&bins](const sensor_msgs::LaserScanConstPtr& scan) { addScanToBin(scan, bins); });
   return bins;
 }
 
@@ -74,11 +71,10 @@ std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
 
   rosbag::View view(bag, rosbag::TopicQuery(topics));
 
-  for (rosbag::MessageInstance const m : view)
-  {
-    sensor_msgs::LaserScanConstPtr scan = m.instantiate<sensor_msgs::LaserScan>();
+  std::for_each(view.begin(), view.end(), [&bins](const rosbag::MessageInstance& msg) {
+    sensor_msgs::LaserScanConstPtr scan = msg.instantiate<sensor_msgs::LaserScan>();
     addScanToBin(scan, bins);
-  }
+  });
 
   bag.close();
 
