@@ -513,7 +513,11 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
   Barrier empty_msg_received;
   // Needed to allow all other log messages which might be received
   EXPECT_CALL(*ros_log_mock, internal_append(::testing::_, ::testing::_)).Times(AnyNumber());
-  EXPECT_LOG(*ros_log_mock, WARN, "No transition in state 2 for event MonitoringFrameReceivedError.")
+  EXPECT_LOG(*ros_log_mock,
+             WARN,
+             "No transition in state"
+             " \"psen_scan_v2::scanner_protocol::ScannerProtocolDef::WaitForMonitoringFrame\""
+             " for event \"MonitoringFrameReceivedError\".")
       .Times(1)
       .WillOnce(OpenBarrier(&empty_msg_received));
 
