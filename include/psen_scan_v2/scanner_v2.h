@@ -21,6 +21,8 @@
 #include <future>
 #include <functional>
 
+#include <boost/optional.hpp>
+
 #include "psen_scan_v2/scanner_interface.h"
 #include "psen_scan_v2/scanner_events.h"
 #include "psen_scan_v2/scanner_state_machine.h"
@@ -81,17 +83,26 @@ private:
   };
 
 private:
-  std::promise<void> scanner_has_started_;
-  std::promise<void> scanner_has_stopped_;
+  using OptionalPromise = boost::optional<std::promise<void>>;
 
-  std::mutex sm_mutex_;
+private:
+  OptionalPromise scanner_has_started_{ boost::none };
+  OptionalPromise scanner_has_stopped_{ boost::none };
+
+  //! @brief This Mutex protects ALL members of the Scanner against concurrent access.
+  //! So far there exist at least the following threads, potentially causing concurrent access to the members:
+  //! - user-main-thread
+  //! - io_service thread of UDPClient
+  //! - watchdog threads
+  std::mutex member_mutex_;
+
   std::unique_ptr<ScannerStateMachine> sm_;
 };
 
 template <class T>
 void ScannerV2::triggerEventWithParam(const T& event)
 {
-  const std::lock_guard<std::mutex> lock(sm_mutex_);
+  const std::lock_guard<std::mutex> lock(member_mutex_);
   sm_->process_event(event);
 }
 
