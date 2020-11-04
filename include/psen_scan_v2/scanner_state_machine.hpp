@@ -96,13 +96,11 @@ DEFAULT_ON_EXIT_IMPL(Stopped)
 
 //+++++++++++++++++++++++++++++++++ Actions +++++++++++++++++++++++++++++++++++
 
-static constexpr uint32_t DEFAULT_SEQ_NUMBER{ 0 };
-
 template <class T>
 inline void ScannerProtocolDef::sendStartRequest(const T& event)
 {
   PSENSCAN_DEBUG("StateMachine", "Action: sendStartRequest");
-  args_->control_client_->write(StartRequest(args_->config_, DEFAULT_SEQ_NUMBER).serialize());
+  args_->control_client_->write(serialize(start_request::Message(args_->config_)));
 }
 
 inline void ScannerProtocolDef::handleStartRequestTimeout(const scanner_events::StartTimeout& event)
@@ -118,7 +116,7 @@ inline void ScannerProtocolDef::sendStopRequest(const scanner_events::StopReques
 {
   PSENSCAN_DEBUG("StateMachine", "Action: sendStopRequest");
   args_->data_client_->close();
-  args_->control_client_->write(StopRequest().serialize());
+  args_->control_client_->write(stop_request::serialize());
 }
 
 inline void ScannerProtocolDef::printUserMsgFor(const ScanValidatorResult& res)
@@ -164,14 +162,14 @@ inline void ScannerProtocolDef::handleMonitoringFrameTimeout(const scanner_event
 
 inline bool ScannerProtocolDef::isStartReply(scanner_events::RawReplyReceived const& reply_event)
 {
-  const ScannerReplyMsg msg{ ScannerReplyMsg::deserialize(reply_event.data_) };
-  return msg.type() == ScannerReplyMsgType::start;
+  const scanner_reply::Message msg{ scanner_reply::deserialize(reply_event.data_) };
+  return msg.type() == scanner_reply::Message::Type::start;
 }
 
 inline bool ScannerProtocolDef::isStopReply(scanner_events::RawReplyReceived const& reply_event)
 {
-  const ScannerReplyMsg msg{ ScannerReplyMsg::deserialize(reply_event.data_) };
-  return msg.type() == ScannerReplyMsgType::stop;
+  const scanner_reply::Message msg{ scanner_reply::deserialize(reply_event.data_) };
+  return msg.type() == scanner_reply::Message::Type::stop;
 }
 
 //++++++++++++++++++++ Special transitions ++++++++++++++++++++++++++++++++++++

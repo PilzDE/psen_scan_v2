@@ -17,90 +17,99 @@
 
 #include <array>
 #include <cstdint>
-#include <string>
 
-#include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/scan_range.h"
+#include "psen_scan_v2/scanner_ids.h"
+#include "psen_scan_v2/scanner_configuration.h"
+#include "psen_scan_v2/tenth_of_degree.h"
 
 namespace psen_scan_v2
 {
-static constexpr std::size_t START_REQUEST_SIZE{ 58 };  // See protocol description
-
+namespace start_request
+{
 /**
  * @brief Higher level data type representing a scanner start request.
  *
  * @note Unless otherwise indicated the byte order is little endian.
  *
  */
-class StartRequest
+class Message
 {
 public:
-  /**
-   * @brief Constructor.
-   *
-   * @param scanner_configuration Specifies the required scanner configuration.
-   * @param seq_number TODO
-   */
-  StartRequest(const ScannerConfiguration& scanner_configuration, const uint32_t& seq_number);
+  Message(const ScannerConfiguration& scanner_configuration);
 
-  //! @returns the CRC of the start request.
-  uint32_t calculateCRC() const;
-
-  DynamicSizeRawData serialize() const;
+  friend DynamicSizeRawData start_request::serialize(const start_request::Message&, const uint32_t&);
+  friend DynamicSizeRawData start_request::serialize(const start_request::Message&);
 
 private:
-  uint32_t crc_{ 0 }; /**< Will be filled in constructor */
-  uint32_t seq_number_;
-  uint64_t const RESERVED_{ 0 };           /**< Use all zeros */
-  uint32_t const OPCODE_{ htole32(0x35) }; /**< Constant 0x35. */
-  uint32_t host_ip_;                       /**< Byte order: big endian */
-  uint16_t host_udp_port_data_;            /**< Byte order: big endian */
-
-  /**< The following 'enable' fields are a 1-byte mask each.
-   * Only the last 4 bits (little endian) are used, each of which represents a device.
-   * For example, (1000) only enables the Master device, while (1010) enables both the Master
-   * and the second Slave device.
-   */
-  uint8_t device_enabled_{ 0b00001000 };
-  uint8_t intensity_enabled_{ 0b00001000 };
-  uint8_t point_in_safety_enabled_{ 0 };
-  uint8_t active_zone_set_enabled_{ 0 };
-  uint8_t io_pin_enabled_{ 0 };
-  uint8_t scan_counter_enabled_{ 0b00001000 };
-  uint8_t speed_encoder_enabled_{ 0 }; /**< 0000000bin disabled, 00001111bin enabled.*/
-  uint8_t diagnostics_enabled_{ 0b00000000 };
-
-  class DeviceField
+  class LaserScanSettings
   {
   public:
-    DeviceField() = default;
-
-    DeviceField(const DefaultScanRange& scan_range, const TenthOfDegree resolution)
-      : scan_range_(scan_range), resolution_(resolution)
-    {
-    }
+    constexpr LaserScanSettings() = default;
+    constexpr LaserScanSettings(const DefaultScanRange& scan_range, const TenthOfDegree& resolution);
 
   public:
-    const DefaultScanRange& getScanRange() const
-    {
-      return scan_range_;
-    };
-
-    TenthOfDegree getResolution() const
-    {
-      return resolution_;
-    };
+    constexpr const DefaultScanRange& getScanRange() const;
+    constexpr TenthOfDegree getResolution() const;
 
   private:
     const DefaultScanRange scan_range_{};
-    TenthOfDegree resolution_{ 0 };
+    const TenthOfDegree resolution_{ 0 };
   };
 
-  DeviceField master_;
-  std::array<DeviceField, 3> slaves_;
+  class DeviceSettings
+  {
+  public:
+    constexpr DeviceSettings(const ScannerId id, const bool diagnostics_enabled);
+
+  public:
+    constexpr bool isDiagnosticsEnabled() const;
+
+  private:
+    const ScannerId id_;
+    const bool diagnostics_enabled_;
+  };
+
+private:
+  static constexpr std::size_t NUM_SLAVES{ 3 };
+
+private:
+  const uint32_t host_ip_;
+  const uint16_t host_udp_port_data_;
+
+  const DeviceSettings master_device_settings_;
+  const LaserScanSettings master_;
+  const std::array<LaserScanSettings, NUM_SLAVES> slaves_;
 };
 
+constexpr Message::LaserScanSettings::LaserScanSettings(const DefaultScanRange& scan_range,
+                                                        const TenthOfDegree& resolution)
+  : scan_range_(scan_range), resolution_(resolution)
+{
+}
+
+constexpr const DefaultScanRange& Message::LaserScanSettings::getScanRange() const
+{
+  return scan_range_;
+};
+
+constexpr TenthOfDegree Message::LaserScanSettings::getResolution() const
+{
+  return resolution_;
+};
+
+constexpr Message::DeviceSettings::DeviceSettings(const ScannerId id, const bool diagnostics_enabled)
+  : id_(id), diagnostics_enabled_(diagnostics_enabled)
+{
+}
+
+constexpr bool Message::DeviceSettings::isDiagnosticsEnabled() const
+{
+  return diagnostics_enabled_;
+};
+
+}  // namespace start_request
 }  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_START_REQUEST_H

@@ -42,6 +42,7 @@ REGISTER_ROSCONSOLE_BRIDGE;
 #include "psen_scan_v2/scanner_v2.h"
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/scanner_reply_msg.h"
+#include "psen_scan_v2/scanner_reply_serialization_deserialization.h"
 #include "psen_scan_v2/scan_range.h"
 #include "psen_scan_v2/diagnostics.h"
 
@@ -57,7 +58,6 @@ static constexpr DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(1)
 static constexpr std::chrono::milliseconds WAIT_TIMEOUT{ 10 };
 static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 3 };
 
-static constexpr uint32_t DEFAULT_SEQ_NUMBER{ 0u };
 static constexpr bool DIAGNOSTICS_ENABLED{ false };
 
 using std::placeholders::_1;
@@ -269,19 +269,21 @@ void ScannerMock::startContinuousListeningForControlMsg()
 
 void ScannerMock::sendReply(const uint32_t reply_type)
 {
-  const ScannerReplyMsg msg(reply_type, 0x00);
-  control_server_.asyncSend<REPLY_MSG_FROM_SCANNER_SIZE>(control_msg_receiver_, msg.serialize());
+  scanner_reply::Message::Type type = static_cast<scanner_reply::Message::Type>(reply_type);
+  scanner_reply::Message::OperationResult result = scanner_reply::Message::OperationResult::accepted;
+  const scanner_reply::Message msg(type, result);
+  control_server_.asyncSend<scanner_reply::Message::SIZE>(control_msg_receiver_, scanner_reply::serialize(msg));
 }
 
 void ScannerMock::sendStartReply()
 {
   std::cout << "ScannerMock: Send start reply..." << std::endl;
-  sendReply(getOpCodeValue(ScannerReplyMsgType::start));
+  sendReply(static_cast<uint32_t>(scanner_reply::Message::Type::start));
 }
 
 void ScannerMock::sendStopReply()
 {
-  sendReply(getOpCodeValue(ScannerReplyMsgType::stop));
+  sendReply(static_cast<uint32_t>(scanner_reply::Message::Type::stop));
 }
 
 void ScannerMock::sendMonitoringFrame(const monitoring_frame::Message& msg)
@@ -307,10 +309,10 @@ TEST_F(ScannerAPITests, testStartFunctionality)
                     std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1),
                     port_holder_.data_port_scanner,
                     port_holder_.control_port_scanner);
-  const StartRequest start_req(config_, DEFAULT_SEQ_NUMBER);
+  const start_request::Message start_req(config_);
 
   Barrier start_req_received_barrier;
-  EXPECT_CALL(scanner_mock, receiveControlMsg(_, start_req.serialize()))
+  EXPECT_CALL(scanner_mock, receiveControlMsg(_, serialize(start_req)))
       .WillOnce(OpenBarrier(&start_req_received_barrier));
 
   scanner_mock.startListeningForControlMsg();
@@ -355,7 +357,7 @@ TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
                     port_holder_.control_port_scanner);
 
   Barrier start_req_received_barrier;
-  ON_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config_, DEFAULT_SEQ_NUMBER).serialize()))
+  ON_CALL(scanner_mock, receiveControlMsg(_, serialize(start_request::Message(config_))))
       .WillByDefault(OpenBarrier(&start_req_received_barrier));
   EXPECT_CALL(cb, LaserScanCallback(_)).Times(0);
 
@@ -380,11 +382,11 @@ TEST_F(ScannerAPITests, testStopFunctionality)
                     port_holder_.data_port_scanner,
                     port_holder_.control_port_scanner);
 
-  EXPECT_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config_, DEFAULT_SEQ_NUMBER).serialize()))
+  EXPECT_CALL(scanner_mock, receiveControlMsg(_, serialize(start_request::Message(config_))))
       .WillOnce(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
   Barrier stop_req_received_barrier;
-  EXPECT_CALL(scanner_mock, receiveControlMsg(_, StopRequest().serialize()))
+  EXPECT_CALL(scanner_mock, receiveControlMsg(_, stop_request::serialize()))
       .WillOnce(OpenBarrier(&stop_req_received_barrier));
 
   scanner_mock.startListeningForControlMsg();
@@ -412,7 +414,7 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStopIsCalledSecondTime)
                     port_holder_.data_port_scanner,
                     port_holder_.control_port_scanner);
 
-  ON_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config_, DEFAULT_SEQ_NUMBER).serialize()))
+  ON_CALL(scanner_mock, receiveControlMsg(_, serialize(start_request::Message(config_))))
       .WillByDefault(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
   scanner_mock.startListeningForControlMsg();
@@ -486,7 +488,7 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
   Barrier diagnostic_barrier;
   {
     InSequence seq;
-    EXPECT_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config_, DEFAULT_SEQ_NUMBER).serialize()))
+    EXPECT_CALL(scanner_mock, receiveControlMsg(_, serialize(start_request::Message(config_))))
         .WillOnce(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
     // Check that toLaserScan(msg) == arg
@@ -522,7 +524,7 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
                     port_holder_.data_port_scanner,
                     port_holder_.control_port_scanner);
 
-  ON_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config_, DEFAULT_SEQ_NUMBER).serialize()))
+  ON_CALL(scanner_mock, receiveControlMsg(_, serialize(start_request::Message(config_))))
       .WillByDefault(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
   Barrier valid_msg_barrier;
@@ -577,7 +579,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
       scan_counter_invalid_round, num_scans_per_round - 1) };
   invalid_scan_round_msgs.emplace_back(createValidMonitoringFrameMsg(scan_counter_invalid_round + 1));
 
-  ON_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config_, DEFAULT_SEQ_NUMBER).serialize()))
+  ON_CALL(scanner_mock, receiveControlMsg(_, serialize(start_request::Message(config_))))
       .WillByDefault(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
   Barrier user_msg_barrier;
@@ -630,7 +632,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
   std::vector<monitoring_frame::Message> msgs{ createValidMonitoringFrameMsgs(scan_counter, num_scans_per_round + 1) };
   msgs.emplace_back(createValidMonitoringFrameMsg(scan_counter + 1));
 
-  ON_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config_, DEFAULT_SEQ_NUMBER).serialize()))
+  ON_CALL(scanner_mock, receiveControlMsg(_, serialize(start_request::Message(config_))))
       .WillByDefault(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
   Barrier user_msg_barrier;
@@ -664,7 +666,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFrameReceiveTimeout)
                     port_holder_.data_port_scanner,
                     port_holder_.control_port_scanner);
 
-  ON_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config_, DEFAULT_SEQ_NUMBER).serialize()))
+  ON_CALL(scanner_mock, receiveControlMsg(_, serialize(start_request::Message(config_))))
       .WillByDefault(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
   Barrier user_msg_barrier;
