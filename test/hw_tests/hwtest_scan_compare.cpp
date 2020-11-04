@@ -41,8 +41,6 @@
 
 namespace psen_scan_v2_test
 {
-// TODO: use radToTenthDegree() from angle_conversions.h
-
 std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
 {
   std::map<int16_t, NormalDist> bins;

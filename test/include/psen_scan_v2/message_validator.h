@@ -18,17 +18,13 @@
 #include <future>
 #include <map>
 #include <vector>
+#include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/dist.h"
 
 #include <ros/ros.h>
 
 namespace psen_scan_v2_test
 {
-int16_t toTenthDegree(const double& rad)
-{
-  return (rad / (2.0 * M_PI)) * 360 * 10;
-}
-
 void addScanToBin(const sensor_msgs::LaserScanConstPtr& scan, std::map<int16_t, NormalDist>& bin)
 {
   if (scan == nullptr)
@@ -38,7 +34,7 @@ void addScanToBin(const sensor_msgs::LaserScanConstPtr& scan, std::map<int16_t, 
 
   for (size_t i = 0; i < scan->ranges.size(); ++i)
   {
-    auto bin_addr = toTenthDegree(scan->angle_min + scan->angle_increment * i);
+    auto bin_addr = psen_scan_v2::radToTenthDegree(scan->angle_min + scan->angle_increment * i);
 
     if (bin.find(bin_addr) == bin.end())
     {
@@ -48,6 +44,7 @@ void addScanToBin(const sensor_msgs::LaserScanConstPtr& scan, std::map<int16_t, 
     bin[bin_addr].update(scan->ranges[i]);
   }
 }
+
 std::map<int16_t, NormalDist> binsFromScans(std::vector<sensor_msgs::LaserScanConstPtr> scans)
 {
   std::map<int16_t, NormalDist> bins;
@@ -55,6 +52,7 @@ std::map<int16_t, NormalDist> binsFromScans(std::vector<sensor_msgs::LaserScanCo
       scans.cbegin(), scans.cend(), [&bins](const sensor_msgs::LaserScanConstPtr& scan) { addScanToBin(scan, bins); });
   return bins;
 }
+
 template <typename MsgType>
 class MessageValidator
 {
