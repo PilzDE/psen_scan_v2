@@ -71,6 +71,11 @@ TEST(LaserScanTest, testGetMaxScanAngle)
   EXPECT_EQ(expected_max_scan_angle, laser_scan->getMaxScanAngle());
 }
 
+TEST(LaserScanTest, testMinEqualsMax)
+{
+  ASSERT_NO_THROW(LaserScan(DEFAULT_RESOLUTION, TenthOfDegree(1000u), TenthOfDegree(1000u)););
+}
+
 }  // namespace psen_scan_v2_test
 
 int main(int argc, char** argv)

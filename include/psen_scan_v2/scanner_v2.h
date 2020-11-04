@@ -19,8 +19,9 @@
 #include <memory>
 #include <mutex>
 #include <future>
-#include <chrono>
 #include <functional>
+
+#include <boost/optional.hpp>
 
 #include "psen_scan_v2/scanner_interface.h"
 #include "psen_scan_v2/scanner_events.h"
@@ -41,8 +42,6 @@ using std::placeholders::_2;
 // TODO: Move to ScannerController class and read from ScannerConfiguration
 static constexpr unsigned short DATA_PORT_OF_SCANNER_DEVICE{ 2000 };
 static constexpr unsigned short CONTROL_PORT_OF_SCANNER_DEVICE{ 3000 };
-
-static constexpr std::chrono::milliseconds REPLY_TIMEOUT{ 1000 };
 
 class ScannerV2 : public IScanner
 {
@@ -72,26 +71,38 @@ private:
   void scannerStartedCB();
   void scannerStoppedCB();
 
-  void startStartWatchdog();
-  void stopStartWatchdog();
+private:
+  class WatchdogFactory : public IWatchdogFactory
+  {
+  public:
+    WatchdogFactory(ScannerV2* scanner);
+    std::unique_ptr<Watchdog> create(const Watchdog::Timeout& timeout, const std::string& event_type) override;
+
+  private:
+    ScannerV2* scanner_;
+  };
 
 private:
-  std::promise<void> scanner_has_started_;
-  std::promise<void> scanner_has_stopped_;
+  using OptionalPromise = boost::optional<std::promise<void>>;
 
-  // The watchdog pointer is changed by the user-main-thread and by the UDP client callback-thread/io-service-thread,
-  // and, therefore, needs to be protected/sychronized via mutex.
-  std::mutex start_watchdog_mutex_;
-  std::unique_ptr<Watchdog> start_watchdog_{};
+private:
+  OptionalPromise scanner_has_started_{ boost::none };
+  OptionalPromise scanner_has_stopped_{ boost::none };
 
-  std::mutex sm_mutex_;
+  //! @brief This Mutex protects ALL members of the Scanner against concurrent access.
+  //! So far there exist at least the following threads, potentially causing concurrent access to the members:
+  //! - user-main-thread
+  //! - io_service thread of UDPClient
+  //! - watchdog threads
+  std::mutex member_mutex_;
+
   std::unique_ptr<ScannerStateMachine> sm_;
 };
 
 template <class T>
 void ScannerV2::triggerEventWithParam(const T& event)
 {
-  const std::lock_guard<std::mutex> lock(sm_mutex_);
+  const std::lock_guard<std::mutex> lock(member_mutex_);
   sm_->process_event(event);
 }
 

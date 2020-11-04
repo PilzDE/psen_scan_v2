@@ -22,15 +22,16 @@
 
 namespace psen_scan_v2
 {
-static LaserScan toLaserScan(const MonitoringFrameMsg& frame)
+static LaserScan toLaserScan(const monitoring_frame::Message& frame)
 {
   const auto resolution = frame.resolution();
   const auto min_angle = frame.fromTheta();
   const uint16_t number_of_samples = frame.measures().size();
-  const auto max_angle = (frame.fromTheta() + frame.resolution() * (number_of_samples - 1u));
+  const auto max_angle = (frame.fromTheta() + frame.resolution() * number_of_samples);
 
   LaserScan scan(resolution, min_angle, max_angle);
   scan.setMeasurements(frame.measures());
+  scan.setIntensities(frame.intensities());
 
   return scan;
 }

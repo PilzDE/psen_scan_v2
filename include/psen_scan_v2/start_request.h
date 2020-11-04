@@ -63,7 +63,7 @@ private:
    * and the second Slave device.
    */
   uint8_t device_enabled_{ 0b00001000 };
-  uint8_t intensity_enabled_{ 0 };
+  uint8_t intensity_enabled_{ 0b00001000 };
   uint8_t point_in_safety_enabled_{ 0 };
   uint8_t active_zone_set_enabled_{ 0 };
   uint8_t io_pin_enabled_{ 0 };

@@ -25,7 +25,7 @@ namespace psen_scan_v2
 /**
  * @brief Higher level data type storing the range in which the scanner takes measurements.
  */
-template <uint16_t min_allowed_angle, uint16_t max_allowed_angle>
+template <int16_t min_allowed_angle, int16_t max_allowed_angle>
 class ScanRange
 {
   static_assert(min_allowed_angle < max_allowed_angle, "MIN-angle limit smaller than MAX-angle limit.");
@@ -52,7 +52,7 @@ private:
   const TenthOfDegree MAX_ANGLE{ max_allowed_angle };
 };
 
-template <uint16_t min_angle, uint16_t max_angle>
+template <int16_t min_angle, int16_t max_angle>
 constexpr ScanRange<min_angle, max_angle>::ScanRange(const TenthOfDegree& start_angle, const TenthOfDegree& end_angle)
   : start_angle_(start_angle), end_angle_(end_angle)
 {
@@ -68,17 +68,17 @@ constexpr ScanRange<min_angle, max_angle>::ScanRange(const TenthOfDegree& start_
 
   if (start_angle > end_angle)
   {
-    throw std::invalid_argument("End angle must not be smaller than start angle");
+    throw std::invalid_argument("Start angle must be smaller or equal to end angle");
   }
 }
 
-template <uint16_t min_angle, uint16_t max_angle>
+template <int16_t min_angle, int16_t max_angle>
 const TenthOfDegree& ScanRange<min_angle, max_angle>::getStart() const
 {
   return start_angle_;
 }
 
-template <uint16_t min_angle, uint16_t max_angle>
+template <int16_t min_angle, int16_t max_angle>
 const TenthOfDegree& ScanRange<min_angle, max_angle>::getEnd() const
 {
   return end_angle_;

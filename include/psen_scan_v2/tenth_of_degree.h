@@ -29,11 +29,11 @@ public:
   }
 
 public:
-  explicit constexpr TenthOfDegree(const uint16_t& tenth_of_degree) : tenth_of_degree_(tenth_of_degree)
+  explicit constexpr TenthOfDegree(const int16_t& tenth_of_degree) : tenth_of_degree_(tenth_of_degree)
   {
   }
 
-  constexpr uint16_t value() const
+  constexpr int16_t value() const
   {
     return tenth_of_degree_;
   }
@@ -49,7 +49,7 @@ public:
     return *this;
   }
 
-  constexpr TenthOfDegree& operator*(const unsigned int& rhs)
+  constexpr TenthOfDegree& operator*(const int& rhs)
   {
     tenth_of_degree_ = value() * rhs;
     return *this;
@@ -87,7 +87,7 @@ public:
   }
 
 private:
-  uint16_t tenth_of_degree_{ 0 };
+  int16_t tenth_of_degree_{ 0 };
 };
 }  // namespace psen_scan_v2
 

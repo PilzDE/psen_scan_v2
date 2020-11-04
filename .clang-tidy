@@ -56,7 +56,7 @@ CheckOptions:
     value:           '_'
   # const static or global variables are UPPER_CASE
   - key:             readability-identifier-naming.EnumConstantCase
-    value:           UPPER_CASE
+    value:           lower_case
   - key:             readability-identifier-naming.StaticConstantCase
     value:           UPPER_CASE
   - key:             readability-identifier-naming.ClassConstantCase

@@ -33,9 +33,9 @@ namespace psen_scan_v2
  */
 enum class ScannerReplyMsgType : uint32_t
 {
-  Unknown = 0,
-  Start = 0x35,
-  Stop = 0x36,
+  unknown = 0,
+  start = 0x35,
+  stop = 0x36,
 };
 
 template <typename TEnum>
@@ -145,17 +145,17 @@ inline ScannerReplyMsg ScannerReplyMsg::deserialize(const MaxSizeRawData& data)
 
 inline ScannerReplyMsgType ScannerReplyMsg::type() const
 {
-  if (opcode_ == getOpCodeValue(ScannerReplyMsgType::Start))
+  if (opcode_ == getOpCodeValue(ScannerReplyMsgType::start))
   {
-    return ScannerReplyMsgType::Start;
+    return ScannerReplyMsgType::start;
   }
 
-  if (opcode_ == getOpCodeValue(ScannerReplyMsgType::Stop))
+  if (opcode_ == getOpCodeValue(ScannerReplyMsgType::stop))
   {
-    return ScannerReplyMsgType::Stop;
+    return ScannerReplyMsgType::stop;
   }
 
-  return ScannerReplyMsgType::Unknown;
+  return ScannerReplyMsgType::unknown;
 }
 
 inline ScannerReplyMsg::RawType ScannerReplyMsg::serialize() const

@@ -23,18 +23,18 @@ namespace psen_scan_v2_test
 {
 enum class Endian
 {
-  LITTLE,
-  BIG
+  little,
+  big
 };
 
 template <typename ValueType, typename RawType>
 ::testing::AssertionResult
-DecodingEquals(RawType const& data, std::size_t offset, ValueType expected, const Endian& endian = Endian::LITTLE)
+DecodingEquals(RawType const& data, std::size_t offset, ValueType expected, const Endian& endian = Endian::little)
 {
   ValueType actual_val;
   memcpy(&actual_val, data.data() + offset, sizeof(ValueType));
 
-  if (endian == Endian::BIG)
+  if (endian == Endian::big)
   {
     boost::endian::native_to_big_inplace(actual_val);
   }
