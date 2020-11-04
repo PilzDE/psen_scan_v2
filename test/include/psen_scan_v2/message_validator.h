@@ -56,10 +56,10 @@ std::map<int16_t, NormalDist> binsFromScans(std::vector<sensor_msgs::LaserScanCo
   return bins;
 }
 template <typename MsgType>
-class MessageCollector
+class MessageValidator
 {
 public:
-  MessageCollector(ros::NodeHandle& nh, std::map<int16_t, NormalDist> bins_expected)
+  MessageValidator(ros::NodeHandle& nh, std::map<int16_t, NormalDist> bins_expected)
     : nh_(nh), bins_expected_(bins_expected){};
 
   typedef boost::shared_ptr<MsgType const> MsgTypeConstPtr;
@@ -131,7 +131,7 @@ public:
 
     auto future = check_result_.get_future();
     sub_ = nh_.subscribe<MsgType>(
-        topic, 1000, boost::bind(&MessageCollector::scanCb, this, boost::placeholders::_1, n_msgs));
+        topic, 1000, boost::bind(&MessageValidator::scanCb, this, boost::placeholders::_1, n_msgs));
 
     std::future_status status = future.wait_for(std::chrono::seconds(duration));
 

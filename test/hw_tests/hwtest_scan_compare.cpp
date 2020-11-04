@@ -22,7 +22,7 @@
 
 #include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/dist.h"
-#include "psen_scan_v2/message_collector.h"
+#include "psen_scan_v2/message_validator.h"
 
 namespace psen_scan_v2_test
 {
@@ -86,7 +86,7 @@ TEST_F(ScanComparisonTests, simpleCompare)
 
   size_t window_size = 200;  // Keep this high to avoid undersampling
 
-  auto res = MessageCollector<sensor_msgs::LaserScan>(nh, bins_expected_)
+  auto res = MessageValidator<sensor_msgs::LaserScan>(nh, bins_expected_)
                  .validateMsgs(window_size, "/laser_scanner/scan_reference", test_duration_);
 
   ASSERT_TRUE(res);
