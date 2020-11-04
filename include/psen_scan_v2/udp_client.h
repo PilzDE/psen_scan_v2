@@ -15,15 +15,14 @@
 #ifndef PSEN_SCAN_V2_UDP_CLIENT_H
 #define PSEN_SCAN_V2_UDP_CLIENT_H
 
-#include <atomic>
 #include <chrono>
-#include <condition_variable>
 #include <functional>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <thread>
+#include <future>
 
 #include <arpa/inet.h>
 
@@ -129,10 +128,6 @@ private:
   std::thread io_service_thread_;
 
   MaxSizeRawData received_data_;
-
-  std::atomic_bool receive_called_{ false };
-  std::condition_variable receive_cv_;
-  std::mutex receive_mutex_;
 
   NewDataHandler data_handler_;
   ErrorHandler error_handler_;
@@ -242,16 +237,16 @@ inline void UdpClientImpl::write(const DynamicSizeRawData& data)
 
 inline void UdpClientImpl::startAsyncReceiving(const ReceiveMode& modi)
 {
+  std::promise<void> post_done_barrier;
+  const auto post_done_future{ post_done_barrier.get_future() };
   // Function is intended to be called from main thread.
   // To ensure that socket operations only happen on one strand (in this case an implicit one),
   // the asyncReceive() operation is scheduled as task to the io_service thread.
-  io_service_.post([this, modi]() {
+  io_service_.post([this, modi, &post_done_barrier]() {
     asyncReceive(modi);
-    receive_called_ = true;
-    receive_cv_.notify_all();
+    post_done_barrier.set_value();
   });
-  std::unique_lock<std::mutex> lock(receive_mutex_);
-  receive_cv_.wait(lock, [this]() { return receive_called_.load(); });
+  post_done_future.wait();
 }
 
 inline void UdpClientImpl::asyncReceive(const ReceiveMode& modi)

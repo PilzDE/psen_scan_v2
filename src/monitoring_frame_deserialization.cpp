@@ -66,7 +66,7 @@ monitoring_frame::Message deserialize(const MaxSizeRawData& data, const std::siz
 
     switch (static_cast<additional_field::HeaderID>(additional_header.id()))
     {
-      case additional_field::HeaderID::SCAN_COUNTER:
+      case additional_field::HeaderID::scan_counter:
         if (additional_header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
         {
           throw format_error::ScanCounterUnexpectedSize(
@@ -77,23 +77,23 @@ monitoring_frame::Message deserialize(const MaxSizeRawData& data, const std::siz
         raw_processing::read(is, msg.scan_counter_);
         break;
 
-      case additional_field::HeaderID::MEASURES:
+      case additional_field::HeaderID::measures:
         raw_processing::readArray<uint16_t, double>(is,
                                                     msg.measures_,
                                                     additional_header.length() / NUMBER_OF_BYTES_SINGLE_MEASURE,
                                                     [](uint16_t raw_element) { return raw_element / 1000.; });
         break;
 
-      case additional_field::HeaderID::END_OF_FRAME:
+      case additional_field::HeaderID::end_of_frame:
         end_of_frame = true;
         break;
 
-      case additional_field::HeaderID::DIAGNOSTICS:
+      case additional_field::HeaderID::diagnostics:
         msg.diagnostic_messages_ = diagnostic::deserializeMessages(is);
         msg.diagnostic_data_enabled_ = true;
         break;
 
-      case additional_field::HeaderID::INTENSITIES:
+      case additional_field::HeaderID::intensities:
         raw_processing::readArray<uint16_t, double>(
             is,
             msg.intensities_,
@@ -147,7 +147,7 @@ std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is)
 
       for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
       {
-        if (raw_bits.test(bit_n) && (diagnostic::ErrorType::UNUSED != diagnostic::error_bits[byte_n][bit_n]))
+        if (raw_bits.test(bit_n) && (diagnostic::ErrorType::unused != diagnostic::error_bits[byte_n][bit_n]))
         {
           diagnostic_messages.push_back(
               diagnostic::Message(static_cast<ScannerId>(scanner_id), diagnostic::ErrorLocation(byte_n, bit_n)));

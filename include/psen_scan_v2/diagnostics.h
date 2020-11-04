@@ -41,32 +41,32 @@ using Field = std::array<uint8_t, diagnostic::raw_message::LENGTH_IN_BYTES>;
 
 enum class ErrorType
 {
-  OSSD1_OC,
-  OSSD_SHRT_C,
-  OSSD_INTEGR,
-  INT,
-  WIN_CLN_AL,
-  POWER_SUPPLY,
-  NETW_PRB,
-  DUST_CRC_FL,
-  OSSD2_OVERCUR,
-  MEAS_PROB,
-  INCOHERENCE,
-  ZONE_INVAL_TRANS,
-  ZONE_INVALID_CONF,
-  WIN_CLN_WARN,
-  INT_COM_PRB,
-  GENERIC_ERR,
-  DISP_COM_PRB,
-  TEMP_MEAS_PROB,
-  ENCOD_OOR,
-  EDM2_ERR,
-  EDM1_ERR,
-  CONF_ERR,
-  OUT_OF_RANGE_ERR,
-  TEMP_RANGE_ERR,
-  ENCODER_GENERIC_ERR,
-  UNUSED
+  ossd1_oc,
+  ossd_shrt_c,
+  ossd_integr,
+  intern,
+  win_cln_al,
+  power_supply,
+  netw_prb,
+  dust_crc_fl,
+  ossd2_overcur,
+  meas_prob,
+  incoherence,
+  zone_inval_trans,
+  zone_invalid_conf,
+  win_cln_warn,
+  int_com_prb,
+  generic_err,
+  disp_com_prb,
+  temp_meas_prob,
+  encod_oor,
+  edm2_err,
+  edm1_err,
+  conf_err,
+  out_of_range_err,
+  temp_range_err,
+  encoder_generic_err,
+  unused
 };
 
 // clang-format off
@@ -76,32 +76,32 @@ using ErrorMessage = std::string;
 
 static const std::map<ErrorType, ErrorMessage> error_code_to_string
 {
-  { Et::OSSD1_OC, "OSSD1 Overcurrent / Short circuit." },
-  { Et::OSSD_SHRT_C, "Short circuit between at least two OSSDs." },
-  { Et::OSSD_INTEGR, "Integrity check problem on any OSSD" },
-  { Et::INT, "Internal error." },
-  { Et::WIN_CLN_AL, "Alarm: The front panel of the safety laser scanner must be cleaned." },
-  { Et::POWER_SUPPLY, "Power supply problem." },
-  { Et::NETW_PRB, "Network problem." },
-  { Et::DUST_CRC_FL, "Dust circuit failure" },
-  { Et::OSSD2_OVERCUR, "OSSD2 Overcurrent / Short circuit." },
-  { Et::MEAS_PROB, "Measurement Problem." },
-  { Et::INCOHERENCE, "Incoherence Error" },
-  { Et::ZONE_INVAL_TRANS, "Zone: Invalid input - transition or integrity." },
-  { Et::ZONE_INVALID_CONF, "Zone: Invalid input configuration / connection." },
-  { Et::WIN_CLN_WARN, "Warning: The front panel of the safety laser scanner must be cleaned." },
-  { Et::INT_COM_PRB, "Internal communication problem." },
-  { Et::GENERIC_ERR, "Generic Error." },
-  { Et::DISP_COM_PRB, "Display communication problem." },
-  { Et::TEMP_MEAS_PROB, "Temperature measurement problem." },
-  { Et::ENCOD_OOR, "Encoder: Out of range." },
-  { Et::EDM2_ERR, "Error in the External Device Monitoring (EDM2_ERR)." },
-  { Et::EDM1_ERR, "Error in the External Device Monitoring (EDM1_ERR)." },
-  { Et::CONF_ERR, "Configuration Error." },
-  { Et::OUT_OF_RANGE_ERR, "Out of range error." },
-  { Et::TEMP_RANGE_ERR, "Temperature out of range." },
-  { Et::ENCODER_GENERIC_ERR, "Encoder: Generic error." },
-  { Et::UNUSED, "Unexpected error" } \
+  { Et::ossd1_oc, "OSSD1 Overcurrent / Short circuit." },
+  { Et::ossd_shrt_c, "Short circuit between at least two OSSDs." },
+  { Et::ossd_integr, "Integrity check problem on any OSSD" },
+  { Et::intern, "Internal error." },
+  { Et::win_cln_al, "Alarm: The front panel of the safety laser scanner must be cleaned." },
+  { Et::power_supply, "Power supply problem." },
+  { Et::netw_prb, "Network problem." },
+  { Et::dust_crc_fl, "Dust circuit failure" },
+  { Et::ossd2_overcur, "OSSD2 Overcurrent / Short circuit." },
+  { Et::meas_prob, "Measurement Problem." },
+  { Et::incoherence, "Incoherence Error" },
+  { Et::zone_inval_trans, "Zone: Invalid input - transition or integrity." },
+  { Et::zone_invalid_conf, "Zone: Invalid input configuration / connection." },
+  { Et::win_cln_warn, "Warning: The front panel of the safety laser scanner must be cleaned." },
+  { Et::int_com_prb, "Internal communication problem." },
+  { Et::generic_err, "Generic Error." },
+  { Et::disp_com_prb, "Display communication problem." },
+  { Et::temp_meas_prob, "Temperature measurement problem." },
+  { Et::encod_oor, "Encoder: Out of range." },
+  { Et::edm2_err, "Error in the External Device Monitoring (EDM2_ERR)." },
+  { Et::edm1_err, "Error in the External Device Monitoring (EDM1_ERR)." },
+  { Et::conf_err, "Configuration Error." },
+  { Et::out_of_range_err, "Out of range error." },
+  { Et::temp_range_err, "Temperature out of range." },
+  { Et::encoder_generic_err, "Encoder: Generic error." },
+  { Et::unused, "Unexpected error" } \
 };
 
 // clang-format off
@@ -109,15 +109,15 @@ static const std::map<ErrorType, ErrorMessage> error_code_to_string
 
   static constexpr std::array<std::array<ErrorType, 8>, 9> error_bits{{
   //Bit7                 Bit6              Bit5              Bit4              Bit3              Bit2                  Bit1                   Bit0
-  { REV(Et::OSSD1_OC,    Et::OSSD_SHRT_C,  Et::OSSD_INTEGR,  Et::INT,          Et::INT,          Et::INT,              Et::INT,               Et::INT) },
-  { REV(Et::WIN_CLN_AL,  Et::POWER_SUPPLY, Et::NETW_PRB,     Et::DUST_CRC_FL,  Et::INT,          Et::INT,              Et::UNUSED,            Et::OSSD2_OVERCUR) },
-  { REV(Et::MEAS_PROB,   Et::INT,          Et::INT,          Et::INT,          Et::INCOHERENCE,  Et::ZONE_INVAL_TRANS, Et::ZONE_INVALID_CONF, Et::WIN_CLN_WARN) },
-  { REV(Et::INT_COM_PRB, Et::INT,          Et::INT,          Et::GENERIC_ERR,  Et::DISP_COM_PRB, Et::INT,              Et::INT,               Et::TEMP_MEAS_PROB) },
-  { REV(Et::ENCOD_OOR,   Et::UNUSED,       Et::UNUSED,       Et::EDM2_ERR,     Et::EDM1_ERR,     Et::CONF_ERR,         Et::OUT_OF_RANGE_ERR,  Et::TEMP_RANGE_ERR) },
-  { REV(Et::UNUSED,      Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,           Et::UNUSED,            Et::ENCODER_GENERIC_ERR) },
-  { REV(Et::UNUSED,      Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,           Et::UNUSED,            Et::UNUSED) },
-  { REV(Et::UNUSED,      Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,           Et::UNUSED,            Et::UNUSED) },
-  { REV(Et::UNUSED,      Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,       Et::UNUSED,           Et::UNUSED,            Et::UNUSED) },
+  { REV(Et::ossd1_oc,    Et::ossd_shrt_c,  Et::ossd_integr,  Et::intern,       Et::intern,       Et::intern,           Et::intern,            Et::intern) },
+  { REV(Et::win_cln_al,  Et::power_supply, Et::netw_prb,     Et::dust_crc_fl,  Et::intern,       Et::intern,           Et::unused,            Et::ossd2_overcur) },
+  { REV(Et::meas_prob,   Et::intern,       Et::intern,       Et::intern,       Et::incoherence,  Et::zone_inval_trans, Et::zone_invalid_conf, Et::win_cln_warn) },
+  { REV(Et::int_com_prb, Et::intern,       Et::intern,       Et::generic_err,  Et::disp_com_prb, Et::intern,           Et::intern,            Et::temp_meas_prob) },
+  { REV(Et::encod_oor,   Et::unused,       Et::unused,       Et::edm2_err,     Et::edm1_err,     Et::conf_err,         Et::out_of_range_err,  Et::temp_range_err) },
+  { REV(Et::unused,      Et::unused,       Et::unused,       Et::unused,       Et::unused,       Et::unused,           Et::unused,            Et::encoder_generic_err) },
+  { REV(Et::unused,      Et::unused,       Et::unused,       Et::unused,       Et::unused,       Et::unused,           Et::unused,            Et::unused) },
+  { REV(Et::unused,      Et::unused,       Et::unused,       Et::unused,       Et::unused,       Et::unused,           Et::unused,            Et::unused) },
+  { REV(Et::unused,      Et::unused,       Et::unused,       Et::unused,       Et::unused,       Et::unused,           Et::unused,            Et::unused) },
   }};
 // clang-format on
 
@@ -181,7 +181,7 @@ constexpr inline bool Message::operator==(const Message& rhs) const
 }
 
 // Store ambiguous errors for additional output
-static const std::set<Et> ambiguous_diagnostic_codes = { Et::UNUSED, Et::INT };
+static const std::set<Et> ambiguous_diagnostic_codes = { Et::unused, Et::intern };
 
 inline bool isAmbiguous(const ErrorType& code)
 {
