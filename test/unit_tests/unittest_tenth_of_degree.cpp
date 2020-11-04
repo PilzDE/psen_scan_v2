@@ -28,6 +28,12 @@ TEST(TenthOfDegreeTest, valueTest)
   EXPECT_EQ(tenth_of_degree.value(), 1);
 }
 
+TEST(TenthOfDegreeTest, negativeValueTest)
+{
+  TenthOfDegree tenth_of_degree{ -1 };
+  EXPECT_EQ(tenth_of_degree.value(), -1);
+}
+
 TEST(TenthOfDegreeTest, toRad)
 {
   TenthOfDegree tenth_of_degree{ 1 };
