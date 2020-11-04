@@ -516,22 +516,26 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
 
 TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFrame)
 {
-  StrictMock<ScannerMock> scanner_mock{ port_holder_ };
+  NiceMock<pilz_testutils::LoggerMock> ros_log_mock;
+  NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
   ScannerV2 scanner(config_,
                     std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1),
                     port_holder_.data_port_scanner,
                     port_holder_.control_port_scanner);
 
-  Barrier monitoring_frame_barrier;
-  {
-    InSequence seq;
+  ON_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config_, DEFAULT_SEQ_NUMBER).serialize()))
+      .WillByDefault(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
-    EXPECT_CALL(scanner_mock, receiveControlMsg(_, StartRequest(config_, DEFAULT_SEQ_NUMBER).serialize()))
-        .WillOnce(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
+  Barrier valid_msg_barrier;
+  EXPECT_CALL(cb, LaserScanCallback(_)).WillOnce(OpenBarrier(&valid_msg_barrier));
 
-    EXPECT_CALL(cb, LaserScanCallback(_)).WillOnce(OpenBarrier(&monitoring_frame_barrier));
-  }
+  Barrier empty_msg_received;
+  // Needed to allow all other log messages which might be received
+  EXPECT_CALL(*ros_log_mock, append(::testing::_, ::testing::_)).Times(AnyNumber());
+  EXPECT_LOG(*ros_log_mock, WARN, "No transition in state 2 for event MonitoringFrameReceivedError.")
+      .Times(1)
+      .WillOnce(OpenBarrier(&empty_msg_received));
 
   scanner_mock.startListeningForControlMsg();
   auto promis = scanner.start();
@@ -539,12 +543,11 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
 
   std::cout << "ScannerAPITests: Send empty monitoring frame..." << std::endl;
   scanner_mock.sendEmptyMonitoringFrame();
-  EXPECT_FALSE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT))
-      << "Empty monitoring frame triggered LaserScanCallback";
+  EXPECT_TRUE(empty_msg_received.waitTillRelease(DEFAULT_TIMEOUT)) << "Empty monitoring frame not received";
 
   std::cout << "ScannerAPITests: Send valid monitoring frame..." << std::endl;
   scanner_mock.sendMonitoringFrame(createValidMonitoringFrameMsg());
-  EXPECT_TRUE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
+  EXPECT_TRUE(valid_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Valid monitoring frame not received";
 }
 
 TEST_F(ScannerAPITests, shouldThrowWhenConstructedWithInvalidLaserScanCallback)
