@@ -59,8 +59,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectMinMaxScanAngleAfter
   std::unique_ptr<LaserScan> scan_ptr;
   ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ toLaserScan(frame) }););
 
-  const TenthOfDegree expected_max_scan_angle{ (frame.fromTheta() +
-                                                frame.resolution() * (frame.measures().size() - 1)) };
+  const TenthOfDegree expected_max_scan_angle{ frame.fromTheta() + frame.resolution() * frame.measures().size() };
 
   EXPECT_EQ(frame.fromTheta(), scan_ptr->getMinScanAngle()) << "Min scan-angle incorrect in LaserScan";
   EXPECT_EQ(expected_max_scan_angle, scan_ptr->getMaxScanAngle()) << "Max scan-angle incorrect in LaserScan";

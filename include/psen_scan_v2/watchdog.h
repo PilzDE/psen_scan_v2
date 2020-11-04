@@ -18,6 +18,8 @@
 #include <chrono>
 #include <functional>
 #include <thread>
+#include <atomic>
+#include <condition_variable>
 
 #include "psen_scan_v2/async_barrier.h"
 
@@ -25,30 +27,49 @@ namespace psen_scan_v2
 {
 /**
  * @brief Watchdog which continuously calls the specified timeout handler (after the specified timeout time has passed)
- * as long as the watchdog exists.
+ * as long as the watchdog exists. The Watchdog restarts the timeout whenever reset() is called.
  */
 class Watchdog
 {
 public:
-  Watchdog(const std::chrono::high_resolution_clock::duration& timeout, const std::function<void()>& timeout_handler);
+  using Timeout = const std::chrono::high_resolution_clock::duration;
+
+public:
+  Watchdog(const Timeout& timeout, const std::function<void()>& timeout_handler);
   ~Watchdog();
+
+public:
+  //! @brief Restarts the watchdog timer.
+  void reset();
+
+private:
+  /**
+   * @returns std::cv_status::timeout if the specified timeout has expired or std::cv_status::no_timeout
+   * if the condition variable was notified.
+   *
+   * @note The function may also return spuriously with std::cv_status::no_timeout even if the condition variable
+   * was not notified. For more info see:
+   * https://en.cppreference.com/w/cpp/thread/condition_variable/wait_for
+   */
+  std::cv_status wait_for(const Timeout& timeout);
 
 private:
   Barrier thread_startetd_barrier_;
-  Barrier barrier_;
+  std::atomic_bool terminated_{ false };
+  std::condition_variable cv_;
+  std::mutex cv_m_;
   std::thread timer_thread_;
 };
 
-inline Watchdog::Watchdog(const std::chrono::high_resolution_clock::duration& timeout,
-                          const std::function<void()>& timeout_handler)
+inline Watchdog::Watchdog(const Timeout& timeout, const std::function<void()>& timeout_handler)
   : timer_thread_([this, timeout, timeout_handler]() {
     thread_startetd_barrier_.release();
-    // Wait until timeout is reached and then call the timeout handler and
-    // restart the wait process.
-    // If the barrier is released by the destructor, the timer_thread is going to finish.
-    while (!barrier_.waitTillRelease(timeout))
+    while (!terminated_)
     {
-      timeout_handler();
+      if ((this->wait_for(timeout) == std::cv_status::timeout) && !terminated_)
+      {
+        timeout_handler();
+      }
     }
   })
 {
@@ -64,9 +85,22 @@ inline Watchdog::Watchdog(const std::chrono::high_resolution_clock::duration& ti
   }
 }
 
+inline std::cv_status Watchdog::wait_for(const Timeout& timeout)
+{
+  std::unique_lock<std::mutex> lk(cv_m_);
+  return cv_.wait_for(lk, timeout);
+}
+
+inline void Watchdog::reset()
+{
+  cv_.notify_all();
+}
+
 inline Watchdog::~Watchdog()
 {
-  barrier_.release();
+  terminated_ = true;
+  // Notify timeout thread to wake up and end execution
+  cv_.notify_all();
   if (timer_thread_.joinable())
   {
     timer_thread_.join();

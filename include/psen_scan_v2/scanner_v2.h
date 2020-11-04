@@ -19,7 +19,6 @@
 #include <memory>
 #include <mutex>
 #include <future>
-#include <chrono>
 #include <functional>
 
 #include "psen_scan_v2/scanner_interface.h"
@@ -41,8 +40,6 @@ using std::placeholders::_2;
 // TODO: Move to ScannerController class and read from ScannerConfiguration
 static constexpr unsigned short DATA_PORT_OF_SCANNER_DEVICE{ 2000 };
 static constexpr unsigned short CONTROL_PORT_OF_SCANNER_DEVICE{ 3000 };
-
-static constexpr std::chrono::milliseconds REPLY_TIMEOUT{ 1000 };
 
 class ScannerV2 : public IScanner
 {
@@ -72,17 +69,20 @@ private:
   void scannerStartedCB();
   void scannerStoppedCB();
 
-  void startStartWatchdog();
-  void stopStartWatchdog();
+private:
+  class WatchdogFactory : public IWatchdogFactory
+  {
+  public:
+    WatchdogFactory(ScannerV2* scanner);
+    std::unique_ptr<Watchdog> create(const Watchdog::Timeout& timeout, const std::string& event_type) override;
+
+  private:
+    ScannerV2* scanner_;
+  };
 
 private:
   std::promise<void> scanner_has_started_;
   std::promise<void> scanner_has_stopped_;
-
-  // The watchdog pointer is changed by the user-main-thread and by the UDP client callback-thread/io-service-thread,
-  // and, therefore, needs to be protected/sychronized via mutex.
-  std::mutex start_watchdog_mutex_;
-  std::unique_ptr<Watchdog> start_watchdog_{};
 
   std::mutex sm_mutex_;
   std::unique_ptr<ScannerStateMachine> sm_;

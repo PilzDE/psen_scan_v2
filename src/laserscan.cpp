@@ -38,9 +38,9 @@ LaserScan::LaserScan(const TenthOfDegree& resolution,
     throw std::invalid_argument("Resolution out of possible angle range");
   }
 
-  if (getMinScanAngle() >= getMaxScanAngle())
+  if (getMinScanAngle() > getMaxScanAngle())
   {
-    throw std::invalid_argument("Attention: Start angle has to be smaller than end angle!");
+    throw std::invalid_argument("Attention: Start angle has to be smaller or equal to the end angle!");
   }
 }
 
