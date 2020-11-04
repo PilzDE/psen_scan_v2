@@ -27,38 +27,6 @@
 namespace psen_scan_v2_test
 {
 // TODO: use radToTenthDegree() from angle_conversions.h
-int16_t toTenthDegree(const double& rad)
-{
-  return (rad / (2.0 * M_PI)) * 360 * 10;
-}
-
-void addScanToBin(const sensor_msgs::LaserScanConstPtr& scan, std::map<int16_t, NormalDist>& bin)
-{
-  if (scan == nullptr)
-  {
-    throw;
-  }
-
-  for (size_t i = 0; i < scan->ranges.size(); ++i)
-  {
-    auto bin_addr = toTenthDegree(scan->angle_min + scan->angle_increment * i);
-
-    if (bin.find(bin_addr) == bin.end())
-    {
-      bin.emplace(bin_addr, NormalDist{});
-      // Create bin
-    }
-    bin[bin_addr].update(scan->ranges[i]);
-  }
-}
-
-std::map<int16_t, NormalDist> binsFromScans(std::vector<sensor_msgs::LaserScanConstPtr> scans)
-{
-  std::map<int16_t, NormalDist> bins;
-  std::for_each(
-      scans.cbegin(), scans.cend(), [&bins](const sensor_msgs::LaserScanConstPtr& scan) { addScanToBin(scan, bins); });
-  return bins;
-}
 
 std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
 {
@@ -101,65 +69,27 @@ public:
 
     bins_expected_ = binsFromRosbag(filepath);
 
-    ASSERT_TRUE(pnh.getParam("continuous_run", continuous_run_));
+    ASSERT_TRUE(pnh.getParam("test_duration", test_duration_));
   }
 
 protected:
   static std::map<int16_t, NormalDist> bins_expected_;
-  static bool continuous_run_;
+  static int test_duration_;
 };
 
 std::map<int16_t, NormalDist> ScanComparisonTests::bins_expected_{};
-bool ScanComparisonTests::continuous_run_{ false };
+int ScanComparisonTests::test_duration_{ 0 };
 
 TEST_F(ScanComparisonTests, simpleCompare)
 {
   ros::NodeHandle nh;
 
-  size_t sample_size = 200;
+  size_t window_size = 200;  // Keep this high to avoid undersampling
 
-  bool test_completed{ false };
-  while (!test_completed && ros::ok())
-  {
-    auto scans =
-        MessageCollector<sensor_msgs::LaserScan>(nh).collectScans(sample_size, "/laser_scanner/scan_reference");
-    auto bins_actual = binsFromScans(scans);
+  auto res = MessageCollector<sensor_msgs::LaserScan>(nh, bins_expected_)
+                 .validateMsgs(window_size, "/laser_scanner/scan_reference", test_duration_);
 
-    std::string error_string;
-    size_t counter_deviations{ 0 };
-
-    for (const auto& bin_actual : bins_actual)
-    {
-      auto bin_expected = bins_expected_.find(bin_actual.first);
-
-      auto dist_actual = bin_actual.second;
-      auto dist_expected = bin_expected->second;
-
-      if (bin_expected == bins_expected_.end())
-      {
-        FAIL() << "Did not find expected value for angle " << bin_actual.first / 10.
-               << " in the given reference scan\n";
-      }
-
-      auto distance = bhattacharyya_distance(dist_actual, dist_expected);
-      if (distance > 10.)
-      {
-        error_string +=
-            fmt::format("On {:+.1f} deg  expected: {} actual: {} | dist: {:.1f}, dmean: {:.3f}, dstdev: {:.3f}\n",
-                        bin_actual.first / 10.,
-                        dist_expected,
-                        dist_actual,
-                        distance,
-                        abs(dist_expected.mean() - dist_actual.mean()),
-                        abs(dist_expected.stdev() - dist_actual.stdev()));
-        counter_deviations++;
-      }
-    }
-
-    ASSERT_EQ(counter_deviations, 0u) << error_string;
-
-    test_completed = !continuous_run_;
-  }
+  ASSERT_TRUE(res);
 }
 
 }  // namespace psen_scan_v2_test
