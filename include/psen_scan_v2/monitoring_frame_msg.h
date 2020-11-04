@@ -79,7 +79,7 @@ public:
   bool operator==(const monitoring_frame::Message& rhs) const;
 
 private:
-  ScannerId scanner_id_{ ScannerId::MASTER };
+  ScannerId scanner_id_{ ScannerId::master };
   TenthOfDegree from_theta_{ 0 };
   TenthOfDegree resolution_{ 0 };
 

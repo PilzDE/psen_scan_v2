@@ -165,13 +165,13 @@ inline void ScannerProtocolDef::handleMonitoringFrameTimeout(const scanner_event
 inline bool ScannerProtocolDef::isStartReply(scanner_events::RawReplyReceived const& reply_event)
 {
   const ScannerReplyMsg msg{ ScannerReplyMsg::deserialize(reply_event.data_) };
-  return msg.type() == ScannerReplyMsgType::Start;
+  return msg.type() == ScannerReplyMsgType::start;
 }
 
 inline bool ScannerProtocolDef::isStopReply(scanner_events::RawReplyReceived const& reply_event)
 {
   const ScannerReplyMsg msg{ ScannerReplyMsg::deserialize(reply_event.data_) };
-  return msg.type() == ScannerReplyMsgType::Stop;
+  return msg.type() == ScannerReplyMsgType::stop;
 }
 
 //++++++++++++++++++++ Special transitions ++++++++++++++++++++++++++++++++++++

@@ -76,14 +76,14 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareEqualIntensitiesSucces)
       42,
       { 1, 2, 3 },
       { 10, 20, 30 },
-      { monitoring_frame::diagnostic::Message(ScannerId::MASTER, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+      { monitoring_frame::diagnostic::Message(ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   const monitoring_frame::Message msg1(
       TenthOfDegree(100),
       TenthOfDegree(10),
       42,
       { 1, 2, 3 },
       { 10, 20, 30 },
-      { monitoring_frame::diagnostic::Message(ScannerId::MASTER, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+      { monitoring_frame::diagnostic::Message(ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   EXPECT_EQ(msg0, msg1);
 }
 
@@ -109,14 +109,14 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareMeasuresNotEqual)
       42,
       { 1, 42, 3 },
       { 10, 20, 30 },
-      { monitoring_frame::diagnostic::Message(ScannerId::MASTER, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+      { monitoring_frame::diagnostic::Message(ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   const monitoring_frame::Message msg1(
       TenthOfDegree(100),
       TenthOfDegree(10),
       42,
       { 1, 2, 3 },
       { 10, 20, 30 },
-      { monitoring_frame::diagnostic::Message(ScannerId::MASTER, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+      { monitoring_frame::diagnostic::Message(ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
                              << "\nexpected to be false but was true";
 }
@@ -129,14 +129,14 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareIntensitiesNotEqual)
       42,
       { 1, 2, 3 },
       { 10, 42, 30 },
-      { monitoring_frame::diagnostic::Message(ScannerId::MASTER, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+      { monitoring_frame::diagnostic::Message(ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   const monitoring_frame::Message msg1(
       TenthOfDegree(100),
       TenthOfDegree(10),
       42,
       { 1, 2, 3 },
       { 10, 20, 30 },
-      { monitoring_frame::diagnostic::Message(ScannerId::MASTER, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+      { monitoring_frame::diagnostic::Message(ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
                              << "\nexpected to be false but was true";
 }
@@ -149,14 +149,14 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareFromThetaNotEqual)
       42,
       { 1, 2, 3 },
       { 10, 20, 30 },
-      { monitoring_frame::diagnostic::Message(ScannerId::MASTER, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+      { monitoring_frame::diagnostic::Message(ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   const monitoring_frame::Message msg1(
       TenthOfDegree(100),
       TenthOfDegree(10),
       42,
       { 1, 2, 3 },
       { 10, 20, 30 },
-      { monitoring_frame::diagnostic::Message(ScannerId::MASTER, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+      { monitoring_frame::diagnostic::Message(ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
                              << "\nexpected to be false but was true";
 }
@@ -169,14 +169,14 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareResolutionNotEqual)
       42,
       { 1, 2, 3 },
       { 10, 20, 30 },
-      { monitoring_frame::diagnostic::Message(ScannerId::MASTER, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+      { monitoring_frame::diagnostic::Message(ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   const monitoring_frame::Message msg1(
       TenthOfDegree(100),
       TenthOfDegree(10),
       42,
       { 1, 2, 3 },
       { 10, 20, 30 },
-      { monitoring_frame::diagnostic::Message(ScannerId::MASTER, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+      { monitoring_frame::diagnostic::Message(ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
                              << "\nexpected to be false but was true";
 }
@@ -189,14 +189,14 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareScanCounterNotEqual)
       42,
       { 1, 2, 3 },
       { 10, 20, 30 },
-      { monitoring_frame::diagnostic::Message(ScannerId::MASTER, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+      { monitoring_frame::diagnostic::Message(ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   const monitoring_frame::Message msg1(
       TenthOfDegree(100),
       TenthOfDegree(10),
       1,
       { 1, 2, 3 },
       { 10, 20, 30 },
-      { monitoring_frame::diagnostic::Message(ScannerId::MASTER, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+      { monitoring_frame::diagnostic::Message(ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
                              << "\nexpected to be false but was true";
 }

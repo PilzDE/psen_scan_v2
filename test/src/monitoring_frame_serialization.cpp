@@ -36,7 +36,7 @@ DynamicSizeRawData serialize(const monitoring_frame::Message& frame)
   raw_processing::write(os, frame.resolution_.value());
 
   additional_field::Header scan_counter_header(
-      static_cast<additional_field::Header::Id>(additional_field::HeaderID::SCAN_COUNTER), sizeof(frame.scan_counter_));
+      static_cast<additional_field::Header::Id>(additional_field::HeaderID::scan_counter), sizeof(frame.scan_counter_));
   write(os, scan_counter_header);
   uint32_t scan_counter_header_payload = frame.scan_counter_;
   raw_processing::write(os, scan_counter_header_payload);
@@ -44,7 +44,7 @@ DynamicSizeRawData serialize(const monitoring_frame::Message& frame)
   if (frame.diagnostic_data_enabled_)
   {
     additional_field::Header diagnostic_data_field_header(
-        static_cast<additional_field::Header::Id>(additional_field::HeaderID::DIAGNOSTICS),
+        static_cast<additional_field::Header::Id>(additional_field::HeaderID::diagnostics),
         diagnostic::raw_message::LENGTH_IN_BYTES);
     write(os, diagnostic_data_field_header);
     diagnostic::raw_message::Field diagnostic_data_field_payload = diagnostic::serialize(frame.diagnostic_messages_);
@@ -52,7 +52,7 @@ DynamicSizeRawData serialize(const monitoring_frame::Message& frame)
   }
 
   additional_field::Header measures_header(
-      static_cast<additional_field::Header::Id>(additional_field::HeaderID::MEASURES),
+      static_cast<additional_field::Header::Id>(additional_field::HeaderID::measures),
       frame.measures_.size() * NUMBER_OF_BYTES_SINGLE_MEASURE);
   write(os, measures_header);
   raw_processing::writeArray<uint16_t, double>(
@@ -61,7 +61,7 @@ DynamicSizeRawData serialize(const monitoring_frame::Message& frame)
   if (!frame.intensities_.empty())
   {
     additional_field::Header intensities_header(
-        static_cast<additional_field::Header::Id>(additional_field::HeaderID::INTENSITIES),
+        static_cast<additional_field::Header::Id>(additional_field::HeaderID::intensities),
         frame.intensities_.size() * NUMBER_OF_BYTES_SINGLE_INTENSITY);
     write(os, intensities_header);
     raw_processing::writeArray<uint16_t, double>(
@@ -69,7 +69,7 @@ DynamicSizeRawData serialize(const monitoring_frame::Message& frame)
   }
 
   additional_field::Header::Id end_of_frame_header_id =
-      static_cast<additional_field::Header::Id>(additional_field::HeaderID::END_OF_FRAME);
+      static_cast<additional_field::Header::Id>(additional_field::HeaderID::end_of_frame);
   raw_processing::write(os, end_of_frame_header_id);
 
   uint8_t unknown_data_at_the_end_of_frame = 0;

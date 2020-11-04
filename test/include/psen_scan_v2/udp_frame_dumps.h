@@ -84,8 +84,8 @@ public:
         0x00008894,
         readMeasures(hex_dump, 74, 250),
         readIntensities(hex_dump, intensities_offset, 250),
-        { monitoring_frame::diagnostic::Message(ScannerId::MASTER, monitoring_frame::diagnostic::ErrorLocation(2, 0)),
-          monitoring_frame::diagnostic::Message(ScannerId::MASTER,
+        { monitoring_frame::diagnostic::Message(ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(2, 0)),
+          monitoring_frame::diagnostic::Message(ScannerId::master,
                                                 monitoring_frame::diagnostic::ErrorLocation(4, 3)) });
     expected_msg_ = msg;
   };

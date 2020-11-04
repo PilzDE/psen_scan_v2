@@ -72,7 +72,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
   for (const auto& elem : error_locations)
   {
     ASSERT_NE(monitoring_frame::diagnostic::error_bits.at(elem.getByte()).at(elem.getBit()),
-              monitoring_frame::diagnostic::ErrorType::UNUSED)
+              monitoring_frame::diagnostic::ErrorType::unused)
         << "The unused diagnostic bits are discarded during deserialization. You should use different test data for "
            "this test.";
   }
@@ -82,9 +82,9 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
                                 456,
                                 { 10, 20, 30, 40 },
                                 { 15, 25, 35, 45 },
-                                { monitoring_frame::diagnostic::Message(ScannerId::MASTER, error_locations.at(0)),
-                                  monitoring_frame::diagnostic::Message(ScannerId::MASTER, error_locations.at(1)),
-                                  monitoring_frame::diagnostic::Message(ScannerId::SLAVE2, error_locations.at(2)) });
+                                { monitoring_frame::diagnostic::Message(ScannerId::master, error_locations.at(0)),
+                                  monitoring_frame::diagnostic::Message(ScannerId::master, error_locations.at(1)),
+                                  monitoring_frame::diagnostic::Message(ScannerId::slave2, error_locations.at(2)) });
 
   auto raw = serialize(msg);
   auto deserialized_msg = monitoring_frame::deserialize(convertToMaxSizeRawData(raw), raw.size());
@@ -106,7 +106,7 @@ TEST(MonitoringFrameSerializationTest, shouldFailOnSerializeAndDeserializeFrameW
 TEST(MonitoringFrameSerializationDiagnosticMessagesTest, shouldSetCorrectBitInSerializedDiagnosticData)
 {
   std::vector<monitoring_frame::diagnostic::Message> diagnostic_data{
-    { ScannerId::MASTER, monitoring_frame::diagnostic::ErrorLocation(5, 3) }
+    { ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(5, 3) }
   };
   auto diagnostic_data_serialized = monitoring_frame::diagnostic::serialize(diagnostic_data);
 

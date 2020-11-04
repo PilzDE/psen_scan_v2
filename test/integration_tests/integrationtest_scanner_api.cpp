@@ -111,7 +111,7 @@ static monitoring_frame::Message createValidMonitoringFrameMsg(const uint32_t sc
   const std::vector<double> intensities{ generateIntensities(num_elements, lowest_intensity, highest_intensity) };
 
   const std::vector<monitoring_frame::diagnostic::Message> diagnostic_messages{
-    { ScannerId::MASTER, monitoring_frame::diagnostic::ErrorLocation(1, 7) }
+    { ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(1, 7) }
   };
 
   return monitoring_frame::Message(
@@ -276,12 +276,12 @@ void ScannerMock::sendReply(const uint32_t reply_type)
 void ScannerMock::sendStartReply()
 {
   std::cout << "ScannerMock: Send start reply..." << std::endl;
-  sendReply(getOpCodeValue(ScannerReplyMsgType::Start));
+  sendReply(getOpCodeValue(ScannerReplyMsgType::start));
 }
 
 void ScannerMock::sendStopReply()
 {
-  sendReply(getOpCodeValue(ScannerReplyMsgType::Stop));
+  sendReply(getOpCodeValue(ScannerReplyMsgType::stop));
 }
 
 void ScannerMock::sendMonitoringFrame(const monitoring_frame::Message& msg)

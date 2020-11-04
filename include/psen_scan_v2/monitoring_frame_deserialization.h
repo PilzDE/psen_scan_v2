@@ -95,11 +95,11 @@ private:
 
 enum class HeaderID : Header::Id
 {
-  SCAN_COUNTER = 0x02,
-  DIAGNOSTICS = 0x04,
-  MEASURES = 0x05,
-  INTENSITIES = 0x06,
-  END_OF_FRAME = 0x09
+  scan_counter = 0x02,
+  diagnostics = 0x04,
+  measures = 0x05,
+  intensities = 0x06,
+  end_of_frame = 0x09
 };
 
 Header read(std::istringstream& is, const std::size_t& max_num_bytes);
