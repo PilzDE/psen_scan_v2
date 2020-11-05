@@ -49,6 +49,11 @@ public:
     return stdev;
   }
 
+  size_t N() const
+  {
+    return values_.size();
+  }
+
 private:
   std::vector<double> values_;
 };
@@ -66,7 +71,7 @@ double bhattacharyya_distance(const NormalDist& dist1, const NormalDist& dist2)
 
 std::ostream& operator<<(std::ostream& os, const psen_scan_v2_test::NormalDist& dist)
 {
-  os << fmt::format("NormalDist(mean: {:+.3f}, stdev: {:+.3f})", dist.mean(), dist.stdev());
+  os << fmt::format("NormalDist(mean: {:+.3f}, stdev: {:+.3f} N: {})", dist.mean(), dist.stdev(), dist.N());
   return os;
 }
 
