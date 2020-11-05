@@ -97,7 +97,7 @@ TEST_F(ScanComparisonTests, simpleCompare)
 {
   ros::NodeHandle nh;
 
-  size_t window_size = 60;  // Keep this high to avoid undersampling
+  size_t window_size = 120;  // Keep this high to avoid undersampling
 
   auto res = MessageValidator<sensor_msgs::LaserScan>(nh, bins_expected_)
                  .validateMsgs(window_size, "/laser_scanner/scan", test_duration_);
