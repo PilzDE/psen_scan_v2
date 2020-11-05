@@ -42,6 +42,10 @@ public:
     double sq_sum = std::inner_product(values_.begin(), values_.end(), values_.begin(), 0.0);
     double stdev = std::sqrt(sq_sum / values_.size() - mean() * mean());
 
+    // This is small hack, a later comparision using the bhattacharyya_distance
+    // would result in inf distance
+    stdev = std::max(stdev, 0.000000001);
+
     return stdev;
   }
 
