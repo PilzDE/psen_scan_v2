@@ -30,4 +30,22 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <param name="testfile" value="$(env HW_TEST_SCAN_COMPARE_TESTFILE)"/>
     <param name="test_duration" value="$(arg test_duration)"/>
   </test>
+
+  <test name="publishtest"
+        test-name="publishtest"
+        pkg="rostest" type="publishtest">
+    <rosparam>
+      topics:
+        - name: laser_scanner/scan
+          timeout: 10
+          negative: False
+    </rosparam>
+  </test>
+
+  <test test-name="hztest_test" pkg="rostest" type="hztest" name="hztest1">
+    <param name="topic" value="laser_scanner/scan" />
+    <param name="hz" value="$(eval 33.333 * 6)" /> <!--6 frame per round, 33.33Hz round cycle-->
+    <param name="hzerror" value="0.5" />
+    <param name="test_duration" value="5.0" />
+  </test>
 </launch>
