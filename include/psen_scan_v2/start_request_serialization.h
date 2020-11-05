@@ -12,41 +12,17 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#ifndef PSEN_SCAN_STOP_REQUEST_H
-#define PSEN_SCAN_STOP_REQUEST_H
+#ifndef PSEN_SCAN_V2_START_REQUEST_SERIALIZATION_H
+#define PSEN_SCAN_V2_START_REQUEST_SERIALIZATION_H
 
-#include <cstdint>
-#include <iostream>
-#include <array>
-
-#include "psen_scan_v2/raw_scanner_data.h"
+#include "psen_scan_v2/start_request.h"
 
 namespace psen_scan_v2
 {
-/**
- * @brief Higher level data type representing a scanner stop request.
- *
- * @note Unless otherwise indicated the byte order is little endian.
- *
- */
-class StopRequest
+namespace start_request
 {
-public:
-  static constexpr std::size_t STOP_REQUEST_SIZE{ 20 };
-  static constexpr std::size_t NUM_RESERVED_FIELDS{ 12 };
-
-public:
-  DynamicSizeRawData serialize() const;
-
-private:
-  std::ostringstream& processMember(std::ostringstream& os) const;
-  uint32_t calcCrc() const;
-
-private:
-  const std::array<uint8_t, NUM_RESERVED_FIELDS> RESERVED_{};
-  const uint32_t OPCODE_{ htole32(0x36) };
-};
-
+DynamicSizeRawData serialize(const start_request::Message& start_request, const uint32_t& seq_number);
+DynamicSizeRawData serialize(const start_request::Message& start_request);
+}  // namespace start_request
 }  // namespace psen_scan_v2
-
-#endif  // PSEN_SCAN_STOP_REQUEST_H
+#endif

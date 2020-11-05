@@ -12,22 +12,23 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#ifndef PSEN_SCAN_V2_STOP_REQUEST_SERIALIZATION_H
+#define PSEN_SCAN_V2_STOP_REQUEST_SERIALIZATION_H
 
-#include "psen_scan_v2/start_request.h"
+#include <cstdint>
+#include <array>
+
+#include "psen_scan_v2/raw_scanner_data.h"
 
 namespace psen_scan_v2
 {
-static constexpr TenthOfDegree MASTER_RESOLUTION{ TenthOfDegree(2u) };
-
-namespace start_request
+namespace stop_request
 {
-Message::Message(const ScannerConfiguration& scanner_configuration)
-  : host_ip_(scanner_configuration.hostIp())
-  , host_udp_port_data_(scanner_configuration.hostUDPPortData())  // Write is deduced by the scanner
-  , master_device_settings_(ScannerId::master, scanner_configuration.diagnosticsEnabled())
-  , master_(scanner_configuration.scanRange(), MASTER_RESOLUTION)
-{
-}
+static constexpr std::size_t NUM_RESERVED_FIELDS{ 12 };
+static constexpr std::array<uint8_t, NUM_RESERVED_FIELDS> RESERVED{};
+static const uint32_t OPCODE{ htole32(0x36) };
 
-}  // namespace start_request
+DynamicSizeRawData serialize();
+}  // namespace stop_request
 }  // namespace psen_scan_v2
+#endif

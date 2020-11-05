@@ -37,9 +37,10 @@
 #include "psen_scan_v2/laserscan_conversions.h"
 
 #include "psen_scan_v2/start_request.h"
-#include "psen_scan_v2/stop_request.h"
+#include "psen_scan_v2/stop_request_serialization.h"
 
 #include "psen_scan_v2/scanner_reply_msg.h"
+#include "psen_scan_v2/scanner_reply_serialization_deserialization.h"
 #include "psen_scan_v2/monitoring_frame_msg.h"
 #include "psen_scan_v2/monitoring_frame_deserialization.h"
 #include "psen_scan_v2/complete_scan_validator.h"

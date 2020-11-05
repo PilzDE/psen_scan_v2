@@ -17,170 +17,85 @@
 #define PSEN_SCAN_V2_SCANNER_REPLY_MSG_H
 
 #include <cstdint>
-#include <cassert>
-#include <array>
-#include <sstream>
-
-#include <boost/crc.hpp>
-
-#include "psen_scan_v2/raw_scanner_data.h"
-#include "psen_scan_v2/raw_processing.h"
 
 namespace psen_scan_v2
 {
-/**
- * @brief Defines the possible types of reply messages which can be received from the scanner.
- */
-enum class ScannerReplyMsgType : uint32_t
+namespace scanner_reply
 {
-  unknown = 0,
-  start = 0x35,
-  stop = 0x36,
-};
-
-template <typename TEnum>
-auto getOpCodeValue(const TEnum value) -> typename std::underlying_type<TEnum>::type
-{
-  return static_cast<typename std::underlying_type<TEnum>::type>(value);
-}
-
-static constexpr std::size_t REPLY_MSG_FROM_SCANNER_SIZE = 16;  // See protocol description
-
 /**
  * @brief Higher level data type representing a reply message from the scanner.
  */
-class ScannerReplyMsg
+class Message
 {
 public:
-  class CRCMismatch : public std::runtime_error
+  //! @brief Defines the possible types of reply messages which can be received from the scanner.
+  enum class Type : uint32_t
   {
-  public:
-    CRCMismatch(const std::string& msg = "CRC did not match!");
+    unknown = 0,
+    start = 0x35,
+    stop = 0x36,
   };
 
-public:
-  static ScannerReplyMsg deserialize(const MaxSizeRawData& data);
+  //! @brief Defines the operation result from the scanner.
+  enum class OperationResult : uint32_t
+  {
+    accepted = 0x00,
+    refused = 0xEB,
+    unknown = 0xFF
+  };
+
+  // See protocol description
+  static constexpr std::size_t SIZE{ 16u };
 
 public:
-  /**
-   * @brief Constructor.
-   *
-   * @param op_code The operation code contained in the raw data of the reply message.
-   * @param res_code The result code contained in the raw data of the reply message.
-   * - If the message is accepted, the returned value is 0x00.
-   * - If the message is refused, the returned value is 0xEB.
-   * - If the CRC is not correct, the device will not send any message.
-   */
-  ScannerReplyMsg(const uint32_t op_code, const uint32_t res_code);
+  static constexpr Type convertToReplyType(const uint32_t& value);
+  static constexpr OperationResult convertToOperationResult(const uint32_t& value);
 
 public:
-  ScannerReplyMsgType type() const;
+  constexpr Message(const Type& type, const OperationResult& result);
 
-public:
-  static uint32_t calcCRC(const ScannerReplyMsg& msg);
-
-  using RawType = FixedSizeRawData<REPLY_MSG_FROM_SCANNER_SIZE>;
-  RawType serialize() const;
+  constexpr Type type() const;
+  constexpr OperationResult result() const;
 
 private:
-  template <typename T>
-  static void processBytes(boost::crc_32_type& crc_32, const T& data);
-  ScannerReplyMsg() = delete;
-
-private:
-  //! A CRC32 of all the following fields.
-  uint32_t crc_{ 0 };
-  uint32_t reserved_{ 0 };
-  //! Operation Code (START 0x35, STOP 0x36).
-  uint32_t opcode_{ 0 };
-  //! Operation result.
-  //! If the message is accepted, the returned value is 0x00.
-  //! If the message is refused, the returned value is 0xEB.
-  //! If the CRC is not correct, the device will not send any message.
-  uint32_t res_code_{ 0 };
+  const Type type_;
+  const OperationResult result_;
 };
 
-inline uint32_t ScannerReplyMsg::calcCRC(const ScannerReplyMsg& msg)
+inline constexpr Message::Type Message::convertToReplyType(const uint32_t& value)
 {
-  boost::crc_32_type result;
-  // Read all data except the field of the sent crc at the beginning according to:
-  // Reference Guide Rev. A – November 2019 Page 14
-  processBytes(result, msg.reserved_);
-  processBytes(result, msg.opcode_);
-  processBytes(result, msg.res_code_);
-  return result.checksum();
-}
-
-template <typename T>
-inline void ScannerReplyMsg::processBytes(boost::crc_32_type& crc_32, const T& data)
-{
-  crc_32.process_bytes(&data, sizeof(T));
-}
-
-inline ScannerReplyMsg::ScannerReplyMsg(const uint32_t op_code, const uint32_t res_code)
-  : opcode_(op_code), res_code_(res_code)
-{
-  crc_ = calcCRC(*this);
-}
-
-inline ScannerReplyMsg ScannerReplyMsg::deserialize(const MaxSizeRawData& data)
-{
-  ScannerReplyMsg msg{ 0, 0 };
-
-  MaxSizeRawData tmp_data{ data };
-  std::istringstream is(std::string(tmp_data.data(), REPLY_MSG_FROM_SCANNER_SIZE));
-
-  raw_processing::read(is, msg.crc_);
-  raw_processing::read(is, msg.reserved_);
-  raw_processing::read(is, msg.opcode_);
-  raw_processing::read(is, msg.res_code_);
-
-  if (msg.crc_ != calcCRC(msg))
+  Type retval{ static_cast<Type>(value) };
+  if ((retval != Type::start) && (retval != Type::stop))
   {
-    throw CRCMismatch();
+    retval = Type::unknown;
   }
-
-  return msg;
+  return retval;
 }
 
-inline ScannerReplyMsgType ScannerReplyMsg::type() const
+inline constexpr Message::OperationResult Message::convertToOperationResult(const uint32_t& value)
 {
-  if (opcode_ == getOpCodeValue(ScannerReplyMsgType::start))
+  OperationResult retval{ static_cast<OperationResult>(value) };
+  if ((retval != OperationResult::accepted) && (retval != OperationResult::refused))
   {
-    return ScannerReplyMsgType::start;
+    retval = OperationResult::unknown;
   }
-
-  if (opcode_ == getOpCodeValue(ScannerReplyMsgType::stop))
-  {
-    return ScannerReplyMsgType::stop;
-  }
-
-  return ScannerReplyMsgType::unknown;
+  return retval;
 }
 
-inline ScannerReplyMsg::RawType ScannerReplyMsg::serialize() const
-{
-  std::ostringstream os;
-
-  uint32_t crc{ calcCRC(*this) };
-
-  raw_processing::write(os, crc);
-  raw_processing::write(os, reserved_);
-  raw_processing::write(os, opcode_);
-  raw_processing::write(os, res_code_);
-
-  // TODO check limits
-  std::string data_str(os.str());
-  assert(data_str.length() == REPLY_MSG_FROM_SCANNER_SIZE && "Message data of start reply has not the expected size");
-
-  ScannerReplyMsg::RawType ret_val{};
-  std::copy(data_str.begin(), data_str.end(), ret_val.begin());
-
-  return ret_val;
-}
-inline ScannerReplyMsg::CRCMismatch::CRCMismatch(const std::string& msg) : std::runtime_error(msg)
+inline constexpr Message::Message(const Type& type, const OperationResult& result) : type_(type), result_(result)
 {
 }
+
+inline constexpr Message::Type Message::type() const
+{
+  return type_;
+}
+
+inline constexpr Message::OperationResult Message::result() const
+{
+  return result_;
+}
+
+}  // namespace scanner_reply
 }  // namespace psen_scan_v2
-
 #endif  // PSEN_SCAN_V2_SCANNER_REPLY_MSG_H

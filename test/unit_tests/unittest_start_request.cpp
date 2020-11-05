@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <array>
+
 #include <arpa/inet.h>
 #include <boost/crc.hpp>
 #include <gtest/gtest.h>
@@ -71,9 +73,9 @@ TEST_F(StartRequestTest, constructorTest)
   ScannerConfiguration sc(host_ip, host_udp_port_data, 0 /* irrelevant */, "192.168.0.50", scan_range, false);
 
   uint32_t sequence_number{ 123 };
-  StartRequest sr(sc, sequence_number);
+  start_request::Message sr(sc);
 
-  auto data = sr.serialize();
+  auto data = serialize(sr, sequence_number);
   boost::crc_32_type result;
   result.process_bytes(&data[sizeof(uint32_t)], data.size() - sizeof(uint32_t));
 
@@ -113,35 +115,27 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_three_angle_resolution), 0));
 }
 
-TEST_F(StartRequestTest, regressionForRealSystem)
+TEST_F(StartRequestTest, crcShouldBeCorrectIfDiagnosticIsDisabled)
 {
-  ScannerConfiguration sc(
+  const ScannerConfiguration config(
       "192.168.0.50", 55115, 0, "192.168.0.10", DefaultScanRange(TenthOfDegree(0), TenthOfDegree(2750)), false);
-  StartRequest sr(sc, 0);
-
-  auto data = sr.serialize();
-
-  unsigned char expected_crc[4] = { 0xaf, 0xc8, 0xde, 0x79 };  // see wireshark for this number
-
-  for (size_t i = 0; i < sizeof(expected_crc); i++)
+  const auto raw_start_request{ serialize(start_request::Message(config)) };
+  const std::array<unsigned char, 4> expected_crc = { 0xaf, 0xc8, 0xde, 0x79 };  // see wireshark for this number
+  for (size_t i = 0; i < expected_crc.size(); ++i)
   {
-    EXPECT_EQ(static_cast<unsigned int>(static_cast<unsigned char>(data[i])), expected_crc[i]);
+    EXPECT_EQ(static_cast<unsigned int>(static_cast<unsigned char>(raw_start_request[i])), expected_crc[i]);
   }
 }
 
-TEST_F(StartRequestTest, regressionForRealSystemWithDiagnostic)
+TEST_F(StartRequestTest, crcShouldBeCorrectIfDiagnosticIsEnabled)
 {
-  ScannerConfiguration sc(
+  const ScannerConfiguration config(
       "192.168.0.50", 55115, 0, "192.168.0.10", DefaultScanRange(TenthOfDegree(0), TenthOfDegree(2750)), true);
-  StartRequest sr(sc, 0);
-
-  auto data = sr.serialize();
-
-  unsigned char expected_crc[4] = { 0x18, 0x5b, 0xd5, 0x55 };  // see wireshark for this number
-
-  for (size_t i = 0; i < sizeof(expected_crc); i++)
+  const auto raw_start_request{ serialize(start_request::Message(config)) };
+  const std::array<unsigned char, 4> expected_crc = { 0x18, 0x5b, 0xd5, 0x55 };  // see wireshark for this number
+  for (size_t i = 0; i < expected_crc.size(); ++i)
   {
-    EXPECT_EQ(static_cast<unsigned int>(static_cast<unsigned char>(data[i])), expected_crc[i]);
+    EXPECT_EQ(static_cast<unsigned int>(static_cast<unsigned char>(raw_start_request[i])), expected_crc[i]);
   }
 }
 

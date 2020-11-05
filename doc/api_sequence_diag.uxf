@@ -502,7 +502,7 @@ startAsyncReceiving()</panel_attributes>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-
 layer=2
-write(StartRequest.serialize())</panel_attributes>
+write(serialize(start_request::Message))</panel_attributes>
     <additional_attributes>860.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
@@ -538,7 +538,7 @@ layer=2</panel_attributes>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-
 layer=4
-StartRequestMsg</panel_attributes>
+start_request::Message</panel_attributes>
     <additional_attributes>360.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
@@ -1551,7 +1551,7 @@ startAsyncReceiving()</panel_attributes>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-
 layer=2
-write(StartRequest.serialize())</panel_attributes>
+write(serialize(start_request::Message))</panel_attributes>
     <additional_attributes>870.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
