@@ -20,12 +20,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
   <include file="$(find psen_scan_v2)/launch/psen_scan_v2.launch" />
 
-  <!--<node pkg="rosbag" type="play" name="fake_scanner" ns="myNamespace" args="-l $(find psen_scan_v2)/test/hw_tests/template_fail.bag"/> -->
-
-  <!--<node pkg="rosbag" type="play" name="playback" ns="myNamespace" args="-l $(find psen_scan_v2)/test/hw_tests/template_fail.bag">
-    <remap from="/laser_scanner/scan" to="/laser_scanner/scan_reference"/>
-  </node>-->
-
   <test test-name="scan_compare" pkg="psen_scan_v2" type="hwtest_scan_compare" time-limit="$(eval test_duration + 10)">
     <param name="testfile" value="$(env HW_TEST_SCAN_COMPARE_TESTFILE)"/>
     <param name="test_duration" value="$(arg test_duration)"/>
