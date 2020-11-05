@@ -12,8 +12,8 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#ifndef PSEN_SCAN_V2_MESSAGE_COLLECTOR_H
-#define PSEN_SCAN_V2_MESSAGE_COLLECTOR_H
+#ifndef PSEN_SCAN_V2_LASERSCAN_VALIDATOR_H
+#define PSEN_SCAN_V2_LASERSCAN_VALIDATOR_H
 
 #include <future>
 #include <map>
@@ -53,13 +53,13 @@ std::map<int16_t, NormalDist> binsFromScans(std::vector<sensor_msgs::LaserScanCo
   return bins;
 }
 
-template <typename MsgType>
-class MessageValidator
+class LaserScanValidator
 {
 public:
-  MessageValidator(ros::NodeHandle& nh, std::map<int16_t, NormalDist> bins_expected)
+  LaserScanValidator(ros::NodeHandle& nh, std::map<int16_t, NormalDist> bins_expected)
     : nh_(nh), bins_expected_(bins_expected){};
 
+  typedef sensor_msgs::LaserScan MsgType;
   typedef boost::shared_ptr<MsgType const> MsgTypeConstPtr;
 
   void scanCb(const MsgTypeConstPtr scan, size_t n_msgs)
@@ -121,7 +121,7 @@ public:
     }
   }
 
-  ::testing::AssertionResult validateMsgs(size_t n_msgs, std::string topic, const int duration)
+  ::testing::AssertionResult validateScans(size_t n_msgs, std::string topic, const int duration)
   {
     msgs_.clear();
 
@@ -129,7 +129,7 @@ public:
 
     auto future = check_result_.get_future();
     sub_ = nh_.subscribe<MsgType>(
-        topic, 1000, boost::bind(&MessageValidator::scanCb, this, boost::placeholders::_1, n_msgs));
+        topic, 1000, boost::bind(&LaserScanValidator::scanCb, this, boost::placeholders::_1, n_msgs));
 
     std::future_status status = future.wait_for(std::chrono::seconds(duration));
 
@@ -158,4 +158,4 @@ private:
 
 }  // namespace psen_scan_v2_test
 
-#endif  // PSEN_SCAN_V2_MESSAGE_COLLECTOR_H
+#endif  // PSEN_SCAN_V2_LASERSCAN_VALIDATOR_H
