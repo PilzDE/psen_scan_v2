@@ -20,15 +20,29 @@ limitations under the License.
 ## Build
 To build the hardware tests execute
 ```
-export HW_TESTING=1
 catkin_make
-catkin_make tests
+catkin_make tests -DENABLE_HARDWARE_TESTING=ON
 ```
 in your catkin workspace.
+
+## Setup the reference scan
+This step is only needed if the setup of the scanner or something within its environment changed.
+
+First startup the scanner
+```
+roslaunch psen_scan_v2 psen_scan_v2.launch
+```
+
+After this record the bag file
+
+```
+export HW_TEST_SCAN_COMPARE_TESTFILE=<your/desired/path/file.bag>
+rosbag record -a -O $HW_TEST_SCAN_COMPARE_TESTFILE --duration 10
+```
 
 ## Run
 To run the hardware tests execute
 ```
-roslaunch psen_scan_v2 psen_scan_v2.launch
-rostest psen_scan_v2 hwtest_scan_compare.test --wait
+export HW_TEST_SCAN_COMPARE_TESTFILE=<path/to/reference/file.bag>
+rostest psen_scan_v2 hwtest_scan_compare.test
 ```
