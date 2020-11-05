@@ -17,6 +17,7 @@
 
 #include <future>
 #include <map>
+#include <stdexcept>
 #include <vector>
 #include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/dist.h"
@@ -29,7 +30,7 @@ void addScanToBin(const sensor_msgs::LaserScanConstPtr& scan, std::map<int16_t, 
 {
   if (scan == nullptr)
   {
-    throw;
+    throw std::invalid_argument("LaserScan pointer must not be null");
   }
 
   for (size_t i = 0; i < scan->ranges.size(); ++i)
@@ -58,6 +59,11 @@ class LaserScanValidator
 public:
   LaserScanValidator(ros::NodeHandle& nh, std::map<int16_t, NormalDist> bins_expected)
     : nh_(nh), bins_expected_(bins_expected){};
+
+  ~LaserScanValidator()
+  {
+    sub_.shutdown();
+  }
 
   typedef sensor_msgs::LaserScan MsgType;
   typedef boost::shared_ptr<MsgType const> MsgTypeConstPtr;
@@ -91,9 +97,9 @@ public:
 
         if (bin_expected == bins_expected_.end())
         {
-          check_result_.set_value(::testing::AssertionFailure() << "Did not find expected value for angle "
-                                                                << bin_actual.first / 10.
-                                                                << " in the given reference scan\n");
+          check_result_.set_value(::testing::AssertionFailure()
+                                  << "Did not find expected value for angle " << bin_actual.first / 10.
+                                  << " in the given reference scan\n");
           check_done_ = true;
         }
         auto distance = bhattacharyya_distance(dist_actual, dist_expected);
@@ -110,6 +116,8 @@ public:
           counter_deviations++;
         }
       }
+
+      number_of_comparisons_++;
 
       if (counter_deviations > 0)
       {
@@ -137,6 +145,10 @@ public:
     if (status == std::future_status::timeout)
     {
       check_done_ = true;
+      if (number_of_comparisons_ == 0)
+      {
+        return ::testing::AssertionFailure() << "Did not perform any checks. Check if laserscans are published.";
+      }
       return ::testing::AssertionSuccess();
     }
 
@@ -154,6 +166,8 @@ private:
   std::map<int16_t, NormalDist> bins_expected_;
 
   std::atomic_bool check_done_{ false };
+
+  std::atomic_ulong number_of_comparisons_{ 0UL };
 };
 
 }  // namespace psen_scan_v2_test
