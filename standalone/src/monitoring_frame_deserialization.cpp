@@ -15,6 +15,7 @@
 
 #include <bitset>
 #include <iostream>
+#include <functional>
 
 #include <fmt/format.h>
 
@@ -25,6 +26,8 @@ namespace psen_scan_v2_standalone
 {
 namespace monitoring_frame
 {
+using namespace std::placeholders;
+
 additional_field::Header::Header(Id id, Length length) : id_(id), length_(length)
 {
 }
@@ -44,6 +47,18 @@ FixedFields::FixedFields(DeviceStatus device_status,
   , from_theta_(from_theta)
   , resolution_(resolution)
 {
+}
+
+static constexpr double toMeter(const uint16_t& value)
+{
+  return static_cast<double>(value) / 1000.;
+}
+
+static constexpr double toIntensities(const uint16_t& value)
+{
+  // Neglegt the first two bytes.
+  uint16_t retval{ value };
+  return static_cast<double>(retval & 0b0011111111111111);
 }
 
 monitoring_frame::Message deserialize(const RawData& data, const std::size_t& num_bytes)
@@ -73,16 +88,17 @@ monitoring_frame::Message deserialize(const RawData& data, const std::size_t& nu
                           additional_header.length(),
                           NUMBER_OF_BYTES_SCAN_COUNTER));
         }
-        raw_processing::read<uint32_t, boost::optional<uint32_t>>(is, msg.scan_counter_);
+        uint32_t scan_counter_read_buffer;
+        raw_processing::read<uint32_t>(is, scan_counter_read_buffer);
+        msg.scan_counter_=scan_counter_read_buffer;
         break;
 
       case additional_field::HeaderID::measurements:
-        raw_processing::readArray<uint16_t, double>(is,
-                                                    msg.measurements_,
-                                                    additional_header.length() / NUMBER_OF_BYTES_SINGLE_MEASUREMENT,
-                                                    [](uint16_t raw_element) { return raw_element / 1000.; });
+      {
+        const size_t num_measurements{ static_cast<size_t>(additional_header.length()) / NUMBER_OF_BYTES_SINGLE_MEASUREMENTS };
+        raw_processing::readArray<uint16_t, double>(is, msg.measurements_, num_measurements, std::bind(toMeter, _1));
         break;
-
+      }
       case additional_field::HeaderID::end_of_frame:
         end_of_frame = true;
         break;
@@ -93,13 +109,11 @@ monitoring_frame::Message deserialize(const RawData& data, const std::size_t& nu
         break;
 
       case additional_field::HeaderID::intensities:
-        raw_processing::readArray<uint16_t, double>(
-            is,
-            msg.intensities_,
-            additional_header.length() / NUMBER_OF_BYTES_SINGLE_MEASUREMENT,
-            [](uint16_t raw_element) { return static_cast<double>(raw_element & 0b0011111111111111); });
+      {
+        const size_t num_measurements{ static_cast<size_t>(additional_header.length()) / NUMBER_OF_BYTES_SINGLE_MEASUREMENTS };
+        raw_processing::readArray<uint16_t, double>(is, msg.intensities_, num_measurements, std::bind(toIntensities, _1));
         break;
-
+      }
       default:
         throw format_error::DecodingFailure(fmt::format(
             "Header Id {:#04x} unknown. Cannot read additional field of monitoring frame.", additional_header.id()));
@@ -110,10 +124,10 @@ monitoring_frame::Message deserialize(const RawData& data, const std::size_t& nu
 
 additional_field::Header additional_field::read(std::istringstream& is, const std::size_t& max_num_bytes)
 {
-  additional_field::Header::Id id;
-  additional_field::Header::Length length;
-  raw_processing::read(is, id);
-  raw_processing::read(is, length);
+  using additional_field::Header;
+
+  auto const id = raw_processing::read<Header::Id>(is);
+  auto length = raw_processing::read<Header::Length>(is);
 
   if (length >= max_num_bytes)
   {
@@ -133,16 +147,15 @@ std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is)
 {
   std::vector<diagnostic::Message> diagnostic_messages;
 
-  std::array<uint8_t, diagnostic::raw_message::UNUSED_OFFSET_IN_BYTES> reserved_diag_unused;
-  raw_processing::read(is, reserved_diag_unused);
+  // Read-in unused data fields
+  raw_processing::read<std::array<uint8_t, raw_message::UNUSED_OFFSET_IN_BYTES>>(is);
 
-  for (auto& scanner_id : VALID_SCANNER_IDS)
+  for (const auto& scanner_id : VALID_SCANNER_IDS)
   {
     for (size_t byte_n = 0; byte_n < diagnostic::raw_message::LENGTH_FOR_ONE_DEVICE_IN_BYTES; byte_n++)
     {
-      uint8_t raw_byte;
-      raw_processing::read(is, raw_byte);
-      std::bitset<8> raw_bits(raw_byte);
+      const auto raw_byte = raw_processing::read<uint8_t>(is);
+      const std::bitset<8> raw_bits(raw_byte);
 
       for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
       {
@@ -160,22 +173,14 @@ std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is)
 
 FixedFields readFixedFields(std::istringstream& is)
 {
-  FixedFields::DeviceStatus device_status;
-  FixedFields::OpCode op_code;
-  FixedFields::WorkingMode working_mode;
-  FixedFields::TransactionType transaction_type;
-  ScannerId scanner_id;
-  FixedFields::FromTheta from_theta(0);
-  FixedFields::Resolution resolution(0);
+  const auto device_status = raw_processing::read<FixedFields::DeviceStatus>(is);
+  const auto op_code = raw_processing::read<FixedFields::OpCode>(is);
+  const auto working_mode = raw_processing::read<FixedFields::WorkingMode>(is);
+  const auto transaction_type = raw_processing::read<FixedFields::TransactionType>(is);
+  const auto scanner_id = raw_processing::read<ScannerId>(is);
 
-  raw_processing::read(is, device_status);
-  raw_processing::read(is, op_code);
-  raw_processing::read(is, working_mode);
-  raw_processing::read(is, transaction_type);
-  raw_processing::read(is, scanner_id);
-
-  raw_processing::read<int16_t, TenthOfDegree>(is, from_theta);
-  raw_processing::read<int16_t, TenthOfDegree>(is, resolution);
+  const auto from_theta = raw_processing::read<int16_t, FixedFields::FromTheta>(is);
+  const auto resolution = raw_processing::read<int16_t, FixedFields::Resolution>(is);
 
   // LCOV_EXCL_START
   if (OP_CODE_MONITORING_FRAME != op_code)

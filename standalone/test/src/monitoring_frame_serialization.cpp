@@ -14,6 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <ostream>
+#include <functional>
 
 #include "psen_scan_v2_standalone/raw_processing.h"
 #include "psen_scan_v2_standalone/monitoring_frame_deserialization.h"
@@ -24,6 +25,18 @@ namespace psen_scan_v2_standalone
 {
 namespace monitoring_frame
 {
+using namespace std::placeholders;
+
+static constexpr uint16_t toMillimeter(const double& value)
+{
+  return static_cast<uint16_t>(std::round(value * 1000.));
+}
+
+static constexpr uint16_t toRawIntensities(const double& value)
+{
+  return static_cast<uint16_t>(std::round(value));
+}
+
 RawData serialize(const monitoring_frame::Message& frame)
 {
   std::ostringstream os;
@@ -48,26 +61,24 @@ RawData serialize(const monitoring_frame::Message& frame)
     additional_field::Header diagnostic_data_field_header(
         static_cast<additional_field::Header::Id>(additional_field::HeaderID::diagnostics),
         diagnostic::raw_message::LENGTH_IN_BYTES);
-    write(os, diagnostic_data_field_header);
+    monitoring_frame::write(os, diagnostic_data_field_header);
     diagnostic::raw_message::Field diagnostic_data_field_payload = diagnostic::serialize(frame.diagnostic_messages_);
     raw_processing::write(os, diagnostic_data_field_payload);
   }
 
   additional_field::Header measurements_header(
       static_cast<additional_field::Header::Id>(additional_field::HeaderID::measurements),
-      frame.measurements_.size() * NUMBER_OF_BYTES_SINGLE_MEASUREMENT);
-  write(os, measurements_header);
-  raw_processing::writeArray<uint16_t, double>(
-      os, frame.measurements_, [](double elem) { return (static_cast<uint16_t>(std::round(elem * 1000.))); });
+      frame.measurements().size() * NUMBER_OF_BYTES_SINGLE_MEASUREMENTS);
+  monitoring_frame::write(os, measurements_header);
+  raw_processing::writeArray<uint16_t, double>(os, frame.measurements(), std::bind(toMillimeter, _1));
 
   if (!frame.intensities_.empty())
   {
     additional_field::Header intensities_header(
         static_cast<additional_field::Header::Id>(additional_field::HeaderID::intensities),
         frame.intensities_.size() * NUMBER_OF_BYTES_SINGLE_INTENSITY);
-    write(os, intensities_header);
-    raw_processing::writeArray<uint16_t, double>(
-        os, frame.intensities_, [](double elem) { return (static_cast<uint16_t>(std::round(elem))); });
+    monitoring_frame::write(os, intensities_header);
+    raw_processing::writeArray<uint16_t, double>(os, frame.intensities_, std::bind(toRawIntensities, _1));
   }
 
   additional_field::Header::Id end_of_frame_header_id =
