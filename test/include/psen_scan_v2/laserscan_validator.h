@@ -92,16 +92,17 @@ public:
       {
         auto bin_expected = bins_expected_.find(bin_actual.first);
 
-        auto dist_actual = bin_actual.second;
-        auto dist_expected = bin_expected->second;
-
         if (bin_expected == bins_expected_.end())
         {
           check_result_.set_value(::testing::AssertionFailure() << "Did not find expected value for angle "
                                                                 << bin_actual.first / 10.
                                                                 << " in the given reference scan\n");
           check_done_ = true;
+          return;
         }
+
+        auto dist_actual = bin_actual.second;
+        auto dist_expected = bin_expected->second;
         auto distance = bhattacharyya_distance(dist_actual, dist_expected);
         if (distance > 10.)
         {
