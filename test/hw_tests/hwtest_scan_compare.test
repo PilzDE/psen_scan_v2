@@ -1,0 +1,45 @@
+<!--
+Copyright (c) 2020 Pilz GmbH & Co. KG
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<launch>
+  <arg name="test_duration" default="10"/>
+
+  <include file="$(find psen_scan_v2)/launch/psen_scan_v2.launch" />
+
+  <test test-name="scan_compare" pkg="psen_scan_v2" type="hwtest_scan_compare" time-limit="$(eval test_duration + 10)">
+    <param name="testfile" value="$(env HW_TEST_SCAN_COMPARE_TESTFILE)"/>
+    <param name="test_duration" value="$(arg test_duration)"/>
+  </test>
+
+  <test name="publishtest"
+        test-name="publishtest"
+        pkg="rostest" type="publishtest">
+    <rosparam>
+      topics:
+        - name: laser_scanner/scan
+          timeout: 10
+          negative: False
+    </rosparam>
+  </test>
+
+  <test test-name="hztest_test" pkg="rostest" type="hztest" name="hztest1">
+    <param name="topic" value="laser_scanner/scan" />
+    <param name="hz" value="$(eval 33.333 * 6)" /> <!--6 frame per round, 30ms per cycle-->
+    <param name="hzerror" value="0.5" />
+    <param name="test_duration" value="5.0" />
+  </test>
+</launch>
