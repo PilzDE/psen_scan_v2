@@ -97,9 +97,9 @@ public:
 
         if (bin_expected == bins_expected_.end())
         {
-          check_result_.set_value(::testing::AssertionFailure()
-                                  << "Did not find expected value for angle " << bin_actual.first / 10.
-                                  << " in the given reference scan\n");
+          check_result_.set_value(::testing::AssertionFailure() << "Did not find expected value for angle "
+                                                                << bin_actual.first / 10.
+                                                                << " in the given reference scan\n");
           check_done_ = true;
         }
         auto distance = bhattacharyya_distance(dist_actual, dist_expected);
