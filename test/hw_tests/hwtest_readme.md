@@ -30,7 +30,7 @@ This step is only needed if the setup of the scanner or something within its env
 
 First startup the scanner
 ```
-roslaunch psen_scan_v2 psen_scan_v2.launch
+roslaunch psen_scan_v2 psen_scan_v2.launch angle_start:=-1.2 angle_end:=1.2
 ```
 
 After this record the bag file
