@@ -20,27 +20,20 @@ limitations under the License.
 ## Prerequisites
   - Properly configure the PSENscan safety laser scanner.
   - Connect it to power and ethernet.
+  - Perform the preparations described in [hwtest_readme.md](https://github.com/PilzDE/psen_scan_v2/blob/melodic-devel/test/hw_tests/hwtest_readme.md)
 
 ### Test Sequence
 
   0. Wait for the PSENscan to be fully powered up.
 
-  1. Run
-  ```
-  roslaunch psen_scan_v2 psen_scan.launch sensor_ip:=<sensor_ip> host_ip:=<host_ip> host_udp_port:=<host_udp_port>
-  ```
-  Replace the variables in brackets with appropriate values for your setup.
+  1. Run `rostest psen_scan_v2 hwtest_scan_compare.test`.
 
-  2. Place your hand infront of the PSENscan.
-
-  3. Move your hand left and right around the PSENscan.
+  2. Run `rostest psen_scan_v2 hwtest_scan_compare.test` and move your hand infront of the PSENscan.
 
 ### Expected Results
 
   0. The PSENscan screen shows a coloured ring with text in the middle.
 
-  1. Rviz shows a red laserscan centered around the origin that matches your surroundings as well as some axes.
+  1. The test result is success.
 
-  2. Rviz shows distance values near to the center toward the X-Axis.
-
-  3. Rviz shows distance values near to the center moving left and right around the origin in synch with your hand movements.
+  2. The test result is failure.
