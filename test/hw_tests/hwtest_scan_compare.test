@@ -18,7 +18,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 <launch>
   <arg name="test_duration" default="10"/>
 
-  <include file="$(find psen_scan_v2)/launch/psen_scan_v2.launch" />
+  <include file="$(find psen_scan_v2)/launch/psen_scan_v2.launch">
+    <arg name="angle_start" value="-1.2" />
+    <arg name="angle_end" value="1.2" />
+  </include>
 
   <test test-name="scan_compare" pkg="psen_scan_v2" type="hwtest_scan_compare" time-limit="$(eval test_duration + 10)">
     <param name="testfile" value="$(env HW_TEST_SCAN_COMPARE_TESTFILE)"/>
@@ -34,12 +37,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
           timeout: 10
           negative: False
     </rosparam>
-  </test>
-
-  <test test-name="hztest_test" pkg="rostest" type="hztest" name="hztest1">
-    <param name="topic" value="laser_scanner/scan" />
-    <param name="hz" value="$(eval 33.333 * 6)" /> <!--6 frame per round, 30ms per cycle-->
-    <param name="hzerror" value="0.5" />
-    <param name="test_duration" value="5.0" />
   </test>
 </launch>
