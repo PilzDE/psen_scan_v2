@@ -78,7 +78,7 @@ static const std::map<ErrorType, ErrorMessage> error_code_to_string
 {
   { Et::ossd1_oc, "OSSD1 Overcurrent / Short circuit." },
   { Et::ossd_shrt_c, "Short circuit between at least two OSSDs." },
-  { Et::ossd_integr, "Integrity check problem on any OSSD" },
+  { Et::ossd_integr, "OSSDF1: An error has occurred when testing the OSSDs." },
   { Et::intern, "Internal error." },
   { Et::win_cln_al, "Alarm: The front panel of the safety laser scanner must be cleaned." },
   { Et::power_supply, "Power supply problem." },
@@ -87,16 +87,19 @@ static const std::map<ErrorType, ErrorMessage> error_code_to_string
   { Et::ossd2_overcur, "OSSD2 Overcurrent / Short circuit." },
   { Et::meas_prob, "Measurement Problem." },
   { Et::incoherence, "Incoherence Error" },
-  { Et::zone_inval_trans, "Zone: Invalid input - transition or integrity." },
-  { Et::zone_invalid_conf, "Zone: Invalid input configuration / connection." },
+  { Et::zone_inval_trans, "INPUTCF2: Configuration error. - \
+                           In the configuration, check the configured state transitions and switching operations." },
+  { Et::zone_invalid_conf, "INPUTCF1: Error in the configuration or the wiring. - \
+                            Check whether the wiring and the configuration will match." },
   { Et::win_cln_warn, "Warning: The front panel of the safety laser scanner must be cleaned." },
   { Et::generic_err, "Generic Error." },
   { Et::disp_com_prb, "Display communication problem." },
   { Et::temp_meas_prob, "Temperature measurement problem." },
   { Et::encod_oor, "Encoder: Out of range." },
-  { Et::edm2_err, "Error in the External Device Monitoring (EDM2_ERR)." },
-  { Et::edm1_err, "Error in the External Device Monitoring (EDM1_ERR)." },
-  { Et::conf_err, "Configuration Error." },
+  { Et::edm2_err, "EDM2: Error in the External Device Monitoring." },
+  { Et::edm1_err, "EDM1: Error in the External Device Monitoring." },
+  { Et::conf_err, "WAITING_CONF: The safety laser scanner waits for a configuration (e.g. after restoring a configuration). - \
+                  Configure the safety laser scanner." },
   { Et::out_of_range_err, "Out of range error." },
   { Et::temp_range_err, "Temperature out of range." },
   { Et::encoder_generic_err, "Encoder: Generic error." },
