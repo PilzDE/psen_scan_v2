@@ -27,7 +27,6 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   rosfmt
-  rosbag
 )
 
 ## System dependencies are found with CMake's conventions
@@ -372,6 +371,8 @@ target_link_libraries(integrationtest_scanner_api
 
   # build this using catkin_make -DENABLE_HARDWARE_TESTING=ON
   if(ENABLE_HARDWARE_TESTING)
+    find_package(rosbag REQUIRED)
+
     add_rostest_gtest(hwtest_scan_compare
         test/hw_tests/hwtest_scan_compare.test
         test/hw_tests/hwtest_scan_compare.cpp
