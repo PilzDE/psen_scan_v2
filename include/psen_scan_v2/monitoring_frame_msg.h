@@ -91,8 +91,7 @@ private:
 
 public:
   friend DynamicSizeRawData serialize(const monitoring_frame::Message& frame);
-  friend monitoring_frame::Message deserialize(const MaxSizeRawData& data,
-                                                                               const std::size_t& num_bytes);
+  friend monitoring_frame::Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
 };
 
 }  // namespace monitoring_frame
