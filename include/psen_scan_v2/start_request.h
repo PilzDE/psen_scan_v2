@@ -39,8 +39,8 @@ class Message
 public:
   Message(const ScannerConfiguration& scanner_configuration);
 
-  friend DynamicSizeRawData start_request::serialize(const start_request::Message&, const uint32_t&);
-  friend DynamicSizeRawData start_request::serialize(const start_request::Message&);
+  friend DynamicSizeRawData serialize(const start_request::Message&, const uint32_t&);
+  friend DynamicSizeRawData serialize(const start_request::Message&);
 
 private:
   class LaserScanSettings

@@ -149,7 +149,7 @@ public:
   constexpr Message(const ScannerId& id, const diagnostic::ErrorLocation& location);
   constexpr bool operator==(const diagnostic::Message& rhs) const;
 
-  friend diagnostic::raw_message::Field diagnostic::serialize(const std::vector<diagnostic::Message>& messages);
+  friend raw_message::Field serialize(const std::vector<diagnostic::Message>& messages);
 
   constexpr ScannerId getScannerId() const
   {
