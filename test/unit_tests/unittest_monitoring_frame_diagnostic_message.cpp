@@ -23,10 +23,10 @@ namespace psen_scan_v2_test
 TEST(MonitoringFrameDiagnosticMessageTest, shouldConstructMonitoringFrameDiagnosticMessageAsExpected)
 {
   auto msg =
-      monitoring_frame::diagnostic::Message(ScannerId::slave0, monitoring_frame::diagnostic::ErrorLocation(4, 2));
+      monitoring_frame::diagnostic::Message(ScannerId::slave0, monitoring_frame::diagnostic::ErrorLocation(4, 3));
   EXPECT_EQ(msg.getDiagnosticCode(), monitoring_frame::diagnostic::ErrorType::conf_err);
   EXPECT_EQ(msg.getErrorLocation().getByte(), static_cast<size_t>(4));
-  EXPECT_EQ(msg.getErrorLocation().getBit(), static_cast<size_t>(2));
+  EXPECT_EQ(msg.getErrorLocation().getBit(), static_cast<size_t>(3));
   EXPECT_EQ(msg.getScannerId(), ScannerId::slave0);
 }
 
