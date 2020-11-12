@@ -32,11 +32,7 @@ public:
 
 public:
   /**
-   * @brief Construct a new Laser Scan object.
-   *
-   * @param resolution Distance of angle between the measurements.
-   * @param min_scan_angle Lowest angle the scanner is scanning.
-   * @param max_scan_angle Highest angle the scanner is scanning.
+   * @brief Holds the measurement data for one laserscan.
    */
   LaserScan(const TenthOfDegree& resolution, const TenthOfDegree& min_scan_angle, const TenthOfDegree& max_scan_angle);
 
