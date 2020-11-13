@@ -54,7 +54,7 @@ To update your ROS environment from the former `psen_scan` package (which suppor
 
 
 ## Branching model
-`melodic-devel` is considered to be the active development branch.
+`main` is considered to be the active development branch.
 
 ## Setup
 
