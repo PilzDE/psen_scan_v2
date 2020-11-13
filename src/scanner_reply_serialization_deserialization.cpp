@@ -54,8 +54,7 @@ RawData scanner_reply::serialize(const Message& reply)
 
 scanner_reply::Message scanner_reply::deserialize(const RawData& data)
 {
-  const RawData tmp_data{ data };
-  std::istringstream is(std::string(tmp_data.data(), Message::SIZE));
+  std::istringstream is(std::string(data.data(), Message::SIZE));
 
   uint32_t crc;
   uint32_t reserved;
