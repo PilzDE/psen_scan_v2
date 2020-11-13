@@ -20,7 +20,7 @@ limitations under the License.
 ## Prerequisites
   - Properly configure the PSENscan safety laser scanner.
   - Connect it to power and ethernet.
-  - Perform the preparations described in [hwtest_readme.md](https://github.com/PilzDE/psen_scan_v2/blob/melodic-devel/test/hw_tests/hwtest_readme.md)
+  - Perform the preparations described in [hwtest_readme.md](https://github.com/PilzDE/psen_scan_v2/blob/main/test/hw_tests/hwtest_readme.md)
 
 ### Test Sequence
 

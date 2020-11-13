@@ -33,13 +33,13 @@ PSENscan firmware >= 3.1.0 is supported on the following models:
 ## Installation
 To use the package, you can install prebuilt packages with
 ```
-sudo apt install ros-melodic-psen-scan-v2
+sudo apt install ros-$ROS_DISTRO-psen-scan-v2
 ```
 
 ## Migration
 To update your ROS environment from the former `psen_scan` package (which supported firmware versions up to 3.0), please execute the following steps:
 1. Update scanner firmware using PSENscan Configurator (unless the device has firmware 3.1 already)
-2. Install the new ROS package ```sudo apt install ros-melodic-psen-scan-v2```
+2. Install the new ROS package ```sudo apt install ros-$ROS_DISTRO-psen-scan-v2```
 3. Replace the launch file arguments:
 	* `password` and `x_axis_rotation` are obsolete and should be dropped
 	* `angle_start` and `angle_end` are now in radians, in direction of the x axis of the scanner tf frame
@@ -151,5 +151,5 @@ funiculars or roller coasters travel safely; they also guarantee fire protection
 supply in buildings.
 
 
-[sensor_msgs/LaserScan]: http://docs.ros.org/melodic/api/sensor_msgs/html/msg/LaserScan.html
+[sensor_msgs/LaserScan]: http://docs.ros.org/noetic/api/sensor_msgs/html/msg/LaserScan.html
 [gmapping]: http://wiki.ros.org/gmapping
