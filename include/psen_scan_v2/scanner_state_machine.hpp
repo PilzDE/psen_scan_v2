@@ -63,7 +63,7 @@ template <class Event, class FSM>
 void ScannerProtocolDef::WaitForStartReply::on_exit(Event const&, FSM& fsm)
 {
   PSENSCAN_DEBUG("StateMachine", fmt::format("Exiting state: {}", "WaitForStartReply"));
-  // Stop watchdog...
+  // Stops the watchdog by resetting the pointer
   fsm.start_reply_watchdog_.reset();
 }
 
@@ -81,7 +81,7 @@ template <class Event, class FSM>
 void ScannerProtocolDef::WaitForMonitoringFrame::on_exit(Event const&, FSM& fsm)
 {
   PSENSCAN_DEBUG("StateMachine", fmt::format("Exiting state: {}", "WaitForMonitoringFrame"));
-  // Stop watchdog...
+  // Stops the watchdog by resetting the pointer
   fsm.monitoring_frame_watchdog_.reset();
 }
 
