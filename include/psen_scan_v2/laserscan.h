@@ -23,7 +23,20 @@
 
 namespace psen_scan_v2
 {
-//! @brief Holds the measurement data for one laserscan.
+/**
+ *  @brief This class represents a single laser scan in the <prefix>_scan target frame.
+ *
+ * All relevant information about a single scan of a psen_scan scanner are stored in this class.
+ * This includes the following information:
+ *
+ * - Distance measures in mm.
+ * - Normalized intensities of the signals.
+ * - Resolution of the scan in radians.
+ * - Min and Max angle in radians.
+ *
+ * The measures use the target frame defined as <prefix>_scan.
+ * @see https://github.com/PilzDE/psen_scan_v2/blob/main/README.md#tf-frames
+ */
 class LaserScan
 {
 public:
@@ -31,9 +44,6 @@ public:
   using IntensityData = std::vector<double>;
 
 public:
-  /**
-   * @brief Holds the measurement data for one laserscan.
-   */
   LaserScan(const TenthOfDegree& resolution, const TenthOfDegree& min_scan_angle, const TenthOfDegree& max_scan_angle);
 
 public:
