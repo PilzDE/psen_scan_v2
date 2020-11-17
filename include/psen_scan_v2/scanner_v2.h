@@ -39,6 +39,21 @@ using namespace psen_scan_v2::scanner_protocol;
 using std::placeholders::_1;
 using std::placeholders::_2;
 
+
+/**
+ * @brief This is the API implementation for external interaction with the PSENscan driver.
+ *
+ * This class is responsible for the initialization of:
+ * - the ScannerStateMachine.
+ * - the Udp connections.
+ * - the guards to ensure threads save interaction between the user, udp connections and timeouts.
+ *
+ * It uses the passed ScannerConfiguration for all configurable parts of this process.
+ *
+ * @see IScanner
+ * @see ScannerStateMachine
+ * @see ScannerConfiguration
+ */
 class ScannerV2 : public IScanner
 {
 public:
