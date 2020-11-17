@@ -39,17 +39,10 @@ using namespace psen_scan_v2::scanner_protocol;
 using std::placeholders::_1;
 using std::placeholders::_2;
 
-// TODO: Move to ScannerController class and read from ScannerConfiguration
-static constexpr unsigned short DATA_PORT_OF_SCANNER_DEVICE{ 2000 };
-static constexpr unsigned short CONTROL_PORT_OF_SCANNER_DEVICE{ 3000 };
-
 class ScannerV2 : public IScanner
 {
 public:
-  ScannerV2(const ScannerConfiguration& scanner_config,
-            const LaserScanCallback& laser_scan_cb,
-            const unsigned short data_port_scanner = DATA_PORT_OF_SCANNER_DEVICE,
-            const unsigned short control_port_scanner = CONTROL_PORT_OF_SCANNER_DEVICE);
+  ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb);
   ~ScannerV2();
 
 public:
@@ -59,8 +52,7 @@ public:
 private:
   // Raw pointer used here because "msm::back::state_machine" cannot properly pass
   // a "std::unique_ptr" to "msm::front::state_machine_def".
-  StateMachineArgs* createStateMachineArgs(const unsigned short& data_port_scanner,
-                                           const unsigned short& control_port_scanner);
+  StateMachineArgs* createStateMachineArgs();
 
   template <class T>
   void triggerEventWithParam(const T& event);

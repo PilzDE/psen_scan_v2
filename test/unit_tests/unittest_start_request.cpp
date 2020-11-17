@@ -21,6 +21,7 @@
 
 #include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/scanner_configuration.h"
+#include "psen_scan_v2/scanner_config_builder.h"
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/raw_data_test_helper.h"
 #include "psen_scan_v2/scan_range.h"
@@ -70,10 +71,16 @@ TEST_F(StartRequestTest, constructorTest)
 
   const DefaultScanRange scan_range{ TenthOfDegree(0), TenthOfDegree::fromRad(4.71) };
 
-  ScannerConfiguration sc(host_ip, host_udp_port_data, 0 /* irrelevant */, "192.168.0.50", scan_range, false);
-
   uint32_t sequence_number{ 123 };
-  start_request::Message sr(sc);
+  start_request::Message sr(ScannerConfigurationBuilder()
+                                .hostIP(host_ip)
+                                .hostDataPort(host_udp_port_data)
+                                .hostControlPort(1 /* irrelevant */)
+                                .scannerIp("192.168.0.50")
+                                .scannerDataPort(77)
+                                .scannerControlPort(78)
+                                .scanRange(scan_range)
+                                .build());
 
   auto data = serialize(sr, sequence_number);
   boost::crc_32_type result;
@@ -115,10 +122,29 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_three_angle_resolution), 0));
 }
 
+static ScannerConfiguration createConfig(bool enable_diagnostics)
+{
+  ScannerConfigurationBuilder builder;
+  builder.hostIP("192.168.0.50")
+      .hostDataPort(55115)
+      .hostControlPort(5700)
+      .scannerIp("192.168.0.10")
+      .scannerDataPort(2000)
+      .scannerControlPort(3000)
+      .scanRange(DefaultScanRange(TenthOfDegree(0), TenthOfDegree(2750)));
+
+  if (enable_diagnostics)
+  {
+    builder.enableDiagnostics();
+  }
+
+  return builder.build();
+}
+
 TEST_F(StartRequestTest, crcShouldBeCorrectIfDiagnosticIsDisabled)
 {
-  const ScannerConfiguration config(
-      "192.168.0.50", 55115, 0, "192.168.0.10", DefaultScanRange(TenthOfDegree(0), TenthOfDegree(2750)), false);
+  const ScannerConfiguration config{ createConfig(false) };
+
   const auto raw_start_request{ serialize(start_request::Message(config)) };
   const std::array<unsigned char, 4> expected_crc = { 0xaf, 0xc8, 0xde, 0x79 };  // see wireshark for this number
   for (size_t i = 0; i < expected_crc.size(); ++i)
@@ -129,8 +155,8 @@ TEST_F(StartRequestTest, crcShouldBeCorrectIfDiagnosticIsDisabled)
 
 TEST_F(StartRequestTest, crcShouldBeCorrectIfDiagnosticIsEnabled)
 {
-  const ScannerConfiguration config(
-      "192.168.0.50", 55115, 0, "192.168.0.10", DefaultScanRange(TenthOfDegree(0), TenthOfDegree(2750)), true);
+  const ScannerConfiguration config{ createConfig(true) };
+
   const auto raw_start_request{ serialize(start_request::Message(config)) };
   const std::array<unsigned char, 4> expected_crc = { 0x18, 0x5b, 0xd5, 0x55 };  // see wireshark for this number
   for (size_t i = 0; i < expected_crc.size(); ++i)

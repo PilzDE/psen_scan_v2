@@ -25,6 +25,7 @@
 #include "psen_scan_v2/ros_scanner_node.h"
 #include "psen_scan_v2/default_parameters.h"
 #include "psen_scan_v2/scanner_configuration.h"
+#include "psen_scan_v2/scanner_config_builder.h"
 #include "psen_scan_v2/scan_range.h"
 
 #include <rosconsole_bridge/bridge.h>
@@ -75,12 +76,17 @@ int main(int argc, char** argv)
                              getOptionalParamFromServer<double>(pnh, PARAM_ANGLE_END, DEFAULT_ANGLE_END))
     };
 
-    ScannerConfiguration scanner_configuration(getRequiredParamFromServer<std::string>(pnh, PARAM_HOST_IP),
-                                               getRequiredParamFromServer<int>(pnh, PARAM_HOST_DATA_PORT),
-                                               getRequiredParamFromServer<int>(pnh, PARAM_HOST_CONTROL_PORT),
-                                               getRequiredParamFromServer<std::string>(pnh, PARAM_SCANNER_IP),
-                                               scan_range,
-                                               true);
+    ScannerConfigurationBuilder config_builder;
+    config_builder.hostIP(getRequiredParamFromServer<std::string>(pnh, PARAM_HOST_IP))
+        .hostDataPort(getRequiredParamFromServer<int>(pnh, PARAM_HOST_DATA_PORT))
+        .hostControlPort(getRequiredParamFromServer<int>(pnh, PARAM_HOST_CONTROL_PORT))
+        .scannerIp(getRequiredParamFromServer<std::string>(pnh, PARAM_SCANNER_IP))
+        .scannerDataPort(DATA_PORT_OF_SCANNER_DEVICE)
+        .scannerControlPort(CONTROL_PORT_OF_SCANNER_DEVICE)
+        .scanRange(scan_range)
+        .enableDiagnostics();
+
+    ScannerConfiguration scanner_configuration{ config_builder.build() };
 
     ROSScannerNode ros_scanner_node(pnh,
                                     DEFAULT_PUBLISH_TOPIC,

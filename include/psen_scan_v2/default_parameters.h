@@ -22,6 +22,9 @@ namespace psen_scan_v2
 {
 namespace constants
 {
+static constexpr unsigned short DATA_PORT_OF_SCANNER_DEVICE{ 2000 };
+static constexpr unsigned short CONTROL_PORT_OF_SCANNER_DEVICE{ 3000 };
+
 //! @brief Start angle of measurement.
 static constexpr double DEFAULT_ANGLE_START(-degreeToRadian(137.5));
 //! @brief  End angle of measurement.

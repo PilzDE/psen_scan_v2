@@ -54,8 +54,7 @@ std::unique_ptr<Watchdog> ScannerV2::WatchdogFactory::create(const Watchdog::Tim
   // LCOV_EXCL_STOP
 }
 
-StateMachineArgs* ScannerV2::createStateMachineArgs(const unsigned short& data_port_scanner,
-                                                    const unsigned short& control_port_scanner)
+StateMachineArgs* ScannerV2::createStateMachineArgs()
 {
   return new StateMachineArgs(IScanner::getConfig(),
                               // UDP clients
@@ -63,12 +62,12 @@ StateMachineArgs* ScannerV2::createStateMachineArgs(const unsigned short& data_p
                                                               BIND_EVENT(ReplyReceiveError),
                                                               IScanner::getConfig().hostUDPPortControl(),
                                                               IScanner::getConfig().clientIp(),
-                                                              control_port_scanner),
+                                                              IScanner::getConfig().scannerControlPort()),
                               std::make_unique<UdpClientImpl>(BIND_RAW_DATA_EVENT(RawMonitoringFrameReceived),
                                                               BIND_EVENT(MonitoringFrameReceivedError),
                                                               IScanner::getConfig().hostUDPPortData(),
                                                               IScanner::getConfig().clientIp(),
-                                                              data_port_scanner),
+                                                              IScanner::getConfig().scannerDataPort()),
                               // Callbacks
                               std::bind(&ScannerV2::scannerStartedCB, this),
                               std::bind(&ScannerV2::scannerStoppedCB, this),
@@ -76,12 +75,8 @@ StateMachineArgs* ScannerV2::createStateMachineArgs(const unsigned short& data_p
                               std::unique_ptr<IWatchdogFactory>(new WatchdogFactory(this)));
 }  // namespace psen_scan_v2
 
-ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config,
-                     const LaserScanCallback& laser_scan_cb,
-                     const unsigned short data_port_scanner,
-                     const unsigned short control_port_scanner)
-  : IScanner(scanner_config, laser_scan_cb)
-  , sm_(new ScannerStateMachine(createStateMachineArgs(data_port_scanner, control_port_scanner)))
+ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb)
+  : IScanner(scanner_config, laser_scan_cb), sm_(new ScannerStateMachine(createStateMachineArgs()))
 {
   const std::lock_guard<std::mutex> lock(member_mutex_);
   sm_->start();
