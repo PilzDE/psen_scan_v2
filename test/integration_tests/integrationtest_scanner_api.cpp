@@ -39,6 +39,7 @@ REGISTER_ROSCONSOLE_BRIDGE;
 
 // Software under testing
 #include "psen_scan_v2/scanner_configuration.h"
+#include "psen_scan_v2/scanner_config_builder.h"
 #include "psen_scan_v2/scanner_v2.h"
 #include "psen_scan_v2/start_request.h"
 #include "psen_scan_v2/scanner_reply_msg.h"
@@ -57,8 +58,6 @@ static constexpr DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(1)
 
 static constexpr std::chrono::milliseconds WAIT_TIMEOUT{ 10 };
 static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 3 };
-
-static constexpr bool DIAGNOSTICS_ENABLED{ false };
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -246,10 +245,15 @@ protected:
 protected:
   const PortHolder port_holder_{ ++GLOBAL_PORT_HOLDER };
 
-  ScannerConfiguration config_{
-    HOST_IP_ADDRESS, port_holder_.data_port_host, port_holder_.control_port_host, SCANNER_IP_ADDRESS,
-    SCAN_RANGE,      DIAGNOSTICS_ENABLED
-  };
+  ScannerConfiguration config_{ ScannerConfigurationBuilder()
+                                    .hostIP(HOST_IP_ADDRESS)
+                                    .hostDataPort(port_holder_.data_port_host)
+                                    .hostControlPort(port_holder_.control_port_host)
+                                    .scannerIp(SCANNER_IP_ADDRESS)
+                                    .scannerDataPort(port_holder_.data_port_scanner)
+                                    .scannerControlPort(port_holder_.control_port_scanner)
+                                    .scanRange(SCAN_RANGE)
+                                    .build() };
 };
 
 void ScannerAPITests::SetUp()
@@ -305,10 +309,7 @@ TEST_F(ScannerAPITests, testStartFunctionality)
 {
   StrictMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
-  ScannerV2 scanner(config_,
-                    std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1),
-                    port_holder_.data_port_scanner,
-                    port_holder_.control_port_scanner);
+  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
   const start_request::Message start_req(config_);
 
   Barrier start_req_received_barrier;
@@ -331,10 +332,7 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStartIsCalledSecondTime)
 {
   NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
-  ScannerV2 scanner(config_,
-                    std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1),
-                    port_holder_.data_port_scanner,
-                    port_holder_.control_port_scanner);
+  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   scanner_mock.startListeningForControlMsg();
   const auto start_future = scanner.start();
@@ -351,10 +349,7 @@ TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
 {
   NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
-  ScannerV2 scanner(config_,
-                    std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1),
-                    port_holder_.data_port_scanner,
-                    port_holder_.control_port_scanner);
+  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   Barrier start_req_received_barrier;
   ON_CALL(scanner_mock, receiveControlMsg(_, serialize(start_request::Message(config_))))
@@ -377,10 +372,7 @@ TEST_F(ScannerAPITests, testStopFunctionality)
 {
   StrictMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
-  ScannerV2 scanner(config_,
-                    std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1),
-                    port_holder_.data_port_scanner,
-                    port_holder_.control_port_scanner);
+  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   EXPECT_CALL(scanner_mock, receiveControlMsg(_, serialize(start_request::Message(config_))))
       .WillOnce(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
@@ -409,10 +401,7 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStopIsCalledSecondTime)
 {
   NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
-  ScannerV2 scanner(config_,
-                    std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1),
-                    port_holder_.data_port_scanner,
-                    port_holder_.control_port_scanner);
+  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   ON_CALL(scanner_mock, receiveControlMsg(_, serialize(start_request::Message(config_))))
       .WillByDefault(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
@@ -438,10 +427,7 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
   NiceMock<pilz_testutils::LoggerMock> ros_log_mock;
   StrictMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
-  ScannerV2 scanner(config_,
-                    std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1),
-                    port_holder_.data_port_scanner,
-                    port_holder_.control_port_scanner);
+  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   Barrier error_msg_barrier;
   Barrier twice_called_barrier;
@@ -477,10 +463,7 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
   StrictMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
 
-  ScannerV2 scanner(config_,
-                    std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1),
-                    port_holder_.data_port_scanner,
-                    port_holder_.control_port_scanner);
+  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   const monitoring_frame::Message msg{ createValidMonitoringFrameMsg() };
 
@@ -519,10 +502,7 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
   NiceMock<pilz_testutils::LoggerMock> ros_log_mock;
   NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
-  ScannerV2 scanner(config_,
-                    std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1),
-                    port_holder_.data_port_scanner,
-                    port_holder_.control_port_scanner);
+  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   ON_CALL(scanner_mock, receiveControlMsg(_, serialize(start_request::Message(config_))))
       .WillByDefault(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
@@ -561,10 +541,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
   NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   NiceMock<UserCallbacks> cb;
 
-  ScannerV2 scanner(config_,
-                    std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1),
-                    port_holder_.data_port_scanner,
-                    port_holder_.control_port_scanner);
+  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   const std::size_t num_scans_per_round{ 6 };
 
@@ -621,10 +598,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
   NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   NiceMock<UserCallbacks> cb;
 
-  ScannerV2 scanner(config_,
-                    std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1),
-                    port_holder_.data_port_scanner,
-                    port_holder_.control_port_scanner);
+  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   const std::size_t num_scans_per_round{ 6 };
 
@@ -661,10 +635,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFrameReceiveTimeout)
   pilz_testutils::LoggerMock ros_log_mock;
   NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
-  ScannerV2 scanner(config_,
-                    std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1),
-                    port_holder_.data_port_scanner,
-                    port_holder_.control_port_scanner);
+  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   ON_CALL(scanner_mock, receiveControlMsg(_, serialize(start_request::Message(config_))))
       .WillByDefault(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));

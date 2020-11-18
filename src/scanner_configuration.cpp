@@ -13,80 +13,52 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <cmath>
-#include <cassert>
-#include <stdexcept>
-#include <limits>
-
-#include <arpa/inet.h>
-
-#include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/scanner_configuration.h"
 
 namespace psen_scan_v2
 {
-ScannerConfiguration::ScannerConfiguration(const std::string& host_ip,
-                                           const int& host_udp_port_data,
-                                           const int& host_udp_port_control,
-                                           const std::string& client_ip,
-                                           const DefaultScanRange& scan_range,
-                                           const bool diagnostics_enabled)
-  : scan_range_(scan_range), diagnostics_enabled_(diagnostics_enabled)
+bool ScannerConfiguration::isValid() const
 {
-  const auto host_ip_number = inet_network(host_ip.c_str());
-  if (static_cast<in_addr_t>(-1) == host_ip_number)
-  {
-    throw std::invalid_argument("Host IP invalid");
-  }
-  assert(sizeof(host_ip_number) == 4 && "host_ip_number has not the expected size");
-  host_ip_ = static_cast<uint32_t>(host_ip_number);
-
-  if (host_udp_port_data < std::numeric_limits<uint16_t>::min() ||
-      host_udp_port_data > std::numeric_limits<uint16_t>::max())
-  {
-    throw std::out_of_range("Host UDP port out of range");
-  }
-  host_udp_port_data_ = htole16(static_cast<uint16_t>(host_udp_port_data));
-
-  if (host_udp_port_control < std::numeric_limits<uint16_t>::min() ||
-      host_udp_port_control > std::numeric_limits<uint16_t>::max())
-  {
-    throw std::out_of_range("Host UDP port out of range");
-  }
-  host_udp_port_control_ = htole16(static_cast<uint16_t>(host_udp_port_control));
-
-  const auto client_ip_number = inet_network(client_ip.c_str());
-  if (static_cast<in_addr_t>(-1) == client_ip_number)
-  {
-    throw std::invalid_argument("client IP invalid");
-  }
-  assert(sizeof(client_ip_number) == 4 && "client_ip_number has not the expected size");
-  client_ip_ = static_cast<uint32_t>(client_ip_number);
+  // clang-format off
+  return host_ip_     && host_data_port_    && host_control_port_ &&
+         scanner_ip_  && scanner_data_port_ && scanner_control_port_ &&
+         scan_range_;
+  // clang-format on
 }
 
 uint32_t ScannerConfiguration::hostIp() const
 {
-  return host_ip_;
+  return *host_ip_;
 }
 
 uint16_t ScannerConfiguration::hostUDPPortData() const
 {
-  return host_udp_port_data_;
+  return *host_data_port_;
 }
 
 uint16_t ScannerConfiguration::hostUDPPortControl() const
 {
-  return host_udp_port_control_;
+  return *host_control_port_;
 }
 
 uint32_t ScannerConfiguration::clientIp() const
 {
-  return client_ip_;
+  return *scanner_ip_;
+}
+
+uint16_t ScannerConfiguration::scannerDataPort() const
+{
+  return *scanner_data_port_;
+}
+
+uint16_t ScannerConfiguration::scannerControlPort() const
+{
+  return *scanner_control_port_;
 }
 
 const DefaultScanRange& ScannerConfiguration::scanRange() const
 {
-  return scan_range_;
+  return *scan_range_;
 }
 
 bool ScannerConfiguration::diagnosticsEnabled() const

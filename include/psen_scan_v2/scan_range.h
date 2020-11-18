@@ -47,15 +47,15 @@ public:
 private:
   TenthOfDegree start_angle_{ 0 };
   TenthOfDegree end_angle_{ 0 };
-
-  const TenthOfDegree MIN_ANGLE{ min_allowed_angle };
-  const TenthOfDegree MAX_ANGLE{ max_allowed_angle };
 };
 
 template <int16_t min_angle, int16_t max_angle>
 constexpr ScanRange<min_angle, max_angle>::ScanRange(const TenthOfDegree& start_angle, const TenthOfDegree& end_angle)
   : start_angle_(start_angle), end_angle_(end_angle)
 {
+  const TenthOfDegree MIN_ANGLE{ min_angle };
+  const TenthOfDegree MAX_ANGLE{ max_angle };
+
   if (start_angle < MIN_ANGLE || start_angle > MAX_ANGLE)
   {
     throw std::out_of_range("Start angle out of range");

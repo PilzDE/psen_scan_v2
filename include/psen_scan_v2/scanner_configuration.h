@@ -15,9 +15,7 @@
 #ifndef PSEN_SCAN_V2_SCANNER_CONFIGURATION_H
 #define PSEN_SCAN_V2_SCANNER_CONFIGURATION_H
 
-#include <string>
-
-#include <arpa/inet.h>
+#include <boost/optional.hpp>
 
 #include "psen_scan_v2/scan_range.h"
 
@@ -29,44 +27,38 @@ namespace psen_scan_v2
  */
 class ScannerConfiguration
 {
-public:
-  /**
-   * @brief Construtor.
-   *
-   * @param host_ip IP address of the host.
-   * @param host_udp_port_data Port on which monitoring frames (scans) should be received.
-   * @param host_udp_port_control Port used to send commands (start/stop) and receive the corresponding replies.
-   * @param device_ip IP address of the scanner.
-   * @param scan_range Range in which measurements are taken.
-   * @param diagnostics_enabled Request diagnostic data from the scanner?
-   */
-  ScannerConfiguration(const std::string& host_ip,
-                       const int& host_udp_port_data,
-                       const int& host_udp_port_control,
-                       const std::string& device_ip,
-                       const DefaultScanRange& scan_range,
-                       const bool diagnostics_enabled);
+private:
+  ScannerConfiguration() = default;
 
 public:
   uint32_t hostIp() const;
-
   uint16_t hostUDPPortData() const;
   uint16_t hostUDPPortControl() const;
 
   uint32_t clientIp() const;
+  uint16_t scannerDataPort() const;
+  uint16_t scannerControlPort() const;
 
   const DefaultScanRange& scanRange() const;
 
   bool diagnosticsEnabled() const;
 
 private:
-  uint32_t host_ip_;
-  uint16_t host_udp_port_data_;
-  uint16_t host_udp_port_control_;
+  friend class ScannerConfigurationBuilder;
 
-  uint32_t client_ip_;
+private:
+  bool isValid() const;
 
-  const DefaultScanRange scan_range_;
+private:
+  boost::optional<uint32_t> host_ip_;
+  boost::optional<uint16_t> host_data_port_;
+  boost::optional<uint16_t> host_control_port_;
+
+  boost::optional<uint32_t> scanner_ip_;
+  boost::optional<uint16_t> scanner_data_port_;
+  boost::optional<uint16_t> scanner_control_port_;
+
+  boost::optional<DefaultScanRange> scan_range_{};
   bool diagnostics_enabled_{ false };
 };
 

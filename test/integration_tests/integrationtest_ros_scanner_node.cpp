@@ -31,6 +31,7 @@
 #include "psen_scan_v2/laserscan.h"
 #include "psen_scan_v2/scanner_mock.h"
 #include "psen_scan_v2/scanner_configuration.h"
+#include "psen_scan_v2/scanner_config_builder.h"
 #include "psen_scan_v2/default_parameters.h"
 #include "psen_scan_v2/scan_range.h"
 #include "psen_scan_v2/laserscan_ros_conversions.h"
@@ -93,15 +94,25 @@ static constexpr DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(27
 static constexpr int SCANNER_STARTED_TIMEOUT_MS{ 3000 };
 static constexpr int SCANNER_STOPPED_TIMEOUT_MS{ 3000 };
 static constexpr int LASERSCAN_RECEIVED_TIMEOUT{ 3000 };
-static constexpr bool DIAGNOSTICS_ENABLED{ false };
+
+static ScannerConfiguration createValidConfig()
+{
+  return ScannerConfigurationBuilder()
+      .hostIP(HOST_IP)
+      .hostDataPort(HOST_UDP_PORT_DATA)
+      .hostControlPort(HOST_UDP_PORT_CONTROL)
+      .scannerIp(DEVICE_IP)
+      .scannerDataPort(DATA_PORT_OF_SCANNER_DEVICE)
+      .scannerControlPort(CONTROL_PORT_OF_SCANNER_DEVICE)
+      .scanRange(SCAN_RANGE)
+      .build();
+}
 
 class RosScannerNodeTests : public testing::Test, public testing::AsyncTest
 {
 protected:
-  RosScannerNodeTests()
-    : scanner_config_(HOST_IP, HOST_UDP_PORT_DATA, HOST_UDP_PORT_CONTROL, DEVICE_IP, SCAN_RANGE, DIAGNOSTICS_ENABLED){};
   ros::NodeHandle nh_priv_{ "~" };
-  ScannerConfiguration scanner_config_;
+  ScannerConfiguration scanner_config_{ createValidConfig() };
 };
 
 TEST_F(RosScannerNodeTests, testScannerInvocation)
