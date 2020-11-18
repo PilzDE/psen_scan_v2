@@ -24,6 +24,20 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Part of a scan round
+ *
+ * A complete scan round can be divided in several parts sent independently over the UDP connection.
+ * Those parts are called monitoring frames.
+ *
+ * Every single monitoring **has to** contain some general information about the scan in the fixed fields
+ * and **can** contain additional data like distances or intensitis in additional fields.
+ *
+ * @see FixedFields
+ * @see Header
+ * @see HeaderID
+ * @see ScanValidator
+ */
 namespace monitoring_frame
 {
 static constexpr uint32_t DEFAULT_DEVICE_STATUS{ 0 };
@@ -34,6 +48,9 @@ static constexpr uint16_t NUMBER_OF_BYTES_SCAN_COUNTER{ 4 };
 static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_MEASURE{ 2 };
 static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_INTENSITY{ 2 };
 
+/**
+ * @brief The information included in every single monitoring frame.
+ */
 class FixedFields
 {
 public:
@@ -73,6 +90,17 @@ private:
 };
 namespace additional_field
 {
+/**
+ * @brief Definition for the type and length of an additional field in a monitoring frame.
+ *
+ * The exact content of an monitoring frame differs depending on the configuration.
+ * Every monitoring frame can contain one or all of additional fields defined in HeaderID in any order.
+ * The type and corresponding length is defined in this header.
+ * Based on this information the data will be deserialized.
+ *
+ * @see monitoring_frame
+ * @see HeaderID
+ */
 class Header
 {
 public:
@@ -114,12 +142,26 @@ std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is);
 
 namespace format_error
 {
+/**
+ * @brief Error indicating a problem during the extraction of the measurement data.
+ */
 class DecodingFailure : public std::runtime_error
 {
 public:
   DecodingFailure(const std::string& msg = "Error while decoding laser scanner measurement data");
 };
 
+/**
+ * @brief Error indicating a problem with the additional field: scan_counter
+ *
+ * The length specified in the Header of the additional field "scan_counter"
+ * should be exactly as defined in NUMBER_OF_BYTES_SCAN_COUNTER.
+ * If this does not apply the data could not be converted and this Error is thrown.
+ *
+ * @see Header
+ * @see HeaderID
+ * @see NUMBER_OF_BYTES_SCAN_COUNTER
+ */
 class ScanCounterUnexpectedSize : public DecodingFailure
 {
 public:
