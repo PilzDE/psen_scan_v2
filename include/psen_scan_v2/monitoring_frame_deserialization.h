@@ -88,6 +88,10 @@ private:
   FromTheta from_theta_;
   Resolution resolution_;
 };
+/**
+ * @brief Namespace containing all informations/types needed to describe the content of the additional information field
+ * of a monitoring frame.
+ */
 namespace additional_field
 {
 /**
