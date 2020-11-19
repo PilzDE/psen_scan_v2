@@ -1,6 +1,14 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Forthcoming
+-----------
+* Add Scanner ports in ScannerConfiguration
+* Switch branching model: Introduce main branch
+* Use github actions
+* Adds missing error bit
+* Contributors: Pilz GmbH and Co. KG
+
 0.1.1 (2020-11-10)
 ------------------
 * Add intensity data to LaserScan
