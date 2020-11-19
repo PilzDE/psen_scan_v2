@@ -168,6 +168,9 @@ public:  // Definition of state machine via table
   typedef ScannerProtocolDef m;
 
   // clang-format off
+  /**
+   * @brief Table describing the state machine which is specified in the scanner protocol.
+   */
   struct transition_table : mpl::vector<
       //    Start                         Event                         Next                        Action                        Guard
       //  +------------------------------+----------------------------+---------------------------+------------------------------+-----------------------------+
