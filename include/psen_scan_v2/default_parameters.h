@@ -20,6 +20,9 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Namespace containing default constants for the scanner setup.
+ */
 namespace constants
 {
 static constexpr unsigned short DATA_PORT_OF_SCANNER_DEVICE{ 2000 };
