@@ -65,6 +65,10 @@ private:
     const TenthOfDegree resolution_{ 0 };
   };
 
+  /**
+   * @brief Class describing the fundamental settings of the master and slave devices, like the id and the
+   * diagnostic setting.
+   */
   class DeviceSettings
   {
   public:
