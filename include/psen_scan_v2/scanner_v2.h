@@ -34,7 +34,7 @@
 #include "psen_scan_v2/watchdog.h"
 
 /**
- * @brief Root namespace in which the software components to communicate with scanner (firmware-version: 2)
+ * @brief Root namespace in which the software components to communicate with the scanner (firmware-version: 2)
  * are realised/implemented.
  */
 namespace psen_scan_v2
