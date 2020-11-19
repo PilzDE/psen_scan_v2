@@ -20,6 +20,9 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Namespace containing all things needed to define and implement a scanner_reply::Message.
+ */
 namespace scanner_reply
 {
 /**
