@@ -27,6 +27,9 @@ namespace psen_scan_v2
 {
 namespace raw_processing
 {
+/**
+ * @brief Exception which is thrown if the incoming data from the scanner cannot be processed.
+ */
 class StringStreamFailure : public std::runtime_error
 {
 public:
