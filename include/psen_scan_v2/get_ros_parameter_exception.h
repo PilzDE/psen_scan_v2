@@ -20,6 +20,9 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Exception thrown if a parameter of a certain type cannot be found on the ROS parameter server.
+ */
 class ParamMissingOnServer : public std::runtime_error
 {
 public:
