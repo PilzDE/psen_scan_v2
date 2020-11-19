@@ -34,6 +34,9 @@ namespace monitoring_frame
  */
 namespace diagnostic
 {
+/**
+ * @brief Namespace containing constants and types needed to define the diagnostic::Message.
+ */
 namespace raw_message
 {
 static constexpr uint32_t LENGTH_FOR_ONE_DEVICE_IN_BYTES{ 9 };
