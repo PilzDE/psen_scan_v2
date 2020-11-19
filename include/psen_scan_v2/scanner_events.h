@@ -21,6 +21,9 @@ namespace psen_scan_v2
 {
 namespace scanner_protocol
 {
+/**
+ * @brief Namespace containing the events needed to define and implement the scanner protocol.
+ */
 namespace scanner_events
 {
 //! @brief User requests scanner to start.
