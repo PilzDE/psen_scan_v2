@@ -46,6 +46,10 @@ public:
   friend DynamicSizeRawData serialize(const start_request::Message&);
 
 private:
+  /**
+   * @brief Class describing the scan settings of the master and slave devices.
+   * The settings include the scan range and the scan resolution of the respective device.
+   */
   class LaserScanSettings
   {
   public:
