@@ -48,6 +48,9 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Namespace containing all things needed to describe and implement the scanner protocol.
+ */
 namespace scanner_protocol
 {
 namespace msm = boost::msm;
