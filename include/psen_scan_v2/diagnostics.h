@@ -158,7 +158,8 @@ private:
  * @brief Defines an Diagnostic message by defining the ErrorLocation and a scanner ID
  *
  * With the provided information a message can be generated for this specific diagnostic incident.
- * The Message object then can be used in an std::ostream to print the diagnostic message defined in the `error_code_to_string` array.
+ * The Message object then can be used in an std::ostream to print the diagnostic message defined in the
+ * `error_code_to_string` array.
  *
  * @see ErrorLocation
  * @see error_bits
