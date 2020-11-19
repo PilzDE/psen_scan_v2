@@ -26,6 +26,9 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Namespace containing all things needed to define and implement a start_request::Message.
+ */
 namespace start_request
 {
 /**
