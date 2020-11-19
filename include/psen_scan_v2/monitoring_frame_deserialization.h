@@ -140,6 +140,9 @@ namespace diagnostic
 std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is);
 }
 
+/**
+ * @brief Namespace defining failures which might occur during the deserialization of MonitoringFrames.
+ */
 namespace format_error
 {
 /**
