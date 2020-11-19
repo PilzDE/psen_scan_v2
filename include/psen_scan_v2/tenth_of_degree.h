@@ -20,6 +20,9 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Helper class to simplify/improve the handling of angles stated in psen_scan_v2::TenthOfDegree.
+ */
 class TenthOfDegree
 {
 public:
