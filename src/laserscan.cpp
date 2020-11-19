@@ -79,7 +79,7 @@ const LaserScan::IntensityData& LaserScan::getIntensities() const
   return intensities_;
 }
 
-void LaserScan::LaserScan::setIntensities(const IntensityData& intensities)
+void LaserScan::setIntensities(const IntensityData& intensities)
 {
   intensities_ = intensities;
 }
