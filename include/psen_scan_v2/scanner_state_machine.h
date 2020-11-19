@@ -95,6 +95,10 @@ public:
   virtual std::unique_ptr<Watchdog> create(const Watchdog::Timeout& timeout, const std::string& event_type) = 0;
 };
 
+/**
+ * @brief Helper class used to easily transfer data from the higher level ScannerV2 class
+ * to the ScannerProtocolDef class during construction of the ScannerStateMachine.
+ */
 struct StateMachineArgs
 {
   StateMachineArgs(const ScannerConfiguration& scanner_config,
