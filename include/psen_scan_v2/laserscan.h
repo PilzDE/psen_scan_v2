@@ -34,7 +34,7 @@ namespace psen_scan_v2
  * - Resolution of the scan in radians.
  * - Min and Max angle in radians.
  *
- * The measures use the target frame defined as <prefix>_scan.
+ * The measures use the target frame defined as \<prefix\>_scan.
  * @see https://github.com/PilzDE/psen_scan_v2/blob/main/README.md#tf-frames
  */
 class LaserScan
