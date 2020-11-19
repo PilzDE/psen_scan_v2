@@ -24,7 +24,7 @@
 namespace psen_scan_v2
 {
 /**
- *  @brief This class represents a single laser scan in the <prefix>_scan target frame.
+ *  @brief This class represents a single laser scan in the \<prefix\>_scan target frame.
  *
  * All relevant information about a single scan of a psen_scan scanner are stored in this class.
  * This includes the following information:
