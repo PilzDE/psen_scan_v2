@@ -48,6 +48,7 @@ public:
 private:
   /**
    * @brief Class describing the scan settings of the master and slave devices.
+   *
    * The settings include the scan range and the scan resolution of the respective device.
    */
   class LaserScanSettings
@@ -66,8 +67,7 @@ private:
   };
 
   /**
-   * @brief Class describing the fundamental settings of the master and slave devices, like the id and the
-   * diagnostic setting.
+   * @brief Class describing the fundamental settings of the master and slave devices, like id and diagnostics.
    */
   class DeviceSettings
   {

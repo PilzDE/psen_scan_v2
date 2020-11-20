@@ -32,8 +32,7 @@ public:
 };
 
 /**
- * @brief Exception thrown if a parameter can be found on the ROS parameter server but has a different type on the
- * ROS server.
+ * @brief Exception thrown if a parameter can be found on the ROS parameter server but with an unexpected type.
  */
 class WrongParameterType : public std::runtime_error
 {

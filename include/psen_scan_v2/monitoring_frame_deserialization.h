@@ -25,12 +25,12 @@
 namespace psen_scan_v2
 {
 /**
- * @brief Part of a scan round
+ * @brief Namespace defining all informations/types needed to describe a monitoring frame.
  *
  * A complete scan round can be divided in several parts sent independently over the UDP connection.
  * Those parts are called monitoring frames.
  *
- * Every single monitoring **has to** contain some general information about the scan in the fixed fields
+ * Every single frame **has to** contain some general information about the scan in the fixed fields
  * and **can** contain additional data like distances or intensitis in additional fields.
  *
  * @see FixedFields
@@ -91,6 +91,8 @@ private:
 /**
  * @brief Namespace containing all informations/types needed to describe the content of the additional information field
  * of a monitoring frame.
+ *
+ * @see monitoring_frame
  */
 namespace additional_field
 {
@@ -162,8 +164,7 @@ public:
  * @brief Error indicating a problem with the additional field: scan_counter
  *
  * The length specified in the Header of the additional field "scan_counter"
- * should be exactly as defined in NUMBER_OF_BYTES_SCAN_COUNTER.
- * If this does not apply the data could not be converted and this Error is thrown.
+ * must be exactly as defined in NUMBER_OF_BYTES_SCAN_COUNTER for it to be converted.
  *
  * @see Header
  * @see HeaderID

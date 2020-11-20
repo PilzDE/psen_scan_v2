@@ -38,7 +38,7 @@ namespace monitoring_frame
 static constexpr uint8_t MAX_SCANNER_ID{ VALID_SCANNER_IDS.size() - 1 };
 
 /**
- * @brief A definition of a single monitoring frame.
+ * @brief Higher level data type representing a single monitoring frame.
  *
  * It contains all information deserialized from a single monitoring frame sent by the scanner hardware.
  *
