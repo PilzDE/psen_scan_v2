@@ -1,6 +1,6 @@
 # PSENscan software architecture
 The following diagram shows the overall architecture of the PSENscan software.
-![overall_architecture_diagram](diag_comp_overall_architecture.png)
+![Diagram showing the high level overall architecture of the system](diag_comp_overall_architecture.png)
 
-The following diagram shows the sequence diagram for the non-ROS user API.
-<img src="api_sequence_diag.png" alt="API sequence diagram" width="100%">
+The following sequence diagram shows the interaction between the software components in a typical use case scenario (User calls start, receives a laserscan and calls stop
+![Sequence diagram showing the interaction between the software components](api_sequence_diag.png)
