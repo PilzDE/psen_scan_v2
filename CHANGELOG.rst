@@ -1,6 +1,11 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Forthcoming
+-----------
+* Improved API documentation
+
 0.1.2 (2020-11-24)
 ------------------
 * Add Scanner ports in ScannerConfiguration
