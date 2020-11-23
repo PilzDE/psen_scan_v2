@@ -17,7 +17,8 @@ jobs:
           - {ROS_DISTRO: melodic, ROS_REPO: main}
           - {ROS_DISTRO: noetic,  ROS_REPO: testing}
           - {ROS_DISTRO: noetic,  ROS_REPO: main}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v1
       - uses: 'ros-industrial/industrial_ci@master'
@@ -25,7 +26,7 @@ jobs:
 
   clang-format:
     name: "Build + Test with clang format with Testing Repo of noetic (http://packages.ros.org/ros-testing/ubuntu)"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v1
       - uses: 'ros-industrial/industrial_ci@master'
@@ -37,7 +38,7 @@ jobs:
 
   coverage:
     name: "Coverage check for psen_scan_v2"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v1
       - uses: 'ros-industrial/industrial_ci@master'
