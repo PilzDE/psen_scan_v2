@@ -28,7 +28,7 @@ namespace psen_scan_v2
 /**
  * @brief This is the API definition for external interaction with the scanner driver.
  *
- * This Interface allows to:
+ * This interface allows to:
  * - Set a configuration for the scanner on startup
  * - Define a callback for incomming scans
  * - Start and Stop the communication with the scanner.
