@@ -99,7 +99,7 @@ namespace additional_field
 /**
  * @brief Definition for the type and length of an additional field in a monitoring frame.
  *
- * The exact content of an monitoring frame differs depending on the configuration.
+ * The exact content of a monitoring frame differs depending on the configuration.
  * Every monitoring frame can contain one or all of additional fields defined in HeaderID in any order.
  * The type and corresponding length is defined in this header.
  * Based on this information the data will be deserialized.
