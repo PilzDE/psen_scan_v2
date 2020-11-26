@@ -150,15 +150,15 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
   try
   {
     const monitoring_frame::Message frame{ monitoring_frame::deserialize(event.data_, event.num_bytes_) };
+    PSENSCAN_WARN_THROTTLE(1 /* sec */, "StateMachine", "The scanner reports an error: {}", frame.diagnosticMessages());
+
+    printUserMsgFor(complete_scan_validator_.validate(frame, DEFAULT_NUM_MSG_PER_ROUND));
+    args_->inform_user_about_laser_scan_cb(toLaserScan(frame));
   }
   catch (const scanner_reply::CRCMismatch& e)
   {
     PSENSCAN_ERROR("StateMachine", e.what());
   }
-  PSENSCAN_WARN_THROTTLE(1 /* sec */, "StateMachine", "The scanner reports an error: {}", frame.diagnosticMessages());
-
-  printUserMsgFor(complete_scan_validator_.validate(frame, DEFAULT_NUM_MSG_PER_ROUND));
-  args_->inform_user_about_laser_scan_cb(toLaserScan(frame));
 }
 
 inline void ScannerProtocolDef::handleMonitoringFrameTimeout(const scanner_events::MonitoringFrameTimeout& event)
