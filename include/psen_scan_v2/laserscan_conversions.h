@@ -23,7 +23,8 @@
 namespace psen_scan_v2
 {
 /**
- * @brief Converts the technical monitoring_frame to the user friendly LaserScan type sent by the IScanner::LaserScanCallback.
+ * @brief Converts the technical monitoring_frame to the user friendly LaserScan type sent by the
+ * IScanner::LaserScanCallback.
  * @see LaserScan
  * @see monitoring_frame::Message
  * @see ScannerV2
