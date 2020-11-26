@@ -44,6 +44,11 @@ static monitoring_frame::Message createMsg()
       from_theta, resolution, scan_counter, measurements, intensities, diagnostic_messages);
 }
 
+TEST(LaserScanConversionsTest, sanityCheck)
+{
+  ASSERT_TRUE(false);
+}
+
 TEST(LaserScanConversionsTest, laserScanShouldContainCorrectScanResolutionAfterConversion)
 {
   const monitoring_frame::Message frame{ createMsg() };
