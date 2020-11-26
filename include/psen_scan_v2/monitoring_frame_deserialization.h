@@ -31,7 +31,7 @@ namespace psen_scan_v2
  * Those parts are called monitoring frames.
  *
  * Every single frame **has to** contain some general information about the scan in the fixed fields
- * and **can** contain additional data like distances or intensitis in additional fields.
+ * and **can** contain additional data like distances or intensities in additional fields.
  *
  * @see FixedFields
  * @see Header
