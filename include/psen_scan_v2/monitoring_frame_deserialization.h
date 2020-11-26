@@ -89,7 +89,7 @@ private:
   Resolution resolution_;
 };
 /**
- * @brief Namespace containing all informations/types needed to describe the content of the additional information field
+ * @brief Namespace containing all information/types needed to describe the content of the additional information field
  * of a monitoring frame.
  *
  * @see monitoring_frame
