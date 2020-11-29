@@ -178,6 +178,7 @@ FixedFields readFixedFields(std::istringstream& is)
   raw_processing::read<int16_t, TenthOfDegree>(is, from_theta);
   raw_processing::read<int16_t, TenthOfDegree>(is, resolution);
 
+  // LCOV_EXCL_START
   if (OP_CODE_MONITORING_FRAME != op_code)
   {
     PSENSCAN_ERROR_THROTTLE(
@@ -186,18 +187,19 @@ FixedFields readFixedFields(std::istringstream& is)
 
   if (ONLINE_WORKING_MODE != working_mode)
   {
-    PSENSCAN_DEBUG("monitoring_frame::Message", "Invalid working mode!");
+    PSENSCAN_ERROR_THROTTLE(0.1, "monitoring_frame::Message", "Invalid working mode (not online)");
   }
 
   if (GUI_MONITORING_TRANSACTION != transaction_type)
   {
-    PSENSCAN_DEBUG("monitoring_frame::Message", "Invalid transaction type!");
+    PSENSCAN_ERROR_THROTTLE(0.1, "monitoring_frame::Message", "Invalid transaction type.");
   }
 
   if (MAX_SCANNER_ID < static_cast<uint8_t>(scanner_id))
   {
-    PSENSCAN_DEBUG("monitoring_frame::Message", "Invalid Scanner id!");
+    PSENSCAN_ERROR_THROTTLE(0.1, "monitoring_frame::Message", "Invalid Scanner id.");
   }
+  // LCOV_EXCL_STOP
 
   return FixedFields(device_status, op_code, working_mode, transaction_type, scanner_id, from_theta, resolution);
 }

@@ -174,30 +174,6 @@ TEST_F(MonitoringFrameDeserializationTest, shouldDeserializeMonitoringFrameCorre
   EXPECT_EQ(msg, with_intensities_.expected_msg_);
 }
 
-TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnWrongOpCode)
-{
-  with_intensities_raw_.at(4) += 1;
-  EXPECT_NO_THROW(monitoring_frame::deserialize(with_intensities_raw_, with_intensities_raw_.size()););
-}
-
-TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnInvalidWorkingMode)
-{
-  with_intensities_raw_.at(8) = 0x03;
-  EXPECT_NO_THROW(monitoring_frame::deserialize(with_intensities_raw_, with_intensities_raw_.size()););
-}
-
-TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnInvalidTransactionType)
-{
-  with_intensities_raw_.at(12) = 0x06;
-  EXPECT_NO_THROW(monitoring_frame::deserialize(with_intensities_raw_, with_intensities_raw_.size()););
-}
-
-TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnInvalidScannerId)
-{
-  with_intensities_raw_.at(16) = 0x04;
-  EXPECT_NO_THROW(monitoring_frame::deserialize(with_intensities_raw_, with_intensities_raw_.size()););
-}
-
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnUnknownFieldId)
 {
   scanner_udp_datagram_hexdumps::WithUnknownFieldId with_unknown_field_id;
