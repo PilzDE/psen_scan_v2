@@ -180,9 +180,8 @@ FixedFields readFixedFields(std::istringstream& is)
 
   if (OP_CODE_MONITORING_FRAME != op_code)
   {
-    // TODO: Get rid of the issue not to spam the system with this debug messages
-    //       Would something like  ROS_DEBUG_THROTTLE(period, ...) be a good solution?
-    PSENSCAN_DEBUG("monitoring_frame::Message", "Wrong Op Code!");
+    PSENSCAN_ERROR_THROTTLE(
+        0.1, "monitoring_frame::Message", "Unexpected opcode during deserialization of MonitoringFrame.");
   }
 
   if (ONLINE_WORKING_MODE != working_mode)
