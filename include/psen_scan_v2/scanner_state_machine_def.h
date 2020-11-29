@@ -174,27 +174,42 @@ inline void ScannerProtocolDef::handleMonitoringFrameTimeout(const scanner_event
 
 //+++++++++++++++++++++++++++++++++ Guards ++++++++++++++++++++++++++++++++++++
 
-inline bool ScannerProtocolDef::isStartReply(scanner_events::RawReplyReceived const& reply_event)
+inline void check_for_internal_errors(const scanner_reply::Message& msg)
 {
-  const scanner_reply::Message msg{ scanner_reply::deserialize(reply_event.data_) };
   // LCOV_EXCL_START
   if (msg.result() != scanner_reply::Message::OperationResult::accepted)
   {
     PSENSCAN_ERROR("StateMachine", "Received reply with non-succesful result code.");
+    if (msg.result() == scanner_reply::Message::OperationResult::refused)
+    {
+      if (msg.type() == scanner_reply::Message::Type::stop)
+      {
+        PSENSCAN_ERROR("StateMachine", "Stop request refused by device.");
+      }
+      if (msg.type() == scanner_reply::Message::Type::start)
+      {
+        PSENSCAN_ERROR("StateMachine", "Start request refused by device.");
+      }
+    }
+    else
+    {
+      PSENSCAN_ERROR("StateMachine", "Unknown operation result code.");
+    }
   }
   // LCOV_EXCL_STOP
+}
+
+inline bool ScannerProtocolDef::isStartReply(scanner_events::RawReplyReceived const& reply_event)
+{
+  const scanner_reply::Message msg{ scanner_reply::deserialize(reply_event.data_) };
+  check_for_internal_errors(msg);
   return msg.type() == scanner_reply::Message::Type::start;
 }
 
 inline bool ScannerProtocolDef::isStopReply(scanner_events::RawReplyReceived const& reply_event)
 {
   const scanner_reply::Message msg{ scanner_reply::deserialize(reply_event.data_) };
-  // LCOV_EXCL_START
-  if (msg.result() != scanner_reply::Message::OperationResult::accepted)
-  {
-    PSENSCAN_ERROR("StateMachine", "Received reply with non-succesful result code.");
-  }
-  // LCOV_EXCL_STOP
+  check_for_internal_errors(msg);
   return msg.type() == scanner_reply::Message::Type::stop;
 }
 
