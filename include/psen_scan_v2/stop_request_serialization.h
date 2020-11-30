@@ -23,7 +23,7 @@
 namespace psen_scan_v2
 {
 /**
- * @brief Namespace containing all things needed to define and implement a scanner stop request.
+ * @brief Contains all things needed to define and implement a scanner stop request.
  */
 namespace stop_request
 {

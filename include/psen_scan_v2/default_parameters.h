@@ -21,7 +21,7 @@
 namespace psen_scan_v2
 {
 /**
- * @brief Namespace containing default constants for the scanner setup.
+ * @brief Contains default constants for the scanner setup.
  */
 namespace constants
 {

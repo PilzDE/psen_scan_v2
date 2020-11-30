@@ -49,7 +49,7 @@
 namespace psen_scan_v2
 {
 /**
- * @brief Namespace containing all things needed to describe and implement the scanner protocol.
+ * @brief Contains all things needed to describe and implement the scanner protocol.
  */
 namespace scanner_protocol
 {

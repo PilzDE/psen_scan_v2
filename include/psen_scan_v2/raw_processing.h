@@ -26,7 +26,7 @@
 namespace psen_scan_v2
 {
 /**
- * @brief Namespace containing functions, etc. needed to transform
+ * @brief Contains functions, etc. needed to transform
  * higher level data to raw data (sent to or received from scanner) or vice versa.
  */
 namespace raw_processing

@@ -29,13 +29,13 @@ namespace psen_scan_v2
 namespace monitoring_frame
 {
 /**
- * @brief Namespace containing all types, etc. needed to describe the diagnostics information contained
+ * @brief Contains all types, etc. needed to describe the diagnostics information contained
  * in a monitoring_frame::Message.
  */
 namespace diagnostic
 {
 /**
- * @brief Namespace containing constants and types needed to define the diagnostic::Message.
+ * @brief Contains constants and types needed to define the diagnostic::Message.
  */
 namespace raw_message
 {
