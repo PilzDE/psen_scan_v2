@@ -34,8 +34,8 @@ namespace psen_scan_v2
  * and **can** contain additional data like distances or intensities in additional fields.
  *
  * @see FixedFields
- * @see Header
- * @see HeaderID
+ * @see additional_field::Header
+ * @see additional_field::HeaderID
  * @see ScanValidator
  */
 namespace monitoring_frame

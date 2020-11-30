@@ -88,7 +88,7 @@ private:
    * Implements the IWatchdogFactory to add behavior to handles specific cases,
    * where the interaction with the scanner hardware takes longer than expected.
    *
-   * @see IWatchdogFactory
+   * @see scanner_protocol::IWatchdogFactory
    * @see Watchdog
    */
   class WatchdogFactory : public IWatchdogFactory
