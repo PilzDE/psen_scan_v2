@@ -27,7 +27,8 @@ namespace psen_scan_v2
 /**
  * @brief Namespace defining all information/types needed to describe a monitoring frame.
  *
- * The scanner splits up a full rotation in several parts and sends them in separate parts and sends them via UDP packages.
+ * The scanner splits up a full rotation in several parts and sends them in separate parts and sends them via UDP
+ * packages.
  * Those parts are called monitoring frames.
  *
  * Every single frame **has to** contain some general information about the scan in the fixed fields
