@@ -151,6 +151,13 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
   {
     const monitoring_frame::Message frame{ monitoring_frame::deserialize(event.data_, event.num_bytes_) };
     PSENSCAN_WARN_THROTTLE(1 /* sec */, "StateMachine", "The scanner reports an error: {}", frame.diagnosticMessages());
+    
+    // LCOV_EXCL_START
+    if (frame.measures().size() == 0)
+      PSENSCAN_ERROR_THROTTLE(1 /* sec */, "StateMachine", "Received frame contained no measures.");
+    if (frame.intensities().size() == 0)
+      PSENSCAN_ERROR_THROTTLE(1 /* sec */, "StateMachine", "Received frame contained no intensities.");
+    // LCOV_EXCL_STOP
 
     printUserMsgFor(complete_scan_validator_.validate(frame, DEFAULT_NUM_MSG_PER_ROUND));
     args_->inform_user_about_laser_scan_cb(toLaserScan(frame));
