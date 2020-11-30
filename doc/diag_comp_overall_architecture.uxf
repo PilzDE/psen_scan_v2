@@ -23,14 +23,14 @@ fontsize=10
 
 
 // This text will be stored with each diagram;  use it for notes.</help_text>
-  <zoom_level>6</zoom_level>
+  <zoom_level>12</zoom_level>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>348</x>
-      <y>1116</y>
-      <w>450</w>
-      <h>48</h>
+      <x>84</x>
+      <y>2232</y>
+      <w>900</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>symbol=component
 layer=-10
@@ -42,10 +42,10 @@ Scanner device</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>624</x>
-      <y>1044</y>
-      <w>54</w>
-      <h>84</h>
+      <x>636</x>
+      <y>2088</y>
+      <w>108</w>
+      <h>168</h>
     </coordinates>
     <panel_attributes>lt=&lt;..
 UDP package</panel_attributes>
@@ -54,10 +54,10 @@ UDP package</panel_attributes>
   <element>
     <id>UMLActor</id>
     <coordinates>
-      <x>540</x>
+      <x>468</x>
       <y>0</y>
-      <w>60</w>
-      <h>72</h>
+      <w>120</w>
+      <h>144</h>
     </coordinates>
     <panel_attributes>User
 (ROS agnostic)
@@ -67,10 +67,10 @@ UDP package</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>348</x>
-      <y>966</y>
-      <w>450</w>
-      <h>84</h>
+      <x>84</x>
+      <y>1932</y>
+      <w>900</w>
+      <h>168</h>
     </coordinates>
     <panel_attributes>symbol=component
 style=wordwrap
@@ -85,10 +85,10 @@ The software components of this abstraction level delivere data as simple byte v
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>624</x>
-      <y>894</y>
-      <w>90</w>
-      <h>84</h>
+      <x>636</x>
+      <y>1788</y>
+      <w>180</w>
+      <h>168</h>
     </coordinates>
     <panel_attributes>lt=&lt;..
 byte vector 
@@ -98,10 +98,10 @@ byte vector
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>504</x>
-      <y>462</y>
-      <w>108</w>
-      <h>24</h>
+      <x>396</x>
+      <y>924</y>
+      <w>216</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>halign=center
 valign=center
@@ -112,10 +112,10 @@ group=1</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>504</x>
-      <y>516</y>
-      <w>108</w>
-      <h>24</h>
+      <x>396</x>
+      <y>1032</y>
+      <w>216</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>halign=center
 valign=center
@@ -126,10 +126,10 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>552</x>
-      <y>480</y>
-      <w>54</w>
-      <h>48</h>
+      <x>492</x>
+      <y>960</y>
+      <w>108</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 StartRequest
@@ -139,10 +139,10 @@ group=1</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>504</x>
-      <y>570</y>
-      <w>108</w>
-      <h>24</h>
+      <x>396</x>
+      <y>1140</y>
+      <w>216</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>halign=center
 valign=center
@@ -153,10 +153,10 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>552</x>
-      <y>534</y>
-      <w>120</w>
-      <h>48</h>
+      <x>492</x>
+      <y>1068</y>
+      <w>240</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 RawReplyReceived [isStartReply()]
@@ -166,10 +166,10 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>552</x>
-      <y>588</y>
-      <w>54</w>
-      <h>66</h>
+      <x>492</x>
+      <y>1176</y>
+      <w>108</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 StopRequest
@@ -179,10 +179,10 @@ group=1</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>504</x>
-      <y>642</y>
-      <w>108</w>
-      <h>24</h>
+      <x>396</x>
+      <y>1284</y>
+      <w>216</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>halign=center
 valign=center
@@ -193,10 +193,10 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>606</x>
-      <y>570</y>
-      <w>120</w>
-      <h>30</h>
+      <x>600</x>
+      <y>1140</y>
+      <w>240</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 RawMonitoringFrameReceived
@@ -206,10 +206,10 @@ group=1</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>384</x>
-      <y>384</y>
-      <w>378</w>
-      <h>348</h>
+      <x>156</x>
+      <y>768</y>
+      <w>756</w>
+      <h>696</h>
     </coordinates>
     <panel_attributes>symbol=component
 style=wordwrap
@@ -229,10 +229,10 @@ This component represents the scanner protocol/ state machine (indirectly) descr
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>348</x>
-      <y>132</y>
-      <w>456</w>
-      <h>114</h>
+      <x>84</x>
+      <y>264</y>
+      <w>912</w>
+      <h>228</h>
     </coordinates>
     <panel_attributes>symbol=component
 style=wordwrap
@@ -241,7 +241,8 @@ layer=-10
 ScannerV2
 --
 **Explanation:**
-This abstraction layer represents the user API (ROS-agnostic) and consists of the shown functions.
+This abstraction layer represents the user API (ROS-agnostic).
+It enables users to configurate, start and stop a single scanner by providing a high level API.
 --
 + Scanner(ScannerConfiguration, LaserscanAvailableCallback)
 
@@ -254,10 +255,10 @@ This abstraction layer represents the user API (ROS-agnostic) and consists of th
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>564</x>
-      <y>60</y>
-      <w>18</w>
-      <h>84</h>
+      <x>516</x>
+      <y>120</y>
+      <w>36</w>
+      <h>168</h>
     </coordinates>
     <panel_attributes>lt=&lt;..&gt;
 </panel_attributes>
@@ -266,10 +267,10 @@ This abstraction layer represents the user API (ROS-agnostic) and consists of th
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>348</x>
-      <y>816</y>
-      <w>450</w>
-      <h>84</h>
+      <x>84</x>
+      <y>1632</y>
+      <w>900</w>
+      <h>168</h>
     </coordinates>
     <panel_attributes>symbol=component
 style=wordwrap
@@ -284,10 +285,10 @@ This abstraction layer consists of all software components transforming primitiv
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>630</x>
-      <y>750</y>
-      <w>102</w>
-      <h>78</h>
+      <x>648</x>
+      <y>1500</y>
+      <w>204</w>
+      <h>156</h>
     </coordinates>
     <panel_attributes>lt=..&gt;
 scanner_reply::Message,
@@ -297,10 +298,10 @@ monitoring_frame::Message</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>486</x>
-      <y>750</y>
-      <w>84</w>
-      <h>78</h>
+      <x>360</x>
+      <y>1500</y>
+      <w>168</w>
+      <h>156</h>
     </coordinates>
     <panel_attributes>lt=&lt;..
 start_request::Message</panel_attributes>
@@ -309,10 +310,10 @@ start_request::Message</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>864</x>
-      <y>132</y>
-      <w>132</w>
-      <h>114</h>
+      <x>1116</x>
+      <y>264</y>
+      <w>264</w>
+      <h>228</h>
     </coordinates>
     <panel_attributes>symbol=component
 style=wordwrap
@@ -326,10 +327,10 @@ like scanner IP &amp; port, scan range, scan resolution, etc.</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>450</x>
-      <y>474</y>
-      <w>66</w>
-      <h>192</h>
+      <x>288</x>
+      <y>948</y>
+      <w>132</w>
+      <h>384</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 m2=StopRequest
@@ -339,10 +340,10 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>456</x>
-      <y>516</y>
-      <w>60</w>
-      <h>24</h>
+      <x>300</x>
+      <y>1032</y>
+      <w>120</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 
@@ -352,10 +353,10 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>606</x>
-      <y>462</y>
-      <w>66</w>
-      <h>30</h>
+      <x>600</x>
+      <y>924</y>
+      <w>132</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 StartTimeout
@@ -365,10 +366,10 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>414</x>
-      <y>570</y>
-      <w>102</w>
-      <h>30</h>
+      <x>216</x>
+      <y>1140</y>
+      <w>204</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 m2=MonitoringFrameTimeout
@@ -378,10 +379,10 @@ group=1</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>504</x>
-      <y>696</y>
-      <w>108</w>
-      <h>24</h>
+      <x>396</x>
+      <y>1392</y>
+      <w>216</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>halign=center
 valign=center
@@ -392,10 +393,10 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>552</x>
-      <y>660</y>
-      <w>120</w>
-      <h>48</h>
+      <x>492</x>
+      <y>1320</y>
+      <w>240</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 m1=RawReplyReceived [isStopReply()]
@@ -405,10 +406,10 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>798</x>
-      <y>180</y>
-      <w>78</w>
-      <h>18</h>
+      <x>984</x>
+      <y>360</y>
+      <w>156</w>
+      <h>36</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-</panel_attributes>
     <additional_attributes>10.0;10.0;110.0;10.0</additional_attributes>
@@ -416,10 +417,10 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>480</x>
-      <y>894</y>
-      <w>90</w>
-      <h>84</h>
+      <x>348</x>
+      <y>1788</y>
+      <w>180</w>
+      <h>168</h>
     </coordinates>
     <panel_attributes>lt=&lt;..
 byte vector
@@ -429,10 +430,10 @@ byte vector
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>474</x>
-      <y>1044</y>
-      <w>54</w>
-      <h>84</h>
+      <x>336</x>
+      <y>2088</y>
+      <w>108</w>
+      <h>168</h>
     </coordinates>
     <panel_attributes>lt=&lt;..
 UDP package</panel_attributes>
@@ -441,10 +442,10 @@ UDP package</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>348</x>
-      <y>294</y>
-      <w>450</w>
-      <h>462</h>
+      <x>84</x>
+      <y>588</y>
+      <w>900</w>
+      <h>924</h>
     </coordinates>
     <panel_attributes>symbol=component
 style=wordwrap
@@ -459,10 +460,10 @@ This abstraction layer implements the scanner protocol. In other words, this lay
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>576</x>
-      <y>240</y>
-      <w>36</w>
-      <h>66</h>
+      <x>540</x>
+      <y>480</y>
+      <w>72</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>lt=&lt;..
 &lt;&lt;uses&gt;&gt;</panel_attributes>
