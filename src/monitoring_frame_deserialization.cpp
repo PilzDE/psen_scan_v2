@@ -80,7 +80,7 @@ monitoring_frame::Message deserialize(const MaxSizeRawData& data, const std::siz
       case additional_field::HeaderID::measurements:
         raw_processing::readArray<uint16_t, double>(is,
                                                     msg.measurements_,
-                                                    additional_header.length() / NUMBER_OF_BYTES_SINGLE_MEASURE,
+                                                    additional_header.length() / NUMBER_OF_BYTES_SINGLE_MEASUREMENT,
                                                     [](uint16_t raw_element) { return raw_element / 1000.; });
         break;
 
@@ -97,7 +97,7 @@ monitoring_frame::Message deserialize(const MaxSizeRawData& data, const std::siz
         raw_processing::readArray<uint16_t, double>(
             is,
             msg.intensities_,
-            additional_header.length() / NUMBER_OF_BYTES_SINGLE_MEASURE,
+            additional_header.length() / NUMBER_OF_BYTES_SINGLE_MEASUREMENT,
             [](uint16_t raw_element) { return static_cast<double>(raw_element & 0b0011111111111111); });
         break;
 

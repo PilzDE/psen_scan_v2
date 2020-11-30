@@ -37,28 +37,28 @@ using namespace psen_scan_v2_test;
 class MonitoringFrameMsgTest : public ::testing::Test
 {
 protected:
-  inline std::istringstream buildExpectedMeasuresStream()
+  inline std::istringstream buildExpectedMeasurementsStream()
   {
     IStringStreamBuilder builder;
-    for (const auto& measure : expected_measures_)
+    for (const auto& measurement : expected_measurements_)
     {
-      builder.add(static_cast<uint16_t>(measure * 1000.));
+      builder.add(static_cast<uint16_t>(measurement * 1000.));
     }
     return builder.get();
   }
 
-  inline bool expectMeasuresPartEqual(const std::vector<double>& measurements)
+  inline bool expectMeasurementsPartEqual(const std::vector<double>& measurements)
   {
-    return std::equal(measurements.begin(), measurements.end(), expected_measures_.begin());
+    return std::equal(measurements.begin(), measurements.end(), expected_measurements_.begin());
   }
 
-  inline bool expectMeasuresEqual(const std::vector<double>& measurements)
+  inline bool expectMeasurementsEqual(const std::vector<double>& measurements)
   {
-    return (measurements.size() == expected_measures_.size() && expectMeasuresPartEqual(measurements));
+    return (measurements.size() == expected_measurements_.size() && expectMeasurementsPartEqual(measurements));
   }
 
 protected:
-  const std::array<double, 3> expected_measures_{ 4.4, 4.3, 4.2 };
+  const std::array<double, 3> expected_measurements_{ 4.4, 4.3, 4.2 };
 };
 
 TEST(MonitoringFrameMsgEqualityTest, testCompareEqualSucces)
@@ -101,7 +101,7 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareEqualIntensitiesEmptySucces)
   EXPECT_EQ(msg0, msg1);
 }
 
-TEST(MonitoringFrameMsgEqualityTest, testCompareMeasuresNotEqual)
+TEST(MonitoringFrameMsgEqualityTest, testCompareMeasurementsNotEqual)
 {
   const monitoring_frame::Message msg0(
       TenthOfDegree(100),

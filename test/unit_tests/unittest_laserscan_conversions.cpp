@@ -76,7 +76,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectMeasurementsAfterCon
   const auto mismatch_pair =
       std::mismatch(scan_ptr->getMeasurements().begin(), scan_ptr->getMeasurements().end(), frame.measurements().begin());
   EXPECT_EQ(scan_ptr->getMeasurements().end(), mismatch_pair.first)
-      << "Measure #" << std::distance(scan_ptr->getMeasurements().begin(), mismatch_pair.first)
+      << "Measurement #" << std::distance(scan_ptr->getMeasurements().begin(), mismatch_pair.first)
       << " in LaserScan is: " << *(mismatch_pair.first) << ", but expected: " << *(mismatch_pair.second);
 }
 
