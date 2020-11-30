@@ -59,7 +59,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectMinMaxScanAngleAfter
   std::unique_ptr<LaserScan> scan_ptr;
   ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ toLaserScan(frame) }););
 
-  const TenthOfDegree expected_max_scan_angle{ frame.fromTheta() + frame.resolution() * frame.measures().size() };
+  const TenthOfDegree expected_max_scan_angle{ frame.fromTheta() + frame.resolution() * frame.measurements().size() };
 
   EXPECT_EQ(frame.fromTheta(), scan_ptr->getMinScanAngle()) << "Min scan-angle incorrect in LaserScan";
   EXPECT_EQ(expected_max_scan_angle, scan_ptr->getMaxScanAngle()) << "Max scan-angle incorrect in LaserScan";
@@ -72,9 +72,9 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectMeasurementsAfterCon
   std::unique_ptr<LaserScan> scan_ptr;
   ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ toLaserScan(frame) }););
 
-  EXPECT_EQ(frame.measures().size(), scan_ptr->getMeasurements().size());
+  EXPECT_EQ(frame.measurements().size(), scan_ptr->getMeasurements().size());
   const auto mismatch_pair =
-      std::mismatch(scan_ptr->getMeasurements().begin(), scan_ptr->getMeasurements().end(), frame.measures().begin());
+      std::mismatch(scan_ptr->getMeasurements().begin(), scan_ptr->getMeasurements().end(), frame.measurements().begin());
   EXPECT_EQ(scan_ptr->getMeasurements().end(), mismatch_pair.first)
       << "Measure #" << std::distance(scan_ptr->getMeasurements().begin(), mismatch_pair.first)
       << " in LaserScan is: " << *(mismatch_pair.first) << ", but expected: " << *(mismatch_pair.second);

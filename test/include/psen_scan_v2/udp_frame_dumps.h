@@ -51,26 +51,26 @@ template <size_t ARRAY_SIZE>
 inline std::vector<double>
 readMeasures(const std::array<uint8_t, ARRAY_SIZE> hex_dump, const size_t offset_measures, const size_t n_measures)
 {
-  std::vector<double> measures;
+  std::vector<double> measurements;
   for (size_t idx = offset_measures; idx < (offset_measures + (n_measures * 2)); idx = idx + 2)
   {
     uint16_t raw_value = convertHexdumpBytesToUint16_t(hex_dump.at(idx + 1), hex_dump.at(idx));
-    measures.push_back(raw_value / 1000.);
+    measurements.push_back(raw_value / 1000.);
   }
-  return measures;
+  return measurements;
 }
 
 template <size_t ARRAY_SIZE>
 inline std::vector<double>
 readIntensities(const std::array<uint8_t, ARRAY_SIZE> hex_dump, const size_t offset_measures, const size_t n_measures)
 {
-  std::vector<double> measures;
+  std::vector<double> measurements;
   for (size_t idx = offset_measures; idx < (offset_measures + (n_measures * 2)); idx = idx + 2)
   {
     uint16_t raw_value = convertHexdumpBytesToUint16_t(hex_dump.at(idx + 1), hex_dump.at(idx));
-    measures.push_back(raw_value & 0b0011111111111111);
+    measurements.push_back(raw_value & 0b0011111111111111);
   }
-  return measures;
+  return measurements;
 }
 
 class WithIntensitiesAndDiagnostics

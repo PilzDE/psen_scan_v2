@@ -132,7 +132,7 @@ enum class HeaderID : Header::Id
 {
   scan_counter = 0x02,
   diagnostics = 0x04,
-  measures = 0x05,
+  measurements = 0x05,
   intensities = 0x06,
   end_of_frame = 0x09
 };

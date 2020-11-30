@@ -47,14 +47,14 @@ protected:
     return builder.get();
   }
 
-  inline bool expectMeasuresPartEqual(const std::vector<double>& measures)
+  inline bool expectMeasuresPartEqual(const std::vector<double>& measurements)
   {
-    return std::equal(measures.begin(), measures.end(), expected_measures_.begin());
+    return std::equal(measurements.begin(), measurements.end(), expected_measures_.begin());
   }
 
-  inline bool expectMeasuresEqual(const std::vector<double>& measures)
+  inline bool expectMeasuresEqual(const std::vector<double>& measurements)
   {
-    return (measures.size() == expected_measures_.size() && expectMeasuresPartEqual(measures));
+    return (measurements.size() == expected_measures_.size() && expectMeasuresPartEqual(measurements));
   }
 
 protected:
@@ -214,7 +214,7 @@ TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)
   monitoring_frame::Message msg(TenthOfDegree(1234), TenthOfDegree(56), 78, { 45, 44, 43, 42 });
   EXPECT_EQ(fmt::format("{}", msg),
             "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-            "measures = {45, 44, 43, 42}, intensities = {}, diagnostics = {})");
+            "measurements = {45, 44, 43, 42}, intensities = {}, diagnostics = {})");
 }
 
 }  // namespace psen_scan_v2
