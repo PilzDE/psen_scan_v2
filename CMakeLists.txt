@@ -22,6 +22,48 @@ add_compile_options(-Wextra)
 add_compile_options(-Wno-unused-parameter)
 add_compile_options(-Werror)
 
+option(BUILD_CPP_LIB "Build the c++ library only" OFF)
+
+if(BUILD_CPP_LIB)
+  ## System dependencies are found with CMake's conventions
+  find_package(Boost REQUIRED COMPONENTS system)
+
+  find_package(console_bridge REQUIRED)
+
+  ###########
+  ## Build ##
+  ###########
+
+  include_directories(
+    include
+    fmt_include
+    ${console_bridge_INCLUDE_DIRS}
+  )
+
+  set(${PROJECT_NAME}_sources
+    src/scanner_v2.cpp
+    src/laserscan.cpp
+    src/monitoring_frame_msg.cpp
+    src/start_request.cpp
+    src/start_request_serialization.cpp
+    src/stop_request_serialization.cpp
+    src/scanner_configuration.cpp
+    src/monitoring_frame_deserialization.cpp
+    src/diagnostics.cpp
+    src/scanner_reply_serialization_deserialization.cpp
+    src/fmt/format.cc
+    src/fmt/os.cc
+  )
+
+  add_library(${PROJECT_NAME} ${${PROJECT_NAME}_sources})
+  target_link_libraries(${PROJECT_NAME}
+    ${console_bridge_LIBRARIES}
+    ${rosfmt_LIBRARIES}
+  )
+
+  return()
+endif()
+
 find_package(catkin REQUIRED COMPONENTS
   rosconsole_bridge
   roscpp
