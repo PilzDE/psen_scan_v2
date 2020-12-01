@@ -117,7 +117,7 @@ inline ScanValidator::ScanRoundInfo& ScanValidator::ScanRoundInfo::operator++()
 
 inline void ScanValidator::reset()
 {
-  curr_scan_round_ == boost::none;
+  curr_scan_round_ = boost::none;
 }
 
 inline ScanValidator::OptionalResult ScanValidator::validate(const monitoring_frame::Message& msg,
