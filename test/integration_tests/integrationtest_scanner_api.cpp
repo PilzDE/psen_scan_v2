@@ -512,7 +512,7 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
 
   Barrier empty_msg_received;
   // Needed to allow all other log messages which might be received
-  EXPECT_CALL(*ros_log_mock, append(::testing::_, ::testing::_)).Times(AnyNumber());
+  EXPECT_CALL(*ros_log_mock, internal_append(::testing::_, ::testing::_)).Times(AnyNumber());
   EXPECT_LOG(*ros_log_mock, WARN, "No transition in state 2 for event MonitoringFrameReceivedError.")
       .Times(1)
       .WillOnce(OpenBarrier(&empty_msg_received));
@@ -561,7 +561,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
 
   Barrier user_msg_barrier;
   // Needed to allow all other log messages which might be received
-  EXPECT_CALL(*ros_log_mock, append(::testing::_, ::testing::_)).Times(AnyNumber());
+  EXPECT_CALL(*ros_log_mock, internal_append(::testing::_, ::testing::_)).Times(AnyNumber());
   EXPECT_LOG(*ros_log_mock,
              WARN,
              "Detected dropped MonitoringFrame."
@@ -611,7 +611,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
 
   Barrier user_msg_barrier;
   // Needed to allow all other log messages which might be received
-  EXPECT_CALL(*ros_log_mock, append(::testing::_, ::testing::_)).Times(AnyNumber());
+  EXPECT_CALL(*ros_log_mock, internal_append(::testing::_, ::testing::_)).Times(AnyNumber());
   EXPECT_LOG(*ros_log_mock, WARN, "Unexpected: Too many MonitoringFrames for one scan round received.")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
@@ -642,7 +642,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFrameReceiveTimeout)
 
   Barrier user_msg_barrier;
   // Needed to allow all other log messages which might be received
-  EXPECT_CALL(*ros_log_mock, append(::testing::_, ::testing::_)).Times(AnyNumber());
+  EXPECT_CALL(*ros_log_mock, internal_append(::testing::_, ::testing::_)).Times(AnyNumber());
   EXPECT_LOG(*ros_log_mock,
              WARN,
              "Timeout while waiting for MonitoringFrame message."
