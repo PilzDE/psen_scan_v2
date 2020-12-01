@@ -87,8 +87,6 @@ TEST(ScannerReplyMsgTest, testdeserializeValidCRC)
   MaxSizeRawData data;
   std::copy(raw_msg.begin(), raw_msg.end(), data.begin());
 
-  const Message msg_from_raw{ scanner_reply::deserialize(data) };
-
   // Check equality by comparing crc checksums
   boost::crc_32_type crc;
   crc.process_bytes(&raw_msg[sizeof(uint32_t)], raw_msg.size() - sizeof(uint32_t));
