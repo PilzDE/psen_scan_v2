@@ -30,7 +30,7 @@ class RawProcessingTest : public ::testing::Test
 };
 
 using MyTypes = testing::Types<uint8_t, uint16_t, uint32_t, uint64_t>;
-TYPED_TEST_CASE(RawProcessingTest, MyTypes);
+TYPED_TEST_SUITE(RawProcessingTest, MyTypes);
 
 TYPED_TEST(RawProcessingTest, write)
 {

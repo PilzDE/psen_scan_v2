@@ -119,7 +119,7 @@ class ParamTestSuite : public ::testing::Test
 };
 
 using TypesToTest = ::testing::Types<StringTestItem, IntTestItem, DoubleTestItem>;
-TYPED_TEST_CASE(ParamTestSuite, TypesToTest);
+TYPED_TEST_SUITE(ParamTestSuite, TypesToTest);
 
 TYPED_TEST(ParamTestSuite, testParamNotOnServer)
 {
