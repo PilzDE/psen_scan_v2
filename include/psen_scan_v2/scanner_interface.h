@@ -26,7 +26,12 @@
 namespace psen_scan_v2
 {
 /**
- * @brief API to control and to fetch measurements from the scanner.
+ * @brief This is the API definition for external interaction with the scanner driver.
+ *
+ * This interface allows to:
+ * - Set a configuration for the scanner on startup
+ * - Define a callback for incomming scans
+ * - Start and Stop the communication with the scanner.
  */
 class IScanner
 {

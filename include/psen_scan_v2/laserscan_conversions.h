@@ -22,6 +22,12 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Converts the technical monitoring_frame to the user friendly LaserScan type sent by the
+ * IScanner::LaserScanCallback.
+ * @see monitoring_frame::Message
+ * @see ScannerV2
+ */
 static LaserScan toLaserScan(const monitoring_frame::Message& frame)
 {
   const auto resolution = frame.resolution();

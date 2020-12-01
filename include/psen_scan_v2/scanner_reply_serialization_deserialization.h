@@ -28,6 +28,9 @@ namespace psen_scan_v2
 {
 namespace scanner_reply
 {
+/**
+ * @brief Exception thrown if an incorrect CRC is detected during deserialization of a scanner_reply::Message.
+ */
 class CRCMismatch : public std::runtime_error
 {
 public:

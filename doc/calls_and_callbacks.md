@@ -1,1 +1,0 @@
-![psen_scan_v2_callbacks](api_sequence_diag.png)

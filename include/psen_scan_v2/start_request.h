@@ -26,6 +26,9 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Contains all things needed to define and implement a start_request::Message.
+ */
 namespace start_request
 {
 /**
@@ -43,6 +46,11 @@ public:
   friend DynamicSizeRawData serialize(const start_request::Message&);
 
 private:
+  /**
+   * @brief Class describing the scan settings of the master and slave devices.
+   *
+   * The settings include the scan range and the scan resolution of the respective device.
+   */
   class LaserScanSettings
   {
   public:
@@ -58,6 +66,9 @@ private:
     const TenthOfDegree resolution_{ 0 };
   };
 
+  /**
+   * @brief Class describing the fundamental settings of the master and slave devices, like id and diagnostics.
+   */
   class DeviceSettings
   {
   public:

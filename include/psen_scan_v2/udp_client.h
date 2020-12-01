@@ -57,12 +57,18 @@ enum class ReceiveMode
 class UdpClientImpl
 {
 public:
+  /**
+   * @brief Exception thrown if the UDP socket cannot be closed.
+   */
   class CloseConnectionFailure : public std::runtime_error
   {
   public:
     CloseConnectionFailure(const std::string& msg = "Failure while closing connection");
   };
 
+  /**
+   * @brief Exception thrown if the UDP socket cannot be opened.
+   */
   class OpenConnectionFailure : public std::runtime_error
   {
   public:
