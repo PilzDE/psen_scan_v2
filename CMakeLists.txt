@@ -275,15 +275,15 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES}
   )
 
-  catkin_add_gtest(unittest_monitoring_frame_msg
-    test/unit_tests/unittest_monitoring_frame_msg.cpp
-    src/monitoring_frame_msg.cpp
-    src/diagnostics.cpp
-    src/monitoring_frame_deserialization.cpp
-  )
-  target_link_libraries(unittest_monitoring_frame_msg
-    ${catkin_LIBRARIES}
-  )
+  #catkin_add_gtest(unittest_monitoring_frame_msg
+  #  test/unit_tests/unittest_monitoring_frame_msg.cpp
+  #  src/monitoring_frame_msg.cpp
+  #  src/diagnostics.cpp
+  #  src/monitoring_frame_deserialization.cpp
+  #)
+  #target_link_libraries(unittest_monitoring_frame_msg
+  #  ${catkin_LIBRARIES}
+  #)
 
   catkin_add_gtest(unittest_monitoring_frame_serialization_deserialization
     src/monitoring_frame_msg.cpp
