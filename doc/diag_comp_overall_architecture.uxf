@@ -256,13 +256,13 @@ It enables users to configurate, start and stop a single scanner by providing a 
     <id>Relation</id>
     <coordinates>
       <x>560</x>
-      <y>104</y>
+      <y>112</y>
       <w>24</w>
-      <h>88</h>
+      <h>80</h>
     </coordinates>
     <panel_attributes>lt=&lt;..&gt;
 </panel_attributes>
-    <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
   </element>
   <element>
     <id>UMLGeneric</id>

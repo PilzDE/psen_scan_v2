@@ -31,7 +31,7 @@ bg=white</panel_attributes>
       <w>136</w>
       <h>24</h>
     </coordinates>
-    <panel_attributes>RosScannerNode
+    <panel_attributes>ROSScannerNode
 bg=pink</panel_attributes>
     <additional_attributes/>
   </element>
