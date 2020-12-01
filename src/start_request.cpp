@@ -24,7 +24,7 @@ namespace start_request
 Message::Message(const ScannerConfiguration& scanner_configuration)
   : host_ip_(scanner_configuration.hostIp())
   , host_udp_port_data_(scanner_configuration.hostUDPPortData())  // Write is deduced by the scanner
-  , master_device_settings_(ScannerId::master, scanner_configuration.diagnosticsEnabled())
+  , master_device_settings_(scanner_configuration.diagnosticsEnabled())
   , master_(scanner_configuration.scanRange(), MASTER_RESOLUTION)
 {
 }
