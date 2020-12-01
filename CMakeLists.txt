@@ -26,13 +26,13 @@ find_package(catkin REQUIRED COMPONENTS
   rosconsole_bridge
   roscpp
   sensor_msgs
-  rosfmt
 )
 
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS system)
 
 find_package(console_bridge REQUIRED)
+find_package(fmt REQUIRED)
 
 catkin_package(
   CATKIN_DEPENDS
@@ -41,6 +41,8 @@ catkin_package(
     sensor_msgs
   DEPENDS
     console_bridge
+  LIBRARIES
+    fmt::fmt
 )
 
 
@@ -116,7 +118,7 @@ set(${PROJECT_NAME}_node_sources
 add_library(${PROJECT_NAME} ${${PROJECT_NAME}_sources})
 target_link_libraries(${PROJECT_NAME}
   ${console_bridge_LIBRARIES}
-  ${rosfmt_LIBRARIES}
+  fmt::fmt
 )
 
 add_executable(${PROJECT_NAME}_node ${${PROJECT_NAME}_node_sources})
