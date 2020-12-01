@@ -32,8 +32,6 @@ using Message = scanner_reply::Message;
 namespace psen_scan_v2_test
 {
 static constexpr uint32_t OP_CODE_START{ 0x35 };
-static constexpr uint32_t OP_CODE_UNKNOWN{ 0x01 };
-static constexpr uint32_t RES_CODE_ACCEPTED{ 0x00 };
 
 TEST(ScannerReplyMsgTest, testTypeStart)
 {
