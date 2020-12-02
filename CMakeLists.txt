@@ -165,9 +165,9 @@ if(CATKIN_ENABLE_TESTING)
 
   roslaunch_add_file_check(launch DEPENDENCIES ${PROJECT_NAME}_node)
 
+  include_directories(SYSTEM ${pilz_testutils_INCLUDE_DIRS})
   include_directories(include
     test/include
-    ${pilz_testutils_INCLUDE_DIRS}
     ${catkin_INCLUDE_DIR}
   )
 
