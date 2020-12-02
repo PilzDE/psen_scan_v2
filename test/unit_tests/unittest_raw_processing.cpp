@@ -30,7 +30,7 @@ class RawProcessingTest : public ::testing::Test
 };
 
 using MyTypes = testing::Types<uint8_t, uint16_t, uint32_t, uint64_t>;
-#if (ROS_VERSION_MINOR >= 13)
+#if (ROS_VERSION_MINOR > 14)
 TYPED_TEST_SUITE(RawProcessingTest, MyTypes);
 #else
 TYPED_TEST_CASE(RawProcessingTest, MyTypes);

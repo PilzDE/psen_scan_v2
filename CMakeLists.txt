@@ -356,14 +356,14 @@ target_link_libraries(integrationtest_scanner_api
     ${pilz_testutils_LIBRARIES}
   )
 
-  #add_rostest_gmock(unittest_ros_parameter_handler
-  #    test/unit_tests/unittest_ros_parameter_handler.test
-  #    test/unit_tests/unittest_ros_parameter_handler.cpp
-  #)
-  #target_link_libraries(unittest_ros_parameter_handler
-  #  ${catkin_LIBRARIES}
-  #  ${pilz_testutils_LIBRARIES}
-  #)
+  add_rostest_gmock(unittest_ros_parameter_handler
+      test/unit_tests/unittest_ros_parameter_handler.test
+      test/unit_tests/unittest_ros_parameter_handler.cpp
+  )
+  target_link_libraries(unittest_ros_parameter_handler
+    ${catkin_LIBRARIES}
+    ${pilz_testutils_LIBRARIES}
+  )
 
   ######################
   ##  Hardware-Tests  ##

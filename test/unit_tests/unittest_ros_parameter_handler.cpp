@@ -119,7 +119,7 @@ class ParamTestSuite : public ::testing::Test
 };
 
 using TypesToTest = ::testing::Types<StringTestItem, IntTestItem, DoubleTestItem>;
-#if (ROS_VERSION_MINOR >= 13)
+#if (ROS_VERSION_MINOR > 14)
 TYPED_TEST_SUITE(ParamTestSuite, TypesToTest);
 #else
 TYPED_TEST_CASE(ParamTestSuite, TypesToTest);
