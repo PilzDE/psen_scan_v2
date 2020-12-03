@@ -31,6 +31,7 @@
 #include "psen_scan_v2/scanner_events.h"
 
 #include "psen_scan_v2/logging.h"
+#include "psen_scan_v2/format_range.h"
 #include "psen_scan_v2/udp_client.h"
 
 #include "psen_scan_v2/laserscan.h"

@@ -13,31 +13,26 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#ifndef PSEN_SCAN_V2_FORMAT_RANGE_H
+#define PSEN_SCAN_V2_FORMAT_RANGE_H
+
+#include <sstream>
+#include <string>
+
 #include <fmt/format.h>
 
-#include "psen_scan_v2/diagnostics.h"
-
-using namespace psen_scan_v2;
-
-namespace psen_scan_v2
+template <typename T>
+std::string formatRange(const T& range)
 {
-namespace monitoring_frame
-{
-namespace diagnostic
-{
-std::ostream& operator<<(std::ostream& os, const psen_scan_v2::monitoring_frame::diagnostic::Message& msg)
-{
-  os << fmt::format(
-      "Device: {} - {}", scanner_id_to_string.at(msg.getScannerId()), error_code_to_string.at(msg.getDiagnosticCode()));
-
-  if (isAmbiguous(msg.getDiagnosticCode()))
+  std::stringstream strstr;
+  strstr << "{";
+  for (const auto& el : range)
   {
-    os << fmt::format(" (Byte:{} Bit:{})", msg.getErrorLocation().getByte(), msg.getErrorLocation().getBit());
+    strstr << fmt::format("{}", el) << ", ";
   }
-
-  return os;
+  strstr.ignore(2, ',');
+  strstr << "}";
+  return strstr.str();
 }
 
-}  // namespace diagnostic
-}  // namespace monitoring_frame
-}  // namespace psen_scan_v2
+#endif  // PSEN_SCAN_V2_FORMAT_RANGE_H

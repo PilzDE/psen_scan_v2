@@ -21,9 +21,8 @@
 #include <string>
 #include <vector>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <fmt/ostream.h>
-#include <fmt/ranges.h>
 
 #include "psen_scan_v2/diagnostics.h"
 #include "psen_scan_v2/angle_conversions.h"
@@ -31,6 +30,8 @@
 #include "psen_scan_v2/raw_processing.h"
 #include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/logging.h"
+#include "psen_scan_v2/format_range.h"
+
 namespace psen_scan_v2
 {
 TenthOfDegree monitoring_frame::Message::fromTheta() const
@@ -79,8 +80,8 @@ std::ostream& operator<<(std::ostream& os, const psen_scan_v2::monitoring_frame:
                     msg.fromTheta().value() / 10.,
                     msg.resolution().value() / 10.,
                     msg.scanCounter(),
-                    msg.measures(),
-                    msg.intensities(),
-                    msg.diagnosticMessages());
+                    formatRange(msg.measures()),
+                    formatRange(msg.intensities()),
+                    formatRange(msg.diagnosticMessages()));
   return os;
 }
