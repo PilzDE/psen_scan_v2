@@ -36,7 +36,8 @@ find_package(fmt REQUIRED)
 
 catkin_package(
   CATKIN_DEPENDS
-    roscpp sensor_msgs
+    roscpp
+    sensor_msgs
 )
 
 
