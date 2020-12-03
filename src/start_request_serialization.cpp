@@ -107,7 +107,7 @@ DynamicSizeRawData start_request::serialize(const start_request::Message& msg, c
   raw_processing::write(os_crc, calculateCRC(raw_data));
 
   std::string with_crc(os_crc.str() + os.str());
-  const DynamicSizeRawData raw_data_with_crc{ convertStringToDynamicSizeRawData(with_crc) };
+  DynamicSizeRawData raw_data_with_crc{ convertStringToDynamicSizeRawData(with_crc) };
 
   assert(with_crc.length() == SIZE && "Message data of start request has not the expected size");
 

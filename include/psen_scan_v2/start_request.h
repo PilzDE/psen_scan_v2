@@ -72,13 +72,12 @@ private:
   class DeviceSettings
   {
   public:
-    constexpr DeviceSettings(const ScannerId id, const bool diagnostics_enabled);
+    constexpr DeviceSettings(const bool diagnostics_enabled);
 
   public:
     constexpr bool isDiagnosticsEnabled() const;
 
   private:
-    const ScannerId id_;
     const bool diagnostics_enabled_;
   };
 
@@ -110,8 +109,8 @@ constexpr TenthOfDegree Message::LaserScanSettings::getResolution() const
   return resolution_;
 };
 
-constexpr Message::DeviceSettings::DeviceSettings(const ScannerId id, const bool diagnostics_enabled)
-  : id_(id), diagnostics_enabled_(diagnostics_enabled)
+constexpr Message::DeviceSettings::DeviceSettings(const bool diagnostics_enabled)
+  : diagnostics_enabled_(diagnostics_enabled)
 {
 }
 
