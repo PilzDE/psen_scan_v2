@@ -26,8 +26,10 @@
 namespace psen_scan_v2
 {
 /**
- * @brief Watchdog which continuously calls the specified timeout handler (after the specified timeout time has passed)
- * as long as the watchdog exists. The Watchdog restarts the timeout whenever reset() is called.
+ * @brief Watchdog which continuously calls the specified timeout handler
+ *
+ * After the specified timeout time has passed the timeout_handler is called and the timer restarts.
+ * This continues as long as the watchdog exists.
  */
 class Watchdog
 {

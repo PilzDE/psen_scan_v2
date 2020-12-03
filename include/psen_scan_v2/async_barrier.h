@@ -21,6 +21,9 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Helper class to simplify the synchronization between different threads.
+ */
 class Barrier
 {
 public:

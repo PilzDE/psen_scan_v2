@@ -34,7 +34,7 @@ namespace psen_scan_v2
 using namespace std::chrono_literals;
 
 /**
- * @brief ROS Node for fetching and publishing laserscan data from the scanner.
+ * @brief ROS Node that continuously publishes scan data of a single PSENscan laser scanner.
  *
  */
 template <typename S = ScannerV2>

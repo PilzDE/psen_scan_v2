@@ -22,6 +22,9 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Contains all things needed to define and implement a scanner stop request.
+ */
 namespace stop_request
 {
 static constexpr std::size_t NUM_RESERVED_FIELDS{ 12 };

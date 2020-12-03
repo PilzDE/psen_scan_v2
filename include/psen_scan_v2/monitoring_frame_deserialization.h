@@ -24,6 +24,21 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Namespace defining all information/types needed to describe a monitoring frame.
+ *
+ * The scanner splits up a full rotation in several parts and sends them in separate parts and sends them via UDP
+ * packages.
+ * Those parts are called monitoring frames.
+ *
+ * Every single frame **has to** contain some general information about the scan in the fixed fields
+ * and **can** contain additional data like distances or intensities in additional fields.
+ *
+ * @see FixedFields
+ * @see additional_field::Header
+ * @see additional_field::HeaderID
+ * @see ScanValidator
+ */
 namespace monitoring_frame
 {
 static constexpr uint32_t DEFAULT_DEVICE_STATUS{ 0 };
@@ -34,6 +49,9 @@ static constexpr uint16_t NUMBER_OF_BYTES_SCAN_COUNTER{ 4 };
 static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_MEASURE{ 2 };
 static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_INTENSITY{ 2 };
 
+/**
+ * @brief The information included in every single monitoring frame.
+ */
 class FixedFields
 {
 public:
@@ -71,8 +89,25 @@ private:
   FromTheta from_theta_;
   Resolution resolution_;
 };
+/**
+ * @brief Contains all information/types needed to describe the content of the additional information field
+ * of a monitoring frame.
+ *
+ * @see monitoring_frame
+ */
 namespace additional_field
 {
+/**
+ * @brief Definition for the type and length of an additional field in a monitoring frame.
+ *
+ * The exact content of a monitoring frame differs depending on the configuration.
+ * Every monitoring frame can contain one or all of additional fields defined in HeaderID in any order.
+ * The type and corresponding length is defined in this header.
+ * Based on this information the data will be deserialized.
+ *
+ * @see monitoring_frame
+ * @see HeaderID
+ */
 class Header
 {
 public:
@@ -112,14 +147,30 @@ namespace diagnostic
 std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is);
 }
 
+/**
+ * @brief Namespace defining failures which might occur during the deserialization of MonitoringFrames.
+ */
 namespace format_error
 {
+/**
+ * @brief Error indicating a problem during the extraction of the measurement data.
+ */
 class DecodingFailure : public std::runtime_error
 {
 public:
   DecodingFailure(const std::string& msg = "Error while decoding laser scanner measurement data");
 };
 
+/**
+ * @brief Error indicating a problem with the additional field: scan_counter
+ *
+ * The length specified in the Header of the additional field "scan_counter"
+ * must be exactly as defined in NUMBER_OF_BYTES_SCAN_COUNTER for it to be converted.
+ *
+ * @see Header
+ * @see HeaderID
+ * @see NUMBER_OF_BYTES_SCAN_COUNTER
+ */
 class ScanCounterUnexpectedSize : public DecodingFailure
 {
 public:

@@ -33,12 +33,30 @@
 
 #include "psen_scan_v2/watchdog.h"
 
+/**
+ * @brief Root namespace in which the software components to communicate with the scanner (firmware-version: 2)
+ * are realised/implemented.
+ */
 namespace psen_scan_v2
 {
 using namespace psen_scan_v2::scanner_protocol;
 using std::placeholders::_1;
 using std::placeholders::_2;
 
+/**
+ * @brief This is the API implementation for external interaction with the PSENscan driver.
+ *
+ * This class is responsible for the initialization of:
+ * - the ScannerStateMachine.
+ * - the Udp connections.
+ * - the guards to ensure threads save interaction between the user, udp connections and timeouts.
+ *
+ * It uses the passed ScannerConfiguration for all configurable parts of this process.
+ *
+ * @see IScanner
+ * @see ScannerStateMachine
+ * @see ScannerConfiguration
+ */
 class ScannerV2 : public IScanner
 {
 public:
@@ -64,6 +82,15 @@ private:
   void scannerStoppedCB();
 
 private:
+  /**
+   * @brief Watchdog factory implementation for scanner interaction timeouts
+   *
+   * Implements the IWatchdogFactory to add behavior to handles specific cases,
+   * where the interaction with the scanner hardware takes longer than expected.
+   *
+   * @see scanner_protocol::IWatchdogFactory
+   * @see Watchdog
+   */
   class WatchdogFactory : public IWatchdogFactory
   {
   public:
