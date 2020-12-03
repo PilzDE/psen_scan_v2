@@ -34,14 +34,7 @@ find_package(Boost REQUIRED COMPONENTS system)
 find_package(console_bridge REQUIRED)
 find_package(fmt REQUIRED)
 
-catkin_package(
-  CATKIN_DEPENDS
-    rosconsole_bridge
-    roscpp
-    sensor_msgs
-  DEPENDS
-    console_bridge
-)
+catkin_package()
 
 
 ###############
