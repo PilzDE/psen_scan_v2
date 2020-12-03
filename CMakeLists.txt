@@ -41,8 +41,6 @@ catkin_package(
     sensor_msgs
   DEPENDS
     console_bridge
-  LIBRARIES
-    fmt::fmt
 )
 
 
