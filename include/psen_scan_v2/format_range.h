@@ -16,6 +16,8 @@
 #ifndef PSEN_SCAN_V2_FORMAT_RANGE_H
 #define PSEN_SCAN_V2_FORMAT_RANGE_H
 
+#include <algorithm>
+
 #include <sstream>
 #include <string>
 
@@ -24,14 +26,10 @@
 template <typename T>
 std::string formatRange(const T& range)
 {
-  std::stringstream strstr;
-  strstr << "{";
-  for (const auto& el : range)
-  {
-    strstr << fmt::format("{}", el) << ", ";
-  }
-  strstr.ignore(2, ',');
-  strstr << "}";
+  std::stringstream strstr{ "{" };
+  std::for_each(
+      range.begin(), std::prev(range.end()), [&strstr](const auto& el) { strstr << fmt::format("{}", el) << ", "; });
+  strstr << fmt::format("{}", *std::prev(range.end())) << "}";
   return strstr.str();
 }
 
