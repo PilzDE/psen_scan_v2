@@ -22,48 +22,6 @@ add_compile_options(-Wextra)
 add_compile_options(-Wno-unused-parameter)
 add_compile_options(-Werror)
 
-option(BUILD_CPP_LIB "Build the c++ library only" OFF)
-
-if(BUILD_CPP_LIB)
-  ## System dependencies are found with CMake's conventions
-  find_package(Boost REQUIRED COMPONENTS system)
-
-  find_package(console_bridge REQUIRED)
-
-  ###########
-  ## Build ##
-  ###########
-
-  include_directories(
-    include
-    fmt_include
-    ${console_bridge_INCLUDE_DIRS}
-  )
-
-  set(${PROJECT_NAME}_sources
-    src/scanner_v2.cpp
-    src/laserscan.cpp
-    src/monitoring_frame_msg.cpp
-    src/start_request.cpp
-    src/start_request_serialization.cpp
-    src/stop_request_serialization.cpp
-    src/scanner_configuration.cpp
-    src/monitoring_frame_deserialization.cpp
-    src/diagnostics.cpp
-    src/scanner_reply_serialization_deserialization.cpp
-    src/fmt/format.cc
-    src/fmt/os.cc
-  )
-
-  add_library(${PROJECT_NAME} ${${PROJECT_NAME}_sources})
-  target_link_libraries(${PROJECT_NAME}
-    ${console_bridge_LIBRARIES}
-    ${rosfmt_LIBRARIES}
-  )
-
-  return()
-endif()
-
 find_package(catkin REQUIRED COMPONENTS
   rosconsole_bridge
   roscpp
@@ -133,22 +91,22 @@ endif()
 ###########
 
 include_directories(
-  include
+  standalone/include
   ${catkin_INCLUDE_DIRS}
   ${console_bridge_INCLUDE_DIRS}
 )
 
 set(${PROJECT_NAME}_sources
-  src/scanner_v2.cpp
-  src/laserscan.cpp
-  src/monitoring_frame_msg.cpp
-  src/start_request.cpp
-  src/start_request_serialization.cpp
-  src/stop_request_serialization.cpp
-  src/scanner_configuration.cpp
-  src/monitoring_frame_deserialization.cpp
-  src/diagnostics.cpp
-  src/scanner_reply_serialization_deserialization.cpp
+  standalone/src/scanner_v2.cpp
+  standalone/src/laserscan.cpp
+  standalone/src/monitoring_frame_msg.cpp
+  standalone/src/start_request.cpp
+  standalone/src/start_request_serialization.cpp
+  standalone/src/stop_request_serialization.cpp
+  standalone/src/scanner_configuration.cpp
+  standalone/src/monitoring_frame_deserialization.cpp
+  standalone/src/diagnostics.cpp
+  standalone/src/scanner_reply_serialization_deserialization.cpp
 )
 
 set(${PROJECT_NAME}_node_sources
@@ -177,7 +135,7 @@ install(DIRECTORY config DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 install(DIRECTORY urdf/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/urdf)
 
-install(DIRECTORY include/${PROJECT_NAME}/
+install(DIRECTORY standalone/include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.h"
   PATTERN ".svn" EXCLUDE
@@ -233,9 +191,9 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(unittest_start_request
     test/unit_tests/unittest_start_request.cpp
-    src/start_request.cpp
-    src/scanner_configuration.cpp
-    src/start_request_serialization.cpp
+    standalone/src/start_request.cpp
+    standalone/src/scanner_configuration.cpp
+    standalone/src/start_request_serialization.cpp
   )
   target_link_libraries(unittest_start_request
     ${catkin_LIBRARIES}
@@ -243,7 +201,7 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(unittest_stop_request
     test/unit_tests/unittest_stop_request.cpp
-    src/stop_request_serialization.cpp
+    standalone/src/stop_request_serialization.cpp
   )
   target_link_libraries(unittest_stop_request
     ${catkin_LIBRARIES}
@@ -258,7 +216,7 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(unittest_scanner_configuration
     test/unit_tests/unittest_scanner_configuration.cpp
-    src/scanner_configuration.cpp
+    standalone/src/scanner_configuration.cpp
   )
   target_link_libraries(unittest_scanner_configuration
     ${catkin_LIBRARIES}
@@ -285,7 +243,7 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(unittest_laserscan
     test/unit_tests/unittest_laserscan.cpp
-    src/laserscan.cpp
+    standalone/src/laserscan.cpp
   )
   target_link_libraries(unittest_laserscan
     ${catkin_LIBRARIES}
@@ -293,9 +251,9 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(unittest_laserscan_conversions
     test/unit_tests/unittest_laserscan_conversions.cpp
-    src/laserscan.cpp
-    src/monitoring_frame_msg.cpp
-    src/diagnostics.cpp
+    standalone/src/laserscan.cpp
+    standalone/src/monitoring_frame_msg.cpp
+    standalone/src/diagnostics.cpp
   )
   target_link_libraries(unittest_laserscan_conversions
     ${catkin_LIBRARIES}
@@ -304,9 +262,9 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(unittest_laserscan_ros_conversions
     test/unit_tests/unittest_laserscan_ros_conversions.cpp
-    src/laserscan.cpp
-    src/monitoring_frame_msg.cpp
-    src/diagnostics.cpp
+    standalone/src/laserscan.cpp
+    standalone/src/monitoring_frame_msg.cpp
+    standalone/src/diagnostics.cpp
   )
   target_link_libraries(unittest_laserscan_ros_conversions
     ${catkin_LIBRARIES}
@@ -315,7 +273,7 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(unittest_scanner_reply_msg
     test/unit_tests/unittest_scanner_reply_msg.cpp
-    src/scanner_reply_serialization_deserialization.cpp
+    standalone/src/scanner_reply_serialization_deserialization.cpp
   )
   target_link_libraries(unittest_scanner_reply_msg
     ${catkin_LIBRARIES}
@@ -324,9 +282,9 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(unittest_monitoring_frame_msg
     test/unit_tests/unittest_monitoring_frame_msg.cpp
-    src/monitoring_frame_msg.cpp
-    src/diagnostics.cpp
-    src/monitoring_frame_deserialization.cpp
+    standalone/src/monitoring_frame_msg.cpp
+    standalone/src/diagnostics.cpp
+    standalone/src/monitoring_frame_deserialization.cpp
   )
   target_link_libraries(unittest_monitoring_frame_msg
     ${catkin_LIBRARIES}
@@ -334,9 +292,9 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gtest(unittest_monitoring_frame_serialization_deserialization
-    src/monitoring_frame_msg.cpp
-    src/monitoring_frame_deserialization.cpp
-    src/diagnostics.cpp
+    standalone/src/monitoring_frame_msg.cpp
+    standalone/src/monitoring_frame_deserialization.cpp
+    standalone/src/diagnostics.cpp
     test/unit_tests/unittest_monitoring_frame_serialization_deserialization.cpp
     test/src/monitoring_frame_serialization.cpp
   )
@@ -355,7 +313,7 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gmock(unittest_monitoring_frame_diagnostic_message
-    src/diagnostics.cpp
+    standalone/src/diagnostics.cpp
     test/unit_tests/unittest_monitoring_frame_diagnostic_message.cpp
   )
   target_link_libraries(unittest_monitoring_frame_diagnostic_message
@@ -379,16 +337,16 @@ if(CATKIN_ENABLE_TESTING)
   catkin_add_gmock(integrationtest_scanner_api
     test/integration_tests/integrationtest_scanner_api.cpp
     test/src/monitoring_frame_serialization.cpp
-    src/scanner_v2.cpp
-    src/laserscan.cpp
-    src/monitoring_frame_msg.cpp
-    src/monitoring_frame_deserialization.cpp
-    src/scanner_configuration.cpp
-    src/start_request.cpp
-    src/stop_request_serialization.cpp
-    src/diagnostics.cpp
-    src/start_request_serialization.cpp
-    src/scanner_reply_serialization_deserialization.cpp
+    standalone/src/scanner_v2.cpp
+    standalone/src/laserscan.cpp
+    standalone/src/monitoring_frame_msg.cpp
+    standalone/src/monitoring_frame_deserialization.cpp
+    standalone/src/scanner_configuration.cpp
+    standalone/src/start_request.cpp
+    standalone/src/stop_request_serialization.cpp
+    standalone/src/diagnostics.cpp
+    standalone/src/start_request_serialization.cpp
+    standalone/src/scanner_reply_serialization_deserialization.cpp
   )
   target_link_libraries(integrationtest_scanner_api
     ${catkin_LIBRARIES}
@@ -399,10 +357,10 @@ if(CATKIN_ENABLE_TESTING)
   add_rostest_gmock(integrationtest_ros_scanner_node
     test/integration_tests/integrationtest_ros_scanner_node.test
     test/integration_tests/integrationtest_ros_scanner_node.cpp
-    src/laserscan.cpp
-    src/scanner_configuration.cpp
-    src/monitoring_frame_msg.cpp
-    src/diagnostics.cpp
+    standalone/src/laserscan.cpp
+    standalone/src/scanner_configuration.cpp
+    standalone/src/monitoring_frame_msg.cpp
+    standalone/src/diagnostics.cpp
   )
   target_link_libraries(integrationtest_ros_scanner_node
     ${catkin_LIBRARIES}
