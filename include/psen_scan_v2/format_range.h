@@ -26,10 +26,17 @@
 template <typename T>
 std::string formatRange(const T& range)
 {
-  std::stringstream strstr{ "{" };
-  std::for_each(
-      range.begin(), std::prev(range.end()), [&strstr](const auto& el) { strstr << fmt::format("{}", el) << ", "; });
-  strstr << fmt::format("{}", *std::prev(range.end())) << "}";
+  std::stringstream strstr;
+  strstr << "{";
+  for (auto it = range.begin(); std::next(it) < range.end(); ++it)
+  {
+    strstr << fmt::format("{}, ", *it);
+  }
+  if (range.begin() < range.end())
+  {
+    strstr << fmt::format("{}", *std::prev(range.end()));
+  }
+  strstr << "}";
   return strstr.str();
 }
 
