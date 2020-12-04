@@ -24,6 +24,14 @@
 
 #include <fmt/format.h>
 
+/*
+ * The resulting string will look like the following:
+ *   "{Item1, Item2, [...], ItemLast}"
+ * Examples:
+ *   "{1, 2, 3}"
+ *   "{}" (Empty Range)
+ */
+
 template <typename T>
 std::string formatRange(const T& range)
 {
