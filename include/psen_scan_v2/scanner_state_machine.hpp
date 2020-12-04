@@ -143,7 +143,8 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
   PSENSCAN_DEBUG("StateMachine", "Action: handleMonitoringFrame");
   monitoring_frame_watchdog_->reset();
   const monitoring_frame::Message frame{ monitoring_frame::deserialize(event.data_, event.num_bytes_) };
-  PSENSCAN_WARN_THROTTLE(1 /* sec */, "StateMachine", "The scanner reports an error: {}", frame.diagnosticMessages());
+  PSENSCAN_WARN_THROTTLE(
+      1 /* sec */, "StateMachine", "The scanner reports an error: {}", formatRange(frame.diagnosticMessages()));
 
   printUserMsgFor(complete_scan_validator_.validate(frame, DEFAULT_NUM_MSG_PER_ROUND));
   args_->inform_user_about_laser_scan_cb(toLaserScan(frame));

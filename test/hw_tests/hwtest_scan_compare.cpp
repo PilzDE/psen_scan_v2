@@ -28,9 +28,6 @@
 #include <numeric>
 #include <math.h>
 
-#include <fmt/core.h>
-#include <fmt/ostream.h>
-
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
 #include <sensor_msgs/LaserScan.h>
