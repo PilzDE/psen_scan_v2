@@ -57,11 +57,22 @@ target_link_libraries(${PROJECT_NAME}
   ${console_bridge_LIBRARIES}
   ${rosfmt_LIBRARIES}
 )
+target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
+#############
+## Install ##
+#############
+if(CATKIN_ENV)
+  install(DIRECTORY include/psen_scan_v2/
+    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+    FILES_MATCHING PATTERN "*.h"
+    PATTERN ".svn" EXCLUDE
+  )
 
-find_package(catkin REQUIRED COMPONENTS
-  rosconsole_bridge
-  roscpp
-  sensor_msgs
-  rosfmt
-)
+  install(TARGETS
+    ${PROJECT_NAME}
+    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  )
+endif()

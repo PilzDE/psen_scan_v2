@@ -28,19 +28,11 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
 )
 
-## System dependencies are found with CMake's conventions
-find_package(Boost REQUIRED COMPONENTS system)
-
-find_package(console_bridge REQUIRED)
-find_package(fmt REQUIRED)
-
 catkin_package(
   CATKIN_DEPENDS
     rosconsole_bridge
     roscpp
     sensor_msgs
-  DEPENDS
-    console_bridge
 )
 
 
@@ -90,39 +82,20 @@ endif()
 ## Build ##
 ###########
 
-include_directories(
-  standalone/include
-  ${catkin_INCLUDE_DIRS}
-  ${console_bridge_INCLUDE_DIRS}
-)
+add_subdirectory(standalone)
 
-set(${PROJECT_NAME}_sources
-  standalone/src/scanner_v2.cpp
-  standalone/src/laserscan.cpp
-  standalone/src/monitoring_frame_msg.cpp
-  standalone/src/start_request.cpp
-  standalone/src/start_request_serialization.cpp
-  standalone/src/stop_request_serialization.cpp
-  standalone/src/scanner_configuration.cpp
-  standalone/src/monitoring_frame_deserialization.cpp
-  standalone/src/diagnostics.cpp
-  standalone/src/scanner_reply_serialization_deserialization.cpp
+include_directories(
+  ${catkin_INCLUDE_DIRS}
 )
 
 set(${PROJECT_NAME}_node_sources
   src/psen_scan_driver.cpp
 )
 
-add_library(${PROJECT_NAME} ${${PROJECT_NAME}_sources})
-target_link_libraries(${PROJECT_NAME}
-  ${console_bridge_LIBRARIES}
-  fmt::fmt
-)
-
 add_executable(${PROJECT_NAME}_node ${${PROJECT_NAME}_node_sources})
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
-  ${PROJECT_NAME}
+  psen_scan_v2_standalone
 )
 
 #############
@@ -135,14 +108,7 @@ install(DIRECTORY config DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 install(DIRECTORY urdf/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/urdf)
 
-install(DIRECTORY standalone/include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.h"
-  PATTERN ".svn" EXCLUDE
-)
-
 install(TARGETS
-  ${PROJECT_NAME}
   ${PROJECT_NAME}_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -157,6 +123,7 @@ if(CATKIN_ENABLE_TESTING)
   find_package(rostest REQUIRED)
   find_package(roslaunch REQUIRED)
   find_package(pilz_testutils REQUIRED)
+  find_package(fmt REQUIRED)
 
   if(ENABLE_COVERAGE_TESTING)
     find_package(code_coverage REQUIRED)
@@ -166,7 +133,8 @@ if(CATKIN_ENABLE_TESTING)
   roslaunch_add_file_check(launch DEPENDENCIES ${PROJECT_NAME}_node)
 
   include_directories(SYSTEM ${pilz_testutils_INCLUDE_DIRS})
-  include_directories(include
+  include_directories(
+    standalone/include
     test/include
     ${catkin_INCLUDE_DIR}
   )
