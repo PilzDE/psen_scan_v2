@@ -24,14 +24,13 @@
 
 #include <fmt/format.h>
 
-/*
+/**
  * The resulting string will look like the following:
- *   "{Item1, Item2, [...], ItemLast}"
+ * \verbatim "{Item1, Item2, [...], ItemLast}" \endverbatim
  * Examples:
- *   "{1, 2, 3}"
- *   "{}" (Empty Range)
+ * \verbatim "{1, 2, 3}" \endverbatim
+ * \verbatim "{}" (Empty Range) \endverbatim
  */
-
 template <typename T>
 std::string formatRange(const T& range)
 {
