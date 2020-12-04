@@ -212,9 +212,16 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareNotEqualEmpty)
 TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)
 {
   monitoring_frame::Message msg(TenthOfDegree(1234), TenthOfDegree(56), 78, { 45, 44, 43, 42 });
+
+#if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
+  EXPECT_EQ(fmt::format("{}", msg),
+            "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
+            "measures = {45.0, 44.0, 43.0, 42.0}, intensities = {}, diagnostics = {})");
+#else
   EXPECT_EQ(fmt::format("{}", msg),
             "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
             "measures = {45, 44, 43, 42}, intensities = {}, diagnostics = {})");
+#endif
 }
 
 }  // namespace psen_scan_v2
