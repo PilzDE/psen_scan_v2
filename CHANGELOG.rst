@@ -5,6 +5,7 @@ Changelog for package psen_scan_v2
 Forthcoming
 -----------
 * Improved API documentation
+* Directly use fmt library instead of rosfmt
 
 0.1.2 (2020-11-24)
 ------------------

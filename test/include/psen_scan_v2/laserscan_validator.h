@@ -19,10 +19,14 @@
 #include <map>
 #include <stdexcept>
 #include <vector>
-#include "psen_scan_v2/angle_conversions.h"
-#include "psen_scan_v2/dist.h"
+
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 
 #include <ros/ros.h>
+
+#include "psen_scan_v2/angle_conversions.h"
+#include "psen_scan_v2/dist.h"
 
 namespace psen_scan_v2_test
 {

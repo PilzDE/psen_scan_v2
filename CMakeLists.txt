@@ -26,13 +26,13 @@ find_package(catkin REQUIRED COMPONENTS
   rosconsole_bridge
   roscpp
   sensor_msgs
-  rosfmt
 )
 
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS system)
 
 find_package(console_bridge REQUIRED)
+find_package(fmt REQUIRED)
 
 catkin_package(
   CATKIN_DEPENDS
@@ -116,7 +116,7 @@ set(${PROJECT_NAME}_node_sources
 add_library(${PROJECT_NAME} ${${PROJECT_NAME}_sources})
 target_link_libraries(${PROJECT_NAME}
   ${console_bridge_LIBRARIES}
-  ${rosfmt_LIBRARIES}
+  fmt::fmt
 )
 
 add_executable(${PROJECT_NAME}_node ${${PROJECT_NAME}_node_sources})
@@ -186,6 +186,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_raw_processing
     ${catkin_LIBRARIES}
+    fmt::fmt
   )
 
   catkin_add_gtest(unittest_start_request
@@ -230,6 +231,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_udp_client
     ${catkin_LIBRARIES}
+    fmt::fmt
   )
 
   catkin_add_gtest(unittest_tenth_degree_conversion
@@ -255,6 +257,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_laserscan_conversions
     ${catkin_LIBRARIES}
+    fmt::fmt
   )
 
   catkin_add_gtest(unittest_laserscan_ros_conversions
@@ -265,6 +268,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_laserscan_ros_conversions
     ${catkin_LIBRARIES}
+    fmt::fmt
   )
 
   catkin_add_gtest(unittest_scanner_reply_msg
@@ -273,6 +277,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_scanner_reply_msg
     ${catkin_LIBRARIES}
+    fmt::fmt
   )
 
   catkin_add_gtest(unittest_monitoring_frame_msg
@@ -283,6 +288,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_monitoring_frame_msg
     ${catkin_LIBRARIES}
+    fmt::fmt
   )
 
   catkin_add_gtest(unittest_monitoring_frame_serialization_deserialization
@@ -294,6 +300,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_monitoring_frame_serialization_deserialization
     ${catkin_LIBRARIES}
+    fmt::fmt
   )
 
   catkin_add_gmock(unittest_logging
@@ -302,6 +309,7 @@ if(CATKIN_ENABLE_TESTING)
   target_link_libraries(unittest_logging
     ${catkin_LIBRARIES}
     ${console_bridge_LIBRARIES}
+    fmt::fmt
   )
 
   catkin_add_gmock(unittest_monitoring_frame_diagnostic_message
@@ -311,6 +319,7 @@ if(CATKIN_ENABLE_TESTING)
   target_link_libraries(unittest_monitoring_frame_diagnostic_message
     ${catkin_LIBRARIES}
     ${console_bridge_LIBRARIES}
+    fmt::fmt
   )
 
   #########################
@@ -322,25 +331,27 @@ if(CATKIN_ENABLE_TESTING)
   target_link_libraries(integrationtest_udp_client
     ${catkin_LIBRARIES}
     ${pilz_testutils_LIBRARIES}
+    fmt::fmt
   )
 
-catkin_add_gmock(integrationtest_scanner_api
-  test/integration_tests/integrationtest_scanner_api.cpp
-  test/src/monitoring_frame_serialization.cpp
-  src/scanner_v2.cpp
-  src/laserscan.cpp
-  src/monitoring_frame_msg.cpp
-  src/monitoring_frame_deserialization.cpp
-  src/scanner_configuration.cpp
-  src/start_request.cpp
-  src/stop_request_serialization.cpp
-  src/diagnostics.cpp
-  src/start_request_serialization.cpp
-  src/scanner_reply_serialization_deserialization.cpp
-)
-target_link_libraries(integrationtest_scanner_api
-  ${catkin_LIBRARIES}
-  ${pilz_testutils_LIBRARIES}
+  catkin_add_gmock(integrationtest_scanner_api
+    test/integration_tests/integrationtest_scanner_api.cpp
+    test/src/monitoring_frame_serialization.cpp
+    src/scanner_v2.cpp
+    src/laserscan.cpp
+    src/monitoring_frame_msg.cpp
+    src/monitoring_frame_deserialization.cpp
+    src/scanner_configuration.cpp
+    src/start_request.cpp
+    src/stop_request_serialization.cpp
+    src/diagnostics.cpp
+    src/start_request_serialization.cpp
+    src/scanner_reply_serialization_deserialization.cpp
+  )
+  target_link_libraries(integrationtest_scanner_api
+    ${catkin_LIBRARIES}
+    ${pilz_testutils_LIBRARIES}
+    fmt::fmt
   )
 
   add_rostest_gmock(integrationtest_ros_scanner_node
@@ -354,6 +365,7 @@ target_link_libraries(integrationtest_scanner_api
   target_link_libraries(integrationtest_ros_scanner_node
     ${catkin_LIBRARIES}
     ${pilz_testutils_LIBRARIES}
+    fmt::fmt
   )
 
   add_rostest_gmock(unittest_ros_parameter_handler
