@@ -95,7 +95,7 @@ set(${PROJECT_NAME}_node_sources
 add_executable(${PROJECT_NAME}_node ${${PROJECT_NAME}_node_sources})
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
-  psen_scan_v2_standalone
+  ${PROJECT_NAME}
 )
 
 #############

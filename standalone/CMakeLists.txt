@@ -13,8 +13,10 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-cmake_minimum_required(VERSION 2.8.12)
-project(psen_scan_v2_standalone)
+if(NOT DEFINED CATKIN_ENV)
+  cmake_minimum_required(VERSION 2.8.12)
+  project(psen_scan_v2_standalone)
+endif()
 
 add_compile_options(-std=c++14)
 add_compile_options(-Wall)
@@ -60,7 +62,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/i
 ## Install ##
 #############
 if(CATKIN_ENV)
-  install(DIRECTORY include/psen_scan_v2/
+  install(DIRECTORY include/${PROJECT_NAME}/
     DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
     FILES_MATCHING PATTERN "*.h"
     PATTERN ".svn" EXCLUDE
