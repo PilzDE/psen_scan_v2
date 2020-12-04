@@ -24,8 +24,8 @@ add_compile_options(-Werror)
 
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS system)
-
 find_package(console_bridge REQUIRED)
+find_package(fmt REQUIRED)
 
 ###########
 ## Build ##
@@ -33,7 +33,6 @@ find_package(console_bridge REQUIRED)
 
 include_directories(
   include
-  fmt_include
   ${console_bridge_INCLUDE_DIRS}
 )
 
@@ -48,14 +47,12 @@ set(${PROJECT_NAME}_sources
   src/monitoring_frame_deserialization.cpp
   src/diagnostics.cpp
   src/scanner_reply_serialization_deserialization.cpp
-  src/fmt/format.cc
-  src/fmt/os.cc
 )
 
 add_library(${PROJECT_NAME} ${${PROJECT_NAME}_sources})
 target_link_libraries(${PROJECT_NAME}
   ${console_bridge_LIBRARIES}
-  ${rosfmt_LIBRARIES}
+  fmt::fmt
 )
 target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
