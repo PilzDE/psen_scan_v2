@@ -17,6 +17,7 @@
 #define PSEN_SCAN_V2_FORMAT_RANGE_H
 
 #include <algorithm>
+#include <iterator>
 
 #include <sstream>
 #include <string>
