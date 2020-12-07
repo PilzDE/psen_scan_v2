@@ -61,17 +61,17 @@ const TenthOfDegree& LaserScan::getMaxScanAngle() const
 
 const LaserScan::MeasurementData& LaserScan::getMeasurements() const
 {
-  return measures_;
+  return measurements_;
 }
 
-void LaserScan::setMeasurements(const MeasurementData& measures)
+void LaserScan::setMeasurements(const MeasurementData& measurements)
 {
-  measures_ = measures;
+  measurements_ = measurements;
 }
 
 LaserScan::MeasurementData& LaserScan::getMeasurements()
 {
-  return measures_;
+  return measurements_;
 }
 
 const LaserScan::IntensityData& LaserScan::getIntensities() const
@@ -87,8 +87,8 @@ void LaserScan::setIntensities(const IntensityData& intensities)
 bool LaserScan::operator==(const LaserScan& scan) const
 {
   return ((max_scan_angle_ == scan.max_scan_angle_) && (min_scan_angle_ == scan.min_scan_angle_) &&
-          (resolution_ == scan.resolution_) && (measures_.size() == scan.measures_.size()) &&
-          std::equal(measures_.begin(), measures_.end(), scan.measures_.begin()));
+          (resolution_ == scan.resolution_) && (measurements_.size() == scan.measurements_.size()) &&
+          std::equal(measurements_.begin(), measurements_.end(), scan.measurements_.begin()));
 }
 
 }  // namespace psen_scan_v2

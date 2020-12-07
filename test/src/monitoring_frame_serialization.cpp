@@ -51,12 +51,12 @@ DynamicSizeRawData serialize(const monitoring_frame::Message& frame)
     raw_processing::write(os, diagnostic_data_field_payload);
   }
 
-  additional_field::Header measures_header(
-      static_cast<additional_field::Header::Id>(additional_field::HeaderID::measures),
-      frame.measures_.size() * NUMBER_OF_BYTES_SINGLE_MEASURE);
-  write(os, measures_header);
+  additional_field::Header measurements_header(
+      static_cast<additional_field::Header::Id>(additional_field::HeaderID::measurements),
+      frame.measurements_.size() * NUMBER_OF_BYTES_SINGLE_MEASUREMENT);
+  write(os, measurements_header);
   raw_processing::writeArray<uint16_t, double>(
-      os, frame.measures_, [](double elem) { return (static_cast<uint16_t>(std::round(elem * 1000.))); });
+      os, frame.measurements_, [](double elem) { return (static_cast<uint16_t>(std::round(elem * 1000.))); });
 
   if (!frame.intensities_.empty())
   {

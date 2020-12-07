@@ -49,28 +49,28 @@ constexpr uint16_t convertHexdumpBytesToUint16_t(const uint8_t msbyte, const uin
 
 template <size_t ARRAY_SIZE>
 inline std::vector<double>
-readMeasures(const std::array<uint8_t, ARRAY_SIZE> hex_dump, const size_t offset_measures, const size_t n_measures)
+readMeasurements(const std::array<uint8_t, ARRAY_SIZE> hex_dump, const size_t offset_measurements, const size_t n_measurements)
 {
-  std::vector<double> measures;
-  for (size_t idx = offset_measures; idx < (offset_measures + (n_measures * 2)); idx = idx + 2)
+  std::vector<double> measurements;
+  for (size_t idx = offset_measurements; idx < (offset_measurements + (n_measurements * 2)); idx = idx + 2)
   {
     uint16_t raw_value = convertHexdumpBytesToUint16_t(hex_dump.at(idx + 1), hex_dump.at(idx));
-    measures.push_back(raw_value / 1000.);
+    measurements.push_back(raw_value / 1000.);
   }
-  return measures;
+  return measurements;
 }
 
 template <size_t ARRAY_SIZE>
 inline std::vector<double>
-readIntensities(const std::array<uint8_t, ARRAY_SIZE> hex_dump, const size_t offset_measures, const size_t n_measures)
+readIntensities(const std::array<uint8_t, ARRAY_SIZE> hex_dump, const size_t offset_measurements, const size_t n_measurements)
 {
-  std::vector<double> measures;
-  for (size_t idx = offset_measures; idx < (offset_measures + (n_measures * 2)); idx = idx + 2)
+  std::vector<double> measurements;
+  for (size_t idx = offset_measurements; idx < (offset_measurements + (n_measurements * 2)); idx = idx + 2)
   {
     uint16_t raw_value = convertHexdumpBytesToUint16_t(hex_dump.at(idx + 1), hex_dump.at(idx));
-    measures.push_back(raw_value & 0b0011111111111111);
+    measurements.push_back(raw_value & 0b0011111111111111);
   }
-  return measures;
+  return measurements;
 }
 
 class WithIntensitiesAndDiagnostics
@@ -82,7 +82,7 @@ public:
         TenthOfDegree(0x3e8),
         TenthOfDegree(0x02),
         0x00008894,
-        readMeasures(hex_dump, 74, 250),
+        readMeasurements(hex_dump, 74, 250),
         readIntensities(hex_dump, intensities_offset, 250),
         { monitoring_frame::diagnostic::Message(ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(2, 0)),
           monitoring_frame::diagnostic::Message(ScannerId::master,

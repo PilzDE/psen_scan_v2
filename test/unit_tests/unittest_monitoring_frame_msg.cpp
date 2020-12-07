@@ -37,28 +37,28 @@ using namespace psen_scan_v2_test;
 class MonitoringFrameMsgTest : public ::testing::Test
 {
 protected:
-  inline std::istringstream buildExpectedMeasuresStream()
+  inline std::istringstream buildExpectedMeasurementsStream()
   {
     IStringStreamBuilder builder;
-    for (const auto& measure : expected_measures_)
+    for (const auto& measurement : expected_measurements_)
     {
-      builder.add(static_cast<uint16_t>(measure * 1000.));
+      builder.add(static_cast<uint16_t>(measurement * 1000.));
     }
     return builder.get();
   }
 
-  inline bool expectMeasuresPartEqual(const std::vector<double>& measures)
+  inline bool expectMeasurementsPartEqual(const std::vector<double>& measurements)
   {
-    return std::equal(measures.begin(), measures.end(), expected_measures_.begin());
+    return std::equal(measurements.begin(), measurements.end(), expected_measurements_.begin());
   }
 
-  inline bool expectMeasuresEqual(const std::vector<double>& measures)
+  inline bool expectMeasurementsEqual(const std::vector<double>& measurements)
   {
-    return (measures.size() == expected_measures_.size() && expectMeasuresPartEqual(measures));
+    return (measurements.size() == expected_measurements_.size() && expectMeasurementsPartEqual(measurements));
   }
 
 protected:
-  const std::array<double, 3> expected_measures_{ 4.4, 4.3, 4.2 };
+  const std::array<double, 3> expected_measurements_{ 4.4, 4.3, 4.2 };
 };
 
 TEST(MonitoringFrameMsgEqualityTest, testCompareEqualSucces)
@@ -101,7 +101,7 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareEqualIntensitiesEmptySucces)
   EXPECT_EQ(msg0, msg1);
 }
 
-TEST(MonitoringFrameMsgEqualityTest, testCompareMeasuresNotEqual)
+TEST(MonitoringFrameMsgEqualityTest, testCompareMeasurementsNotEqual)
 {
   const monitoring_frame::Message msg0(
       TenthOfDegree(100),
@@ -216,11 +216,11 @@ TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
   EXPECT_EQ(fmt::format("{}", msg),
             "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-            "measures = {45.0, 44.0, 43.0, 42.0}, intensities = {}, diagnostics = {})");
+            "measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {}, diagnostics = {})");
 #else
   EXPECT_EQ(fmt::format("{}", msg),
             "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-            "measures = {45, 44, 43, 42}, intensities = {}, diagnostics = {})");
+            "measurements = {45, 44, 43, 42}, intensities = {}, diagnostics = {})");
 #endif
 }
 
