@@ -24,6 +24,8 @@ add_compile_options(-Wextra)
 add_compile_options(-Wno-unused-parameter)
 add_compile_options(-Werror)
 
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS system)
 find_package(console_bridge REQUIRED)
@@ -53,10 +55,18 @@ set(${PROJECT_NAME}_sources
 
 add_library(${PROJECT_NAME} ${${PROJECT_NAME}_sources})
 target_link_libraries(${PROJECT_NAME}
+  Boost::system
   ${console_bridge_LIBRARIES}
   fmt::fmt
 )
 target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+if(BUILD_EXAMPLE)
+  add_executable(${PROJECT_NAME}_app main.cpp)
+  target_link_libraries(${PROJECT_NAME}_app
+    ${PROJECT_NAME}
+  )
+endif()
 
 #############
 ## Install ##
