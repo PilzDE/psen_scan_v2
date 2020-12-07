@@ -82,7 +82,11 @@ endif()
 ## Build ##
 ###########
 
+#catkin_lint: ignore duplicate_cmd
+#catkin_lint: ignore subproject
 add_subdirectory(standalone)
+#catkin_lint: report duplicate_cmd
+#catkin_lint: report subproject
 
 include_directories(
   ${catkin_INCLUDE_DIRS}
