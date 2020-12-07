@@ -150,7 +150,8 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
   try
   {
     const monitoring_frame::Message frame{ monitoring_frame::deserialize(event.data_, event.num_bytes_) };
-    PSENSCAN_WARN_THROTTLE(1 /* sec */, "StateMachine", "The scanner reports an error: {}", frame.diagnosticMessages());
+    PSENSCAN_WARN_THROTTLE(
+        1 /* sec */, "StateMachine", "The scanner reports an error: {}", formatRange(frame.diagnosticMessages()));
 
     // LCOV_EXCL_START
     if (frame.measurements().size() == 0)
