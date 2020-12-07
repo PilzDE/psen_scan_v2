@@ -48,8 +48,9 @@ constexpr uint16_t convertHexdumpBytesToUint16_t(const uint8_t msbyte, const uin
 }
 
 template <size_t ARRAY_SIZE>
-inline std::vector<double>
-readMeasurements(const std::array<uint8_t, ARRAY_SIZE> hex_dump, const size_t offset_measurements, const size_t n_measurements)
+inline std::vector<double> readMeasurements(const std::array<uint8_t, ARRAY_SIZE> hex_dump,
+                                            const size_t offset_measurements,
+                                            const size_t n_measurements)
 {
   std::vector<double> measurements;
   for (size_t idx = offset_measurements; idx < (offset_measurements + (n_measurements * 2)); idx = idx + 2)
@@ -61,8 +62,9 @@ readMeasurements(const std::array<uint8_t, ARRAY_SIZE> hex_dump, const size_t of
 }
 
 template <size_t ARRAY_SIZE>
-inline std::vector<double>
-readIntensities(const std::array<uint8_t, ARRAY_SIZE> hex_dump, const size_t offset_measurements, const size_t n_measurements)
+inline std::vector<double> readIntensities(const std::array<uint8_t, ARRAY_SIZE> hex_dump,
+                                           const size_t offset_measurements,
+                                           const size_t n_measurements)
 {
   std::vector<double> measurements;
   for (size_t idx = offset_measurements; idx < (offset_measurements + (n_measurements * 2)); idx = idx + 2)
