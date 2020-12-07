@@ -54,7 +54,7 @@ To update your ROS environment from the former `psen_scan` package (which suppor
 
 
 ## Branching model
-`main` is considered to be the active development branch.
+`main` is considered to be the active development branch, it targets the ROS distributions `melodic` and `noetic`.
 
 ## Setup
 
