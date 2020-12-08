@@ -49,7 +49,7 @@ using namespace psen_scan_v2;
 static const std::string SCANNER_IP_ADDRESS{ "127.0.0.1" };
 static const std::string HOST_IP_ADDRESS{ "127.0.0.1" };
 
-static constexpr DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(1) };
+static constexpr DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(60) };
 
 static constexpr std::chrono::milliseconds WAIT_TIMEOUT{ 10 };
 static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 3 };
@@ -89,12 +89,13 @@ static std::vector<double> generateIntensities(const unsigned int& num_elements,
   return vec;
 }
 
-static monitoring_frame::Message createValidMonitoringFrameMsg(const uint32_t scan_counter = 42)
+static monitoring_frame::Message createValidMonitoringFrameMsg(const uint32_t scan_counter = 42,
+                                                               const TenthOfDegree start_angle = TenthOfDegree(0),
+                                                               const TenthOfDegree end_angle = TenthOfDegree(60))
 {
-  const auto from_theta{ TenthOfDegree(10.) };
-  const auto resolution{ TenthOfDegree(90.) };
+  const auto resolution{ TenthOfDegree(10) };
 
-  const unsigned int num_elements{ 6 };
+  const unsigned int num_elements = (end_angle - start_angle) / resolution;
   const double lowest_measurement{ 0. };
   const double highest_measurement{ 10. };
   const std::vector<double> measurements{ generateMeasurements(num_elements, lowest_measurement, highest_measurement) };
@@ -108,7 +109,7 @@ static monitoring_frame::Message createValidMonitoringFrameMsg(const uint32_t sc
   };
 
   return monitoring_frame::Message(
-      from_theta, resolution, scan_counter, measurements, intensities, diagnostic_messages);
+      start_angle, resolution, scan_counter, measurements, intensities, diagnostic_messages);
 }
 
 static std::vector<monitoring_frame::Message> createValidMonitoringFrameMsgs(const uint32_t scan_counter,
