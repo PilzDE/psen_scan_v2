@@ -36,9 +36,9 @@ DynamicSizeRawData serialize(const monitoring_frame::Message& frame)
   raw_processing::write(os, frame.resolution_.value());
 
   additional_field::Header scan_counter_header(
-      static_cast<additional_field::Header::Id>(additional_field::HeaderID::scan_counter), sizeof(frame.scan_counter_));
+      static_cast<additional_field::Header::Id>(additional_field::HeaderID::scan_counter), sizeof(frame.scan_counter_.get()));
   write(os, scan_counter_header);
-  uint32_t scan_counter_header_payload = frame.scan_counter_;
+  uint32_t scan_counter_header_payload = frame.scan_counter_.get();
   raw_processing::write(os, scan_counter_header_payload);
 
   if (frame.diagnostic_data_enabled_)
