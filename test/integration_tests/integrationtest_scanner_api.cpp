@@ -90,8 +90,8 @@ static std::vector<double> generateIntensities(const unsigned int& num_elements,
 }
 
 static monitoring_frame::Message createValidMonitoringFrameMsg(const uint32_t scan_counter = 42,
-                                                               const TenthOfDegree start_angle = TenthOfDegree(0),
-                                                               const TenthOfDegree end_angle = TenthOfDegree(60))
+                                                               const TenthOfDegree start_angle = SCAN_RANGE.getStart(),
+                                                               const TenthOfDegree end_angle = SCAN_RANGE.getEnd())
 {
   const auto resolution{ TenthOfDegree(10) };
 
