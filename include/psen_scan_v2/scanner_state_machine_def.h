@@ -165,11 +165,6 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
     // LCOV_EXCL_START
     if (frame.measurements().size() != expected_size)
     {
-      PSENSCAN_ERROR("StateMachine",
-                     fmt::format("frame.resolution() {}, end_angle {}, args_->config_.scanRange().getStart() {}",
-                                 frame.resolution(),
-                                 end_angle,
-                                 args_->config_.scanRange().getStart()));
       PSENSCAN_ERROR_THROTTLE(1 /* sec */,
                               "StateMachine",
                               "Received frame contained unexpected number of measurements. " +
