@@ -46,7 +46,12 @@ TenthOfDegree monitoring_frame::Message::resolution() const
 
 uint32_t monitoring_frame::Message::scanCounter() const
 {
-  return scan_counter_;
+  if (scan_counter_.is_initialized())
+  {
+    return scan_counter_.get();
+  } else {
+    throw monitoring_frame::ScanCounterMissing();
+  }
 }
 
 const std::vector<double>& monitoring_frame::Message::measurements() const
