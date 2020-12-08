@@ -74,7 +74,7 @@ monitoring_frame::Message deserialize(const MaxSizeRawData& data, const std::siz
                           additional_header.length(),
                           NUMBER_OF_BYTES_SCAN_COUNTER));
         }
-        raw_processing::read(is, msg.scan_counter_);
+        raw_processing::read<uint32_t, boost::optional<uint32_t>>(is, msg.scan_counter_);
         break;
 
       case additional_field::HeaderID::measurements:
