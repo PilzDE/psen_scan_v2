@@ -12,7 +12,7 @@ env:
 jobs:
   testing-repo:
     name: "Build + Test with Testing Repo of melodic (http://packages.ros.org/ros-testing/ubuntu)"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v1
       - uses: 'ros-industrial/industrial_ci@master'
@@ -21,7 +21,7 @@ jobs:
 
   main-repo:
     name: "Build + Test with Main Repo of melodic (http://packages.ros.org/ros/ubuntu)"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-18.04
     continue-on-error: true
     steps:
       - uses: actions/checkout@v1
