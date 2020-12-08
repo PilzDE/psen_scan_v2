@@ -49,7 +49,9 @@ uint32_t monitoring_frame::Message::scanCounter() const
   if (scan_counter_.is_initialized())
   {
     return scan_counter_.get();
-  } else {
+  }
+  else
+  {
     throw monitoring_frame::ScanCounterMissing();
   }
 }
