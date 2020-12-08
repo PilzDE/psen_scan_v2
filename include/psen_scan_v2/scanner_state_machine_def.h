@@ -186,6 +186,12 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
     PSENSCAN_ERROR("StateMachine", e.what());
     // LCOV_EXCL_STOP
   }
+  catch (const monitoring_frame::ScanCounterMissing& e)
+  {
+    // LCOV_EXCL_START
+    PSENSCAN_ERROR("StateMachine", e.what());
+    // LCOV_EXCL_STOP
+  }
 }
 
 inline void ScannerProtocolDef::handleMonitoringFrameTimeout(const scanner_events::MonitoringFrameTimeout& event)
