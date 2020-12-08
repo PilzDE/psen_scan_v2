@@ -101,9 +101,9 @@ public:
   friend monitoring_frame::Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
 };
 
+std::ostream& operator<<(std::ostream& os, const psen_scan_v2::monitoring_frame::Message& msg);
+
 }  // namespace monitoring_frame
 }  // namespace psen_scan_v2
-
-std::ostream& operator<<(std::ostream& os, const psen_scan_v2::monitoring_frame::Message& msg);
 
 #endif  // PSEN_SCAN_V2_MONITORING_FRAME_MSG_H

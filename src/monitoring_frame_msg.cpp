@@ -71,8 +71,8 @@ bool monitoring_frame::Message::operator==(const monitoring_frame::Message& rhs)
           diagnosticMessages() == rhs.diagnosticMessages());
 }
 
-}  // namespace psen_scan_v2
-
+namespace monitoring_frame
+{
 std::ostream& operator<<(std::ostream& os, const psen_scan_v2::monitoring_frame::Message& msg)
 {
   os << fmt::format("monitoring_frame::Message(fromTheta = {} deg, resolution = {} deg, scanCounter = "
@@ -85,3 +85,5 @@ std::ostream& operator<<(std::ostream& os, const psen_scan_v2::monitoring_frame:
                     formatRange(msg.diagnosticMessages()));
   return os;
 }
+}  // namespace monitoring_frame
+}  // namespace psen_scan_v2
