@@ -96,6 +96,11 @@ TEST(TenthOfDegreeTest, LargerThanOrEqualComparison)
   EXPECT_FALSE(TenthOfDegree(1) >= TenthOfDegree(2));
 }
 
+TEST(TenthOfDegreeTest, shouldThrowUnderflowErrorOnCastToIntOfValuesUnderZero)
+{
+  EXPECT_THROW(uint16_t(TenthOfDegree(-1));, std::underflow_error);
+}
+
 }  // namespace psen_scan_v2_test
 
 int main(int argc, char* argv[])
