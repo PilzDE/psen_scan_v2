@@ -16,11 +16,7 @@
 #include <string>
 #include <iostream>
 
-#include "psen_scan_v2/laserscan.h"
-#include "psen_scan_v2/scanner_configuration.h"
-#include "psen_scan_v2/scanner_config_builder.h"
-#include "psen_scan_v2/scanner_v2.h"
-#include "psen_scan_v2/scan_range.h"
+#include <psen_scan_v2/core.h>
 
 using namespace psen_scan_v2;
 
