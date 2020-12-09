@@ -180,18 +180,16 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
     printUserMsgFor(complete_scan_validator_.validate(frame, DEFAULT_NUM_MSG_PER_ROUND));
     args_->inform_user_about_laser_scan_cb(toLaserScan(frame));
   }
+  // LCOV_EXCL_START
   catch (const scanner_reply::CRCMismatch& e)
   {
-    // LCOV_EXCL_START
     PSENSCAN_ERROR("StateMachine", e.what());
-    // LCOV_EXCL_STOP
   }
   catch (const monitoring_frame::ScanCounterMissing& e)
   {
-    // LCOV_EXCL_START
     PSENSCAN_ERROR("StateMachine", e.what());
-    // LCOV_EXCL_STOP
   }
+  // LCOV_EXCL_STOP
 }
 
 inline void ScannerProtocolDef::handleMonitoringFrameTimeout(const scanner_events::MonitoringFrameTimeout& event)
