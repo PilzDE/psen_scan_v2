@@ -16,7 +16,6 @@
 #include <string>
 #include <iostream>
 
-#include "psen_scan_v2/default_parameters.h"
 #include "psen_scan_v2/laserscan.h"
 #include "psen_scan_v2/scanner_configuration.h"
 #include "psen_scan_v2/scanner_config_builder.h"
@@ -24,14 +23,11 @@
 #include "psen_scan_v2/scan_range.h"
 
 using namespace psen_scan_v2;
-using namespace psen_scan_v2::constants;
 
 /*
  * In this section we declare all necessary configuration parameters
  */
 const std::string HOST_IP{ "192.168.0.50" };
-const int HOST_DATA_PORT{ 55115 };
-const int HOST_CONTROL_PORT{ 55116 };
 const std::string SCANNER_IP{ "192.168.0.10" };
 const TenthOfDegree ANGLE_START{ degreeToTenthDegree(0) };
 const TenthOfDegree ANGLE_END{ degreeToTenthDegree(275) };
@@ -56,11 +52,7 @@ int main(int argc, char** argv)
 
   ScannerConfigurationBuilder config_builder;
   config_builder.hostIP(HOST_IP)
-      .hostDataPort(HOST_DATA_PORT)
-      .hostControlPort(HOST_CONTROL_PORT)
       .scannerIp(SCANNER_IP)
-      .scannerDataPort(DATA_PORT_OF_SCANNER_DEVICE)
-      .scannerControlPort(CONTROL_PORT_OF_SCANNER_DEVICE)
       .scanRange(scan_range)
       .enableDiagnostics();
 
