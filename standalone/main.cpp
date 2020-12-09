@@ -33,8 +33,8 @@ const std::string HOST_IP{ "192.168.0.50" };
 const int HOST_DATA_PORT{ 55115 };
 const int HOST_CONTROL_PORT{ 55116 };
 const std::string SCANNER_IP{ "192.168.0.10" };
-const TenthOfDegree ANGLE_START{ 0 };
-const TenthOfDegree ANGLE_END{ 2750 };
+const TenthOfDegree ANGLE_START{ degreeToTenthDegree(0) };
+const TenthOfDegree ANGLE_END{ degreeToTenthDegree(275) };
 
 /*
  * This function is used as a callback every time a new laserscan is received.
