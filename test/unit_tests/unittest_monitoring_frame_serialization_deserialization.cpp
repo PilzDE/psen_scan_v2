@@ -207,17 +207,6 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
                , monitoring_frame::format_error::ScanCounterUnexpectedSize);
 }
 
-TEST_F(MonitoringFrameDeserializationTest, shouldThrowNoScanCounterErrorOnMissingScanCounter)
-{
-  scanner_udp_datagram_hexdumps::WithNoScanCounter with_no_scan_counter;
-  const auto raw_frame_data = convertToMaxSizeRawData(with_no_scan_counter.hex_dump);
-  const auto num_bytes = 2 * with_no_scan_counter.hex_dump.size();
-
-  monitoring_frame::Message msg;
-  msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);
-  EXPECT_THROW(msg.scanCounter(), monitoring_frame::ScanCounterMissing);
-}
-
 }  // namespace psen_scan_v2_test
 
 int main(int argc, char* argv[])

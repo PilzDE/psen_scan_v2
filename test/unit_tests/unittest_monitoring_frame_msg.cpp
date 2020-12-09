@@ -181,7 +181,7 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareResolutionNotEqual)
                              << "\nexpected to be false but was true";
 }
 
-TEST(MonitoringFrameMsgEqualityTest, testCompareScanCounterNotEqual)
+TEST(MonitoringFrameMsgEqualityTest, shouldCompareToFalseOnMessagesWithDifferentCounter)
 {
   const monitoring_frame::Message msg0(
       TenthOfDegree(100),
@@ -199,6 +199,12 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareScanCounterNotEqual)
       { monitoring_frame::diagnostic::Message(ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
                              << "\nexpected to be false but was true";
+}
+
+TEST(MonitoringFrameMsgTest, shouldThrowMissingScanCounterErrorWhenScanCounterWasNeverSet)
+{
+  monitoring_frame::Message msg{};
+  EXPECT_THROW(msg.scanCounter(), monitoring_frame::ScanCounterMissing);
 }
 
 TEST(MonitoringFrameMsgEqualityTest, testCompareNotEqualEmpty)
