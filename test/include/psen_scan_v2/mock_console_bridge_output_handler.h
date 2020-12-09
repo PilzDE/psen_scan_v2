@@ -41,8 +41,7 @@ public:
 #define EXPECT_LOG_SHORT(level, msg)                                                                                   \
   EXPECT_CALL(mock, log(msg, console_bridge::CONSOLE_BRIDGE_LOG_##level, ::testing::_, ::testing::_))
 
-#define EXPECT_ANY_LOG()                                                                                               \
-  EXPECT_CALL(mock, log(::testing::_, ::testing::_, ::testing::_, ::testing::_))
+#define EXPECT_ANY_LOG() EXPECT_CALL(mock, log(::testing::_, ::testing::_, ::testing::_, ::testing::_))
 
 }  // namespace psen_scan_v2_test
 

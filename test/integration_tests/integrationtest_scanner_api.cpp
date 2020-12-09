@@ -542,10 +542,8 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
 
   // Create valid scan round
   const uint32_t scan_counter_valid_round{ 42 };
-  std::vector<monitoring_frame::Message> valid_scan_round_msgs{
-  createValidMonitoringFrameMsgs(scan_counter_valid_round,
-                                                                                               num_scans_per_round)
-                                                                                               };
+  std::vector<monitoring_frame::Message> valid_scan_round_msgs{ createValidMonitoringFrameMsgs(scan_counter_valid_round,
+                                                                                               num_scans_per_round) };
 
   // Create invalid scan round -> invalid because one MonitoringFrame missing
   const uint32_t scan_counter_invalid_round{ scan_counter_valid_round + 1 };
@@ -560,8 +558,8 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(WARN,
-             "StateMachine: Detected dropped MonitoringFrame."
-             " (Please check the ethernet connection or contact PILZ support if the error persists.)")
+                   "StateMachine: Detected dropped MonitoringFrame."
+                   " (Please check the ethernet connection or contact PILZ support if the error persists.)")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
@@ -599,8 +597,8 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
   const std::size_t num_scans_per_round{ 6 };
 
   const uint32_t scan_counter{ 42 };
-  std::vector<monitoring_frame::Message> msgs{ createValidMonitoringFrameMsgs(scan_counter, num_scans_per_round + 1)
-  }; msgs.emplace_back(createValidMonitoringFrameMsg(scan_counter + 1));
+  std::vector<monitoring_frame::Message> msgs{ createValidMonitoringFrameMsgs(scan_counter, num_scans_per_round + 1) };
+  msgs.emplace_back(createValidMonitoringFrameMsg(scan_counter + 1));
 
   ON_CALL(scanner_mock, receiveControlMsg(_, serialize(start_request::Message(config_))))
       .WillByDefault(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
@@ -640,8 +638,8 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFrameReceiveTimeout)
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(WARN,
-             "StateMachine: Timeout while waiting for MonitoringFrame message."
-             " (Please check the ethernet connection or contact PILZ support if the error persists.)")
+                   "StateMachine: Timeout while waiting for MonitoringFrame message."
+                   " (Please check the ethernet connection or contact PILZ support if the error persists.)")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
