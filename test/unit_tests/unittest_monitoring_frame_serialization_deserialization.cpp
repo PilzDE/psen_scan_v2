@@ -215,6 +215,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowNoScanCounterErrorOnMissin
 
   monitoring_frame::Message msg;
   msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);
+  EXPECT_THROW(msg.scanCounter(), monitoring_frame::ScanCounterMissing);
 }
 
 }  // namespace psen_scan_v2_test
