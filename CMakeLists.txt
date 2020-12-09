@@ -89,6 +89,7 @@ add_subdirectory(standalone)
 #catkin_lint: report subproject
 
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -105,6 +106,12 @@ target_link_libraries(${PROJECT_NAME}_node
 #############
 ## Install ##
 #############
+
+install(DIRECTORY include/${PROJECT_NAME}/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN ".svn" EXCLUDE
+)
 
 install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 install(DIRECTORY config DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
