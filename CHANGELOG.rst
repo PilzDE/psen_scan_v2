@@ -4,13 +4,15 @@ Changelog for package psen_scan_v2
 
 Forthcoming
 -----------
+* Add ROS noetic support (`#103 <https://github.com/PilzDE/psen_scan_v2/issues/103>`_)
+* Use TYPED_TEST_SUITE instead of deprecated TYPED_TEST_CASE
+* Apply fixes from clang-format (`#113 <https://github.com/PilzDE/psen_scan_v2/issues/113>`_)
+* Spelling measurements (`#112 <https://github.com/PilzDE/psen_scan_v2/issues/112>`_)
+* Directly use fmt lib instead of rosfmt (`#108 <https://github.com/PilzDE/psen_scan_v2/issues/108>`_)
+* Fix clang tidy errors (`#109 <https://github.com/PilzDE/psen_scan_v2/issues/109>`_)
+* Feature/api documentation improvement (`#100 <https://github.com/PilzDE/psen_scan_v2/issues/100>`_)
+* Improve the API documentation
 * Add ROS Noetic support
-* Add separate CI Badges for Melodic and Noetic.
-* Treat float formatting dependent on fmt version
-* Add targets of main branch to README.md
-* Exclude lines with std::bind from coverage
-* Improved API documentation
-* Directly use fmt library instead of rosfmt
 * Contributors: Pilz GmbH and Co. KG
 
 0.1.2 (2020-11-24)
