@@ -119,7 +119,11 @@ class ParamTestSuite : public ::testing::Test
 };
 
 using TypesToTest = ::testing::Types<StringTestItem, IntTestItem, DoubleTestItem>;
+#if (ROS_VERSION_MINOR > 14)  // ROS noetic implies a higher gtest version
+TYPED_TEST_SUITE(ParamTestSuite, TypesToTest);
+#else
 TYPED_TEST_CASE(ParamTestSuite, TypesToTest);
+#endif
 
 TYPED_TEST(ParamTestSuite, testParamNotOnServer)
 {

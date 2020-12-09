@@ -4,8 +4,14 @@ Changelog for package psen_scan_v2
 
 Forthcoming
 -----------
+* Add ROS Noetic support
+* Add separate CI Badges for Melodic and Noetic.
+* Treat float formatting dependent on fmt version
+* Add targets of main branch to README.md
+* Exclude lines with std::bind from coverage
 * Improved API documentation
 * Directly use fmt library instead of rosfmt
+* Contributors: Pilz GmbH and Co. KG
 
 0.1.2 (2020-11-24)
 ------------------

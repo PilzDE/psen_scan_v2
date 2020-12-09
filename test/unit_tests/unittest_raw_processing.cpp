@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <ros/common.h>
+
 #include <gtest/gtest.h>
 #include <gtest/gtest-typed-test.h>
 #include <sstream>
@@ -30,7 +32,11 @@ class RawProcessingTest : public ::testing::Test
 };
 
 using MyTypes = testing::Types<uint8_t, uint16_t, uint32_t, uint64_t>;
+#if (ROS_VERSION_MINOR > 14)  // ROS noetic implies a higher gtest version
+TYPED_TEST_SUITE(RawProcessingTest, MyTypes);
+#else
 TYPED_TEST_CASE(RawProcessingTest, MyTypes);
+#endif
 
 TYPED_TEST(RawProcessingTest, write)
 {
