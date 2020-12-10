@@ -1,1 +1,0 @@
-/usr/bin/c++   -pthread  -rdynamic CMakeFiles/psen_scan_v2_standalone_app.dir/main.cpp.o  -o psen_scan_v2_standalone_app libpsen_scan_v2_standalone.a /usr/lib/x86_64-linux-gnu/libboost_system.so /usr/lib/x86_64-linux-gnu/libconsole_bridge.so.0.4 /usr/lib/libfmt.a 

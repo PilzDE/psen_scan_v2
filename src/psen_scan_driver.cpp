@@ -20,7 +20,6 @@
 
 #include <ros/ros.h>
 
-
 #include "psen_scan_v2_standalone/default_parameters.h"
 #include "psen_scan_v2_standalone/function_pointers.h"
 #include "psen_scan_v2_standalone/scanner_configuration.h"

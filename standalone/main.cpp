@@ -36,7 +36,7 @@ void laserScanCallback(const LaserScan& scan)
 {
   LaserScan::MeasurementData measures = scan.getMeasurements();
 
-  for(auto it = measures.cbegin(); it < measures.cend(); ++it)
+  for (auto it = measures.cbegin(); it < measures.cend(); ++it)
   {
     std::cout << *it;
   }
@@ -48,17 +48,15 @@ int main(int argc, char** argv)
   DefaultScanRange scan_range{ ANGLE_START, ANGLE_END };
 
   ScannerConfigurationBuilder config_builder;
-  config_builder.hostIP(HOST_IP)
-      .scannerIp(SCANNER_IP)
-      .scanRange(scan_range)
-      .enableDiagnostics();
+  config_builder.hostIP(HOST_IP).scannerIp(SCANNER_IP).scanRange(scan_range).enableDiagnostics();
 
   ScannerConfiguration scanner_configuration{ config_builder.build() };
 
   ScannerV2 scanner(scanner_configuration, laserScanCallback);
   scanner.start();
 
-  while(1);
+  while (1)
+    ;
 
   return 0;
 }

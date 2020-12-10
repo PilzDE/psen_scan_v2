@@ -109,4 +109,4 @@ void write(std::ostringstream& os, const additional_field::Header& header)
 }
 
 }  // namespace monitoring_frame
-}  // namespace psen_scan_v2
+}  // namespace psen_scan_v2_standalone

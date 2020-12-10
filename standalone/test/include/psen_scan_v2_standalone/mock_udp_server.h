@@ -120,7 +120,8 @@ void MockUDPServer::handleSend(const boost::system::error_code& error, std::size
 }
 
 template <unsigned int N>
-void MockUDPServer::asyncSend(const udp::endpoint& receiver_of_data, const psen_scan_v2_standalone::FixedSizeRawData<N>& data)
+void MockUDPServer::asyncSend(const udp::endpoint& receiver_of_data,
+                              const psen_scan_v2_standalone::FixedSizeRawData<N>& data)
 {
   io_service_.post([this, receiver_of_data, data]() {
     socket_.async_send_to(boost::asio::buffer(data),
