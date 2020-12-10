@@ -208,12 +208,12 @@ private:
   monitoring_frame::ScanValidator complete_scan_validator_;
 };
 
-#include "psen_scan_v2/scanner_state_machine_def.h"
-
 // Pick a back-end
 using ScannerStateMachine = msm::back::state_machine<ScannerProtocolDef>;
 
 }  // namespace scanner_protocol
 }  // namespace psen_scan_v2
+
+#include "psen_scan_v2/scanner_state_machine_def.h"
 
 #endif  // PSEN_SCAN_V2_SCANNER_PROTOCOL_DEF_H
