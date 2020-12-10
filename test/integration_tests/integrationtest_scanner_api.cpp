@@ -24,14 +24,9 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <pilz_testutils/mock_appender.h>
-#include <pilz_testutils/logger_mock.h>
-
-#include <rosconsole_bridge/bridge.h>
-REGISTER_ROSCONSOLE_BRIDGE;
-
 // Test frameworks
 #include "psen_scan_v2/async_barrier.h"
+#include "psen_scan_v2/mock_console_bridge_output_handler.h"
 #include "psen_scan_v2/mock_udp_server.h"
 #include "psen_scan_v2/udp_frame_dumps.h"
 #include "psen_scan_v2/raw_data_array_conversion.h"
@@ -64,7 +59,6 @@ using std::placeholders::_2;
 
 using namespace ::testing;
 using namespace std::chrono_literals;
-using namespace pilz_testutils;
 
 static double randDouble(double low, double high)
 {
@@ -424,7 +418,7 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStopIsCalledSecondTime)
 
 TEST_F(ScannerAPITests, testStartReplyTimeout)
 {
-  NiceMock<pilz_testutils::LoggerMock> ros_log_mock;
+  INJECT_NICE_LOG_MOCK;
   StrictMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
   ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
@@ -436,14 +430,15 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
     EXPECT_CALL(scanner_mock, receiveControlMsg(_, _)).Times(1);
     EXPECT_CALL(scanner_mock, receiveControlMsg(_, _)).Times(1).WillOnce(OpenBarrier(&twice_called_barrier));
   }
-  EXPECT_LOG(*ros_log_mock, INFO, "Start scanner called.").Times(1);
-  EXPECT_LOG(*ros_log_mock,
-             ERROR,
-             "Timeout while waiting for the scanner to start! Retrying... "
-             "(Please check the ethernet connection or contact PILZ support if the error persists.)")
+
+  EXPECT_LOG_SHORT(DEBUG, _).Times(AnyNumber());
+  EXPECT_LOG_SHORT(INFO, "Scanner: Start scanner called.").Times(1);
+  EXPECT_LOG_SHORT(ERROR,
+                   "StateMachine: Timeout while waiting for the scanner to start! Retrying... "
+                   "(Please check the ethernet connection or contact PILZ support if the error persists.)")
       .Times(AtLeast(1))
       .WillOnce(OpenBarrier(&error_msg_barrier));
-  EXPECT_LOG(*ros_log_mock, INFO, "Scanner started successfully.").Times(1);
+  EXPECT_LOG_SHORT(INFO, "ScannerController: Scanner started successfully.").Times(1);
 
   scanner_mock.startContinuousListeningForControlMsg();
   const auto start_future{ std::async(std::launch::async, [&scanner]() {
@@ -459,7 +454,7 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
 
 TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFrameMsg)
 {
-  pilz_testutils::LoggerMock ros_log_mock;
+  INJECT_LOG_MOCK;
   StrictMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
 
@@ -478,12 +473,12 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
     EXPECT_CALL(cb, LaserScanCallback(toLaserScan(msg))).WillOnce(OpenBarrier(&monitoring_frame_barrier));
   }
 
-  EXPECT_LOG(*ros_log_mock, INFO, "Start scanner called.").Times(1);
-  EXPECT_LOG(*ros_log_mock, INFO, "Scanner started successfully.").Times(1);
-  EXPECT_LOG(*ros_log_mock,
-             WARN,
-             "The scanner reports an error: {Device: Master - Alarm: The front panel of the safety laser scanner must "
-             "be cleaned.}")
+  EXPECT_LOG_SHORT(DEBUG, _).Times(AnyNumber());
+  EXPECT_LOG_SHORT(INFO, "Scanner: Start scanner called.").Times(1);
+  EXPECT_LOG_SHORT(INFO, "ScannerController: Scanner started successfully.").Times(1);
+  EXPECT_LOG_SHORT(WARN,
+                   "StateMachine: The scanner reports an error: {Device: Master - Alarm: The front panel of the safety "
+                   "laser scanner must be cleaned.}")
       .Times(1)
       .WillOnce(OpenBarrier(&diagnostic_barrier));
 
@@ -499,7 +494,7 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
 
 TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFrame)
 {
-  NiceMock<pilz_testutils::LoggerMock> ros_log_mock;
+  INJECT_NICE_LOG_MOCK;
   NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
   ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
@@ -512,8 +507,8 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
 
   Barrier empty_msg_received;
   // Needed to allow all other log messages which might be received
-  EXPECT_CALL(*ros_log_mock, internal_append(::testing::_, ::testing::_)).Times(AnyNumber());
-  EXPECT_LOG(*ros_log_mock, WARN, "No transition in state 2 for event MonitoringFrameReceivedError.")
+  EXPECT_ANY_LOG().Times(AnyNumber());
+  EXPECT_LOG_SHORT(WARN, "StateMachine: No transition in state 2 for event MonitoringFrameReceivedError.")
       .Times(1)
       .WillOnce(OpenBarrier(&empty_msg_received));
 
@@ -537,7 +532,7 @@ TEST_F(ScannerAPITests, shouldThrowWhenConstructedWithInvalidLaserScanCallback)
 
 TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
 {
-  pilz_testutils::LoggerMock ros_log_mock;
+  INJECT_LOG_MOCK;
   NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   NiceMock<UserCallbacks> cb;
 
@@ -561,11 +556,10 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
 
   Barrier user_msg_barrier;
   // Needed to allow all other log messages which might be received
-  EXPECT_CALL(*ros_log_mock, internal_append(::testing::_, ::testing::_)).Times(AnyNumber());
-  EXPECT_LOG(*ros_log_mock,
-             WARN,
-             "Detected dropped MonitoringFrame."
-             " (Please check the ethernet connection or contact PILZ support if the error persists.)")
+  EXPECT_ANY_LOG().Times(AnyNumber());
+  EXPECT_LOG_SHORT(WARN,
+                   "StateMachine: Detected dropped MonitoringFrame."
+                   " (Please check the ethernet connection or contact PILZ support if the error persists.)")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
@@ -594,7 +588,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
 
 TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
 {
-  pilz_testutils::LoggerMock ros_log_mock;
+  INJECT_LOG_MOCK;
   NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   NiceMock<UserCallbacks> cb;
 
@@ -611,8 +605,8 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
 
   Barrier user_msg_barrier;
   // Needed to allow all other log messages which might be received
-  EXPECT_CALL(*ros_log_mock, internal_append(::testing::_, ::testing::_)).Times(AnyNumber());
-  EXPECT_LOG(*ros_log_mock, WARN, "Unexpected: Too many MonitoringFrames for one scan round received.")
+  EXPECT_ANY_LOG().Times(AnyNumber());
+  EXPECT_LOG_SHORT(WARN, "StateMachine: Unexpected: Too many MonitoringFrames for one scan round received.")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
@@ -632,7 +626,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
 
 TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFrameReceiveTimeout)
 {
-  pilz_testutils::LoggerMock ros_log_mock;
+  INJECT_LOG_MOCK;
   NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
   ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
@@ -642,11 +636,10 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFrameReceiveTimeout)
 
   Barrier user_msg_barrier;
   // Needed to allow all other log messages which might be received
-  EXPECT_CALL(*ros_log_mock, internal_append(::testing::_, ::testing::_)).Times(AnyNumber());
-  EXPECT_LOG(*ros_log_mock,
-             WARN,
-             "Timeout while waiting for MonitoringFrame message."
-             " (Please check the ethernet connection or contact PILZ support if the error persists.)")
+  EXPECT_ANY_LOG().Times(AnyNumber());
+  EXPECT_LOG_SHORT(WARN,
+                   "StateMachine: Timeout while waiting for MonitoringFrame message."
+                   " (Please check the ethernet connection or contact PILZ support if the error persists.)")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 

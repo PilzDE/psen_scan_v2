@@ -32,7 +32,7 @@ class RawProcessingTest : public ::testing::Test
 };
 
 using MyTypes = testing::Types<uint8_t, uint16_t, uint32_t, uint64_t>;
-#if (ROS_VERSION_MINOR > 14)  // ROS noetic implies a higher gtest version
+#ifdef TYPED_TEST_SUITE  // in this case TYPED_TEST_CASE is deprecated
 TYPED_TEST_SUITE(RawProcessingTest, MyTypes);
 #else
 TYPED_TEST_CASE(RawProcessingTest, MyTypes);
