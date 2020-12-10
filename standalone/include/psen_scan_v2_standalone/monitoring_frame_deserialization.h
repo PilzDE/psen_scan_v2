@@ -46,7 +46,7 @@ static constexpr uint32_t OP_CODE_MONITORING_FRAME{ 0xCA };
 static constexpr uint32_t ONLINE_WORKING_MODE{ 0x00 };
 static constexpr uint32_t GUI_MONITORING_TRANSACTION{ 0x05 };
 static constexpr uint16_t NUMBER_OF_BYTES_SCAN_COUNTER{ 4 };
-static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_MEASURE{ 2 };
+static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_MEASUREMENT{ 2 };
 static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_INTENSITY{ 2 };
 
 /**
@@ -132,7 +132,7 @@ enum class HeaderID : Header::Id
 {
   scan_counter = 0x02,
   diagnostics = 0x04,
-  measures = 0x05,
+  measurements = 0x05,
   intensities = 0x06,
   end_of_frame = 0x09
 };

@@ -119,7 +119,11 @@ class ParamTestSuite : public ::testing::Test
 };
 
 using TypesToTest = ::testing::Types<StringTestItem, IntTestItem, DoubleTestItem>;
+#ifdef TYPED_TEST_SUITE  // in this case TYPED_TEST_CASE is deprecated
+TYPED_TEST_SUITE(ParamTestSuite, TypesToTest);
+#else
 TYPED_TEST_CASE(ParamTestSuite, TypesToTest);
+#endif
 
 TYPED_TEST(ParamTestSuite, testParamNotOnServer)
 {

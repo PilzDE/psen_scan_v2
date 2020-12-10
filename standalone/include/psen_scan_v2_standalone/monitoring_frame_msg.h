@@ -51,11 +51,11 @@ public:
   Message(const TenthOfDegree& from_theta,
           const TenthOfDegree& resolution,
           const uint32_t scan_counter,
-          const std::vector<double>& measures)
+          const std::vector<double>& measurements)
     : from_theta_(from_theta)
     , resolution_(resolution)
     , scan_counter_(scan_counter)
-    , measures_(measures)
+    , measurements_(measurements)
     , diagnostic_data_enabled_(false){
 
     };
@@ -63,13 +63,13 @@ public:
   Message(const TenthOfDegree& from_theta,
           const TenthOfDegree& resolution,
           const uint32_t scan_counter,
-          const std::vector<double>& measures,
+          const std::vector<double>& measurements,
           const std::vector<double>& intensities,
           const std::vector<monitoring_frame::diagnostic::Message>& diagnostic_messages)
     : from_theta_(from_theta)
     , resolution_(resolution)
     , scan_counter_(scan_counter)
-    , measures_(measures)
+    , measurements_(measurements)
     , intensities_(intensities)
     , diagnostic_messages_(diagnostic_messages)
     , diagnostic_data_enabled_(true){
@@ -80,7 +80,7 @@ public:
   TenthOfDegree fromTheta() const;
   TenthOfDegree resolution() const;
   uint32_t scanCounter() const;
-  const std::vector<double>& measures() const;
+  const std::vector<double>& measurements() const;
   const std::vector<double>& intensities() const;
   std::vector<monitoring_frame::diagnostic::Message> diagnosticMessages() const;
   bool operator==(const monitoring_frame::Message& rhs) const;
@@ -91,7 +91,7 @@ private:
   TenthOfDegree resolution_{ 0 };
 
   uint32_t scan_counter_{ 0 };
-  std::vector<double> measures_;
+  std::vector<double> measurements_;
   std::vector<double> intensities_;
   std::vector<monitoring_frame::diagnostic::Message> diagnostic_messages_;
   bool diagnostic_data_enabled_{ false };
@@ -101,9 +101,9 @@ public:
   friend monitoring_frame::Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
 };
 
+std::ostream& operator<<(std::ostream& os, const psen_scan_v2_standalone::monitoring_frame::Message& msg);
+
 }  // namespace monitoring_frame
 }  // namespace psen_scan_v2_standalone
-
-std::ostream& operator<<(std::ostream& os, const psen_scan_v2_standalone::monitoring_frame::Message& msg);
 
 #endif  // PSEN_SCAN_V2_STANDALONE_MONITORING_FRAME_MSG_H

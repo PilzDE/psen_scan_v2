@@ -45,8 +45,8 @@ static LaserScan createScan()
   const TenthOfDegree angle_increment{ 1 };
 
   LaserScan laserscan(angle_increment, angle_min_raw, angle_max_raw);
-  const LaserScan::MeasurementData measures{ 1., 2., 3. };
-  laserscan.setMeasurements(measures);
+  const LaserScan::MeasurementData measurements{ 1., 2., 3. };
+  laserscan.setMeasurements(measurements);
 
   const LaserScan::IntensityData intensities{ 707., 304., 0. };
   laserscan.setIntensities(intensities);

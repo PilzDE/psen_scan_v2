@@ -62,7 +62,7 @@ public:
 
 private:
   //! Measurement data of the laserscan (in Millimeters).
-  MeasurementData measures_;
+  MeasurementData measurements_;
   //! Stores the received normalized signal intensities.
   IntensityData intensities_;
   //! Distance of angle between the measurements (in radian).
