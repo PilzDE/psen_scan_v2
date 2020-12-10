@@ -1,0 +1,1 @@
+/usr/bin/c++   -pthread  -rdynamic CMakeFiles/unittest_tenth_of_degree.dir/test/unit_tests/unittest_tenth_of_degree.cpp.o  -o unittest_tenth_of_degree /usr/lib/x86_64-linux-gnu/libboost_system.so -lgtest 

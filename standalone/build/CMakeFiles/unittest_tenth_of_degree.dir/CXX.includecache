@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/psen_scan_v2_standalone/angle_conversions.h
+sstream
+-
+stdexcept
+-
+boost/math/constants/constants.hpp
+-
+
+../include/psen_scan_v2_standalone/tenth_of_degree.h
+psen_scan_v2_standalone/angle_conversions.h
+../include/psen_scan_v2_standalone/psen_scan_v2_standalone/angle_conversions.h
+
+/home/rosuser/catkin_ws/src/psen_scan_v2/standalone/test/unit_tests/unittest_tenth_of_degree.cpp
+gtest/gtest.h
+-
+psen_scan_v2_standalone/angle_conversions.h
+/home/rosuser/catkin_ws/src/psen_scan_v2/standalone/test/unit_tests/psen_scan_v2_standalone/angle_conversions.h
+psen_scan_v2_standalone/tenth_of_degree.h
+/home/rosuser/catkin_ws/src/psen_scan_v2/standalone/test/unit_tests/psen_scan_v2_standalone/tenth_of_degree.h
+

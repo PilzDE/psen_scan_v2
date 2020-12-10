@@ -146,6 +146,7 @@ if(CATKIN_ENABLE_TESTING)
   include_directories(SYSTEM ${pilz_testutils_INCLUDE_DIRS})
   include_directories(
     standalone/include
+    standalone/test/include
     test/include
     ${catkin_INCLUDE_DIR}
   )
@@ -161,7 +162,7 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gtest(unittest_raw_processing
-    test/unit_tests/unittest_raw_processing.cpp
+    standalone/test/unit_tests/unittest_raw_processing.cpp
   )
   target_link_libraries(unittest_raw_processing
     ${catkin_LIBRARIES}
@@ -169,7 +170,7 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gtest(unittest_start_request
-    test/unit_tests/unittest_start_request.cpp
+    standalone/test/unit_tests/unittest_start_request.cpp
     standalone/src/start_request.cpp
     standalone/src/scanner_configuration.cpp
     standalone/src/start_request_serialization.cpp
@@ -179,7 +180,7 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gtest(unittest_stop_request
-    test/unit_tests/unittest_stop_request.cpp
+    standalone/test/unit_tests/unittest_stop_request.cpp
     standalone/src/stop_request_serialization.cpp
   )
   target_link_libraries(unittest_stop_request
@@ -187,14 +188,14 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gtest(unittest_scan_range
-    test/unit_tests/unittest_scan_range.cpp
+    standalone/test/unit_tests/unittest_scan_range.cpp
   )
   target_link_libraries(unittest_scan_range
     ${catkin_LIBRARIES}
   )
 
   catkin_add_gtest(unittest_scanner_configuration
-    test/unit_tests/unittest_scanner_configuration.cpp
+    standalone/test/unit_tests/unittest_scanner_configuration.cpp
     standalone/src/scanner_configuration.cpp
   )
   target_link_libraries(unittest_scanner_configuration
@@ -202,11 +203,11 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gmock(unittest_tenth_of_degree
-    test/unit_tests/unittest_tenth_of_degree.cpp
+    standalone/test/unit_tests/unittest_tenth_of_degree.cpp
   )
 
   catkin_add_gmock(unittest_udp_client
-    test/unit_tests/unittest_udp_client.cpp
+    standalone/test/unit_tests/unittest_udp_client.cpp
   )
   target_link_libraries(unittest_udp_client
     ${catkin_LIBRARIES}
@@ -214,14 +215,14 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gtest(unittest_tenth_degree_conversion
-    test/unit_tests/unittest_tenth_degree_conversion.cpp
+    standalone/test/unit_tests/unittest_tenth_degree_conversion.cpp
   )
   target_link_libraries(unittest_tenth_degree_conversion
     ${catkin_LIBRARIES}
   )
 
   catkin_add_gtest(unittest_laserscan
-    test/unit_tests/unittest_laserscan.cpp
+    standalone/test/unit_tests/unittest_laserscan.cpp
     standalone/src/laserscan.cpp
   )
   target_link_libraries(unittest_laserscan
@@ -229,7 +230,7 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gtest(unittest_laserscan_conversions
-    test/unit_tests/unittest_laserscan_conversions.cpp
+    standalone/test/unit_tests/unittest_laserscan_conversions.cpp
     standalone/src/laserscan.cpp
     standalone/src/monitoring_frame_msg.cpp
     standalone/src/diagnostics.cpp
@@ -251,7 +252,7 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gtest(unittest_scanner_reply_msg
-    test/unit_tests/unittest_scanner_reply_msg.cpp
+    standalone/test/unit_tests/unittest_scanner_reply_msg.cpp
     standalone/src/scanner_reply_serialization_deserialization.cpp
   )
   target_link_libraries(unittest_scanner_reply_msg
@@ -260,7 +261,7 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gtest(unittest_monitoring_frame_msg
-    test/unit_tests/unittest_monitoring_frame_msg.cpp
+    standalone/test/unit_tests/unittest_monitoring_frame_msg.cpp
     standalone/src/monitoring_frame_msg.cpp
     standalone/src/diagnostics.cpp
     standalone/src/monitoring_frame_deserialization.cpp
@@ -274,8 +275,8 @@ if(CATKIN_ENABLE_TESTING)
     standalone/src/monitoring_frame_msg.cpp
     standalone/src/monitoring_frame_deserialization.cpp
     standalone/src/diagnostics.cpp
-    test/unit_tests/unittest_monitoring_frame_serialization_deserialization.cpp
-    test/src/monitoring_frame_serialization.cpp
+    standalone/test/unit_tests/unittest_monitoring_frame_serialization_deserialization.cpp
+    standalone/test/src/monitoring_frame_serialization.cpp
   )
   target_link_libraries(unittest_monitoring_frame_serialization_deserialization
     ${catkin_LIBRARIES}
@@ -283,7 +284,7 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gmock(unittest_logging
-    test/unit_tests/unittest_logging.cpp
+    standalone/test/unit_tests/unittest_logging.cpp
   )
   target_link_libraries(unittest_logging
     ${catkin_LIBRARIES}
@@ -293,7 +294,7 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gmock(unittest_monitoring_frame_diagnostic_message
     standalone/src/diagnostics.cpp
-    test/unit_tests/unittest_monitoring_frame_diagnostic_message.cpp
+    standalone/test/unit_tests/unittest_monitoring_frame_diagnostic_message.cpp
   )
   target_link_libraries(unittest_monitoring_frame_diagnostic_message
     ${catkin_LIBRARIES}
@@ -305,7 +306,7 @@ if(CATKIN_ENABLE_TESTING)
   ##  Integration-Tests  ##
   #########################
   catkin_add_gmock(integrationtest_udp_client
-    test/integration_tests/integrationtest_udp_client.cpp
+    standalone/test/integration_tests/integrationtest_udp_client.cpp
   )
   target_link_libraries(integrationtest_udp_client
     ${catkin_LIBRARIES}
@@ -314,8 +315,8 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gmock(integrationtest_scanner_api
-    test/integration_tests/integrationtest_scanner_api.cpp
-    test/src/monitoring_frame_serialization.cpp
+    standalone/test/integration_tests/integrationtest_scanner_api.cpp
+    standalone/test/src/monitoring_frame_serialization.cpp
     standalone/src/scanner_v2.cpp
     standalone/src/laserscan.cpp
     standalone/src/monitoring_frame_msg.cpp
