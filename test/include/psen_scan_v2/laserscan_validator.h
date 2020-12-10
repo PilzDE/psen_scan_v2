@@ -25,7 +25,8 @@
 
 #include <ros/ros.h>
 
-#include "psen_scan_v2/angle_conversions.h"
+#include "psen_scan_v2_standalone/angle_conversions.h"
+
 #include "psen_scan_v2/dist.h"
 
 namespace psen_scan_v2_test
@@ -39,7 +40,7 @@ void addScanToBin(const sensor_msgs::LaserScanConstPtr& scan, std::map<int16_t, 
 
   for (size_t i = 0; i < scan->ranges.size(); ++i)
   {
-    auto bin_addr = psen_scan_v2::radToTenthDegree(scan->angle_min + scan->angle_increment * i);
+    auto bin_addr = psen_scan_v2_standalone::radToTenthDegree(scan->angle_min + scan->angle_increment * i);
 
     if (bin.find(bin_addr) == bin.end())
     {

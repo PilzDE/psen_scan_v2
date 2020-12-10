@@ -21,8 +21,8 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "psen_scan_v2/raw_scanner_data.h"
-#include "psen_scan_v2/udp_client.h"
+#include "psen_scan_v2_standalone/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/udp_client.h"
 
 namespace psen_scan_v2_test
 {
@@ -37,7 +37,7 @@ using std::placeholders::_2;
 class CallbackHandler
 {
 public:
-  MOCK_METHOD2(handleNewData, void(const psen_scan_v2::MaxSizeRawData&, const std::size_t&));
+  MOCK_METHOD2(handleNewData, void(const psen_scan_v2_standalone::MaxSizeRawData&, const std::size_t&));
   MOCK_METHOD1(handleError, void(const std::string&));
 };
 
@@ -45,7 +45,7 @@ TEST(UdpClientTests, testInvalidNewDataHandler)
 {
   CallbackHandler handler;
 
-  EXPECT_THROW(psen_scan_v2::UdpClientImpl reader(nullptr,
+  EXPECT_THROW(psen_scan_v2_standalone::UdpClientImpl reader(nullptr,
                                                   std::bind(&CallbackHandler::handleError, &handler, _1),
                                                   HOST_UDP_READ_PORT,
                                                   inet_network(UDP_MOCK_IP_ADDRESS.c_str()),
@@ -57,7 +57,7 @@ TEST(UdpClientTests, testInvalidErrorHandler)
 {
   CallbackHandler handler;
 
-  EXPECT_THROW(psen_scan_v2::UdpClientImpl reader(std::bind(&CallbackHandler::handleNewData, &handler, _1, _2),
+  EXPECT_THROW(psen_scan_v2_standalone::UdpClientImpl reader(std::bind(&CallbackHandler::handleNewData, &handler, _1, _2),
                                                   nullptr,
                                                   HOST_UDP_READ_PORT,
                                                   inet_network(UDP_MOCK_IP_ADDRESS.c_str()),
@@ -67,15 +67,15 @@ TEST(UdpClientTests, testInvalidErrorHandler)
 
 TEST(UdpClientTests, testCloseConnectionFailureForCompleteCoverage)
 {
-  std::unique_ptr<psen_scan_v2::UdpClientImpl::CloseConnectionFailure> ex{
-    new psen_scan_v2::UdpClientImpl::CloseConnectionFailure()
+  std::unique_ptr<psen_scan_v2_standalone::UdpClientImpl::CloseConnectionFailure> ex{
+    new psen_scan_v2_standalone::UdpClientImpl::CloseConnectionFailure()
   };
 }
 
 TEST(UdpClientTests, testOpenConnectionFailureForCompleteCoverage)
 {
-  std::unique_ptr<psen_scan_v2::UdpClientImpl::OpenConnectionFailure> ex{
-    new psen_scan_v2::UdpClientImpl::OpenConnectionFailure()
+  std::unique_ptr<psen_scan_v2_standalone::UdpClientImpl::OpenConnectionFailure> ex{
+    new psen_scan_v2_standalone::UdpClientImpl::OpenConnectionFailure()
   };
 }
 

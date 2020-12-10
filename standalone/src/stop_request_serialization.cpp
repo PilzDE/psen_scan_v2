@@ -13,17 +13,17 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "psen_scan_v2/stop_request_serialization.h"
+#include "psen_scan_v2_standalone/stop_request_serialization.h"
 
 #include <iostream>
 
 #include <boost/crc.hpp>
 
-#include "psen_scan_v2/raw_processing.h"
+#include "psen_scan_v2_standalone/raw_processing.h"
 
-namespace psen_scan_v2
+namespace psen_scan_v2_standalone
 {
-psen_scan_v2::DynamicSizeRawData psen_scan_v2::stop_request::serialize()
+psen_scan_v2_standalone::DynamicSizeRawData psen_scan_v2_standalone::stop_request::serialize()
 {
   std::ostringstream os;
 
@@ -37,4 +37,4 @@ psen_scan_v2::DynamicSizeRawData psen_scan_v2::stop_request::serialize()
 
   return raw_processing::toArray<DynamicSizeRawData>(os);
 }
-}  // namespace psen_scan_v2
+}  // namespace psen_scan_v2_standalone

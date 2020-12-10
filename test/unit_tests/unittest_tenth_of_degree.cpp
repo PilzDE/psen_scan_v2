@@ -15,10 +15,10 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2/angle_conversions.h"
-#include "psen_scan_v2/tenth_of_degree.h"
+#include "psen_scan_v2_standalone/angle_conversions.h"
+#include "psen_scan_v2_standalone/tenth_of_degree.h"
 
-using namespace psen_scan_v2;
+using namespace psen_scan_v2_standalone;
 
 namespace psen_scan_v2_test
 {

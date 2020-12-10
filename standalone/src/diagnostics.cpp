@@ -15,17 +15,17 @@
 
 #include <fmt/format.h>
 
-#include "psen_scan_v2/diagnostics.h"
+#include "psen_scan_v2_standalone/diagnostics.h"
 
-using namespace psen_scan_v2;
+using namespace psen_scan_v2_standalone;
 
-namespace psen_scan_v2
+namespace psen_scan_v2_standalone
 {
 namespace monitoring_frame
 {
 namespace diagnostic
 {
-std::ostream& operator<<(std::ostream& os, const psen_scan_v2::monitoring_frame::diagnostic::Message& msg)
+std::ostream& operator<<(std::ostream& os, const psen_scan_v2_standalone::monitoring_frame::diagnostic::Message& msg)
 {
   os << fmt::format(
       "Device: {} - {}", scanner_id_to_string.at(msg.getScannerId()), error_code_to_string.at(msg.getDiagnosticCode()));
@@ -40,4 +40,4 @@ std::ostream& operator<<(std::ostream& os, const psen_scan_v2::monitoring_frame:
 
 }  // namespace diagnostic
 }  // namespace monitoring_frame
-}  // namespace psen_scan_v2
+}  // namespace psen_scan_v2_standalone

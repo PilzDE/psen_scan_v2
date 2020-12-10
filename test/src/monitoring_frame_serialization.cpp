@@ -15,11 +15,12 @@
 
 #include <ostream>
 
-#include "psen_scan_v2/raw_processing.h"
-#include "psen_scan_v2/monitoring_frame_serialization.h"
-#include "psen_scan_v2/monitoring_frame_deserialization.h"
+#include "psen_scan_v2_standalone/raw_processing.h"
+#include "psen_scan_v2_standalone/monitoring_frame_deserialization.h"
 
-namespace psen_scan_v2
+#include "psen_scan_v2/monitoring_frame_serialization.h"
+
+namespace psen_scan_v2_standalone
 {
 namespace monitoring_frame
 {

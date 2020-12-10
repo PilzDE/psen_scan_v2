@@ -32,7 +32,6 @@
 #include <rosbag/view.h>
 #include <sensor_msgs/LaserScan.h>
 
-#include "psen_scan_v2/angle_conversions.h"
 #include "psen_scan_v2/dist.h"
 #include "psen_scan_v2/laserscan_validator.h"
 

@@ -18,30 +18,30 @@
 
 #include <gmock/gmock.h>
 
-#include "psen_scan_v2/controller_state_machine.h"
-#include "psen_scan_v2/function_pointers.h"
-#include "psen_scan_v2/scanner_reply_msg.h"
+#include "psen_scan_v2_standalone/controller_state_machine.h"
+#include "psen_scan_v2_standalone/function_pointers.h"
+#include "psen_scan_v2_standalone/scanner_reply_msg.h"
 
 namespace psen_scan_v2_test
 {
 class ControllerStateMachineMock
 {
 public:
-  ControllerStateMachineMock(const psen_scan_v2::SendRequestCallback& start_request_cb,
-                             const psen_scan_v2::SendRequestCallback& stop_request_cb,
-                             const psen_scan_v2::StartedCallback& started_cb,
-                             const psen_scan_v2::StoppedCallback& stopped_cb)
+  ControllerStateMachineMock(const psen_scan_v2_standalone::SendRequestCallback& start_request_cb,
+                             const psen_scan_v2_standalone::SendRequestCallback& stop_request_cb,
+                             const psen_scan_v2_standalone::StartedCallback& started_cb,
+                             const psen_scan_v2_standalone::StoppedCallback& stopped_cb)
     : started_cb_(started_cb), stopped_cb_(stopped_cb){};
 
 public:
   MOCK_METHOD0(processStartRequestEvent, void());
   MOCK_METHOD0(processStartReplyTimeoutEvent, void());
-  MOCK_METHOD1(processReplyReceivedEvent, void(psen_scan_v2::ScannerReplyMsgType));
+  MOCK_METHOD1(processReplyReceivedEvent, void(psen_scan_v2_standalone::ScannerReplyMsgType));
   MOCK_METHOD0(processMonitoringFrameReceivedEvent, void());
   MOCK_METHOD0(processStopRequestEvent, void());
 
-  const psen_scan_v2::StoppedCallback started_cb_;
-  const psen_scan_v2::StoppedCallback stopped_cb_;
+  const psen_scan_v2_standalone::StoppedCallback started_cb_;
+  const psen_scan_v2_standalone::StoppedCallback stopped_cb_;
 };
 
 }  // namespace psen_scan_v2_test

@@ -13,9 +13,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "psen_scan_v2/scanner_configuration.h"
+#include "psen_scan_v2_standalone/scanner_configuration.h"
 
-namespace psen_scan_v2
+namespace psen_scan_v2_standalone
 {
 bool ScannerConfiguration::isValid() const
 {
@@ -66,4 +66,4 @@ bool ScannerConfiguration::diagnosticsEnabled() const
   return diagnostics_enabled_;
 }
 
-}  // namespace psen_scan_v2
+}  // namespace psen_scan_v2_standalone

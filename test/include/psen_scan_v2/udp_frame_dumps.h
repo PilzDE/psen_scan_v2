@@ -21,9 +21,9 @@
 #include <map>
 #include <iostream>
 
-#include "psen_scan_v2/monitoring_frame_msg.h"
+#include "psen_scan_v2_standalone/monitoring_frame_msg.h"
 
-using namespace psen_scan_v2;
+using namespace psen_scan_v2_standalone;
 
 namespace psen_scan_v2_test
 {

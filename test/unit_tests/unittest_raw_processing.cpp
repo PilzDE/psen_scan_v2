@@ -17,11 +17,11 @@
 #include <gtest/gtest-typed-test.h>
 #include <sstream>
 
-#include "psen_scan_v2/raw_processing.h"
+#include "psen_scan_v2_standalone/raw_processing.h"
 
 namespace psen_scan_v2_test
 {
-using namespace psen_scan_v2;
+using namespace psen_scan_v2_standalone;
 
 template <typename T>
 class RawProcessingTest : public ::testing::Test

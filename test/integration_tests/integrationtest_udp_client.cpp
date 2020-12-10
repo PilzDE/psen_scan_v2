@@ -25,11 +25,12 @@
 
 #include <pilz_testutils/async_test.h>
 
-#include "psen_scan_v2/raw_scanner_data.h"
-#include "psen_scan_v2/mock_udp_server.h"
-#include "psen_scan_v2/udp_client.h"
+#include "psen_scan_v2_standalone/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/udp_client.h"
 
-using namespace psen_scan_v2;
+#include "psen_scan_v2/mock_udp_server.h"
+
+using namespace psen_scan_v2_standalone;
 using namespace ::testing;
 using boost::asio::ip::udp;
 
@@ -60,7 +61,7 @@ public:
   MOCK_METHOD2(handleNewData, void(const MaxSizeRawData&, const std::size_t&));
   MOCK_METHOD1(handleError, void(const std::string&));
 
-  MOCK_METHOD2(receivedUdpMsg, void(const udp::endpoint&, const psen_scan_v2::DynamicSizeRawData&));
+  MOCK_METHOD2(receivedUdpMsg, void(const udp::endpoint&, const psen_scan_v2_standalone::DynamicSizeRawData&));
 
 public:
   void sendTestDataToClient();
@@ -91,7 +92,7 @@ void UdpClientTests::sendTestDataToClient()
 
 void UdpClientTests::sendEmptyTestDataToClient()
 {
-  const psen_scan_v2::FixedSizeRawData<0> data;
+  const psen_scan_v2_standalone::FixedSizeRawData<0> data;
   mock_udp_server_.asyncSend<data.size()>(host_endpoint, data);
 }
 

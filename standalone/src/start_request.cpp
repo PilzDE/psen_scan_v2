@@ -13,9 +13,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "psen_scan_v2/start_request.h"
+#include "psen_scan_v2_standalone/start_request.h"
 
-namespace psen_scan_v2
+namespace psen_scan_v2_standalone
 {
 static constexpr TenthOfDegree MASTER_RESOLUTION{ TenthOfDegree(2u) };
 
@@ -30,4 +30,4 @@ Message::Message(const ScannerConfiguration& scanner_configuration)
 }
 
 }  // namespace start_request
-}  // namespace psen_scan_v2
+}  // namespace psen_scan_v2_standalone

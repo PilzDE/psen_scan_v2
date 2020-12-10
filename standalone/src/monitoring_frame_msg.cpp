@@ -24,15 +24,15 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
-#include "psen_scan_v2/diagnostics.h"
-#include "psen_scan_v2/angle_conversions.h"
-#include "psen_scan_v2/monitoring_frame_msg.h"
-#include "psen_scan_v2/raw_processing.h"
-#include "psen_scan_v2/raw_scanner_data.h"
-#include "psen_scan_v2/logging.h"
-#include "psen_scan_v2/format_range.h"
+#include "psen_scan_v2_standalone/diagnostics.h"
+#include "psen_scan_v2_standalone/angle_conversions.h"
+#include "psen_scan_v2_standalone/monitoring_frame_msg.h"
+#include "psen_scan_v2_standalone/raw_processing.h"
+#include "psen_scan_v2_standalone/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/logging.h"
+#include "psen_scan_v2_standalone/format_range.h"
 
-namespace psen_scan_v2
+namespace psen_scan_v2_standalone
 {
 TenthOfDegree monitoring_frame::Message::fromTheta() const
 {
@@ -71,9 +71,9 @@ bool monitoring_frame::Message::operator==(const monitoring_frame::Message& rhs)
           diagnosticMessages() == rhs.diagnosticMessages());
 }
 
-}  // namespace psen_scan_v2
+}  // namespace psen_scan_v2_standalone
 
-std::ostream& operator<<(std::ostream& os, const psen_scan_v2::monitoring_frame::Message& msg)
+std::ostream& operator<<(std::ostream& os, const psen_scan_v2_standalone::monitoring_frame::Message& msg)
 {
   os << fmt::format("monitoring_frame::Message(fromTheta = {} deg, resolution = {} deg, scanCounter = "
                     "{}, measures = {}, intensities = {}, diagnostics = {})",

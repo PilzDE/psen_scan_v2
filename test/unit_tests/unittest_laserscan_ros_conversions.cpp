@@ -18,12 +18,14 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "psen_scan_v2/laserscan.h"
+#include "psen_scan_v2_standalone/laserscan.h"
+#include "psen_scan_v2_standalone/default_parameters.h"
+
 #include "psen_scan_v2/laserscan_ros_conversions.h"
-#include "psen_scan_v2/default_parameters.h"
 
 using namespace psen_scan_v2;
-using namespace psen_scan_v2::constants;
+using namespace psen_scan_v2_standalone;
+using namespace psen_scan_v2_standalone::constants;
 
 MATCHER_P(IsReversed, data_vec, "")
 {

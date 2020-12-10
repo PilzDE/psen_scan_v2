@@ -19,15 +19,15 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2/angle_conversions.h"
-#include "psen_scan_v2/laserscan.h"
-#include "psen_scan_v2/laserscan_conversions.h"
-#include "psen_scan_v2/monitoring_frame_msg.h"
-#include "psen_scan_v2/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/angle_conversions.h"
+#include "psen_scan_v2_standalone/laserscan.h"
+#include "psen_scan_v2_standalone/laserscan_conversions.h"
+#include "psen_scan_v2_standalone/monitoring_frame_msg.h"
+#include "psen_scan_v2_standalone/raw_scanner_data.h"
 
 #include "psen_scan_v2/raw_data_array_conversion.h"
 
-using namespace psen_scan_v2;
+using namespace psen_scan_v2_standalone;
 
 namespace psen_scan_v2_test
 {

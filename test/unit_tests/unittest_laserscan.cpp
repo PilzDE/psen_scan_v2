@@ -18,9 +18,9 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2/laserscan.h"
+#include "psen_scan_v2_standalone/laserscan.h"
 
-using namespace psen_scan_v2;
+using namespace psen_scan_v2_standalone;
 
 namespace psen_scan_v2_test
 {

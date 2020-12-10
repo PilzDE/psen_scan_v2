@@ -18,7 +18,8 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "psen_scan_v2/logging.h"
+#include "psen_scan_v2_standalone/logging.h"
+
 #include "psen_scan_v2/mock_console_bridge_output_handler.h"
 
 using namespace psen_scan_v2_test;

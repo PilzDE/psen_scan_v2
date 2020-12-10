@@ -13,13 +13,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "psen_scan_v2/scanner_reply_serialization_deserialization.h"
+#include "psen_scan_v2_standalone/scanner_reply_serialization_deserialization.h"
 
 #include <iostream>
 #include <algorithm>
 #include <cassert>
 
-namespace psen_scan_v2
+namespace psen_scan_v2_standalone
 {
 template <typename T>
 inline void processBytes(boost::crc_32_type& crc_32, const T& data)
@@ -57,4 +57,4 @@ scanner_reply::RawType scanner_reply::serialize(const Message& reply)
 {
   return serialize(static_cast<uint32_t>(reply.type()), static_cast<uint32_t>(reply.result()));
 }
-}  // namespace psen_scan_v2
+}  // namespace psen_scan_v2_standalone

@@ -15,17 +15,17 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2/diagnostics.h"
-#include "psen_scan_v2/monitoring_frame_deserialization.h"
-#include "psen_scan_v2/monitoring_frame_msg.h"
-#include "psen_scan_v2/scanner_ids.h"
+#include "psen_scan_v2_standalone/diagnostics.h"
+#include "psen_scan_v2_standalone/monitoring_frame_deserialization.h"
+#include "psen_scan_v2_standalone/monitoring_frame_msg.h"
+#include "psen_scan_v2_standalone/scanner_ids.h"
 
 #include "psen_scan_v2/istring_stream_builder.h"
 #include "psen_scan_v2/monitoring_frame_serialization.h"
 #include "psen_scan_v2/raw_data_array_conversion.h"
 #include "psen_scan_v2/udp_frame_dumps.h"
 
-using namespace psen_scan_v2;
+using namespace psen_scan_v2_standalone;
 
 namespace psen_scan_v2_test
 {

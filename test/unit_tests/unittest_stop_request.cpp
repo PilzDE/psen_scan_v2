@@ -17,10 +17,11 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2/stop_request_serialization.h"
+#include "psen_scan_v2_standalone/stop_request_serialization.h"
+
 #include "psen_scan_v2/raw_data_test_helper.h"
 
-using namespace psen_scan_v2;
+using namespace psen_scan_v2_standalone;
 
 namespace psen_scan_v2_test
 {

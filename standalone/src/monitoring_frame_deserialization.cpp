@@ -18,10 +18,10 @@
 
 #include <fmt/format.h>
 
-#include "psen_scan_v2/diagnostics.h"
-#include "psen_scan_v2/monitoring_frame_deserialization.h"
+#include "psen_scan_v2_standalone/diagnostics.h"
+#include "psen_scan_v2_standalone/monitoring_frame_deserialization.h"
 
-namespace psen_scan_v2
+namespace psen_scan_v2_standalone
 {
 namespace monitoring_frame
 {
@@ -203,4 +203,4 @@ FixedFields readFixedFields(std::istringstream& is)
   return FixedFields(device_status, op_code, working_mode, transaction_type, scanner_id, from_theta, resolution);
 }
 }  // namespace monitoring_frame
-}  // namespace psen_scan_v2
+}  // namespace psen_scan_v2_standalone

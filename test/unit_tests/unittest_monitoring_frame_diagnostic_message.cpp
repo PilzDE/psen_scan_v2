@@ -15,9 +15,9 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2/diagnostics.h"
+#include "psen_scan_v2_standalone/diagnostics.h"
 
-using namespace psen_scan_v2;
+using namespace psen_scan_v2_standalone;
 namespace psen_scan_v2_test
 {
 TEST(MonitoringFrameDiagnosticMessageTest, shouldConstructMonitoringFrameDiagnosticMessageAsExpected)

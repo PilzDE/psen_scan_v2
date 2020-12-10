@@ -25,7 +25,7 @@
 #include <boost/bind.hpp>
 #include <boost/array.hpp>
 
-#include "psen_scan_v2/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/raw_scanner_data.h"
 
 using boost::asio::ip::udp;
 
@@ -53,7 +53,7 @@ public:
   };
 
 public:
-  using NewDataHandler = std::function<void(const udp::endpoint&, const psen_scan_v2::DynamicSizeRawData&)>;
+  using NewDataHandler = std::function<void(const udp::endpoint&, const psen_scan_v2_standalone::DynamicSizeRawData&)>;
 
 public:
   ~MockUDPServer();
@@ -65,7 +65,7 @@ public:
   void asyncReceive(const ReceiveMode& modi = ReceiveMode::single);
 
   template <unsigned int N>
-  void asyncSend(const udp::endpoint& receiver_of_data, const psen_scan_v2::FixedSizeRawData<N>& data);
+  void asyncSend(const udp::endpoint& receiver_of_data, const psen_scan_v2_standalone::FixedSizeRawData<N>& data);
 
 private:
   void handleSend(const boost::system::error_code& error, std::size_t bytes_transferred);
@@ -76,7 +76,7 @@ private:
 private:
   udp::endpoint remote_endpoint_;
 
-  psen_scan_v2::MaxSizeRawData recv_buffer_;
+  psen_scan_v2_standalone::MaxSizeRawData recv_buffer_;
 
   boost::asio::io_service io_service_;
   // Prevent the run() method of the io_service from returning when there is no more work.
@@ -120,7 +120,7 @@ void MockUDPServer::handleSend(const boost::system::error_code& error, std::size
 }
 
 template <unsigned int N>
-void MockUDPServer::asyncSend(const udp::endpoint& receiver_of_data, const psen_scan_v2::FixedSizeRawData<N>& data)
+void MockUDPServer::asyncSend(const udp::endpoint& receiver_of_data, const psen_scan_v2_standalone::FixedSizeRawData<N>& data)
 {
   io_service_.post([this, receiver_of_data, data]() {
     socket_.async_send_to(boost::asio::buffer(data),
@@ -141,7 +141,7 @@ void MockUDPServer::handleReceive(const ReceiveMode& modi,
     std::cerr << "UDP server mock failed to receive data. Error msg: " << error.message() << std::endl;
     return;
   }
-  psen_scan_v2::DynamicSizeRawData recv_data(recv_buffer_.cbegin(), recv_buffer_.cbegin() + bytes_received);
+  psen_scan_v2_standalone::DynamicSizeRawData recv_data(recv_buffer_.cbegin(), recv_buffer_.cbegin() + bytes_received);
   new_data_handler_(remote_endpoint_, recv_data);
   if (modi == ReceiveMode::continuous)
   {

@@ -21,7 +21,7 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2/angle_conversions.h"
+#include "psen_scan_v2_standalone/angle_conversions.h"
 
 namespace psen_scan_v2_test
 {
@@ -29,30 +29,30 @@ TEST(TenthDegreeConversionTests, radToTenthDegreeShouldReturnExpectedPositiveVal
 {
   const int16_t expected_tenth_degree{ 11 };
   const double angle_in_rad{ (static_cast<double>(expected_tenth_degree) / 1800.) * boost::math::double_constants::pi };
-  EXPECT_EQ(expected_tenth_degree, psen_scan_v2::radToTenthDegree(angle_in_rad));
+  EXPECT_EQ(expected_tenth_degree, psen_scan_v2_standalone::radToTenthDegree(angle_in_rad));
 }
 
 TEST(TenthDegreeConversionTests, radToTenthDegreeShouldReturnExpectedNegativeValue)
 {
   const int16_t expected_tenth_degree{ -11 };
   const double angle_in_rad{ (static_cast<double>(expected_tenth_degree) / 1800.) * boost::math::double_constants::pi };
-  EXPECT_EQ(expected_tenth_degree, psen_scan_v2::radToTenthDegree(angle_in_rad));
+  EXPECT_EQ(expected_tenth_degree, psen_scan_v2_standalone::radToTenthDegree(angle_in_rad));
 }
 
 TEST(TenthDegreeConversionTests, radToTenthDegreeShouldThrowWhenAngleOutOfRange)
 {
   const double max_exceeding_angle_in_rad{ static_cast<double>(std::numeric_limits<int16_t>::max()) + .1 };
-  EXPECT_THROW(psen_scan_v2::radToTenthDegree(max_exceeding_angle_in_rad), std::invalid_argument);
+  EXPECT_THROW(psen_scan_v2_standalone::radToTenthDegree(max_exceeding_angle_in_rad), std::invalid_argument);
 
   const double min_exceeding_angle_in_rad{ static_cast<double>(std::numeric_limits<int16_t>::min()) - .1 };
-  EXPECT_THROW(psen_scan_v2::radToTenthDegree(min_exceeding_angle_in_rad), std::invalid_argument);
+  EXPECT_THROW(psen_scan_v2_standalone::radToTenthDegree(min_exceeding_angle_in_rad), std::invalid_argument);
 }
 
 TEST(TenthDegreeConversionTests, tenthDegreeToRadShouldReturnExpectedValue)
 {
   const double expected_radian{ 0.01 * boost::math::double_constants::pi };
   const int16_t angle_in_tenth_degree{ 18 };
-  EXPECT_DOUBLE_EQ(expected_radian, psen_scan_v2::tenthDegreeToRad(angle_in_tenth_degree));
+  EXPECT_DOUBLE_EQ(expected_radian, psen_scan_v2_standalone::tenthDegreeToRad(angle_in_tenth_degree));
 }
 
 }  // namespace psen_scan_v2_test

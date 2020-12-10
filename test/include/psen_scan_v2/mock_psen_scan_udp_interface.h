@@ -20,11 +20,11 @@
 
 #include <gmock/gmock.h>
 
-#include "psen_scan_v2/scanner_communication_interface.h"
+#include "psen_scan_v2_standalone/scanner_communication_interface.h"
 
 namespace psen_scan_v2_test
 {
-class MockPSENscanUDPInterface : public psen_scan_v2::ScannerCommunicationInterface
+class MockPSENscanUDPInterface : public psen_scan_v2_standalone::ScannerCommunicationInterface
 {
 public:
   MOCK_METHOD0(open, void());

@@ -31,25 +31,25 @@
 REGISTER_ROSCONSOLE_BRIDGE;
 
 // Test frameworks
-#include "psen_scan_v2/async_barrier.h"
 #include "psen_scan_v2/mock_udp_server.h"
 #include "psen_scan_v2/udp_frame_dumps.h"
 #include "psen_scan_v2/raw_data_array_conversion.h"
-#include "psen_scan_v2/logging.h"
 
 // Software under testing
-#include "psen_scan_v2/scanner_configuration.h"
-#include "psen_scan_v2/scanner_config_builder.h"
-#include "psen_scan_v2/scanner_v2.h"
-#include "psen_scan_v2/start_request.h"
-#include "psen_scan_v2/scanner_reply_msg.h"
-#include "psen_scan_v2/scanner_reply_serialization_deserialization.h"
-#include "psen_scan_v2/scan_range.h"
-#include "psen_scan_v2/diagnostics.h"
+#include "psen_scan_v2_standalone/async_barrier.h"
+#include "psen_scan_v2_standalone/diagnostics.h"
+#include "psen_scan_v2_standalone/logging.h"
+#include "psen_scan_v2_standalone/scanner_configuration.h"
+#include "psen_scan_v2_standalone/scanner_config_builder.h"
+#include "psen_scan_v2_standalone/scanner_v2.h"
+#include "psen_scan_v2_standalone/start_request.h"
+#include "psen_scan_v2_standalone/scanner_reply_msg.h"
+#include "psen_scan_v2_standalone/scanner_reply_serialization_deserialization.h"
+#include "psen_scan_v2_standalone/scan_range.h"
 
 namespace psen_scan_v2_test
 {
-using namespace psen_scan_v2;
+using namespace psen_scan_v2_standalone;
 
 static const std::string SCANNER_IP_ADDRESS{ "127.0.0.1" };
 static const std::string HOST_IP_ADDRESS{ "127.0.0.1" };
@@ -213,8 +213,8 @@ public:
   }
 
 public:
-  MOCK_METHOD2(receiveControlMsg, void(const udp::endpoint&, const psen_scan_v2::DynamicSizeRawData&));
-  MOCK_METHOD2(receiveDataMsg, void(const udp::endpoint&, const psen_scan_v2::DynamicSizeRawData&));
+  MOCK_METHOD2(receiveControlMsg, void(const udp::endpoint&, const psen_scan_v2_standalone::DynamicSizeRawData&));
+  MOCK_METHOD2(receiveDataMsg, void(const udp::endpoint&, const psen_scan_v2_standalone::DynamicSizeRawData&));
 
 public:
   void startListeningForControlMsg();
@@ -301,7 +301,7 @@ void ScannerMock::sendMonitoringFrame(const monitoring_frame::Message& msg)
 
 void ScannerMock::sendEmptyMonitoringFrame()
 {
-  const psen_scan_v2::FixedSizeRawData<0> data;
+  const psen_scan_v2_standalone::FixedSizeRawData<0> data;
   data_server_.asyncSend<data.size()>(monitoring_frame_receiver_, data);
 }
 

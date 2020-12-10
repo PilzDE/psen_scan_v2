@@ -16,9 +16,9 @@
 #include <string>
 #include <iostream>
 
-#include <psen_scan_v2/core.h>
+#include <psen_scan_v2_standalone/core.h>
 
-using namespace psen_scan_v2;
+using namespace psen_scan_v2_standalone;
 
 /*
  * In this section we declare all necessary configuration parameters

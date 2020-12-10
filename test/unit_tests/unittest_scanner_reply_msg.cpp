@@ -21,11 +21,12 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2/scanner_reply_msg.h"
-#include "psen_scan_v2/scanner_reply_serialization_deserialization.h"
+#include "psen_scan_v2_standalone/scanner_reply_msg.h"
+#include "psen_scan_v2_standalone/scanner_reply_serialization_deserialization.h"
+
 #include "psen_scan_v2/raw_data_test_helper.h"
 
-using namespace psen_scan_v2;
+using namespace psen_scan_v2_standalone;
 
 using Message = scanner_reply::Message;
 

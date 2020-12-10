@@ -16,10 +16,10 @@
 #include <algorithm>
 #include <stdexcept>
 
-#include "psen_scan_v2/angle_conversions.h"
-#include "psen_scan_v2/laserscan.h"
+#include "psen_scan_v2_standalone/angle_conversions.h"
+#include "psen_scan_v2_standalone/laserscan.h"
 
-namespace psen_scan_v2
+namespace psen_scan_v2_standalone
 {
 static const TenthOfDegree MAX_X_AXIS_ROTATION{ 275 };
 
@@ -91,4 +91,4 @@ bool LaserScan::operator==(const LaserScan& scan) const
           std::equal(measures_.begin(), measures_.end(), scan.measures_.begin()));
 }
 
-}  // namespace psen_scan_v2
+}  // namespace psen_scan_v2_standalone

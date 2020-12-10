@@ -20,19 +20,22 @@
 
 #include <ros/ros.h>
 
-#include "psen_scan_v2/function_pointers.h"
+
+#include "psen_scan_v2_standalone/default_parameters.h"
+#include "psen_scan_v2_standalone/function_pointers.h"
+#include "psen_scan_v2_standalone/scanner_configuration.h"
+#include "psen_scan_v2_standalone/scanner_config_builder.h"
+#include "psen_scan_v2_standalone/scan_range.h"
+
 #include "psen_scan_v2/ros_parameter_handler.h"
 #include "psen_scan_v2/ros_scanner_node.h"
-#include "psen_scan_v2/default_parameters.h"
-#include "psen_scan_v2/scanner_configuration.h"
-#include "psen_scan_v2/scanner_config_builder.h"
-#include "psen_scan_v2/scan_range.h"
 
 #include <rosconsole_bridge/bridge.h>
 REGISTER_ROSCONSOLE_BRIDGE;
 
 using namespace psen_scan_v2;
-using namespace psen_scan_v2::constants;
+using namespace psen_scan_v2_standalone;
+using namespace psen_scan_v2_standalone::constants;
 
 std::function<void()> NODE_TERMINATE_CB;
 

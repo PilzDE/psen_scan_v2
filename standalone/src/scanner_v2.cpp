@@ -13,14 +13,14 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "psen_scan_v2/scanner_v2.h"
+#include "psen_scan_v2_standalone/scanner_v2.h"
 
 #include <cassert>
 #include <stdexcept>
 
-namespace psen_scan_v2
+namespace psen_scan_v2_standalone
 {
-using namespace psen_scan_v2::scanner_protocol::scanner_events;
+using namespace psen_scan_v2_standalone::scanner_protocol::scanner_events;
 
 // clang-format off
 #define BIND_EVENT(event_name)\
@@ -73,7 +73,7 @@ StateMachineArgs* ScannerV2::createStateMachineArgs()
                               std::bind(&ScannerV2::scannerStoppedCB, this),
                               IScanner::getLaserScanCB(),
                               std::unique_ptr<IWatchdogFactory>(new WatchdogFactory(this)));
-}  // namespace psen_scan_v2
+}  // namespace psen_scan_v2_standalone
 
 ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb)
   : IScanner(scanner_config, laser_scan_cb), sm_(new ScannerStateMachine(createStateMachineArgs()))
@@ -146,4 +146,4 @@ void ScannerV2::scannerStoppedCB()
   scanner_has_stopped_ = boost::none;
 }
 
-}  // namespace psen_scan_v2
+}  // namespace psen_scan_v2_standalone

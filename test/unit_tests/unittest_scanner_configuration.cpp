@@ -20,12 +20,12 @@
 #include <arpa/inet.h>
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2/angle_conversions.h"
-#include "psen_scan_v2/scanner_configuration.h"
-#include "psen_scan_v2/scanner_config_builder.h"
-#include "psen_scan_v2/scan_range.h"
+#include "psen_scan_v2_standalone/angle_conversions.h"
+#include "psen_scan_v2_standalone/scanner_configuration.h"
+#include "psen_scan_v2_standalone/scanner_config_builder.h"
+#include "psen_scan_v2_standalone/scan_range.h"
 
-using namespace psen_scan_v2;
+using namespace psen_scan_v2_standalone;
 
 namespace psen_scan_v2_test
 {

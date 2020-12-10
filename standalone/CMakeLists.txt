@@ -72,7 +72,7 @@ endif()
 ## Install ##
 #############
 if(CATKIN_ENV)
-  install(DIRECTORY include/${PROJECT_NAME}/
+  install(DIRECTORY include/${PROJECT_NAME}_standalone/
     DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
     FILES_MATCHING PATTERN "*.h"
     PATTERN ".svn" EXCLUDE
