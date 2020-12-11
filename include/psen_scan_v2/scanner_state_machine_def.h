@@ -153,30 +153,6 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
     PSENSCAN_WARN_THROTTLE(
         1 /* sec */, "StateMachine", "The scanner reports an error: {}", formatRange(frame.diagnosticMessages()));
 
-    // LCOV_EXCL_START
-    if (frame.measurements().size() == 0)
-      PSENSCAN_ERROR_THROTTLE(1 /* sec */, "StateMachine", "Received frame contained no measurements.");
-    if (frame.intensities().size() == 0)
-      PSENSCAN_ERROR_THROTTLE(1 /* sec */, "StateMachine", "Received frame contained no intensities.");
-    // LCOV_EXCL_STOP
-
-    TenthOfDegree end_angle{ args_->config_.scanRange().getEnd() };
-    uint16_t expected_size{ (end_angle - args_->config_.scanRange().getStart()) / frame.resolution() };
-    // LCOV_EXCL_START
-    if (frame.measurements().size() != expected_size)
-    {
-      PSENSCAN_ERROR_THROTTLE(1 /* sec */,
-                              "StateMachine",
-                              "Received frame contained unexpected number of measurements. " +
-                                  fmt::format("Expected {}, received {}", expected_size, frame.measurements().size()));
-    }
-    if (frame.intensities().size() != expected_size)
-      PSENSCAN_ERROR_THROTTLE(1 /* sec */,
-                              "StateMachine",
-                              "Received frame contained unexpected number of intensities. " +
-                                  fmt::format("Expected {}, received {}", expected_size, frame.intensities().size()));
-    // LCOV_EXCL_STOP
-
     printUserMsgFor(complete_scan_validator_.validate(frame, DEFAULT_NUM_MSG_PER_ROUND));
     args_->inform_user_about_laser_scan_cb(toLaserScan(frame));
   }
