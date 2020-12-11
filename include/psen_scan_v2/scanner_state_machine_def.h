@@ -13,6 +13,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+namespace psen_scan_v2
+{
+namespace scanner_protocol
+{
 inline ScannerProtocolDef::ScannerProtocolDef(StateMachineArgs* const args) : args_(args)
 {
 }
@@ -193,3 +197,6 @@ void ScannerProtocolDef::no_transition(const scanner_events::RawMonitoringFrameR
 {
   PSENSCAN_WARN("StateMachine", "Received monitoring frame despite not waiting for it");
 }
+
+}  // namespace scanner_protocol
+}  // namespace psen_scan_v2
