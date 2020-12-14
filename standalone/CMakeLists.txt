@@ -61,7 +61,7 @@ target_link_libraries(${PROJECT_NAME}
 )
 target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-if(BUILD_EXAMPLE)
+if(NOT DEFINED CATKIN_ENV)
   add_executable(${PROJECT_NAME}_app main.cpp)
   target_link_libraries(${PROJECT_NAME}_app
     ${PROJECT_NAME}
