@@ -2,6 +2,12 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Make specifying udp ports optional
+* Contributors: Pilz GmbH and Co. KG
+
+
 0.1.3 (2020-12-09)
 ------------------
 * Add ROS noetic support (`#103 <https://github.com/PilzDE/psen_scan_v2/issues/103>`_)
