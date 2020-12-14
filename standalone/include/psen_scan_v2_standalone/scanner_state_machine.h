@@ -214,6 +214,6 @@ using ScannerStateMachine = msm::back::state_machine<ScannerProtocolDef>;
 }  // namespace scanner_protocol
 }  // namespace psen_scan_v2_standalone
 
-#include "psen_scan_v2/scanner_state_machine_def.h"
+#include "psen_scan_v2_standalone/scanner_state_machine_def.h"
 
 #endif  // PSEN_SCAN_V2_STANDALONE_SCANNER_PROTOCOL_DEF_H

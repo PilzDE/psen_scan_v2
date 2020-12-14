@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-namespace psen_scan_v2
+namespace psen_scan_v2_standalone
 {
 namespace scanner_protocol
 {
@@ -199,4 +199,4 @@ void ScannerProtocolDef::no_transition(const scanner_events::RawMonitoringFrameR
 }
 
 }  // namespace scanner_protocol
-}  // namespace psen_scan_v2
+}  // namespace psen_scan_v2_standalone
