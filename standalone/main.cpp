@@ -19,12 +19,15 @@
 #include <psen_scan_v2_standalone/core.h>
 
 using namespace psen_scan_v2_standalone;
+using namespace psen_scan_v2_standalone::constants;
 
 /*
  * In this section we declare all necessary configuration parameters
  */
 const std::string HOST_IP{ "192.168.0.50" };
 const std::string SCANNER_IP{ "192.168.0.10" };
+const unsigned short HOST_UDP_DATA_PORT{ 55115 };
+const unsigned short HOST_UDP_CONTROL_PORT{ 55116 };
 // Start- and end-angle have been configured to be in the middle of the scan range.
 const TenthOfDegree ANGLE_START{ degreeToTenthDegree(137) };
 const TenthOfDegree ANGLE_END{ degreeToTenthDegree(138) };
@@ -48,7 +51,14 @@ int main(int argc, char** argv)
   DefaultScanRange scan_range{ ANGLE_START, ANGLE_END };
 
   ScannerConfigurationBuilder config_builder;
-  config_builder.hostIP(HOST_IP).scannerIp(SCANNER_IP).scanRange(scan_range).enableDiagnostics();
+  config_builder.hostIP(HOST_IP)
+      .hostDataPort(HOST_UDP_DATA_PORT)
+      .hostControlPort(HOST_UDP_CONTROL_PORT)
+      .scannerIp(SCANNER_IP)
+      .scannerDataPort(DATA_PORT_OF_SCANNER_DEVICE)
+      .scannerControlPort(CONTROL_PORT_OF_SCANNER_DEVICE)
+      .scanRange(scan_range)
+      .enableDiagnostics();
 
   ScannerConfiguration scanner_configuration{ config_builder.build() };
 
