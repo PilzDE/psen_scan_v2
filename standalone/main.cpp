@@ -60,9 +60,7 @@ int main(int argc, char** argv)
       .scanRange(scan_range)
       .enableDiagnostics();
 
-  ScannerConfiguration scanner_configuration{ config_builder.build() };
-
-  ScannerV2 scanner(scanner_configuration, laserScanCallback);
+  ScannerV2 scanner(config_builder.build(), laserScanCallback);
   scanner.start();
 
   while (1)
