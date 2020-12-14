@@ -13,8 +13,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <string>
+#include <chrono>
 #include <iostream>
+#include <string>
+#include <thread>
 
 #include <psen_scan_v2_standalone/core.h>
 
@@ -63,8 +65,10 @@ int main(int argc, char** argv)
   ScannerV2 scanner(config_builder.build(), laserScanCallback);
   scanner.start();
 
-  while (1)
-    ;
+  while (true)
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  }
 
   return 0;
 }
