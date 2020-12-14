@@ -100,7 +100,7 @@ set(${PROJECT_NAME}_node_sources
 add_executable(${PROJECT_NAME}_node ${${PROJECT_NAME}_node_sources})
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
-  ${PROJECT_NAME}
+  ${PROJECT_NAME}_standalone
 )
 
 #############

@@ -13,10 +13,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-if(NOT DEFINED CATKIN_ENV)
-  cmake_minimum_required(VERSION 3.0.2)
-  project(psen_scan_v2_standalone)
-endif()
+cmake_minimum_required(VERSION 3.0.2)
+project(psen_scan_v2_standalone)
 
 add_compile_options(-std=c++14)
 add_compile_options(-Wall)
@@ -61,12 +59,10 @@ target_link_libraries(${PROJECT_NAME}
 )
 target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-if(NOT DEFINED CATKIN_ENV)
-  add_executable(${PROJECT_NAME}_app main.cpp)
-  target_link_libraries(${PROJECT_NAME}_app
-    ${PROJECT_NAME}
-  )
-endif()
+add_executable(${PROJECT_NAME}_app main.cpp)
+target_link_libraries(${PROJECT_NAME}_app
+  ${PROJECT_NAME}
+)
 
 #############
 ## Install ##
