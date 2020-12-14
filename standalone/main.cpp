@@ -14,11 +14,12 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <chrono>
-#include <iostream>
+#include <sstream>
 #include <string>
 #include <thread>
 
 #include <psen_scan_v2_standalone/core.h>
+#include <psen_scan_v2_standalone/logging.h>
 
 using namespace psen_scan_v2_standalone;
 using namespace psen_scan_v2_standalone::constants;
@@ -41,11 +42,12 @@ void laserScanCallback(const LaserScan& scan)
 {
   LaserScan::MeasurementData measures = scan.getMeasurements();
 
+  std::stringstream strstr;
   for (auto it = measures.cbegin(); it < measures.cend(); ++it)
   {
-    std::cout << *it;
+    strstr << " " << *it;
   }
-  std::cout << std::endl;
+  PSENSCAN_INFO_THROTTLE(1 /* sec */, "laserScanCallback()", strstr.str());
 }
 
 int main(int argc, char** argv)
