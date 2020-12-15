@@ -6,9 +6,16 @@ The PSENscan Standalone C++ Library allows you to easily integrate the PSENscan 
 
 ## Table of Contents
 
-1. [Get Started](#get-started)
-2. [Usage example](#usage-example)
-3. [C++ API](#c++-api)
+1. [Prerequisites](#prerequisites)
+2. [Get Started](#get-started)
+3. [Usage example](#usage-example)
+4. [C++ API](#c++-api)
+
+## Prerequisites
+Make sure you have all necessary tools and libraries installed:
+```
+sudo apt-get install build-essential cmake git libboost-all-dev libconsole-bridge-dev libfmt-dev
+```
 
 ## Get Started
 First, clone this repository:
