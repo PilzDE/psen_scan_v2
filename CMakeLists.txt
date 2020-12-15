@@ -107,7 +107,7 @@ target_link_libraries(${PROJECT_NAME}_node
 ## Install ##
 #############
 
-install(DIRECTORY include/${PROJECT_NAME}/
+install(DIRECTORY include/${PROJECT_NAME}/ standalone/include/${PROJECT_NAME}_standalone/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.h"
   PATTERN ".svn" EXCLUDE
@@ -121,6 +121,8 @@ install(DIRECTORY urdf/
 
 install(TARGETS
   ${PROJECT_NAME}_node
+  # the following requires cmake 3.13
+  #${PROJECT_NAME}_standalone
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

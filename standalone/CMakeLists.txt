@@ -63,21 +63,3 @@ add_executable(${PROJECT_NAME}_app main.cpp)
 target_link_libraries(${PROJECT_NAME}_app
   ${PROJECT_NAME}
 )
-
-#############
-## Install ##
-#############
-if(CATKIN_ENV)
-  install(DIRECTORY include/${PROJECT_NAME}_standalone/
-    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-    FILES_MATCHING PATTERN "*.h"
-    PATTERN ".svn" EXCLUDE
-  )
-
-  install(TARGETS
-    ${PROJECT_NAME}
-    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-  )
-endif()
