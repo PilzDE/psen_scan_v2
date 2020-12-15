@@ -30,12 +30,7 @@ cd build/ && cmake .. && make
 The library should now be built and available under `psen_scan_v2/standalone/build/libpsen_scan_v2_standalone.a`
 
 ## Usage example
-To build the example application, which prints distance data to the screen, you can follow the first two steps as in [Get Started](#get-started) if you haven't done so already. The last command will be different:
-```
-cd build/ && cmake -DBUILD_EXAMPLE=ON .. && make
-```
-
-You can now execute the example program by running the following while in the `build` folder:
+An example application, which prints distance data to the screen, is built by default and can be executed in the `build` folder:
 ```
 ./psen_scan_v2_standalone_app
 ```
