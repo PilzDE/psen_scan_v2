@@ -81,14 +81,3 @@ if(CATKIN_ENV)
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
   )
 endif()
-
-# TEST?
-#find_package(GTest REQUIRED)
-#add_executable(unittest_tenth_of_degree
-#  test/unit_tests/unittest_tenth_of_degree.cpp
-#)
-#target_link_libraries(unittest_tenth_of_degree
-#  Boost::system
-#  gtest
-#)
-#add_test(NAME unittest_tenth_of_degree COMMAND unittest_tenth_of_degree)
