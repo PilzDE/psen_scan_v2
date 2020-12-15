@@ -40,7 +40,7 @@ const TenthOfDegree ANGLE_END{ degreeToTenthDegree(138) };
  */
 void laserScanCallback(const LaserScan& scan)
 {
-  LaserScan::MeasurementData measures = scan.getMeasurements();
+  const LaserScan::MeasurementData& measures = scan.getMeasurements();
 
   std::stringstream strstr;
   for (auto it = measures.cbegin(); it < measures.cend(); ++it)
