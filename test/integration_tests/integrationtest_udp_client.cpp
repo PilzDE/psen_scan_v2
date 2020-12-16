@@ -40,8 +40,6 @@ static constexpr unsigned short HOST_UDP_PORT{ 46001 };
 static const std::string UDP_MOCK_IP_ADDRESS{ "127.0.0.1" };
 static constexpr unsigned short UDP_MOCK_PORT{ HOST_UDP_PORT + 1 };
 
-static constexpr std::size_t DATA_SIZE_BYTES{ 100 };
-
 static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 5 };
 
 using std::placeholders::_1;
@@ -97,7 +95,8 @@ ACTION_P(OpenBarrier, barrier)
 
 TEST_F(UdpClientTests, testAsyncReadOperation)
 {
-  EXPECT_CALL(*this, handleNewData(_, DATA_SIZE_BYTES)).WillOnce(ACTION_OPEN_BARRIER_VOID(CLIENT_RECEIVED_DATA));
+  Barrier client_received_data_barrier;
+  EXPECT_CALL(*this, handleNewData(_, send_array_.size())).WillOnce(OpenBarrier(&client_received_data_barrier));
 
   udp_client_->startAsyncReceiving();
   sendTestDataToClient();
@@ -106,7 +105,8 @@ TEST_F(UdpClientTests, testAsyncReadOperation)
 
 TEST_F(UdpClientTests, testSingleAsyncReadOperation)
 {
-  EXPECT_CALL(*this, handleNewData(_, DATA_SIZE_BYTES)).WillOnce(ACTION_OPEN_BARRIER_VOID(CLIENT_RECEIVED_DATA));
+  Barrier client_received_data_barrier;
+  EXPECT_CALL(*this, handleNewData(_, send_array_.size())).WillOnce(OpenBarrier(&client_received_data_barrier));
 
   udp_client_->startAsyncReceiving(ReceiveMode::single);
   sendTestDataToClient();
@@ -152,7 +152,9 @@ TEST_F(UdpClientTests, testWritingWhileReceiving)
   RawData write_buf;
   std::copy(str.begin(), str.end(), std::back_inserter(write_buf));
 
-  EXPECT_CALL(*this, handleNewData(_, DATA_SIZE_BYTES)).WillOnce(ACTION_OPEN_BARRIER_VOID(CLIENT_RECEIVED_DATA));
+  Barrier client_received_data_barrier;
+  Barrier server_mock_received_data_barrier;
+  EXPECT_CALL(*this, handleNewData(_, send_array_.size())).WillOnce(OpenBarrier(&client_received_data_barrier));
   EXPECT_CALL(*this, receivedUdpMsg(_, write_buf))
       .WillOnce(DoAll(InvokeWithoutArgs(this, &UdpClientTests::sendTestDataToClient),
                       OpenBarrier(&server_mock_received_data_barrier)));
