@@ -27,12 +27,12 @@ namespace monitoring_frame
 {
 using namespace std::placeholders;
 
-static constexpr uint16_t toMillimeter(const double& value)
+static uint16_t toMillimeter(const double& value)
 {
   return static_cast<uint16_t>(std::round(value * 1000.));
 }
 
-static constexpr uint16_t toRawIntensities(const double& value)
+static uint16_t toRawIntensities(const double& value)
 {
   return static_cast<uint16_t>(std::round(value));
 }
@@ -68,9 +68,9 @@ RawData serialize(const monitoring_frame::Message& frame)
 
   additional_field::Header measurements_header(
       static_cast<additional_field::Header::Id>(additional_field::HeaderID::measurements),
-      frame.measurements().size() * NUMBER_OF_BYTES_SINGLE_MEASUREMENTS);
+      frame.measurements_.size() * NUMBER_OF_BYTES_SINGLE_MEASUREMENT);
   monitoring_frame::write(os, measurements_header);
-  raw_processing::writeArray<uint16_t, double>(os, frame.measurements(), std::bind(toMillimeter, _1));
+  raw_processing::writeArray<uint16_t, double>(os, frame.measurements_, std::bind(toMillimeter, _1));
 
   if (!frame.intensities_.empty())
   {
