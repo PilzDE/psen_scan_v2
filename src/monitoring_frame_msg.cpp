@@ -21,9 +21,8 @@
 #include <string>
 #include <vector>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <fmt/ostream.h>
-#include <fmt/ranges.h>
 
 #include "psen_scan_v2/diagnostics.h"
 #include "psen_scan_v2/angle_conversions.h"
@@ -31,6 +30,8 @@
 #include "psen_scan_v2/raw_processing.h"
 #include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/logging.h"
+#include "psen_scan_v2/format_range.h"
+
 namespace psen_scan_v2
 {
 TenthOfDegree monitoring_frame::Message::fromTheta() const
@@ -48,9 +49,9 @@ uint32_t monitoring_frame::Message::scanCounter() const
   return scan_counter_;
 }
 
-const std::vector<double>& monitoring_frame::Message::measures() const
+const std::vector<double>& monitoring_frame::Message::measurements() const
 {
-  return measures_;
+  return measurements_;
 }
 
 const std::vector<double>& monitoring_frame::Message::intensities() const
@@ -66,21 +67,23 @@ std::vector<monitoring_frame::diagnostic::Message> monitoring_frame::Message::di
 bool monitoring_frame::Message::operator==(const monitoring_frame::Message& rhs) const
 {
   return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
-          measures() == rhs.measures() && intensities() == rhs.intensities() &&
+          measurements() == rhs.measurements() && intensities() == rhs.intensities() &&
           diagnosticMessages() == rhs.diagnosticMessages());
 }
 
-}  // namespace psen_scan_v2
-
+namespace monitoring_frame
+{
 std::ostream& operator<<(std::ostream& os, const psen_scan_v2::monitoring_frame::Message& msg)
 {
   os << fmt::format("monitoring_frame::Message(fromTheta = {} deg, resolution = {} deg, scanCounter = "
-                    "{}, measures = {}, intensities = {}, diagnostics = {})",
+                    "{}, measurements = {}, intensities = {}, diagnostics = {})",
                     msg.fromTheta().value() / 10.,
                     msg.resolution().value() / 10.,
                     msg.scanCounter(),
-                    msg.measures(),
-                    msg.intensities(),
-                    msg.diagnosticMessages());
+                    formatRange(msg.measurements()),
+                    formatRange(msg.intensities()),
+                    formatRange(msg.diagnosticMessages()));
   return os;
 }
+}  // namespace monitoring_frame
+}  // namespace psen_scan_v2

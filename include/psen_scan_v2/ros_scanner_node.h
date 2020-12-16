@@ -34,7 +34,7 @@ namespace psen_scan_v2
 using namespace std::chrono_literals;
 
 /**
- * @brief ROS Node for fetching and publishing laserscan data from the scanner.
+ * @brief ROS Node that continuously publishes scan data of a single PSENscan laser scanner.
  *
  */
 template <typename S = ScannerV2>
@@ -120,7 +120,7 @@ void ROSScannerNodeT<S>::run()
   scanner_.start();
   while (ros::ok() && !terminate_)
   {
-    r.sleep();
+    r.sleep();  // LCOV_EXCL_LINE can not be reached deterministically
   }
   const auto stop_future = scanner_.stop();
   const auto stop_status = stop_future.wait_for(3s);

@@ -35,22 +35,14 @@ static constexpr uint32_t DEFAULT_SEQ_NUMBER{ 0 };
 static const uint32_t OPCODE{ htole32(0x35) };
 }  // namespace start_request
 
-DynamicSizeRawData convertStringToDynamicSizeRawData(const std::string& str)
-{
-  DynamicSizeRawData raw;
-  raw.reserve(str.length());
-  std::copy(str.begin(), str.end(), std::back_inserter(raw));
-  return raw;
-};
-
-uint32_t calculateCRC(const DynamicSizeRawData& data)
+uint32_t calculateCRC(const RawData& data)
 {
   boost::crc_32_type crc;
   crc.process_bytes(&data.at(0), data.size());
   return static_cast<uint32_t>(crc.checksum());
 }
 
-DynamicSizeRawData start_request::serialize(const start_request::Message& msg, const uint32_t& seq_number)
+RawData start_request::serialize(const start_request::Message& msg, const uint32_t& seq_number)
 {
   std::ostringstream os;
 
@@ -101,20 +93,21 @@ DynamicSizeRawData start_request::serialize(const start_request::Message& msg, c
     raw_processing::write(os, slave.getResolution().value());
   }
 
-  const DynamicSizeRawData raw_data{ convertStringToDynamicSizeRawData(os.str()) };
+  const std::string raw_data_as_str{ os.str() };
+  const RawData raw_data(raw_data_as_str.cbegin(), raw_data_as_str.cend());
 
   std::ostringstream os_crc;
   raw_processing::write(os_crc, calculateCRC(raw_data));
 
-  std::string with_crc(os_crc.str() + os.str());
-  const DynamicSizeRawData raw_data_with_crc{ convertStringToDynamicSizeRawData(with_crc) };
+  std::string raw_data_with_crc_str(os_crc.str() + os.str());
+  RawData raw_data_with_crc{ raw_data_with_crc_str.cbegin(), raw_data_with_crc_str.cend() };
 
-  assert(with_crc.length() == SIZE && "Message data of start request has not the expected size");
+  assert(raw_data_with_crc.size() == SIZE && "Message data of start request has not the expected size");
 
   return raw_data_with_crc;
 }
 
-DynamicSizeRawData start_request::serialize(const start_request::Message& msg)
+RawData start_request::serialize(const start_request::Message& msg)
 {
   return serialize(msg, start_request::DEFAULT_SEQ_NUMBER);
 }

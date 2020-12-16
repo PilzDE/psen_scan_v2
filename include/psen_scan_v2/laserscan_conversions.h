@@ -22,15 +22,21 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Converts the technical monitoring_frame to the user friendly LaserScan type sent by the
+ * IScanner::LaserScanCallback.
+ * @see monitoring_frame::Message
+ * @see ScannerV2
+ */
 static LaserScan toLaserScan(const monitoring_frame::Message& frame)
 {
   const auto resolution = frame.resolution();
   const auto min_angle = frame.fromTheta();
-  const uint16_t number_of_samples = frame.measures().size();
+  const uint16_t number_of_samples = frame.measurements().size();
   const auto max_angle = (frame.fromTheta() + frame.resolution() * number_of_samples);
 
   LaserScan scan(resolution, min_angle, max_angle);
-  scan.setMeasurements(frame.measures());
+  scan.setMeasurements(frame.measurements());
   scan.setIntensities(frame.intensities());
 
   return scan;

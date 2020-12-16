@@ -26,6 +26,9 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Contains all things needed to define and implement a start_request::Message.
+ */
 namespace start_request
 {
 /**
@@ -39,10 +42,15 @@ class Message
 public:
   Message(const ScannerConfiguration& scanner_configuration);
 
-  friend DynamicSizeRawData serialize(const start_request::Message&, const uint32_t&);
-  friend DynamicSizeRawData serialize(const start_request::Message&);
+  friend RawData serialize(const start_request::Message&, const uint32_t&);
+  friend RawData serialize(const start_request::Message&);
 
 private:
+  /**
+   * @brief Class describing the scan settings of the master and slave devices.
+   *
+   * The settings include the scan range and the scan resolution of the respective device.
+   */
   class LaserScanSettings
   {
   public:
@@ -54,20 +62,22 @@ private:
     constexpr TenthOfDegree getResolution() const;
 
   private:
-    const DefaultScanRange scan_range_{};
+    const DefaultScanRange scan_range_{ DefaultScanRange::createInvalidScanRange() };
     const TenthOfDegree resolution_{ 0 };
   };
 
+  /**
+   * @brief Class describing the fundamental settings of the master and slave devices, like id and diagnostics.
+   */
   class DeviceSettings
   {
   public:
-    constexpr DeviceSettings(const ScannerId id, const bool diagnostics_enabled);
+    constexpr DeviceSettings(const bool diagnostics_enabled);
 
   public:
     constexpr bool isDiagnosticsEnabled() const;
 
   private:
-    const ScannerId id_;
     const bool diagnostics_enabled_;
   };
 
@@ -99,8 +109,8 @@ constexpr TenthOfDegree Message::LaserScanSettings::getResolution() const
   return resolution_;
 };
 
-constexpr Message::DeviceSettings::DeviceSettings(const ScannerId id, const bool diagnostics_enabled)
-  : id_(id), diagnostics_enabled_(diagnostics_enabled)
+constexpr Message::DeviceSettings::DeviceSettings(const bool diagnostics_enabled)
+  : diagnostics_enabled_(diagnostics_enabled)
 {
 }
 

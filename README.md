@@ -46,15 +46,15 @@ To update your ROS environment from the former `psen_scan` package (which suppor
 4. In your application launch file / roslaunch command: replace all occurrences of `psen_scan` with `psen_scan_v2`
 
 ## Build Status
-| Platform | Status |
-| -------- | ------ |
-| Travis | [![Build Status](https://travis-ci.org/PilzDE/psen_scan_v2.svg?branch=melodic-devel)](https://travis-ci.org/PilzDE/psen_scan_v2) |
-| Buildfarm src | [![Build Status](http://build.ros.org/job/Msrc_uB__psen_scan_v2__ubuntu_bionic__source/badge/icon)](http://build.ros.org/job/Msrc_uB__psen_scan_v2__ubuntu_bionic__source/) |
-| Buildfarm bin | [![Build Status](http://build.ros.org/job/Mbin_uB64__psen_scan_v2__ubuntu_bionic_amd64__binary/badge/icon)](http://build.ros.org/job/Mbin_uB64__psen_scan_v2__ubuntu_bionic_amd64__binary/) |
+| Platform | Melodic | Noetic |
+| -------- | ------- | ------ |
+| CI | [![CI-Melodic](https://github.com/PilzDE/psen_scan_v2/workflows/CI-Melodic/badge.svg?event=push)](https://github.com/PilzDE/psen_scan_v2/actions?query=event%3Apush+workflow%3ACI-Melodic+branch%3Amain) | [![CI-Noetic](https://github.com/PilzDE/psen_scan_v2/workflows/CI-Noetic/badge.svg?event=push)](https://github.com/PilzDE/psen_scan_v2/actions?query=event%3Apush+workflow%3ACI-Noetic+branch%3Amain) |
+| Buildfarm src | [![Build Status](http://build.ros.org/job/Msrc_uB__psen_scan_v2__ubuntu_bionic__source/badge/icon)](http://build.ros.org/job/Msrc_uB__psen_scan_v2__ubuntu_bionic__source/) | Coming Soon! |
+| Buildfarm bin | [![Build Status](http://build.ros.org/job/Mbin_uB64__psen_scan_v2__ubuntu_bionic_amd64__binary/badge/icon)](http://build.ros.org/job/Mbin_uB64__psen_scan_v2__ubuntu_bionic_amd64__binary/) | Coming Soon! |
 
 
 ## Branching model
-`main` is considered to be the active development branch.
+`main` is considered to be the active development branch, it targets the ROS distributions `melodic` and `noetic`.
 
 ## Setup
 
@@ -72,14 +72,16 @@ Publishes a complete scan from the PSENscan safety laser scanner.
 _host_ip_ (_string_, default: "192.168.0.50")<br/>
 IP-Address of host machine.
 
+_sensor_ip_ (_string_, default: "192.168.0.10")<br/>
+IP-Address of safety laser scanner.
+
+### Further Parameters (optional)
+
 _host_udp_port_data_ (_int_, default: 55115)<br/>
 UDP Port on which monitoring frames (scans) should be received.
 
 _host_udp_port_control_ (_int_, default: 55116)<br/>
 UDP Port used to send commands (start/stop) and receive the corresponding replies.
-
-_sensor_ip_ (_string_, default: "192.168.0.10")<br/>
-IP-Address of safety laser scanner.
 
 _prefix_ (_string_, default: "laser_1")<br/>
 Name of this scanner that can be changed to differentiate between multiple units.

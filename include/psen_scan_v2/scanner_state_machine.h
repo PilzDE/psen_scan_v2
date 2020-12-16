@@ -35,6 +35,7 @@
 #include "psen_scan_v2/scanner_events.h"
 
 #include "psen_scan_v2/logging.h"
+#include "psen_scan_v2/format_range.h"
 #include "psen_scan_v2/udp_client.h"
 
 #include "psen_scan_v2/laserscan.h"
@@ -52,6 +53,9 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Contains all things needed to describe and implement the scanner protocol.
+ */
 namespace scanner_protocol
 {
 namespace msm = boost::msm;
@@ -79,6 +83,14 @@ using ScannerStartedCB = std::function<void()>;
 using ScannerStoppedCB = std::function<void()>;
 using InformUserAboutLaserScanCB = std::function<void(const LaserScan&)>;
 
+/**
+ * @brief Interface to create event timeout handlers.
+ *
+ * Implementations of this Interface should create thread save timeout handlers that
+ * call an event every time a defined timeout has run out and restart themselves until deleted.
+ *
+ * @see Watchdog
+ */
 class IWatchdogFactory
 {
 public:
@@ -88,6 +100,10 @@ public:
   virtual std::unique_ptr<Watchdog> create(const Watchdog::Timeout& timeout, const std::string& event_type) = 0;
 };
 
+/**
+ * @brief Helper class used to easily transfer data from the higher level ScannerV2 class
+ * to the ScannerProtocolDef class during construction of the ScannerStateMachine.
+ */
 struct StateMachineArgs
 {
   StateMachineArgs(const ScannerConfiguration& scanner_config,
@@ -164,6 +180,9 @@ public:  // Definition of state machine via table
   typedef ScannerProtocolDef m;
 
   // clang-format off
+  /**
+   * @brief Table describing the state machine which is specified in the scanner protocol.
+   */
   struct transition_table : mpl::vector<
       //    Start                         Event                         Next                        Action                        Guard
       //  +------------------------------+----------------------------+---------------------------+------------------------------+-----------------------------+
@@ -193,12 +212,12 @@ private:
   monitoring_frame::ScanValidator complete_scan_validator_;
 };
 
-#include "psen_scan_v2/scanner_state_machine.hpp"
-
 // Pick a back-end
 using ScannerStateMachine = msm::back::state_machine<ScannerProtocolDef>;
 
 }  // namespace scanner_protocol
 }  // namespace psen_scan_v2
+
+#include "psen_scan_v2/scanner_state_machine_def.h"
 
 #endif  // PSEN_SCAN_V2_SCANNER_PROTOCOL_DEF_H

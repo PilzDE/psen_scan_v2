@@ -35,7 +35,7 @@
 
 namespace psen_scan_v2
 {
-using NewDataHandler = std::function<void(const MaxSizeRawData&, const std::size_t&)>;
+using NewDataHandler = std::function<void(const RawData&, const std::size_t&)>;
 using ErrorHandler = std::function<void(const std::string&)>;
 using TimeoutHandler = std::function<void(const std::string&)>;
 
@@ -57,12 +57,18 @@ enum class ReceiveMode
 class UdpClientImpl
 {
 public:
+  /**
+   * @brief Exception thrown if the UDP socket cannot be closed.
+   */
   class CloseConnectionFailure : public std::runtime_error
   {
   public:
     CloseConnectionFailure(const std::string& msg = "Failure while closing connection");
   };
 
+  /**
+   * @brief Exception thrown if the UDP socket cannot be opened.
+   */
   class OpenConnectionFailure : public std::runtime_error
   {
   public:
@@ -109,7 +115,7 @@ public:
    *
    * @param data Data which have to be send to the other endpoint.
    */
-  void write(const DynamicSizeRawData& data);
+  void write(const RawData& data);
 
   /**
    * @brief Closes the UDP connection and stops all pending asynchronous operation.
@@ -127,7 +133,7 @@ private:
   boost::asio::io_service::work work_{ io_service_ };
   std::thread io_service_thread_;
 
-  MaxSizeRawData received_data_;
+  RawData received_data_;
 
   NewDataHandler data_handler_;
   ErrorHandler error_handler_;
@@ -156,6 +162,7 @@ inline UdpClientImpl::UdpClientImpl(const NewDataHandler& data_handler,
     throw std::invalid_argument("Error handler is invalid");
   }
 
+  received_data_.resize(psen_scan_v2::MAX_UDP_PAKET_SIZE);
   try
   {
     socket_.connect(endpoint_);
@@ -220,11 +227,12 @@ inline void UdpClientImpl::sendCompleteHandler(const boost::system::error_code& 
   {
     PSENSCAN_ERROR("UdpClient", "Failed to send data. Error message: {}", error.message());
   }
+
   // LCOV_EXCL_STOP
   PSENSCAN_DEBUG("UdpClient", "Data successfully send.");
 }
 
-inline void UdpClientImpl::write(const DynamicSizeRawData& data)
+inline void UdpClientImpl::write(const RawData& data)
 {
   io_service_.post([this, data]() {
     socket_.async_send(boost::asio::buffer(data.data(), data.size()),

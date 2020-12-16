@@ -21,12 +21,19 @@
 #include <algorithm>
 #include <vector>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Contains functions, etc. needed to transform
+ * higher level data to raw data (sent to or received from scanner) or vice versa.
+ */
 namespace raw_processing
 {
+/**
+ * @brief Exception which is thrown if the incoming data from the scanner cannot be processed.
+ */
 class StringStreamFailure : public std::runtime_error
 {
 public:

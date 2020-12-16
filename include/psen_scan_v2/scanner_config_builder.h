@@ -30,6 +30,9 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Helper class to simplify/improve the construction of the psen_scan_v2::ScannerConfiguration.
+ */
 class ScannerConfigurationBuilder
 {
 public:

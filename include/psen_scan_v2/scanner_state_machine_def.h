@@ -13,6 +13,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+namespace psen_scan_v2
+{
+namespace scanner_protocol
+{
 inline ScannerProtocolDef::ScannerProtocolDef(StateMachineArgs* const args) : args_(args)
 {
 }
@@ -63,7 +67,7 @@ template <class Event, class FSM>
 void ScannerProtocolDef::WaitForStartReply::on_exit(Event const&, FSM& fsm)
 {
   PSENSCAN_DEBUG("StateMachine", fmt::format("Exiting state: {}", "WaitForStartReply"));
-  // Stop watchdog...
+  // Stops the watchdog by resetting the pointer
   fsm.start_reply_watchdog_.reset();
 }
 
@@ -81,7 +85,7 @@ template <class Event, class FSM>
 void ScannerProtocolDef::WaitForMonitoringFrame::on_exit(Event const&, FSM& fsm)
 {
   PSENSCAN_DEBUG("StateMachine", fmt::format("Exiting state: {}", "WaitForMonitoringFrame"));
-  // Stop watchdog...
+  // Stops the watchdog by resetting the pointer
   fsm.monitoring_frame_watchdog_.reset();
 }
 
@@ -143,7 +147,8 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
   PSENSCAN_DEBUG("StateMachine", "Action: handleMonitoringFrame");
   monitoring_frame_watchdog_->reset();
   const monitoring_frame::Message frame{ monitoring_frame::deserialize(event.data_, event.num_bytes_) };
-  PSENSCAN_WARN_THROTTLE(1 /* sec */, "StateMachine", "The scanner reports an error: {}", frame.diagnosticMessages());
+  PSENSCAN_WARN_THROTTLE(
+      1 /* sec */, "StateMachine", "The scanner reports an error: {}", formatRange(frame.diagnosticMessages()));
 
   printUserMsgFor(complete_scan_validator_.validate(frame, DEFAULT_NUM_MSG_PER_ROUND));
   args_->inform_user_about_laser_scan_cb(toLaserScan(frame));
@@ -207,3 +212,6 @@ void ScannerProtocolDef::no_transition(const scanner_events::RawMonitoringFrameR
 {
   PSENSCAN_WARN("StateMachine", "Received monitoring frame despite not waiting for it");
 }
+
+}  // namespace scanner_protocol
+}  // namespace psen_scan_v2

@@ -21,6 +21,9 @@ namespace psen_scan_v2
 {
 namespace scanner_protocol
 {
+/**
+ * @brief Contains the events needed to define and implement the scanner protocol.
+ */
 namespace scanner_events
 {
 //! @brief User requests scanner to start.
@@ -42,12 +45,12 @@ class StartTimeout
 class RawReplyReceived
 {
 public:
-  RawReplyReceived(const MaxSizeRawData& data, const std::size_t& num_bytes) : data_(data), num_bytes_(num_bytes)
+  RawReplyReceived(const RawData& data, const std::size_t& num_bytes) : data_(data), num_bytes_(num_bytes)
   {
   }
 
 public:
-  const MaxSizeRawData data_;
+  const RawData data_;
   const std::size_t num_bytes_;
 };
 
@@ -60,13 +63,12 @@ class ReplyReceiveError
 class RawMonitoringFrameReceived
 {
 public:
-  RawMonitoringFrameReceived(const MaxSizeRawData& data, const std::size_t& num_bytes)
-    : data_(data), num_bytes_(num_bytes)
+  RawMonitoringFrameReceived(const RawData& data, const std::size_t& num_bytes) : data_(data), num_bytes_(num_bytes)
   {
   }
 
 public:
-  const MaxSizeRawData data_;
+  const RawData data_;
   const std::size_t num_bytes_;
 };
 

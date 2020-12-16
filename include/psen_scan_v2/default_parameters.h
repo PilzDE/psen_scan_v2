@@ -20,10 +20,16 @@
 
 namespace psen_scan_v2
 {
+/**
+ * @brief Contains default constants for the scanner setup.
+ */
 namespace constants
 {
 static constexpr unsigned short DATA_PORT_OF_SCANNER_DEVICE{ 2000 };
 static constexpr unsigned short CONTROL_PORT_OF_SCANNER_DEVICE{ 3000 };
+
+static constexpr unsigned short DATA_PORT_OF_HOST_DEVICE{ 55115 };
+static constexpr unsigned short CONTROL_PORT_OF_HOST_DEVICE{ 55116 };
 
 //! @brief Start angle of measurement.
 static constexpr double DEFAULT_ANGLE_START(-degreeToRadian(137.5));

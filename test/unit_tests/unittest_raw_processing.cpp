@@ -30,7 +30,11 @@ class RawProcessingTest : public ::testing::Test
 };
 
 using MyTypes = testing::Types<uint8_t, uint16_t, uint32_t, uint64_t>;
+#ifdef TYPED_TEST_SUITE  // in this case TYPED_TEST_CASE is deprecated
+TYPED_TEST_SUITE(RawProcessingTest, MyTypes);
+#else
 TYPED_TEST_CASE(RawProcessingTest, MyTypes);
+#endif
 
 TYPED_TEST(RawProcessingTest, write)
 {
