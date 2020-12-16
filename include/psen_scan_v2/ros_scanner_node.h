@@ -120,7 +120,7 @@ void ROSScannerNodeT<S>::run()
   scanner_.start();
   while (ros::ok() && !terminate_)
   {
-    r.sleep();
+    r.sleep();  // LCOV_EXCL_LINE can not be reached deterministically
   }
   const auto stop_future = scanner_.stop();
   const auto stop_status = stop_future.wait_for(3s);
