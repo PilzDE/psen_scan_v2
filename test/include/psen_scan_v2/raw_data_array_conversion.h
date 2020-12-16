@@ -20,9 +20,10 @@
 namespace psen_scan_v2_test
 {
 template <typename T>
-inline psen_scan_v2::MaxSizeRawData convertToMaxSizeRawData(const T data)
+inline psen_scan_v2::RawData convertToRawData(const T data)
 {
-  psen_scan_v2::MaxSizeRawData ret;
+  psen_scan_v2::RawData ret(data.begin(), data.end());
+
   for (size_t i = 0; i < data.size(); i++)
   {
     ret.at(i) = static_cast<char>(data.at(i));

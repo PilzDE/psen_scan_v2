@@ -46,12 +46,11 @@ FixedFields::FixedFields(DeviceStatus device_status,
 {
 }
 
-monitoring_frame::Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes)
+monitoring_frame::Message deserialize(const RawData& data, const std::size_t& num_bytes)
 {
   monitoring_frame::Message msg;
 
-  MaxSizeRawData tmp_data{ data };
-  std::istringstream is(std::string(tmp_data.data(), tmp_data.size()));
+  std::istringstream is(std::string(data.cbegin(), data.cend()));
 
   FixedFields frame_header = readFixedFields(is);
 
