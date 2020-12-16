@@ -62,7 +62,7 @@ private:
     constexpr TenthOfDegree getResolution() const;
 
   private:
-    const DefaultScanRange scan_range_{};
+    const DefaultScanRange scan_range_{ DefaultScanRange::createInvalidScanRange() };
     const TenthOfDegree resolution_{ 0 };
   };
 

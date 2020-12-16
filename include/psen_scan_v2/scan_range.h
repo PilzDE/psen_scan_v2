@@ -31,8 +31,6 @@ class ScanRange
   static_assert(min_allowed_angle < max_allowed_angle, "MIN-angle limit smaller than MAX-angle limit.");
 
 public:
-  ScanRange() = default;
-
   /**
    * @brief Constructor.
    *
@@ -43,6 +41,12 @@ public:
 
   const TenthOfDegree& getStart() const;
   const TenthOfDegree& getEnd() const;
+
+public:
+  static constexpr ScanRange<min_allowed_angle, max_allowed_angle> createInvalidScanRange();
+
+private:
+  ScanRange() = default;
 
 private:
   TenthOfDegree start_angle_{ 0 };
@@ -70,6 +74,12 @@ constexpr ScanRange<min_angle, max_angle>::ScanRange(const TenthOfDegree& start_
   {
     throw std::invalid_argument("Start angle must be smaller or equal to end angle");
   }
+}
+
+template <int16_t min_angle, int16_t max_angle>
+constexpr ScanRange<min_angle, max_angle> ScanRange<min_angle, max_angle>::createInvalidScanRange()
+{
+  return ScanRange<min_angle, max_angle>();
 }
 
 template <int16_t min_angle, int16_t max_angle>
