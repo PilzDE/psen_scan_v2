@@ -98,7 +98,9 @@ TEST(TenthOfDegreeTest, LargerThanOrEqualComparison)
 
 TEST(TenthOfDegreeTest, shouldThrowUnderflowErrorOnCastToIntOfValuesUnderZero)
 {
-  EXPECT_THROW(uint16_t(TenthOfDegree(-1));, std::underflow_error);
+  EXPECT_THROW(std::cout << static_cast<uint16_t>(TenthOfDegree(-1))
+                         << " - printed to not be unused. Should trow before.\n!",
+               std::underflow_error);
 }
 
 }  // namespace psen_scan_v2_test
