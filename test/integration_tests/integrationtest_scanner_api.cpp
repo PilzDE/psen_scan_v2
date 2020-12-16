@@ -509,10 +509,9 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
   Barrier empty_msg_received;
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
-  EXPECT_LOG_SHORT(WARN,
-                   "StateMachine: No transition in state"
-                   " \"psen_scan_v2::scanner_protocol::ScannerProtocolDef::WaitForMonitoringFrame\""
-                   " for event \"MonitoringFrameReceivedError\".")
+  EXPECT_LOG_SHORT(
+      WARN,
+      "StateMachine: No transition in state \"WaitForMonitoringFrame\" for event \"MonitoringFrameReceivedError\".")
       .Times(1)
       .WillOnce(OpenBarrier(&empty_msg_received));
 

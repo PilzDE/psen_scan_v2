@@ -188,7 +188,8 @@ static std::string getStateName(const int& state_id)
   std::string mangle_state_name;
   boost::mpl::for_each<states, boost::msm::wrap<boost::mpl::placeholders::_1> >(
       boost::msm::back::get_state_name<recursive_transition_table>(mangle_state_name, state_id));
-  return boost::core::demangle(mangle_state_name.c_str());
+  const auto full_name{ boost::core::demangle(mangle_state_name.c_str()) };
+  return full_name.substr(full_name.rfind("::") + 2);
 }
 
 template <class T>
