@@ -52,6 +52,8 @@ void laserScanCallback(const LaserScan& scan)
 
 int main(int argc, char** argv)
 {
+  setLogLevel(CONSOLE_BRIDGE_LOG_INFO);
+
   DefaultScanRange scan_range{ ANGLE_START, ANGLE_END };
 
   ScannerConfigurationBuilder config_builder;
