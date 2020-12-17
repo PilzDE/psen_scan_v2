@@ -96,7 +96,7 @@ MockUDPServer::MockUDPServer(const unsigned short port, const NewDataHandler& ne
     throw std::invalid_argument("New data handler must not be null");
   }
 
-  recv_buffer_.resize(psen_scan_v2::MAX_UDP_PAKET_SIZE);
+  recv_buffer_.resize(psen_scan_v2_standalone::MAX_UDP_PAKET_SIZE);
   io_service_thread_ = std::thread([this]() { io_service_.run(); });
 }
 
