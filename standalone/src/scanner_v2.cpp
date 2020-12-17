@@ -27,7 +27,7 @@ using namespace psen_scan_v2_standalone::scanner_protocol::scanner_events;
   std::bind(&ScannerV2::triggerEvent<event_name>, this)
 
 #define BIND_RAW_DATA_EVENT(event_name)\
-  [this](const MaxSizeRawData& data, const std::size_t& num_bytes){ triggerEventWithParam(event_name(data, num_bytes)); }
+  [this](const RawData& data, const std::size_t& num_bytes){ triggerEventWithParam(event_name(data, num_bytes)); }
 // clang-format on
 
 ScannerV2::WatchdogFactory::WatchdogFactory(ScannerV2* scanner) : IWatchdogFactory(), scanner_(scanner)

@@ -24,7 +24,7 @@ namespace psen_scan_v2_standalone
 {
 namespace monitoring_frame
 {
-DynamicSizeRawData serialize(const monitoring_frame::Message& frame)
+RawData serialize(const monitoring_frame::Message& frame)
 {
   std::ostringstream os;
 
@@ -78,7 +78,7 @@ DynamicSizeRawData serialize(const monitoring_frame::Message& frame)
   raw_processing::write(os, unknown_data_at_the_end_of_frame);
   raw_processing::write(os, unknown_data_at_the_end_of_frame);
 
-  return raw_processing::toArray<DynamicSizeRawData>(os);
+  return raw_processing::toArray<RawData>(os);
 }
 
 constexpr size_t calculateIndexInRawDiagnosticData(const ScannerId& id, const diagnostic::ErrorLocation& location)

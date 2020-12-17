@@ -23,7 +23,7 @@
 
 namespace psen_scan_v2_standalone
 {
-psen_scan_v2_standalone::DynamicSizeRawData psen_scan_v2_standalone::stop_request::serialize()
+RawData stop_request::serialize()
 {
   std::ostringstream os;
 
@@ -35,6 +35,6 @@ psen_scan_v2_standalone::DynamicSizeRawData psen_scan_v2_standalone::stop_reques
   raw_processing::write(os, stop_request::RESERVED);
   raw_processing::write(os, stop_request::OPCODE);
 
-  return raw_processing::toArray<DynamicSizeRawData>(os);
+  return raw_processing::toArray<RawData>(os);
 }
 }  // namespace psen_scan_v2_standalone

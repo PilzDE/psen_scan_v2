@@ -41,8 +41,6 @@ static constexpr unsigned short HOST_UDP_PORT{ 46001 };
 static const std::string UDP_MOCK_IP_ADDRESS{ "127.0.0.1" };
 static constexpr unsigned short UDP_MOCK_PORT{ HOST_UDP_PORT + 1 };
 
-static constexpr std::size_t DATA_SIZE_BYTES{ 100 };
-
 static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 5 };
 
 using std::placeholders::_1;
@@ -52,10 +50,10 @@ class UdpClientTests : public testing::Test
 {
 public:
   UdpClientTests();
-  MOCK_METHOD2(handleNewData, void(const MaxSizeRawData&, const std::size_t&));
+  MOCK_METHOD2(handleNewData, void(const RawData&, const std::size_t&));
   MOCK_METHOD1(handleError, void(const std::string&));
 
-  MOCK_METHOD2(receivedUdpMsg, void(const udp::endpoint&, const psen_scan_v2_standalone::DynamicSizeRawData&));
+  MOCK_METHOD2(receivedUdpMsg, void(const udp::endpoint&, const psen_scan_v2_standalone::RawData&));
 
 public:
   void sendTestDataToClient();
@@ -70,7 +68,7 @@ protected:
                                                                 inet_network(UDP_MOCK_IP_ADDRESS.c_str()),
                                                                 UDP_MOCK_PORT) };
 
-  FixedSizeRawData<DATA_SIZE_BYTES> send_array = { "Hello" };
+  const RawData send_array_{ 'H', 'e', 'l', 'l', 'o' };
   const udp::endpoint host_endpoint;
 };
 
@@ -81,13 +79,14 @@ UdpClientTests::UdpClientTests()
 
 void UdpClientTests::sendTestDataToClient()
 {
-  mock_udp_server_.asyncSend<DATA_SIZE_BYTES>(host_endpoint, send_array);
+  mock_udp_server_.asyncSend(host_endpoint, send_array_);
 }
 
 void UdpClientTests::sendEmptyTestDataToClient()
 {
-  const psen_scan_v2_standalone::FixedSizeRawData<0> data;
-  mock_udp_server_.asyncSend<data.size()>(host_endpoint, data);
+  const psen_scan_v2_standalone::RawData data;
+  assert(data.empty());
+  mock_udp_server_.asyncSend(host_endpoint, data);
 }
 
 ACTION_P(OpenBarrier, barrier)
@@ -98,7 +97,7 @@ ACTION_P(OpenBarrier, barrier)
 TEST_F(UdpClientTests, testAsyncReadOperation)
 {
   Barrier client_received_data_barrier;
-  EXPECT_CALL(*this, handleNewData(_, DATA_SIZE_BYTES)).WillOnce(OpenBarrier(&client_received_data_barrier));
+  EXPECT_CALL(*this, handleNewData(_, send_array_.size())).WillOnce(OpenBarrier(&client_received_data_barrier));
 
   udp_client_->startAsyncReceiving();
   sendTestDataToClient();
@@ -108,7 +107,7 @@ TEST_F(UdpClientTests, testAsyncReadOperation)
 TEST_F(UdpClientTests, testSingleAsyncReadOperation)
 {
   Barrier client_received_data_barrier;
-  EXPECT_CALL(*this, handleNewData(_, DATA_SIZE_BYTES)).WillOnce(OpenBarrier(&client_received_data_barrier));
+  EXPECT_CALL(*this, handleNewData(_, send_array_.size())).WillOnce(OpenBarrier(&client_received_data_barrier));
 
   udp_client_->startAsyncReceiving(ReceiveMode::single);
   sendTestDataToClient();
@@ -136,7 +135,7 @@ TEST_F(UdpClientTests, testErrorHandlingForReceive)
 TEST_F(UdpClientTests, testWriteOperation)
 {
   std::string str = "Hello!";
-  DynamicSizeRawData write_buf;
+  RawData write_buf;
   std::copy(str.begin(), str.end(), std::back_inserter(write_buf));
 
   Barrier server_mock_received_data_barrier;
@@ -151,12 +150,12 @@ TEST_F(UdpClientTests, testWriteOperation)
 TEST_F(UdpClientTests, testWritingWhileReceiving)
 {
   std::string str = "Hello!";
-  DynamicSizeRawData write_buf;
+  RawData write_buf;
   std::copy(str.begin(), str.end(), std::back_inserter(write_buf));
 
   Barrier client_received_data_barrier;
   Barrier server_mock_received_data_barrier;
-  EXPECT_CALL(*this, handleNewData(_, DATA_SIZE_BYTES)).WillOnce(OpenBarrier(&client_received_data_barrier));
+  EXPECT_CALL(*this, handleNewData(_, send_array_.size())).WillOnce(OpenBarrier(&client_received_data_barrier));
   EXPECT_CALL(*this, receivedUdpMsg(_, write_buf))
       .WillOnce(DoAll(InvokeWithoutArgs(this, &UdpClientTests::sendTestDataToClient),
                       OpenBarrier(&server_mock_received_data_barrier)));

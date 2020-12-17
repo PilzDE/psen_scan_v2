@@ -179,6 +179,19 @@ inline bool ScannerProtocolDef::isStopReply(scanner_events::RawReplyReceived con
 
 //++++++++++++++++++++ Special transitions ++++++++++++++++++++++++++++++++++++
 
+template <class FSM>
+static std::string getStateName(const int& state_id)
+{
+  using recursive_transition_table = typename boost::msm::back::recursive_get_transition_table<FSM>::type;
+  using states = typename boost::msm::back::generate_state_set<recursive_transition_table>::type;
+
+  std::string mangle_state_name;
+  boost::mpl::for_each<states, boost::msm::wrap<boost::mpl::placeholders::_1> >(
+      boost::msm::back::get_state_name<recursive_transition_table>(mangle_state_name, state_id));
+  const auto full_name{ boost::core::demangle(mangle_state_name.c_str()) };
+  return full_name.substr(full_name.rfind("::") + 2);
+}
+
 template <class T>
 static std::string classNameShort(const T& t)
 {
@@ -189,7 +202,10 @@ static std::string classNameShort(const T& t)
 template <class FSM, class Event>
 void ScannerProtocolDef::no_transition(Event const& event, FSM&, int state)
 {
-  PSENSCAN_WARN("StateMachine", "No transition in state {} for event {}.", state, classNameShort(event));
+  PSENSCAN_WARN("StateMachine",
+                "No transition in state \"{}\" for event \"{}\".",
+                getStateName<FSM>(state),
+                classNameShort(event));
 }
 
 template <class FSM>

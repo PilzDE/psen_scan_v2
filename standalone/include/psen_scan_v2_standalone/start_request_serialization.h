@@ -16,13 +16,14 @@
 #define PSEN_SCAN_V2_STANDALONE_START_REQUEST_SERIALIZATION_H
 
 #include "psen_scan_v2_standalone/start_request.h"
+#include "psen_scan_v2_standalone/raw_scanner_data.h"
 
 namespace psen_scan_v2_standalone
 {
 namespace start_request
 {
-DynamicSizeRawData serialize(const start_request::Message& start_request, const uint32_t& seq_number);
-DynamicSizeRawData serialize(const start_request::Message& start_request);
+RawData serialize(const start_request::Message& start_request, const uint32_t& seq_number);
+RawData serialize(const start_request::Message& start_request);
 }  // namespace start_request
 }  // namespace psen_scan_v2_standalone
 #endif

@@ -31,7 +31,7 @@ static constexpr std::size_t NUM_RESERVED_FIELDS{ 12 };
 static constexpr std::array<uint8_t, NUM_RESERVED_FIELDS> RESERVED{};
 static const uint32_t OPCODE{ htole32(0x36) };
 
-DynamicSizeRawData serialize();
+RawData serialize();
 }  // namespace stop_request
 }  // namespace psen_scan_v2_standalone
 #endif

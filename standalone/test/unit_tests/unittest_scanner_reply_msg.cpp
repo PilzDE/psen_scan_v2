@@ -21,6 +21,7 @@
 
 #include <gtest/gtest.h>
 
+#include "psen_scan_v2_standalone/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/scanner_reply_msg.h"
 #include "psen_scan_v2_standalone/scanner_reply_serialization_deserialization.h"
 
@@ -54,10 +55,10 @@ TEST(ScannerReplyMsgTest, testGetStartOpCode)
 TEST(ScannerReplyMsgTest, testserialize)
 {
   const Message msg(Message::Type::start, Message::OperationResult::accepted);
-  const scanner_reply::RawType raw_msg{ scanner_reply::serialize(msg) };
+  const auto raw_msg{ scanner_reply::serialize(msg) };
 
   boost::crc_32_type crc;
-  crc.process_bytes(&raw_msg[sizeof(uint32_t)], raw_msg.size() - sizeof(uint32_t));
+  crc.process_bytes(&raw_msg.at(sizeof(uint32_t)), raw_msg.size() - sizeof(uint32_t));
 
   const uint32_t reserved{ 0 };
 
@@ -70,8 +71,8 @@ TEST(ScannerReplyMsgTest, testserialize)
 TEST(ScannerReplyMsgTest, testdeserializeUnknownFields)
 {
   const Message msg(Message::Type::unknown, Message::OperationResult::unknown);
-  const scanner_reply::RawType raw_msg{ scanner_reply::serialize(msg) };
-  const Message deserialized = scanner_reply::deserialize<scanner_reply::RawType>(raw_msg);
+  const auto raw_msg{ scanner_reply::serialize(msg) };
+  const auto deserialized{ scanner_reply::deserialize(raw_msg) };
 
   EXPECT_EQ(deserialized.type(), Message::Type::unknown);
   EXPECT_EQ(deserialized.result(), Message::OperationResult::unknown);
@@ -81,10 +82,9 @@ TEST(ScannerReplyMsgTest, testdeserializeValidCRC)
 {
   // Use raw data generated from serialize()
   const Message msg(Message::Type::start, Message::OperationResult::accepted);
-  const scanner_reply::RawType raw_msg{ scanner_reply::serialize(msg) };
+  const auto raw_msg{ scanner_reply::serialize(msg) };
 
-  MaxSizeRawData data;
-  std::copy(raw_msg.begin(), raw_msg.end(), data.begin());
+  const RawData data(raw_msg.begin(), raw_msg.end());
 
   // Check equality by comparing crc checksums
   boost::crc_32_type crc;
@@ -96,12 +96,10 @@ TEST(ScannerReplyMsgTest, testdeserializeInvalidCRC)
 {
   // Use raw data generated from serialize()
   const Message msg(Message::Type::start, Message::OperationResult::accepted);
-  scanner_reply::RawType raw_msg{ scanner_reply::serialize(msg) };
-  raw_msg[0] += 0x01;  // alter crc checksum
+  auto raw_msg{ scanner_reply::serialize(msg) };
+  raw_msg.at(0) += 0x01;  // alter crc checksum
 
-  MaxSizeRawData data;
-  std::copy(raw_msg.begin(), raw_msg.end(), data.begin());
-
+  const RawData data(raw_msg.begin(), raw_msg.end());
   EXPECT_THROW(scanner_reply::deserialize(data), scanner_reply::CRCMismatch);
 }
 
