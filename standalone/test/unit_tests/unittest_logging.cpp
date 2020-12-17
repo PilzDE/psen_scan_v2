@@ -27,6 +27,7 @@ using namespace psen_scan_v2_standalone_test;
 TEST(LoggingTest, logInfo)
 {
   INJECT_LOG_MOCK;
+  setLogLevel(CONSOLE_BRIDGE_LOG_INFO);
   EXPECT_LOG(INFO, "Name: msg", __FILE__, __LINE__ + 1).Times(1);
   PSENSCAN_INFO("Name", "msg");
 }
@@ -34,6 +35,7 @@ TEST(LoggingTest, logInfo)
 TEST(LoggingTest, logDebug)
 {
   INJECT_LOG_MOCK;
+  setLogLevel(CONSOLE_BRIDGE_LOG_DEBUG);
   EXPECT_LOG(DEBUG, "Name: msg", __FILE__, __LINE__ + 1).Times(1);
   PSENSCAN_DEBUG("Name", "msg");
 }
@@ -55,6 +57,7 @@ TEST(LoggingTest, logError)
 TEST(LoggingTest, logInfoThrottle)
 {
   INJECT_LOG_MOCK;
+  setLogLevel(CONSOLE_BRIDGE_LOG_INFO);
   EXPECT_LOG(INFO, "Name: msg", __FILE__, __LINE__ + 1).Times(1);
   PSENSCAN_INFO_THROTTLE(0.1, "Name", "msg");
 }
@@ -62,6 +65,7 @@ TEST(LoggingTest, logInfoThrottle)
 TEST(LoggingTest, logDebugThrottle)
 {
   INJECT_LOG_MOCK;
+  setLogLevel(CONSOLE_BRIDGE_LOG_DEBUG);
   EXPECT_LOG(DEBUG, "Name: msg", __FILE__, __LINE__ + 1).Times(1);
   PSENSCAN_DEBUG_THROTTLE(0.1, "Name", "msg");
 }

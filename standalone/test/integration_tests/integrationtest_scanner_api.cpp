@@ -257,6 +257,7 @@ protected:
 void ScannerAPITests::SetUp()
 {
   port_holder_.printPorts();
+  setLogLevel(CONSOLE_BRIDGE_LOG_DEBUG);
 }
 
 void ScannerMock::startListeningForControlMsg()
