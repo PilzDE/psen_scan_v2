@@ -19,7 +19,6 @@
 #include <thread>
 
 #include <psen_scan_v2_standalone/core.h>
-#include <psen_scan_v2_standalone/logging.h>
 
 using namespace psen_scan_v2_standalone;
 using namespace psen_scan_v2_standalone::constants;
