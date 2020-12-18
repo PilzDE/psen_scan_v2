@@ -17,6 +17,7 @@
 
 #include <boost/optional.hpp>
 
+#include "psen_scan_v2_standalone/default_parameters.h"
 #include "psen_scan_v2_standalone/scan_range.h"
 
 namespace psen_scan_v2_standalone
@@ -51,12 +52,12 @@ private:
 
 private:
   boost::optional<uint32_t> host_ip_;
-  boost::optional<uint16_t> host_data_port_;
-  boost::optional<uint16_t> host_control_port_;
+  uint16_t host_data_port_{ constants::DATA_PORT_OF_HOST_DEVICE };
+  uint16_t host_control_port_{ constants::CONTROL_PORT_OF_HOST_DEVICE };
 
   boost::optional<uint32_t> scanner_ip_;
-  boost::optional<uint16_t> scanner_data_port_;
-  boost::optional<uint16_t> scanner_control_port_;
+  uint16_t scanner_data_port_{ constants::DATA_PORT_OF_SCANNER_DEVICE };
+  uint16_t scanner_control_port_{ constants::CONTROL_PORT_OF_SCANNER_DEVICE };
 
   boost::optional<DefaultScanRange> scan_range_{};
   bool diagnostics_enabled_{ false };
