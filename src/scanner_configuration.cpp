@@ -19,11 +19,7 @@ namespace psen_scan_v2
 {
 bool ScannerConfiguration::isValid() const
 {
-  // clang-format off
-  return host_ip_     && host_data_port_    && host_control_port_ &&
-         scanner_ip_  && scanner_data_port_ && scanner_control_port_ &&
-         scan_range_;
-  // clang-format on
+  return host_ip_ && scanner_ip_ && scan_range_;
 }
 
 uint32_t ScannerConfiguration::hostIp() const
@@ -33,12 +29,12 @@ uint32_t ScannerConfiguration::hostIp() const
 
 uint16_t ScannerConfiguration::hostUDPPortData() const
 {
-  return *host_data_port_;
+  return host_data_port_;
 }
 
 uint16_t ScannerConfiguration::hostUDPPortControl() const
 {
-  return *host_control_port_;
+  return host_control_port_;
 }
 
 uint32_t ScannerConfiguration::clientIp() const
@@ -48,12 +44,12 @@ uint32_t ScannerConfiguration::clientIp() const
 
 uint16_t ScannerConfiguration::scannerDataPort() const
 {
-  return *scanner_data_port_;
+  return scanner_data_port_;
 }
 
 uint16_t ScannerConfiguration::scannerControlPort() const
 {
-  return *scanner_control_port_;
+  return scanner_control_port_;
 }
 
 const DefaultScanRange& ScannerConfiguration::scanRange() const
