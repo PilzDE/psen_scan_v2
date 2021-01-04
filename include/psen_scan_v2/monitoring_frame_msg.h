@@ -107,8 +107,8 @@ private:
   bool diagnostic_data_enabled_{ false };
 
 public:
-  friend DynamicSizeRawData serialize(const monitoring_frame::Message& frame);
-  friend monitoring_frame::Message deserialize(const MaxSizeRawData& data, const std::size_t& num_bytes);
+  friend RawData serialize(const monitoring_frame::Message& frame);
+  friend monitoring_frame::Message deserialize(const RawData& data, const std::size_t& num_bytes);
 };
 
 inline ScanCounterMissing::ScanCounterMissing(const std::string& msg) : std::runtime_error(msg)

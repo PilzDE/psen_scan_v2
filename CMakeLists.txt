@@ -36,11 +36,8 @@ find_package(fmt REQUIRED)
 
 catkin_package(
   CATKIN_DEPENDS
-    rosconsole_bridge
     roscpp
     sensor_msgs
-  DEPENDS
-    console_bridge
 )
 
 

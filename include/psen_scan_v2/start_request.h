@@ -42,8 +42,8 @@ class Message
 public:
   Message(const ScannerConfiguration& scanner_configuration);
 
-  friend DynamicSizeRawData serialize(const start_request::Message&, const uint32_t&);
-  friend DynamicSizeRawData serialize(const start_request::Message&);
+  friend RawData serialize(const start_request::Message&, const uint32_t&);
+  friend RawData serialize(const start_request::Message&);
 
 private:
   /**
@@ -62,7 +62,7 @@ private:
     constexpr TenthOfDegree getResolution() const;
 
   private:
-    const DefaultScanRange scan_range_{};
+    const DefaultScanRange scan_range_{ DefaultScanRange::createInvalidScanRange() };
     const TenthOfDegree resolution_{ 0 };
   };
 

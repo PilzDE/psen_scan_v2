@@ -87,7 +87,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
                                   monitoring_frame::diagnostic::Message(ScannerId::slave2, error_locations.at(2)) });
 
   auto raw = serialize(msg);
-  auto deserialized_msg = monitoring_frame::deserialize(convertToMaxSizeRawData(raw), raw.size());
+  auto deserialized_msg = monitoring_frame::deserialize(convertToRawData(raw), raw.size());
 
   EXPECT_EQ(msg, deserialized_msg);
 }
@@ -97,7 +97,7 @@ TEST(MonitoringFrameSerializationTest, shouldFailOnSerializeAndDeserializeFrameW
   monitoring_frame::Message msg(TenthOfDegree(25), TenthOfDegree(1), 1, { 0 }, { 70045 }, {});
 
   auto raw = serialize(msg);
-  auto deserialized_msg = monitoring_frame::deserialize(convertToMaxSizeRawData(raw), raw.size());
+  auto deserialized_msg = monitoring_frame::deserialize(convertToRawData(raw), raw.size());
 
   EXPECT_FALSE(msg == deserialized_msg);
   EXPECT_EQ(deserialized_msg.intensities().at(0), 0b0011111111111111 & 70045);
@@ -159,11 +159,11 @@ class MonitoringFrameDeserializationTest : public ::testing::Test
 protected:
   MonitoringFrameDeserializationTest()
   {
-    with_intensities_raw_ = convertToMaxSizeRawData(with_intensities_.hex_dump);
+    with_intensities_raw_ = convertToRawData(with_intensities_.hex_dump);
   }
 
 protected:
-  MaxSizeRawData with_intensities_raw_;
+  RawData with_intensities_raw_;
   scanner_udp_datagram_hexdumps::WithIntensitiesAndDiagnostics with_intensities_;
 };
 
@@ -199,7 +199,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeIntensityLength)
 {
   scanner_udp_datagram_hexdumps::WithTooLargeIntensityLength with_too_large_field_length;
-  const auto raw_frame_data = convertToMaxSizeRawData(with_too_large_field_length.hex_dump);
+  const auto raw_frame_data = convertToRawData(with_too_large_field_length.hex_dump);
   const auto num_bytes = 2 * with_too_large_field_length.hex_dump.size();
 
   monitoring_frame::Message msg;
@@ -210,7 +210,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnMissingEndOfFrame)
 {
   scanner_udp_datagram_hexdumps::WithNoEnd with_no_end_of_frame;
-  const auto raw_frame_data = convertToMaxSizeRawData(with_no_end_of_frame.hex_dump);
+  const auto raw_frame_data = convertToRawData(with_no_end_of_frame.hex_dump);
   const auto num_bytes = 2 * with_no_end_of_frame.hex_dump.size();
 
   monitoring_frame::Message msg;
@@ -221,7 +221,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeScanCounterLength)
 {
   scanner_udp_datagram_hexdumps::WithTooLargeScanCounterLength with_too_large_scan_counter_length;
-  const auto raw_frame_data = convertToMaxSizeRawData(with_too_large_scan_counter_length.hex_dump);
+  const auto raw_frame_data = convertToRawData(with_too_large_scan_counter_length.hex_dump);
   const auto num_bytes = 2 * with_too_large_scan_counter_length.hex_dump.size();
 
   monitoring_frame::Message msg;

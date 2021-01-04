@@ -21,13 +21,11 @@
 
 namespace psen_scan_v2
 {
-template <typename T>
-inline void processBytes(boost::crc_32_type& crc_32, const T& data)
+scanner_reply::CRCMismatch::CRCMismatch(const std::string& msg) : std::runtime_error(msg)
 {
-  crc_32.process_bytes(&data, sizeof(T));
 }
 
-scanner_reply::RawType scanner_reply::serialize(const uint32_t op_code, const uint32_t res_code)
+RawData scanner_reply::serialize(const uint32_t op_code, const uint32_t res_code)
 {
   std::ostringstream os;
 
@@ -46,15 +44,39 @@ scanner_reply::RawType scanner_reply::serialize(const uint32_t op_code, const ui
   // TODO check limits
   const std::string data_str(os.str());
   assert(data_str.length() == scanner_reply::Message::SIZE && "Message data of start reply has not the expected size");
-
-  scanner_reply::RawType ret_val{};
-  std::copy(data_str.begin(), data_str.end(), ret_val.begin());
-
-  return ret_val;
+  return RawData(data_str.cbegin(), data_str.cend());
 }
 
-scanner_reply::RawType scanner_reply::serialize(const Message& reply)
+RawData scanner_reply::serialize(const Message& reply)
 {
   return serialize(static_cast<uint32_t>(reply.type()), static_cast<uint32_t>(reply.result()));
 }
+
+scanner_reply::Message scanner_reply::deserialize(const RawData& data)
+{
+  std::istringstream is(std::string(data.data(), Message::SIZE));
+
+  uint32_t crc;
+  uint32_t reserved;
+  uint32_t opcode;
+  uint32_t res_code;
+
+  raw_processing::read(is, crc);
+  raw_processing::read(is, reserved);
+  raw_processing::read(is, opcode);
+  raw_processing::read(is, res_code);
+
+  boost::crc_32_type crc_checked;
+  crc_checked.process_bytes(&reserved, sizeof(reserved));
+  crc_checked.process_bytes(&opcode, sizeof(opcode));
+  crc_checked.process_bytes(&res_code, sizeof(res_code));
+
+  if (crc != crc_checked.checksum())
+  {
+    throw scanner_reply::CRCMismatch();
+  }
+
+  return Message(Message::convertToReplyType(opcode), Message::convertToOperationResult(res_code));
+}
+
 }  // namespace psen_scan_v2

@@ -78,8 +78,8 @@ int main(int argc, char** argv)
 
     ScannerConfigurationBuilder config_builder;
     config_builder.hostIP(getRequiredParamFromServer<std::string>(pnh, PARAM_HOST_IP))
-        .hostDataPort(getRequiredParamFromServer<int>(pnh, PARAM_HOST_DATA_PORT))
-        .hostControlPort(getRequiredParamFromServer<int>(pnh, PARAM_HOST_CONTROL_PORT))
+        .hostDataPort(getOptionalParamFromServer<int>(pnh, PARAM_HOST_DATA_PORT, DATA_PORT_OF_HOST_DEVICE))
+        .hostControlPort(getOptionalParamFromServer<int>(pnh, PARAM_HOST_CONTROL_PORT, CONTROL_PORT_OF_HOST_DEVICE))
         .scannerIp(getRequiredParamFromServer<std::string>(pnh, PARAM_SCANNER_IP))
         .scannerDataPort(DATA_PORT_OF_SCANNER_DEVICE)
         .scannerControlPort(CONTROL_PORT_OF_SCANNER_DEVICE)

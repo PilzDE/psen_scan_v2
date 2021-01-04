@@ -26,7 +26,7 @@
 #define PSENSCAN_LOG(name, file, line, level, ...)                                                                     \
   do                                                                                                                   \
   {                                                                                                                    \
-    console_bridge::getOutputHandler()->log(fmt::format("{}: {}", name, fmt::format(__VA_ARGS__)), level, file, line); \
+    console_bridge::log(file, line, level, fmt::format("{}: {}", name, fmt::format(__VA_ARGS__)).c_str());             \
   } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
 
 #define PSENSCAN_LOG_THROTTLE(period, name, file, line, level, ...)                                                    \
