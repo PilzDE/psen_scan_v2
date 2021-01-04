@@ -20,6 +20,7 @@
 #include <memory>
 #include <mutex>
 #include <chrono>
+#include <stdexcept>
 
 // back-end
 #include <boost/msm/back/state_machine.hpp>
@@ -160,7 +161,8 @@ public:  // Action methods
   template <class T>
   void sendStartRequest(const T& event);
   void handleStartRequestTimeout(const scanner_events::StartTimeout& event);
-  void sendStopRequest(const scanner_events::StopRequest& event);
+  template <class T>
+  void sendStopRequest(const T& event);
   void handleMonitoringFrame(const scanner_events::RawMonitoringFrameReceived& event);
   void handleMonitoringFrameTimeout(const scanner_events::MonitoringFrameTimeout& event);
 
@@ -168,7 +170,10 @@ public:  // Guards
   bool isStartReply(scanner_events::RawReplyReceived const& reply_event);
   bool isStopReply(scanner_events::RawReplyReceived const& reply_event);
 
-public:  // Replaces the default no-transition responses
+public:  // Replaces the default exception/no-transition responses
+  template <class FSM, class Event>
+  void exception_caught(Event const& event, FSM& fsm, std::exception& exception);
+
   template <class FSM, class Event>
   void no_transition(Event const& event, FSM&, int state);
 
@@ -200,6 +205,13 @@ public:  // Definition of state machine via table
   // clang-format on
 
 private:
+  // LCOV_EXCL_START
+  class InternalScannerReplyError : public std::runtime_error
+  {
+  public:
+    InternalScannerReplyError(const std::string& error_msg);
+  };
+  // LCOV_EXCL_STOP
   void checkForInternalErrors(const scanner_reply::Message& msg);
 
   using ScanValidatorResult = monitoring_frame::ScanValidator::OptionalResult;

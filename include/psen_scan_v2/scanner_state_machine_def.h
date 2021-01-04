@@ -116,7 +116,8 @@ inline void ScannerProtocolDef::handleStartRequestTimeout(const scanner_events::
   sendStartRequest(event);
 }
 
-inline void ScannerProtocolDef::sendStopRequest(const scanner_events::StopRequest& event)
+template <class T>
+inline void ScannerProtocolDef::sendStopRequest(const T& event)
 {
   PSENSCAN_DEBUG("StateMachine", "Action: sendStopRequest");
   args_->data_client_->close();
@@ -160,10 +161,6 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
     args_->inform_user_about_laser_scan_cb(toLaserScan(frame));
   }
   // LCOV_EXCL_START
-  catch (const scanner_reply::CRCMismatch& e)
-  {
-    PSENSCAN_ERROR("StateMachine", e.what());
-  }
   catch (const monitoring_frame::ScanCounterMissing& e)
   {
     PSENSCAN_ERROR("StateMachine", e.what());
@@ -182,26 +179,29 @@ inline void ScannerProtocolDef::handleMonitoringFrameTimeout(const scanner_event
 
 //+++++++++++++++++++++++++++++++++ Guards ++++++++++++++++++++++++++++++++++++
 
+// LCOV_EXCL_START
+inline ScannerProtocolDef::InternalScannerReplyError::InternalScannerReplyError(const std::string& error_msg)
+  : std::runtime_error(error_msg)
+{
+}
+// LCOV_EXCL_STOP
+
 inline void ScannerProtocolDef::checkForInternalErrors(const scanner_reply::Message& msg)
 {
   // LCOV_EXCL_START
+  if (msg.type() == scanner_reply::Message::Type::unknown)
+  {
+    throw InternalScannerReplyError("Unexpected code in reply");
+  }
   if (msg.result() != scanner_reply::Message::OperationResult::accepted)
   {
-    PSENSCAN_ERROR("StateMachine", "Received reply with non-successful result code.");
     if (msg.result() == scanner_reply::Message::OperationResult::refused)
     {
-      if (msg.type() == scanner_reply::Message::Type::stop)
-      {
-        PSENSCAN_ERROR("StateMachine", "Stop request refused by device.");
-      }
-      if (msg.type() == scanner_reply::Message::Type::start)
-      {
-        PSENSCAN_ERROR("StateMachine", "Start request refused by device.");
-      }
+      throw InternalScannerReplyError("Request refused by device.");
     }
     else
     {
-      PSENSCAN_ERROR("StateMachine", "Unknown operation result code.");
+      throw InternalScannerReplyError("Unknown operation result code.");
     }
   }
   // LCOV_EXCL_STOP
@@ -242,6 +242,16 @@ static std::string classNameShort(const T& t)
   const auto full_name{ boost::core::demangle(typeid(t).name()) };
   return full_name.substr(full_name.rfind("::") + 2);
 }
+
+// LCOV_EXCL_START
+template <class FSM, class Event>
+void ScannerProtocolDef::exception_caught(Event const& event, FSM& fsm, std::exception& exception)
+{
+  PSENSCAN_ERROR("StateMachine", "Received error \"{}\". Shutting down now.", exception.what());
+  sendStopRequest(event);
+  throw exception;
+}
+// LCOV_EXCL_STOP
 
 template <class FSM, class Event>
 void ScannerProtocolDef::no_transition(Event const& event, FSM&, int state)
