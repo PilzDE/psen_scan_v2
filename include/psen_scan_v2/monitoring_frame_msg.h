@@ -44,7 +44,7 @@ static constexpr uint8_t MAX_SCANNER_ID{ VALID_SCANNER_IDS.size() - 1 };
 class ScanCounterMissing : public std::runtime_error
 {
 public:
-  ScanCounterMissing(const std::string& msg = "Scan counter not set!");
+  ScanCounterMissing(const std::string& msg = "Scan counter not set! (Contact PILZ support if the error persists.)");
 };
 
 /**
