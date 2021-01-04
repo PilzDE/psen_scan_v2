@@ -22,6 +22,13 @@ using namespace psen_scan_v2;
 
 namespace psen_scan_v2_test
 {
+TEST(TenthOfDegreeTest, fromRad)
+{
+  const double angle_in_rad{ 0.1 };
+  TenthOfDegree tenth_of_degree{ TenthOfDegree::fromRad(angle_in_rad) };
+  EXPECT_EQ(tenth_of_degree.value(), radToTenthDegree(angle_in_rad));
+}
+
 TEST(TenthOfDegreeTest, valueTest)
 {
   TenthOfDegree tenth_of_degree{ 1 };
@@ -56,12 +63,28 @@ TEST(TenthOfDegreeTest, MultiplicationWithInteger)
   EXPECT_EQ((tenth_of_degree * int_value).value(), 6);
 }
 
+TEST(TenthOfDegreeTest, DivisionWithInteger)
+{
+  TenthOfDegree tenth_of_degree{ 6 };
+  const int int_value{ 3 };
+
+  EXPECT_EQ((tenth_of_degree / int_value).value(), 2);
+}
+
 TEST(TenthOfDegreeTest, Addition)
 {
   TenthOfDegree tenth_of_degree_1{ 2 };
   TenthOfDegree tenth_of_degree_2{ 3 };
 
   EXPECT_EQ((tenth_of_degree_1 + tenth_of_degree_2).value(), 5);
+}
+
+TEST(TenthOfDegreeTest, Subtraction)
+{
+  TenthOfDegree tenth_of_degree_1{ 2 };
+  TenthOfDegree tenth_of_degree_2{ 3 };
+
+  EXPECT_EQ((tenth_of_degree_1 - tenth_of_degree_2).value(), -1);
 }
 
 TEST(TenthOfDegreeTest, EqualityComparison)
