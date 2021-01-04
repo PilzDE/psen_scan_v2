@@ -99,7 +99,7 @@ TEST(TenthOfDegreeTest, LargerThanOrEqualComparison)
 TEST(TenthOfDegreeTest, shouldThrowUnderflowErrorOnCastToIntOfValuesUnderZero)
 {
   EXPECT_THROW(std::cout << static_cast<uint16_t>(TenthOfDegree(-1))
-                         << " - printed to not be unused. Should trow before.\n!",
+                         << " - printed to not be unused. Should throw before!\n",
                std::underflow_error);
 }
 

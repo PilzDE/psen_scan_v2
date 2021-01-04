@@ -200,6 +200,8 @@ public:  // Definition of state machine via table
   // clang-format on
 
 private:
+  void checkForInternalErrors(const scanner_reply::Message& msg);
+
   using ScanValidatorResult = monitoring_frame::ScanValidator::OptionalResult;
   void printUserMsgFor(const ScanValidatorResult& validation_result);
 
