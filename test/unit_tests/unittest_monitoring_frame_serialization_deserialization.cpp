@@ -177,7 +177,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldDeserializeMonitoringFrameCorre
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnUnknownFieldId)
 {
   scanner_udp_datagram_hexdumps::WithUnknownFieldId with_unknown_field_id;
-  const auto raw_frame_data = convertToMaxSizeRawData(with_unknown_field_id.hex_dump);
+  const auto raw_frame_data = convertToRawData(with_unknown_field_id.hex_dump);
   const auto num_bytes = 2 * with_unknown_field_id.hex_dump.size();
 
   monitoring_frame::Message msg;
@@ -188,7 +188,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeMonitoringLength)
 {
   scanner_udp_datagram_hexdumps::WithTooLargeFieldLength with_too_large_field_length;
-  const auto raw_frame_data = convertToMaxSizeRawData(with_too_large_field_length.hex_dump);
+  const auto raw_frame_data = convertToRawData(with_too_large_field_length.hex_dump);
   const auto num_bytes = 2 * with_too_large_field_length.hex_dump.size();
 
   monitoring_frame::Message msg;
