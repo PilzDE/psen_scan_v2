@@ -17,7 +17,7 @@
 #define PSEN_SCAN_V2_STANDALONE_CORE_H
 
 /*
- * Convenience include file for users of psen_scan_v2_standalone standalone.
+ * Convenience include file for users of psen_scan_v2 standalone.
  */
 
 #include "psen_scan_v2_standalone/default_parameters.h"
