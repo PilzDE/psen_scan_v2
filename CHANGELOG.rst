@@ -4,6 +4,7 @@ Changelog for package psen_scan_v2
 
 Forthcoming
 -----------
+* Add internal error handling for detecting regressions in the scanner firmware
 * Make specifying udp ports optional
 * Contributors: Pilz GmbH and Co. KG
 

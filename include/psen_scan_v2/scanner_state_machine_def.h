@@ -116,7 +116,8 @@ inline void ScannerProtocolDef::handleStartRequestTimeout(const scanner_events::
   sendStartRequest(event);
 }
 
-inline void ScannerProtocolDef::sendStopRequest(const scanner_events::StopRequest& event)
+template <class T>
+inline void ScannerProtocolDef::sendStopRequest(const T& event)
 {
   PSENSCAN_DEBUG("StateMachine", "Action: sendStopRequest");
   args_->data_client_->close();
@@ -146,15 +147,25 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
 {
   PSENSCAN_DEBUG("StateMachine", "Action: handleMonitoringFrame");
   monitoring_frame_watchdog_->reset();
-  const monitoring_frame::Message frame{ monitoring_frame::deserialize(event.data_, event.num_bytes_) };
-  if (!frame.diagnosticMessages().empty())
-  {
-    PSENSCAN_WARN_THROTTLE(
-        1 /* sec */, "StateMachine", "The scanner reports an error: {}", formatRange(frame.diagnosticMessages()));
-  }
 
-  printUserMsgFor(complete_scan_validator_.validate(frame, DEFAULT_NUM_MSG_PER_ROUND));
-  args_->inform_user_about_laser_scan_cb(toLaserScan(frame));
+  try
+  {
+    const monitoring_frame::Message frame{ monitoring_frame::deserialize(event.data_, event.num_bytes_) };
+    if (!frame.diagnosticMessages().empty())
+    {
+      PSENSCAN_WARN_THROTTLE(
+          1 /* sec */, "StateMachine", "The scanner reports an error: {}", formatRange(frame.diagnosticMessages()));
+    }
+
+    printUserMsgFor(complete_scan_validator_.validate(frame, DEFAULT_NUM_MSG_PER_ROUND));
+    args_->inform_user_about_laser_scan_cb(toLaserScan(frame));
+  }
+  // LCOV_EXCL_START
+  catch (const monitoring_frame::ScanCounterMissing& e)
+  {
+    PSENSCAN_ERROR("StateMachine", e.what());
+  }
+  // LCOV_EXCL_STOP
 }
 
 inline void ScannerProtocolDef::handleMonitoringFrameTimeout(const scanner_events::MonitoringFrameTimeout& event)
@@ -168,15 +179,45 @@ inline void ScannerProtocolDef::handleMonitoringFrameTimeout(const scanner_event
 
 //+++++++++++++++++++++++++++++++++ Guards ++++++++++++++++++++++++++++++++++++
 
+// LCOV_EXCL_START
+inline ScannerProtocolDef::InternalScannerReplyError::InternalScannerReplyError(const std::string& error_msg)
+  : std::runtime_error(error_msg)
+{
+}
+// LCOV_EXCL_STOP
+
+inline void ScannerProtocolDef::checkForInternalErrors(const scanner_reply::Message& msg)
+{
+  // LCOV_EXCL_START
+  if (msg.type() == scanner_reply::Message::Type::unknown)
+  {
+    throw InternalScannerReplyError("Unexpected code in reply");
+  }
+  if (msg.result() != scanner_reply::Message::OperationResult::accepted)
+  {
+    if (msg.result() == scanner_reply::Message::OperationResult::refused)
+    {
+      throw InternalScannerReplyError("Request refused by device.");
+    }
+    else
+    {
+      throw InternalScannerReplyError("Unknown operation result code.");
+    }
+  }
+  // LCOV_EXCL_STOP
+}
+
 inline bool ScannerProtocolDef::isStartReply(scanner_events::RawReplyReceived const& reply_event)
 {
   const scanner_reply::Message msg{ scanner_reply::deserialize(reply_event.data_) };
+  checkForInternalErrors(msg);
   return msg.type() == scanner_reply::Message::Type::start;
 }
 
 inline bool ScannerProtocolDef::isStopReply(scanner_events::RawReplyReceived const& reply_event)
 {
   const scanner_reply::Message msg{ scanner_reply::deserialize(reply_event.data_) };
+  checkForInternalErrors(msg);
   return msg.type() == scanner_reply::Message::Type::stop;
 }
 
@@ -201,6 +242,16 @@ static std::string classNameShort(const T& t)
   const auto full_name{ boost::core::demangle(typeid(t).name()) };
   return full_name.substr(full_name.rfind("::") + 2);
 }
+
+// LCOV_EXCL_START
+template <class FSM, class Event>
+void ScannerProtocolDef::exception_caught(Event const& event, FSM& fsm, std::exception& exception)
+{
+  PSENSCAN_ERROR("StateMachine", "Received error \"{}\". Shutting down now.", exception.what());
+  sendStopRequest(event);
+  throw exception;
+}
+// LCOV_EXCL_STOP
 
 template <class FSM, class Event>
 void ScannerProtocolDef::no_transition(Event const& event, FSM&, int state)

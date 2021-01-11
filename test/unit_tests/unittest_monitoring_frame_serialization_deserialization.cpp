@@ -174,30 +174,6 @@ TEST_F(MonitoringFrameDeserializationTest, shouldDeserializeMonitoringFrameCorre
   EXPECT_EQ(msg, with_intensities_.expected_msg_);
 }
 
-TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnWrongOpCode)
-{
-  with_intensities_raw_.at(4) += 1;
-  EXPECT_NO_THROW(monitoring_frame::deserialize(with_intensities_raw_, with_intensities_raw_.size()););
-}
-
-TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnInvalidWorkingMode)
-{
-  with_intensities_raw_.at(8) = 0x03;
-  EXPECT_NO_THROW(monitoring_frame::deserialize(with_intensities_raw_, with_intensities_raw_.size()););
-}
-
-TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnInvalidTransactionType)
-{
-  with_intensities_raw_.at(12) = 0x06;
-  EXPECT_NO_THROW(monitoring_frame::deserialize(with_intensities_raw_, with_intensities_raw_.size()););
-}
-
-TEST_F(MonitoringFrameDeserializationTest, shouldPrintDebugMessageOnInvalidScannerId)
-{
-  with_intensities_raw_.at(16) = 0x04;
-  EXPECT_NO_THROW(monitoring_frame::deserialize(with_intensities_raw_, with_intensities_raw_.size()););
-}
-
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnUnknownFieldId)
 {
   scanner_udp_datagram_hexdumps::WithUnknownFieldId with_unknown_field_id;
@@ -209,11 +185,33 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
                , monitoring_frame::format_error::DecodingFailure);
 }
 
-TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeFieldLength)
+TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeMonitoringLength)
 {
   scanner_udp_datagram_hexdumps::WithTooLargeFieldLength with_too_large_field_length;
   const auto raw_frame_data = convertToRawData(with_too_large_field_length.hex_dump);
   const auto num_bytes = 2 * with_too_large_field_length.hex_dump.size();
+
+  monitoring_frame::Message msg;
+  EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);
+               , monitoring_frame::format_error::DecodingFailure);
+}
+
+TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeIntensityLength)
+{
+  scanner_udp_datagram_hexdumps::WithTooLargeIntensityLength with_too_large_field_length;
+  const auto raw_frame_data = convertToRawData(with_too_large_field_length.hex_dump);
+  const auto num_bytes = 2 * with_too_large_field_length.hex_dump.size();
+
+  monitoring_frame::Message msg;
+  EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);
+               , monitoring_frame::format_error::DecodingFailure);
+}
+
+TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnMissingEndOfFrame)
+{
+  scanner_udp_datagram_hexdumps::WithNoEnd with_no_end_of_frame;
+  const auto raw_frame_data = convertToRawData(with_no_end_of_frame.hex_dump);
+  const auto num_bytes = 2 * with_no_end_of_frame.hex_dump.size();
 
   monitoring_frame::Message msg;
   EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);

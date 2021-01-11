@@ -25,6 +25,7 @@
 #include <vector>
 #include <array>
 #include <bitset>
+#include <boost/optional.hpp>
 
 #include "psen_scan_v2/raw_scanner_data.h"
 #include "psen_scan_v2/diagnostics.h"
@@ -36,6 +37,15 @@ namespace psen_scan_v2
 namespace monitoring_frame
 {
 static constexpr uint8_t MAX_SCANNER_ID{ VALID_SCANNER_IDS.size() - 1 };
+
+/**
+ * @brief Exception thrown if scan_counter was missing during deserialization of a monitoring_frame::Message.
+ */
+class ScanCounterMissing : public std::runtime_error
+{
+public:
+  ScanCounterMissing(const std::string& msg = "Scan counter not set! (Contact PILZ support if the error persists.)");
+};
 
 /**
  * @brief Higher level data type representing a single monitoring frame.
@@ -90,7 +100,7 @@ private:
   TenthOfDegree from_theta_{ 0 };
   TenthOfDegree resolution_{ 0 };
 
-  uint32_t scan_counter_{ 0 };
+  boost::optional<uint32_t> scan_counter_;
   std::vector<double> measurements_;
   std::vector<double> intensities_;
   std::vector<monitoring_frame::diagnostic::Message> diagnostic_messages_;
@@ -100,6 +110,10 @@ public:
   friend RawData serialize(const monitoring_frame::Message& frame);
   friend monitoring_frame::Message deserialize(const RawData& data, const std::size_t& num_bytes);
 };
+
+inline ScanCounterMissing::ScanCounterMissing(const std::string& msg) : std::runtime_error(msg)
+{
+}
 
 std::ostream& operator<<(std::ostream& os, const psen_scan_v2::monitoring_frame::Message& msg);
 
