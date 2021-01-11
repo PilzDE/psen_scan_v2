@@ -73,7 +73,7 @@ monitoring_frame::Message deserialize(const RawData& data, const std::size_t& nu
                           additional_header.length(),
                           NUMBER_OF_BYTES_SCAN_COUNTER));
         }
-        raw_processing::read(is, msg.scan_counter_);
+        raw_processing::read<uint32_t, boost::optional<uint32_t>>(is, msg.scan_counter_);
         break;
 
       case additional_field::HeaderID::measurements:
@@ -177,27 +177,28 @@ FixedFields readFixedFields(std::istringstream& is)
   raw_processing::read<int16_t, TenthOfDegree>(is, from_theta);
   raw_processing::read<int16_t, TenthOfDegree>(is, resolution);
 
+  // LCOV_EXCL_START
   if (OP_CODE_MONITORING_FRAME != op_code)
   {
-    // TODO: Get rid of the issue not to spam the system with this debug messages
-    //       Would something like  ROS_DEBUG_THROTTLE(period, ...) be a good solution?
-    PSENSCAN_DEBUG("monitoring_frame::Message", "Wrong Op Code!");
+    PSENSCAN_ERROR_THROTTLE(
+        0.1, "monitoring_frame::Message", "Unexpected opcode during deserialization of MonitoringFrame.");
   }
 
   if (ONLINE_WORKING_MODE != working_mode)
   {
-    PSENSCAN_DEBUG("monitoring_frame::Message", "Invalid working mode!");
+    PSENSCAN_ERROR_THROTTLE(0.1, "monitoring_frame::Message", "Invalid working mode (not online)");
   }
 
   if (GUI_MONITORING_TRANSACTION != transaction_type)
   {
-    PSENSCAN_DEBUG("monitoring_frame::Message", "Invalid transaction type!");
+    PSENSCAN_ERROR_THROTTLE(0.1, "monitoring_frame::Message", "Invalid transaction type.");
   }
 
   if (MAX_SCANNER_ID < static_cast<uint8_t>(scanner_id))
   {
-    PSENSCAN_DEBUG("monitoring_frame::Message", "Invalid Scanner id!");
+    PSENSCAN_ERROR_THROTTLE(0.1, "monitoring_frame::Message", "Invalid Scanner id.");
   }
+  // LCOV_EXCL_STOP
 
   return FixedFields(device_status, op_code, working_mode, transaction_type, scanner_id, from_theta, resolution);
 }

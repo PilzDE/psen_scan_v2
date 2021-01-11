@@ -5,6 +5,7 @@ Changelog for package psen_scan_v2
 Forthcoming
 -----------
 * Enable separate building of cpp-lib; extract sources into subproject psen_scan_v2_standalone
+* Add internal error handling for detecting regressions in the scanner firmware
 * Make specifying udp ports optional
 * Contributors: Pilz GmbH and Co. KG
 

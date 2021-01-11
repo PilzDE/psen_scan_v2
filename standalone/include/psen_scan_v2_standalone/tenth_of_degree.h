@@ -64,9 +64,21 @@ public:
     return *this;
   }
 
+  constexpr TenthOfDegree& operator/(const int& rhs)
+  {
+    tenth_of_degree_ = value() / rhs;
+    return *this;
+  }
+
   constexpr TenthOfDegree& operator+(const TenthOfDegree& rhs)
   {
     tenth_of_degree_ = value() + rhs.value();
+    return *this;
+  }
+
+  TenthOfDegree& operator-(const TenthOfDegree& rhs)
+  {
+    tenth_of_degree_ = value() - rhs.value();
     return *this;
   }
 
@@ -93,6 +105,15 @@ public:
   constexpr bool operator<(const TenthOfDegree& rhs) const
   {
     return value() < rhs.value();
+  }
+
+  constexpr operator uint16_t() const
+  {
+    if (value() < 0)
+    {
+      throw std::underflow_error("Can only use values over zero as unsigned int.");
+    }
+    return value();
   }
 
 private:
