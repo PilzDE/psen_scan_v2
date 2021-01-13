@@ -58,10 +58,9 @@ int main(int argc, char** argv)
   ScannerV2 scanner(config_builder.build(), laserScanCallback);
   scanner.start();
 
-  while (true)
-  {
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-  }
+  std::this_thread::sleep_for(std::chrono::seconds(10));
+
+  scanner.stop();
 
   return 0;
 }
