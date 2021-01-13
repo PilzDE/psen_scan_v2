@@ -16,18 +16,12 @@
 #include <ros/ros.h>
 #include <gtest/gtest.h>
 
-#include <functional>
+#include <boost/bind.hpp>
+#include <boost/shared_ptr.hpp>
 
-#include <algorithm>
-#include <future>
-#include <iostream>
+#include <map>
+#include <string>
 
-#include <numeric>
-#include <math.h>
-
-#include <rosbag/bag.h>
-#include <rosbag/view.h>
-#include <rosbag/exceptions.h>
 #include <sensor_msgs/LaserScan.h>
 
 #include "psen_scan_v2/dist.h"
@@ -39,28 +33,6 @@ typedef sensor_msgs::LaserScan ScanType;
 typedef boost::shared_ptr<ScanType const> ScanConstPtr;
 
 static constexpr int32_t WAIT_FOR_MESSAGE_TIMEOUT_S{ 5 };
-
-std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
-{
-  std::map<int16_t, NormalDist> bins;
-
-  rosbag::Bag bag;
-  bag.open(filepath, rosbag::bagmode::Read);
-
-  std::vector<std::string> topics;
-  topics.push_back(std::string("/laser_1_node/scan"));
-
-  rosbag::View view(bag, rosbag::TopicQuery(topics));
-
-  std::for_each(view.begin(), view.end(), [&bins](const rosbag::MessageInstance& msg) {
-    ScanConstPtr scan = msg.instantiate<ScanType>();
-    addScanToBin(*scan, bins);
-  });
-
-  bag.close();
-
-  return bins;
-}
 
 class ScanComparisonTests : public ::testing::Test
 {

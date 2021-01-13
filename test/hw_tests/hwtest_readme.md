@@ -36,7 +36,7 @@ Then run
 ```
 rosrun industrial_ci run_ci ROS_DISTRO=noetic ROS_REPO=main \
 CMAKE_ARGS="-DENABLE_HARDWARE_TESTING=ON" DOCKER_RUN_OPTS="--env \
-HOST_IP=192.168.0.122 --env SENSOR_IP=192.168.0.100 -p 55000-55005:55000-55005/udp"
+HOST_IP=192.168.0.122 --env SENSOR_IP=192.168.0.100 -p 55000-55006:55000-55006/udp"
 ```
 note that you especially need to setup the `HOST_IP` to be the IP of your actually system
 in order to receive the data inside the docker container used by industrial_ci.
@@ -47,7 +47,7 @@ If you need to use a custom ROOT_CA and have a apt-proxy the command for running
 rosrun industrial_ci run_ci ROS_DISTRO=noetic ROS_REPO=main \
 CMAKE_ARGS="-DENABLE_HARDWARE_TESTING=ON" \
 DOCKER_RUN_OPTS="--env HOST_IP=192.168.0.122 --env SENSOR_IP=192.168.0.100 \
--p 55000-55005:55000-55005/udp \
+-p 55000-55006:55000-55006/udp \
 -v /usr/local/share/ca-certificates:/usr/local/share/ca-certificates:ro" \
 APT_PROXY=http://172.20.20.104:3142
 
@@ -73,8 +73,15 @@ export HW_TEST_SCAN_COMPARE_TESTFILE=<your/desired/path/file.bag>
 rosbag record -a -O $HW_TEST_SCAN_COMPARE_TESTFILE --duration 10
 ```
 
-### Run using `rostest`
-To run the hardware tests execute
+### Run standalone test
+Execute
+```
+export HW_TEST_SCAN_COMPARE_TESTFILE=<path/to/reference/file.bag>
+./devel/lib/psen_scan_v2/hwtest_scan_compare_standalone
+```
+
+### Run `rostest`
+Execute
 ```
 export HW_TEST_SCAN_COMPARE_TESTFILE=<path/to/reference/file.bag>
 rostest psen_scan_v2 hwtest_scan_compare.test
