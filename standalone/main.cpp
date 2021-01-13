@@ -14,7 +14,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <chrono>
-#include <sstream>
 #include <string>
 #include <thread>
 
@@ -39,12 +38,12 @@ void laserScanCallback(const LaserScan& scan)
 {
   const LaserScan::MeasurementData& measures = scan.getMeasurements();
 
-  std::stringstream strstr;
-  for (auto it = measures.cbegin(); it < measures.cend(); ++it)
+  if(measures.empty())
   {
-    strstr << " " << *it;
+    return;
   }
-  PSENSCAN_INFO_THROTTLE(1 /* sec */, "laserScanCallback()", strstr.str());
+
+  PSENSCAN_INFO_THROTTLE(1 /* sec */, "laserScanCallback()", "Ranges {}", formatRange(measures));
 }
 
 int main(int argc, char** argv)
