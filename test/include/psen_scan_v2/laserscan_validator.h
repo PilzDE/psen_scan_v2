@@ -17,63 +17,75 @@
 
 #include <future>
 #include <map>
+#include <memory>
 #include <stdexcept>
 #include <vector>
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
-#include <ros/ros.h>
+// #include <ros/ros.h>
 
 #include "psen_scan_v2_standalone/angle_conversions.h"
+#include "psen_scan_v2_standalone/laserscan.h"
 
 #include "psen_scan_v2/dist.h"
 
 namespace psen_scan_v2_test
 {
-void addScanToBin(const sensor_msgs::LaserScanConstPtr& scan, std::map<int16_t, NormalDist>& bin)
+void addScanToBin(const psen_scan_v2_standalone::LaserScan& scan, std::map<int16_t, NormalDist>& bin)
 {
-  if (scan == nullptr)
+  for (size_t i = 0; i < scan.getMeasurements().size(); ++i)
   {
-    throw std::invalid_argument("LaserScan pointer must not be null");
-  }
-
-  for (size_t i = 0; i < scan->ranges.size(); ++i)
-  {
-    auto bin_addr = psen_scan_v2_standalone::radToTenthDegree(scan->angle_min + scan->angle_increment * i);
+    auto bin_addr = psen_scan_v2_standalone::radToTenthDegree(scan.getMinScanAngle() + scan.getScanResolution() * i);
 
     if (bin.find(bin_addr) == bin.end())
     {
       bin.emplace(bin_addr, NormalDist{});
       // Create bin
     }
-    bin[bin_addr].update(scan->ranges[i]);
+    bin[bin_addr].update(scan.getMeasurements()[i]);
   }
 }
 
-std::map<int16_t, NormalDist> binsFromScans(std::vector<sensor_msgs::LaserScanConstPtr> scans)
+void addScanToBin(const sensor_msgs::LaserScan& scan, std::map<int16_t, NormalDist>& bin)
+{
+  for (size_t i = 0; i < scan.ranges.size(); ++i)
+  {
+    auto bin_addr = psen_scan_v2_standalone::radToTenthDegree(scan.angle_min + scan.angle_increment * i);
+
+    if (bin.find(bin_addr) == bin.end())
+    {
+      bin.emplace(bin_addr, NormalDist{});
+      // Create bin
+    }
+    bin[bin_addr].update(scan.ranges[i]);
+  }
+}
+
+template <typename ScanConstPtr>
+std::map<int16_t, NormalDist> binsFromScans(const std::vector<ScanConstPtr>& scans)
 {
   std::map<int16_t, NormalDist> bins;
-  std::for_each(
-      scans.cbegin(), scans.cend(), [&bins](const sensor_msgs::LaserScanConstPtr& scan) { addScanToBin(scan, bins); });
+  std::for_each(scans.cbegin(), scans.cend(), [&bins](const ScanConstPtr& scan) {
+    if (scan == nullptr)
+    {
+      throw std::invalid_argument("LaserScan pointer must not be null");
+    }
+    addScanToBin(*scan, bins);
+  });
   return bins;
 }
 
+template <typename ScanType>
 class LaserScanValidator
 {
 public:
-  LaserScanValidator(ros::NodeHandle& nh, std::map<int16_t, NormalDist> bins_expected)
-    : nh_(nh), bins_expected_(bins_expected){};
+  LaserScanValidator(std::map<int16_t, NormalDist> bins_expected) : bins_expected_(bins_expected){};
 
-  ~LaserScanValidator()
-  {
-    sub_.shutdown();
-  }
+  typedef boost::shared_ptr<ScanType const> ScanConstPtr;
 
-  typedef sensor_msgs::LaserScan MsgType;
-  typedef boost::shared_ptr<MsgType const> MsgTypeConstPtr;
-
-  void scanCb(const MsgTypeConstPtr scan, size_t n_msgs)
+  void scanCb(const ScanConstPtr scan, size_t n_msgs)
   {
     ROS_INFO_THROTTLE(5, "Checking messages for validity. So far looking good.");
 
@@ -135,17 +147,16 @@ public:
     }
   }
 
-  ::testing::AssertionResult validateScans(size_t n_msgs, std::string topic, const int duration)
+  void reset()
   {
     msgs_.clear();
-
     check_result_ = std::promise<::testing::AssertionResult>();
+    check_result_future_ = check_result_.get_future();
+  }
 
-    auto future = check_result_.get_future();
-    sub_ = nh_.subscribe<MsgType>(
-        topic, 1000, boost::bind(&LaserScanValidator::scanCb, this, boost::placeholders::_1, n_msgs));
-
-    std::future_status status = future.wait_for(std::chrono::seconds(duration));
+  ::testing::AssertionResult waitForResult(const int duration)
+  {
+    std::future_status status = check_result_future_.wait_for(std::chrono::seconds(duration));
 
     // If the future timeouts no failure were detected, thus this means the test result is a success
     if (status == std::future_status::timeout)
@@ -158,16 +169,15 @@ public:
       return ::testing::AssertionSuccess();
     }
 
-    return future.get();
+    return check_result_future_.get();
   }
 
 private:
-  ros::NodeHandle nh_;
-  ros::Subscriber sub_;
-
-  std::vector<MsgTypeConstPtr> msgs_;
+  std::vector<ScanConstPtr> msgs_;
 
   std::promise<::testing::AssertionResult> check_result_;
+
+  std::future<::testing::AssertionResult> check_result_future_;
 
   std::map<int16_t, NormalDist> bins_expected_;
 
