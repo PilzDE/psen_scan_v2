@@ -15,16 +15,28 @@
 #ifndef PSEN_SCAN_V2_LASERSCAN_VALIDATOR_H
 #define PSEN_SCAN_V2_LASERSCAN_VALIDATOR_H
 
+#include <algorithm>
+#include <atomic>
 #include <future>
 #include <map>
-#include <memory>
 #include <stdexcept>
+#include <string>
 #include <vector>
+
+#include <boost/shared_ptr.hpp>
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
-// #include <ros/ros.h>
+#include <gtest/gtest.h>
+
+#include <math.h>
+
+#include <ros/ros.h>
+
+#include <rosbag/bag.h>
+#include <rosbag/view.h>
+#include <sensor_msgs/LaserScan.h>
 
 #include "psen_scan_v2_standalone/angle_conversions.h"
 #include "psen_scan_v2_standalone/laserscan.h"
@@ -74,6 +86,28 @@ std::map<int16_t, NormalDist> binsFromScans(const std::vector<ScanConstPtr>& sca
     }
     addScanToBin(*scan, bins);
   });
+  return bins;
+}
+
+std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
+{
+  std::map<int16_t, NormalDist> bins;
+
+  rosbag::Bag bag;
+  bag.open(filepath, rosbag::bagmode::Read);
+
+  std::vector<std::string> topics;
+  topics.push_back(std::string("/laser_scanner/scan"));
+
+  rosbag::View view(bag, rosbag::TopicQuery(topics));
+
+  std::for_each(view.begin(), view.end(), [&bins](const rosbag::MessageInstance& msg) {
+    sensor_msgs::LaserScanConstPtr scan = msg.instantiate<sensor_msgs::LaserScan>();
+    addScanToBin(*scan, bins);
+  });
+
+  bag.close();
+
   return bins;
 }
 

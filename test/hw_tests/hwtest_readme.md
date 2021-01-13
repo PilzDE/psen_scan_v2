@@ -46,3 +46,7 @@ To run the hardware tests execute
 export HW_TEST_SCAN_COMPARE_TESTFILE=<path/to/reference/file.bag>
 rostest psen_scan_v2 hwtest_scan_compare.test
 ```
+In order to test the psen_scan_v2 standalone library specifically, execute
+```
+rostest psen_scan_v2 hwtest_scan_compare_standalone.test
+```

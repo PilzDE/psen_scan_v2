@@ -366,6 +366,18 @@ if(CATKIN_ENABLE_TESTING)
   if(ENABLE_HARDWARE_TESTING)
     find_package(rosbag REQUIRED)
 
+    add_rostest_gtest(hwtest_scan_compare_standalone
+      test/hw_tests/hwtest_scan_compare_standalone.test
+      test/hw_tests/hwtest_scan_compare_standalone.cpp
+      standalone/src/laserscan.cpp
+    )
+    target_link_libraries(hwtest_scan_compare_standalone
+      ${catkin_LIBRARIES}
+      ${PROJECT_NAME}_standalone
+      ${rosbag_LIBRARIES}
+      fmt::fmt
+    )
+
     add_rostest_gtest(hwtest_scan_compare
         test/hw_tests/hwtest_scan_compare.test
         test/hw_tests/hwtest_scan_compare.cpp
