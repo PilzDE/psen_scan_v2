@@ -38,7 +38,7 @@ void laserScanCallback(const LaserScan& scan)
 {
   const LaserScan::MeasurementData& measures = scan.getMeasurements();
 
-  if(measures.empty())
+  if (measures.empty())
   {
     return;
   }
