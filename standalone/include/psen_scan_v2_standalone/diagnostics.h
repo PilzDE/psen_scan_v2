@@ -26,25 +26,25 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace data_conversion_layer
+{
 namespace monitoring_frame
 {
 /**
  * @brief Contains all types, etc. needed to describe the diagnostics information contained
- * in a monitoring_frame::Message.
+ * in a  data_conversion_layer::monitoring_frame::Message.
  */
 namespace diagnostic
 {
 /**
  * @brief Contains constants and types needed to define the diagnostic::Message.
  */
-namespace raw_message
-{
-static constexpr uint32_t LENGTH_FOR_ONE_DEVICE_IN_BYTES{ 9 };
-static constexpr uint32_t UNUSED_OFFSET_IN_BYTES{ 4 };
-static constexpr uint32_t LENGTH_IN_BYTES{ UNUSED_OFFSET_IN_BYTES +
-                                           LENGTH_FOR_ONE_DEVICE_IN_BYTES * VALID_SCANNER_IDS.size() };
-using Field = std::array<uint8_t, diagnostic::raw_message::LENGTH_IN_BYTES>;
-}  // namespace raw_message
+static constexpr uint32_t RAW_CHUNK_LENGTH_FOR_ONE_DEVICE_IN_BYTES{ 9 };
+static constexpr uint32_t RAW_CHUNK_UNUSED_OFFSET_IN_BYTES{ 4 };
+static constexpr uint32_t RAW_CHUNK_LENGTH_IN_BYTES{
+  RAW_CHUNK_UNUSED_OFFSET_IN_BYTES + RAW_CHUNK_LENGTH_FOR_ONE_DEVICE_IN_BYTES * VALID_SCANNER_IDS.size()
+};
+using RawChunk = std::array<uint8_t, diagnostic::RAW_CHUNK_LENGTH_IN_BYTES>;
 
 enum class ErrorType
 {
@@ -178,7 +178,7 @@ public:
   constexpr Message(const ScannerId& id, const diagnostic::ErrorLocation& location);
   constexpr bool operator==(const diagnostic::Message& rhs) const;
 
-  friend raw_message::Field serialize(const std::vector<diagnostic::Message>& messages);
+  friend RawChunk serialize(const std::vector<diagnostic::Message>& messages);
 
   constexpr ScannerId getScannerId() const
   {
@@ -223,6 +223,7 @@ std::ostream& operator<<(std::ostream& os, const diagnostic::Message& msg);
 
 }  // namespace diagnostic
 }  // namespace monitoring_frame
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_DIAGNOSTICS_H

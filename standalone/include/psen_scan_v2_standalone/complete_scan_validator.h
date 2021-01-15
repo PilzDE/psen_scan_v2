@@ -23,6 +23,8 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace data_conversion_layer
+{
 namespace monitoring_frame
 {
 //! @brief Validates complete scan rounds and detects if MonitoringFrames are missing for a complete scan or
@@ -54,7 +56,8 @@ public:
    * @param num_expected_msgs Number of MonitoringFrames which are needed for a scan round to be complete.
    * @return See Result type.
    */
-  OptionalResult validate(const monitoring_frame::Message& msg, const uint32_t& num_expected_msgs);
+  OptionalResult validate(const data_conversion_layer::monitoring_frame::Message& msg,
+                          const uint32_t& num_expected_msgs);
 
   /**
    * @brief Readies the validator for a new validation round. This function has to be called whenever
@@ -120,8 +123,8 @@ inline void ScanValidator::reset()
   curr_scan_round_ = boost::none;
 }
 
-inline ScanValidator::OptionalResult ScanValidator::validate(const monitoring_frame::Message& msg,
-                                                             const uint32_t& num_expected_msgs)
+inline ScanValidator::OptionalResult
+ScanValidator::validate(const data_conversion_layer::monitoring_frame::Message& msg, const uint32_t& num_expected_msgs)
 {
   if (curr_scan_round_ == boost::none)
   {
@@ -142,7 +145,7 @@ inline ScanValidator::OptionalResult ScanValidator::validate(const monitoring_fr
 }
 
 }  // namespace monitoring_frame
-
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_COMPLETE_SCAN_VALIDATOR_H

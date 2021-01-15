@@ -19,6 +19,8 @@ namespace psen_scan_v2_standalone
 {
 static constexpr TenthOfDegree MASTER_RESOLUTION{ TenthOfDegree(2u) };
 
+namespace data_conversion_layer
+{
 namespace start_request
 {
 Message::Message(const ScannerConfiguration& scanner_configuration)
@@ -30,4 +32,5 @@ Message::Message(const ScannerConfiguration& scanner_configuration)
 }
 
 }  // namespace start_request
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone

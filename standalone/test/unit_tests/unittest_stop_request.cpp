@@ -31,7 +31,7 @@ class StopRequestTest : public ::testing::Test
 
 TEST_F(StopRequestTest, constructorTest)
 {
-  const auto raw_stop_request{ stop_request::serialize() };
+  const auto raw_stop_request{ data_conversion_layer::stop_request::serialize() };
   boost::crc_32_type crc;
   crc.process_bytes(&raw_stop_request[sizeof(uint32_t)], raw_stop_request.size() - sizeof(uint32_t));
 
@@ -39,20 +39,21 @@ TEST_F(StopRequestTest, constructorTest)
       << "Calculated CRC incorrect";
 
   const std::size_t crc_offset{ 4u };
-  for (std::size_t i = 0; i < stop_request::NUM_RESERVED_FIELDS; ++i)
+  for (std::size_t i = 0; i < data_conversion_layer::stop_request::NUM_RESERVED_FIELDS; ++i)
   {
     const std::size_t curr_field_offset{ crc_offset + i * sizeof(uint8_t) };
     EXPECT_TRUE(DecodingEquals(raw_stop_request, curr_field_offset, static_cast<uint8_t>(0)))
         << "Reserved field has incorrect value";
   }
 
-  const std::size_t op_code_offset{ crc_offset + stop_request::NUM_RESERVED_FIELDS * sizeof(uint8_t) };
+  const std::size_t op_code_offset{ crc_offset +
+                                    data_conversion_layer::stop_request::NUM_RESERVED_FIELDS * sizeof(uint8_t) };
   EXPECT_TRUE(DecodingEquals(raw_stop_request, op_code_offset, static_cast<uint32_t>(0x36))) << "OP code incorrect";
 }
 
 TEST_F(StopRequestTest, crcShouldBeCorrectAfterSerialization)
 {
-  const auto raw_stop_request{ stop_request::serialize() };
+  const auto raw_stop_request{ data_conversion_layer::stop_request::serialize() };
   const std::array<unsigned char, 4> expected_crc = { 0x28, 0xec, 0xfb, 0x39 };  // see wireshark for this number
   for (size_t i = 0; i < expected_crc.size(); ++i)
   {

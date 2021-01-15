@@ -7,7 +7,7 @@ The overall architecture should give a good idea of how the driver is supposed t
 For more details we recommend taking a look at the source code itself:
 * For the **ROS** part we refer to psen_scan_v2::ROSScannerNodeT
 * The referenced **User API** is mainly defined by psen_scan_v2::ScannerV2.
-* For the **Scanner protocol Layer** please check psen_scan_v2::scanner_protocol::ScannerProtocolDef or the ScannerStateMachine.
+* For the **Scanner protocol Layer** please check psen_scan_v2::protocol_layer::ScannerProtocolDef or the ScannerStateMachine.
 * Data **Serialization** and **Deserialization** is for example handled in psen_scan_v2::monitoring_frame::deserialize() or psen_scan_v2::start_reply::serialize()
 * For the  **Primitive communication layer** we recommend taking a look at psen_scan_v2::UdpClientImpl
 

@@ -19,7 +19,7 @@
 
 namespace psen_scan_v2_standalone
 {
-namespace scanner_protocol
+namespace protocol_layer
 {
 /**
  * @brief Contains the events needed to define and implement the scanner protocol.
@@ -83,7 +83,7 @@ class MonitoringFrameReceivedError
 };
 
 }  // namespace scanner_events
-}  // namespace scanner_protocol
+}  // namespace protocol_layer
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_EVENTS_H

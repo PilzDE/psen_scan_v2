@@ -21,11 +21,15 @@ using namespace psen_scan_v2_standalone;
 
 namespace psen_scan_v2_standalone
 {
+namespace data_conversion_layer
+{
 namespace monitoring_frame
 {
 namespace diagnostic
 {
-std::ostream& operator<<(std::ostream& os, const psen_scan_v2_standalone::monitoring_frame::diagnostic::Message& msg)
+std::ostream&
+operator<<(std::ostream& os,
+           const psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::diagnostic::Message& msg)
 {
   os << fmt::format(
       "Device: {} - {}", scanner_id_to_string.at(msg.getScannerId()), error_code_to_string.at(msg.getDiagnosticCode()));
@@ -40,4 +44,5 @@ std::ostream& operator<<(std::ostream& os, const psen_scan_v2_standalone::monito
 
 }  // namespace diagnostic
 }  // namespace monitoring_frame
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone

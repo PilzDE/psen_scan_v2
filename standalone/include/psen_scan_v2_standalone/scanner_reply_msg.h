@@ -20,8 +20,10 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace data_conversion_layer
+{
 /**
- * @brief Contains all things needed to define and implement a scanner_reply::Message.
+ * @brief Contains all things needed to define and implement a data_conversion_layer::scanner_reply::Message.
  */
 namespace scanner_reply
 {
@@ -100,5 +102,6 @@ inline constexpr Message::OperationResult Message::result() const
 }
 
 }  // namespace scanner_reply
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
 #endif  // PSEN_SCAN_V2_STANDALONE_SCANNER_REPLY_MSG_H

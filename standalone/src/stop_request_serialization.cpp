@@ -23,18 +23,21 @@
 
 namespace psen_scan_v2_standalone
 {
-RawData stop_request::serialize()
+namespace data_conversion_layer
+{
+RawData data_conversion_layer::stop_request::serialize()
 {
   std::ostringstream os;
 
   boost::crc_32_type crc;
-  crc.process_bytes(&stop_request::RESERVED, sizeof(stop_request::RESERVED));
-  crc.process_bytes(&stop_request::OPCODE, sizeof(stop_request::OPCODE));
+  crc.process_bytes(&stop_request::RESERVED, sizeof(data_conversion_layer::stop_request::RESERVED));
+  crc.process_bytes(&stop_request::OPCODE, sizeof(data_conversion_layer::stop_request::OPCODE));
 
   raw_processing::write(os, static_cast<uint32_t>(crc.checksum()));
-  raw_processing::write(os, stop_request::RESERVED);
-  raw_processing::write(os, stop_request::OPCODE);
+  raw_processing::write(os, data_conversion_layer::stop_request::RESERVED);
+  raw_processing::write(os, data_conversion_layer::stop_request::OPCODE);
 
   return raw_processing::toArray<RawData>(os);
 }
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone

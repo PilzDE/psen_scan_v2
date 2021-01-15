@@ -22,9 +22,9 @@ namespace psen_scan_v2_standalone_test
 {
 TEST(MonitoringFrameDiagnosticMessageTest, shouldConstructMonitoringFrameDiagnosticMessageAsExpected)
 {
-  auto msg =
-      monitoring_frame::diagnostic::Message(ScannerId::slave0, monitoring_frame::diagnostic::ErrorLocation(4, 3));
-  EXPECT_EQ(msg.getDiagnosticCode(), monitoring_frame::diagnostic::ErrorType::conf_err);
+  auto msg = data_conversion_layer::monitoring_frame::diagnostic::Message(
+      ScannerId::slave0, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(4, 3));
+  EXPECT_EQ(msg.getDiagnosticCode(), data_conversion_layer::monitoring_frame::diagnostic::ErrorType::conf_err);
   EXPECT_EQ(msg.getErrorLocation().getByte(), static_cast<size_t>(4));
   EXPECT_EQ(msg.getErrorLocation().getBit(), static_cast<size_t>(3));
   EXPECT_EQ(msg.getScannerId(), ScannerId::slave0);
@@ -32,44 +32,44 @@ TEST(MonitoringFrameDiagnosticMessageTest, shouldConstructMonitoringFrameDiagnos
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldBeEqualOnSameInputData)
 {
-  auto msg0 =
-      monitoring_frame::diagnostic::Message(ScannerId::slave1, monitoring_frame::diagnostic::ErrorLocation(3, 0));
-  auto msg1 =
-      monitoring_frame::diagnostic::Message(ScannerId::slave1, monitoring_frame::diagnostic::ErrorLocation(3, 0));
+  auto msg0 = data_conversion_layer::monitoring_frame::diagnostic::Message(
+      ScannerId::slave1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(3, 0));
+  auto msg1 = data_conversion_layer::monitoring_frame::diagnostic::Message(
+      ScannerId::slave1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(3, 0));
   EXPECT_EQ(msg0, msg1);
 }
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldBeNotEqualOnDifferentScannerId)
 {
-  auto msg0 =
-      monitoring_frame::diagnostic::Message(ScannerId::slave0, monitoring_frame::diagnostic::ErrorLocation(3, 0));
-  auto msg1 =
-      monitoring_frame::diagnostic::Message(ScannerId::slave1, monitoring_frame::diagnostic::ErrorLocation(3, 0));
+  auto msg0 = data_conversion_layer::monitoring_frame::diagnostic::Message(
+      ScannerId::slave0, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(3, 0));
+  auto msg1 = data_conversion_layer::monitoring_frame::diagnostic::Message(
+      ScannerId::slave1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(3, 0));
   EXPECT_FALSE(msg0 == msg1);
 }
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldBeNotEqualOnErrorByteLocation)
 {
-  auto msg0 =
-      monitoring_frame::diagnostic::Message(ScannerId::slave1, monitoring_frame::diagnostic::ErrorLocation(0, 0));
-  auto msg1 =
-      monitoring_frame::diagnostic::Message(ScannerId::slave1, monitoring_frame::diagnostic::ErrorLocation(1, 0));
+  auto msg0 = data_conversion_layer::monitoring_frame::diagnostic::Message(
+      ScannerId::slave1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(0, 0));
+  auto msg1 = data_conversion_layer::monitoring_frame::diagnostic::Message(
+      ScannerId::slave1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 0));
   EXPECT_FALSE(msg0 == msg1);
 }
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldBeNotEqualOnDifferentErrorBitLocation)
 {
-  auto msg0 =
-      monitoring_frame::diagnostic::Message(ScannerId::slave1, monitoring_frame::diagnostic::ErrorLocation(1, 0));
-  auto msg1 =
-      monitoring_frame::diagnostic::Message(ScannerId::slave1, monitoring_frame::diagnostic::ErrorLocation(1, 1));
+  auto msg0 = data_conversion_layer::monitoring_frame::diagnostic::Message(
+      ScannerId::slave1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 0));
+  auto msg1 = data_conversion_layer::monitoring_frame::diagnostic::Message(
+      ScannerId::slave1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 1));
   EXPECT_FALSE(msg0 == msg1);
 }
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldOutputTheRightDiagnosticMessage)
 {
-  auto msg =
-      monitoring_frame::diagnostic::Message(ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(3, 3));
+  auto msg = data_conversion_layer::monitoring_frame::diagnostic::Message(
+      ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(3, 3));
   std::ostringstream os;
   os << msg;
   EXPECT_EQ(os.str(), "Device: Master - Display communication problem.");
@@ -77,8 +77,8 @@ TEST(MonitoringFrameDiagnosticMessageTest, shouldOutputTheRightDiagnosticMessage
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldOutputTheRightDiagnosticMessageWithBitandBytes)
 {
-  auto msg =
-      monitoring_frame::diagnostic::Message(ScannerId::slave1, monitoring_frame::diagnostic::ErrorLocation(2, 5));
+  auto msg = data_conversion_layer::monitoring_frame::diagnostic::Message(
+      ScannerId::slave1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(2, 5));
   std::ostringstream os;
   os << msg;
 

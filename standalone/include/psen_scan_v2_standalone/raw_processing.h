@@ -25,6 +25,8 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace data_conversion_layer
+{
 /**
  * @brief Contains functions, etc. needed to transform
  * higher level data to raw data (sent to or received from scanner) or vice versa.
@@ -116,6 +118,7 @@ inline StringStreamFailure::StringStreamFailure(const std::string& msg) : std::r
 }
 
 }  // namespace raw_processing
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_RAW_PROCESSING_H

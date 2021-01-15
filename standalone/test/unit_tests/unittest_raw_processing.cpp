@@ -40,7 +40,7 @@ TYPED_TEST(RawProcessingTest, write)
 {
   std::ostringstream os;
   TypeParam data{ 123 };
-  raw_processing::write(os, data);
+  data_conversion_layer::raw_processing::write(os, data);
 
   EXPECT_EQ(os.str().length(), sizeof(data));
 
@@ -58,7 +58,7 @@ TYPED_TEST(RawProcessingTest, read)
   std::istringstream is{ os.str() };
 
   TypeParam data_read;
-  raw_processing::read(is, data_read);
+  data_conversion_layer::raw_processing::read(is, data_read);
 
   EXPECT_EQ(data_read, data);
 }
@@ -71,8 +71,8 @@ TYPED_TEST(RawProcessingTest, readTooMuch)
   std::istringstream is{ os.str() };
 
   TypeParam data_read;
-  raw_processing::read(is, data_read);
-  EXPECT_THROW(raw_processing::read(is, data_read), std::exception);
+  data_conversion_layer::raw_processing::read(is, data_read);
+  EXPECT_THROW(data_conversion_layer::raw_processing::read(is, data_read), std::exception);
 }
 
 TYPED_TEST(RawProcessingTest, readWithConversion)
@@ -83,7 +83,8 @@ TYPED_TEST(RawProcessingTest, readWithConversion)
   std::istringstream is{ os.str() };
 
   TypeParam data_read;
-  raw_processing::read<TypeParam, TypeParam>(is, data_read, [](TypeParam raw_data) { return raw_data * 2; });
+  data_conversion_layer::raw_processing::read<TypeParam, TypeParam>(
+      is, data_read, [](TypeParam raw_data) { return raw_data * 2; });
 
   EXPECT_EQ(data_read, data * 2);
 }
@@ -100,7 +101,7 @@ TYPED_TEST(RawProcessingTest, readArray)
   std::istringstream is{ os.str() };
 
   std::vector<TypeParam> data_read;
-  raw_processing::readArray<TypeParam, TypeParam>(
+  data_conversion_layer::raw_processing::readArray<TypeParam, TypeParam>(
       is, data_read, data.size(), [](TypeParam raw_data) { return raw_data * 2; });
 
   EXPECT_EQ(data_read.size(), data.size());
@@ -122,7 +123,7 @@ TYPED_TEST(RawProcessingTest, readArrayTooMuch)
   std::istringstream is{ os.str() };
 
   std::vector<TypeParam> data_read;
-  EXPECT_THROW((raw_processing::readArray<TypeParam, TypeParam>(
+  EXPECT_THROW((data_conversion_layer::raw_processing::readArray<TypeParam, TypeParam>(
                    is, data_read, data.size() + 1, [](TypeParam raw_data) { return raw_data; })),
                std::exception);
 }

@@ -15,7 +15,7 @@
 
 namespace psen_scan_v2_standalone
 {
-namespace scanner_protocol
+namespace protocol_layer
 {
 inline ScannerProtocolDef::ScannerProtocolDef(StateMachineArgs* const args) : args_(args)
 {
@@ -104,7 +104,7 @@ template <class T>
 inline void ScannerProtocolDef::sendStartRequest(const T& event)
 {
   PSENSCAN_DEBUG("StateMachine", "Action: sendStartRequest");
-  args_->control_client_->write(serialize(start_request::Message(args_->config_)));
+  args_->control_client_->write(serialize(data_conversion_layer::start_request::Message(args_->config_)));
 }
 
 inline void ScannerProtocolDef::handleStartRequestTimeout(const scanner_events::StartTimeout& event)
@@ -121,12 +121,12 @@ inline void ScannerProtocolDef::sendStopRequest(const T& event)
 {
   PSENSCAN_DEBUG("StateMachine", "Action: sendStopRequest");
   args_->data_client_->close();
-  args_->control_client_->write(stop_request::serialize());
+  args_->control_client_->write(data_conversion_layer::stop_request::serialize());
 }
 
 inline void ScannerProtocolDef::printUserMsgFor(const ScanValidatorResult& res)
 {
-  using Result = monitoring_frame::ScanValidator::Result;
+  using Result = data_conversion_layer::monitoring_frame::ScanValidator::Result;
   if (!res || res.value() == Result::valid)
   {
     return;
@@ -150,7 +150,8 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
 
   try
   {
-    const monitoring_frame::Message frame{ monitoring_frame::deserialize(event.data_, event.num_bytes_) };
+    const data_conversion_layer::monitoring_frame::Message frame{ data_conversion_layer::monitoring_frame::deserialize(
+        event.data_, event.num_bytes_) };
     if (!frame.diagnosticMessages().empty())
     {
       PSENSCAN_WARN_THROTTLE(
@@ -158,10 +159,10 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
     }
 
     printUserMsgFor(complete_scan_validator_.validate(frame, DEFAULT_NUM_MSG_PER_ROUND));
-    args_->inform_user_about_laser_scan_cb(toLaserScan(frame));
+    args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan(frame));
   }
   // LCOV_EXCL_START
-  catch (const monitoring_frame::ScanCounterMissing& e)
+  catch (const data_conversion_layer::monitoring_frame::ScanCounterMissing& e)
   {
     PSENSCAN_ERROR("StateMachine", e.what());
   }
@@ -186,16 +187,16 @@ inline ScannerProtocolDef::InternalScannerReplyError::InternalScannerReplyError(
 }
 // LCOV_EXCL_STOP
 
-inline void ScannerProtocolDef::checkForInternalErrors(const scanner_reply::Message& msg)
+inline void ScannerProtocolDef::checkForInternalErrors(const data_conversion_layer::scanner_reply::Message& msg)
 {
   // LCOV_EXCL_START
-  if (msg.type() == scanner_reply::Message::Type::unknown)
+  if (msg.type() == data_conversion_layer::scanner_reply::Message::Type::unknown)
   {
     throw InternalScannerReplyError("Unexpected code in reply");
   }
-  if (msg.result() != scanner_reply::Message::OperationResult::accepted)
+  if (msg.result() != data_conversion_layer::scanner_reply::Message::OperationResult::accepted)
   {
-    if (msg.result() == scanner_reply::Message::OperationResult::refused)
+    if (msg.result() == data_conversion_layer::scanner_reply::Message::OperationResult::refused)
     {
       throw InternalScannerReplyError("Request refused by device.");
     }
@@ -209,16 +210,18 @@ inline void ScannerProtocolDef::checkForInternalErrors(const scanner_reply::Mess
 
 inline bool ScannerProtocolDef::isStartReply(scanner_events::RawReplyReceived const& reply_event)
 {
-  const scanner_reply::Message msg{ scanner_reply::deserialize(reply_event.data_) };
+  const data_conversion_layer::scanner_reply::Message msg{ data_conversion_layer::scanner_reply::deserialize(
+      reply_event.data_) };
   checkForInternalErrors(msg);
-  return msg.type() == scanner_reply::Message::Type::start;
+  return msg.type() == data_conversion_layer::scanner_reply::Message::Type::start;
 }
 
 inline bool ScannerProtocolDef::isStopReply(scanner_events::RawReplyReceived const& reply_event)
 {
-  const scanner_reply::Message msg{ scanner_reply::deserialize(reply_event.data_) };
+  const data_conversion_layer::scanner_reply::Message msg{ data_conversion_layer::scanner_reply::deserialize(
+      reply_event.data_) };
   checkForInternalErrors(msg);
-  return msg.type() == scanner_reply::Message::Type::stop;
+  return msg.type() == data_conversion_layer::scanner_reply::Message::Type::stop;
 }
 
 //++++++++++++++++++++ Special transitions ++++++++++++++++++++++++++++++++++++
@@ -268,5 +271,5 @@ void ScannerProtocolDef::no_transition(const scanner_events::RawMonitoringFrameR
   PSENSCAN_WARN("StateMachine", "Received monitoring frame despite not waiting for it");
 }
 
-}  // namespace scanner_protocol
+}  // namespace protocol_layer
 }  // namespace psen_scan_v2_standalone

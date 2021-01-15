@@ -57,12 +57,12 @@ namespace psen_scan_v2_standalone
 /**
  * @brief Contains all things needed to describe and implement the scanner protocol.
  */
-namespace scanner_protocol
+namespace protocol_layer
 {
 namespace msm = boost::msm;
 namespace mpl = boost::mpl;
 
-namespace e = psen_scan_v2_standalone::scanner_protocol::scanner_events;
+namespace e = psen_scan_v2_standalone::protocol_layer::scanner_events;
 
 // clang-format off
 #define STATE(state_name)\
@@ -212,9 +212,9 @@ private:
     InternalScannerReplyError(const std::string& error_msg);
   };
   // LCOV_EXCL_STOP
-  void checkForInternalErrors(const scanner_reply::Message& msg);
+  void checkForInternalErrors(const data_conversion_layer::scanner_reply::Message& msg);
 
-  using ScanValidatorResult = monitoring_frame::ScanValidator::OptionalResult;
+  using ScanValidatorResult = data_conversion_layer::monitoring_frame::ScanValidator::OptionalResult;
   void printUserMsgFor(const ScanValidatorResult& validation_result);
 
 private:
@@ -223,13 +223,13 @@ private:
   std::unique_ptr<Watchdog> start_reply_watchdog_{};
 
   std::unique_ptr<Watchdog> monitoring_frame_watchdog_{};
-  monitoring_frame::ScanValidator complete_scan_validator_;
+  data_conversion_layer::monitoring_frame::ScanValidator complete_scan_validator_;
 };
 
 // Pick a back-end
 using ScannerStateMachine = msm::back::state_machine<ScannerProtocolDef>;
 
-}  // namespace scanner_protocol
+}  // namespace protocol_layer
 }  // namespace psen_scan_v2_standalone
 
 #include "psen_scan_v2_standalone/scanner_state_machine_def.h"

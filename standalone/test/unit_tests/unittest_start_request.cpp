@@ -73,15 +73,15 @@ TEST_F(StartRequestTest, constructorTest)
   const DefaultScanRange scan_range{ TenthOfDegree(0), TenthOfDegree::fromRad(4.71) };
 
   uint32_t sequence_number{ 123 };
-  start_request::Message sr(ScannerConfigurationBuilder()
-                                .hostIP(host_ip)
-                                .hostDataPort(host_udp_port_data)
-                                .hostControlPort(1 /* irrelevant */)
-                                .scannerIp("192.168.0.50")
-                                .scannerDataPort(77)
-                                .scannerControlPort(78)
-                                .scanRange(scan_range)
-                                .build());
+  data_conversion_layer::start_request::Message sr(ScannerConfigurationBuilder()
+                                                       .hostIP(host_ip)
+                                                       .hostDataPort(host_udp_port_data)
+                                                       .hostControlPort(1 /* irrelevant */)
+                                                       .scannerIp("192.168.0.50")
+                                                       .scannerDataPort(77)
+                                                       .scannerControlPort(78)
+                                                       .scanRange(scan_range)
+                                                       .build());
 
   auto data = serialize(sr, sequence_number);
   boost::crc_32_type result;
@@ -146,7 +146,7 @@ TEST_F(StartRequestTest, crcShouldBeCorrectIfDiagnosticIsDisabled)
 {
   const ScannerConfiguration config{ createConfig(false) };
 
-  const auto raw_start_request{ serialize(start_request::Message(config)) };
+  const auto raw_start_request{ serialize(data_conversion_layer::start_request::Message(config)) };
   const std::array<unsigned char, 4> expected_crc = { 0xaf, 0xc8, 0xde, 0x79 };  // see wireshark for this number
   for (size_t i = 0; i < expected_crc.size(); ++i)
   {
@@ -158,7 +158,7 @@ TEST_F(StartRequestTest, crcShouldBeCorrectIfDiagnosticIsEnabled)
 {
   const ScannerConfiguration config{ createConfig(true) };
 
-  const auto raw_start_request{ serialize(start_request::Message(config)) };
+  const auto raw_start_request{ serialize(data_conversion_layer::start_request::Message(config)) };
   const std::array<unsigned char, 4> expected_crc = { 0x18, 0x5b, 0xd5, 0x55 };  // see wireshark for this number
   for (size_t i = 0; i < expected_crc.size(); ++i)
   {

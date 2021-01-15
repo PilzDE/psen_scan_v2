@@ -26,6 +26,8 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace data_conversion_layer
+{
 namespace start_request
 {
 static constexpr std::size_t SIZE{ 58 };  // See protocol description
@@ -42,13 +44,14 @@ uint32_t calculateCRC(const RawData& data)
   return static_cast<uint32_t>(crc.checksum());
 }
 
-RawData start_request::serialize(const start_request::Message& msg, const uint32_t& seq_number)
+RawData data_conversion_layer::start_request::serialize(const data_conversion_layer::start_request::Message& msg,
+                                                        const uint32_t& seq_number)
 {
   std::ostringstream os;
 
   raw_processing::write(os, seq_number);
-  raw_processing::write(os, start_request::RESERVED);
-  raw_processing::write(os, start_request::OPCODE);
+  raw_processing::write(os, data_conversion_layer::start_request::RESERVED);
+  raw_processing::write(os, data_conversion_layer::start_request::OPCODE);
 
   /**< Byte order: big endian */
   const uint32_t host_ip_big_endian = htobe32(msg.host_ip_);
@@ -107,8 +110,9 @@ RawData start_request::serialize(const start_request::Message& msg, const uint32
   return raw_data_with_crc;
 }
 
-RawData start_request::serialize(const start_request::Message& msg)
+RawData data_conversion_layer::start_request::serialize(const data_conversion_layer::start_request::Message& msg)
 {
-  return serialize(msg, start_request::DEFAULT_SEQ_NUMBER);
+  return serialize(msg, data_conversion_layer::start_request::DEFAULT_SEQ_NUMBER);
 }
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone

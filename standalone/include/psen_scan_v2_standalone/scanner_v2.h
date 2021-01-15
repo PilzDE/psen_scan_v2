@@ -39,7 +39,7 @@
  */
 namespace psen_scan_v2_standalone
 {
-using namespace psen_scan_v2_standalone::scanner_protocol;
+using namespace psen_scan_v2_standalone::protocol_layer;
 using std::placeholders::_1;
 using std::placeholders::_2;
 
@@ -88,7 +88,7 @@ private:
    * Implements the IWatchdogFactory to add behavior to handles specific cases,
    * where the interaction with the scanner hardware takes longer than expected.
    *
-   * @see scanner_protocol::IWatchdogFactory
+   * @see protocol_layer::IWatchdogFactory
    * @see Watchdog
    */
   class WatchdogFactory : public IWatchdogFactory

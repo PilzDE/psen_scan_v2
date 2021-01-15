@@ -20,7 +20,7 @@
 
 namespace psen_scan_v2_standalone
 {
-using namespace psen_scan_v2_standalone::scanner_protocol::scanner_events;
+using namespace psen_scan_v2_standalone::protocol_layer::scanner_events;
 
 // clang-format off
 #define BIND_EVENT(event_name)\

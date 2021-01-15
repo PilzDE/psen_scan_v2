@@ -26,8 +26,10 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace data_conversion_layer
+{
 /**
- * @brief Contains all things needed to define and implement a start_request::Message.
+ * @brief Contains all things needed to define and implement a data_conversion_layer::start_request::Message.
  */
 namespace start_request
 {
@@ -42,8 +44,8 @@ class Message
 public:
   Message(const ScannerConfiguration& scanner_configuration);
 
-  friend RawData serialize(const start_request::Message&, const uint32_t&);
-  friend RawData serialize(const start_request::Message&);
+  friend RawData serialize(const data_conversion_layer::start_request::Message&, const uint32_t&);
+  friend RawData serialize(const data_conversion_layer::start_request::Message&);
 
 private:
   /**
@@ -120,6 +122,7 @@ constexpr bool Message::DeviceSettings::isDiagnosticsEnabled() const
 };
 
 }  // namespace start_request
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_START_REQUEST_H

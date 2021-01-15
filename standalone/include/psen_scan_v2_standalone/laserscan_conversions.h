@@ -22,13 +22,15 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace data_conversion_layer
+{
 /**
  * @brief Converts the technical monitoring_frame to the user friendly LaserScan type sent by the
  * IScanner::LaserScanCallback.
- * @see monitoring_frame::Message
+ * @see  data_conversion_layer::monitoring_frame::Message
  * @see ScannerV2
  */
-static LaserScan toLaserScan(const monitoring_frame::Message& frame)
+static LaserScan toLaserScan(const data_conversion_layer::monitoring_frame::Message& frame)
 {
   const auto resolution = frame.resolution();
   const auto min_angle = frame.fromTheta();
@@ -42,6 +44,7 @@ static LaserScan toLaserScan(const monitoring_frame::Message& frame)
   return scan;
 }
 
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_LASERSCAN_CONVERSIONS_H

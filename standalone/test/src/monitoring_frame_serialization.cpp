@@ -22,9 +22,11 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace data_conversion_layer
+{
 namespace monitoring_frame
 {
-RawData serialize(const monitoring_frame::Message& frame)
+RawData serialize(const data_conversion_layer::monitoring_frame::Message& frame)
 {
   std::ostringstream os;
 
@@ -47,17 +49,17 @@ RawData serialize(const monitoring_frame::Message& frame)
   {
     additional_field::Header diagnostic_data_field_header(
         static_cast<additional_field::Header::Id>(additional_field::HeaderID::diagnostics),
-        diagnostic::raw_message::LENGTH_IN_BYTES);
+        diagnostic::RAW_CHUNK_LENGTH_IN_BYTES);
     write(os, diagnostic_data_field_header);
-    diagnostic::raw_message::Field diagnostic_data_field_payload = diagnostic::serialize(frame.diagnostic_messages_);
-    raw_processing::write(os, diagnostic_data_field_payload);
+    diagnostic::RawChunk diagnostic_data_field_payload = diagnostic::serialize(frame.diagnostic_messages_);
+    data_conversion_layer::raw_processing::write(os, diagnostic_data_field_payload);
   }
 
   additional_field::Header measurements_header(
       static_cast<additional_field::Header::Id>(additional_field::HeaderID::measurements),
       frame.measurements_.size() * NUMBER_OF_BYTES_SINGLE_MEASUREMENT);
   write(os, measurements_header);
-  raw_processing::writeArray<uint16_t, double>(
+  data_conversion_layer::raw_processing::writeArray<uint16_t, double>(
       os, frame.measurements_, [](double elem) { return (static_cast<uint16_t>(std::round(elem * 1000.))); });
 
   if (!frame.intensities_.empty())
@@ -66,33 +68,33 @@ RawData serialize(const monitoring_frame::Message& frame)
         static_cast<additional_field::Header::Id>(additional_field::HeaderID::intensities),
         frame.intensities_.size() * NUMBER_OF_BYTES_SINGLE_INTENSITY);
     write(os, intensities_header);
-    raw_processing::writeArray<uint16_t, double>(
+    data_conversion_layer::raw_processing::writeArray<uint16_t, double>(
         os, frame.intensities_, [](double elem) { return (static_cast<uint16_t>(std::round(elem))); });
   }
 
   additional_field::Header::Id end_of_frame_header_id =
       static_cast<additional_field::Header::Id>(additional_field::HeaderID::end_of_frame);
-  raw_processing::write(os, end_of_frame_header_id);
+  data_conversion_layer::raw_processing::write(os, end_of_frame_header_id);
 
   uint8_t unknown_data_at_the_end_of_frame = 0;
-  raw_processing::write(os, unknown_data_at_the_end_of_frame);
-  raw_processing::write(os, unknown_data_at_the_end_of_frame);
-  raw_processing::write(os, unknown_data_at_the_end_of_frame);
+  data_conversion_layer::raw_processing::write(os, unknown_data_at_the_end_of_frame);
+  data_conversion_layer::raw_processing::write(os, unknown_data_at_the_end_of_frame);
+  data_conversion_layer::raw_processing::write(os, unknown_data_at_the_end_of_frame);
 
-  return raw_processing::toArray<RawData>(os);
+  return data_conversion_layer::raw_processing::toArray<RawData>(os);
 }
 
 constexpr size_t calculateIndexInRawDiagnosticData(const ScannerId& id, const diagnostic::ErrorLocation& location)
 {
-  return diagnostic::raw_message::UNUSED_OFFSET_IN_BYTES +
-         (static_cast<uint8_t>(id) * diagnostic::raw_message::LENGTH_FOR_ONE_DEVICE_IN_BYTES) + location.getByte();
+  return diagnostic::RAW_CHUNK_UNUSED_OFFSET_IN_BYTES +
+         (static_cast<uint8_t>(id) * diagnostic::RAW_CHUNK_LENGTH_FOR_ONE_DEVICE_IN_BYTES) + location.getByte();
 }
 
 namespace diagnostic
 {
-raw_message::Field serialize(const std::vector<monitoring_frame::diagnostic::Message>& messages)
+RawChunk serialize(const std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message>& messages)
 {
-  raw_message::Field raw_diagnostic_data{};
+  RawChunk raw_diagnostic_data{};
 
   for (const auto& elem : messages)
   {
@@ -105,9 +107,10 @@ raw_message::Field serialize(const std::vector<monitoring_frame::diagnostic::Mes
 
 void write(std::ostringstream& os, const additional_field::Header& header)
 {
-  raw_processing::write(os, header.id());
-  raw_processing::write<additional_field::Header::Length>(os, header.length() + 1);
+  data_conversion_layer::raw_processing::write(os, header.id());
+  data_conversion_layer::raw_processing::write<additional_field::Header::Length>(os, header.length() + 1);
 }
 
 }  // namespace monitoring_frame
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone

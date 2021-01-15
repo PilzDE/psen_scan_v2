@@ -21,11 +21,13 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace data_conversion_layer
+{
 scanner_reply::CRCMismatch::CRCMismatch(const std::string& msg) : std::runtime_error(msg)
 {
 }
 
-RawData scanner_reply::serialize(const uint32_t op_code, const uint32_t res_code)
+RawData data_conversion_layer::scanner_reply::serialize(const uint32_t op_code, const uint32_t res_code)
 {
   std::ostringstream os;
 
@@ -43,16 +45,17 @@ RawData scanner_reply::serialize(const uint32_t op_code, const uint32_t res_code
 
   // TODO check limits
   const std::string data_str(os.str());
-  assert(data_str.length() == scanner_reply::Message::SIZE && "Message data of start reply has not the expected size");
+  assert(data_str.length() == data_conversion_layer::scanner_reply::Message::SIZE &&
+         "Message data of start reply has not the expected size");
   return RawData(data_str.cbegin(), data_str.cend());
 }
 
-RawData scanner_reply::serialize(const Message& reply)
+RawData data_conversion_layer::scanner_reply::serialize(const Message& reply)
 {
   return serialize(static_cast<uint32_t>(reply.type()), static_cast<uint32_t>(reply.result()));
 }
 
-scanner_reply::Message scanner_reply::deserialize(const RawData& data)
+scanner_reply::Message data_conversion_layer::scanner_reply::deserialize(const RawData& data)
 {
   std::istringstream is(std::string(data.data(), Message::SIZE));
 
@@ -73,10 +76,11 @@ scanner_reply::Message scanner_reply::deserialize(const RawData& data)
 
   if (crc != crc_checked.checksum())
   {
-    throw scanner_reply::CRCMismatch();
+    throw data_conversion_layer::scanner_reply::CRCMismatch();
   }
 
   return Message(Message::convertToReplyType(opcode), Message::convertToOperationResult(res_code));
 }
 
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone

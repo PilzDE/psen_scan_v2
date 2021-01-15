@@ -29,7 +29,7 @@
 
 using namespace psen_scan_v2_standalone;
 
-using Message = scanner_reply::Message;
+using Message = data_conversion_layer::scanner_reply::Message;
 
 namespace psen_scan_v2_standalone_test
 {
@@ -55,7 +55,7 @@ TEST(ScannerReplyMsgTest, testGetStartOpCode)
 TEST(ScannerReplyMsgTest, testserialize)
 {
   const Message msg(Message::Type::start, Message::OperationResult::accepted);
-  const auto raw_msg{ scanner_reply::serialize(msg) };
+  const auto raw_msg{ data_conversion_layer::scanner_reply::serialize(msg) };
 
   boost::crc_32_type crc;
   crc.process_bytes(&raw_msg.at(sizeof(uint32_t)), raw_msg.size() - sizeof(uint32_t));
@@ -71,8 +71,8 @@ TEST(ScannerReplyMsgTest, testserialize)
 TEST(ScannerReplyMsgTest, testdeserializeUnknownFields)
 {
   const Message msg(Message::Type::unknown, Message::OperationResult::unknown);
-  const auto raw_msg{ scanner_reply::serialize(msg) };
-  const auto deserialized{ scanner_reply::deserialize(raw_msg) };
+  const auto raw_msg{ data_conversion_layer::scanner_reply::serialize(msg) };
+  const auto deserialized{ data_conversion_layer::scanner_reply::deserialize(raw_msg) };
 
   EXPECT_EQ(deserialized.type(), Message::Type::unknown);
   EXPECT_EQ(deserialized.result(), Message::OperationResult::unknown);
@@ -82,7 +82,7 @@ TEST(ScannerReplyMsgTest, testdeserializeValidCRC)
 {
   // Use raw data generated from serialize()
   const Message msg(Message::Type::start, Message::OperationResult::accepted);
-  const auto raw_msg{ scanner_reply::serialize(msg) };
+  const auto raw_msg{ data_conversion_layer::scanner_reply::serialize(msg) };
 
   const RawData data(raw_msg.begin(), raw_msg.end());
 
@@ -96,11 +96,12 @@ TEST(ScannerReplyMsgTest, testdeserializeInvalidCRC)
 {
   // Use raw data generated from serialize()
   const Message msg(Message::Type::start, Message::OperationResult::accepted);
-  auto raw_msg{ scanner_reply::serialize(msg) };
+  auto raw_msg{ data_conversion_layer::scanner_reply::serialize(msg) };
   raw_msg.at(0) += 0x01;  // alter crc checksum
 
   const RawData data(raw_msg.begin(), raw_msg.end());
-  EXPECT_THROW(scanner_reply::deserialize(data), scanner_reply::CRCMismatch);
+  EXPECT_THROW(data_conversion_layer::scanner_reply::deserialize(data),
+               data_conversion_layer::scanner_reply::CRCMismatch);
 }
 
 }  // namespace psen_scan_v2_standalone_test

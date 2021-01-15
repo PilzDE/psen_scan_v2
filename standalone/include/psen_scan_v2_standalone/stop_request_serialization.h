@@ -22,6 +22,8 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace data_conversion_layer
+{
 /**
  * @brief Contains all things needed to define and implement a scanner stop request.
  */
@@ -33,5 +35,6 @@ static const uint32_t OPCODE{ htole32(0x36) };
 
 RawData serialize();
 }  // namespace stop_request
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
 #endif

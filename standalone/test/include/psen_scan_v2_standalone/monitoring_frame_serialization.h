@@ -22,15 +22,18 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace data_conversion_layer
+{
 namespace monitoring_frame
 {
-RawData serialize(const monitoring_frame::Message& frame);
+RawData serialize(const data_conversion_layer::monitoring_frame::Message& frame);
 namespace diagnostic
 {
-raw_message::Field serialize(const std::vector<monitoring_frame::diagnostic::Message>& messages);
+RawChunk serialize(const std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message>& messages);
 }  // namespace diagnostic
-void write(std::ostringstream& os, const monitoring_frame::additional_field::Header& header);
+void write(std::ostringstream& os, const data_conversion_layer::monitoring_frame::additional_field::Header& header);
 }  // namespace monitoring_frame
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_MONITORING_FRAME_SERIALIZATION_H

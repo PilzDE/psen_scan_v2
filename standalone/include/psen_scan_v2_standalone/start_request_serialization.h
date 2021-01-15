@@ -20,10 +20,13 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace data_conversion_layer
+{
 namespace start_request
 {
-RawData serialize(const start_request::Message& start_request, const uint32_t& seq_number);
-RawData serialize(const start_request::Message& start_request);
+RawData serialize(const data_conversion_layer::start_request::Message& start_request, const uint32_t& seq_number);
+RawData serialize(const data_conversion_layer::start_request::Message& start_request);
 }  // namespace start_request
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
 #endif

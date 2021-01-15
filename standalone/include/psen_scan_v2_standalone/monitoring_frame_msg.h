@@ -34,12 +34,15 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace data_conversion_layer
+{
 namespace monitoring_frame
 {
 static constexpr uint8_t MAX_SCANNER_ID{ VALID_SCANNER_IDS.size() - 1 };
 
 /**
- * @brief Exception thrown if scan_counter was missing during deserialization of a monitoring_frame::Message.
+ * @brief Exception thrown if scan_counter was missing during deserialization of a
+ * data_conversion_layer::monitoring_frame::Message.
  */
 class ScanCounterMissing : public std::runtime_error
 {
@@ -75,7 +78,7 @@ public:
           const uint32_t scan_counter,
           const std::vector<double>& measurements,
           const std::vector<double>& intensities,
-          const std::vector<monitoring_frame::diagnostic::Message>& diagnostic_messages)
+          const std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message>& diagnostic_messages)
     : from_theta_(from_theta)
     , resolution_(resolution)
     , scan_counter_(scan_counter)
@@ -92,8 +95,8 @@ public:
   uint32_t scanCounter() const;
   const std::vector<double>& measurements() const;
   const std::vector<double>& intensities() const;
-  std::vector<monitoring_frame::diagnostic::Message> diagnosticMessages() const;
-  bool operator==(const monitoring_frame::Message& rhs) const;
+  std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnosticMessages() const;
+  bool operator==(const data_conversion_layer::monitoring_frame::Message& rhs) const;
 
 private:
   ScannerId scanner_id_{ ScannerId::master };
@@ -103,21 +106,24 @@ private:
   boost::optional<uint32_t> scan_counter_;
   std::vector<double> measurements_;
   std::vector<double> intensities_;
-  std::vector<monitoring_frame::diagnostic::Message> diagnostic_messages_;
+  std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnostic_messages_;
   bool diagnostic_data_enabled_{ false };
 
 public:
-  friend RawData serialize(const monitoring_frame::Message& frame);
-  friend monitoring_frame::Message deserialize(const RawData& data, const std::size_t& num_bytes);
+  friend RawData serialize(const data_conversion_layer::monitoring_frame::Message& frame);
+  friend data_conversion_layer::monitoring_frame::Message deserialize(const RawData& data,
+                                                                      const std::size_t& num_bytes);
 };
 
 inline ScanCounterMissing::ScanCounterMissing(const std::string& msg) : std::runtime_error(msg)
 {
 }
 
-std::ostream& operator<<(std::ostream& os, const psen_scan_v2_standalone::monitoring_frame::Message& msg);
+std::ostream& operator<<(std::ostream& os,
+                         const psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message& msg);
 
 }  // namespace monitoring_frame
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_MONITORING_FRAME_MSG_H

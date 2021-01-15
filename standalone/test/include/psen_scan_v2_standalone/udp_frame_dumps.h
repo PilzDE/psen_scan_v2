@@ -80,15 +80,16 @@ class WithIntensitiesAndDiagnostics
 public:
   WithIntensitiesAndDiagnostics()
   {
-    monitoring_frame::Message msg(
+    data_conversion_layer::monitoring_frame::Message msg(
         TenthOfDegree(0x3e8),
         TenthOfDegree(0x02),
         0x00008894,
         readMeasurements(hex_dump, 74, 250),
         readIntensities(hex_dump, intensities_offset, 250),
-        { monitoring_frame::diagnostic::Message(ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(2, 0)),
-          monitoring_frame::diagnostic::Message(ScannerId::master,
-                                                monitoring_frame::diagnostic::ErrorLocation(4, 3)) });
+        { data_conversion_layer::monitoring_frame::diagnostic::Message(
+              ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(2, 0)),
+          data_conversion_layer::monitoring_frame::diagnostic::Message(
+              ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(4, 3)) });
     expected_msg_ = msg;
   };
 
@@ -167,7 +168,7 @@ public:
   };
   // clang-format on
 
-  monitoring_frame::Message expected_msg_;
+  data_conversion_layer::monitoring_frame::Message expected_msg_;
 };
 
 class WithoutMeasurementsAndIntensities
@@ -175,7 +176,7 @@ class WithoutMeasurementsAndIntensities
 public:
   WithoutMeasurementsAndIntensities()
   {
-    monitoring_frame::Message msg(TenthOfDegree(0x5dc), TenthOfDegree(0x0a), 0x0661fc, {});
+    data_conversion_layer::monitoring_frame::Message msg(TenthOfDegree(0x5dc), TenthOfDegree(0x0a), 0x0661fc, {});
     expected_msg_ = msg;
   }
 
@@ -187,7 +188,7 @@ public:
     0x09, 0x00, 0x00, 0x00                                       // End of Frame
   };
 
-  monitoring_frame::Message expected_msg_;
+  data_conversion_layer::monitoring_frame::Message expected_msg_;
 };
 
 class WithUnknownFieldId

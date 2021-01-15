@@ -93,9 +93,10 @@ static std::vector<double> generateIntensities(const unsigned int& num_elements,
   return vec;
 }
 
-static monitoring_frame::Message createValidMonitoringFrameMsg(const uint32_t scan_counter = 42,
-                                                               const TenthOfDegree start_angle = SCAN_RANGE.getStart(),
-                                                               const TenthOfDegree end_angle = SCAN_RANGE.getEnd())
+static data_conversion_layer::monitoring_frame::Message
+createValidMonitoringFrameMsg(const uint32_t scan_counter = 42,
+                              const TenthOfDegree start_angle = SCAN_RANGE.getStart(),
+                              const TenthOfDegree end_angle = SCAN_RANGE.getEnd())
 {
   const auto resolution{ TenthOfDegree(10) };
 
@@ -108,18 +109,18 @@ static monitoring_frame::Message createValidMonitoringFrameMsg(const uint32_t sc
   const double highest_intensity{ 17000. };
   const std::vector<double> intensities{ generateIntensities(num_elements, lowest_intensity, highest_intensity) };
 
-  const std::vector<monitoring_frame::diagnostic::Message> diagnostic_messages{
-    { ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(1, 7) }
+  const std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnostic_messages{
+    { ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 7) }
   };
 
-  return monitoring_frame::Message(
+  return data_conversion_layer::monitoring_frame::Message(
       start_angle, resolution, scan_counter, measurements, intensities, diagnostic_messages);
 }
 
-static std::vector<monitoring_frame::Message> createValidMonitoringFrameMsgs(const uint32_t scan_counter,
-                                                                             const std::size_t num_elements)
+static std::vector<data_conversion_layer::monitoring_frame::Message>
+createValidMonitoringFrameMsgs(const uint32_t scan_counter, const std::size_t num_elements)
 {
-  std::vector<monitoring_frame::Message> msgs(num_elements);
+  std::vector<data_conversion_layer::monitoring_frame::Message> msgs(num_elements);
   std::generate(msgs.begin(), msgs.end(), [scan_counter]() { return createValidMonitoringFrameMsg(scan_counter); });
   return msgs;
 }
@@ -222,11 +223,11 @@ public:
 public:
   void sendStartReply();
   void sendStopReply();
-  void sendMonitoringFrame(const monitoring_frame::Message& msg);
+  void sendMonitoringFrame(const data_conversion_layer::monitoring_frame::Message& msg);
   void sendEmptyMonitoringFrame();
 
 private:
-  void sendReply(const scanner_reply::Message::Type& reply_type);
+  void sendReply(const data_conversion_layer::scanner_reply::Message::Type& reply_type);
 
 private:
   const udp::endpoint control_msg_receiver_;
@@ -271,28 +272,29 @@ void ScannerMock::startContinuousListeningForControlMsg()
   control_server_.asyncReceive(MockUDPServer::ReceiveMode::continuous);
 }
 
-void ScannerMock::sendReply(const scanner_reply::Message::Type& reply_type)
+void ScannerMock::sendReply(const data_conversion_layer::scanner_reply::Message::Type& reply_type)
 {
-  const scanner_reply::Message msg(reply_type, scanner_reply::Message::OperationResult::accepted);
-  control_server_.asyncSend(control_msg_receiver_, scanner_reply::serialize(msg));
+  const data_conversion_layer::scanner_reply::Message msg(
+      reply_type, data_conversion_layer::scanner_reply::Message::OperationResult::accepted);
+  control_server_.asyncSend(control_msg_receiver_, data_conversion_layer::scanner_reply::serialize(msg));
 }
 
 void ScannerMock::sendStartReply()
 {
   std::cout << "ScannerMock: Send start reply..." << std::endl;
-  sendReply(scanner_reply::Message::Type::start);
+  sendReply(data_conversion_layer::scanner_reply::Message::Type::start);
 }
 
 void ScannerMock::sendStopReply()
 {
   std::cout << "ScannerMock: Send stop reply..." << std::endl;
-  sendReply(scanner_reply::Message::Type::stop);
+  sendReply(data_conversion_layer::scanner_reply::Message::Type::stop);
 }
 
-void ScannerMock::sendMonitoringFrame(const monitoring_frame::Message& msg)
+void ScannerMock::sendMonitoringFrame(const data_conversion_layer::monitoring_frame::Message& msg)
 {
   std::cout << "ScannerMock: Send monitoring frame..." << std::endl;
-  data_server_.asyncSend(monitoring_frame_receiver_, monitoring_frame::serialize(msg));
+  data_server_.asyncSend(monitoring_frame_receiver_, data_conversion_layer::monitoring_frame::serialize(msg));
 }
 
 void ScannerMock::sendEmptyMonitoringFrame()
@@ -307,10 +309,10 @@ TEST_F(ScannerAPITests, testStartFunctionality)
   StrictMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
   ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
-  const start_request::Message start_req(config_);
+  const data_conversion_layer::start_request::Message start_req(config_);
 
   Barrier start_req_received_barrier;
-  EXPECT_CALL(scanner_mock, receiveControlMsg(_, start_request::serialize(start_req)))
+  EXPECT_CALL(scanner_mock, receiveControlMsg(_, data_conversion_layer::start_request::serialize(start_req)))
       .WillOnce(OpenBarrier(&start_req_received_barrier));
 
   scanner_mock.startListeningForControlMsg();
@@ -349,7 +351,10 @@ TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
   ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   Barrier start_req_received_barrier;
-  ON_CALL(scanner_mock, receiveControlMsg(_, start_request::serialize(start_request::Message(config_))))
+  ON_CALL(
+      scanner_mock,
+      receiveControlMsg(
+          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
       .WillByDefault(OpenBarrier(&start_req_received_barrier));
   EXPECT_CALL(cb, LaserScanCallback(_)).Times(0);
 
@@ -371,11 +376,14 @@ TEST_F(ScannerAPITests, testStopFunctionality)
   UserCallbacks cb;
   ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
-  EXPECT_CALL(scanner_mock, receiveControlMsg(_, start_request::serialize(start_request::Message(config_))))
+  EXPECT_CALL(
+      scanner_mock,
+      receiveControlMsg(
+          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
       .WillOnce(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
   Barrier stop_req_received_barrier;
-  EXPECT_CALL(scanner_mock, receiveControlMsg(_, stop_request::serialize()))
+  EXPECT_CALL(scanner_mock, receiveControlMsg(_, data_conversion_layer::stop_request::serialize()))
       .WillOnce(OpenBarrier(&stop_req_received_barrier));
 
   scanner_mock.startListeningForControlMsg();
@@ -400,7 +408,10 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStopIsCalledSecondTime)
   UserCallbacks cb;
   ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
-  ON_CALL(scanner_mock, receiveControlMsg(_, start_request::serialize(start_request::Message(config_))))
+  ON_CALL(
+      scanner_mock,
+      receiveControlMsg(
+          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
       .WillByDefault(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
   scanner_mock.startListeningForControlMsg();
@@ -463,17 +474,21 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
 
   ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
-  const monitoring_frame::Message msg{ createValidMonitoringFrameMsg() };
+  const data_conversion_layer::monitoring_frame::Message msg{ createValidMonitoringFrameMsg() };
 
   Barrier monitoring_frame_barrier;
   Barrier diagnostic_barrier;
   {
     InSequence seq;
-    EXPECT_CALL(scanner_mock, receiveControlMsg(_, start_request::serialize(start_request::Message(config_))))
+    EXPECT_CALL(
+        scanner_mock,
+        receiveControlMsg(
+            _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
         .WillOnce(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
     // Check that toLaserScan(msg) == arg
-    EXPECT_CALL(cb, LaserScanCallback(toLaserScan(msg))).WillOnce(OpenBarrier(&monitoring_frame_barrier));
+    EXPECT_CALL(cb, LaserScanCallback(data_conversion_layer::toLaserScan(msg)))
+        .WillOnce(OpenBarrier(&monitoring_frame_barrier));
   }
 
   EXPECT_LOG_SHORT(DEBUG, _).Times(AnyNumber());
@@ -502,7 +517,10 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
   UserCallbacks cb;
   ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
-  ON_CALL(scanner_mock, receiveControlMsg(_, start_request::serialize(start_request::Message(config_))))
+  ON_CALL(
+      scanner_mock,
+      receiveControlMsg(
+          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
       .WillByDefault(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
   Barrier valid_msg_barrier;
@@ -547,16 +565,19 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
 
   // Create valid scan round
   const uint32_t scan_counter_valid_round{ 42 };
-  std::vector<monitoring_frame::Message> valid_scan_round_msgs{ createValidMonitoringFrameMsgs(scan_counter_valid_round,
-                                                                                               num_scans_per_round) };
+  std::vector<data_conversion_layer::monitoring_frame::Message> valid_scan_round_msgs{ createValidMonitoringFrameMsgs(
+      scan_counter_valid_round, num_scans_per_round) };
 
   // Create invalid scan round -> invalid because one MonitoringFrame missing
   const uint32_t scan_counter_invalid_round{ scan_counter_valid_round + 1 };
-  std::vector<monitoring_frame::Message> invalid_scan_round_msgs{ createValidMonitoringFrameMsgs(
+  std::vector<data_conversion_layer::monitoring_frame::Message> invalid_scan_round_msgs{ createValidMonitoringFrameMsgs(
       scan_counter_invalid_round, num_scans_per_round - 1) };
   invalid_scan_round_msgs.emplace_back(createValidMonitoringFrameMsg(scan_counter_invalid_round + 1));
 
-  ON_CALL(scanner_mock, receiveControlMsg(_, start_request::serialize(start_request::Message(config_))))
+  ON_CALL(
+      scanner_mock,
+      receiveControlMsg(
+          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
       .WillByDefault(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
   Barrier user_msg_barrier;
@@ -602,10 +623,14 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
   const std::size_t num_scans_per_round{ 6 };
 
   const uint32_t scan_counter{ 42 };
-  std::vector<monitoring_frame::Message> msgs{ createValidMonitoringFrameMsgs(scan_counter, num_scans_per_round + 1) };
+  std::vector<data_conversion_layer::monitoring_frame::Message> msgs{ createValidMonitoringFrameMsgs(
+      scan_counter, num_scans_per_round + 1) };
   msgs.emplace_back(createValidMonitoringFrameMsg(scan_counter + 1));
 
-  ON_CALL(scanner_mock, receiveControlMsg(_, start_request::serialize(start_request::Message(config_))))
+  ON_CALL(
+      scanner_mock,
+      receiveControlMsg(
+          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
       .WillByDefault(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
   Barrier user_msg_barrier;
@@ -636,7 +661,10 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFrameReceiveTimeout)
   UserCallbacks cb;
   ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
-  ON_CALL(scanner_mock, receiveControlMsg(_, start_request::serialize(start_request::Message(config_))))
+  ON_CALL(
+      scanner_mock,
+      receiveControlMsg(
+          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
       .WillByDefault(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
   Barrier user_msg_barrier;

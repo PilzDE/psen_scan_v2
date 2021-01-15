@@ -26,10 +26,13 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace data_conversion_layer
+{
 namespace scanner_reply
 {
 /**
- * @brief Exception thrown if an incorrect CRC is detected during deserialization of a scanner_reply::Message.
+ * @brief Exception thrown if an incorrect CRC is detected during deserialization of a
+ * data_conversion_layer::scanner_reply::Message.
  */
 class CRCMismatch : public std::runtime_error
 {
@@ -43,5 +46,6 @@ RawData serialize(const Message& reply);
 RawData serialize(const uint32_t op_code, const uint32_t res_code);
 
 }  // namespace scanner_reply
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
 #endif  // PSEN_SCAN_V2_STANDALONE_SCANNER_REPLY_SERIALIZATION_DESERIALIZATION_H

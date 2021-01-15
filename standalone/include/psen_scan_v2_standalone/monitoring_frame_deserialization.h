@@ -39,6 +39,8 @@ namespace psen_scan_v2_standalone
  * @see additional_field::HeaderID
  * @see ScanValidator
  */
+namespace data_conversion_layer
+{
 namespace monitoring_frame
 {
 static constexpr uint32_t DEFAULT_DEVICE_STATUS{ 0 };
@@ -232,6 +234,7 @@ inline FixedFields::Resolution FixedFields::resolution() const
 }
 
 }  // namespace monitoring_frame
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_MONITORING_FRAME_DESERIALIZATION_H

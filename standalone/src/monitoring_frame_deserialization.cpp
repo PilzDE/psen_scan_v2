@@ -23,6 +23,8 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace data_conversion_layer
+{
 namespace monitoring_frame
 {
 additional_field::Header::Header(Id id, Length length) : id_(id), length_(length)
@@ -48,7 +50,7 @@ FixedFields::FixedFields(DeviceStatus device_status,
 
 monitoring_frame::Message deserialize(const RawData& data, const std::size_t& num_bytes)
 {
-  monitoring_frame::Message msg;
+  data_conversion_layer::monitoring_frame::Message msg;
 
   std::istringstream is(std::string(data.cbegin(), data.cend()));
 
@@ -133,12 +135,12 @@ std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is)
 {
   std::vector<diagnostic::Message> diagnostic_messages;
 
-  std::array<uint8_t, diagnostic::raw_message::UNUSED_OFFSET_IN_BYTES> reserved_diag_unused;
+  std::array<uint8_t, diagnostic::RAW_CHUNK_UNUSED_OFFSET_IN_BYTES> reserved_diag_unused;
   raw_processing::read(is, reserved_diag_unused);
 
   for (auto& scanner_id : VALID_SCANNER_IDS)
   {
-    for (size_t byte_n = 0; byte_n < diagnostic::raw_message::LENGTH_FOR_ONE_DEVICE_IN_BYTES; byte_n++)
+    for (size_t byte_n = 0; byte_n < diagnostic::RAW_CHUNK_LENGTH_FOR_ONE_DEVICE_IN_BYTES; byte_n++)
     {
       uint8_t raw_byte;
       raw_processing::read(is, raw_byte);
@@ -203,4 +205,5 @@ FixedFields readFixedFields(std::istringstream& is)
   return FixedFields(device_status, op_code, working_mode, transaction_type, scanner_id, from_theta, resolution);
 }
 }  // namespace monitoring_frame
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
