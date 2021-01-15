@@ -374,8 +374,6 @@ if(CATKIN_ENABLE_TESTING)
     target_link_libraries(hwtest_scan_compare
       ${catkin_LIBRARIES}
       ${pilz_testutils_LIBRARIES}
-      ${rosbag_LIBRARIES}
-      fmt::fmt
     )
   endif()
 
