@@ -22,8 +22,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         time-limit="$(eval test_duration + 10)">
     <param name="testfile" value="$(env HW_TEST_SCAN_COMPARE_TESTFILE)"/>
     <param name="test_duration" value="$(arg test_duration)"/>
-    <param name="angle_start" value="-1.2"/>
-    <param name="angle_end" value="1.2"/>
+    <param name="angle_start" value="68.7"/>
+    <param name="angle_end" value="206.3"/>
     <param name="host_ip" value="192.168.0.50"/>
     <param name="scanner_ip" value="192.168.0.10"/>
   </test>

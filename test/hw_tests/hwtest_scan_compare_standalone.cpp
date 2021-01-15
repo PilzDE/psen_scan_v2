@@ -59,8 +59,8 @@ public:
     double angle_end;
     ASSERT_TRUE(pnh.getParam("angle_start", angle_start));
     ASSERT_TRUE(pnh.getParam("angle_end", angle_end));
-    angle_start_ = TenthOfDegree::fromRad(angle_start);
-    angle_end_ = TenthOfDegree::fromRad(angle_end);
+    angle_start_ = TenthOfDegree(degreeToTenthDegree(angle_start));
+    angle_end_ = TenthOfDegree(degreeToTenthDegree(angle_end));
   }
 
 protected:
