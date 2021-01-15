@@ -37,9 +37,6 @@
 
 namespace psen_scan_v2_test
 {
-typedef sensor_msgs::LaserScan ScanType;
-typedef boost::shared_ptr<ScanType const> ScanConstPtr;
-
 std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
 {
   std::map<int16_t, NormalDist> bins;
@@ -53,8 +50,8 @@ std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
   rosbag::View view(bag, rosbag::TopicQuery(topics));
 
   std::for_each(view.begin(), view.end(), [&bins](const rosbag::MessageInstance& msg) {
-    ScanConstPtr scan = msg.instantiate<ScanType>();
-    addScanToBin(*scan, bins);
+    sensor_msgs::LaserScanConstPtr scan = msg.instantiate<sensor_msgs::LaserScan>();
+    addScanToBin(scan, bins);
   });
 
   bag.close();
@@ -98,14 +95,9 @@ TEST_F(ScanComparisonTests, simpleCompare)
 
   size_t window_size = 120;  // Keep this high to avoid undersampling
 
-  LaserScanValidator<ScanType> laser_scan_validator(bins_expected_);
-  laser_scan_validator.reset();
-  nh.subscribe<ScanType>(
-      "/laser_scanner/scan",
-      1000,
-      boost::bind(&LaserScanValidator<ScanType>::scanCb, &laser_scan_validator, boost::placeholders::_1, window_size));
+  auto res = LaserScanValidator(nh, bins_expected_).validateScans(window_size, "/laser_scanner/scan", test_duration_);
 
-  ASSERT_TRUE(laser_scan_validator.waitForResult(test_duration_));
+  ASSERT_TRUE(res);
 }
 
 }  // namespace psen_scan_v2_test
