@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -18,10 +18,12 @@
 
 #include <sensor_msgs/LaserScan.h>
 
-#include "psen_scan_v2/default_parameters.h"
+#include "psen_scan_v2_standalone/default_parameters.h"
 
 namespace psen_scan_v2
 {
+using namespace psen_scan_v2_standalone;
+
 sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
                                       const std::string& prefix,
                                       const double x_axis_rotation,

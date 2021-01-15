@@ -29,6 +29,7 @@ PSENscan firmware >= 3.1.0 is supported on the following models:
 3. [Setup](#setup)
 4. [ROS API](#ros-api)
 5. [Usage](#usage)
+6. [C++ standalone library](#c++-standalone-library)
 
 ## Installation
 To use the package, you can install prebuilt packages with
@@ -123,6 +124,9 @@ Both limits are defined within the _laser_1_scan_ frame as shown in the image be
 If you've created an application package with your own launch file as described in the
 [tutorials](http://wiki.ros.org/psen_scan_v2/Tutorials/),
 you can easily adjust the aforementioned configuration parameters.
+
+## C++ standalone library
+If you are interested in using the PSENscan safety laser scanner without ROS, please take a look at our C++ standalone library. You can read more about it [here](https://github.com/PilzDE/psen_scan_v2/blob/main/standalone/CMakeLists.txt)
 
 ## Test concept
 ![psen_scan_test_concept](doc/test_architecture.svg)

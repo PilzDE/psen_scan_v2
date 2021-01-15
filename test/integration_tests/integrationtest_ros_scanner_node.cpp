@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -26,21 +26,24 @@
 #include <sensor_msgs/LaserScan.h>
 #include <pilz_testutils/async_test.h>
 
-#include "psen_scan_v2/angle_conversions.h"
-#include "psen_scan_v2/ros_scanner_node.h"
-#include "psen_scan_v2/laserscan.h"
-#include "psen_scan_v2/scanner_mock.h"
-#include "psen_scan_v2/scanner_configuration.h"
-#include "psen_scan_v2/scanner_config_builder.h"
-#include "psen_scan_v2/default_parameters.h"
-#include "psen_scan_v2/scan_range.h"
+#include "psen_scan_v2_standalone/angle_conversions.h"
+#include "psen_scan_v2_standalone/laserscan.h"
+#include "psen_scan_v2_standalone/scanner_configuration.h"
+#include "psen_scan_v2_standalone/scanner_config_builder.h"
+#include "psen_scan_v2_standalone/default_parameters.h"
+#include "psen_scan_v2_standalone/scan_range.h"
+
 #include "psen_scan_v2/laserscan_ros_conversions.h"
+#include "psen_scan_v2/ros_scanner_node.h"
+
+#include "psen_scan_v2/scanner_mock.h"
 
 using namespace psen_scan_v2;
+using namespace psen_scan_v2_standalone;
 using namespace psen_scan_v2_test;
 
 using namespace ::testing;
-using namespace psen_scan_v2::constants;
+using namespace psen_scan_v2_standalone::constants;
 
 namespace psen_scan_v2
 {

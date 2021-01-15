@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -26,11 +26,13 @@
 
 #include <ros/ros.h>
 
-#include "psen_scan_v2/scanner_v2.h"
+#include "psen_scan_v2_standalone/scanner_v2.h"
+
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 
 namespace psen_scan_v2
 {
+using namespace psen_scan_v2_standalone;
 using namespace std::chrono_literals;
 
 /**

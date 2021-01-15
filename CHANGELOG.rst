@@ -2,6 +2,11 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Enable separate building of cpp-lib; extract sources into subproject psen_scan_v2_standalone
+* Contributors: Pilz GmbH and Co. KG
+
 0.1.4 (2021-01-13)
 ------------------
 * Add internal error handling for detecting regressions in the scanner firmware

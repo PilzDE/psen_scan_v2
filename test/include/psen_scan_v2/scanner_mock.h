@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -20,29 +20,29 @@
 
 #include <gmock/gmock.h>
 
-#include "psen_scan_v2/scanner_configuration.h"
-#include "psen_scan_v2/function_pointers.h"
-#include "psen_scan_v2/laserscan.h"
+#include "psen_scan_v2_standalone/scanner_configuration.h"
+#include "psen_scan_v2_standalone/function_pointers.h"
+#include "psen_scan_v2_standalone/laserscan.h"
 
 namespace psen_scan_v2_test
 {
 class ScannerMock
 {
 public:
-  ScannerMock(const psen_scan_v2::ScannerConfiguration& scanner_config,
-              const psen_scan_v2::LaserScanCallback& laser_scan_callback)
+  ScannerMock(const psen_scan_v2_standalone::ScannerConfiguration& scanner_config,
+              const psen_scan_v2_standalone::LaserScanCallback& laser_scan_callback)
     : laser_scan_callback_(laser_scan_callback){};
 
   MOCK_METHOD0(start, std::future<void>());
   MOCK_METHOD0(stop, std::future<void>());
 
-  void invokeLaserScanCallback(const psen_scan_v2::LaserScan& scan);
+  void invokeLaserScanCallback(const psen_scan_v2_standalone::LaserScan& scan);
 
 private:
-  psen_scan_v2::LaserScanCallback laser_scan_callback_;
+  psen_scan_v2_standalone::LaserScanCallback laser_scan_callback_;
 };
 
-inline void ScannerMock::invokeLaserScanCallback(const psen_scan_v2::LaserScan& scan)
+inline void ScannerMock::invokeLaserScanCallback(const psen_scan_v2_standalone::LaserScan& scan)
 {
   laser_scan_callback_(scan);
 }
