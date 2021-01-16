@@ -33,6 +33,7 @@
 namespace psen_scan_v2
 {
 using namespace psen_scan_v2_standalone;
+using namespace psen_scan_v2_standalone::api;
 using namespace std::chrono_literals;
 
 /**

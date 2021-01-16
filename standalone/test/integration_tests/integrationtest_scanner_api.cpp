@@ -308,7 +308,7 @@ TEST_F(ScannerAPITests, testStartFunctionality)
 {
   StrictMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
-  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+  api::ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
   const data_conversion_layer::start_request::Message start_req(config_);
 
   Barrier start_req_received_barrier;
@@ -331,7 +331,7 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStartIsCalledSecondTime)
 {
   NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
-  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+  api::ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   scanner_mock.startListeningForControlMsg();
   const auto start_future = scanner.start();
@@ -348,7 +348,7 @@ TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
 {
   NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
-  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+  api::ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   Barrier start_req_received_barrier;
   ON_CALL(
@@ -374,7 +374,7 @@ TEST_F(ScannerAPITests, testStopFunctionality)
 {
   StrictMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
-  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+  api::ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   EXPECT_CALL(
       scanner_mock,
@@ -406,7 +406,7 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStopIsCalledSecondTime)
 {
   NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
-  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+  api::ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   ON_CALL(
       scanner_mock,
@@ -435,7 +435,7 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
   INJECT_NICE_LOG_MOCK;
   StrictMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
-  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+  api::ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   Barrier error_msg_barrier;
   Barrier twice_called_barrier;
@@ -472,7 +472,7 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
   StrictMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
 
-  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+  api::ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   const data_conversion_layer::monitoring_frame::Message msg{ createValidMonitoringFrameMsg() };
 
@@ -515,7 +515,7 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
   INJECT_NICE_LOG_MOCK;
   NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
-  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+  api::ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   ON_CALL(
       scanner_mock,
@@ -550,7 +550,7 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
 
 TEST_F(ScannerAPITests, shouldThrowWhenConstructedWithInvalidLaserScanCallback)
 {
-  EXPECT_THROW(ScannerV2 scanner(config_, nullptr);, std::invalid_argument);
+  EXPECT_THROW(api::ScannerV2 scanner(config_, nullptr);, std::invalid_argument);
 }
 
 TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
@@ -559,7 +559,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
   NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   NiceMock<UserCallbacks> cb;
 
-  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+  api::ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   const std::size_t num_scans_per_round{ 6 };
 
@@ -618,7 +618,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
   NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   NiceMock<UserCallbacks> cb;
 
-  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+  api::ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   const std::size_t num_scans_per_round{ 6 };
 
@@ -659,7 +659,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFrameReceiveTimeout)
   INJECT_LOG_MOCK;
   NiceMock<ScannerMock> scanner_mock{ port_holder_ };
   UserCallbacks cb;
-  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
+  api::ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   ON_CALL(
       scanner_mock,

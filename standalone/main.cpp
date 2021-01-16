@@ -21,6 +21,7 @@
 
 using namespace psen_scan_v2_standalone;
 using namespace psen_scan_v2_standalone::constants;
+using namespace psen_scan_v2_standalone::api;
 
 /*
  * In this section we declare all necessary configuration parameters

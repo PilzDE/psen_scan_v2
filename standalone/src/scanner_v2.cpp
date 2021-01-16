@@ -20,6 +20,8 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace api
+{
 using namespace psen_scan_v2_standalone::protocol_layer::scanner_events;
 
 // clang-format off
@@ -151,4 +153,5 @@ void ScannerV2::scannerStoppedCB()
   scanner_has_stopped_ = boost::none;
 }
 
+}  // namespace api
 }  // namespace psen_scan_v2_standalone

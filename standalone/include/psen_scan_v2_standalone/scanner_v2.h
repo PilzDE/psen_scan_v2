@@ -39,6 +39,8 @@
  */
 namespace psen_scan_v2_standalone
 {
+namespace api
+{
 using namespace psen_scan_v2_standalone::protocol_layer;
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -131,6 +133,7 @@ void ScannerV2::triggerEvent()
   triggerEventWithParam<T>(T());
 }
 
+}  // namespace api
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_SCANNER_V2_H
