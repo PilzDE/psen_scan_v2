@@ -70,10 +70,9 @@ monitoring_frame::Message deserialize(const RawData& data, const std::size_t& nu
       case additional_field::HeaderID::scan_counter:
         if (additional_header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
         {
-          throw format_error::ScanCounterUnexpectedSize(
-              fmt::format("Length of scan counter field is {}, but should be {}.",
-                          additional_header.length(),
-                          NUMBER_OF_BYTES_SCAN_COUNTER));
+          throw ScanCounterUnexpectedSize(fmt::format("Length of scan counter field is {}, but should be {}.",
+                                                      additional_header.length(),
+                                                      NUMBER_OF_BYTES_SCAN_COUNTER));
         }
         raw_processing::read<uint32_t, boost::optional<uint32_t>>(is, msg.scan_counter_);
         break;
@@ -103,7 +102,7 @@ monitoring_frame::Message deserialize(const RawData& data, const std::size_t& nu
         break;
 
       default:
-        throw format_error::DecodingFailure(fmt::format(
+        throw DecodingFailure(fmt::format(
             "Header Id {:#04x} unknown. Cannot read additional field of monitoring frame.", additional_header.id()));
     }
   }
@@ -119,7 +118,7 @@ additional_field::Header additional_field::read(std::istringstream& is, const st
 
   if (length >= max_num_bytes)
   {
-    throw format_error::DecodingFailure(
+    throw DecodingFailure(
         fmt::format("Length given in header of additional field is too large: {}, id: {:#04x}", length, id));
   }
   if (length > 0)

@@ -187,7 +187,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
 
   data_conversion_layer::monitoring_frame::Message msg;
   EXPECT_THROW(msg = data_conversion_layer::monitoring_frame::deserialize(raw_frame_data, num_bytes);
-               , data_conversion_layer::monitoring_frame::format_error::DecodingFailure);
+               , data_conversion_layer::monitoring_frame::DecodingFailure);
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeMonitoringLength)
@@ -198,7 +198,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
 
   data_conversion_layer::monitoring_frame::Message msg;
   EXPECT_THROW(msg = data_conversion_layer::monitoring_frame::deserialize(raw_frame_data, num_bytes);
-               , data_conversion_layer::monitoring_frame::format_error::DecodingFailure);
+               , data_conversion_layer::monitoring_frame::DecodingFailure);
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeIntensityLength)
@@ -209,7 +209,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
 
   data_conversion_layer::monitoring_frame::Message msg;
   EXPECT_THROW(msg = data_conversion_layer::monitoring_frame::deserialize(raw_frame_data, num_bytes);
-               , data_conversion_layer::monitoring_frame::format_error::DecodingFailure);
+               , data_conversion_layer::monitoring_frame::DecodingFailure);
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnMissingEndOfFrame)
@@ -220,7 +220,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
 
   data_conversion_layer::monitoring_frame::Message msg;
   EXPECT_THROW(msg = data_conversion_layer::monitoring_frame::deserialize(raw_frame_data, num_bytes);
-               , data_conversion_layer::monitoring_frame::format_error::DecodingFailure);
+               , data_conversion_layer::monitoring_frame::DecodingFailure);
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeScanCounterLength)
@@ -231,7 +231,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
 
   data_conversion_layer::monitoring_frame::Message msg;
   EXPECT_THROW(msg = data_conversion_layer::monitoring_frame::deserialize(raw_frame_data, num_bytes);
-               , data_conversion_layer::monitoring_frame::format_error::ScanCounterUnexpectedSize);
+               , data_conversion_layer::monitoring_frame::ScanCounterUnexpectedSize);
 }
 
 }  // namespace psen_scan_v2_standalone_test

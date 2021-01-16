@@ -150,11 +150,6 @@ std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is);
 }
 
 /**
- * @brief Namespace defining failures which might occur during the deserialization of MonitoringFrames.
- */
-namespace format_error
-{
-/**
  * @brief Error indicating a problem during the extraction of the measurement data.
  */
 class DecodingFailure : public std::runtime_error
@@ -186,7 +181,6 @@ inline DecodingFailure::DecodingFailure(const std::string& msg) : std::runtime_e
 inline ScanCounterUnexpectedSize::ScanCounterUnexpectedSize(const std::string& msg) : DecodingFailure(msg)
 {
 }
-}  // namespace format_error
 
 inline additional_field::Header::Id additional_field::Header::id() const
 {
