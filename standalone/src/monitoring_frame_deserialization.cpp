@@ -27,7 +27,7 @@ namespace data_conversion_layer
 {
 namespace monitoring_frame
 {
-additional_field::Header::Header(Id id, Length length) : id_(id), length_(length)
+AdditionalFieldHeader::AdditionalFieldHeader(Id id, Length length) : id_(id), length_(length)
 {
 }
 
@@ -63,11 +63,11 @@ monitoring_frame::Message deserialize(const RawData& data, const std::size_t& nu
   bool end_of_frame{ false };
   while (!end_of_frame)
   {
-    const additional_field::Header additional_header{ additional_field::read(is, num_bytes) };
+    const AdditionalFieldHeader additional_header{ readAdditionalField(is, num_bytes) };
 
-    switch (static_cast<additional_field::HeaderID>(additional_header.id()))
+    switch (static_cast<AdditionalFieldHeaderID>(additional_header.id()))
     {
-      case additional_field::HeaderID::scan_counter:
+      case AdditionalFieldHeaderID::scan_counter:
         if (additional_header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
         {
           throw ScanCounterUnexpectedSize(fmt::format("Length of scan counter field is {}, but should be {}.",
@@ -77,23 +77,23 @@ monitoring_frame::Message deserialize(const RawData& data, const std::size_t& nu
         raw_processing::read<uint32_t, boost::optional<uint32_t>>(is, msg.scan_counter_);
         break;
 
-      case additional_field::HeaderID::measurements:
+      case AdditionalFieldHeaderID::measurements:
         raw_processing::readArray<uint16_t, double>(is,
                                                     msg.measurements_,
                                                     additional_header.length() / NUMBER_OF_BYTES_SINGLE_MEASUREMENT,
                                                     [](uint16_t raw_element) { return raw_element / 1000.; });
         break;
 
-      case additional_field::HeaderID::end_of_frame:
+      case AdditionalFieldHeaderID::end_of_frame:
         end_of_frame = true;
         break;
 
-      case additional_field::HeaderID::diagnostics:
+      case AdditionalFieldHeaderID::diagnostics:
         msg.diagnostic_messages_ = diagnostic::deserializeMessages(is);
         msg.diagnostic_data_enabled_ = true;
         break;
 
-      case additional_field::HeaderID::intensities:
+      case AdditionalFieldHeaderID::intensities:
         raw_processing::readArray<uint16_t, double>(
             is,
             msg.intensities_,
@@ -109,10 +109,10 @@ monitoring_frame::Message deserialize(const RawData& data, const std::size_t& nu
   return msg;
 }
 
-additional_field::Header additional_field::read(std::istringstream& is, const std::size_t& max_num_bytes)
+AdditionalFieldHeader readAdditionalField(std::istringstream& is, const std::size_t& max_num_bytes)
 {
-  additional_field::Header::Id id;
-  additional_field::Header::Length length;
+  AdditionalFieldHeader::Id id;
+  AdditionalFieldHeader::Length length;
   raw_processing::read(is, id);
   raw_processing::read(is, length);
 
@@ -125,7 +125,7 @@ additional_field::Header additional_field::read(std::istringstream& is, const st
   {
     length--;
   }
-  return additional_field::Header(id, length);
+  return AdditionalFieldHeader(id, length);
 }
 
 namespace diagnostic

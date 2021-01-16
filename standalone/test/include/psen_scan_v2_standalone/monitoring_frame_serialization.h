@@ -31,7 +31,7 @@ namespace diagnostic
 {
 RawChunk serialize(const std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message>& messages);
 }  // namespace diagnostic
-void write(std::ostringstream& os, const data_conversion_layer::monitoring_frame::additional_field::Header& header);
+void write(std::ostringstream& os, const data_conversion_layer::monitoring_frame::AdditionalFieldHeader& header);
 }  // namespace monitoring_frame
 }  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone

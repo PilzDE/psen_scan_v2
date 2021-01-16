@@ -35,8 +35,8 @@ namespace psen_scan_v2_standalone
  * and **can** contain additional data like distances or intensities in additional fields.
  *
  * @see FixedFields
- * @see additional_field::Header
- * @see additional_field::HeaderID
+ * @see Header
+ * @see HeaderID
  * @see ScanValidator
  */
 namespace data_conversion_layer
@@ -92,14 +92,6 @@ private:
   Resolution resolution_;
 };
 /**
- * @brief Contains all information/types needed to describe the content of the additional information field
- * of a monitoring frame.
- *
- * @see monitoring_frame
- */
-namespace additional_field
-{
-/**
  * @brief Definition for the type and length of an additional field in a monitoring frame.
  *
  * The exact content of a monitoring frame differs depending on the configuration.
@@ -110,14 +102,14 @@ namespace additional_field
  * @see monitoring_frame
  * @see HeaderID
  */
-class Header
+class AdditionalFieldHeader
 {
 public:
   using Id = uint8_t;
   using Length = uint16_t;
 
 public:
-  Header(Id id, Length length);
+  AdditionalFieldHeader(Id id, Length length);
 
 public:
   Id id() const;
@@ -130,7 +122,7 @@ private:
   Length length_;
 };
 
-enum class HeaderID : Header::Id
+enum class AdditionalFieldHeaderID : AdditionalFieldHeader::Id
 {
   scan_counter = 0x02,
   diagnostics = 0x04,
@@ -139,8 +131,7 @@ enum class HeaderID : Header::Id
   end_of_frame = 0x09
 };
 
-Header read(std::istringstream& is, const std::size_t& max_num_bytes);
-}  // namespace additional_field
+AdditionalFieldHeader readAdditionalField(std::istringstream& is, const std::size_t& max_num_bytes);
 
 monitoring_frame::Message deserialize(const RawData& data, const std::size_t& num_bytes);
 FixedFields readFixedFields(std::istringstream& is);
@@ -182,12 +173,12 @@ inline ScanCounterUnexpectedSize::ScanCounterUnexpectedSize(const std::string& m
 {
 }
 
-inline additional_field::Header::Id additional_field::Header::id() const
+inline AdditionalFieldHeader::Id AdditionalFieldHeader::id() const
 {
   return id_;
 }
 
-inline additional_field::Header::Length additional_field::Header::length() const
+inline AdditionalFieldHeader::Length AdditionalFieldHeader::length() const
 {
   return length_;
 }
