@@ -56,27 +56,28 @@ std::unique_ptr<Watchdog> ScannerV2::WatchdogFactory::create(const Watchdog::Tim
 
 StateMachineArgs* ScannerV2::createStateMachineArgs()
 {
-  return new StateMachineArgs(IScanner::getConfig(),
-                              // LCOV_EXCL_START
-                              // The following includes calls to std::bind which are not marked correctly
-                              // by some gcc versions, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96006
-                              // UDP clients
-                              std::make_unique<UdpClientImpl>(BIND_RAW_DATA_EVENT(RawReplyReceived),
-                                                              BIND_EVENT(ReplyReceiveError),
-                                                              IScanner::getConfig().hostUDPPortControl(),
-                                                              IScanner::getConfig().clientIp(),
-                                                              IScanner::getConfig().scannerControlPort()),
-                              std::make_unique<UdpClientImpl>(BIND_RAW_DATA_EVENT(RawMonitoringFrameReceived),
-                                                              BIND_EVENT(MonitoringFrameReceivedError),
-                                                              IScanner::getConfig().hostUDPPortData(),
-                                                              IScanner::getConfig().clientIp(),
-                                                              IScanner::getConfig().scannerDataPort()),
-                              // Callbacks
-                              std::bind(&ScannerV2::scannerStartedCB, this),
-                              std::bind(&ScannerV2::scannerStoppedCB, this),
-                              // LCOV_EXCL_STOP
-                              IScanner::getLaserScanCB(),
-                              std::unique_ptr<IWatchdogFactory>(new WatchdogFactory(this)));
+  return new StateMachineArgs(
+      IScanner::getConfig(),
+      // LCOV_EXCL_START
+      // The following includes calls to std::bind which are not marked correctly
+      // by some gcc versions, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96006
+      // UDP clients
+      std::make_unique<communication_layer::UdpClientImpl>(BIND_RAW_DATA_EVENT(RawReplyReceived),
+                                                           BIND_EVENT(ReplyReceiveError),
+                                                           IScanner::getConfig().hostUDPPortControl(),
+                                                           IScanner::getConfig().clientIp(),
+                                                           IScanner::getConfig().scannerControlPort()),
+      std::make_unique<communication_layer::UdpClientImpl>(BIND_RAW_DATA_EVENT(RawMonitoringFrameReceived),
+                                                           BIND_EVENT(MonitoringFrameReceivedError),
+                                                           IScanner::getConfig().hostUDPPortData(),
+                                                           IScanner::getConfig().clientIp(),
+                                                           IScanner::getConfig().scannerDataPort()),
+      // Callbacks
+      std::bind(&ScannerV2::scannerStartedCB, this),
+      std::bind(&ScannerV2::scannerStoppedCB, this),
+      // LCOV_EXCL_STOP
+      IScanner::getLaserScanCB(),
+      std::unique_ptr<IWatchdogFactory>(new WatchdogFactory(this)));
 }  // namespace psen_scan_v2_standalone
 
 ScannerV2::ScannerV2(const configuration::ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb)

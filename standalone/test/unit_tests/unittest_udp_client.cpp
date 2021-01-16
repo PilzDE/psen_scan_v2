@@ -45,11 +45,12 @@ TEST(UdpClientTests, testInvalidNewDataHandler)
 {
   CallbackHandler handler;
 
-  EXPECT_THROW(psen_scan_v2_standalone::UdpClientImpl reader(nullptr,
-                                                             std::bind(&CallbackHandler::handleError, &handler, _1),
-                                                             HOST_UDP_READ_PORT,
-                                                             inet_network(UDP_MOCK_IP_ADDRESS.c_str()),
-                                                             UDP_MOCK_SEND_PORT),
+  EXPECT_THROW(psen_scan_v2_standalone::communication_layer::UdpClientImpl reader(
+                   nullptr,
+                   std::bind(&CallbackHandler::handleError, &handler, _1),
+                   HOST_UDP_READ_PORT,
+                   inet_network(UDP_MOCK_IP_ADDRESS.c_str()),
+                   UDP_MOCK_SEND_PORT),
                std::invalid_argument);
 }
 
@@ -57,26 +58,26 @@ TEST(UdpClientTests, testInvalidErrorHandler)
 {
   CallbackHandler handler;
 
-  EXPECT_THROW(
-      psen_scan_v2_standalone::UdpClientImpl reader(std::bind(&CallbackHandler::handleNewData, &handler, _1, _2),
-                                                    nullptr,
-                                                    HOST_UDP_READ_PORT,
-                                                    inet_network(UDP_MOCK_IP_ADDRESS.c_str()),
-                                                    UDP_MOCK_SEND_PORT),
-      std::invalid_argument);
+  EXPECT_THROW(psen_scan_v2_standalone::communication_layer::UdpClientImpl reader(
+                   std::bind(&CallbackHandler::handleNewData, &handler, _1, _2),
+                   nullptr,
+                   HOST_UDP_READ_PORT,
+                   inet_network(UDP_MOCK_IP_ADDRESS.c_str()),
+                   UDP_MOCK_SEND_PORT),
+               std::invalid_argument);
 }
 
 TEST(UdpClientTests, testCloseConnectionFailureForCompleteCoverage)
 {
-  std::unique_ptr<psen_scan_v2_standalone::UdpClientImpl::CloseConnectionFailure> ex{
-    new psen_scan_v2_standalone::UdpClientImpl::CloseConnectionFailure()
+  std::unique_ptr<psen_scan_v2_standalone::communication_layer::UdpClientImpl::CloseConnectionFailure> ex{
+    new psen_scan_v2_standalone::communication_layer::UdpClientImpl::CloseConnectionFailure()
   };
 }
 
 TEST(UdpClientTests, testOpenConnectionFailureForCompleteCoverage)
 {
-  std::unique_ptr<psen_scan_v2_standalone::UdpClientImpl::OpenConnectionFailure> ex{
-    new psen_scan_v2_standalone::UdpClientImpl::OpenConnectionFailure()
+  std::unique_ptr<psen_scan_v2_standalone::communication_layer::UdpClientImpl::OpenConnectionFailure> ex{
+    new psen_scan_v2_standalone::communication_layer::UdpClientImpl::OpenConnectionFailure()
   };
 }
 

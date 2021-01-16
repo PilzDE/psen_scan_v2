@@ -8,8 +8,8 @@ For more details we recommend taking a look at the source code itself:
 * For the **ROS** part we refer to psen_scan_v2::ROSScannerNodeT
 * The referenced **User API** is mainly defined by psen_scan_v2::ScannerV2.
 * For the **Scanner protocol Layer** please check psen_scan_v2::protocol_layer::ScannerProtocolDef or the ScannerStateMachine.
-* Data **Serialization** and **Deserialization** is for example handled in psen_scan_v2::monitoring_frame::deserialize() or psen_scan_v2::start_reply::serialize()
-* For the  **Primitive communication layer** we recommend taking a look at psen_scan_v2::UdpClientImpl
+* Data **Serialization** and **Deserialization** is for example handled in psen_scan_v2::data_conversion_layer::monitoring_frame::deserialize() or psen_scan_v2::data_conversion_layer::start_reply::serialize()
+* For the  **Primitive communication layer** we recommend taking a look at psen_scan_v2::communication_layer::UdpClientImpl
 
 ## Workflow
 To help understand the workflow the following sequence diagram shows the interaction between the software components in a typical use case scenario (User calls start, receives a laserscan and calls stop).

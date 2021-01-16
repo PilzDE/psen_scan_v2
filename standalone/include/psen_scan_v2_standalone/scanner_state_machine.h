@@ -108,8 +108,8 @@ public:
 struct StateMachineArgs
 {
   StateMachineArgs(const configuration::ScannerConfiguration& scanner_config,
-                   std::unique_ptr<UdpClientImpl> control_client,
-                   std::unique_ptr<UdpClientImpl> data_client,
+                   std::unique_ptr<communication_layer::UdpClientImpl> control_client,
+                   std::unique_ptr<communication_layer::UdpClientImpl> data_client,
                    const ScannerStartedCB& started_cb,
                    const ScannerStoppedCB& stopped_cb,
                    const InformUserAboutLaserScanCB& laser_scan_cb,
@@ -137,8 +137,8 @@ struct StateMachineArgs
   // UDP clients
   // Note: The clients must be declared last, to ensure that they are desroyed first.
   // If they are not declared last, segmentation default might occur!
-  std::unique_ptr<UdpClientImpl> control_client_{};
-  std::unique_ptr<UdpClientImpl> data_client_{};
+  std::unique_ptr<communication_layer::UdpClientImpl> control_client_{};
+  std::unique_ptr<communication_layer::UdpClientImpl> data_client_{};
 };
 
 // front-end: define the FSM structure

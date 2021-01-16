@@ -62,11 +62,12 @@ public:
 protected:
   MockUDPServer mock_udp_server_{ UDP_MOCK_PORT, std::bind(&UdpClientTests::receivedUdpMsg, this, _1, _2) };
 
-  std::unique_ptr<UdpClientImpl> udp_client_{ new UdpClientImpl(std::bind(&UdpClientTests::handleNewData, this, _1, _2),
-                                                                std::bind(&UdpClientTests::handleError, this, _1),
-                                                                HOST_UDP_PORT,
-                                                                inet_network(UDP_MOCK_IP_ADDRESS.c_str()),
-                                                                UDP_MOCK_PORT) };
+  std::unique_ptr<communication_layer::UdpClientImpl> udp_client_{ new communication_layer::UdpClientImpl(
+      std::bind(&UdpClientTests::handleNewData, this, _1, _2),
+      std::bind(&UdpClientTests::handleError, this, _1),
+      HOST_UDP_PORT,
+      inet_network(UDP_MOCK_IP_ADDRESS.c_str()),
+      UDP_MOCK_PORT) };
 
   const RawData send_array_{ 'H', 'e', 'l', 'l', 'o' };
   const udp::endpoint host_endpoint;
@@ -109,7 +110,7 @@ TEST_F(UdpClientTests, testSingleAsyncReadOperation)
   Barrier client_received_data_barrier;
   EXPECT_CALL(*this, handleNewData(_, send_array_.size())).WillOnce(OpenBarrier(&client_received_data_barrier));
 
-  udp_client_->startAsyncReceiving(ReceiveMode::single);
+  udp_client_->startAsyncReceiving(communication_layer::ReceiveMode::single);
   sendTestDataToClient();
   EXPECT_TRUE(client_received_data_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Udp client did not receive data";
 }
@@ -127,7 +128,7 @@ TEST_F(UdpClientTests, testErrorHandlingForReceive)
   Barrier error_handler_called_barrier;
   EXPECT_CALL(*this, handleError(_)).WillOnce(OpenBarrier(&error_handler_called_barrier));
 
-  udp_client_->startAsyncReceiving(ReceiveMode::single);
+  udp_client_->startAsyncReceiving(communication_layer::ReceiveMode::single);
   sendEmptyTestDataToClient();
   EXPECT_TRUE(error_handler_called_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Error handler should have been called";
 }

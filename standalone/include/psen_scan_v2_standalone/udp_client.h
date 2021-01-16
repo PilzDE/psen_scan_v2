@@ -35,6 +35,8 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace communication_layer
+{
 using NewDataHandler = std::function<void(const RawData&, const std::size_t&)>;
 using ErrorHandler = std::function<void(const std::string&)>;
 using TimeoutHandler = std::function<void(const std::string&)>;
@@ -142,11 +144,11 @@ private:
   boost::asio::ip::udp::endpoint endpoint_;
 };
 
-inline UdpClientImpl::UdpClientImpl(const NewDataHandler& data_handler,
-                                    const ErrorHandler& error_handler,
-                                    const unsigned short& host_port,
-                                    const unsigned int& endpoint_ip,
-                                    const unsigned short& endpoint_port)
+inline communication_layer::UdpClientImpl::UdpClientImpl(const NewDataHandler& data_handler,
+                                                         const ErrorHandler& error_handler,
+                                                         const unsigned short& host_port,
+                                                         const unsigned int& endpoint_ip,
+                                                         const unsigned short& endpoint_port)
   : data_handler_(data_handler)
   , error_handler_(error_handler)
   , socket_(io_service_, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), host_port))
@@ -283,5 +285,6 @@ inline UdpClientImpl::OpenConnectionFailure::OpenConnectionFailure(const std::st
 inline UdpClientImpl::CloseConnectionFailure::CloseConnectionFailure(const std::string& msg) : std::runtime_error(msg)
 {
 }
+}  // namespace communication_layer
 }  // namespace psen_scan_v2_standalone
 #endif  // PSEN_SCAN_V2_STANDALONE_UDP_CLIENT_H
