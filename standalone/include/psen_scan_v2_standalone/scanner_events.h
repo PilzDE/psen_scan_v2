@@ -19,6 +19,9 @@
 
 namespace psen_scan_v2_standalone
 {
+/**
+ * @brief Namespace for the implementation of the scanner protocol state machine.
+ */
 namespace protocol_layer
 {
 /**

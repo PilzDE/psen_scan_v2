@@ -30,6 +30,9 @@
 
 namespace psen_scan_v2_standalone
 {
+/**
+ * @brief Namespace for the scanner configuration.
+ */
 namespace configuration
 {
 /**

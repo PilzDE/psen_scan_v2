@@ -35,6 +35,9 @@
 
 namespace psen_scan_v2_standalone
 {
+/**
+ * @brief Namespace for the primitive communication layer implementation.
+ */
 namespace communication_layer
 {
 using NewDataHandler = std::function<void(const RawData&, const std::size_t&)>;

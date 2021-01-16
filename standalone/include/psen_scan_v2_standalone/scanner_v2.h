@@ -39,6 +39,9 @@
  */
 namespace psen_scan_v2_standalone
 {
+/**
+ * @brief Namespace for the API implementation.
+ */
 namespace api
 {
 using namespace psen_scan_v2_standalone::protocol_layer;

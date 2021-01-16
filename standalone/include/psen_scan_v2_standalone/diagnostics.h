@@ -26,6 +26,9 @@
 
 namespace psen_scan_v2_standalone
 {
+/**
+ * @brief Namespace for the data conversion layer implementation.
+ */
 namespace data_conversion_layer
 {
 namespace monitoring_frame
