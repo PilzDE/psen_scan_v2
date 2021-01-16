@@ -51,16 +51,16 @@ using std::placeholders::_2;
  * - the Udp connections.
  * - the guards to ensure threads save interaction between the user, udp connections and timeouts.
  *
- * It uses the passed ScannerConfiguration for all configurable parts of this process.
+ * It uses the passed configuration::ScannerConfiguration for all configurable parts of this process.
  *
  * @see IScanner
  * @see ScannerStateMachine
- * @see ScannerConfiguration
+ * @see configuration::ScannerConfiguration
  */
 class ScannerV2 : public IScanner
 {
 public:
-  ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb);
+  ScannerV2(const configuration::ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb);
   ~ScannerV2();
 
 public:

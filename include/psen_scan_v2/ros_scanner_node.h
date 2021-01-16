@@ -56,7 +56,7 @@ public:
                   const std::string& topic,
                   const std::string& prefix,
                   const double& x_axis_rotation,
-                  const ScannerConfiguration& scanner_config);
+                  const configuration::ScannerConfiguration& scanner_config);
 
   //! @brief Continuously fetches data from the scanner and publishes the data as ROS scanner message.
   void run();
@@ -89,7 +89,7 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
                                     const std::string& topic,
                                     const std::string& prefix,
                                     const double& x_axis_rotation,
-                                    const ScannerConfiguration& scanner_config)
+                                    const configuration::ScannerConfiguration& scanner_config)
   : nh_(nh)
   , prefix_(prefix)
   , x_axis_rotation_(x_axis_rotation)

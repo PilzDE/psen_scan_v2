@@ -73,7 +73,7 @@ TEST_F(StartRequestTest, constructorTest)
   const DefaultScanRange scan_range{ TenthOfDegree(0), TenthOfDegree::fromRad(4.71) };
 
   uint32_t sequence_number{ 123 };
-  data_conversion_layer::start_request::Message sr(ScannerConfigurationBuilder()
+  data_conversion_layer::start_request::Message sr(configuration::ScannerConfigurationBuilder()
                                                        .hostIP(host_ip)
                                                        .hostDataPort(host_udp_port_data)
                                                        .hostControlPort(1 /* irrelevant */)
@@ -123,9 +123,9 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_three_angle_resolution), 0));
 }
 
-static ScannerConfiguration createConfig(bool enable_diagnostics)
+static configuration::ScannerConfiguration createConfig(bool enable_diagnostics)
 {
-  ScannerConfigurationBuilder builder;
+  configuration::ScannerConfigurationBuilder builder;
   builder.hostIP("192.168.0.50")
       .hostDataPort(55115)
       .hostControlPort(5700)
@@ -144,7 +144,7 @@ static ScannerConfiguration createConfig(bool enable_diagnostics)
 
 TEST_F(StartRequestTest, crcShouldBeCorrectIfDiagnosticIsDisabled)
 {
-  const ScannerConfiguration config{ createConfig(false) };
+  const configuration::ScannerConfiguration config{ createConfig(false) };
 
   const auto raw_start_request{ serialize(data_conversion_layer::start_request::Message(config)) };
   const std::array<unsigned char, 4> expected_crc = { 0xaf, 0xc8, 0xde, 0x79 };  // see wireshark for this number
@@ -156,7 +156,7 @@ TEST_F(StartRequestTest, crcShouldBeCorrectIfDiagnosticIsDisabled)
 
 TEST_F(StartRequestTest, crcShouldBeCorrectIfDiagnosticIsEnabled)
 {
-  const ScannerConfiguration config{ createConfig(true) };
+  const configuration::ScannerConfiguration config{ createConfig(true) };
 
   const auto raw_start_request{ serialize(data_conversion_layer::start_request::Message(config)) };
   const std::array<unsigned char, 4> expected_crc = { 0x18, 0x5b, 0xd5, 0x55 };  // see wireshark for this number

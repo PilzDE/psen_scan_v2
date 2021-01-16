@@ -29,7 +29,7 @@ namespace psen_scan_v2_test
 class ScannerMock
 {
 public:
-  ScannerMock(const psen_scan_v2_standalone::ScannerConfiguration& scanner_config,
+  ScannerMock(const psen_scan_v2_standalone::configuration::ScannerConfiguration& scanner_config,
               const psen_scan_v2_standalone::LaserScanCallback& laser_scan_callback)
     : laser_scan_callback_(laser_scan_callback){};
 

@@ -30,13 +30,16 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace configuration
+{
 /**
- * @brief Helper class to simplify/improve the construction of the psen_scan_v2_standalone::ScannerConfiguration.
+ * @brief Helper class to simplify/improve the construction of the
+ * psen_scan_v2_standalone::configuration::ScannerConfiguration.
  */
 class ScannerConfigurationBuilder
 {
 public:
-  ScannerConfiguration build() const;
+  configuration::ScannerConfiguration build() const;
 
 public:
   ScannerConfigurationBuilder& hostIP(const std::string&);
@@ -133,7 +136,7 @@ inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableDiagnosti
   config_.diagnostics_enabled_ = true;
   return *this;
 }
-
+}  // namespace configuration
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_SCANNER_CONFIG_BUILDER_H

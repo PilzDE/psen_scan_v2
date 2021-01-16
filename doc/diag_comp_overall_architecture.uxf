@@ -113,7 +113,7 @@ ScannerV2
 This abstraction layer represents the user API (ROS-agnostic).
 It enables users to configurate, start and stop a single scanner by providing a high level API.
 --
-+ Scanner(ScannerConfiguration, LaserscanAvailableCallback)
++ Scanner(configuration::ScannerConfiguration, LaserscanAvailableCallback)
 
 + start()
 + stop()
@@ -186,7 +186,7 @@ start_request::Message</panel_attributes>
     </coordinates>
     <panel_attributes>symbol=component
 style=wordwrap
-ScannerConfiguration
+configuration::ScannerConfiguration
 --
 **Explanation:**
 Higher level data type storing the configuration details of the scanner,

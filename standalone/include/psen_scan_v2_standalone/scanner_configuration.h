@@ -22,6 +22,8 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace configuration
+{
 /**
  * @brief Higher level data type storing the configuration details of the scanner like scanner IP, port,
  * scan range, etc.
@@ -63,6 +65,7 @@ private:
   bool diagnostics_enabled_{ false };
 };
 
+}  // namespace configuration
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_SCANNER_CONFIGURATION_H

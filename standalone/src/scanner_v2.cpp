@@ -79,7 +79,7 @@ StateMachineArgs* ScannerV2::createStateMachineArgs()
                               std::unique_ptr<IWatchdogFactory>(new WatchdogFactory(this)));
 }  // namespace psen_scan_v2_standalone
 
-ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb)
+ScannerV2::ScannerV2(const configuration::ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb)
   : IScanner(scanner_config, laser_scan_cb), sm_(new ScannerStateMachine(createStateMachineArgs()))
 {
   const std::lock_guard<std::mutex> lock(member_mutex_);

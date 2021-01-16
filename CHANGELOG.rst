@@ -29,7 +29,7 @@ Forthcoming
 
 0.1.2 (2020-11-24)
 ------------------
-* Add Scanner ports in ScannerConfiguration
+* Add Scanner ports in configuration::ScannerConfiguration
 * Switch branching model: Introduce main branch
 * Use github actions
 * Adds missing error bit

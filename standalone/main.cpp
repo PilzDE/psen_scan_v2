@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 
   DefaultScanRange scan_range{ ANGLE_START, ANGLE_END };
 
-  ScannerConfigurationBuilder config_builder;
+  configuration::ScannerConfigurationBuilder config_builder;
   config_builder.hostIP(HOST_IP).scannerIp(SCANNER_IP).scanRange(scan_range);
 
   ScannerV2 scanner(config_builder.build(), laserScanCallback);

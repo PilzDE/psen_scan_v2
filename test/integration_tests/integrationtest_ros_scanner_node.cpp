@@ -98,9 +98,9 @@ static constexpr int SCANNER_STARTED_TIMEOUT_MS{ 3000 };
 static constexpr int SCANNER_STOPPED_TIMEOUT_MS{ 3000 };
 static constexpr int LASERSCAN_RECEIVED_TIMEOUT{ 3000 };
 
-static ScannerConfiguration createValidConfig()
+static configuration::ScannerConfiguration createValidConfig()
 {
-  return ScannerConfigurationBuilder()
+  return configuration::ScannerConfigurationBuilder()
       .hostIP(HOST_IP)
       .hostDataPort(HOST_UDP_PORT_DATA)
       .hostControlPort(HOST_UDP_PORT_CONTROL)
@@ -115,7 +115,7 @@ class RosScannerNodeTests : public testing::Test, public testing::AsyncTest
 {
 protected:
   ros::NodeHandle nh_priv_{ "~" };
-  ScannerConfiguration scanner_config_{ createValidConfig() };
+  configuration::ScannerConfiguration scanner_config_{ createValidConfig() };
 };
 
 TEST_F(RosScannerNodeTests, testScannerInvocation)

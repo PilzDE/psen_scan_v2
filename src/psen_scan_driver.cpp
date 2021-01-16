@@ -78,7 +78,7 @@ int main(int argc, char** argv)
                              getOptionalParamFromServer<double>(pnh, PARAM_ANGLE_END, DEFAULT_ANGLE_END))
     };
 
-    ScannerConfigurationBuilder config_builder;
+    configuration::ScannerConfigurationBuilder config_builder;
     config_builder.hostIP(getRequiredParamFromServer<std::string>(pnh, PARAM_HOST_IP))
         .hostDataPort(getOptionalParamFromServer<int>(pnh, PARAM_HOST_DATA_PORT, DATA_PORT_OF_HOST_DEVICE))
         .hostControlPort(getOptionalParamFromServer<int>(pnh, PARAM_HOST_CONTROL_PORT, CONTROL_PORT_OF_HOST_DEVICE))
@@ -88,7 +88,7 @@ int main(int argc, char** argv)
         .scanRange(scan_range)
         .enableDiagnostics();
 
-    ScannerConfiguration scanner_configuration{ config_builder.build() };
+    configuration::ScannerConfiguration scanner_configuration{ config_builder.build() };
 
     ROSScannerNode ros_scanner_node(pnh,
                                     DEFAULT_PUBLISH_TOPIC,

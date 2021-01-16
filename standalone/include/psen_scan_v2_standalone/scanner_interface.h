@@ -39,7 +39,7 @@ public:
   using LaserScanCallback = std::function<void(const LaserScan&)>;
 
 public:
-  IScanner(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback);
+  IScanner(const configuration::ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback);
   virtual ~IScanner() = default;
 
 public:
@@ -49,15 +49,16 @@ public:
   virtual std::future<void> stop() = 0;
 
 protected:
-  const ScannerConfiguration& getConfig() const;
+  const configuration::ScannerConfiguration& getConfig() const;
   const LaserScanCallback& getLaserScanCB() const;
 
 private:
-  const ScannerConfiguration config_;
+  const configuration::ScannerConfiguration config_;
   const LaserScanCallback laser_scan_cb_;
 };
 
-inline IScanner::IScanner(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback)
+inline IScanner::IScanner(const configuration::ScannerConfiguration& scanner_config,
+                          const LaserScanCallback& laser_scan_callback)
   : config_(scanner_config), laser_scan_cb_(laser_scan_callback)
 {
   if (!laser_scan_callback)
@@ -66,7 +67,7 @@ inline IScanner::IScanner(const ScannerConfiguration& scanner_config, const Lase
   }
 }
 
-inline const ScannerConfiguration& IScanner::getConfig() const
+inline const configuration::ScannerConfiguration& IScanner::getConfig() const
 {
   return config_;
 }

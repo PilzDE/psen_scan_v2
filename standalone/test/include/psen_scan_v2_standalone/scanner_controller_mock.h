@@ -31,7 +31,7 @@ namespace psen_scan_v2_standalone_test
 class ScannerControllerMock
 {
 public:
-  ScannerControllerMock(const psen_scan_v2_standalone::ScannerConfiguration& scanner_config,
+  ScannerControllerMock(const psen_scan_v2_standalone::configuration::ScannerConfiguration& scanner_config,
                         const psen_scan_v2_standalone::LaserScanCallback& laser_scan_callback)
     : laser_scan_callback_(laser_scan_callback){};
 

@@ -107,7 +107,7 @@ public:
  */
 struct StateMachineArgs
 {
-  StateMachineArgs(const ScannerConfiguration& scanner_config,
+  StateMachineArgs(const configuration::ScannerConfiguration& scanner_config,
                    std::unique_ptr<UdpClientImpl> control_client,
                    std::unique_ptr<UdpClientImpl> data_client,
                    const ScannerStartedCB& started_cb,
@@ -124,7 +124,7 @@ struct StateMachineArgs
   {
   }
 
-  const ScannerConfiguration config_;
+  const configuration::ScannerConfiguration config_;
 
   // Callbacks
   const ScannerStartedCB scanner_started_cb{};
