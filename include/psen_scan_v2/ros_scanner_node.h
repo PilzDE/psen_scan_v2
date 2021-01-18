@@ -30,6 +30,9 @@
 
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 
+/**
+ * @brief Root namespace for the ROS part
+ */
 namespace psen_scan_v2
 {
 using namespace psen_scan_v2_standalone;
