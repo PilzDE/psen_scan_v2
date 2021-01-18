@@ -40,7 +40,7 @@
 namespace psen_scan_v2_standalone
 {
 /**
- * @brief Namespace for the API implementation.
+ * @brief Contains the user API related code.
  */
 namespace api
 {

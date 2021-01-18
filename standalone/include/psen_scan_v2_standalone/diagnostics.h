@@ -27,7 +27,7 @@
 namespace psen_scan_v2_standalone
 {
 /**
- * @brief Namespace for the data conversion layer implementation.
+ * @brief Contains the data serialization and deserialization layer.
  */
 namespace data_conversion_layer
 {
