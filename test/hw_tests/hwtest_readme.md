@@ -48,5 +48,6 @@ rostest psen_scan_v2 hwtest_scan_compare.test
 ```
 In order to test the psen_scan_v2 standalone library specifically, execute
 ```
-rostest psen_scan_v2 hwtest_scan_compare_standalone.test
+./devel/lib/psen_scan_v2/hwtest_scan_compare_standalone
 ```
+in your catkin workspace.
