@@ -316,9 +316,9 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gmock(integrationtest_scanner_api
-    standalone/test/integration_tests/integrationtest_scanner_api.cpp
+    standalone/test/integration_tests/api/integrationtest_scanner_api.cpp
     standalone/test/src/data_conversion_layer/monitoring_frame_serialization.cpp
-    standalone/src/scanner_v2.cpp
+    standalone/src/api/scanner_v2.cpp
     standalone/src/laserscan.cpp
     standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
     standalone/src/data_conversion_layer/monitoring_frame_deserialization.cpp

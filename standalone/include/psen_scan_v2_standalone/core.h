@@ -25,7 +25,7 @@
 #include "psen_scan_v2_standalone/logging.h"
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scanner_config_builder.h"
-#include "psen_scan_v2_standalone/scanner_v2.h"
+#include "psen_scan_v2_standalone/api/scanner_v2.h"
 #include "psen_scan_v2_standalone/scan_range.h"
 
 #endif  // PSEN_SCAN_V2_STANDALONE_CORE_H

@@ -37,7 +37,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_serialization.h"
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scanner_config_builder.h"
-#include "psen_scan_v2_standalone/scanner_v2.h"
+#include "psen_scan_v2_standalone/api/scanner_v2.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request_serialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_msg.h"

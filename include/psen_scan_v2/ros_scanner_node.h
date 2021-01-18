@@ -26,7 +26,7 @@
 
 #include <ros/ros.h>
 
-#include "psen_scan_v2_standalone/scanner_v2.h"
+#include "psen_scan_v2_standalone/api/scanner_v2.h"
 
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 
