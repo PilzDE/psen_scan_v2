@@ -15,9 +15,9 @@
 #ifndef PSEN_SCAN_V2_MONITORING_FRAME_SERIALIZATION_H
 #define PSEN_SCAN_V2_MONITORING_FRAME_SERIALIZATION_H
 
-#include "psen_scan_v2_standalone/diagnostics.h"
-#include "psen_scan_v2_standalone/monitoring_frame_msg.h"
-#include "psen_scan_v2_standalone/monitoring_frame_deserialization.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
 #include "psen_scan_v2_standalone/raw_scanner_data.h"
 
 namespace psen_scan_v2_standalone

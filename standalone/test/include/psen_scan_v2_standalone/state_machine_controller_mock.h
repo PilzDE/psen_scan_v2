@@ -20,7 +20,7 @@
 
 #include "psen_scan_v2_standalone/controller_state_machine.h"
 #include "psen_scan_v2_standalone/function_pointers.h"
-#include "psen_scan_v2_standalone/scanner_reply_msg.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_msg.h"
 
 namespace psen_scan_v2_standalone_test
 {

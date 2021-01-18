@@ -28,7 +28,7 @@
 #include <boost/optional.hpp>
 
 #include "psen_scan_v2_standalone/raw_scanner_data.h"
-#include "psen_scan_v2_standalone/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/tenth_of_degree.h"
 #include "psen_scan_v2_standalone/scanner_ids.h"
 

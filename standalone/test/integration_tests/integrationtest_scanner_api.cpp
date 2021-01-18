@@ -32,16 +32,16 @@
 
 // Software under testing
 #include "psen_scan_v2_standalone/async_barrier.h"
-#include "psen_scan_v2_standalone/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/logging.h"
 #include "psen_scan_v2_standalone/monitoring_frame_serialization.h"
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scanner_config_builder.h"
 #include "psen_scan_v2_standalone/scanner_v2.h"
-#include "psen_scan_v2_standalone/start_request.h"
-#include "psen_scan_v2_standalone/start_request_serialization.h"
-#include "psen_scan_v2_standalone/scanner_reply_msg.h"
-#include "psen_scan_v2_standalone/scanner_reply_serialization_deserialization.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/start_request.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/start_request_serialization.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_msg.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_serialization_deserialization.h"
 #include "psen_scan_v2_standalone/scan_range.h"
 
 namespace psen_scan_v2_standalone_test

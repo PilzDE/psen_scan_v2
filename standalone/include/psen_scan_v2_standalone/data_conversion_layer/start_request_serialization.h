@@ -12,32 +12,21 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#ifndef PSEN_SCAN_V2_STANDALONE_START_REQUEST_SERIALIZATION_H
+#define PSEN_SCAN_V2_STANDALONE_START_REQUEST_SERIALIZATION_H
 
-#include "psen_scan_v2_standalone/stop_request_serialization.h"
-
-#include <iostream>
-
-#include <boost/crc.hpp>
-
-#include "psen_scan_v2_standalone/raw_processing.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/start_request.h"
+#include "psen_scan_v2_standalone/raw_scanner_data.h"
 
 namespace psen_scan_v2_standalone
 {
 namespace data_conversion_layer
 {
-RawData data_conversion_layer::stop_request::serialize()
+namespace start_request
 {
-  std::ostringstream os;
-
-  boost::crc_32_type crc;
-  crc.process_bytes(&stop_request::RESERVED, sizeof(data_conversion_layer::stop_request::RESERVED));
-  crc.process_bytes(&stop_request::OPCODE, sizeof(data_conversion_layer::stop_request::OPCODE));
-
-  raw_processing::write(os, static_cast<uint32_t>(crc.checksum()));
-  raw_processing::write(os, data_conversion_layer::stop_request::RESERVED);
-  raw_processing::write(os, data_conversion_layer::stop_request::OPCODE);
-
-  return raw_processing::toArray<RawData>(os);
-}
+RawData serialize(const data_conversion_layer::start_request::Message& start_request, const uint32_t& seq_number);
+RawData serialize(const data_conversion_layer::start_request::Message& start_request);
+}  // namespace start_request
 }  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
+#endif

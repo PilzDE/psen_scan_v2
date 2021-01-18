@@ -13,36 +13,31 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <fmt/format.h>
+#include "psen_scan_v2_standalone/data_conversion_layer/stop_request_serialization.h"
 
-#include "psen_scan_v2_standalone/diagnostics.h"
+#include <iostream>
 
-using namespace psen_scan_v2_standalone;
+#include <boost/crc.hpp>
+
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
 
 namespace psen_scan_v2_standalone
 {
 namespace data_conversion_layer
 {
-namespace monitoring_frame
+RawData data_conversion_layer::stop_request::serialize()
 {
-namespace diagnostic
-{
-std::ostream&
-operator<<(std::ostream& os,
-           const psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::diagnostic::Message& msg)
-{
-  os << fmt::format(
-      "Device: {} - {}", scanner_id_to_string.at(msg.getScannerId()), error_code_to_string.at(msg.getDiagnosticCode()));
+  std::ostringstream os;
 
-  if (isAmbiguous(msg.getDiagnosticCode()))
-  {
-    os << fmt::format(" (Byte:{} Bit:{})", msg.getErrorLocation().getByte(), msg.getErrorLocation().getBit());
-  }
+  boost::crc_32_type crc;
+  crc.process_bytes(&stop_request::RESERVED, sizeof(data_conversion_layer::stop_request::RESERVED));
+  crc.process_bytes(&stop_request::OPCODE, sizeof(data_conversion_layer::stop_request::OPCODE));
 
-  return os;
+  raw_processing::write(os, static_cast<uint32_t>(crc.checksum()));
+  raw_processing::write(os, data_conversion_layer::stop_request::RESERVED);
+  raw_processing::write(os, data_conversion_layer::stop_request::OPCODE);
+
+  return raw_processing::toArray<RawData>(os);
 }
-
-}  // namespace diagnostic
-}  // namespace monitoring_frame
 }  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone

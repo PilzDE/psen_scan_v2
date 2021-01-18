@@ -172,9 +172,9 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(unittest_start_request
     standalone/test/unit_tests/unittest_start_request.cpp
-    standalone/src/start_request.cpp
+    standalone/src/data_conversion_layer/start_request.cpp
     standalone/src/scanner_configuration.cpp
-    standalone/src/start_request_serialization.cpp
+    standalone/src/data_conversion_layer/start_request_serialization.cpp
   )
   target_link_libraries(unittest_start_request
     ${catkin_LIBRARIES}
@@ -182,7 +182,7 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(unittest_stop_request
     standalone/test/unit_tests/unittest_stop_request.cpp
-    standalone/src/stop_request_serialization.cpp
+    standalone/src/data_conversion_layer/stop_request_serialization.cpp
   )
   target_link_libraries(unittest_stop_request
     ${catkin_LIBRARIES}
@@ -233,8 +233,8 @@ if(CATKIN_ENABLE_TESTING)
   catkin_add_gtest(unittest_laserscan_conversions
     standalone/test/unit_tests/unittest_laserscan_conversions.cpp
     standalone/src/laserscan.cpp
-    standalone/src/monitoring_frame_msg.cpp
-    standalone/src/diagnostics.cpp
+    standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
+    standalone/src/data_conversion_layer/diagnostics.cpp
   )
   target_link_libraries(unittest_laserscan_conversions
     ${catkin_LIBRARIES}
@@ -244,8 +244,8 @@ if(CATKIN_ENABLE_TESTING)
   catkin_add_gtest(unittest_laserscan_ros_conversions
     test/unit_tests/unittest_laserscan_ros_conversions.cpp
     standalone/src/laserscan.cpp
-    standalone/src/monitoring_frame_msg.cpp
-    standalone/src/diagnostics.cpp
+    standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
+    standalone/src/data_conversion_layer/diagnostics.cpp
   )
   target_link_libraries(unittest_laserscan_ros_conversions
     ${catkin_LIBRARIES}
@@ -254,7 +254,7 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(unittest_scanner_reply_msg
     standalone/test/unit_tests/unittest_scanner_reply_msg.cpp
-    standalone/src/scanner_reply_serialization_deserialization.cpp
+    standalone/src/data_conversion_layer/scanner_reply_serialization_deserialization.cpp
   )
   target_link_libraries(unittest_scanner_reply_msg
     ${catkin_LIBRARIES}
@@ -263,9 +263,9 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(unittest_monitoring_frame_msg
     standalone/test/unit_tests/unittest_monitoring_frame_msg.cpp
-    standalone/src/monitoring_frame_msg.cpp
-    standalone/src/diagnostics.cpp
-    standalone/src/monitoring_frame_deserialization.cpp
+    standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
+    standalone/src/data_conversion_layer/diagnostics.cpp
+    standalone/src/data_conversion_layer/monitoring_frame_deserialization.cpp
   )
   target_link_libraries(unittest_monitoring_frame_msg
     ${catkin_LIBRARIES}
@@ -273,9 +273,9 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gtest(unittest_monitoring_frame_serialization_deserialization
-    standalone/src/monitoring_frame_msg.cpp
-    standalone/src/monitoring_frame_deserialization.cpp
-    standalone/src/diagnostics.cpp
+    standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
+    standalone/src/data_conversion_layer/monitoring_frame_deserialization.cpp
+    standalone/src/data_conversion_layer/diagnostics.cpp
     standalone/test/unit_tests/unittest_monitoring_frame_serialization_deserialization.cpp
     standalone/test/src/monitoring_frame_serialization.cpp
   )
@@ -294,7 +294,7 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gmock(unittest_monitoring_frame_diagnostic_message
-    standalone/src/diagnostics.cpp
+    standalone/src/data_conversion_layer/diagnostics.cpp
     standalone/test/unit_tests/unittest_monitoring_frame_diagnostic_message.cpp
   )
   target_link_libraries(unittest_monitoring_frame_diagnostic_message
@@ -320,14 +320,14 @@ if(CATKIN_ENABLE_TESTING)
     standalone/test/src/monitoring_frame_serialization.cpp
     standalone/src/scanner_v2.cpp
     standalone/src/laserscan.cpp
-    standalone/src/monitoring_frame_msg.cpp
-    standalone/src/monitoring_frame_deserialization.cpp
+    standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
+    standalone/src/data_conversion_layer/monitoring_frame_deserialization.cpp
     standalone/src/scanner_configuration.cpp
-    standalone/src/start_request.cpp
-    standalone/src/stop_request_serialization.cpp
-    standalone/src/diagnostics.cpp
-    standalone/src/start_request_serialization.cpp
-    standalone/src/scanner_reply_serialization_deserialization.cpp
+    standalone/src/data_conversion_layer/start_request.cpp
+    standalone/src/data_conversion_layer/stop_request_serialization.cpp
+    standalone/src/data_conversion_layer/diagnostics.cpp
+    standalone/src/data_conversion_layer/start_request_serialization.cpp
+    standalone/src/data_conversion_layer/scanner_reply_serialization_deserialization.cpp
   )
   target_link_libraries(integrationtest_scanner_api
     ${catkin_LIBRARIES}
@@ -340,8 +340,8 @@ if(CATKIN_ENABLE_TESTING)
     test/integration_tests/integrationtest_ros_scanner_node.cpp
     standalone/src/laserscan.cpp
     standalone/src/scanner_configuration.cpp
-    standalone/src/monitoring_frame_msg.cpp
-    standalone/src/diagnostics.cpp
+    standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
+    standalone/src/data_conversion_layer/diagnostics.cpp
   )
   target_link_libraries(integrationtest_ros_scanner_node
     ${catkin_LIBRARIES}

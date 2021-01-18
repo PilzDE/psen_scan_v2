@@ -17,7 +17,7 @@
 #include <gtest/gtest-typed-test.h>
 #include <sstream>
 
-#include "psen_scan_v2_standalone/raw_processing.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
 
 namespace psen_scan_v2_standalone_test
 {

@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2_standalone/stop_request_serialization.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/stop_request_serialization.h"
 
 #include "psen_scan_v2_standalone/raw_data_test_helper.h"
 

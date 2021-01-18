@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2_standalone/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 
 using namespace psen_scan_v2_standalone;
 namespace psen_scan_v2_standalone_test

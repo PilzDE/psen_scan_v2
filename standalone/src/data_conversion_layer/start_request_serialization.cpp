@@ -19,9 +19,9 @@
 
 #include <boost/crc.hpp>
 
-#include "psen_scan_v2_standalone/start_request.h"
-#include "psen_scan_v2_standalone/start_request_serialization.h"
-#include "psen_scan_v2_standalone/raw_processing.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/start_request.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/start_request_serialization.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
 #include "psen_scan_v2_standalone/raw_scanner_data.h"
 
 namespace psen_scan_v2_standalone

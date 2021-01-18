@@ -22,8 +22,8 @@
 #include <gtest/gtest.h>
 
 #include "psen_scan_v2_standalone/raw_scanner_data.h"
-#include "psen_scan_v2_standalone/scanner_reply_msg.h"
-#include "psen_scan_v2_standalone/scanner_reply_serialization_deserialization.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_msg.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_serialization_deserialization.h"
 
 #include "psen_scan_v2_standalone/raw_data_test_helper.h"
 

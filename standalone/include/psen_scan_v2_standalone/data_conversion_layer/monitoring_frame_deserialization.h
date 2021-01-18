@@ -18,8 +18,8 @@
 #include <ostream>
 
 #include "psen_scan_v2_standalone/raw_scanner_data.h"
-#include "psen_scan_v2_standalone/raw_processing.h"
-#include "psen_scan_v2_standalone/monitoring_frame_msg.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/logging.h"
 
 namespace psen_scan_v2_standalone

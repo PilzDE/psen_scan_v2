@@ -15,9 +15,9 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2_standalone/diagnostics.h"
-#include "psen_scan_v2_standalone/monitoring_frame_deserialization.h"
-#include "psen_scan_v2_standalone/monitoring_frame_msg.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/scanner_ids.h"
 
 #include "psen_scan_v2_standalone/istring_stream_builder.h"

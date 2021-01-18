@@ -12,21 +12,37 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#ifndef PSEN_SCAN_V2_STANDALONE_START_REQUEST_SERIALIZATION_H
-#define PSEN_SCAN_V2_STANDALONE_START_REQUEST_SERIALIZATION_H
 
-#include "psen_scan_v2_standalone/start_request.h"
-#include "psen_scan_v2_standalone/raw_scanner_data.h"
+#include <fmt/format.h>
+
+#include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+
+using namespace psen_scan_v2_standalone;
 
 namespace psen_scan_v2_standalone
 {
 namespace data_conversion_layer
 {
-namespace start_request
+namespace monitoring_frame
 {
-RawData serialize(const data_conversion_layer::start_request::Message& start_request, const uint32_t& seq_number);
-RawData serialize(const data_conversion_layer::start_request::Message& start_request);
-}  // namespace start_request
+namespace diagnostic
+{
+std::ostream&
+operator<<(std::ostream& os,
+           const psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::diagnostic::Message& msg)
+{
+  os << fmt::format(
+      "Device: {} - {}", scanner_id_to_string.at(msg.getScannerId()), error_code_to_string.at(msg.getDiagnosticCode()));
+
+  if (isAmbiguous(msg.getDiagnosticCode()))
+  {
+    os << fmt::format(" (Byte:{} Bit:{})", msg.getErrorLocation().getByte(), msg.getErrorLocation().getBit());
+  }
+
+  return os;
+}
+
+}  // namespace diagnostic
+}  // namespace monitoring_frame
 }  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
-#endif

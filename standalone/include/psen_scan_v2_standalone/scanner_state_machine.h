@@ -40,15 +40,15 @@
 #include "psen_scan_v2_standalone/udp_client.h"
 
 #include "psen_scan_v2_standalone/laserscan.h"
-#include "psen_scan_v2_standalone/laserscan_conversions.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/laserscan_conversions.h"
 
-#include "psen_scan_v2_standalone/start_request.h"
-#include "psen_scan_v2_standalone/stop_request_serialization.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/start_request.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/stop_request_serialization.h"
 
-#include "psen_scan_v2_standalone/scanner_reply_msg.h"
-#include "psen_scan_v2_standalone/scanner_reply_serialization_deserialization.h"
-#include "psen_scan_v2_standalone/monitoring_frame_msg.h"
-#include "psen_scan_v2_standalone/monitoring_frame_deserialization.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_msg.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_serialization_deserialization.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
 #include "psen_scan_v2_standalone/complete_scan_validator.h"
 #include "psen_scan_v2_standalone/watchdog.h"
 

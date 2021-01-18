@@ -18,10 +18,10 @@
 
 #include <gmock/gmock.h>
 
-#include "psen_scan_v2_standalone/scanner_reply_msg.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_msg.h"
 #include "psen_scan_v2_standalone/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/udp_client.h"
-#include "psen_scan_v2_standalone/monitoring_frame_msg.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 
 #include "psen_scan_v2_standalone/raw_data_array_conversion.h"
 

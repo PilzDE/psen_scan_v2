@@ -22,7 +22,7 @@
 #include "psen_scan_v2_standalone/angle_conversions.h"
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scanner_config_builder.h"
-#include "psen_scan_v2_standalone/start_request.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/start_request.h"
 #include "psen_scan_v2_standalone/scan_range.h"
 
 #include "psen_scan_v2_standalone/raw_data_test_helper.h"
