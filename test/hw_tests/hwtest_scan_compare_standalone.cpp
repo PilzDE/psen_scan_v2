@@ -14,10 +14,11 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <map>
+#include <sstream>
+#include <stdlib.h>
 #include <string>
 
 #include <gtest/gtest.h>
-#include <ros/ros.h>
 
 #include <boost/filesystem.hpp>
 #include <boost/shared_ptr.hpp>
@@ -32,52 +33,41 @@ using namespace psen_scan_v2_test;
 
 namespace psen_scan_v2_standalone_test
 {
+static const char* TESTFILE_ENV_VAR{ "HW_TEST_SCAN_COMPARE_TESTFILE" };
+static const TenthOfDegree ANGLE_START{ 687 };
+static const TenthOfDegree ANGLE_END{ 2063 };
+static const std::string HOST_IP{ "192.168.0.50" };
+static const std::string SCANNER_IP{ "192.168.0.10" };
+static int TEST_DURATION_S{ 10 };
+
 class ScanComparisonTests : public ::testing::Test
 {
 public:
   static void SetUpTestCase()
   {
-    ros::NodeHandle pnh{ "~" };
+    setLogLevel(CONSOLE_BRIDGE_LOG_INFO);
+    PSENSCAN_INFO("ScanComparisonTests", "Using test duration={}", TEST_DURATION_S);
 
-    std::string filepath;
-    pnh.getParam("testfile", filepath);
-
-    ROS_INFO_STREAM("Using testfile " << filepath);
-    if (!boost::filesystem::exists(filepath))
+    const char* filepath{ std::getenv(TESTFILE_ENV_VAR) };
+    if (!filepath)
     {
-      ROS_ERROR_STREAM("File " << filepath << " not found!");
+      PSENSCAN_ERROR("ScanComparisonTests", "Environment variable {} not set!", TESTFILE_ENV_VAR);
       FAIL();
     }
-
+    PSENSCAN_INFO("ScanComparisonTests", "Using testfile {}", filepath);
+    if (!boost::filesystem::exists(filepath))
+    {
+      PSENSCAN_ERROR("ScanComparisonTests", "File {} not found!", filepath);
+      FAIL();
+    }
     bins_expected_ = binsFromRosbag(filepath);
-
-    ASSERT_TRUE(pnh.getParam("test_duration", test_duration_));
-    ASSERT_TRUE(pnh.getParam("host_ip", host_ip_));
-    ASSERT_TRUE(pnh.getParam("scanner_ip", scanner_ip_));
-
-    double angle_start;
-    double angle_end;
-    ASSERT_TRUE(pnh.getParam("angle_start", angle_start));
-    ASSERT_TRUE(pnh.getParam("angle_end", angle_end));
-    angle_start_ = TenthOfDegree(degreeToTenthDegree(angle_start));
-    angle_end_ = TenthOfDegree(degreeToTenthDegree(angle_end));
   }
 
 protected:
   static std::map<int16_t, NormalDist> bins_expected_;
-  static int test_duration_;
-  static TenthOfDegree angle_start_;
-  static TenthOfDegree angle_end_;
-  static std::string host_ip_;
-  static std::string scanner_ip_;
 };
 
 std::map<int16_t, NormalDist> ScanComparisonTests::bins_expected_{};
-int ScanComparisonTests::test_duration_{ 0 };
-TenthOfDegree ScanComparisonTests::angle_start_{ 0 };
-TenthOfDegree ScanComparisonTests::angle_end_{ 0 };
-std::string ScanComparisonTests::host_ip_{};
-std::string ScanComparisonTests::scanner_ip_{};
 
 TEST_F(ScanComparisonTests, simpleCompare)
 {
@@ -86,19 +76,17 @@ TEST_F(ScanComparisonTests, simpleCompare)
   LaserScanValidator<LaserScan> laser_scan_validator(bins_expected_);
   laser_scan_validator.reset();
 
-  setLogLevel(CONSOLE_BRIDGE_LOG_WARN);
-
-  DefaultScanRange scan_range{ angle_start_, angle_end_ };
+  DefaultScanRange scan_range{ ANGLE_START, ANGLE_END };
 
   ScannerConfigurationBuilder config_builder;
-  config_builder.hostIP(host_ip_).scannerIp(scanner_ip_).scanRange(scan_range);
+  config_builder.hostIP(HOST_IP).scannerIp(SCANNER_IP).scanRange(scan_range);
 
   ScannerV2 scanner(config_builder.build(), [&laser_scan_validator, &window_size](const LaserScan& scan) {
     return laser_scan_validator.scanCb(boost::make_shared<LaserScan const>(scan), window_size);
   });
   scanner.start();
 
-  EXPECT_TRUE(laser_scan_validator.waitForResult(test_duration_));
+  EXPECT_TRUE(laser_scan_validator.waitForResult(TEST_DURATION_S));
 
   scanner.stop();
 }
@@ -107,7 +95,14 @@ TEST_F(ScanComparisonTests, simpleCompare)
 int main(int argc, char** argv)
 {
   testing::InitGoogleTest(&argc, argv);
-  ros::init(argc, argv, "scan_compare_standalone_test");
-
+  if (argc > 1)
+  {
+    std::istringstream is(argv[1]);
+    int test_duration;
+    if (is >> test_duration)
+    {
+      psen_scan_v2_standalone_test::TEST_DURATION_S = test_duration;
+    }
+  }
   return RUN_ALL_TESTS();
 }

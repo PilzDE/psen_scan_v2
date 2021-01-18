@@ -366,8 +366,7 @@ if(CATKIN_ENABLE_TESTING)
   if(ENABLE_HARDWARE_TESTING)
     find_package(rosbag REQUIRED)
 
-    add_rostest_gtest(hwtest_scan_compare_standalone
-      test/hw_tests/hwtest_scan_compare_standalone.test
+    catkin_add_gtest(hwtest_scan_compare_standalone
       test/hw_tests/hwtest_scan_compare_standalone.cpp
       standalone/src/laserscan.cpp
     )
