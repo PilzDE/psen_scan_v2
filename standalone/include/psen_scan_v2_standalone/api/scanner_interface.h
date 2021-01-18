@@ -25,6 +25,8 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace api
+{
 /**
  * @brief This is the API definition for external interaction with the scanner driver.
  *
@@ -77,6 +79,7 @@ inline const IScanner::LaserScanCallback& IScanner::getLaserScanCB() const
   return laser_scan_cb_;
 }
 
+}  // namespace api
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_SCANNER_H
