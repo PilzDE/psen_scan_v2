@@ -26,10 +26,10 @@
 
 // #include <ros/ros.h>
 
-#include "psen_scan_v2_standalone/angle_conversions.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/laserscan.h"
 
-#include "psen_scan_v2_standalone/angle_conversions.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 
 #include "psen_scan_v2/dist.h"
 
@@ -39,7 +39,8 @@ void addScanToBin(const psen_scan_v2_standalone::LaserScan& scan, std::map<int16
 {
   for (size_t i = 0; i < scan.getMeasurements().size(); ++i)
   {
-    auto bin_addr = psen_scan_v2_standalone::radToTenthDegree(scan.getMinScanAngle() + scan.getScanResolution() * i);
+    auto bin_addr = psen_scan_v2_standalone::data_conversion_layer::radToTenthDegree(scan.getMinScanAngle() +
+                                                                                     scan.getScanResolution() * i);
 
     if (bin.find(bin_addr) == bin.end())
     {
@@ -54,7 +55,8 @@ void addScanToBin(const sensor_msgs::LaserScan& scan, std::map<int16_t, NormalDi
 {
   for (size_t i = 0; i < scan.ranges.size(); ++i)
   {
-    auto bin_addr = psen_scan_v2_standalone::radToTenthDegree(scan->angle_min + scan->angle_increment * i);
+    auto bin_addr =
+        psen_scan_v2_standalone::data_conversion_layer::radToTenthDegree(scan->angle_min + scan->angle_increment * i);
 
     if (bin.find(bin_addr) == bin.end())
     {

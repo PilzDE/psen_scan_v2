@@ -16,7 +16,7 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_LASERSCAN_CONVERSIONS_H
 #define PSEN_SCAN_V2_STANDALONE_LASERSCAN_CONVERSIONS_H
 
-#include "psen_scan_v2_standalone/angle_conversions.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 

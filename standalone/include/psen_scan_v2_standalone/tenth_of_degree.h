@@ -16,7 +16,7 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_TENTH_OF_DEGREE_H
 #define PSEN_SCAN_V2_STANDALONE_TENTH_OF_DEGREE_H
 
-#include "psen_scan_v2_standalone/angle_conversions.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -34,7 +34,7 @@ class TenthOfDegree
 public:
   static TenthOfDegree fromRad(const double& angle_in_rad)
   {
-    return TenthOfDegree(radToTenthDegree(angle_in_rad));
+    return TenthOfDegree(data_conversion_layer::radToTenthDegree(angle_in_rad));
   }
 
 public:
@@ -49,7 +49,7 @@ public:
 
   constexpr double toRad() const
   {
-    return tenthDegreeToRad(tenth_of_degree_);
+    return data_conversion_layer::tenthDegreeToRad(tenth_of_degree_);
   }
 
   constexpr TenthOfDegree& operator*(const TenthOfDegree& rhs)

@@ -29,8 +29,8 @@ using namespace psen_scan_v2_standalone::api;
 const std::string HOST_IP{ "192.168.0.50" };
 const std::string SCANNER_IP{ "192.168.0.10" };
 // Start- and end-angle have been configured to be in the middle of the scan range.
-const TenthOfDegree ANGLE_START{ degreeToTenthDegree(137) };
-const TenthOfDegree ANGLE_END{ degreeToTenthDegree(138) };
+const TenthOfDegree ANGLE_START{ data_conversion_layer::degreeToTenthDegree(137) };
+const TenthOfDegree ANGLE_END{ data_conversion_layer::degreeToTenthDegree(138) };
 
 /*
  * This function is used as a callback every time a new laserscan is received.

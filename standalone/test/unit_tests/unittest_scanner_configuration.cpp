@@ -20,7 +20,7 @@
 #include <arpa/inet.h>
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2_standalone/angle_conversions.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/default_parameters.h"
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scanner_config_builder.h"

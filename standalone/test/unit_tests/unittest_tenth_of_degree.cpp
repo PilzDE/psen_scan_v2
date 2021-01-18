@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2_standalone/angle_conversions.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/tenth_of_degree.h"
 
 using namespace psen_scan_v2_standalone;
@@ -26,7 +26,7 @@ TEST(TenthOfDegreeTest, fromRad)
 {
   const double angle_in_rad{ 0.1 };
   TenthOfDegree tenth_of_degree{ TenthOfDegree::fromRad(angle_in_rad) };
-  EXPECT_EQ(tenth_of_degree.value(), radToTenthDegree(angle_in_rad));
+  EXPECT_EQ(tenth_of_degree.value(), data_conversion_layer::radToTenthDegree(angle_in_rad));
 }
 
 TEST(TenthOfDegreeTest, valueTest)
@@ -44,7 +44,7 @@ TEST(TenthOfDegreeTest, negativeValueTest)
 TEST(TenthOfDegreeTest, toRad)
 {
   TenthOfDegree tenth_of_degree{ 1 };
-  EXPECT_DOUBLE_EQ(tenth_of_degree.toRad(), tenthDegreeToRad(1));
+  EXPECT_DOUBLE_EQ(tenth_of_degree.toRad(), data_conversion_layer::tenthDegreeToRad(1));
 }
 
 TEST(TenthOfDegreeTest, Multiplication)

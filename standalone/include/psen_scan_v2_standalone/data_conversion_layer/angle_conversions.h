@@ -23,6 +23,8 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace data_conversion_layer
+{
 inline static constexpr double radianToDegree(const double& angle_in_rad)
 {
   return angle_in_rad * 180. / boost::math::double_constants::pi;
@@ -53,9 +55,10 @@ inline static int16_t radToTenthDegree(const double& angle_in_rad)
 
 inline static double constexpr tenthDegreeToRad(const int16_t& angle_in_tenth_degree)
 {
-  return degreeToRadian(static_cast<double>(angle_in_tenth_degree) / 10.);
+  return data_conversion_layer::degreeToRadian(static_cast<double>(angle_in_tenth_degree) / 10.);
 }
 
+}  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_ANGLE_CONVERSIONS_H

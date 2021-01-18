@@ -16,7 +16,7 @@
 #include <algorithm>
 #include <stdexcept>
 
-#include "psen_scan_v2_standalone/angle_conversions.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/laserscan.h"
 
 namespace psen_scan_v2_standalone
