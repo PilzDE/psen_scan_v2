@@ -18,7 +18,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
 
-#include "psen_scan_v2_standalone/monitoring_frame_serialization.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_serialization.h"
 
 namespace psen_scan_v2_standalone
 {

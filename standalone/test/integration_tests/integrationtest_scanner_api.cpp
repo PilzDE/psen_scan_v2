@@ -28,13 +28,13 @@
 #include "psen_scan_v2_standalone/mock_console_bridge_output_handler.h"
 #include "psen_scan_v2_standalone/mock_udp_server.h"
 #include "psen_scan_v2_standalone/udp_frame_dumps.h"
-#include "psen_scan_v2_standalone/raw_data_array_conversion.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
 
 // Software under testing
 #include "psen_scan_v2_standalone/async_barrier.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/logging.h"
-#include "psen_scan_v2_standalone/monitoring_frame_serialization.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_serialization.h"
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scanner_config_builder.h"
 #include "psen_scan_v2_standalone/scanner_v2.h"

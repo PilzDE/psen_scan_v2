@@ -21,8 +21,8 @@
 #include "psen_scan_v2_standalone/scanner_ids.h"
 
 #include "psen_scan_v2_standalone/istring_stream_builder.h"
-#include "psen_scan_v2_standalone/monitoring_frame_serialization.h"
-#include "psen_scan_v2_standalone/raw_data_array_conversion.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_serialization.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
 #include "psen_scan_v2_standalone/udp_frame_dumps.h"
 
 using namespace psen_scan_v2_standalone;

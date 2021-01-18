@@ -25,7 +25,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_serialization_deserialization.h"
 
-#include "psen_scan_v2_standalone/raw_data_test_helper.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_data_test_helper.h"
 
 using namespace psen_scan_v2_standalone;
 

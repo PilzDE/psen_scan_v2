@@ -29,7 +29,7 @@
 
 #include "psen_scan_v2_standalone/istring_stream_builder.h"
 #include "psen_scan_v2_standalone/udp_frame_dumps.h"
-#include "psen_scan_v2_standalone/raw_data_array_conversion.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
 
 namespace psen_scan_v2
 {
