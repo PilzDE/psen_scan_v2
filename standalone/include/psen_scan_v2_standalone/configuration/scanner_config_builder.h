@@ -24,7 +24,7 @@
 
 #include <arpa/inet.h>
 
-#include "psen_scan_v2_standalone/scanner_configuration.h"
+#include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scan_range.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 

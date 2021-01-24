@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "psen_scan_v2_standalone/scanner_configuration.h"
+#include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
 
 namespace psen_scan_v2_standalone
 {

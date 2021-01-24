@@ -21,7 +21,7 @@
 #include <functional>
 
 #include "psen_scan_v2_standalone/laserscan.h"
-#include "psen_scan_v2_standalone/scanner_configuration.h"
+#include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
 
 namespace psen_scan_v2_standalone
 {

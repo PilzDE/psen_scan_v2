@@ -20,8 +20,8 @@
 #include <gtest/gtest.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
-#include "psen_scan_v2_standalone/scanner_configuration.h"
-#include "psen_scan_v2_standalone/scanner_config_builder.h"
+#include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
+#include "psen_scan_v2_standalone/configuration/scanner_config_builder.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request.h"
 #include "psen_scan_v2_standalone/scan_range.h"
 

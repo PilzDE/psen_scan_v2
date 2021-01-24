@@ -21,7 +21,7 @@
 #include "psen_scan_v2_standalone/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/scan_range.h"
 #include "psen_scan_v2_standalone/scanner_ids.h"
-#include "psen_scan_v2_standalone/scanner_configuration.h"
+#include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
 #include "psen_scan_v2_standalone/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
