@@ -61,8 +61,8 @@ public:
   using OpCode = uint32_t;
   using WorkingMode = uint32_t;
   using TransactionType = uint32_t;
-  using FromTheta = TenthOfDegree;
-  using Resolution = TenthOfDegree;
+  using FromTheta = util::TenthOfDegree;
+  using Resolution = util::TenthOfDegree;
 
 public:
   FixedFields(DeviceStatus device_status,

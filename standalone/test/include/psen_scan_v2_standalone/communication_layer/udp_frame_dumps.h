@@ -81,8 +81,8 @@ public:
   WithIntensitiesAndDiagnostics()
   {
     data_conversion_layer::monitoring_frame::Message msg(
-        TenthOfDegree(0x3e8),
-        TenthOfDegree(0x02),
+        util::TenthOfDegree(0x3e8),
+        util::TenthOfDegree(0x02),
         0x00008894,
         readMeasurements(hex_dump, 74, 250),
         readIntensities(hex_dump, intensities_offset, 250),
@@ -176,7 +176,8 @@ class WithoutMeasurementsAndIntensities
 public:
   WithoutMeasurementsAndIntensities()
   {
-    data_conversion_layer::monitoring_frame::Message msg(TenthOfDegree(0x5dc), TenthOfDegree(0x0a), 0x0661fc, {});
+    data_conversion_layer::monitoring_frame::Message msg(
+        util::TenthOfDegree(0x5dc), util::TenthOfDegree(0x0a), 0x0661fc, {});
     expected_msg_ = msg;
   }
 

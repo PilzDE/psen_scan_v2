@@ -18,7 +18,7 @@
 
 #include <stdexcept>
 
-#include "psen_scan_v2_standalone/tenth_of_degree.h"
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -39,10 +39,10 @@ public:
    * @param start_angle Start angle of measurement (scanner-zero = zero on the left).
    * @param end_angle End angle of measurement.
    */
-  constexpr ScanRange(const TenthOfDegree& start_angle, const TenthOfDegree& end_angle);
+  constexpr ScanRange(const util::TenthOfDegree& start_angle, const util::TenthOfDegree& end_angle);
 
-  const TenthOfDegree& getStart() const;
-  const TenthOfDegree& getEnd() const;
+  const util::TenthOfDegree& getStart() const;
+  const util::TenthOfDegree& getEnd() const;
 
 public:
   static constexpr ScanRange<min_allowed_angle, max_allowed_angle> createInvalidScanRange();
@@ -51,16 +51,17 @@ private:
   ScanRange() = default;
 
 private:
-  TenthOfDegree start_angle_{ 0 };
-  TenthOfDegree end_angle_{ 0 };
+  util::TenthOfDegree start_angle_{ 0 };
+  util::TenthOfDegree end_angle_{ 0 };
 };
 
 template <int16_t min_angle, int16_t max_angle>
-constexpr ScanRange<min_angle, max_angle>::ScanRange(const TenthOfDegree& start_angle, const TenthOfDegree& end_angle)
+constexpr ScanRange<min_angle, max_angle>::ScanRange(const util::TenthOfDegree& start_angle,
+                                                     const util::TenthOfDegree& end_angle)
   : start_angle_(start_angle), end_angle_(end_angle)
 {
-  const TenthOfDegree MIN_ANGLE{ min_angle };
-  const TenthOfDegree MAX_ANGLE{ max_angle };
+  const util::TenthOfDegree MIN_ANGLE{ min_angle };
+  const util::TenthOfDegree MAX_ANGLE{ max_angle };
 
   if (start_angle < MIN_ANGLE || start_angle > MAX_ANGLE)
   {
@@ -85,13 +86,13 @@ constexpr ScanRange<min_angle, max_angle> ScanRange<min_angle, max_angle>::creat
 }
 
 template <int16_t min_angle, int16_t max_angle>
-const TenthOfDegree& ScanRange<min_angle, max_angle>::getStart() const
+const util::TenthOfDegree& ScanRange<min_angle, max_angle>::getStart() const
 {
   return start_angle_;
 }
 
 template <int16_t min_angle, int16_t max_angle>
-const TenthOfDegree& ScanRange<min_angle, max_angle>::getEnd() const
+const util::TenthOfDegree& ScanRange<min_angle, max_angle>::getEnd() const
 {
   return end_angle_;
 }

@@ -72,10 +72,10 @@ int main(int argc, char** argv)
   try
   {
     configuration::DefaultScanRange scan_range{
-      TenthOfDegree::fromRad(DEFAULT_X_AXIS_ROTATION +
-                             getOptionalParamFromServer<double>(pnh, PARAM_ANGLE_START, DEFAULT_ANGLE_START)),
-      TenthOfDegree::fromRad(DEFAULT_X_AXIS_ROTATION +
-                             getOptionalParamFromServer<double>(pnh, PARAM_ANGLE_END, DEFAULT_ANGLE_END))
+      util::TenthOfDegree::fromRad(DEFAULT_X_AXIS_ROTATION +
+                                   getOptionalParamFromServer<double>(pnh, PARAM_ANGLE_START, DEFAULT_ANGLE_START)),
+      util::TenthOfDegree::fromRad(DEFAULT_X_AXIS_ROTATION +
+                                   getOptionalParamFromServer<double>(pnh, PARAM_ANGLE_END, DEFAULT_ANGLE_END))
     };
 
     configuration::ScannerConfigurationBuilder config_builder;

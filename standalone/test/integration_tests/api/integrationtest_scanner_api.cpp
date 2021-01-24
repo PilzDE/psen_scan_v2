@@ -53,7 +53,7 @@ using MaxSizeUdpRawData = std::array<char, 65507>;
 static const std::string SCANNER_IP_ADDRESS{ "127.0.0.1" };
 static const std::string HOST_IP_ADDRESS{ "127.0.0.1" };
 
-static constexpr configuration::DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(60) };
+static constexpr configuration::DefaultScanRange SCAN_RANGE{ util::TenthOfDegree(0), util::TenthOfDegree(60) };
 
 static constexpr std::chrono::milliseconds WAIT_TIMEOUT{ 10 };
 static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 3 };
@@ -95,10 +95,10 @@ static std::vector<double> generateIntensities(const unsigned int& num_elements,
 
 static data_conversion_layer::monitoring_frame::Message
 createValidMonitoringFrameMsg(const uint32_t scan_counter = 42,
-                              const TenthOfDegree start_angle = SCAN_RANGE.getStart(),
-                              const TenthOfDegree end_angle = SCAN_RANGE.getEnd())
+                              const util::TenthOfDegree start_angle = SCAN_RANGE.getStart(),
+                              const util::TenthOfDegree end_angle = SCAN_RANGE.getEnd())
 {
-  const auto resolution{ TenthOfDegree(10) };
+  const auto resolution{ util::TenthOfDegree(10) };
 
   const unsigned int num_elements = (end_angle - start_angle) / resolution;
   const double lowest_measurement{ 0. };

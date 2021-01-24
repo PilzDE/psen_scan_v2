@@ -36,12 +36,12 @@ namespace psen_scan_v2_standalone
 {
 namespace data_conversion_layer
 {
-TenthOfDegree data_conversion_layer::monitoring_frame::Message::fromTheta() const
+util::TenthOfDegree data_conversion_layer::monitoring_frame::Message::fromTheta() const
 {
   return from_theta_;
 }
 
-TenthOfDegree data_conversion_layer::monitoring_frame::Message::resolution() const
+util::TenthOfDegree data_conversion_layer::monitoring_frame::Message::resolution() const
 {
   return resolution_;
 }

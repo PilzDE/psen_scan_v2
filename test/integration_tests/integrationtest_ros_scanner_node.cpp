@@ -93,7 +93,7 @@ static const std::string HOST_IP{ "127.0.0.1" };
 static constexpr int HOST_UDP_PORT_DATA{ 50505 };
 static constexpr int HOST_UDP_PORT_CONTROL{ 55055 };
 static const std::string DEVICE_IP{ "127.0.0.100" };
-static constexpr configuration::DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(2750) };
+static constexpr configuration::DefaultScanRange SCAN_RANGE{ util::TenthOfDegree(0), util::TenthOfDegree(2750) };
 static constexpr int SCANNER_STARTED_TIMEOUT_MS{ 3000 };
 static constexpr int SCANNER_STOPPED_TIMEOUT_MS{ 3000 };
 static constexpr int LASERSCAN_RECEIVED_TIMEOUT{ 3000 };
@@ -142,7 +142,7 @@ TEST_F(RosScannerNodeTests, testScannerInvocation)
 
 TEST_F(RosScannerNodeTests, testScanTopicReceived)
 {
-  LaserScan laser_scan_fake(TenthOfDegree(1), TenthOfDegree(3), TenthOfDegree(5));
+  LaserScan laser_scan_fake(util::TenthOfDegree(1), util::TenthOfDegree(3), util::TenthOfDegree(5));
   laser_scan_fake.getMeasurements().push_back(1);
 
   SubscriberMock subscriber;
@@ -195,8 +195,8 @@ TEST_F(RosScannerNodeTests, testMissingStopReply)
 
 TEST_F(RosScannerNodeTests, shouldNotInvokeUserCallbackInCaseOfEmptyLaserScan)
 {
-  LaserScan empty_scan(TenthOfDegree(1), TenthOfDegree(3), TenthOfDegree(5));
-  LaserScan scan_with_data(TenthOfDegree(1), TenthOfDegree(3), TenthOfDegree(5));
+  LaserScan empty_scan(util::TenthOfDegree(1), util::TenthOfDegree(3), util::TenthOfDegree(5));
+  LaserScan scan_with_data(util::TenthOfDegree(1), util::TenthOfDegree(3), util::TenthOfDegree(5));
   scan_with_data.getMeasurements().push_back(7);
 
   const std::string prefix{ "scanner" };

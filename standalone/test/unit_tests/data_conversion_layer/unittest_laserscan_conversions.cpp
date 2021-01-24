@@ -33,8 +33,8 @@ namespace psen_scan_v2_standalone_test
 {
 static data_conversion_layer::monitoring_frame::Message createMsg()
 {
-  const TenthOfDegree from_theta{ 10 };
-  const TenthOfDegree resolution{ 90 };
+  const util::TenthOfDegree from_theta{ 10 };
+  const util::TenthOfDegree resolution{ 90 };
   const uint32_t scan_counter{ 42 };
   const std::vector<double> measurements{ 1., 2., 3., 4.5, 5., 42. };
   const std::vector<double> intensities{ 0., 4., 3., 1007., 508., 14000. };
@@ -59,8 +59,8 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectMinMaxScanAngleAfter
   std::unique_ptr<api::LaserScan> scan_ptr;
   ASSERT_NO_THROW(scan_ptr.reset(new api::LaserScan{ data_conversion_layer::toLaserScan(frame) }););
 
-  const TenthOfDegree expected_max_scan_angle{ frame.fromTheta() +
-                                               frame.resolution() * (int)frame.measurements().size() };
+  const util::TenthOfDegree expected_max_scan_angle{ frame.fromTheta() +
+                                                     frame.resolution() * (int)frame.measurements().size() };
 
   EXPECT_EQ(frame.fromTheta(), scan_ptr->getMinScanAngle()) << "Min scan-angle incorrect in LaserScan";
   EXPECT_EQ(expected_max_scan_angle, scan_ptr->getMaxScanAngle()) << "Max scan-angle incorrect in LaserScan";

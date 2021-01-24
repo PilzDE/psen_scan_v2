@@ -70,7 +70,7 @@ TEST_F(StartRequestTest, constructorTest)
   const std::string& host_ip = "192.168.0.1";
   const uint16_t& host_udp_port_data = 65535;
 
-  const configuration::DefaultScanRange scan_range{ TenthOfDegree(0), TenthOfDegree::fromRad(4.71) };
+  const configuration::DefaultScanRange scan_range{ util::TenthOfDegree(0), util::TenthOfDegree::fromRad(4.71) };
 
   uint32_t sequence_number{ 123 };
   data_conversion_layer::start_request::Message sr(configuration::ScannerConfigurationBuilder()
@@ -133,7 +133,7 @@ static configuration::ScannerConfiguration createConfig(bool enable_diagnostics)
       .scannerIp("192.168.0.10")
       .scannerDataPort(2000)
       .scannerControlPort(3000)
-      .scanRange(configuration::DefaultScanRange(TenthOfDegree(0), TenthOfDegree(2750)));
+      .scanRange(configuration::DefaultScanRange(util::TenthOfDegree(0), util::TenthOfDegree(2750)));
 
   if (enable_diagnostics)
   {

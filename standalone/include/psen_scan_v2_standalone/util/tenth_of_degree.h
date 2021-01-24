@@ -20,6 +20,8 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace util
+{
 /**
  * @brief Helper class to simplify/improve the handling of angles.
  *
@@ -32,7 +34,7 @@ namespace psen_scan_v2_standalone
 class TenthOfDegree
 {
 public:
-  static TenthOfDegree fromRad(const double& angle_in_rad)
+  static util::TenthOfDegree fromRad(const double& angle_in_rad)
   {
     return TenthOfDegree(data_conversion_layer::radToTenthDegree(angle_in_rad));
   }
@@ -52,57 +54,57 @@ public:
     return data_conversion_layer::tenthDegreeToRad(tenth_of_degree_);
   }
 
-  constexpr TenthOfDegree& operator*(const TenthOfDegree& rhs)
+  constexpr util::TenthOfDegree& operator*(const util::TenthOfDegree& rhs)
   {
     tenth_of_degree_ = value() * rhs.value();
     return *this;
   }
 
-  constexpr TenthOfDegree& operator*(const int& rhs)
+  constexpr util::TenthOfDegree& operator*(const int& rhs)
   {
     tenth_of_degree_ = value() * rhs;
     return *this;
   }
 
-  constexpr TenthOfDegree& operator/(const int& rhs)
+  constexpr util::TenthOfDegree& operator/(const int& rhs)
   {
     tenth_of_degree_ = value() / rhs;
     return *this;
   }
 
-  constexpr TenthOfDegree& operator+(const TenthOfDegree& rhs)
+  constexpr util::TenthOfDegree& operator+(const util::TenthOfDegree& rhs)
   {
     tenth_of_degree_ = value() + rhs.value();
     return *this;
   }
 
-  TenthOfDegree& operator-(const TenthOfDegree& rhs)
+  util::TenthOfDegree& operator-(const util::TenthOfDegree& rhs)
   {
     tenth_of_degree_ = value() - rhs.value();
     return *this;
   }
 
-  constexpr bool operator==(const TenthOfDegree& rhs) const
+  constexpr bool operator==(const util::TenthOfDegree& rhs) const
   {
     return value() == rhs.value();
   }
 
-  constexpr bool operator>=(const TenthOfDegree& rhs) const
+  constexpr bool operator>=(const util::TenthOfDegree& rhs) const
   {
     return value() >= rhs.value();
   }
 
-  constexpr bool operator<=(const TenthOfDegree& rhs) const
+  constexpr bool operator<=(const util::TenthOfDegree& rhs) const
   {
     return value() <= rhs.value();
   }
 
-  constexpr bool operator>(const TenthOfDegree& rhs) const
+  constexpr bool operator>(const util::TenthOfDegree& rhs) const
   {
     return value() > rhs.value();
   }
 
-  constexpr bool operator<(const TenthOfDegree& rhs) const
+  constexpr bool operator<(const util::TenthOfDegree& rhs) const
   {
     return value() < rhs.value();
   }
@@ -119,6 +121,7 @@ public:
 private:
   int16_t tenth_of_degree_{ 0 };
 };
+}  // namespace util
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_TENTH_OF_DEGREE_H

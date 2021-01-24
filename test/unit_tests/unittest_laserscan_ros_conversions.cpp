@@ -40,9 +40,9 @@ namespace psen_scan_v2_test
 {
 static api::LaserScan createScan()
 {
-  const TenthOfDegree angle_min_raw{ 0 };
-  const TenthOfDegree angle_max_raw{ 20 };
-  const TenthOfDegree angle_increment{ 1 };
+  const util::TenthOfDegree angle_min_raw{ 0 };
+  const util::TenthOfDegree angle_max_raw{ 20 };
+  const util::TenthOfDegree angle_increment{ 1 };
 
   api::LaserScan laserscan(angle_increment, angle_min_raw, angle_max_raw);
   const api::LaserScan::MeasurementData measurements{ 1., 2., 3. };

@@ -17,7 +17,7 @@
 
 namespace psen_scan_v2_standalone
 {
-static constexpr TenthOfDegree MASTER_RESOLUTION{ TenthOfDegree(2u) };
+static constexpr util::TenthOfDegree MASTER_RESOLUTION{ util::TenthOfDegree(2u) };
 
 namespace data_conversion_layer
 {

@@ -78,8 +78,8 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
   }
 
   data_conversion_layer::monitoring_frame::Message msg(
-      TenthOfDegree(25),
-      TenthOfDegree(1),
+      util::TenthOfDegree(25),
+      util::TenthOfDegree(1),
       456,
       { 10, 20, 30, 40 },
       { 15, 25, 35, 45 },
@@ -95,7 +95,8 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
 
 TEST(MonitoringFrameSerializationTest, shouldFailOnSerializeAndDeserializeFrameWithIntensityChannelBits)
 {
-  data_conversion_layer::monitoring_frame::Message msg(TenthOfDegree(25), TenthOfDegree(1), 1, { 0 }, { 70045 }, {});
+  data_conversion_layer::monitoring_frame::Message msg(
+      util::TenthOfDegree(25), util::TenthOfDegree(1), 1, { 0 }, { 70045 }, {});
 
   auto raw = serialize(msg);
   auto deserialized_msg = data_conversion_layer::monitoring_frame::deserialize(convertToRawData(raw), raw.size());

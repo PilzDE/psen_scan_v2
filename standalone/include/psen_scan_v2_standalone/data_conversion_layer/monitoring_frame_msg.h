@@ -29,7 +29,7 @@
 
 #include "psen_scan_v2_standalone/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
-#include "psen_scan_v2_standalone/tenth_of_degree.h"
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 #include "psen_scan_v2_standalone/scanner_ids.h"
 
 namespace psen_scan_v2_standalone
@@ -61,8 +61,8 @@ class Message
 {
 public:
   Message() = default;
-  Message(const TenthOfDegree& from_theta,
-          const TenthOfDegree& resolution,
+  Message(const util::TenthOfDegree& from_theta,
+          const util::TenthOfDegree& resolution,
           const uint32_t scan_counter,
           const std::vector<double>& measurements)
     : from_theta_(from_theta)
@@ -73,8 +73,8 @@ public:
 
     };
 
-  Message(const TenthOfDegree& from_theta,
-          const TenthOfDegree& resolution,
+  Message(const util::TenthOfDegree& from_theta,
+          const util::TenthOfDegree& resolution,
           const uint32_t scan_counter,
           const std::vector<double>& measurements,
           const std::vector<double>& intensities,
@@ -90,8 +90,8 @@ public:
     };
 
 public:
-  TenthOfDegree fromTheta() const;
-  TenthOfDegree resolution() const;
+  util::TenthOfDegree fromTheta() const;
+  util::TenthOfDegree resolution() const;
   uint32_t scanCounter() const;
   const std::vector<double>& measurements() const;
   const std::vector<double>& intensities() const;
@@ -100,8 +100,8 @@ public:
 
 private:
   ScannerId scanner_id_{ ScannerId::master };
-  TenthOfDegree from_theta_{ 0 };
-  TenthOfDegree resolution_{ 0 };
+  util::TenthOfDegree from_theta_{ 0 };
+  util::TenthOfDegree resolution_{ 0 };
 
   boost::optional<uint32_t> scan_counter_;
   std::vector<double> measurements_;

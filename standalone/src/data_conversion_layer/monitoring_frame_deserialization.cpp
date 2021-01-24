@@ -175,8 +175,8 @@ FixedFields readFixedFields(std::istringstream& is)
   raw_processing::read(is, transaction_type);
   raw_processing::read(is, scanner_id);
 
-  raw_processing::read<int16_t, TenthOfDegree>(is, from_theta);
-  raw_processing::read<int16_t, TenthOfDegree>(is, resolution);
+  raw_processing::read<int16_t, util::TenthOfDegree>(is, from_theta);
+  raw_processing::read<int16_t, util::TenthOfDegree>(is, resolution);
 
   // LCOV_EXCL_START
   if (OP_CODE_MONITORING_FRAME != op_code)

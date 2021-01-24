@@ -23,14 +23,14 @@ using namespace psen_scan_v2_standalone;
 
 namespace psen_scan_v2_standalone_test
 {
-static constexpr TenthOfDegree MIN_ALLOWED_ANGLE{ 7 };
-static constexpr TenthOfDegree MAX_ALLOWED_ANGLE{ 54 };
+static constexpr util::TenthOfDegree MIN_ALLOWED_ANGLE{ 7 };
+static constexpr util::TenthOfDegree MAX_ALLOWED_ANGLE{ 54 };
 
-static constexpr TenthOfDegree VALID_START_ANGLE{ MIN_ALLOWED_ANGLE.value() + 1 };
-static constexpr TenthOfDegree VALID_END_ANGLE{ MAX_ALLOWED_ANGLE.value() - 1 };
+static constexpr util::TenthOfDegree VALID_START_ANGLE{ MIN_ALLOWED_ANGLE.value() + 1 };
+static constexpr util::TenthOfDegree VALID_END_ANGLE{ MAX_ALLOWED_ANGLE.value() - 1 };
 
-static constexpr TenthOfDegree TOO_SMALL_SCAN_ANGLE{ MIN_ALLOWED_ANGLE.value() - 1 };
-static constexpr TenthOfDegree TOO_LARGE_SCAN_ANGLE{ MAX_ALLOWED_ANGLE.value() + 1 };
+static constexpr util::TenthOfDegree TOO_SMALL_SCAN_ANGLE{ MIN_ALLOWED_ANGLE.value() - 1 };
+static constexpr util::TenthOfDegree TOO_LARGE_SCAN_ANGLE{ MAX_ALLOWED_ANGLE.value() + 1 };
 
 using TestScanRange = configuration::ScanRange<MIN_ALLOWED_ANGLE.value(), MAX_ALLOWED_ANGLE.value()>;
 
@@ -62,7 +62,7 @@ TEST(ScanRangeTest, testEndAngleTooLarge)
 
 TEST(ScanRangeTest, testEndAngleSmallerThanStartAngle)
 {
-  EXPECT_THROW(TestScanRange(TenthOfDegree(17), TenthOfDegree(15)), std::invalid_argument);
+  EXPECT_THROW(TestScanRange(util::TenthOfDegree(17), util::TenthOfDegree(15)), std::invalid_argument);
 }
 
 }  // namespace psen_scan_v2_standalone_test

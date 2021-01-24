@@ -22,7 +22,7 @@
 #include "psen_scan_v2_standalone/configuration/scan_range.h"
 #include "psen_scan_v2_standalone/scanner_ids.h"
 #include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
-#include "psen_scan_v2_standalone/tenth_of_degree.h"
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -57,15 +57,16 @@ private:
   {
   public:
     constexpr LaserScanSettings() = default;
-    constexpr LaserScanSettings(const configuration::DefaultScanRange& scan_range, const TenthOfDegree& resolution);
+    constexpr LaserScanSettings(const configuration::DefaultScanRange& scan_range,
+                                const util::TenthOfDegree& resolution);
 
   public:
     constexpr const configuration::DefaultScanRange& getScanRange() const;
-    constexpr TenthOfDegree getResolution() const;
+    constexpr util::TenthOfDegree getResolution() const;
 
   private:
     const configuration::DefaultScanRange scan_range_{ configuration::DefaultScanRange::createInvalidScanRange() };
-    const TenthOfDegree resolution_{ 0 };
+    const util::TenthOfDegree resolution_{ 0 };
   };
 
   /**
@@ -96,7 +97,7 @@ private:
 };
 
 constexpr Message::LaserScanSettings::LaserScanSettings(const configuration::DefaultScanRange& scan_range,
-                                                        const TenthOfDegree& resolution)
+                                                        const util::TenthOfDegree& resolution)
   : scan_range_(scan_range), resolution_(resolution)
 {
 }
@@ -106,7 +107,7 @@ constexpr const configuration::DefaultScanRange& Message::LaserScanSettings::get
   return scan_range_;
 };
 
-constexpr TenthOfDegree Message::LaserScanSettings::getResolution() const
+constexpr util::TenthOfDegree Message::LaserScanSettings::getResolution() const
 {
   return resolution_;
 };
