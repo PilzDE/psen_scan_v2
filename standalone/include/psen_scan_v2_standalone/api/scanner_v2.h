@@ -24,8 +24,8 @@
 #include <boost/optional.hpp>
 
 #include "psen_scan_v2_standalone/api/scanner_interface.h"
-#include "psen_scan_v2_standalone/scanner_events.h"
-#include "psen_scan_v2_standalone/scanner_state_machine.h"
+#include "psen_scan_v2_standalone/protocol_layer/scanner_events.h"
+#include "psen_scan_v2_standalone/protocol_layer/scanner_state_machine.h"
 #include "psen_scan_v2_standalone/laserscan.h"
 
 #include "psen_scan_v2_standalone/udp_client.h"
