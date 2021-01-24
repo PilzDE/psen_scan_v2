@@ -21,6 +21,8 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace util
+{
 /**
  * @brief Helper class to simplify the synchronization between different threads.
  */
@@ -36,17 +38,18 @@ private:
   const std::future<void> future_{ barrier_.get_future() };
 };
 
-inline void Barrier::release()
+inline void util::Barrier::release()
 {
   barrier_.set_value();
 }
 
 template <class Rep, class Period>
-inline bool Barrier::waitTillRelease(const std::chrono::duration<Rep, Period>& timeout) const
+inline bool util::Barrier::waitTillRelease(const std::chrono::duration<Rep, Period>& timeout) const
 {
   return future_.wait_for(timeout) == std::future_status::ready;
 }
 
+}  // namespace util
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_ASYNC_BARRIER_H

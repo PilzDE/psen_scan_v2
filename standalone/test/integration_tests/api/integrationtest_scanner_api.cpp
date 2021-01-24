@@ -31,7 +31,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
 
 // Software under testing
-#include "psen_scan_v2_standalone/async_barrier.h"
+#include "psen_scan_v2_standalone/util/async_barrier.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/logging.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_serialization.h"
@@ -311,7 +311,7 @@ TEST_F(ScannerAPITests, testStartFunctionality)
   api::ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
   const data_conversion_layer::start_request::Message start_req(config_);
 
-  Barrier start_req_received_barrier;
+  util::Barrier start_req_received_barrier;
   EXPECT_CALL(scanner_mock, receiveControlMsg(_, data_conversion_layer::start_request::serialize(start_req)))
       .WillOnce(OpenBarrier(&start_req_received_barrier));
 
@@ -350,7 +350,7 @@ TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
   UserCallbacks cb;
   api::ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
-  Barrier start_req_received_barrier;
+  util::Barrier start_req_received_barrier;
   ON_CALL(
       scanner_mock,
       receiveControlMsg(
@@ -382,7 +382,7 @@ TEST_F(ScannerAPITests, testStopFunctionality)
           _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
       .WillOnce(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
-  Barrier stop_req_received_barrier;
+  util::Barrier stop_req_received_barrier;
   EXPECT_CALL(scanner_mock, receiveControlMsg(_, data_conversion_layer::stop_request::serialize()))
       .WillOnce(OpenBarrier(&stop_req_received_barrier));
 
@@ -437,8 +437,8 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
   UserCallbacks cb;
   api::ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
-  Barrier error_msg_barrier;
-  Barrier twice_called_barrier;
+  util::Barrier error_msg_barrier;
+  util::Barrier twice_called_barrier;
   {
     InSequence seq;
     EXPECT_CALL(scanner_mock, receiveControlMsg(_, _)).Times(1);
@@ -476,8 +476,8 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
 
   const data_conversion_layer::monitoring_frame::Message msg{ createValidMonitoringFrameMsg() };
 
-  Barrier monitoring_frame_barrier;
-  Barrier diagnostic_barrier;
+  util::Barrier monitoring_frame_barrier;
+  util::Barrier diagnostic_barrier;
   {
     InSequence seq;
     EXPECT_CALL(
@@ -523,10 +523,10 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
           _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
       .WillByDefault(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
-  Barrier valid_msg_barrier;
+  util::Barrier valid_msg_barrier;
   EXPECT_CALL(cb, LaserScanCallback(_)).WillOnce(OpenBarrier(&valid_msg_barrier));
 
-  Barrier empty_msg_received;
+  util::Barrier empty_msg_received;
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(
@@ -580,7 +580,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
           _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
       .WillByDefault(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
-  Barrier user_msg_barrier;
+  util::Barrier user_msg_barrier;
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(WARN,
@@ -633,7 +633,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
           _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
       .WillByDefault(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
-  Barrier user_msg_barrier;
+  util::Barrier user_msg_barrier;
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(WARN, "StateMachine: Unexpected: Too many MonitoringFrames for one scan round received.")
@@ -667,7 +667,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFrameReceiveTimeout)
           _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
       .WillByDefault(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
-  Barrier user_msg_barrier;
+  util::Barrier user_msg_barrier;
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(WARN,

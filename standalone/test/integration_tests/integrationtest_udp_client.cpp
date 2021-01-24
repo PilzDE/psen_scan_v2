@@ -23,7 +23,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "psen_scan_v2_standalone/async_barrier.h"
+#include "psen_scan_v2_standalone/util/async_barrier.h"
 #include "psen_scan_v2_standalone/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/communication_layer/udp_client.h"
 
@@ -97,7 +97,7 @@ ACTION_P(OpenBarrier, barrier)
 
 TEST_F(UdpClientTests, testAsyncReadOperation)
 {
-  Barrier client_received_data_barrier;
+  util::Barrier client_received_data_barrier;
   EXPECT_CALL(*this, handleNewData(_, send_array_.size())).WillOnce(OpenBarrier(&client_received_data_barrier));
 
   udp_client_->startAsyncReceiving();
@@ -107,7 +107,7 @@ TEST_F(UdpClientTests, testAsyncReadOperation)
 
 TEST_F(UdpClientTests, testSingleAsyncReadOperation)
 {
-  Barrier client_received_data_barrier;
+  util::Barrier client_received_data_barrier;
   EXPECT_CALL(*this, handleNewData(_, send_array_.size())).WillOnce(OpenBarrier(&client_received_data_barrier));
 
   udp_client_->startAsyncReceiving(communication_layer::ReceiveMode::single);
@@ -125,7 +125,7 @@ TEST_F(UdpClientTests, Should_NotCallErrorHandler_WhenDestroyedWhileAsyncReceive
 
 TEST_F(UdpClientTests, testErrorHandlingForReceive)
 {
-  Barrier error_handler_called_barrier;
+  util::Barrier error_handler_called_barrier;
   EXPECT_CALL(*this, handleError(_)).WillOnce(OpenBarrier(&error_handler_called_barrier));
 
   udp_client_->startAsyncReceiving(communication_layer::ReceiveMode::single);
@@ -139,7 +139,7 @@ TEST_F(UdpClientTests, testWriteOperation)
   RawData write_buf;
   std::copy(str.begin(), str.end(), std::back_inserter(write_buf));
 
-  Barrier server_mock_received_data_barrier;
+  util::Barrier server_mock_received_data_barrier;
   EXPECT_CALL(*this, receivedUdpMsg(_, write_buf)).WillOnce(OpenBarrier(&server_mock_received_data_barrier));
 
   mock_udp_server_.asyncReceive();
@@ -154,8 +154,8 @@ TEST_F(UdpClientTests, testWritingWhileReceiving)
   RawData write_buf;
   std::copy(str.begin(), str.end(), std::back_inserter(write_buf));
 
-  Barrier client_received_data_barrier;
-  Barrier server_mock_received_data_barrier;
+  util::Barrier client_received_data_barrier;
+  util::Barrier server_mock_received_data_barrier;
   EXPECT_CALL(*this, handleNewData(_, send_array_.size())).WillOnce(OpenBarrier(&client_received_data_barrier));
   EXPECT_CALL(*this, receivedUdpMsg(_, write_buf))
       .WillOnce(DoAll(InvokeWithoutArgs(this, &UdpClientTests::sendTestDataToClient),

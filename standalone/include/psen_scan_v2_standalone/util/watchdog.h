@@ -21,7 +21,7 @@
 #include <atomic>
 #include <condition_variable>
 
-#include "psen_scan_v2_standalone/async_barrier.h"
+#include "psen_scan_v2_standalone/util/async_barrier.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -61,7 +61,7 @@ private:
   std::cv_status wait_for(const Timeout& timeout);
 
 private:
-  Barrier thread_startetd_barrier_;
+  util::Barrier thread_startetd_barrier_;
   std::atomic_bool terminated_{ false };
   std::condition_variable cv_;
   std::mutex cv_m_;
