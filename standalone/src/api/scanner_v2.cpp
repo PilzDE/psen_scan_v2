@@ -37,18 +37,18 @@ ScannerV2::WatchdogFactory::WatchdogFactory(ScannerV2* scanner) : IWatchdogFacto
   assert(scanner);
 }
 
-std::unique_ptr<Watchdog> ScannerV2::WatchdogFactory::create(const Watchdog::Timeout& timeout,
-                                                             const std::string& event_type)
+std::unique_ptr<util::Watchdog> ScannerV2::WatchdogFactory::create(const util::Watchdog::Timeout& timeout,
+                                                                   const std::string& event_type)
 {
   if (event_type == "StartReplyTimeout")
   {
-    return std::unique_ptr<Watchdog>(
-        new Watchdog(timeout, std::bind(&ScannerV2::triggerEvent<scanner_events::StartTimeout>, scanner_)));
+    return std::unique_ptr<util::Watchdog>(
+        new util::Watchdog(timeout, std::bind(&ScannerV2::triggerEvent<scanner_events::StartTimeout>, scanner_)));
   }
   if (event_type == "MonitoringFrameTimeout")
   {
-    return std::unique_ptr<Watchdog>(
-        new Watchdog(timeout, std::bind(&ScannerV2::triggerEvent<scanner_events::MonitoringFrameTimeout>, scanner_)));
+    return std::unique_ptr<util::Watchdog>(new util::Watchdog(
+        timeout, std::bind(&ScannerV2::triggerEvent<scanner_events::MonitoringFrameTimeout>, scanner_)));
   }
 
   // LCOV_EXCL_START

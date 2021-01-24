@@ -50,7 +50,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
 #include "psen_scan_v2_standalone/complete_scan_validator.h"
-#include "psen_scan_v2_standalone/watchdog.h"
+#include "psen_scan_v2_standalone/util/watchdog.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -98,7 +98,8 @@ public:
   virtual ~IWatchdogFactory() = default;
 
 public:
-  virtual std::unique_ptr<Watchdog> create(const Watchdog::Timeout& timeout, const std::string& event_type) = 0;
+  virtual std::unique_ptr<util::Watchdog> create(const util::Watchdog::Timeout& timeout,
+                                                 const std::string& event_type) = 0;
 };
 
 /**
@@ -220,9 +221,9 @@ private:
 private:
   const std::unique_ptr<StateMachineArgs> args_;
 
-  std::unique_ptr<Watchdog> start_reply_watchdog_{};
+  std::unique_ptr<util::Watchdog> start_reply_watchdog_{};
 
-  std::unique_ptr<Watchdog> monitoring_frame_watchdog_{};
+  std::unique_ptr<util::Watchdog> monitoring_frame_watchdog_{};
   data_conversion_layer::monitoring_frame::ScanValidator complete_scan_validator_;
 };
 

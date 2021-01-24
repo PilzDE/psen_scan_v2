@@ -26,6 +26,11 @@
 namespace psen_scan_v2_standalone
 {
 /**
+ * @brief Namespace containing utilities like the watchdog and barrier
+ */
+namespace util
+{
+/**
  * @brief Watchdog which continuously calls the specified timeout handler
  *
  * After the specified timeout time has passed the timeout_handler is called and the timer restarts.
@@ -109,6 +114,7 @@ inline Watchdog::~Watchdog()
   }
 }
 
+}  // namespace util
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_WATCHDOG_H

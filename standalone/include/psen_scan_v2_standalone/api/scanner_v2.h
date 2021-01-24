@@ -31,7 +31,7 @@
 #include "psen_scan_v2_standalone/communication_layer/udp_client.h"
 #include "psen_scan_v2_standalone/raw_scanner_data.h"
 
-#include "psen_scan_v2_standalone/watchdog.h"
+#include "psen_scan_v2_standalone/util/watchdog.h"
 
 /**
  * @brief Root namespace in which the software components to communicate with the scanner (firmware-version: 2)
@@ -100,7 +100,8 @@ private:
   {
   public:
     WatchdogFactory(ScannerV2* scanner);
-    std::unique_ptr<Watchdog> create(const Watchdog::Timeout& timeout, const std::string& event_type) override;
+    std::unique_ptr<util::Watchdog> create(const util::Watchdog::Timeout& timeout,
+                                           const std::string& event_type) override;
 
   private:
     ScannerV2* scanner_;
