@@ -207,6 +207,11 @@ public:  // Definition of state machine via table
 
 private:
   // LCOV_EXCL_START
+  /**
+   * @brief This error is thrown when something goes wrong with the scanner reply.
+   *
+   * For example an unexpected code in reply, request refused by device or unknown operation result code.
+   */
   class InternalScannerReplyError : public std::runtime_error
   {
   public:
