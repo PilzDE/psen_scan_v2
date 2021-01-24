@@ -26,8 +26,8 @@
 
 // Test frameworks
 #include "psen_scan_v2_standalone/mock_console_bridge_output_handler.h"
-#include "psen_scan_v2_standalone/mock_udp_server.h"
-#include "psen_scan_v2_standalone/udp_frame_dumps.h"
+#include "psen_scan_v2_standalone/communication_layer/mock_udp_server.h"
+#include "psen_scan_v2_standalone/communication_layer/udp_frame_dumps.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
 
 // Software under testing

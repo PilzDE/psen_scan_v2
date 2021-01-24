@@ -37,7 +37,7 @@
 
 #include "psen_scan_v2_standalone/logging.h"
 #include "psen_scan_v2_standalone/format_range.h"
-#include "psen_scan_v2_standalone/udp_client.h"
+#include "psen_scan_v2_standalone/communication_layer/udp_client.h"
 
 #include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/laserscan_conversions.h"

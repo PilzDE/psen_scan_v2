@@ -208,7 +208,7 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gmock(unittest_udp_client
-    standalone/test/unit_tests/unittest_udp_client.cpp
+    standalone/test/unit_tests/communication_layer/unittest_udp_client.cpp
   )
   target_link_libraries(unittest_udp_client
     ${catkin_LIBRARIES}

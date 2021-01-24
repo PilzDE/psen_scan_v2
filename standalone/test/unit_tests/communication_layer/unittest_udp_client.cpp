@@ -22,7 +22,7 @@
 #include <gmock/gmock.h>
 
 #include "psen_scan_v2_standalone/raw_scanner_data.h"
-#include "psen_scan_v2_standalone/udp_client.h"
+#include "psen_scan_v2_standalone/communication_layer/udp_client.h"
 
 namespace psen_scan_v2_standalone_test
 {

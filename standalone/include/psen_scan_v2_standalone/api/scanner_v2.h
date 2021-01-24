@@ -28,7 +28,7 @@
 #include "psen_scan_v2_standalone/protocol_layer/scanner_state_machine.h"
 #include "psen_scan_v2_standalone/laserscan.h"
 
-#include "psen_scan_v2_standalone/udp_client.h"
+#include "psen_scan_v2_standalone/communication_layer/udp_client.h"
 #include "psen_scan_v2_standalone/raw_scanner_data.h"
 
 #include "psen_scan_v2_standalone/watchdog.h"
