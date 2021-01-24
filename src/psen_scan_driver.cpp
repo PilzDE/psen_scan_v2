@@ -24,7 +24,7 @@
 #include "psen_scan_v2_standalone/function_pointers.h"
 #include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
 #include "psen_scan_v2_standalone/configuration/scanner_config_builder.h"
-#include "psen_scan_v2_standalone/scan_range.h"
+#include "psen_scan_v2_standalone/configuration/scan_range.h"
 
 #include "psen_scan_v2/ros_parameter_handler.h"
 #include "psen_scan_v2/ros_scanner_node.h"
@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 
   try
   {
-    DefaultScanRange scan_range{
+    configuration::DefaultScanRange scan_range{
       TenthOfDegree::fromRad(DEFAULT_X_AXIS_ROTATION +
                              getOptionalParamFromServer<double>(pnh, PARAM_ANGLE_START, DEFAULT_ANGLE_START)),
       TenthOfDegree::fromRad(DEFAULT_X_AXIS_ROTATION +

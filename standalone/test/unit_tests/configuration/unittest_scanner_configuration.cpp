@@ -24,7 +24,7 @@
 #include "psen_scan_v2_standalone/default_parameters.h"
 #include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
 #include "psen_scan_v2_standalone/configuration/scanner_config_builder.h"
-#include "psen_scan_v2_standalone/scan_range.h"
+#include "psen_scan_v2_standalone/configuration/scan_range.h"
 
 using namespace psen_scan_v2_standalone;
 
@@ -32,7 +32,7 @@ namespace psen_scan_v2_standalone_test
 {
 static constexpr int MINIMAL_PORT_NUMBER{ std::numeric_limits<uint16_t>::min() };
 static constexpr int MAXIMAL_PORT_NUMBER{ std::numeric_limits<uint16_t>::max() };
-static constexpr DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(2750) };
+static constexpr configuration::DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(2750) };
 static const std::string VALID_IP{ "127.0.0.1" };
 static const std::string INVALID_IP{ "invalid_ip" };
 

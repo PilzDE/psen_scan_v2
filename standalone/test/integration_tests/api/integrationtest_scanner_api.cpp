@@ -42,7 +42,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request_serialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_serialization_deserialization.h"
-#include "psen_scan_v2_standalone/scan_range.h"
+#include "psen_scan_v2_standalone/configuration/scan_range.h"
 
 namespace psen_scan_v2_standalone_test
 {
@@ -53,7 +53,7 @@ using MaxSizeUdpRawData = std::array<char, 65507>;
 static const std::string SCANNER_IP_ADDRESS{ "127.0.0.1" };
 static const std::string HOST_IP_ADDRESS{ "127.0.0.1" };
 
-static constexpr DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(60) };
+static constexpr configuration::DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(60) };
 
 static constexpr std::chrono::milliseconds WAIT_TIMEOUT{ 10 };
 static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 3 };

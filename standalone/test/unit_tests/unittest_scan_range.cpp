@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2_standalone/scan_range.h"
+#include "psen_scan_v2_standalone/configuration/scan_range.h"
 
 using namespace psen_scan_v2_standalone;
 
@@ -32,11 +32,12 @@ static constexpr TenthOfDegree VALID_END_ANGLE{ MAX_ALLOWED_ANGLE.value() - 1 };
 static constexpr TenthOfDegree TOO_SMALL_SCAN_ANGLE{ MIN_ALLOWED_ANGLE.value() - 1 };
 static constexpr TenthOfDegree TOO_LARGE_SCAN_ANGLE{ MAX_ALLOWED_ANGLE.value() + 1 };
 
-using TestScanRange = ScanRange<MIN_ALLOWED_ANGLE.value(), MAX_ALLOWED_ANGLE.value()>;
+using TestScanRange = configuration::ScanRange<MIN_ALLOWED_ANGLE.value(), MAX_ALLOWED_ANGLE.value()>;
 
 TEST(ScanRangeTest, testCtorCallForCoverage)
 {
-  std::unique_ptr<DefaultScanRange> ptr{ new DefaultScanRange(MIN_ALLOWED_ANGLE, MAX_ALLOWED_ANGLE) };
+  std::unique_ptr<configuration::DefaultScanRange> ptr{ new configuration::DefaultScanRange(MIN_ALLOWED_ANGLE,
+                                                                                            MAX_ALLOWED_ANGLE) };
 }
 
 TEST(ScanRangeTest, testStartAngleTooSmall)

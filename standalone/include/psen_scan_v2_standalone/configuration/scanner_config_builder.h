@@ -25,7 +25,7 @@
 #include <arpa/inet.h>
 
 #include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
-#include "psen_scan_v2_standalone/scan_range.h"
+#include "psen_scan_v2_standalone/configuration/scan_range.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 
 namespace psen_scan_v2_standalone
@@ -51,7 +51,7 @@ public:
   ScannerConfigurationBuilder& scannerIp(const std::string&);
   ScannerConfigurationBuilder& scannerDataPort(const int&);
   ScannerConfigurationBuilder& scannerControlPort(const int&);
-  ScannerConfigurationBuilder& scanRange(const DefaultScanRange&);
+  ScannerConfigurationBuilder& scanRange(const configuration::DefaultScanRange&);
   ScannerConfigurationBuilder& enableDiagnostics();
 
 private:
@@ -128,7 +128,8 @@ inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scannerControlP
   return *this;
 }
 
-inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scanRange(const DefaultScanRange& scan_range)
+inline ScannerConfigurationBuilder&
+ScannerConfigurationBuilder::scanRange(const configuration::DefaultScanRange& scan_range)
 {
   config_.scan_range_ = scan_range;
   return *this;
