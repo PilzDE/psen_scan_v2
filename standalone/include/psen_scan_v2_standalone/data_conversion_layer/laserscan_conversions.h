@@ -17,7 +17,7 @@
 #define PSEN_SCAN_V2_STANDALONE_LASERSCAN_CONVERSIONS_H
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
-#include "psen_scan_v2_standalone/laserscan.h"
+#include "psen_scan_v2_standalone/api/laserscan.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 
 namespace psen_scan_v2_standalone
@@ -30,14 +30,14 @@ namespace data_conversion_layer
  * @see  data_conversion_layer::monitoring_frame::Message
  * @see ScannerV2
  */
-static LaserScan toLaserScan(const data_conversion_layer::monitoring_frame::Message& frame)
+static api::LaserScan toLaserScan(const data_conversion_layer::monitoring_frame::Message& frame)
 {
   const auto resolution = frame.resolution();
   const auto min_angle = frame.fromTheta();
   const uint16_t number_of_samples = frame.measurements().size();
   const auto max_angle = (frame.fromTheta() + frame.resolution() * number_of_samples);
 
-  LaserScan scan(resolution, min_angle, max_angle);
+  api::LaserScan scan(resolution, min_angle, max_angle);
   scan.setMeasurements(frame.measurements());
   scan.setIntensities(frame.intensities());
 

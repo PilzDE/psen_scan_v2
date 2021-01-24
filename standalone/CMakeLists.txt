@@ -40,7 +40,7 @@ include_directories(
 
 set(${PROJECT_NAME}_sources
   src/api/scanner_v2.cpp
-  src/laserscan.cpp
+  src/api/laserscan.cpp
   src/data_conversion_layer/monitoring_frame_msg.cpp
   src/data_conversion_layer/start_request.cpp
   src/data_conversion_layer/start_request_serialization.cpp

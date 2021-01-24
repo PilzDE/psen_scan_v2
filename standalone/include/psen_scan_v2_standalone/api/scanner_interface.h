@@ -20,7 +20,7 @@
 #include <future>
 #include <functional>
 
-#include "psen_scan_v2_standalone/laserscan.h"
+#include "psen_scan_v2_standalone/api/laserscan.h"
 #include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
 
 namespace psen_scan_v2_standalone
@@ -38,7 +38,7 @@ namespace api
 class IScanner
 {
 public:
-  using LaserScanCallback = std::function<void(const LaserScan&)>;
+  using LaserScanCallback = std::function<void(const api::LaserScan&)>;
 
 public:
   IScanner(const configuration::ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback);

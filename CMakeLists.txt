@@ -223,8 +223,8 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gtest(unittest_laserscan
-    standalone/test/unit_tests/unittest_laserscan.cpp
-    standalone/src/laserscan.cpp
+    standalone/test/unit_tests/api/unittest_laserscan.cpp
+    standalone/src/api/laserscan.cpp
   )
   target_link_libraries(unittest_laserscan
     ${catkin_LIBRARIES}
@@ -232,7 +232,7 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(unittest_laserscan_conversions
     standalone/test/unit_tests/data_conversion_layer/unittest_laserscan_conversions.cpp
-    standalone/src/laserscan.cpp
+    standalone/src/api/laserscan.cpp
     standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
     standalone/src/data_conversion_layer/diagnostics.cpp
   )
@@ -243,7 +243,7 @@ if(CATKIN_ENABLE_TESTING)
 
   catkin_add_gtest(unittest_laserscan_ros_conversions
     test/unit_tests/unittest_laserscan_ros_conversions.cpp
-    standalone/src/laserscan.cpp
+    standalone/src/api/laserscan.cpp
     standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
     standalone/src/data_conversion_layer/diagnostics.cpp
   )
@@ -319,7 +319,7 @@ if(CATKIN_ENABLE_TESTING)
     standalone/test/integration_tests/api/integrationtest_scanner_api.cpp
     standalone/test/src/data_conversion_layer/monitoring_frame_serialization.cpp
     standalone/src/api/scanner_v2.cpp
-    standalone/src/laserscan.cpp
+    standalone/src/api/laserscan.cpp
     standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
     standalone/src/data_conversion_layer/monitoring_frame_deserialization.cpp
     standalone/src/configuration/scanner_configuration.cpp
@@ -338,7 +338,7 @@ if(CATKIN_ENABLE_TESTING)
   add_rostest_gmock(integrationtest_ros_scanner_node
     test/integration_tests/integrationtest_ros_scanner_node.test
     test/integration_tests/integrationtest_ros_scanner_node.cpp
-    standalone/src/laserscan.cpp
+    standalone/src/api/laserscan.cpp
     standalone/src/configuration/scanner_configuration.cpp
     standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
     standalone/src/data_conversion_layer/diagnostics.cpp
@@ -369,7 +369,7 @@ if(CATKIN_ENABLE_TESTING)
     add_rostest_gtest(hwtest_scan_compare
         test/hw_tests/hwtest_scan_compare.test
         test/hw_tests/hwtest_scan_compare.cpp
-        standalone/src/laserscan.cpp
+        standalone/src/api/laserscan.cpp
     )
     target_link_libraries(hwtest_scan_compare
       ${catkin_LIBRARIES}

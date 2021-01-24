@@ -68,7 +68,7 @@ public:
   void terminate();
 
 private:
-  void laserScanCallback(const LaserScan& scan);
+  void laserScanCallback(const api::LaserScan& scan);
 
 private:
   ros::NodeHandle nh_;
@@ -103,7 +103,7 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
 }
 
 template <typename S>
-void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
+void ROSScannerNodeT<S>::laserScanCallback(const api::LaserScan& scan)
 {
   if (scan.getMeasurements().empty())
   {

@@ -35,9 +35,9 @@ const TenthOfDegree ANGLE_END{ data_conversion_layer::degreeToTenthDegree(138) }
 /*
  * This function is used as a callback every time a new laserscan is received.
  */
-void laserScanCallback(const LaserScan& scan)
+void laserScanCallback(const api::LaserScan& scan)
 {
-  const LaserScan::MeasurementData& measures = scan.getMeasurements();
+  const api::LaserScan::MeasurementData& measures = scan.getMeasurements();
 
   if (measures.empty())
   {

@@ -23,7 +23,7 @@
 #include "psen_scan_v2_standalone/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scanner_controller.h"
-#include "psen_scan_v2_standalone/laserscan.h"
+#include "psen_scan_v2_standalone/api/laserscan.h"
 #include "psen_scan_v2_standalone/function_pointers.h"
 
 namespace psen_scan_v2_standalone_test
@@ -42,13 +42,13 @@ public:
   MOCK_METHOD0(sendStartRequest, void());
   MOCK_METHOD0(buildLaserScan, psen_scan_v2_standalone::LaserScan());
 
-  void invokeLaserScanCallback(const psen_scan_v2_standalone::LaserScan& scan);
+  void invokeLaserScanCallback(const psen_scan_v2_standalone::api::LaserScan& scan);
 
 private:
   psen_scan_v2_standalone::LaserScanCallback laser_scan_callback_;
 };
 
-inline void ScannerControllerMock::invokeLaserScanCallback(const psen_scan_v2_standalone::LaserScan& scan)
+inline void ScannerControllerMock::invokeLaserScanCallback(const psen_scan_v2_standalone::api::LaserScan& scan)
 {
   laser_scan_callback_(scan);
 }

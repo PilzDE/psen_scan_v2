@@ -39,7 +39,7 @@
 #include "psen_scan_v2_standalone/format_range.h"
 #include "psen_scan_v2_standalone/communication_layer/udp_client.h"
 
-#include "psen_scan_v2_standalone/laserscan.h"
+#include "psen_scan_v2_standalone/api/laserscan.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/laserscan_conversions.h"
 
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request.h"
@@ -82,7 +82,7 @@ static constexpr uint32_t DEFAULT_NUM_MSG_PER_ROUND{ 6 };
 
 using ScannerStartedCB = std::function<void()>;
 using ScannerStoppedCB = std::function<void()>;
-using InformUserAboutLaserScanCB = std::function<void(const LaserScan&)>;
+using InformUserAboutLaserScanCB = std::function<void(const api::LaserScan&)>;
 
 /**
  * @brief Interface to create event timeout handlers.

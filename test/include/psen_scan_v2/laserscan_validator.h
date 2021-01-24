@@ -27,7 +27,7 @@
 // #include <ros/ros.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
-#include "psen_scan_v2_standalone/laserscan.h"
+#include "psen_scan_v2_standalone/api/laserscan.h"
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 
@@ -35,7 +35,7 @@
 
 namespace psen_scan_v2_test
 {
-void addScanToBin(const psen_scan_v2_standalone::LaserScan& scan, std::map<int16_t, NormalDist>& bin)
+void addScanToBin(const psen_scan_v2_standalone::api::LaserScan& scan, std::map<int16_t, NormalDist>& bin)
 {
   for (size_t i = 0; i < scan.getMeasurements().size(); ++i)
   {

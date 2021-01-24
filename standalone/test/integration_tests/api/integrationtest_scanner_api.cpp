@@ -196,7 +196,7 @@ ACTION_P(OpenBarrier, barrier)
 class UserCallbacks
 {
 public:
-  MOCK_METHOD1(LaserScanCallback, void(const LaserScan&));
+  MOCK_METHOD1(LaserScanCallback, void(const api::LaserScan&));
 };
 
 class ScannerMock

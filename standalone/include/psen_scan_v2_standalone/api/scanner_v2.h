@@ -26,7 +26,7 @@
 #include "psen_scan_v2_standalone/api/scanner_interface.h"
 #include "psen_scan_v2_standalone/protocol_layer/scanner_events.h"
 #include "psen_scan_v2_standalone/protocol_layer/scanner_state_machine.h"
-#include "psen_scan_v2_standalone/laserscan.h"
+#include "psen_scan_v2_standalone/api/laserscan.h"
 
 #include "psen_scan_v2_standalone/communication_layer/udp_client.h"
 #include "psen_scan_v2_standalone/raw_scanner_data.h"

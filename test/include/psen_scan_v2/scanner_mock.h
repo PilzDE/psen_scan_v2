@@ -22,7 +22,7 @@
 
 #include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
 #include "psen_scan_v2_standalone/function_pointers.h"
-#include "psen_scan_v2_standalone/laserscan.h"
+#include "psen_scan_v2_standalone/api/laserscan.h"
 
 namespace psen_scan_v2_test
 {
@@ -36,13 +36,13 @@ public:
   MOCK_METHOD0(start, std::future<void>());
   MOCK_METHOD0(stop, std::future<void>());
 
-  void invokeLaserScanCallback(const psen_scan_v2_standalone::LaserScan& scan);
+  void invokeLaserScanCallback(const psen_scan_v2_standalone::api::LaserScan& scan);
 
 private:
   psen_scan_v2_standalone::LaserScanCallback laser_scan_callback_;
 };
 
-inline void ScannerMock::invokeLaserScanCallback(const psen_scan_v2_standalone::LaserScan& scan)
+inline void ScannerMock::invokeLaserScanCallback(const psen_scan_v2_standalone::api::LaserScan& scan)
 {
   laser_scan_callback_(scan);
 }

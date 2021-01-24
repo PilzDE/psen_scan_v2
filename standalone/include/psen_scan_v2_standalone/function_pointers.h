@@ -19,7 +19,7 @@
 #include <functional>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
-#include "psen_scan_v2_standalone/laserscan.h"
+#include "psen_scan_v2_standalone/api/laserscan.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -27,7 +27,7 @@ using SendRequestCallback = std::function<void()>;
 using ReplyCallback = std::function<void()>;
 using MonitoringFrameCallback = std::function<void(const data_conversion_layer::monitoring_frame::Message&)>;
 using ErrorCallback = std::function<void(const std::string&)>;
-using LaserScanCallback = std::function<void(const LaserScan&)>;
+using LaserScanCallback = std::function<void(const api::LaserScan&)>;
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_FUNCTION_POINTERS_H
