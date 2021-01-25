@@ -22,7 +22,7 @@
 #include <string>
 #include <limits>
 
-#include <arpa/inet.h>
+#include <WinSock2.h>
 
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scan_range.h"
@@ -67,8 +67,8 @@ inline ScannerConfiguration ScannerConfigurationBuilder::build() const
 
 uint32_t ScannerConfigurationBuilder::convertIP(const std::string& ip)
 {
-  const auto ip_number = inet_network(ip.c_str());
-  if (static_cast<in_addr_t>(-1) == ip_number)
+  const auto ip_number = inet_addr(ip.c_str());
+  if (INADDR_NONE == ip_number)
   {
     throw std::invalid_argument("IP invalid");
   }
