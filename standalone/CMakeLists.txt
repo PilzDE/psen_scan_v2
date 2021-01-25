@@ -18,9 +18,14 @@ project(psen_scan_v2_standalone)
 
 add_compile_options(-std=c++14)
 add_compile_options(-Wall)
-add_compile_options(-Wextra)
-add_compile_options(-Wno-unused-parameter)
-add_compile_options(-Werror)
+if (UNIX)
+  add_compile_options(-Wextra)
+  add_compile_options(-Wno-unused-parameter)
+  add_compile_options(-Werror)
+endif (UNIX)
+if (WIN32)
+  add_definitions(-DNOMINMAX)
+endif (WIN32)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
