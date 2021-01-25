@@ -24,7 +24,7 @@
 #include <thread>
 #include <future>
 
-#include <arpa/inet.h>
+#include <WinSock2.h>
 
 #include <boost/asio.hpp>
 #include <boost/asio/high_resolution_timer.hpp>
