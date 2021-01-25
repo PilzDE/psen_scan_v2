@@ -16,6 +16,7 @@
 #include <string>
 #include <cassert>
 #include <iostream>
+#include <Windows.h>
 
 #include <boost/crc.hpp>
 
@@ -51,7 +52,7 @@ RawData start_request::serialize(const start_request::Message& msg, const uint32
   raw_processing::write(os, start_request::OPCODE);
 
   /**< Byte order: big endian */
-  const uint32_t host_ip_big_endian = htobe32(msg.host_ip_);
+  const uint32_t host_ip_big_endian = _byteswap_ulong(msg.host_ip_);
   raw_processing::write(os, host_ip_big_endian);
 
   /**< Byte order: big endian */
