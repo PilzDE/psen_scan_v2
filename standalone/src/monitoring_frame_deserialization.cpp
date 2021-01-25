@@ -73,7 +73,7 @@ monitoring_frame::Message deserialize(const RawData& data, const std::size_t& nu
                           additional_header.length(),
                           NUMBER_OF_BYTES_SCAN_COUNTER));
         }
-        raw_processing::read<uint32_t, boost::optional<uint32_t>>(is, msg.scan_counter_);
+        raw_processing::read2<uint32_t, boost::optional<uint32_t>>(is, msg.scan_counter_);
         break;
 
       case additional_field::HeaderID::measurements:
@@ -174,8 +174,8 @@ FixedFields readFixedFields(std::istringstream& is)
   raw_processing::read(is, transaction_type);
   raw_processing::read(is, scanner_id);
 
-  raw_processing::read<int16_t, TenthOfDegree>(is, from_theta);
-  raw_processing::read<int16_t, TenthOfDegree>(is, resolution);
+  raw_processing::read2<int16_t, TenthOfDegree>(is, from_theta);
+  raw_processing::read2<int16_t, TenthOfDegree>(is, resolution);
 
   // LCOV_EXCL_START
   if (OP_CODE_MONITORING_FRAME != op_code)

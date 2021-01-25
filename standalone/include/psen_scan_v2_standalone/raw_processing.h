@@ -58,7 +58,7 @@ inline void read(std::istringstream& is, T& data)
 }
 
 template <typename RawType, typename ReturnType>
-inline void read(std::istringstream& is, ReturnType& data, std::function<ReturnType(RawType)> conversion_fcn)
+inline void read2(std::istringstream& is, ReturnType& data, std::function<ReturnType(RawType)> conversion_fcn)
 {
   RawType raw_data;
   read<RawType>(is, raw_data);
@@ -67,9 +67,9 @@ inline void read(std::istringstream& is, ReturnType& data, std::function<ReturnT
 }
 
 template <typename RawType, typename ReturnType>
-inline void read(std::istringstream& is, ReturnType& data)
+inline void read2(std::istringstream& is, ReturnType& data)
 {
-  read<RawType, ReturnType>(is, data, [](const RawType& raw_data) { return ReturnType(raw_data); });
+  read2<RawType, ReturnType>(is, data, [](const RawType& raw_data) { return ReturnType(raw_data); });
 }
 
 template <typename RawType, typename ReturnType>
@@ -82,7 +82,7 @@ inline void readArray(std::istringstream& is,
 
   std::generate_n(std::back_inserter(data), number_of_samples, [&is, &conversion_fcn]() {
     ReturnType sample;
-    raw_processing::read<RawType, ReturnType>(is, sample, conversion_fcn);
+    raw_processing::read2<RawType, ReturnType>(is, sample, conversion_fcn);
     return sample;
   });
 }
