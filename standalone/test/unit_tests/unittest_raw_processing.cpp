@@ -46,7 +46,7 @@ TYPED_TEST(RawProcessingTest, write)
 
   TypeParam data_returned;
   std::string data_str(os.str());
-  std::copy(data_str.begin(), data_str.end(), &data_returned);
+  std::copy(data_str.begin(), data_str.end(), reinterpret_cast<char*>(&data_returned));
   EXPECT_EQ(data_returned, data);
 }
 
