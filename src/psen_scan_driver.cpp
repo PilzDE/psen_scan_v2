@@ -21,7 +21,7 @@
 #include <ros/ros.h>
 
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
-#include "psen_scan_v2_standalone/function_pointers.h"
+#include "psen_scan_v2_standalone/protocol_layer/function_pointers.h"
 #include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
 #include "psen_scan_v2_standalone/configuration/scanner_config_builder.h"
 #include "psen_scan_v2_standalone/configuration/scan_range.h"
