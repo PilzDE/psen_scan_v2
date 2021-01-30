@@ -27,7 +27,7 @@
 #include <bitset>
 #include <boost/optional.hpp>
 
-#include "psen_scan_v2_standalone/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 #include "psen_scan_v2_standalone/scanner_ids.h"
@@ -110,8 +110,8 @@ private:
   bool diagnostic_data_enabled_{ false };
 
 public:
-  friend RawData serialize(const data_conversion_layer::monitoring_frame::Message& frame);
-  friend data_conversion_layer::monitoring_frame::Message deserialize(const RawData& data,
+  friend data_conversion_layer::RawData serialize(const data_conversion_layer::monitoring_frame::Message& frame);
+  friend data_conversion_layer::monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data,
                                                                       const std::size_t& num_bytes);
 };
 

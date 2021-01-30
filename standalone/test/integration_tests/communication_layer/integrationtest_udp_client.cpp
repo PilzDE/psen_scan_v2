@@ -24,7 +24,7 @@
 #include <gmock/gmock.h>
 
 #include "psen_scan_v2_standalone/util/async_barrier.h"
-#include "psen_scan_v2_standalone/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/communication_layer/udp_client.h"
 
 #include "psen_scan_v2_standalone/communication_layer/mock_udp_server.h"
@@ -50,10 +50,11 @@ class UdpClientTests : public testing::Test
 {
 public:
   UdpClientTests();
-  MOCK_METHOD2(handleNewData, void(const RawData&, const std::size_t&));
+  MOCK_METHOD2(handleNewData, void(const data_conversion_layer::RawData&, const std::size_t&));
   MOCK_METHOD1(handleError, void(const std::string&));
 
-  MOCK_METHOD2(receivedUdpMsg, void(const udp::endpoint&, const psen_scan_v2_standalone::RawData&));
+  MOCK_METHOD2(receivedUdpMsg,
+               void(const udp::endpoint&, const psen_scan_v2_standalone::data_conversion_layer::RawData&));
 
 public:
   void sendTestDataToClient();
@@ -69,7 +70,7 @@ protected:
       inet_network(UDP_MOCK_IP_ADDRESS.c_str()),
       UDP_MOCK_PORT) };
 
-  const RawData send_array_{ 'H', 'e', 'l', 'l', 'o' };
+  const data_conversion_layer::RawData send_array_{ 'H', 'e', 'l', 'l', 'o' };
   const udp::endpoint host_endpoint;
 };
 
@@ -85,7 +86,7 @@ void UdpClientTests::sendTestDataToClient()
 
 void UdpClientTests::sendEmptyTestDataToClient()
 {
-  const psen_scan_v2_standalone::RawData data;
+  const psen_scan_v2_standalone::data_conversion_layer::RawData data;
   assert(data.empty());
   mock_udp_server_.asyncSend(host_endpoint, data);
 }
@@ -136,7 +137,7 @@ TEST_F(UdpClientTests, testErrorHandlingForReceive)
 TEST_F(UdpClientTests, testWriteOperation)
 {
   std::string str = "Hello!";
-  RawData write_buf;
+  data_conversion_layer::RawData write_buf;
   std::copy(str.begin(), str.end(), std::back_inserter(write_buf));
 
   util::Barrier server_mock_received_data_barrier;
@@ -151,7 +152,7 @@ TEST_F(UdpClientTests, testWriteOperation)
 TEST_F(UdpClientTests, testWritingWhileReceiving)
 {
   std::string str = "Hello!";
-  RawData write_buf;
+  data_conversion_layer::RawData write_buf;
   std::copy(str.begin(), str.end(), std::back_inserter(write_buf));
 
   util::Barrier client_received_data_barrier;

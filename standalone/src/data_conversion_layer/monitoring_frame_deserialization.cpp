@@ -48,7 +48,7 @@ FixedFields::FixedFields(DeviceStatus device_status,
 {
 }
 
-monitoring_frame::Message deserialize(const RawData& data, const std::size_t& num_bytes)
+monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data, const std::size_t& num_bytes)
 {
   data_conversion_layer::monitoring_frame::Message msg;
 

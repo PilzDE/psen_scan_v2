@@ -20,7 +20,7 @@
 
 #include <boost/crc.hpp>
 
-#include "psen_scan_v2_standalone/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_msg.h"
 
@@ -40,7 +40,7 @@ public:
   CRCMismatch(const std::string& msg = "CRC did not match!");
 };
 
-Message deserialize(const RawData& data);
+Message deserialize(const data_conversion_layer::RawData& data);
 
 RawData serialize(const Message& reply);
 RawData serialize(const uint32_t op_code, const uint32_t res_code);

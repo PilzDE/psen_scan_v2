@@ -22,7 +22,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request_serialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
-#include "psen_scan_v2_standalone/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -37,7 +37,7 @@ static constexpr uint32_t DEFAULT_SEQ_NUMBER{ 0 };
 static const uint32_t OPCODE{ htole32(0x35) };
 }  // namespace start_request
 
-uint32_t calculateCRC(const RawData& data)
+uint32_t calculateCRC(const data_conversion_layer::RawData& data)
 {
   boost::crc_32_type crc;
   crc.process_bytes(&data.at(0), data.size());
@@ -97,13 +97,13 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
   }
 
   const std::string raw_data_as_str{ os.str() };
-  const RawData raw_data(raw_data_as_str.cbegin(), raw_data_as_str.cend());
+  const data_conversion_layer::RawData raw_data(raw_data_as_str.cbegin(), raw_data_as_str.cend());
 
   std::ostringstream os_crc;
   raw_processing::write(os_crc, calculateCRC(raw_data));
 
   std::string raw_data_with_crc_str(os_crc.str() + os.str());
-  RawData raw_data_with_crc{ raw_data_with_crc_str.cbegin(), raw_data_with_crc_str.cend() };
+  data_conversion_layer::RawData raw_data_with_crc{ raw_data_with_crc_str.cbegin(), raw_data_with_crc_str.cend() };
 
   assert(raw_data_with_crc.size() == SIZE && "Message data of start request has not the expected size");
 

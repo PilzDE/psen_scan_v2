@@ -213,8 +213,10 @@ public:
   }
 
 public:
-  MOCK_METHOD2(receiveControlMsg, void(const udp::endpoint&, const psen_scan_v2_standalone::RawData&));
-  MOCK_METHOD2(receiveDataMsg, void(const udp::endpoint&, const psen_scan_v2_standalone::RawData&));
+  MOCK_METHOD2(receiveControlMsg,
+               void(const udp::endpoint&, const psen_scan_v2_standalone::data_conversion_layer::RawData&));
+  MOCK_METHOD2(receiveDataMsg,
+               void(const udp::endpoint&, const psen_scan_v2_standalone::data_conversion_layer::RawData&));
 
 public:
   void startListeningForControlMsg();
@@ -299,7 +301,7 @@ void ScannerMock::sendMonitoringFrame(const data_conversion_layer::monitoring_fr
 
 void ScannerMock::sendEmptyMonitoringFrame()
 {
-  psen_scan_v2_standalone::RawData data;
+  psen_scan_v2_standalone::data_conversion_layer::RawData data;
   assert(data.empty());
   data_server_.asyncSend(monitoring_frame_receiver_, data);
 }

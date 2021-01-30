@@ -19,7 +19,7 @@
 #include <gmock/gmock.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_msg.h"
-#include "psen_scan_v2_standalone/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/udp_client.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 
@@ -65,10 +65,10 @@ public:
   // "Simulates" function call which uses default values
   MOCK_METHOD0(startAsyncReceiving, void());
   MOCK_METHOD1(startAsyncReceiving, void(const ReceiveMode& modi));
-  MOCK_METHOD1(write, void(const RawData& data));
+  MOCK_METHOD1(write, void(const data_conversion_layer::RawData& data));
 
 private:
-  void handleNewData(const RawData& received_data, const std::size_t& bytes_received);
+  void handleNewData(const data_conversion_layer::RawData& received_data, const std::size_t& bytes_received);
 
 private:
   NewDataHandler data_handler_;
@@ -80,7 +80,7 @@ void MockUdpClient::sendStartReply()
 {
   const ScannerReplyMsg msg(OP_CODE_START, RES_CODE_ACCEPTED);
   const auto data{ msg.serialize() };
-  RawData raw_data;
+  data_conversion_layer::RawData raw_data;
   std::copy_n(data.begin(), data.size(), std::back_inserter(raw_data));
 
   handleNewData(raw_data, raw_data.size());
@@ -90,7 +90,7 @@ void MockUdpClient::sendStopReply()
 {
   const ScannerReplyMsg msg(OP_CODE_STOP, RES_CODE_ACCEPTED);
   const auto data{ msg.serialize() };
-  RawData raw_data;
+  data_conversion_layer::RawData raw_data;
   std::copy_n(data.begin(), data.size(), std::back_inserter(raw_data));
 
   handleNewData(raw_data, raw_data.size());
@@ -98,11 +98,12 @@ void MockUdpClient::sendStopReply()
 
 void MockUdpClient::sendMonitoringFrame(monitoring_frame::Message& msg)
 {
-  const RawData msg_raw = convertToRawData(serialize(msg));
+  const data_conversion_layer::RawData msg_raw = convertToRawData(serialize(msg));
   handleNewData(msg_raw, msg_raw.size());
 }
 
-void MockUdpClient::handleNewData(const RawData& received_data, const std::size_t& bytes_received)
+void MockUdpClient::handleNewData(const data_conversion_layer::RawData& received_data,
+                                  const std::size_t& bytes_received)
 {
   data_handler_(received_data, bytes_received);
 }

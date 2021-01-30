@@ -16,7 +16,7 @@
 #define PSEN_SCAN_V2_STANDALONE_START_REQUEST_SERIALIZATION_H
 
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request.h"
-#include "psen_scan_v2_standalone/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 
 namespace psen_scan_v2_standalone
 {

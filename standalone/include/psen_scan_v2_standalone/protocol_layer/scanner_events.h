@@ -15,7 +15,7 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_EVENTS_H
 #define PSEN_SCAN_V2_STANDALONE_EVENTS_H
 
-#include "psen_scan_v2_standalone/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -48,12 +48,13 @@ class StartTimeout
 class RawReplyReceived
 {
 public:
-  RawReplyReceived(const RawData& data, const std::size_t& num_bytes) : data_(data), num_bytes_(num_bytes)
+  RawReplyReceived(const data_conversion_layer::RawData& data, const std::size_t& num_bytes)
+    : data_(data), num_bytes_(num_bytes)
   {
   }
 
 public:
-  const RawData data_;
+  const data_conversion_layer::RawData data_;
   const std::size_t num_bytes_;
 };
 
@@ -66,12 +67,13 @@ class ReplyReceiveError
 class RawMonitoringFrameReceived
 {
 public:
-  RawMonitoringFrameReceived(const RawData& data, const std::size_t& num_bytes) : data_(data), num_bytes_(num_bytes)
+  RawMonitoringFrameReceived(const data_conversion_layer::RawData& data, const std::size_t& num_bytes)
+    : data_(data), num_bytes_(num_bytes)
   {
   }
 
 public:
-  const RawData data_;
+  const data_conversion_layer::RawData data_;
   const std::size_t num_bytes_;
 };
 

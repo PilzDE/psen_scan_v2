@@ -23,7 +23,7 @@
 #include "psen_scan_v2_standalone/api/laserscan.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/laserscan_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
-#include "psen_scan_v2_standalone/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
 

@@ -18,7 +18,7 @@
 #include <array>
 #include <cstdint>
 
-#include "psen_scan_v2_standalone/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/configuration/scan_range.h"
 #include "psen_scan_v2_standalone/scanner_ids.h"
 #include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
@@ -44,8 +44,9 @@ class Message
 public:
   Message(const configuration::ScannerConfiguration& scanner_configuration);
 
-  friend RawData serialize(const data_conversion_layer::start_request::Message&, const uint32_t&);
-  friend RawData serialize(const data_conversion_layer::start_request::Message&);
+  friend data_conversion_layer::RawData serialize(const data_conversion_layer::start_request::Message&,
+                                                  const uint32_t&);
+  friend data_conversion_layer::RawData serialize(const data_conversion_layer::start_request::Message&);
 
 private:
   /**

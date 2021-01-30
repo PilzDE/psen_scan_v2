@@ -47,7 +47,7 @@ RawData data_conversion_layer::scanner_reply::serialize(const uint32_t op_code, 
   const std::string data_str(os.str());
   assert(data_str.length() == data_conversion_layer::scanner_reply::Message::SIZE &&
          "Message data of start reply has not the expected size");
-  return RawData(data_str.cbegin(), data_str.cend());
+  return data_conversion_layer::RawData(data_str.cbegin(), data_str.cend());
 }
 
 RawData data_conversion_layer::scanner_reply::serialize(const Message& reply)
@@ -55,7 +55,7 @@ RawData data_conversion_layer::scanner_reply::serialize(const Message& reply)
   return serialize(static_cast<uint32_t>(reply.type()), static_cast<uint32_t>(reply.result()));
 }
 
-scanner_reply::Message data_conversion_layer::scanner_reply::deserialize(const RawData& data)
+scanner_reply::Message data_conversion_layer::scanner_reply::deserialize(const data_conversion_layer::RawData& data)
 {
   std::istringstream is(std::string(data.data(), Message::SIZE));
 

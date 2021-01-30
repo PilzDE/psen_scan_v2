@@ -30,7 +30,7 @@
 #include <boost/asio/high_resolution_timer.hpp>
 #include <boost/bind.hpp>
 
-#include "psen_scan_v2_standalone/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/util/logging.h"
 
 namespace psen_scan_v2_standalone
@@ -40,7 +40,7 @@ namespace psen_scan_v2_standalone
  */
 namespace communication_layer
 {
-using NewDataHandler = std::function<void(const RawData&, const std::size_t&)>;
+using NewDataHandler = std::function<void(const data_conversion_layer::RawData&, const std::size_t&)>;
 using ErrorHandler = std::function<void(const std::string&)>;
 using TimeoutHandler = std::function<void(const std::string&)>;
 
@@ -120,7 +120,7 @@ public:
    *
    * @param data Data which have to be send to the other endpoint.
    */
-  void write(const RawData& data);
+  void write(const data_conversion_layer::RawData& data);
 
   /**
    * @brief Closes the UDP connection and stops all pending asynchronous operation.
@@ -138,7 +138,7 @@ private:
   boost::asio::io_service::work work_{ io_service_ };
   std::thread io_service_thread_;
 
-  RawData received_data_;
+  data_conversion_layer::RawData received_data_;
 
   NewDataHandler data_handler_;
   ErrorHandler error_handler_;
@@ -167,7 +167,7 @@ inline communication_layer::UdpClientImpl::UdpClientImpl(const NewDataHandler& d
     throw std::invalid_argument("Error handler is invalid");
   }
 
-  received_data_.resize(psen_scan_v2_standalone::MAX_UDP_PAKET_SIZE);
+  received_data_.resize(psen_scan_v2_standalone::data_conversion_layer::MAX_UDP_PAKET_SIZE);
   try
   {
     socket_.connect(endpoint_);
@@ -237,7 +237,7 @@ inline void UdpClientImpl::sendCompleteHandler(const boost::system::error_code& 
   PSENSCAN_DEBUG("UdpClient", "Data successfully send.");
 }
 
-inline void UdpClientImpl::write(const RawData& data)
+inline void UdpClientImpl::write(const data_conversion_layer::RawData& data)
 {
   io_service_.post([this, data]() {
     socket_.async_send(boost::asio::buffer(data.data(), data.size()),

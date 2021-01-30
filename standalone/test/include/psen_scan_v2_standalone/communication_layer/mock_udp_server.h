@@ -25,7 +25,7 @@
 #include <boost/bind.hpp>
 #include <boost/array.hpp>
 
-#include "psen_scan_v2_standalone/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 
 using boost::asio::ip::udp;
 
@@ -53,7 +53,8 @@ public:
   };
 
 public:
-  using NewDataHandler = std::function<void(const udp::endpoint&, const psen_scan_v2_standalone::RawData&)>;
+  using NewDataHandler =
+      std::function<void(const udp::endpoint&, const psen_scan_v2_standalone::data_conversion_layer::RawData&)>;
 
 public:
   ~MockUDPServer();
@@ -64,7 +65,8 @@ public:
 public:
   void asyncReceive(const ReceiveMode& modi = ReceiveMode::single);
 
-  void asyncSend(const udp::endpoint& receiver_of_data, const psen_scan_v2_standalone::RawData& data);
+  void asyncSend(const udp::endpoint& receiver_of_data,
+                 const psen_scan_v2_standalone::data_conversion_layer::RawData& data);
 
 private:
   void handleSend(const boost::system::error_code& error, std::size_t bytes_transferred);
@@ -75,7 +77,7 @@ private:
 private:
   udp::endpoint remote_endpoint_;
 
-  psen_scan_v2_standalone::RawData recv_buffer_;
+  psen_scan_v2_standalone::data_conversion_layer::RawData recv_buffer_;
 
   boost::asio::io_service io_service_;
   // Prevent the run() method of the io_service from returning when there is no more work.
@@ -96,7 +98,7 @@ MockUDPServer::MockUDPServer(const unsigned short port, const NewDataHandler& ne
     throw std::invalid_argument("New data handler must not be null");
   }
 
-  recv_buffer_.resize(psen_scan_v2_standalone::MAX_UDP_PAKET_SIZE);
+  recv_buffer_.resize(psen_scan_v2_standalone::data_conversion_layer::MAX_UDP_PAKET_SIZE);
   io_service_thread_ = std::thread([this]() { io_service_.run(); });
 }
 
@@ -119,7 +121,8 @@ void MockUDPServer::handleSend(const boost::system::error_code& error, std::size
   std::cout << "MockUDPServer: Data successfully send" << std::endl;
 }
 
-void MockUDPServer::asyncSend(const udp::endpoint& receiver_of_data, const psen_scan_v2_standalone::RawData& data)
+void MockUDPServer::asyncSend(const udp::endpoint& receiver_of_data,
+                              const psen_scan_v2_standalone::data_conversion_layer::RawData& data)
 {
   io_service_.post([this, receiver_of_data, data]() {
     socket_.async_send_to(boost::asio::buffer(data.data(), data.size()),
@@ -147,7 +150,8 @@ void MockUDPServer::handleReceive(const ReceiveMode& modi,
     return;
   }
 
-  const psen_scan_v2_standalone::RawData recv_data(recv_buffer_.cbegin(), recv_buffer_.cbegin() + bytes_received);
+  const psen_scan_v2_standalone::data_conversion_layer::RawData recv_data(recv_buffer_.cbegin(),
+                                                                          recv_buffer_.cbegin() + bytes_received);
   new_data_handler_(remote_endpoint_, recv_data);
   if (modi == ReceiveMode::continuous)
   {

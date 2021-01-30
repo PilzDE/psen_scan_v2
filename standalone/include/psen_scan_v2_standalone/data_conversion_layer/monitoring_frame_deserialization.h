@@ -17,7 +17,7 @@
 
 #include <ostream>
 
-#include "psen_scan_v2_standalone/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/util/logging.h"
@@ -133,7 +133,7 @@ enum class AdditionalFieldHeaderID : AdditionalFieldHeader::Id
 
 AdditionalFieldHeader readAdditionalField(std::istringstream& is, const std::size_t& max_num_bytes);
 
-monitoring_frame::Message deserialize(const RawData& data, const std::size_t& num_bytes);
+monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data, const std::size_t& num_bytes);
 FixedFields readFixedFields(std::istringstream& is);
 namespace diagnostic
 {

@@ -15,14 +15,14 @@
 #ifndef PSEN_SCAN_V2_RAW_DATA_ARRAY_CONVERSION_H
 #define PSEN_SCAN_V2_RAW_DATA_ARRAY_CONVERSION_H
 
-#include "psen_scan_v2_standalone/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 
 namespace psen_scan_v2_standalone_test
 {
 template <typename T>
-inline psen_scan_v2_standalone::RawData convertToRawData(const T data)
+inline psen_scan_v2_standalone::data_conversion_layer::RawData convertToRawData(const T data)
 {
-  psen_scan_v2_standalone::RawData ret(data.begin(), data.end());
+  psen_scan_v2_standalone::data_conversion_layer::RawData ret(data.begin(), data.end());
 
   for (size_t i = 0; i < data.size(); i++)
   {

@@ -168,7 +168,7 @@ protected:
   }
 
 protected:
-  RawData with_intensities_raw_;
+  data_conversion_layer::RawData with_intensities_raw_;
   scanner_udp_datagram_hexdumps::WithIntensitiesAndDiagnostics with_intensities_;
 };
 

@@ -21,7 +21,7 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2_standalone/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_serialization_deserialization.h"
 
@@ -84,7 +84,7 @@ TEST(ScannerReplyMsgTest, testdeserializeValidCRC)
   const Message msg(Message::Type::start, Message::OperationResult::accepted);
   const auto raw_msg{ data_conversion_layer::scanner_reply::serialize(msg) };
 
-  const RawData data(raw_msg.begin(), raw_msg.end());
+  const data_conversion_layer::RawData data(raw_msg.begin(), raw_msg.end());
 
   // Check equality by comparing crc checksums
   boost::crc_32_type crc;
@@ -99,7 +99,7 @@ TEST(ScannerReplyMsgTest, testdeserializeInvalidCRC)
   auto raw_msg{ data_conversion_layer::scanner_reply::serialize(msg) };
   raw_msg.at(0) += 0x01;  // alter crc checksum
 
-  const RawData data(raw_msg.begin(), raw_msg.end());
+  const data_conversion_layer::RawData data(raw_msg.begin(), raw_msg.end());
   EXPECT_THROW(data_conversion_layer::scanner_reply::deserialize(data),
                data_conversion_layer::scanner_reply::CRCMismatch);
 }
