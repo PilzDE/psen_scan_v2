@@ -31,8 +31,9 @@ std::ostream&
 operator<<(std::ostream& os,
            const psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::diagnostic::Message& msg)
 {
-  os << fmt::format(
-      "Device: {} - {}", scanner_id_to_string.at(msg.getScannerId()), error_code_to_string.at(msg.getDiagnosticCode()));
+  os << fmt::format("Device: {} - {}",
+                    configuration::scanner_id_to_string.at(msg.getScannerId()),
+                    error_code_to_string.at(msg.getDiagnosticCode()));
 
   if (isAmbiguous(msg.getDiagnosticCode()))
   {

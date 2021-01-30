@@ -83,7 +83,8 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& frame)
   return data_conversion_layer::raw_processing::toArray<RawData>(os);
 }
 
-constexpr size_t calculateIndexInRawDiagnosticData(const ScannerId& id, const diagnostic::ErrorLocation& location)
+constexpr size_t calculateIndexInRawDiagnosticData(const configuration::ScannerId& id,
+                                                   const diagnostic::ErrorLocation& location)
 {
   return diagnostic::RAW_CHUNK_UNUSED_OFFSET_IN_BYTES +
          (static_cast<uint8_t>(id) * diagnostic::RAW_CHUNK_LENGTH_FOR_ONE_DEVICE_IN_BYTES) + location.getByte();

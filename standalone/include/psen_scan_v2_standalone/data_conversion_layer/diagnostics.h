@@ -22,7 +22,7 @@
 #include <vector>
 #include <set>
 
-#include "psen_scan_v2_standalone/scanner_ids.h"
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -45,7 +45,7 @@ namespace diagnostic
 static constexpr uint32_t RAW_CHUNK_LENGTH_FOR_ONE_DEVICE_IN_BYTES{ 9 };
 static constexpr uint32_t RAW_CHUNK_UNUSED_OFFSET_IN_BYTES{ 4 };
 static constexpr uint32_t RAW_CHUNK_LENGTH_IN_BYTES{
-  RAW_CHUNK_UNUSED_OFFSET_IN_BYTES + RAW_CHUNK_LENGTH_FOR_ONE_DEVICE_IN_BYTES * VALID_SCANNER_IDS.size()
+  RAW_CHUNK_UNUSED_OFFSET_IN_BYTES + RAW_CHUNK_LENGTH_FOR_ONE_DEVICE_IN_BYTES * configuration::VALID_SCANNER_IDS.size()
 };
 using RawChunk = std::array<uint8_t, diagnostic::RAW_CHUNK_LENGTH_IN_BYTES>;
 
@@ -178,12 +178,12 @@ private:
 class Message
 {
 public:
-  constexpr Message(const ScannerId& id, const diagnostic::ErrorLocation& location);
+  constexpr Message(const configuration::ScannerId& id, const diagnostic::ErrorLocation& location);
   constexpr bool operator==(const diagnostic::Message& rhs) const;
 
   friend RawChunk serialize(const std::vector<diagnostic::Message>& messages);
 
-  constexpr ScannerId getScannerId() const
+  constexpr configuration::ScannerId getScannerId() const
   {
     return id_;
   }
@@ -199,11 +199,11 @@ public:
   }
 
 private:
-  ScannerId id_;
+  configuration::ScannerId id_;
   ErrorLocation error_location_;
 };
 
-constexpr inline Message::Message(const ScannerId& id, const ErrorLocation& location)
+constexpr inline Message::Message(const configuration::ScannerId& id, const ErrorLocation& location)
   : id_(id), error_location_(location)
 {
 }

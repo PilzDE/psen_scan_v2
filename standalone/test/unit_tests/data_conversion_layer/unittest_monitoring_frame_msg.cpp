@@ -81,7 +81,8 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareEqualIntensitiesSucces)
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+          configuration::ScannerId::master,
+          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   const data_conversion_layer::monitoring_frame::Message msg1(
       util::TenthOfDegree(100),
       util::TenthOfDegree(10),
@@ -89,7 +90,8 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareEqualIntensitiesSucces)
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+          configuration::ScannerId::master,
+          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   EXPECT_EQ(msg0, msg1);
 }
 
@@ -120,7 +122,8 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareMeasurementsNotEqual)
       { 1, 42, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+          configuration::ScannerId::master,
+          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   const data_conversion_layer::monitoring_frame::Message msg1(
       util::TenthOfDegree(100),
       util::TenthOfDegree(10),
@@ -128,7 +131,8 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareMeasurementsNotEqual)
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+          configuration::ScannerId::master,
+          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
                              << "\nexpected to be false but was true";
 }
@@ -142,7 +146,8 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareIntensitiesNotEqual)
       { 1, 2, 3 },
       { 10, 42, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+          configuration::ScannerId::master,
+          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   const data_conversion_layer::monitoring_frame::Message msg1(
       util::TenthOfDegree(100),
       util::TenthOfDegree(10),
@@ -150,7 +155,8 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareIntensitiesNotEqual)
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+          configuration::ScannerId::master,
+          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
                              << "\nexpected to be false but was true";
 }
@@ -164,7 +170,8 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareFromThetaNotEqual)
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+          configuration::ScannerId::master,
+          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   const data_conversion_layer::monitoring_frame::Message msg1(
       util::TenthOfDegree(100),
       util::TenthOfDegree(10),
@@ -172,7 +179,8 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareFromThetaNotEqual)
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+          configuration::ScannerId::master,
+          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
                              << "\nexpected to be false but was true";
 }
@@ -186,7 +194,8 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareResolutionNotEqual)
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+          configuration::ScannerId::master,
+          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   const data_conversion_layer::monitoring_frame::Message msg1(
       util::TenthOfDegree(100),
       util::TenthOfDegree(10),
@@ -194,7 +203,8 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareResolutionNotEqual)
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+          configuration::ScannerId::master,
+          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
                              << "\nexpected to be false but was true";
 }
@@ -208,7 +218,8 @@ TEST(MonitoringFrameMsgEqualityTest, shouldCompareToFalseOnMessagesWithDifferent
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+          configuration::ScannerId::master,
+          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   const data_conversion_layer::monitoring_frame::Message msg1(
       util::TenthOfDegree(100),
       util::TenthOfDegree(10),
@@ -216,7 +227,8 @@ TEST(MonitoringFrameMsgEqualityTest, shouldCompareToFalseOnMessagesWithDifferent
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+          configuration::ScannerId::master,
+          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
   EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
                              << "\nexpected to be false but was true";
 }

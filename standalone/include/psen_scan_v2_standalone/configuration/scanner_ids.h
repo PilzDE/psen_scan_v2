@@ -22,6 +22,8 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace configuration
+{
 enum class ScannerId : uint8_t
 {
   master = 0,
@@ -40,6 +42,7 @@ static const std::map<ScannerId, std::string> scanner_id_to_string{ { ScannerId:
                                                                     { ScannerId::slave1, "Slave1" },
                                                                     { ScannerId::slave2, "Slave2" } };
 
-}  //   namespace psen_scan_v2_standalone
+}  // namespace configuration
+}  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_SCANNER_IDS_H

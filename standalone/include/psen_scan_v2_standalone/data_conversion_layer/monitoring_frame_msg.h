@@ -30,7 +30,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
-#include "psen_scan_v2_standalone/scanner_ids.h"
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -38,7 +38,7 @@ namespace data_conversion_layer
 {
 namespace monitoring_frame
 {
-static constexpr uint8_t MAX_SCANNER_ID{ VALID_SCANNER_IDS.size() - 1 };
+static constexpr uint8_t MAX_SCANNER_ID{ configuration::VALID_SCANNER_IDS.size() - 1 };
 
 /**
  * @brief Exception thrown if scan_counter was missing during deserialization of a
@@ -99,7 +99,7 @@ public:
   bool operator==(const data_conversion_layer::monitoring_frame::Message& rhs) const;
 
 private:
-  ScannerId scanner_id_{ ScannerId::master };
+  configuration::ScannerId scanner_id_{ configuration::ScannerId::master };
   util::TenthOfDegree from_theta_{ 0 };
   util::TenthOfDegree resolution_{ 0 };
 

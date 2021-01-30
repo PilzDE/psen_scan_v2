@@ -18,7 +18,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
-#include "psen_scan_v2_standalone/scanner_ids.h"
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 
 #include "psen_scan_v2_standalone/data_conversion_layer/istring_stream_builder.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_serialization.h"
@@ -83,9 +83,12 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
       456,
       { 10, 20, 30, 40 },
       { 15, 25, 35, 45 },
-      { data_conversion_layer::monitoring_frame::diagnostic::Message(ScannerId::master, error_locations.at(0)),
-        data_conversion_layer::monitoring_frame::diagnostic::Message(ScannerId::master, error_locations.at(1)),
-        data_conversion_layer::monitoring_frame::diagnostic::Message(ScannerId::slave2, error_locations.at(2)) });
+      { data_conversion_layer::monitoring_frame::diagnostic::Message(configuration::ScannerId::master,
+                                                                     error_locations.at(0)),
+        data_conversion_layer::monitoring_frame::diagnostic::Message(configuration::ScannerId::master,
+                                                                     error_locations.at(1)),
+        data_conversion_layer::monitoring_frame::diagnostic::Message(configuration::ScannerId::slave2,
+                                                                     error_locations.at(2)) });
 
   auto raw = serialize(msg);
   auto deserialized_msg = data_conversion_layer::monitoring_frame::deserialize(convertToRawData(raw), raw.size());
@@ -108,7 +111,7 @@ TEST(MonitoringFrameSerializationTest, shouldFailOnSerializeAndDeserializeFrameW
 TEST(MonitoringFrameSerializationDiagnosticMessagesTest, shouldSetCorrectBitInSerializedDiagnosticData)
 {
   std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnostic_data{
-    { ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3) }
+    { configuration::ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3) }
   };
   auto diagnostic_data_serialized = data_conversion_layer::monitoring_frame::diagnostic::serialize(diagnostic_data);
 

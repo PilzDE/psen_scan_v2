@@ -87,9 +87,11 @@ public:
         readMeasurements(hex_dump, 74, 250),
         readIntensities(hex_dump, intensities_offset, 250),
         { data_conversion_layer::monitoring_frame::diagnostic::Message(
-              ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(2, 0)),
+              configuration::ScannerId::master,
+              data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(2, 0)),
           data_conversion_layer::monitoring_frame::diagnostic::Message(
-              ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(4, 3)) });
+              configuration::ScannerId::master,
+              data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(4, 3)) });
     expected_msg_ = msg;
   };
 

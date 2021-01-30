@@ -69,7 +69,7 @@ public:
               OpCode op_code,
               WorkingMode working_mode,
               TransactionType transaction_type,
-              ScannerId scanner_id,
+              configuration::ScannerId scanner_id,
               FromTheta from_theta,
               Resolution resolution);
 
@@ -78,7 +78,7 @@ public:
   OpCode op_code() const;
   WorkingMode working_mode() const;
   TransactionType transaction_type() const;
-  ScannerId scanner_id() const;
+  configuration::ScannerId scanner_id() const;
   FromTheta from_theta() const;
   Resolution resolution() const;
 
@@ -87,7 +87,7 @@ private:
   OpCode op_code_;
   WorkingMode working_mode_;
   TransactionType transaction_type_;
-  ScannerId scanner_id_;
+  configuration::ScannerId scanner_id_;
   FromTheta from_theta_;
   Resolution resolution_;
 };
@@ -203,7 +203,7 @@ inline FixedFields::TransactionType FixedFields::transaction_type() const
   return transaction_type_;
 }
 
-inline ScannerId FixedFields::scanner_id() const
+inline configuration::ScannerId FixedFields::scanner_id() const
 {
   return scanner_id_;
 }

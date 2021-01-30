@@ -110,7 +110,7 @@ createValidMonitoringFrameMsg(const uint32_t scan_counter = 42,
   const std::vector<double> intensities{ generateIntensities(num_elements, lowest_intensity, highest_intensity) };
 
   const std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnostic_messages{
-    { ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 7) }
+    { configuration::ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 7) }
   };
 
   return data_conversion_layer::monitoring_frame::Message(

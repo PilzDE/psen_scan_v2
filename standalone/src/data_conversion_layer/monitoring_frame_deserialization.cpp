@@ -35,7 +35,7 @@ FixedFields::FixedFields(DeviceStatus device_status,
                          OpCode op_code,
                          WorkingMode working_mode,
                          TransactionType transaction_type,
-                         ScannerId scanner_id,
+                         configuration::ScannerId scanner_id,
                          FromTheta from_theta,
                          Resolution resolution)
   : device_status_(device_status)
@@ -137,7 +137,7 @@ std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is)
   std::array<uint8_t, diagnostic::RAW_CHUNK_UNUSED_OFFSET_IN_BYTES> reserved_diag_unused;
   raw_processing::read(is, reserved_diag_unused);
 
-  for (auto& scanner_id : VALID_SCANNER_IDS)
+  for (auto& scanner_id : configuration::VALID_SCANNER_IDS)
   {
     for (size_t byte_n = 0; byte_n < diagnostic::RAW_CHUNK_LENGTH_FOR_ONE_DEVICE_IN_BYTES; byte_n++)
     {
@@ -149,8 +149,8 @@ std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is)
       {
         if (raw_bits.test(bit_n) && (diagnostic::ErrorType::unused != diagnostic::error_bits[byte_n][bit_n]))
         {
-          diagnostic_messages.push_back(
-              diagnostic::Message(static_cast<ScannerId>(scanner_id), diagnostic::ErrorLocation(byte_n, bit_n)));
+          diagnostic_messages.push_back(diagnostic::Message(static_cast<configuration::ScannerId>(scanner_id),
+                                                            diagnostic::ErrorLocation(byte_n, bit_n)));
         }
       }
     }
@@ -165,7 +165,7 @@ FixedFields readFixedFields(std::istringstream& is)
   FixedFields::OpCode op_code;
   FixedFields::WorkingMode working_mode;
   FixedFields::TransactionType transaction_type;
-  ScannerId scanner_id;
+  configuration::ScannerId scanner_id;
   FixedFields::FromTheta from_theta(0);
   FixedFields::Resolution resolution(0);
 
