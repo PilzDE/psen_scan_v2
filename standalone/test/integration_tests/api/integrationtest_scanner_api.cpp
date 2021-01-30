@@ -25,7 +25,7 @@
 #include <gmock/gmock.h>
 
 // Test frameworks
-#include "psen_scan_v2_standalone/mock_console_bridge_output_handler.h"
+#include "psen_scan_v2_standalone/util/mock_console_bridge_output_handler.h"
 #include "psen_scan_v2_standalone/communication_layer/mock_udp_server.h"
 #include "psen_scan_v2_standalone/communication_layer/udp_frame_dumps.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
@@ -33,7 +33,7 @@
 // Software under testing
 #include "psen_scan_v2_standalone/util/async_barrier.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
-#include "psen_scan_v2_standalone/logging.h"
+#include "psen_scan_v2_standalone/util/logging.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_serialization.h"
 #include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
 #include "psen_scan_v2_standalone/configuration/scanner_config_builder.h"

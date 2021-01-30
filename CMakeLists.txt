@@ -189,7 +189,7 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gtest(unittest_scan_range
-    standalone/test/unit_tests/unittest_scan_range.cpp
+    standalone/test/unit_tests/util/unittest_scan_range.cpp
   )
   target_link_libraries(unittest_scan_range
     ${catkin_LIBRARIES}
@@ -204,7 +204,7 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gtest(unittest_tenth_of_degree
-    standalone/test/unit_tests/unittest_tenth_of_degree.cpp
+    standalone/test/unit_tests/util/unittest_tenth_of_degree.cpp
   )
 
   catkin_add_gmock(unittest_udp_client
@@ -285,7 +285,7 @@ if(CATKIN_ENABLE_TESTING)
   )
 
   catkin_add_gmock(unittest_logging
-    standalone/test/unit_tests/unittest_logging.cpp
+    standalone/test/unit_tests/util/unittest_logging.cpp
   )
   target_link_libraries(unittest_logging
     ${catkin_LIBRARIES}
@@ -307,7 +307,7 @@ if(CATKIN_ENABLE_TESTING)
   ##  Integration-Tests  ##
   #########################
   catkin_add_gmock(integrationtest_udp_client
-    standalone/test/integration_tests/integrationtest_udp_client.cpp
+    standalone/test/integration_tests/communication_layer/integrationtest_udp_client.cpp
   )
   target_link_libraries(integrationtest_udp_client
     ${catkin_LIBRARIES}

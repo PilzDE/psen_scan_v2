@@ -31,7 +31,7 @@
 #include <boost/bind.hpp>
 
 #include "psen_scan_v2_standalone/raw_scanner_data.h"
-#include "psen_scan_v2_standalone/logging.h"
+#include "psen_scan_v2_standalone/util/logging.h"
 
 namespace psen_scan_v2_standalone
 {

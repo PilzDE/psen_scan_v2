@@ -35,7 +35,7 @@
 
 #include "psen_scan_v2_standalone/protocol_layer/scanner_events.h"
 
-#include "psen_scan_v2_standalone/logging.h"
+#include "psen_scan_v2_standalone/util/logging.h"
 #include "psen_scan_v2_standalone/util/format_range.h"
 #include "psen_scan_v2_standalone/communication_layer/udp_client.h"
 

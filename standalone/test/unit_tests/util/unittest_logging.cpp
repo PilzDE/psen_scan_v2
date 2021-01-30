@@ -18,9 +18,9 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "psen_scan_v2_standalone/logging.h"
+#include "psen_scan_v2_standalone/util/logging.h"
 
-#include "psen_scan_v2_standalone/mock_console_bridge_output_handler.h"
+#include "psen_scan_v2_standalone/util/mock_console_bridge_output_handler.h"
 
 using namespace psen_scan_v2_standalone_test;
 
