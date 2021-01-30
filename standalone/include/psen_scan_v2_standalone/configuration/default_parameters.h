@@ -20,6 +20,8 @@
 
 namespace psen_scan_v2_standalone
 {
+namespace configuration
+{
 /**
  * @brief Contains default constants for the scanner setup.
  */
@@ -47,6 +49,7 @@ static constexpr double DEFAULT_X_AXIS_ROTATION(data_conversion_layer::degreeToR
 
 static std::string SCAN_FRAME_ID_SUFFIX{ "_scan" };
 }  // namespace constants
+}  // namespace configuration
 
 }  // namespace psen_scan_v2_standalone
 #endif  // PSEN_SCAN_V2_STANDALONE_DEFAULT_PARAMETERS_H

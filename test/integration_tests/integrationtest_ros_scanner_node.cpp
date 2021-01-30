@@ -30,7 +30,7 @@
 #include "psen_scan_v2_standalone/api/laserscan.h"
 #include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
 #include "psen_scan_v2_standalone/configuration/scanner_config_builder.h"
-#include "psen_scan_v2_standalone/default_parameters.h"
+#include "psen_scan_v2_standalone/configuration/default_parameters.h"
 #include "psen_scan_v2_standalone/configuration/scan_range.h"
 
 #include "psen_scan_v2/laserscan_ros_conversions.h"
@@ -43,7 +43,7 @@ using namespace psen_scan_v2_standalone;
 using namespace psen_scan_v2_test;
 
 using namespace ::testing;
-using namespace psen_scan_v2_standalone::constants;
+using namespace psen_scan_v2_standalone::configuration::constants;
 
 namespace psen_scan_v2
 {

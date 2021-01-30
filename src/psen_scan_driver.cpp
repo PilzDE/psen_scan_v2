@@ -20,7 +20,7 @@
 
 #include <ros/ros.h>
 
-#include "psen_scan_v2_standalone/default_parameters.h"
+#include "psen_scan_v2_standalone/configuration/default_parameters.h"
 #include "psen_scan_v2_standalone/function_pointers.h"
 #include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
 #include "psen_scan_v2_standalone/configuration/scanner_config_builder.h"
@@ -34,7 +34,7 @@ REGISTER_ROSCONSOLE_BRIDGE;
 
 using namespace psen_scan_v2;
 using namespace psen_scan_v2_standalone;
-using namespace psen_scan_v2_standalone::constants;
+using namespace psen_scan_v2_standalone::configuration::constants;
 
 std::function<void()> NODE_TERMINATE_CB;
 

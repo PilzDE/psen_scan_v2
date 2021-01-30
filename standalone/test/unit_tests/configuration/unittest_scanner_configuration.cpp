@@ -21,7 +21,7 @@
 #include <gtest/gtest.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
-#include "psen_scan_v2_standalone/default_parameters.h"
+#include "psen_scan_v2_standalone/configuration/default_parameters.h"
 #include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
 #include "psen_scan_v2_standalone/configuration/scanner_config_builder.h"
 #include "psen_scan_v2_standalone/configuration/scan_range.h"
@@ -167,10 +167,10 @@ TEST_F(ScannerConfigurationTest, shouldReturnCorrectPortsAfterDefaultConstructio
 {
   const configuration::ScannerConfiguration config{ createValidDefaultConfig() };
 
-  EXPECT_EQ(constants::DATA_PORT_OF_SCANNER_DEVICE, config.scannerDataPort());
-  EXPECT_EQ(constants::CONTROL_PORT_OF_SCANNER_DEVICE, config.scannerControlPort());
-  EXPECT_EQ(constants::DATA_PORT_OF_HOST_DEVICE, config.hostUDPPortData());
-  EXPECT_EQ(constants::CONTROL_PORT_OF_HOST_DEVICE, config.hostUDPPortControl());
+  EXPECT_EQ(configuration::constants::DATA_PORT_OF_SCANNER_DEVICE, config.scannerDataPort());
+  EXPECT_EQ(configuration::constants::CONTROL_PORT_OF_SCANNER_DEVICE, config.scannerControlPort());
+  EXPECT_EQ(configuration::constants::DATA_PORT_OF_HOST_DEVICE, config.hostUDPPortData());
+  EXPECT_EQ(configuration::constants::CONTROL_PORT_OF_HOST_DEVICE, config.hostUDPPortControl());
 }
 
 TEST_F(ScannerConfigurationTest, shouldReturnCorrectDiagnosticsFlagAfterDefaultConstruction)

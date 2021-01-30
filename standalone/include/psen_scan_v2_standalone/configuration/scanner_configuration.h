@@ -17,7 +17,7 @@
 
 #include <boost/optional.hpp>
 
-#include "psen_scan_v2_standalone/default_parameters.h"
+#include "psen_scan_v2_standalone/configuration/default_parameters.h"
 #include "psen_scan_v2_standalone/configuration/scan_range.h"
 
 namespace psen_scan_v2_standalone

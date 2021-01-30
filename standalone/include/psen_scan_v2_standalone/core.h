@@ -20,7 +20,7 @@
  * Convenience include file for users of psen_scan_v2 standalone.
  */
 
-#include "psen_scan_v2_standalone/default_parameters.h"
+#include "psen_scan_v2_standalone/configuration/default_parameters.h"
 #include "psen_scan_v2_standalone/api/laserscan.h"
 #include "psen_scan_v2_standalone/logging.h"
 #include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
