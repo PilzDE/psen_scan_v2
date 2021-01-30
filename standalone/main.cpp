@@ -44,7 +44,7 @@ void laserScanCallback(const api::LaserScan& scan)
     return;
   }
 
-  PSENSCAN_INFO_THROTTLE(1 /* sec */, "laserScanCallback()", "Ranges {}", formatRange(measures));
+  PSENSCAN_INFO_THROTTLE(1 /* sec */, "laserScanCallback()", "Ranges {}", util::formatRange(measures));
 }
 
 int main(int argc, char** argv)

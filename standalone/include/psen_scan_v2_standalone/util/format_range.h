@@ -24,6 +24,10 @@
 
 #include <fmt/format.h>
 
+namespace psen_scan_v2_standalone
+{
+namespace util
+{
 /**
  * The resulting string will look like the following:
  * \verbatim "{Item1, Item2, [...], ItemLast}" \endverbatim
@@ -47,5 +51,8 @@ std::string formatRange(const T& range)
   strstr << "}";
   return strstr.str();
 }
+
+}  // namespace util
+}  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_FORMAT_RANGE_H

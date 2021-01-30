@@ -30,7 +30,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
 #include "psen_scan_v2_standalone/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/logging.h"
-#include "psen_scan_v2_standalone/format_range.h"
+#include "psen_scan_v2_standalone/util/format_range.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -74,8 +74,8 @@ data_conversion_layer::monitoring_frame::Message::diagnosticMessages() const
   return diagnostic_messages_;
 }
 
-bool data_conversion_layer::monitoring_frame::Message::operator==(
-    const data_conversion_layer::monitoring_frame::Message& rhs) const
+bool data_conversion_layer::monitoring_frame::Message::
+operator==(const data_conversion_layer::monitoring_frame::Message& rhs) const
 {
   return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
           measurements() == rhs.measurements() && intensities() == rhs.intensities() &&
@@ -92,9 +92,9 @@ std::ostream& operator<<(std::ostream& os,
                     msg.fromTheta().value() / 10.,
                     msg.resolution().value() / 10.,
                     msg.scanCounter(),
-                    formatRange(msg.measurements()),
-                    formatRange(msg.intensities()),
-                    formatRange(msg.diagnosticMessages()));
+                    util::formatRange(msg.measurements()),
+                    util::formatRange(msg.intensities()),
+                    util::formatRange(msg.diagnosticMessages()));
   return os;
 }
 }  // namespace monitoring_frame

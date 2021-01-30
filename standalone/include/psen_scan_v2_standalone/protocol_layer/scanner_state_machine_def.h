@@ -154,8 +154,10 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
         event.data_, event.num_bytes_) };
     if (!frame.diagnosticMessages().empty())
     {
-      PSENSCAN_WARN_THROTTLE(
-          1 /* sec */, "StateMachine", "The scanner reports an error: {}", formatRange(frame.diagnosticMessages()));
+      PSENSCAN_WARN_THROTTLE(1 /* sec */,
+                             "StateMachine",
+                             "The scanner reports an error: {}",
+                             util::formatRange(frame.diagnosticMessages()));
     }
 
     printUserMsgFor(complete_scan_validator_.validate(frame, DEFAULT_NUM_MSG_PER_ROUND));
