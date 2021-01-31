@@ -32,7 +32,7 @@ static constexpr std::size_t SIZE{ 58 };  // See protocol description
 static constexpr uint64_t RESERVED{ 0 };
 static constexpr uint32_t DEFAULT_SEQ_NUMBER{ 0 };
 
-static const uint32_t OPCODE{ htole32(0x35) };
+static const uint32_t OPCODE{ 0x35 };
 }  // namespace start_request
 
 uint32_t calculateCRC(const RawData& data)
