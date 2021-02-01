@@ -73,7 +73,7 @@ uint32_t ScannerConfigurationBuilder::convertIP(const std::string& ip)
     throw std::invalid_argument("IP invalid");
   }
   assert(sizeof(ip_number) == 4 && "ip_number has not the expected size");
-  return static_cast<uint32_t>(ip_number);
+  return htonl(static_cast<uint32_t>(ip_number)); //TODO Windows only
 }
 
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::hostIP(const std::string& ip)
