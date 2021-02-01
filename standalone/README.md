@@ -101,12 +101,12 @@ Boost should now be successfully built.
    _With `cmake -G` you can check which generators are abailable_
 - Build the generated project with 
   ```
-  cmake --build . --target ALL_BUILD
+  cmake --build . --config Release --target ALL_BUILD
   ```
   `--target` is the available Visual Studio Project we generated before, you can look in the folder how they are named
 - Install with 
   ```
-  cmake --build . --target INSTALL
+  cmake --build . --config Release --target INSTALL
   ```
   _You may need admin privileges_
 
@@ -120,7 +120,7 @@ Boost should now be successfully built.
   ```
 - Generate Visual Studio Project 
   ```
-  cmake -G "Visual Studio 15 2017 Win64" \path_to_source\
+  cmake -DCMAKE_PREFIX_PATH=<path_to_boost>\boost_1_75_0\stage\lib\cmake -G "Visual Studio 15 2017 Win64" \path_to_source\
   ```
 - Go back to `standalone`-folder 
   ```
