@@ -19,7 +19,7 @@ In order to build and use the PSENscan Standalone C++ Library you need Ubuntu ve
 
 Make sure you have all necessary tools and libraries installed:
 ```
-sudo apt-get install build-essential cmake git libboost-all-dev libconsole-bridge-dev libfmt-dev
+sudo apt-get install build-essential cmake git libboost-system-dev libconsole-bridge-dev libfmt-dev
 ```
 
 ## Get Started on Linux

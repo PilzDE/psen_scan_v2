@@ -15,6 +15,8 @@
 
 #include "psen_scan_v2_standalone/start_request.h"
 
+#include "psen_scan_v2_standalone/scanner_configuration.h"
+
 namespace psen_scan_v2_standalone
 {
 static constexpr TenthOfDegree MASTER_RESOLUTION{ TenthOfDegree(2u) };
