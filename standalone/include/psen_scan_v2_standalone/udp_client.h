@@ -24,7 +24,13 @@
 #include <thread>
 #include <future>
 
+#ifdef __linux__
+#include <arpa/inet.h>
+#endif
+
+#ifdef _WIN32
 #include <WinSock2.h>
+#endif
 
 #include <boost/asio.hpp>
 #include <boost/asio/high_resolution_timer.hpp>
