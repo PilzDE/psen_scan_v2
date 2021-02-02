@@ -15,7 +15,6 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_SCANNER_V2_H
 #define PSEN_SCAN_V2_STANDALONE_SCANNER_V2_H
 
-#include <stdexcept>
 #include <memory>
 #include <mutex>
 #include <future>
@@ -26,10 +25,6 @@
 #include "psen_scan_v2_standalone/scanner_interface.h"
 #include "psen_scan_v2_standalone/scanner_events.h"
 #include "psen_scan_v2_standalone/scanner_state_machine.h"
-#include "psen_scan_v2_standalone/laserscan.h"
-
-#include "psen_scan_v2_standalone/udp_client.h"
-#include "psen_scan_v2_standalone/raw_scanner_data.h"
 
 #include "psen_scan_v2_standalone/watchdog.h"
 
@@ -39,6 +34,7 @@
  */
 namespace psen_scan_v2_standalone
 {
+class ScannerConfiguration;
 using namespace psen_scan_v2_standalone::scanner_protocol;
 using std::placeholders::_1;
 using std::placeholders::_2;

@@ -18,6 +18,8 @@
 #include <cassert>
 #include <stdexcept>
 
+#include "psen_scan_v2_standalone/scanner_configuration.h"
+
 namespace psen_scan_v2_standalone
 {
 using namespace psen_scan_v2_standalone::scanner_protocol::scanner_events;
