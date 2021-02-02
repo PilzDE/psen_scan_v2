@@ -36,7 +36,7 @@ namespace psen_scan_v2_standalone
 {
 namespace monitoring_frame
 {
-static constexpr uint8_t MAX_SCANNER_ID{ static_cast<const uint8_t>(VALID_SCANNER_IDS.size() - 1) };
+static constexpr uint8_t MAX_SCANNER_ID{ static_cast<uint8_t>(VALID_SCANNER_IDS.size() - 1) };
 
 /**
  * @brief Exception thrown if scan_counter was missing during deserialization of a monitoring_frame::Message.
