@@ -30,10 +30,7 @@ endif (WIN32)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 ## System dependencies are found with CMake's conventions
-find_package(Boost 1.69) ## Boost::system is header-only since 1.69
-if(NOT Boost_FOUND)
-  find_package(Boost REQUIRED COMPONENTS system)
-endif()
+find_package(Boost REQUIRED COMPONENTS system)
 find_package(console_bridge REQUIRED)
 find_package(fmt REQUIRED)
 
@@ -44,7 +41,6 @@ find_package(fmt REQUIRED)
 include_directories(
   include
   ${console_bridge_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS}
 )
 
 set(${PROJECT_NAME}_sources
@@ -62,7 +58,7 @@ set(${PROJECT_NAME}_sources
 
 add_library(${PROJECT_NAME} ${${PROJECT_NAME}_sources})
 target_link_libraries(${PROJECT_NAME}
-  ${Boost_LIBRARIES}
+  Boost::system
   ${console_bridge_LIBRARIES}
   fmt::fmt
 )
