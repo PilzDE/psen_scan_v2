@@ -17,10 +17,6 @@
 #include <cassert>
 #include <iostream>
 
-#ifdef _WIN32
-#include <Windows.h>
-#endif
-
 #include <boost/crc.hpp>
 
 #include "psen_scan_v2_standalone/start_request.h"
@@ -54,16 +50,8 @@ RawData start_request::serialize(const start_request::Message& msg, const uint32
   raw_processing::write(os, start_request::RESERVED);
   raw_processing::write(os, start_request::OPCODE);
 
-/**< Byte order: big endian */
-#ifdef __linux__
-  const uint32_t host_ip_big_endian = htobe32(msg.host_ip_);
-#endif
-
-#ifdef _WIN32
-  const uint32_t host_ip_big_endian = _byteswap_ulong(msg.host_ip_);
-#endif
-
-  raw_processing::write(os, host_ip_big_endian);
+  /**< Network Byte order: big endian */
+  raw_processing::write(os, msg.host_ip_);
 
   /**< Byte order: big endian */
   raw_processing::write(os, msg.host_udp_port_data_);
