@@ -85,7 +85,7 @@ private:
   static constexpr std::size_t NUM_SLAVES{ 3 };
 
 private:
-  const uint32_t host_ip_; ///< network byte order = big endian
+  const uint32_t host_ip_;  ///< network byte order = big endian
   const uint16_t host_udp_port_data_;
 
   const DeviceSettings master_device_settings_;
