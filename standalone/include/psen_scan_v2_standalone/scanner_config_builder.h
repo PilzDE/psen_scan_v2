@@ -96,63 +96,63 @@ uint32_t ScannerConfigurationBuilder::convertIP(const std::string& ip)
 }
 #endif
 
-  inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::hostIP(const std::string& ip)
-  {
-    config_.host_ip_ = convertIP(ip);
+inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::hostIP(const std::string& ip)
+{
+  config_.host_ip_ = convertIP(ip);
 
-    return *this;
-  }
+  return *this;
+}
 
-  inline uint16_t ScannerConfigurationBuilder::convertPort(const int& port)
+inline uint16_t ScannerConfigurationBuilder::convertPort(const int& port)
+{
+  if (port < std::numeric_limits<uint16_t>::min() || port > std::numeric_limits<uint16_t>::max())
   {
-    if (port < std::numeric_limits<uint16_t>::min() || port > std::numeric_limits<uint16_t>::max())
-    {
-      throw std::out_of_range("Port out of range");
-    }
-    return static_cast<uint16_t>(port);
+    throw std::out_of_range("Port out of range");
   }
+  return static_cast<uint16_t>(port);
+}
 
-  inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::hostDataPort(const int& port)
-  {
-    config_.host_data_port_ = convertPort(port);
-    return *this;
-  }
+inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::hostDataPort(const int& port)
+{
+  config_.host_data_port_ = convertPort(port);
+  return *this;
+}
 
-  inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::hostControlPort(const int& port)
-  {
-    config_.host_control_port_ = convertPort(port);
-    return *this;
-  }
+inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::hostControlPort(const int& port)
+{
+  config_.host_control_port_ = convertPort(port);
+  return *this;
+}
 
-  inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scannerIp(const std::string& ip)
-  {
-    config_.scanner_ip_ = convertIP(ip);
-    return *this;
-  }
+inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scannerIp(const std::string& ip)
+{
+  config_.scanner_ip_ = convertIP(ip);
+  return *this;
+}
 
-  inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scannerDataPort(const int& port)
-  {
-    config_.scanner_data_port_ = convertPort(port);
-    return *this;
-  }
+inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scannerDataPort(const int& port)
+{
+  config_.scanner_data_port_ = convertPort(port);
+  return *this;
+}
 
-  inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scannerControlPort(const int& port)
-  {
-    config_.scanner_control_port_ = convertPort(port);
-    return *this;
-  }
+inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scannerControlPort(const int& port)
+{
+  config_.scanner_control_port_ = convertPort(port);
+  return *this;
+}
 
-  inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scanRange(const DefaultScanRange& scan_range)
-  {
-    config_.scan_range_ = scan_range;
-    return *this;
-  }
+inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scanRange(const DefaultScanRange& scan_range)
+{
+  config_.scan_range_ = scan_range;
+  return *this;
+}
 
-  inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableDiagnostics()
-  {
-    config_.diagnostics_enabled_ = true;
-    return *this;
-  }
+inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableDiagnostics()
+{
+  config_.diagnostics_enabled_ = true;
+  return *this;
+}
 
 }  // namespace psen_scan_v2_standalone
 
