@@ -1,0 +1,93 @@
+name: Win-Standalone-CI
+
+on: [push, pull_request]
+
+env:
+  BUILD_TYPE: "Release"
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install deps with vcpkg
+      shell: bash
+      run: |
+        vcpkg install console-bridge:x64-windows
+        vcpkg integrate install
+
+    - name: Clone fmt
+      shell: bash
+      working-directory: ${{runner.workspace}}
+      run: |
+        git clone https://github.com/fmtlib/fmt.git --depth 1 --branch 6.1.2
+        dir
+
+    - name: Install Dependencies
+      shell: cmd
+      working-directory: ${{runner.workspace}}/fmt
+      run: |
+        dir
+        cmake -G "Visual Studio 16 2019" .
+        cmake --build . --config Release --target ALL_BUILD
+        cmake --build . --config Release --target INSTALL
+
+    # - name: Clone boost
+    #   shell: bash
+    #   run: |
+    #     git --version
+    #     git clone https://github.com/boostorg/boost.git --shallow-submodules --depth=1 \
+    #       --recurse-submodules="tools/build" \
+    #       --recurse-submodules="libs/system" \
+    #       --recurse-submodules="libs/optional" \
+    #       --recurse-submodules="libs/msm" \
+    #       --recurse-submodules="libs/mpl" \
+    #       --recurse-submodules="libs/core" \
+    #       --recurse-submodules="libs/asio" \
+    #       --recurse-submodules="libs/bind" \
+    #       --recurse-submodules="libs/crc" \
+    #       --recurse-submodules="libs/array" \
+    #       --recurse-submodules="libs/endian" \
+    #       --recurse-submodules="libs/filesystem" \
+    #       --recurse-submodules="libs/function" \
+    #       --recurse-submodules="libs/math" \
+    #       -j8 --branch boost-1.75.0 boost_1_75_0
+
+    # - name: Install Dependencies
+    #   shell: cmd
+    #   run: |
+    #     echo "cd into boost_1_75_0"
+    #     cd boost_1_75_0
+    #     echo "dir"
+    #     dir
+    #     echo "bootstrap"
+    #     bootstrap.bat
+    #     echo "b2 the stuff"
+    #     b2 -j8 toolset=msvc-14.1 address-model=64 architecture=x86 link=static threading=multi runtime-link=shared --build-type=complete stage
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{runner.workspace}}/psen_scan_v2/standalone/build
+
+    - name: Configure CMake
+      shell: cmd
+      working-directory: ${{runner.workspace}}/psen_scan_v2/standalone/build
+      run: |
+        set BOOST_ROOT=%BOOST_ROOT_1_72_0%
+        echo %BOOST_ROOT%
+        dir
+        ls
+        cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release ^
+          -DBOOST_ROOT=%BOOST_ROOT_1_72_0% ^
+          -DCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%/scripts/buildsystems/vcpkg.cmake ^
+          ..
+
+    - name: Build
+      working-directory: ${{runner.workspace}}/psen_scan_v2/standalone
+      shell: bash
+      run: cmake --build build --config $BUILD_TYPE --target ALL_BUILD

@@ -17,13 +17,14 @@ cmake_minimum_required(VERSION 3.0.2)
 project(psen_scan_v2_standalone)
 
 add_compile_options(-std=c++14)
-add_compile_options(-Wall)
 if (UNIX)
+  add_compile_options(-Wall)
   add_compile_options(-Wextra)
   add_compile_options(-Wno-unused-parameter)
   add_compile_options(-Werror)
 endif (UNIX)
 if (WIN32)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4") # Turn of warnings
   add_definitions(-DNOMINMAX)
 endif (WIN32)
 
@@ -57,6 +58,7 @@ set(${PROJECT_NAME}_sources
 )
 
 add_library(${PROJECT_NAME} ${${PROJECT_NAME}_sources})
+
 target_link_libraries(${PROJECT_NAME}
   Boost::system
   ${console_bridge_LIBRARIES}
