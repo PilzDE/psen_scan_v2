@@ -42,6 +42,12 @@ sudo apt-get install build-essential cmake git libboost-all-dev libconsole-bridg
 
 The library should now be built and available under `psen_scan_v2/standalone/build/libpsen_scan_v2_standalone.a`
 
+### Usage example
+An example application, which prints distance data to the screen, is built by default and can be executed in the `build` folder:
+```
+./psen_scan_v2_standalone_app
+```
+
 ## Get Started on Windows
 ### Dependencies
 - Visual Studio
@@ -133,7 +139,7 @@ Boost should now be successfully built.
 
 _If there is any problem, check if all paths are set correct with `cmake -DBoost_DEBUG=ON`_
 
-## Usage example
+### Usage example
 An example application, which prints distance data to the screen, is built by default and can be executed in the `build` folder:
 ```
 ./Release/psen_scan_v2_standalone_app.exe
