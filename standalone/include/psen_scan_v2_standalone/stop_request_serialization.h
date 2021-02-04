@@ -29,7 +29,7 @@ namespace stop_request
 {
 static constexpr std::size_t NUM_RESERVED_FIELDS{ 12 };
 static constexpr std::array<uint8_t, NUM_RESERVED_FIELDS> RESERVED{};
-static const uint32_t OPCODE{ htole32(0x36) };
+static const uint32_t OPCODE{ 0x36 };
 
 RawData serialize();
 }  // namespace stop_request
