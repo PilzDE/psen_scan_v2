@@ -18,6 +18,8 @@
 #include <cassert>
 #include <stdexcept>
 
+#include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
+
 namespace psen_scan_v2_standalone
 {
 namespace api

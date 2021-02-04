@@ -20,12 +20,15 @@
 
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/configuration/scan_range.h"
-#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
-#include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
 {
+namespace configuration
+{
+class ScannerConfiguration;
+}
+
 namespace data_conversion_layer
 {
 /**

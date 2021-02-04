@@ -15,9 +15,12 @@
 
 #include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_serialization_deserialization.h"
 
-#include <iostream>
 #include <algorithm>
 #include <cassert>
+#include <boost/crc.hpp>
+#include <sstream>
+
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
 
 namespace psen_scan_v2_standalone
 {

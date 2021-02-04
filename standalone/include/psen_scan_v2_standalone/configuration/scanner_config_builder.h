@@ -95,7 +95,7 @@ inline uint16_t ScannerConfigurationBuilder::convertPort(const int& port)
   {
     throw std::out_of_range("Port out of range");
   }
-  return htole16(static_cast<uint16_t>(port));
+  return static_cast<uint16_t>(port);
 }
 
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::hostDataPort(const int& port)

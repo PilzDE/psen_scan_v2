@@ -59,45 +59,50 @@ inline void read(std::istringstream& is, T& data)
   }
 }
 
-template <typename RawType, typename ReturnType>
-inline void read(std::istringstream& is, ReturnType& data, std::function<ReturnType(RawType)> conversion_fcn)
+template <typename T>
+inline T read(std::istringstream& is)
 {
-  RawType raw_data;
-  read<RawType>(is, raw_data);
+  T retval;
+  raw_processing::read<T>(is, retval);
+  return retval;
+}
 
-  data = conversion_fcn(raw_data);
+template <class ReturnType, class RawType>
+using ConversionFunc = std::function<ReturnType(const RawType&)>;
+
+template <typename RawType, typename ReturnType>
+inline ReturnType read(std::istringstream& is, ConversionFunc<ReturnType, RawType> conversion_fcn)
+{
+  return conversion_fcn(raw_processing::read<RawType>(is));
 }
 
 template <typename RawType, typename ReturnType>
-inline void read(std::istringstream& is, ReturnType& data)
+inline ReturnType read(std::istringstream& is)
 {
-  read<RawType, ReturnType>(is, data, [](const RawType& raw_data) { return ReturnType(raw_data); });
+  return ReturnType(raw_processing::read<RawType>(is));
 }
 
 template <typename RawType, typename ReturnType>
 inline void readArray(std::istringstream& is,
                       std::vector<ReturnType>& data,
                       const size_t& number_of_samples,
-                      std::function<ReturnType(RawType)> conversion_fcn)
+                      ConversionFunc<ReturnType, RawType> conversion_fcn)
 {
   data.reserve(number_of_samples);
 
   std::generate_n(std::back_inserter(data), number_of_samples, [&is, &conversion_fcn]() {
-    ReturnType sample;
-    raw_processing::read<RawType, ReturnType>(is, sample, conversion_fcn);
-    return sample;
+    return raw_processing::read<RawType, ReturnType>(is, conversion_fcn);
   });
 }
 
 template <typename RawType, typename ArrayElemType>
 inline void writeArray(std::ostringstream& os,
-                       std::vector<ArrayElemType> array,
-                       std::function<RawType(ArrayElemType)> conversion_fcn)
+                       const std::vector<ArrayElemType>& array,
+                       ConversionFunc<RawType, ArrayElemType> conversion_fcn)
 {
-  for (auto& elem : array)
+  for (const auto& elem : array)
   {
-    auto raw = conversion_fcn(elem);
-    raw_processing::write(os, raw);
+    raw_processing::write(os, conversion_fcn(elem));
   }
 }
 

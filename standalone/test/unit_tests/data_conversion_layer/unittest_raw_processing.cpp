@@ -46,7 +46,7 @@ TYPED_TEST(RawProcessingTest, write)
 
   TypeParam data_returned;
   std::string data_str(os.str());
-  std::copy(data_str.begin(), data_str.end(), &data_returned);
+  std::copy(data_str.begin(), data_str.end(), reinterpret_cast<char*>(&data_returned));
   EXPECT_EQ(data_returned, data);
 }
 
@@ -82,9 +82,8 @@ TYPED_TEST(RawProcessingTest, readWithConversion)
   os.write(reinterpret_cast<const char*>(&data), sizeof(TypeParam));
   std::istringstream is{ os.str() };
 
-  TypeParam data_read;
-  data_conversion_layer::raw_processing::read<TypeParam, TypeParam>(
-      is, data_read, [](TypeParam raw_data) { return raw_data * 2; });
+  const TypeParam data_read = data_conversion_layer::raw_processing::read<TypeParam, TypeParam>(
+      is, [](TypeParam raw_data) { return raw_data * 2; });
 
   EXPECT_EQ(data_read, data * 2);
 }
