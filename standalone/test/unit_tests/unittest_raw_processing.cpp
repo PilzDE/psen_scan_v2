@@ -82,8 +82,8 @@ TYPED_TEST(RawProcessingTest, readWithConversion)
   os.write(reinterpret_cast<const char*>(&data), sizeof(TypeParam));
   std::istringstream is{ os.str() };
 
-  TypeParam data_read;
-  raw_processing::read<TypeParam, TypeParam>(is, data_read, [](TypeParam raw_data) { return raw_data * 2; });
+  const TypeParam data_read =
+      raw_processing::read<TypeParam, TypeParam>(is, [](TypeParam raw_data) { return raw_data * 2; });
 
   EXPECT_EQ(data_read, data * 2);
 }
