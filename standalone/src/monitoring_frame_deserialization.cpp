@@ -90,7 +90,7 @@ monitoring_frame::Message deserialize(const RawData& data, const std::size_t& nu
         }
         uint32_t scan_counter_read_buffer;
         raw_processing::read<uint32_t>(is, scan_counter_read_buffer);
-        msg.scan_counter_=scan_counter_read_buffer;
+        msg.scan_counter_ = scan_counter_read_buffer;
         break;
 
       case additional_field::HeaderID::measurements: {
@@ -108,11 +108,11 @@ monitoring_frame::Message deserialize(const RawData& data, const std::size_t& nu
         msg.diagnostic_data_enabled_ = true;
         break;
 
-
       case additional_field::HeaderID::intensities: {
         const size_t num_measurements{ static_cast<size_t>(additional_header.length()) /
-                                   NUMBER_OF_BYTES_SINGLE_MEASUREMENT };
-        raw_processing::readArray<uint16_t, double>(is, msg.intensities_, num_measurements, std::bind(toIntensities, _1));
+                                       NUMBER_OF_BYTES_SINGLE_MEASUREMENT };
+        raw_processing::readArray<uint16_t, double>(
+            is, msg.intensities_, num_measurements, std::bind(toIntensities, _1));
         break;
       }
       default:
