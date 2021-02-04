@@ -136,7 +136,7 @@ _If there is any problem, check if all paths are set correct with `cmake -DBoost
 ## Usage example
 An example application, which prints distance data to the screen, is built by default and can be executed in the `build` folder:
 ```
-./psen_scan_v2_standalone_app
+./Release/psen_scan_v2_standalone_app.exe
 ```
 
 Feel free to take a look at the [example code](https://github.com/PilzDE/psen_scan_v2/blob/main/standalone/main.cpp) as well as the [C++ Api](#c++-api) to understand how to integrate the C++ Library into your application.
