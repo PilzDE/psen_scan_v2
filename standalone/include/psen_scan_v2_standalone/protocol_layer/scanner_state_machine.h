@@ -49,7 +49,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_serialization_deserialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/complete_scan_validator.h"
+#include "psen_scan_v2_standalone/protocol_layer/complete_scan_validator.h"
 #include "psen_scan_v2_standalone/util/watchdog.h"
 
 namespace psen_scan_v2_standalone
@@ -220,7 +220,7 @@ private:
   // LCOV_EXCL_STOP
   void checkForInternalErrors(const data_conversion_layer::scanner_reply::Message& msg);
 
-  using ScanValidatorResult = data_conversion_layer::monitoring_frame::ScanValidator::OptionalResult;
+  using ScanValidatorResult = ScanValidator::OptionalResult;
   void printUserMsgFor(const ScanValidatorResult& validation_result);
 
 private:
@@ -229,7 +229,7 @@ private:
   std::unique_ptr<util::Watchdog> start_reply_watchdog_{};
 
   std::unique_ptr<util::Watchdog> monitoring_frame_watchdog_{};
-  data_conversion_layer::monitoring_frame::ScanValidator complete_scan_validator_;
+  ScanValidator complete_scan_validator_;
 };
 
 // Pick a back-end

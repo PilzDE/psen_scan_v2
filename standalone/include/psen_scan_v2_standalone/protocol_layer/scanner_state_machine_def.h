@@ -126,7 +126,7 @@ inline void ScannerProtocolDef::sendStopRequest(const T& event)
 
 inline void ScannerProtocolDef::printUserMsgFor(const ScanValidatorResult& res)
 {
-  using Result = data_conversion_layer::monitoring_frame::ScanValidator::Result;
+  using Result = ScanValidator::Result;
   if (!res || res.value() == Result::valid)
   {
     return;

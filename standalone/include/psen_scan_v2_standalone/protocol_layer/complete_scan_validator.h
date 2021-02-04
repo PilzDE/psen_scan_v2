@@ -23,9 +23,7 @@
 
 namespace psen_scan_v2_standalone
 {
-namespace data_conversion_layer
-{
-namespace monitoring_frame
+namespace protocol_layer
 {
 //! @brief Validates complete scan rounds and detects if MonitoringFrames are missing for a complete scan or
 //! if to many MonitoringFrames were received.
@@ -144,8 +142,7 @@ ScanValidator::validate(const data_conversion_layer::monitoring_frame::Message& 
   return old_info.validate(num_expected_msgs);
 }
 
-}  // namespace monitoring_frame
-}  // namespace data_conversion_layer
+}  // namespace protocol_layer
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_COMPLETE_SCAN_VALIDATOR_H
