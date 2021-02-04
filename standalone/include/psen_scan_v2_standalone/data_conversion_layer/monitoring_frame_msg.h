@@ -36,6 +36,13 @@ namespace psen_scan_v2_standalone
 {
 namespace data_conversion_layer
 {
+/**
+ * @brief Namespace containing all things about the MonitoringFrame data strucure.
+ *
+ * The MonitoringFrame is a data structure fitting into a UDP paket, containing for example
+ * distance and intensity data, and also diagnostic data. Take a look into the protocol
+ * description for more info about the MonitoringFrame data structure.
+ */
 namespace monitoring_frame
 {
 static constexpr uint8_t MAX_SCANNER_ID{ configuration::VALID_SCANNER_IDS.size() - 1 };
