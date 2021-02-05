@@ -32,7 +32,9 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 ## System dependencies are found with CMake's conventions
 find_package(Boost 1.69) ## Boost::system is header-only since 1.69
-if(NOT Boost_FOUND)
+if(Boost_FOUND)
+  add_definitions(-DBOOST_ERROR_CODE_HEADER_ONLY -DBOOST_DATE_TIME_NO_LIB -DBOOST_REGEX_NO_LIB -DBOOST_SYSTEM_NO_LIB)
+else()
   find_package(Boost REQUIRED COMPONENTS system)
 endif()
 find_package(console_bridge REQUIRED)
