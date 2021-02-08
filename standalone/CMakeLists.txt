@@ -70,3 +70,21 @@ add_executable(${PROJECT_NAME}_app main.cpp)
 target_link_libraries(${PROJECT_NAME}_app
   ${PROJECT_NAME}
 )
+
+###########
+## Tests ##
+###########
+if (WIN32)
+
+find_package(GTest CONFIG REQUIRED)
+ADD_EXECUTABLE(unittest_laserscan_conversions test/unit_tests/unittest_laserscan_conversions.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_laserscan_conversions
+    ${PROJECT_NAME}
+    libgtest
+    PRIVATE GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+)
+
+add_test(NAME unittest_laserscan_conversions
+         COMMAND unittest_laserscan_conversions)
+endif (WIN32)
