@@ -75,12 +75,13 @@ target_link_libraries(${PROJECT_NAME}_app
 ## Tests ##
 ###########
 if (WIN32)
+find_package(GTest CONFIG REQUIRED)
+
 include_directories(
   test/include
   ${GTEST_INCLUDE_DIRS}
 )
 
-find_package(GTest CONFIG REQUIRED)
 ADD_EXECUTABLE(unittest_laserscan_conversions test/unit_tests/unittest_laserscan_conversions.cpp)
 
 TARGET_LINK_LIBRARIES(unittest_laserscan_conversions
