@@ -76,6 +76,7 @@ target_link_libraries(${PROJECT_NAME}_app
 ###########
 if (WIN32)
 find_package(GTest CONFIG REQUIRED)
+enable_testing()
 
 include_directories(
   test/include
@@ -90,8 +91,171 @@ TARGET_LINK_LIBRARIES(unittest_laserscan_conversions
     GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
 )
 
-enable_testing()
-
-add_test(NAME unittest_laserscan_conversions
+ADD_TEST(NAME unittest_laserscan_conversions
          COMMAND unittest_laserscan_conversions)
+
+ADD_EXECUTABLE(unittest_laserscan test/unit_tests/unittest_laserscan.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_laserscan
+    ${PROJECT_NAME}
+    ${GTEST_LIBRARIES}
+    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+)
+
+ADD_TEST(NAME unittest_laserscan
+         COMMAND unittest_laserscan)
+
+ADD_EXECUTABLE(unittest_logging test/unit_tests/unittest_logging.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_logging
+    ${PROJECT_NAME}
+    ${GTEST_LIBRARIES}
+    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+)
+
+ADD_TEST(NAME unittest_logging
+         COMMAND unittest_logging)
+
+
+ADD_EXECUTABLE(unittest_monitoring_frame_diagnostic_message test/unit_tests/unittest_monitoring_frame_diagnostic_message.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_monitoring_frame_diagnostic_message
+    ${PROJECT_NAME}
+    ${GTEST_LIBRARIES}
+    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+)
+
+ADD_TEST(NAME unittest_monitoring_frame_diagnostic_message
+         COMMAND unittest_monitoring_frame_diagnostic_message)
+
+ADD_EXECUTABLE(unittest_monitoring_frame_msg test/unit_tests/unittest_monitoring_frame_msg.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_monitoring_frame_msg
+    ${PROJECT_NAME}
+    ${GTEST_LIBRARIES}
+    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+)
+
+ADD_TEST(NAME unittest_monitoring_frame_msg
+         COMMAND unittest_monitoring_frame_msg)
+
+ADD_EXECUTABLE(unittest_monitoring_frame_serialization_deserialization test/unit_tests/unittest_monitoring_frame_serialization_deserialization.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_monitoring_frame_serialization_deserialization
+    ${PROJECT_NAME}
+    ${GTEST_LIBRARIES}
+    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+)
+
+ADD_TEST(NAME unittest_monitoring_frame_serialization_deserialization
+         COMMAND unittest_monitoring_frame_serialization_deserialization)
+
+
+ADD_EXECUTABLE(unittest_raw_processing test/unit_tests/unittest_raw_processing.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_raw_processing
+    ${PROJECT_NAME}
+    ${GTEST_LIBRARIES}
+    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+)
+
+ADD_TEST(NAME unittest_raw_processing
+         COMMAND unittest_raw_processing)
+
+
+ADD_EXECUTABLE(unittest_scan_range test/unit_tests/unittest_scan_range.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_scan_range
+    ${PROJECT_NAME}
+    ${GTEST_LIBRARIES}
+    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+)
+
+ADD_TEST(NAME unittest_scan_range
+         COMMAND unittest_scan_range)
+
+
+ADD_EXECUTABLE(unittest_scanner_configuration test/unit_tests/unittest_scanner_configuration.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_scanner_configuration
+    ${PROJECT_NAME}
+    ${GTEST_LIBRARIES}
+    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+)
+
+ADD_TEST(NAME unittest_scanner_configuration
+         COMMAND unittest_scanner_configuration)
+
+
+ADD_EXECUTABLE(unittest_scanner_reply_msg test/unit_tests/unittest_scanner_reply_msg.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_scanner_reply_msg
+    ${PROJECT_NAME}
+    ${GTEST_LIBRARIES}
+    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+)
+
+ADD_TEST(NAME unittest_scanner_reply_msg
+         COMMAND unittest_scanner_reply_msg)
+
+
+ADD_EXECUTABLE(unittest_start_request test/unit_tests/unittest_start_request.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_start_request
+    ${PROJECT_NAME}
+    ${GTEST_LIBRARIES}
+    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+)
+
+ADD_TEST(NAME unittest_start_request
+         COMMAND unittest_start_request)
+
+
+ADD_EXECUTABLE(unittest_stop_request test/unit_tests/unittest_stop_request.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_stop_request
+    ${PROJECT_NAME}
+    ${GTEST_LIBRARIES}
+    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+)
+
+ADD_TEST(NAME unittest_stop_request
+        COMMAND unittest_stop_request)
+
+
+ADD_EXECUTABLE(unittest_tenth_degree_conversion test/unit_tests/unittest_tenth_degree_conversion.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_tenth_degree_conversion
+    ${PROJECT_NAME}
+    ${GTEST_LIBRARIES}
+    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+)
+
+ADD_TEST(NAME unittest_tenth_degree_conversion
+        COMMAND unittest_tenth_degree_conversion)
+
+
+ADD_EXECUTABLE(unittest_tenth_of_degree test/unit_tests/unittest_tenth_of_degree.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_tenth_of_degree
+    ${PROJECT_NAME}
+    ${GTEST_LIBRARIES}
+    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+)
+
+ADD_TEST(NAME unittest_tenth_of_degree
+        COMMAND unittest_tenth_of_degree)
+
+
+ADD_EXECUTABLE(unittest_udp_client test/unit_tests/unittest_udp_client.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_udp_client
+    ${PROJECT_NAME}
+    ${GTEST_LIBRARIES}
+    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+)
+
+ADD_TEST(NAME unittest_udp_client
+        COMMAND unittest_udp_client)
+
 endif (WIN32)
