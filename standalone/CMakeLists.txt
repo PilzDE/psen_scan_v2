@@ -85,7 +85,7 @@ ADD_EXECUTABLE(unittest_laserscan_conversions test/unit_tests/unittest_laserscan
 
 TARGET_LINK_LIBRARIES(unittest_laserscan_conversions
     ${PROJECT_NAME}
-    GTEST_LIBRARIES
+    ${GTEST_LIBRARIES}
     GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
 )
 
