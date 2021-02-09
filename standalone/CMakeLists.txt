@@ -89,6 +89,8 @@ TARGET_LINK_LIBRARIES(unittest_laserscan_conversions
     GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
 )
 
+enable_testing()
+
 add_test(NAME unittest_laserscan_conversions
          COMMAND unittest_laserscan_conversions)
 endif (WIN32)

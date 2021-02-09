@@ -44,3 +44,9 @@ jobs:
       working-directory: ${{runner.workspace}}/psen_scan_v2/standalone
       shell: bash
       run: cmake --build build --config $BUILD_TYPE --target ALL_BUILD
+
+    -name: Test
+      working-directory: ${{runner.workspace}}/psen_scan_v2/standalone
+      shell: bash
+      run: cmake --build build --config $BUILD_TYPE --target RUN_TESTS
+
