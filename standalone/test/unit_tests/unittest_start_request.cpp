@@ -15,7 +15,7 @@
 
 #include <array>
 
-#include <arpa/inet.h>
+#include <boost/asio.hpp>
 #include <boost/crc.hpp>
 #include <gtest/gtest.h>
 
@@ -96,7 +96,10 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::seq_number), (uint32_t)sequence_number));
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::reserved), (uint64_t)0));
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::opcode), (uint32_t)0x35));
-  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::ip), inet_network(host_ip.c_str()), Endian::big));
+
+  EXPECT_TRUE(DecodingEquals(
+      data, static_cast<size_t>(Offset::ip), boost::asio::ip::make_address_v4(host_ip.c_str()).to_uint(), Endian::big));
+
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::udp_port), host_udp_port_data));
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::device_enabled), (uint8_t)0b00001000));
 

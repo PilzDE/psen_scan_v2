@@ -139,7 +139,9 @@ TARGET_LINK_LIBRARIES(unittest_monitoring_frame_msg
 ADD_TEST(NAME unittest_monitoring_frame_msg
          COMMAND unittest_monitoring_frame_msg)
 
-ADD_EXECUTABLE(unittest_monitoring_frame_serialization_deserialization test/unit_tests/unittest_monitoring_frame_serialization_deserialization.cpp)
+ADD_EXECUTABLE(unittest_monitoring_frame_serialization_deserialization
+               test/unit_tests/unittest_monitoring_frame_serialization_deserialization.cpp
+               test/src/monitoring_frame_serialization.cpp)
 
 TARGET_LINK_LIBRARIES(unittest_monitoring_frame_serialization_deserialization
     ${PROJECT_NAME}

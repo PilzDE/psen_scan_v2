@@ -18,6 +18,8 @@
 #include <functional>
 #include <memory>
 
+#include <boost/asio.hpp>
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -45,25 +47,25 @@ TEST(UdpClientTests, testInvalidNewDataHandler)
 {
   CallbackHandler handler;
 
-  EXPECT_THROW(psen_scan_v2_standalone::UdpClientImpl reader(nullptr,
-                                                             std::bind(&CallbackHandler::handleError, &handler, _1),
-                                                             HOST_UDP_READ_PORT,
-                                                             inet_network(UDP_MOCK_IP_ADDRESS.c_str()),
-                                                             UDP_MOCK_SEND_PORT),
+  EXPECT_THROW(psen_scan_v2_standalone::UdpClientImpl reader(
+                   nullptr,
+                   std::bind(&CallbackHandler::handleError, &handler, _1),
+                   HOST_UDP_READ_PORT,
+                   boost::asio::ip::make_address_v4(UDP_MOCK_IP_ADDRESS.c_str()).to_uint(),
+                   UDP_MOCK_SEND_PORT),
                std::invalid_argument);
 }
 
 TEST(UdpClientTests, testInvalidErrorHandler)
 {
   CallbackHandler handler;
-
-  EXPECT_THROW(
-      psen_scan_v2_standalone::UdpClientImpl reader(std::bind(&CallbackHandler::handleNewData, &handler, _1, _2),
-                                                    nullptr,
-                                                    HOST_UDP_READ_PORT,
-                                                    inet_network(UDP_MOCK_IP_ADDRESS.c_str()),
-                                                    UDP_MOCK_SEND_PORT),
-      std::invalid_argument);
+  EXPECT_THROW(psen_scan_v2_standalone::UdpClientImpl reader(
+                   std::bind(&CallbackHandler::handleNewData, &handler, _1, _2),
+                   nullptr,
+                   HOST_UDP_READ_PORT,
+                   boost::asio::ip::make_address_v4(UDP_MOCK_IP_ADDRESS.c_str()).to_uint(),
+                   UDP_MOCK_SEND_PORT),
+               std::invalid_argument);
 }
 
 TEST(UdpClientTests, testCloseConnectionFailureForCompleteCoverage)
