@@ -77,6 +77,7 @@ target_link_libraries(${PROJECT_NAME}_app
 if (WIN32)
 include_directories(
   test/include
+  ${GTEST_INCLUDE_DIRS}
 )
 
 find_package(GTest CONFIG REQUIRED)
@@ -84,7 +85,7 @@ ADD_EXECUTABLE(unittest_laserscan_conversions test/unit_tests/unittest_laserscan
 
 TARGET_LINK_LIBRARIES(unittest_laserscan_conversions
     ${PROJECT_NAME}
-    libgtest
+    GTEST_LIBRARIES
     GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
 )
 
