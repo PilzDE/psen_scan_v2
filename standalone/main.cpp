@@ -20,7 +20,7 @@
 #include <psen_scan_v2_standalone/core.h>
 
 using namespace psen_scan_v2_standalone;
-using namespace psen_scan_v2_standalone::configuration::constants;
+using namespace psen_scan_v2_standalone::configuration;
 using namespace psen_scan_v2_standalone::api;
 
 /*

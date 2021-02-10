@@ -22,11 +22,6 @@ namespace psen_scan_v2_standalone
 {
 namespace configuration
 {
-/**
- * @brief Contains default constants for the scanner setup.
- */
-namespace constants
-{
 static constexpr unsigned short DATA_PORT_OF_SCANNER_DEVICE{ 2000 };
 static constexpr unsigned short CONTROL_PORT_OF_SCANNER_DEVICE{ 3000 };
 
@@ -48,7 +43,6 @@ static constexpr double RANGE_MAX_IN_M{ 40. };
 static constexpr double DEFAULT_X_AXIS_ROTATION(data_conversion_layer::degreeToRadian(137.5));
 
 static std::string SCAN_FRAME_ID_SUFFIX{ "_scan" };
-}  // namespace constants
 }  // namespace configuration
 
 }  // namespace psen_scan_v2_standalone

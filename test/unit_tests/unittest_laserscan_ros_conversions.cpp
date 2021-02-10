@@ -25,7 +25,7 @@
 
 using namespace psen_scan_v2;
 using namespace psen_scan_v2_standalone;
-using namespace psen_scan_v2_standalone::configuration::constants;
+using namespace psen_scan_v2_standalone::configuration;
 
 MATCHER_P(IsReversed, data_vec, "")
 {

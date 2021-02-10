@@ -167,10 +167,10 @@ TEST_F(ScannerConfigurationTest, shouldReturnCorrectPortsAfterDefaultConstructio
 {
   const configuration::ScannerConfiguration config{ createValidDefaultConfig() };
 
-  EXPECT_EQ(configuration::constants::DATA_PORT_OF_SCANNER_DEVICE, config.scannerDataPort());
-  EXPECT_EQ(configuration::constants::CONTROL_PORT_OF_SCANNER_DEVICE, config.scannerControlPort());
-  EXPECT_EQ(configuration::constants::DATA_PORT_OF_HOST_DEVICE, config.hostUDPPortData());
-  EXPECT_EQ(configuration::constants::CONTROL_PORT_OF_HOST_DEVICE, config.hostUDPPortControl());
+  EXPECT_EQ(configuration::DATA_PORT_OF_SCANNER_DEVICE, config.scannerDataPort());
+  EXPECT_EQ(configuration::CONTROL_PORT_OF_SCANNER_DEVICE, config.scannerControlPort());
+  EXPECT_EQ(configuration::DATA_PORT_OF_HOST_DEVICE, config.hostUDPPortData());
+  EXPECT_EQ(configuration::CONTROL_PORT_OF_HOST_DEVICE, config.hostUDPPortControl());
 }
 
 TEST_F(ScannerConfigurationTest, shouldReturnCorrectDiagnosticsFlagAfterDefaultConstruction)

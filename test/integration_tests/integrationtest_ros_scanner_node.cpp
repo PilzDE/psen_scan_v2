@@ -43,7 +43,7 @@ using namespace psen_scan_v2_standalone;
 using namespace psen_scan_v2_test;
 
 using namespace ::testing;
-using namespace psen_scan_v2_standalone::configuration::constants;
+using namespace psen_scan_v2_standalone::configuration;
 
 namespace psen_scan_v2
 {
