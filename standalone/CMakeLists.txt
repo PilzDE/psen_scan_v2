@@ -260,4 +260,40 @@ TARGET_LINK_LIBRARIES(unittest_udp_client
 ADD_TEST(NAME unittest_udp_client
         COMMAND unittest_udp_client)
 
+
+add_executable(integrationtest_scanner_api
+        test/integration_tests/integrationtest_scanner_api.cpp
+        test/src/monitoring_frame_serialization.cpp
+        src/scanner_v2.cpp
+        src/laserscan.cpp
+        src/monitoring_frame_msg.cpp
+        src/monitoring_frame_deserialization.cpp
+        src/scanner_configuration.cpp
+        src/start_request.cpp
+        src/stop_request_serialization.cpp
+        src/diagnostics.cpp
+        src/start_request_serialization.cpp
+        src/scanner_reply_serialization_deserialization.cpp)
+
+target_link_libraries(integrationtest_scanner_api
+    ${PROJECT_NAME}
+    ${GTEST_LIBRARIES}
+    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+)
+
+add_test(NAME integrationtest_scanner_api
+        COMMAND integrationtest_scanner_api)
+
+
+add_executable(integrationtest_udp_client
+        test/integration_tests/integrationtest_udp_client.cpp)
+
+target_link_libraries(integrationtest_udp_client
+    ${PROJECT_NAME}
+    ${GTEST_LIBRARIES}
+    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+)
+
+add_test(NAME integrationtest_udp_client
+        COMMAND integrationtest_udp_client)
 endif (WIN32)
