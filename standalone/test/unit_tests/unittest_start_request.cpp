@@ -106,10 +106,10 @@ TEST_F(StartRequestTest, constructorTest)
                              boost::asio::ip::address_v4::make_address_v4(host_ip.c_str()).to_uint(),
                              Endian::big));
 #else
-  EXPECT_TRUE(DecodingEquals(data,
-                             static_cast<size_t>(Offset::ip),
-                             boost::asio::ip::address_v4::from_string(host_ip.c_str()).to_ulong(),
-                             Endian::big));
+  EXPECT_TRUE(DecodingEquals<uint32_t>(data,
+                                       static_cast<size_t>(Offset::ip),
+                                       boost::asio::ip::address_v4::from_string(host_ip.c_str()).to_ulong(),
+                                       Endian::big));
 #endif
 
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::udp_port), host_udp_port_data));
