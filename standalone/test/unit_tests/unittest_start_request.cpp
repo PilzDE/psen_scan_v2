@@ -97,8 +97,20 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::reserved), (uint64_t)0));
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::opcode), (uint32_t)0x35));
 
+#if BOOST_VERSION >= 107000
   EXPECT_TRUE(DecodingEquals(
       data, static_cast<size_t>(Offset::ip), boost::asio::ip::make_address_v4(host_ip.c_str()).to_uint(), Endian::big));
+#elif BOOST_VERSION >= 106900
+  EXPECT_TRUE(DecodingEquals(data,
+                             static_cast<size_t>(Offset::ip),
+                             boost::asio::ip::address_v4::make_address_v4(host_ip.c_str()).to_uint(),
+                             Endian::big));
+#else
+  EXPECT_TRUE(DecodingEquals(data,
+                             static_cast<size_t>(Offset::ip),
+                             boost::asio::ip::address_v4::from_string(host_ip.c_str()).to_ulong(),
+                             Endian::big));
+#endif
 
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::udp_port), host_udp_port_data));
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::device_enabled), (uint8_t)0b00001000));
