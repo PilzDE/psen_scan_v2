@@ -44,9 +44,6 @@ public:
                 const unsigned short& endpoint_port)
     : data_handler_(data_handler), error_handler_(error_handler)
   {
-    using ::testing::_;
-    using ::testing::SaveArg;
-    ON_CALL(*this, startAsyncReceiving(_, _, _)).WillByDefault(SaveArg<1>(&timeout_handler_));
   };
 
 public:
@@ -54,14 +51,9 @@ public:
   void sendStopReply();
   void sendMonitoringFrame(monitoring_frame::Message& msg);
   void simulateError(const std::string& msg);
-  void simulateTimeout(const std::string& msg);
 
 public:
   MOCK_METHOD0(close, void());
-  MOCK_METHOD3(startAsyncReceiving,
-               void(const ReceiveMode& modi,
-                    const TimeoutHandler& timeout_handler,
-                    const std::chrono::high_resolution_clock::duration& timeout));
   // "Simulates" function call which uses default values
   MOCK_METHOD0(startAsyncReceiving, void());
   MOCK_METHOD1(startAsyncReceiving, void(const ReceiveMode& modi));
@@ -73,7 +65,6 @@ private:
 private:
   NewDataHandler data_handler_;
   ErrorHandler error_handler_;
-  TimeoutHandler timeout_handler_;
 };
 
 void MockUdpClient::sendStartReply()
@@ -111,11 +102,6 @@ void MockUdpClient::handleNewData(const data_conversion_layer::RawData& received
 void MockUdpClient::simulateError(const std::string& msg)
 {
   error_handler_(msg);
-}
-
-void MockUdpClient::simulateTimeout(const std::string& msg)
-{
-  timeout_handler_(msg);
 }
 
 }  // namespace psen_scan_v2_standalone_test
