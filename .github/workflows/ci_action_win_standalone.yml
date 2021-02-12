@@ -15,7 +15,7 @@ jobs:
     - name: Install deps with vcpkg
       shell: bash
       run: |
-        vcpkg install console-bridge:x64-windows
+        vcpkg install console-bridge:x64-windows gtest:x64-windows
         vcpkg integrate install
 
     - name: Clone fmt
@@ -44,3 +44,9 @@ jobs:
       working-directory: ${{runner.workspace}}/psen_scan_v2/standalone
       shell: bash
       run: cmake --build build --config $BUILD_TYPE --target ALL_BUILD
+
+    - name: Test
+      working-directory: ${{runner.workspace}}/psen_scan_v2/standalone
+      shell: bash
+      run: cmake --build build --config $BUILD_TYPE --target RUN_TESTS
+
