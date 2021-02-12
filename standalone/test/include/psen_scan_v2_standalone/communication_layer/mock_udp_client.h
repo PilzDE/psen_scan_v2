@@ -42,9 +42,7 @@ public:
                 const unsigned short& host_port,
                 const unsigned int& endpoint_ip,
                 const unsigned short& endpoint_port)
-    : data_handler_(data_handler), error_handler_(error_handler)
-  {
-  };
+    : data_handler_(data_handler), error_handler_(error_handler){};
 
 public:
   void sendStartReply();
