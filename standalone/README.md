@@ -126,7 +126,7 @@ Boost should now be successfully built.
   ```
 - Generate Visual Studio Project 
   ```
-  cmake -DCMAKE_PREFIX_PATH=<path_to_boost>\boost_1_75_0\stage\lib\cmake -G "Visual Studio 15 2017 Win64" \path_to_source\
+  cmake -DBUILD_TESTING=OFF -DCMAKE_PREFIX_PATH=<path_to_boost>\boost_1_75_0\stage\lib\cmake -G "Visual Studio 15 2017 Win64" \path_to_source\
   ```
 - Go back to `standalone`-folder 
   ```

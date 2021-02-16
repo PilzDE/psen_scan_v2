@@ -81,8 +81,10 @@ target_link_libraries(${PROJECT_NAME}_app
 ## Tests ##
 ###########
 if (WIN32)
+include(CTest)
+
+if (BUILD_TESTING)
 find_package(GTest CONFIG REQUIRED)
-enable_testing()
 
 include_directories(
   test/include
@@ -302,4 +304,6 @@ target_link_libraries(integrationtest_udp_client
 
 add_test(NAME integrationtest_udp_client
         COMMAND integrationtest_udp_client)
+
+endif (BUILD_TESTING)
 endif (WIN32)
