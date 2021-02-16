@@ -10,8 +10,8 @@ The PSENscan Standalone C++ Library allows you to easily integrate the PSENscan 
 ## Table of Contents
 
 1. [Prerequisites](#prerequisites)
-2. [Get Started](#get-started)
-3. [Usage example](#usage-example)
+2. [Get Started on Linux](#get-started-on-linux)
+3. [Get Started on Windows](#get-started-on-windows)
 4. [C++ API](#c++-api)
 
 ## Prerequisites
@@ -49,15 +49,13 @@ An example application, which prints distance data to the screen, is built by de
 ```
 
 ## Get Started on Windows
-### Dependencies
-- Visual Studio
-- Boost (https://www.boost.org/)
-- console_bridge https://github.com/ros/console_bridge
-- fmt (https://github.com/fmtlib/fmt)
-
 ### Build and install dependencies
-#### Boost
+#### Visual Studio
+- Get Visual Studio from https://visualstudio.microsoft.com/de/
+- Open `Visual Studio Developer Console`, the version you want
+- Use this Console for the next steps
 
+#### Boost
 - First download source from https://www.boost.org/
 - Unzip the file and open the folder e.g. `boost_1_75_0`
 - Open a command line and run
@@ -76,7 +74,6 @@ Boost should now be successfully built.
 
 #### console_bridge
 - Download source from Github (https://github.com/ros/console_bridge)
-- Open `Visual Studio Developer Console`, the version you want
 - Open the `console_bridge`-folder, with the `CMakeLists.txt` in it
 - Generate Visual Studio Project
   ```
@@ -98,7 +95,6 @@ Boost should now be successfully built.
 
 #### fmt
 - Download source from Github (https://github.com/fmtlib/fmt)
-- Open `Visual Studio Developer Console`, the version you want
 - Open the `fmt`-folder, with the `CMakeLists.txt` in it
 - Generate Visual Studio Project: 
    ```
@@ -118,7 +114,6 @@ Boost should now be successfully built.
 
 ### Build psen_scan_v2_standalone
 - Download source from Github
-- Open `Visual Studio Developer Console`, the version you want
 - Open the `standalone`-folder, with the `CMakeLists.txt` in it
 - Create a build folder and open it 
   ```
