@@ -57,20 +57,7 @@ An example application, which prints distance data to the screen, is built by de
 
 #### Boost
 - First download source from https://www.boost.org/
-- Unzip the file and open the folder e.g. `boost_1_75_0`
-- Open a command line and run
-  ```
-  bootstrap.bat
-  ```
-- Build boost with
-  ```
-  b2 -j8 toolset=msvc-14.1 address-model=64 architecture=x86 link=static threading=multi runtime-link=shared --build-type=complete stage
-  ```
-  `toolset` is the compiler you want to use, here 14.1->MSVC2017 <br>
-  `address-model` build for 64 or 32 bit <br>
-  `link` has to be static, because cmake expects them so
-
-Boost should now be successfully built.
+- Unzip the file and open the folder e.g. `boost_1_75_0` since the lib is used as header-only no install step is required.
 
 #### console_bridge
 - Download source from Github (https://github.com/ros/console_bridge)
@@ -121,7 +108,7 @@ Boost should now be successfully built.
   ```
 - Generate Visual Studio Project 
   ```
-  cmake -DBUILD_TESTING=OFF -DCMAKE_PREFIX_PATH=<path_to_boost>\boost_1_75_0\stage\lib\cmake -G "Visual Studio 15 2017 Win64" \path_to_source\
+  cmake -DBUILD_TESTING=OFF -G "Visual Studio 15 2017 Win64" \path_to_source\
   ```
 - Go back to `standalone`-folder 
   ```
