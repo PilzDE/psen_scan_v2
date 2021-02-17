@@ -126,7 +126,7 @@ If you've created an application package with your own launch file as described 
 you can easily adjust the aforementioned configuration parameters.
 
 ## C++ standalone library
-If you are interested in using the PSENscan safety laser scanner without ROS, please take a look at our C++ standalone library. You can read more about it [here](https://github.com/PilzDE/psen_scan_v2/blob/main/standalone/CMakeLists.txt)
+If you are interested in using the PSENscan safety laser scanner without ROS, please take a look at our C++ standalone library. You can read more about it [here](https://github.com/PilzDE/psen_scan_v2/blob/main/standalone/README.md)
 
 ## Test concept
 ![psen_scan_test_concept](doc/test_architecture.svg)
