@@ -23,7 +23,6 @@
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <boost/array.hpp>
 
 #include "psen_scan_v2_standalone/raw_scanner_data.h"
 

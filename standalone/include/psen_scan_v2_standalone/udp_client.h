@@ -33,7 +33,6 @@
 #endif
 
 #include <boost/asio.hpp>
-#include <boost/asio/high_resolution_timer.hpp>
 #include <boost/bind.hpp>
 
 #include "psen_scan_v2_standalone/raw_scanner_data.h"
