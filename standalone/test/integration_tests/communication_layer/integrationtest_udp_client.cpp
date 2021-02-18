@@ -63,19 +63,43 @@ public:
 protected:
   MockUDPServer mock_udp_server_{ UDP_MOCK_PORT, std::bind(&UdpClientTests::receivedUdpMsg, this, _1, _2) };
 
+#if BOOST_VERSION > 107000
   std::unique_ptr<communication_layer::UdpClientImpl> udp_client_{ new communication_layer::UdpClientImpl(
       std::bind(&UdpClientTests::handleNewData, this, _1, _2),
       std::bind(&UdpClientTests::handleError, this, _1),
       HOST_UDP_PORT,
-      inet_network(UDP_MOCK_IP_ADDRESS.c_str()),
+      boost::asio::ip::make_address_v4(UDP_MOCK_IP_ADDRESS.c_str()).to_uint(),
       UDP_MOCK_PORT) };
+#elif BOOST_VERSION >= 106900
+  std::unique_ptr<communication_layer::UdpClientImpl> udp_client_{ new communication_layer::UdpClientImpl(
+      std::bind(&UdpClientTests::handleNewData, this, _1, _2),
+      std::bind(&UdpClientTests::handleError, this, _1),
+      HOST_UDP_PORT,
+      boost::asio::ip::address_v4::make_address_v4(UDP_MOCK_IP_ADDRESS.c_str()).to_uint(),
+      UDP_MOCK_PORT) };
+#else
+  std::unique_ptr<communication_layer::UdpClientImpl> udp_client_{ new communication_layer::UdpClientImpl(
+      std::bind(&UdpClientTests::handleNewData, this, _1, _2),
+      std::bind(&UdpClientTests::handleError, this, _1),
+      HOST_UDP_PORT,
+      boost::asio::ip::address_v4::from_string(UDP_MOCK_IP_ADDRESS.c_str()).to_ulong(),
+      UDP_MOCK_PORT) };
+#endif
 
   const data_conversion_layer::RawData send_array_{ 'H', 'e', 'l', 'l', 'o' };
   const udp::endpoint host_endpoint;
 };
 
+#if BOOST_VERSION > 107000
 UdpClientTests::UdpClientTests()
-  : host_endpoint(udp::endpoint(boost::asio::ip::address_v4::from_string(HOST_IP_ADDRESS), HOST_UDP_PORT))
+  : host_endpoint(udp::endpoint(boost::asio::ip::make_address_v4(HOST_IP_ADDRESS.c_str()), HOST_UDP_PORT))
+#elif BOOST_VERSION >= 106900
+UdpClientTests::UdpClientTests()
+  : host_endpoint(udp::endpoint(boost::asio::ip::address_v4::make_address_v4(HOST_IP_ADDRESS.c_str()), HOST_UDP_PORT))
+#else
+UdpClientTests::UdpClientTests()
+  : host_endpoint(udp::endpoint(boost::asio::ip::address_v4::from_string(HOST_IP_ADDRESS.c_str()), HOST_UDP_PORT))
+#endif
 {
 }
 

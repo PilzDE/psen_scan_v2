@@ -22,7 +22,12 @@
 #include <string>
 #include <limits>
 
+#ifdef __linux__
 #include <arpa/inet.h>
+#endif
+#ifdef _WIN32
+#include <WinSock2.h>
+#endif
 
 #include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
 #include "psen_scan_v2_standalone/configuration/scan_range.h"
@@ -71,6 +76,7 @@ inline ScannerConfiguration ScannerConfigurationBuilder::build() const
   return config_;
 }
 
+#ifdef __linux__
 uint32_t ScannerConfigurationBuilder::convertIP(const std::string& ip)
 {
   const auto ip_number = inet_network(ip.c_str());
@@ -81,6 +87,20 @@ uint32_t ScannerConfigurationBuilder::convertIP(const std::string& ip)
   assert(sizeof(ip_number) == 4 && "ip_number has not the expected size");
   return static_cast<uint32_t>(ip_number);
 }
+#endif
+
+#ifdef _WIN32
+uint32_t ScannerConfigurationBuilder::convertIP(const std::string& ip)
+{
+  const auto ip_number = inet_addr(ip.c_str());
+  if (INADDR_NONE == ip_number)
+  {
+    throw std::invalid_argument("IP invalid");
+  }
+  assert(sizeof(ip_number) == 4 && "ip_number has not the expected size");
+  return htonl(static_cast<uint32_t>(ip_number));
+}
+#endif
 
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::hostIP(const std::string& ip)
 {

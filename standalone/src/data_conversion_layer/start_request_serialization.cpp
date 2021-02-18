@@ -17,6 +17,10 @@
 #include <cassert>
 #include <iostream>
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 #include <boost/crc.hpp>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request.h"
@@ -53,8 +57,15 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
   raw_processing::write(os, data_conversion_layer::start_request::RESERVED);
   raw_processing::write(os, data_conversion_layer::start_request::OPCODE);
 
-  /**< Byte order: big endian */
+/**< Byte order: big endian */
+#ifdef __linux__
   const uint32_t host_ip_big_endian = htobe32(msg.host_ip_);
+#endif
+
+#ifdef _WIN32
+  const uint32_t host_ip_big_endian = _byteswap_ulong(msg.host_ip_);
+#endif
+
   raw_processing::write(os, host_ip_big_endian);
 
   /**< Byte order: big endian */

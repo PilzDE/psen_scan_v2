@@ -47,6 +47,7 @@ static constexpr uint32_t RAW_CHUNK_UNUSED_OFFSET_IN_BYTES{ 4 };
 static constexpr uint32_t RAW_CHUNK_LENGTH_IN_BYTES{
   RAW_CHUNK_UNUSED_OFFSET_IN_BYTES + RAW_CHUNK_LENGTH_FOR_ONE_DEVICE_IN_BYTES * configuration::VALID_SCANNER_IDS.size()
 };
+
 using RawChunk = std::array<uint8_t, diagnostic::RAW_CHUNK_LENGTH_IN_BYTES>;
 
 enum class ErrorType

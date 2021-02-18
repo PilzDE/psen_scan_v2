@@ -55,7 +55,7 @@ static const std::string HOST_IP_ADDRESS{ "127.0.0.1" };
 
 static constexpr configuration::DefaultScanRange SCAN_RANGE{ util::TenthOfDegree(0), util::TenthOfDegree(60) };
 
-static constexpr std::chrono::milliseconds WAIT_TIMEOUT{ 10 };
+static constexpr std::chrono::milliseconds FUTURE_WAIT_TIMEOUT{ 10 };
 static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 3 };
 
 using std::placeholders::_1;
@@ -324,7 +324,8 @@ TEST_F(ScannerAPITests, testStartFunctionality)
   }) };
 
   ASSERT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
-  ASSERT_EQ(start_future.wait_for(WAIT_TIMEOUT), std::future_status::timeout) << "Scanner::start() finished too early";
+  ASSERT_EQ(start_future.wait_for(FUTURE_WAIT_TIMEOUT), std::future_status::timeout)
+      << "Scanner::start() finished too early";
   scanner_mock.sendStartReply();
   ASSERT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
 }
@@ -366,7 +367,8 @@ TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
   ASSERT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
 
   scanner_mock.sendMonitoringFrame(createValidMonitoringFrameMsg());
-  ASSERT_EQ(start_future.wait_for(WAIT_TIMEOUT), std::future_status::timeout) << "Scanner::start() finished too early ";
+  ASSERT_EQ(start_future.wait_for(FUTURE_WAIT_TIMEOUT), std::future_status::timeout)
+      << "Scanner::start() finished too early ";
 
   scanner_mock.sendStartReply();
   EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
@@ -399,7 +401,8 @@ TEST_F(ScannerAPITests, testStopFunctionality)
   }) };
 
   EXPECT_TRUE(stop_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Stop request not received";
-  EXPECT_EQ(stop_future.wait_for(WAIT_TIMEOUT), std::future_status::timeout) << "Scanner::stop() finished too early";
+  EXPECT_EQ(stop_future.wait_for(FUTURE_WAIT_TIMEOUT), std::future_status::timeout)
+      << "Scanner::stop() finished too early";
   scanner_mock.sendStopReply();
   EXPECT_EQ(stop_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::stop() not finished";
 }

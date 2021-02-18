@@ -17,7 +17,8 @@
 #include <string>
 #include <limits>
 
-#include <arpa/inet.h>
+#include <boost/asio.hpp>
+
 #include <gtest/gtest.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
@@ -187,9 +188,7 @@ TEST_F(ScannerConfigurationTest, shouldReturnCorrectHostIpAfterConstruction)
   const auto host_ip = sc.hostIp();
   EXPECT_EQ(4U, sizeof(host_ip));
 
-  const auto network_number = inet_makeaddr(host_ip, 0);
-  const auto network_number_ascii = inet_ntoa(network_number);
-  const std::string host_ip_string(network_number_ascii);
+  const std::string host_ip_string(boost::asio::ip::address_v4(host_ip).to_string());
 
   EXPECT_EQ(VALID_IP, host_ip_string);
 }
@@ -201,9 +200,7 @@ TEST_F(ScannerConfigurationTest, shouldReturnCorrectScannerIpAfterConstruction)
   const auto client_ip = sc.clientIp();
   EXPECT_EQ(4U, sizeof(client_ip));
 
-  const auto network_number = inet_makeaddr(client_ip, 0);
-  const auto network_number_ascii = inet_ntoa(network_number);
-  const std::string client_ip_string(network_number_ascii);
+  const std::string client_ip_string(boost::asio::ip::address_v4(client_ip).to_string());
 
   EXPECT_EQ(VALID_IP, client_ip_string);
 }
