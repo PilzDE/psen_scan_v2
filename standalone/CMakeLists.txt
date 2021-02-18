@@ -245,7 +245,7 @@ ADD_TEST(NAME unittest_tenth_degree_conversion
         COMMAND unittest_tenth_degree_conversion)
 
 
-ADD_EXECUTABLE(unittest_tenth_of_degree test/unit_tests/data_conversion_layer/unittest_tenth_of_degree.cpp)
+ADD_EXECUTABLE(unittest_tenth_of_degree test/unit_tests/util/unittest_tenth_of_degree.cpp)
 
 TARGET_LINK_LIBRARIES(unittest_tenth_of_degree
     ${PROJECT_NAME}
@@ -294,7 +294,7 @@ add_test(NAME integrationtest_scanner_api
 
 
 add_executable(integrationtest_udp_client
-        test/integration_tests/api/integrationtest_udp_client.cpp)
+        test/integration_tests/communication_layer/integrationtest_udp_client.cpp)
 
 target_link_libraries(integrationtest_udp_client
     ${PROJECT_NAME}
