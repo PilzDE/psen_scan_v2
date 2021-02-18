@@ -1,0 +1,48 @@
+name: Win-Standalone-CI
+
+on: [push, pull_request]
+
+env:
+  BUILD_TYPE: "Release"
+
+jobs:
+  build:
+    runs-on: [windows-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install deps with vcpkg
+      shell: bash
+      run: |
+        vcpkg install console-bridge:x64-windows gtest:x64-windows
+        vcpkg integrate install
+
+    - name: Clone fmt
+      shell: bash
+      working-directory: ${{runner.workspace}}
+      run: git clone https://github.com/fmtlib/fmt.git --depth 1 --branch 6.1.2
+
+    - name: Install fmt
+      shell: cmd
+      working-directory: ${{runner.workspace}}/fmt
+      run: |
+        cmake -G "Visual Studio 16 2019" .
+        cmake --build . --config %BUILD_TYPE% --target ALL_BUILD
+        cmake --build . --config %BUILD_TYPE% --target INSTALL
+
+    - name: Configure and build CMake
+      shell: cmd
+      working-directory: ${{runner.workspace}}/psen_scan_v2/standalone
+      run: |
+        set     BOOST_ROOT=%BOOST_ROOT_1_72_0%
+        cmake -G "Visual Studio 16 2019" -A x64 ^
+          -DCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%/scripts/buildsystems/vcpkg.cmake ^
+          -S . -B build
+        cmake --build build --config %BUILD_TYPE% --target ALL_BUILD
+
+    - name: Test
+      working-directory: ${{runner.workspace}}/psen_scan_v2/standalone
+      shell: bash
+      run: cmake --build build --config $BUILD_TYPE --target RUN_TESTS
+

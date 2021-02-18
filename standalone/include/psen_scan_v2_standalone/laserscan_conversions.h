@@ -33,7 +33,7 @@ static LaserScan toLaserScan(const monitoring_frame::Message& frame)
   const auto resolution = frame.resolution();
   const auto min_angle = frame.fromTheta();
   const uint16_t number_of_samples = frame.measurements().size();
-  const auto max_angle = (frame.fromTheta() + frame.resolution() * number_of_samples);
+  const auto max_angle = (frame.fromTheta() + frame.resolution() * static_cast<int>(number_of_samples));
 
   LaserScan scan(resolution, min_angle, max_angle);
   scan.setMeasurements(frame.measurements());

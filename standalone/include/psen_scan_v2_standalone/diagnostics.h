@@ -41,8 +41,8 @@ namespace raw_message
 {
 static constexpr uint32_t LENGTH_FOR_ONE_DEVICE_IN_BYTES{ 9 };
 static constexpr uint32_t UNUSED_OFFSET_IN_BYTES{ 4 };
-static constexpr uint32_t LENGTH_IN_BYTES{ UNUSED_OFFSET_IN_BYTES +
-                                           LENGTH_FOR_ONE_DEVICE_IN_BYTES * VALID_SCANNER_IDS.size() };
+static constexpr uint32_t LENGTH_IN_BYTES{ static_cast<uint32_t>(
+    UNUSED_OFFSET_IN_BYTES + LENGTH_FOR_ONE_DEVICE_IN_BYTES * VALID_SCANNER_IDS.size()) };
 using Field = std::array<uint8_t, diagnostic::raw_message::LENGTH_IN_BYTES>;
 }  // namespace raw_message
 
