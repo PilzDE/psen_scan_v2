@@ -21,13 +21,13 @@
 namespace psen_scan_v2_standalone
 {
 /**
- * @brief Helper class to simplify/improve the handling of angles.
+ * @brief Helper class representing angles in tenth of degree.
  *
  * There are different representations for angles on the scanner side and the api.
  * - The scanner uses tenth of degree
  * - The driver uses radian to be conform to ROS.
  *
- * This class helps to convert those angles back and forth and to keep consistency within the driver.
+ * This class simplifies/improves the handling of angles. It provides conversions from/to radian angles.
  */
 class TenthOfDegree
 {

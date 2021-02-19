@@ -103,7 +103,7 @@ public:
 
 /**
  * @brief Helper class used to easily transfer data from the higher level ScannerV2 class
- * to the ScannerProtocolDef class during construction of the ScannerStateMachine.
+ * to the ScannerProtocolDef class during construction of the scanner_protocol::ScannerStateMachine.
  */
 struct StateMachineArgs
 {
@@ -143,7 +143,21 @@ struct StateMachineArgs
 
 // front-end: define the FSM structure
 /**
- * @brief Definition of the scanner protocol.
+ * @brief Definition of the scanner protocol. It is initialized using the StateMachineArgs class.
+ *
+ * This class interacts with UdpClientImpl in order to perform its actions. These include sending a start request, a
+ * stop request and handling incoming messages such as a start reply, a stop reply and a monitoring frame.
+ *
+ * Precisely, the StateMachineArgs::control_client_ is used for the starting-/stopping procedure and the
+ * StateMachineArgs::data_client_ for receiving monitoring frames.
+ *
+ * It also checks for internal errors of incoming messages and handles timeouts of the above mentioned actions by
+ * creating watchdogs via IWatchdogFactory.
+ *
+ * @see start_request::Message
+ * @see stop_request
+ * @see scanner_reply::Message
+ * @see monitoring_frame::Message
  */
 class ScannerProtocolDef : public msm::front::state_machine_def<ScannerProtocolDef>
 {
@@ -227,6 +241,11 @@ private:
 };
 
 // Pick a back-end
+/**
+ * @brief State machine handling all events according to the scanner protocol and error handling specification.
+ *
+ * @see ScannerProtocolDef
+ */
 using ScannerStateMachine = msm::back::state_machine<ScannerProtocolDef>;
 
 }  // namespace scanner_protocol

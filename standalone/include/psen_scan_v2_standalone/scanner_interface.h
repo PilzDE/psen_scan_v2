@@ -30,12 +30,17 @@ namespace psen_scan_v2_standalone
  *
  * This interface allows to:
  * - Set a configuration for the scanner on startup
- * - Define a callback for incomming scans
- * - Start and Stop the communication with the scanner.
+ * - Define a callback for incoming scans
+ * - Start and stop the communication with the scanner
+ *
+ * @see LaserScanCallback
+ * @see ScannerConfiguration
+ * @see ScannerV2
  */
 class IScanner
 {
 public:
+  //! @brief Represents the user-provided callback for processing incoming scan data.
   using LaserScanCallback = std::function<void(const LaserScan&)>;
 
 public:

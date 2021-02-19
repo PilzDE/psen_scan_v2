@@ -40,16 +40,20 @@ using std::placeholders::_1;
 using std::placeholders::_2;
 
 /**
- * @brief This is the API implementation for external interaction with the PSENscan driver.
+ * @brief This is the implementation of the Scanner API defined by IScanner.
  *
- * This class is responsible for the initialization of:
+ * The class ScannerV2 is responsible for the initialization of:
  * - the state machine.
  * - the Udp connections.
  * - the guards to ensure threads save interaction between the user, udp connections and timeouts.
  *
  * It uses the passed ScannerConfiguration for all configurable parts of this process.
  *
+ * The class creates two UdpClientImpl, a WatchdogFactory and passes them together with the @ref LaserScanCallback to
+ * the scanner_protocol::ScannerStateMachine via scanner_protocol::StateMachineArgs.
+ *
  * @see IScanner
+ * @see UdpClientImpl
  * @see scanner_protocol::ScannerStateMachine
  * @see ScannerConfiguration
  */
@@ -81,7 +85,7 @@ private:
   /**
    * @brief Watchdog factory implementation for scanner interaction timeouts
    *
-   * Implements the IWatchdogFactory to add behavior to handles specific cases,
+   * Implements the IWatchdogFactory to add behavior to handle specific cases,
    * where the interaction with the scanner hardware takes longer than expected.
    *
    * @see scanner_protocol::IWatchdogFactory
