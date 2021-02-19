@@ -16,7 +16,6 @@
 #include <ros/ros.h>
 #include <gtest/gtest.h>
 
-#include <boost/filesystem.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <functional>
@@ -30,6 +29,7 @@
 
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
+#include <rosbag/exceptions.h>
 #include <sensor_msgs/LaserScan.h>
 
 #include "psen_scan_v2/dist.h"
@@ -65,7 +65,7 @@ std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
 class ScanComparisonTests : public ::testing::Test
 {
 public:
-  static void SetUpTestCase()
+  static void SetUpTestSuite()
   {
     ros::NodeHandle pnh{ "~" };
 
@@ -73,13 +73,20 @@ public:
     pnh.getParam("testfile", filepath);
 
     ROS_INFO_STREAM("Using testfile " << filepath);
-    if (!boost::filesystem::exists(filepath))
-    {
-      ROS_ERROR_STREAM("File " << filepath << " not found!");
-      FAIL();
-    }
 
-    bins_expected_ = binsFromRosbag(filepath);
+    try
+    {
+      bins_expected_ = binsFromRosbag(filepath);
+    }
+    catch (const rosbag::BagIOException& e)
+    {
+      FAIL() << "File " << filepath
+             << " could not be opened. Make sure the file exists and the you have sufficient rights to open it.";
+    }
+    catch (const rosbag::BagException& e)
+    {
+      FAIL() << "There was an error opening " << filepath;
+    }
 
     ASSERT_TRUE(pnh.getParam("test_duration", test_duration_));
   }

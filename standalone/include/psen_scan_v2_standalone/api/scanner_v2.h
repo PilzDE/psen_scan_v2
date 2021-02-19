@@ -48,14 +48,14 @@ using std::placeholders::_2;
  * @brief This is the API implementation for external interaction with the PSENscan driver.
  *
  * This class is responsible for the initialization of:
- * - the ScannerStateMachine.
+ * - the state machine.
  * - the Udp connections.
  * - the guards to ensure threads save interaction between the user, udp connections and timeouts.
  *
  * It uses the passed configuration::ScannerConfiguration for all configurable parts of this process.
  *
  * @see IScanner
- * @see ScannerStateMachine
+ * @see protocol_layer::ScannerStateMachine
  * @see configuration::ScannerConfiguration
  */
 class ScannerV2 : public IScanner
