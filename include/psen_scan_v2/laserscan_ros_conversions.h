@@ -18,29 +18,29 @@
 
 #include <sensor_msgs/LaserScan.h>
 
-#include "psen_scan_v2_standalone/default_parameters.h"
+#include "psen_scan_v2_standalone/configuration/default_parameters.h"
 
 namespace psen_scan_v2
 {
 using namespace psen_scan_v2_standalone;
 
-sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
+sensor_msgs::LaserScan toLaserScanMsg(const api::LaserScan& laserscan,
                                       const std::string& prefix,
                                       const double x_axis_rotation,
                                       const ros::Time& timestamp = ros::Time::now())
 {
   sensor_msgs::LaserScan ros_message;
   ros_message.header.stamp = timestamp;
-  ros_message.header.frame_id = prefix + constants::SCAN_FRAME_ID_SUFFIX;
+  ros_message.header.frame_id = prefix + configuration::SCAN_FRAME_ID_SUFFIX;
   ros_message.angle_min = laserscan.getMinScanAngle().toRad() - x_axis_rotation;
   ros_message.angle_max = laserscan.getMaxScanAngle().toRad() - x_axis_rotation;
   ros_message.angle_increment = laserscan.getScanResolution().toRad();
 
-  ros_message.time_increment = constants::TIME_PER_SCAN_IN_S / (2 * M_PI) * laserscan.getScanResolution().toRad();
+  ros_message.time_increment = configuration::TIME_PER_SCAN_IN_S / (2 * M_PI) * laserscan.getScanResolution().toRad();
 
-  ros_message.scan_time = constants::TIME_PER_SCAN_IN_S;
-  ros_message.range_min = constants::RANGE_MIN_IN_M;
-  ros_message.range_max = constants::RANGE_MAX_IN_M;
+  ros_message.scan_time = configuration::TIME_PER_SCAN_IN_S;
+  ros_message.range_min = configuration::RANGE_MIN_IN_M;
+  ros_message.range_max = configuration::RANGE_MAX_IN_M;
 
   ros_message.ranges.insert(
       ros_message.ranges.begin(), laserscan.getMeasurements().cbegin(), laserscan.getMeasurements().cend());

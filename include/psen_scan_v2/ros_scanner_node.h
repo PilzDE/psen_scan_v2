@@ -26,13 +26,17 @@
 
 #include <ros/ros.h>
 
-#include "psen_scan_v2_standalone/scanner_v2.h"
+#include "psen_scan_v2_standalone/api/scanner_v2.h"
 
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 
+/**
+ * @brief Root namespace for the ROS part
+ */
 namespace psen_scan_v2
 {
 using namespace psen_scan_v2_standalone;
+using namespace psen_scan_v2_standalone::api;
 using namespace std::chrono_literals;
 
 /**
@@ -56,7 +60,7 @@ public:
                   const std::string& topic,
                   const std::string& prefix,
                   const double& x_axis_rotation,
-                  const ScannerConfiguration& scanner_config);
+                  const configuration::ScannerConfiguration& scanner_config);
 
   //! @brief Continuously fetches data from the scanner and publishes the data as ROS scanner message.
   void run();
@@ -64,7 +68,7 @@ public:
   void terminate();
 
 private:
-  void laserScanCallback(const LaserScan& scan);
+  void laserScanCallback(const api::LaserScan& scan);
 
 private:
   ros::NodeHandle nh_;
@@ -89,7 +93,7 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
                                     const std::string& topic,
                                     const std::string& prefix,
                                     const double& x_axis_rotation,
-                                    const ScannerConfiguration& scanner_config)
+                                    const configuration::ScannerConfiguration& scanner_config)
   : nh_(nh)
   , prefix_(prefix)
   , x_axis_rotation_(x_axis_rotation)
@@ -99,7 +103,7 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
 }
 
 template <typename S>
-void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
+void ROSScannerNodeT<S>::laserScanCallback(const api::LaserScan& scan)
 {
   if (scan.getMeasurements().empty())
   {
