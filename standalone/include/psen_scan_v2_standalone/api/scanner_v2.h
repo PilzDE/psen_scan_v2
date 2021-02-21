@@ -94,7 +94,7 @@ private:
    * where the interaction with the scanner hardware takes longer than expected.
    *
    * @see protocol_layer::IWatchdogFactory
-   * @see Watchdog
+   * @see util::Watchdog
    */
   class WatchdogFactory : public IWatchdogFactory
   {

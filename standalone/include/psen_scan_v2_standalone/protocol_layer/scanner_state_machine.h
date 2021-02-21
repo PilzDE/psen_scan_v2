@@ -90,7 +90,7 @@ using InformUserAboutLaserScanCB = std::function<void(const api::LaserScan&)>;
  * Implementations of this Interface should create thread save timeout handlers that
  * call an event every time a defined timeout has run out and restart themselves until deleted.
  *
- * @see Watchdog
+ * util::Watchdog
  */
 class IWatchdogFactory
 {
@@ -155,10 +155,10 @@ struct StateMachineArgs
  * It also checks for internal errors of incoming messages and handles timeouts of the above mentioned actions by
  * creating watchdogs via IWatchdogFactory.
  *
- * @see start_request::Message
- * @see stop_request
- * @see scanner_reply::Message
- * @see monitoring_frame::Message
+ * @see data_conversion_layer::start_request::Message
+ * @see data_conversion_layer::stop_request
+ * @see data_conversion_layer::scanner_reply::Message
+ * @see data_conversion_layer::monitoring_frame::Message
  */
 class ScannerProtocolDef : public msm::front::state_machine_def<ScannerProtocolDef>
 {
@@ -250,7 +250,7 @@ private:
 /**
  * @brief State machine handling all events according to the scanner protocol and error handling specification.
  *
- * @see ScannerProtocolDef
+ * @see protocol_layer::ScannerProtocolDef
  */
 using ScannerStateMachine = msm::back::state_machine<ScannerProtocolDef>;
 

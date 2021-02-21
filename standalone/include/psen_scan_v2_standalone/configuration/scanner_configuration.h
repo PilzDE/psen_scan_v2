@@ -28,7 +28,7 @@ namespace configuration
  * @brief Higher level data type storing the configuration details of the scanner like scanner IP, port,
  * scan range, etc.
  *
- * @see ScanRange
+ * @see configuration::ScanRange
  */
 class ScannerConfiguration
 {

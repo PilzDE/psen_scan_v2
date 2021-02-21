@@ -35,9 +35,9 @@ namespace api
  * - Define a callback for incoming scans
  * - Start and stop the communication with the scanner
  *
- * @see LaserScanCallback
- * @see ScannerConfiguration
- * @see ScannerV2
+ * @see protocol_layer::LaserScanCallback
+ * @see configuration::ScannerConfiguration
+ * @see api::ScannerV2
  */
 class IScanner
 {
