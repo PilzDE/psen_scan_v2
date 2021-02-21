@@ -20,7 +20,8 @@
 #include <psen_scan_v2_standalone/core.h>
 
 using namespace psen_scan_v2_standalone;
-using namespace psen_scan_v2_standalone::constants;
+using namespace psen_scan_v2_standalone::configuration;
+using namespace psen_scan_v2_standalone::api;
 
 /*
  * In this section we declare all necessary configuration parameters
@@ -28,31 +29,31 @@ using namespace psen_scan_v2_standalone::constants;
 const std::string HOST_IP{ "192.168.0.50" };
 const std::string SCANNER_IP{ "192.168.0.10" };
 // Start- and end-angle have been configured to be in the middle of the scan range.
-const TenthOfDegree ANGLE_START{ degreeToTenthDegree(137) };
-const TenthOfDegree ANGLE_END{ degreeToTenthDegree(138) };
+const util::TenthOfDegree ANGLE_START{ data_conversion_layer::degreeToTenthDegree(137) };
+const util::TenthOfDegree ANGLE_END{ data_conversion_layer::degreeToTenthDegree(138) };
 
 /*
  * This function is used as a callback every time a new laserscan is received.
  */
-void laserScanCallback(const LaserScan& scan)
+void laserScanCallback(const api::LaserScan& scan)
 {
-  const LaserScan::MeasurementData& measures = scan.getMeasurements();
+  const api::LaserScan::MeasurementData& measures = scan.getMeasurements();
 
   if (measures.empty())
   {
     return;
   }
 
-  PSENSCAN_INFO_THROTTLE(1 /* sec */, "laserScanCallback()", "Ranges {}", formatRange(measures));
+  PSENSCAN_INFO_THROTTLE(1 /* sec */, "laserScanCallback()", "Ranges {}", util::formatRange(measures));
 }
 
 int main(int argc, char** argv)
 {
   setLogLevel(CONSOLE_BRIDGE_LOG_INFO);
 
-  DefaultScanRange scan_range{ ANGLE_START, ANGLE_END };
+  configuration::DefaultScanRange scan_range{ ANGLE_START, ANGLE_END };
 
-  ScannerConfigurationBuilder config_builder;
+  configuration::ScannerConfigurationBuilder config_builder;
   config_builder.hostIP(HOST_IP).scannerIp(SCANNER_IP).scanRange(scan_range);
 
   ScannerV2 scanner(config_builder.build(), laserScanCallback);

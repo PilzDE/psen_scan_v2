@@ -26,12 +26,12 @@
 #include <sensor_msgs/LaserScan.h>
 #include <pilz_testutils/async_test.h>
 
-#include "psen_scan_v2_standalone/angle_conversions.h"
-#include "psen_scan_v2_standalone/laserscan.h"
-#include "psen_scan_v2_standalone/scanner_configuration.h"
-#include "psen_scan_v2_standalone/scanner_config_builder.h"
-#include "psen_scan_v2_standalone/default_parameters.h"
-#include "psen_scan_v2_standalone/scan_range.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
+#include "psen_scan_v2_standalone/api/laserscan.h"
+#include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
+#include "psen_scan_v2_standalone/configuration/scanner_config_builder.h"
+#include "psen_scan_v2_standalone/configuration/default_parameters.h"
+#include "psen_scan_v2_standalone/configuration/scan_range.h"
 
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 #include "psen_scan_v2/ros_scanner_node.h"
@@ -43,7 +43,7 @@ using namespace psen_scan_v2_standalone;
 using namespace psen_scan_v2_test;
 
 using namespace ::testing;
-using namespace psen_scan_v2_standalone::constants;
+using namespace psen_scan_v2_standalone::configuration;
 
 namespace psen_scan_v2
 {
@@ -93,14 +93,14 @@ static const std::string HOST_IP{ "127.0.0.1" };
 static constexpr int HOST_UDP_PORT_DATA{ 50505 };
 static constexpr int HOST_UDP_PORT_CONTROL{ 55055 };
 static const std::string DEVICE_IP{ "127.0.0.100" };
-static constexpr DefaultScanRange SCAN_RANGE{ TenthOfDegree(0), TenthOfDegree(2750) };
+static constexpr configuration::DefaultScanRange SCAN_RANGE{ util::TenthOfDegree(0), util::TenthOfDegree(2750) };
 static constexpr int SCANNER_STARTED_TIMEOUT_MS{ 3000 };
 static constexpr int SCANNER_STOPPED_TIMEOUT_MS{ 3000 };
 static constexpr int LASERSCAN_RECEIVED_TIMEOUT{ 3000 };
 
-static ScannerConfiguration createValidConfig()
+static configuration::ScannerConfiguration createValidConfig()
 {
-  return ScannerConfigurationBuilder()
+  return configuration::ScannerConfigurationBuilder()
       .hostIP(HOST_IP)
       .hostDataPort(HOST_UDP_PORT_DATA)
       .hostControlPort(HOST_UDP_PORT_CONTROL)
@@ -115,7 +115,7 @@ class RosScannerNodeTests : public testing::Test, public testing::AsyncTest
 {
 protected:
   ros::NodeHandle nh_priv_{ "~" };
-  ScannerConfiguration scanner_config_{ createValidConfig() };
+  configuration::ScannerConfiguration scanner_config_{ createValidConfig() };
 };
 
 TEST_F(RosScannerNodeTests, testScannerInvocation)
@@ -142,7 +142,7 @@ TEST_F(RosScannerNodeTests, testScannerInvocation)
 
 TEST_F(RosScannerNodeTests, testScanTopicReceived)
 {
-  LaserScan laser_scan_fake(TenthOfDegree(1), TenthOfDegree(3), TenthOfDegree(5));
+  LaserScan laser_scan_fake(util::TenthOfDegree(1), util::TenthOfDegree(3), util::TenthOfDegree(5));
   laser_scan_fake.getMeasurements().push_back(1);
 
   SubscriberMock subscriber;
@@ -195,8 +195,8 @@ TEST_F(RosScannerNodeTests, testMissingStopReply)
 
 TEST_F(RosScannerNodeTests, shouldNotInvokeUserCallbackInCaseOfEmptyLaserScan)
 {
-  LaserScan empty_scan(TenthOfDegree(1), TenthOfDegree(3), TenthOfDegree(5));
-  LaserScan scan_with_data(TenthOfDegree(1), TenthOfDegree(3), TenthOfDegree(5));
+  LaserScan empty_scan(util::TenthOfDegree(1), util::TenthOfDegree(3), util::TenthOfDegree(5));
+  LaserScan scan_with_data(util::TenthOfDegree(1), util::TenthOfDegree(3), util::TenthOfDegree(5));
   scan_with_data.getMeasurements().push_back(7);
 
   const std::string prefix{ "scanner" };

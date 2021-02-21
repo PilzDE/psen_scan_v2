@@ -112,7 +112,7 @@ User API layer
 This abstraction layer represents the user API (ROS-agnostic).
 It enables users to configurate, start and stop a single scanner by providing a high level API.
 --
-+ Scanner(ScannerConfiguration, LaserscanCallback)
++ Scanner(configuration::ScannerConfiguration, LaserscanCallback)
 
 + start()
 + stop()
@@ -146,7 +146,7 @@ layer=-10
 Data serializer / deserializer layer
 --
 **Explanation:**
-This abstraction layer consists of all software components transforming primitive data (byte vectors) into higher level data types (like scanner_reply::Message) and vice versa.
+This abstraction layer consists of all software components transforming primitive data (byte vectors) into higher level data types (like data_conversion_layer::scanner_reply::Message) and vice versa.
 </panel_attributes>
     <additional_attributes/>
   </element>
@@ -172,7 +172,7 @@ This abstraction layer consists of all software components transforming primitiv
     </coordinates>
     <panel_attributes>symbol=component
 style=wordwrap
-ScannerConfiguration
+configuration::ScannerConfiguration
 --
 **Explanation:**
 This component helps storing the configuration details of the scanner,

@@ -20,11 +20,11 @@
 
 #include <ros/ros.h>
 
-#include "psen_scan_v2_standalone/default_parameters.h"
-#include "psen_scan_v2_standalone/function_pointers.h"
-#include "psen_scan_v2_standalone/scanner_configuration.h"
-#include "psen_scan_v2_standalone/scanner_config_builder.h"
-#include "psen_scan_v2_standalone/scan_range.h"
+#include "psen_scan_v2_standalone/configuration/default_parameters.h"
+#include "psen_scan_v2_standalone/protocol_layer/function_pointers.h"
+#include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
+#include "psen_scan_v2_standalone/configuration/scanner_config_builder.h"
+#include "psen_scan_v2_standalone/configuration/scan_range.h"
 
 #include "psen_scan_v2/ros_parameter_handler.h"
 #include "psen_scan_v2/ros_scanner_node.h"
@@ -34,7 +34,7 @@ REGISTER_ROSCONSOLE_BRIDGE;
 
 using namespace psen_scan_v2;
 using namespace psen_scan_v2_standalone;
-using namespace psen_scan_v2_standalone::constants;
+using namespace psen_scan_v2_standalone::configuration;
 
 std::function<void()> NODE_TERMINATE_CB;
 
@@ -71,29 +71,33 @@ int main(int argc, char** argv)
 
   try
   {
-    DefaultScanRange scan_range{
-      TenthOfDegree::fromRad(DEFAULT_X_AXIS_ROTATION +
-                             getOptionalParamFromServer<double>(pnh, PARAM_ANGLE_START, DEFAULT_ANGLE_START)),
-      TenthOfDegree::fromRad(DEFAULT_X_AXIS_ROTATION +
-                             getOptionalParamFromServer<double>(pnh, PARAM_ANGLE_END, DEFAULT_ANGLE_END))
+    configuration::DefaultScanRange scan_range{
+      util::TenthOfDegree::fromRad(
+          configuration::DEFAULT_X_AXIS_ROTATION +
+          getOptionalParamFromServer<double>(pnh, PARAM_ANGLE_START, configuration::DEFAULT_ANGLE_START)),
+      util::TenthOfDegree::fromRad(
+          configuration::DEFAULT_X_AXIS_ROTATION +
+          getOptionalParamFromServer<double>(pnh, PARAM_ANGLE_END, configuration::DEFAULT_ANGLE_END))
     };
 
-    ScannerConfigurationBuilder config_builder;
+    configuration::ScannerConfigurationBuilder config_builder;
     config_builder.hostIP(getRequiredParamFromServer<std::string>(pnh, PARAM_HOST_IP))
-        .hostDataPort(getOptionalParamFromServer<int>(pnh, PARAM_HOST_DATA_PORT, DATA_PORT_OF_HOST_DEVICE))
-        .hostControlPort(getOptionalParamFromServer<int>(pnh, PARAM_HOST_CONTROL_PORT, CONTROL_PORT_OF_HOST_DEVICE))
+        .hostDataPort(
+            getOptionalParamFromServer<int>(pnh, PARAM_HOST_DATA_PORT, configuration::DATA_PORT_OF_HOST_DEVICE))
+        .hostControlPort(
+            getOptionalParamFromServer<int>(pnh, PARAM_HOST_CONTROL_PORT, configuration::CONTROL_PORT_OF_HOST_DEVICE))
         .scannerIp(getRequiredParamFromServer<std::string>(pnh, PARAM_SCANNER_IP))
-        .scannerDataPort(DATA_PORT_OF_SCANNER_DEVICE)
-        .scannerControlPort(CONTROL_PORT_OF_SCANNER_DEVICE)
+        .scannerDataPort(configuration::DATA_PORT_OF_SCANNER_DEVICE)
+        .scannerControlPort(configuration::CONTROL_PORT_OF_SCANNER_DEVICE)
         .scanRange(scan_range)
         .enableDiagnostics();
 
-    ScannerConfiguration scanner_configuration{ config_builder.build() };
+    configuration::ScannerConfiguration scanner_configuration{ config_builder.build() };
 
     ROSScannerNode ros_scanner_node(pnh,
                                     DEFAULT_PUBLISH_TOPIC,
                                     getOptionalParamFromServer<std::string>(pnh, PARAM_PREFIX, DEFAULT_PREFIX),
-                                    DEFAULT_X_AXIS_ROTATION,
+                                    configuration::DEFAULT_X_AXIS_ROTATION,
                                     scanner_configuration);
 
     NODE_TERMINATE_CB = std::bind(&ROSScannerNode::terminate, &ros_scanner_node);
