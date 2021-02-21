@@ -113,7 +113,7 @@ ScannerV2
 This abstraction layer represents the user API (ROS-agnostic).
 It enables users to configurate, start and stop a single scanner by providing a high level API.
 --
-+ Scanner(ScannerConfiguration, LaserscanAvailableCallback)
++ Scanner(configuration::ScannerConfiguration, LaserscanAvailableCallback)
 
 + start()
 + stop()
@@ -147,7 +147,7 @@ layer=-10
 Data Serializer / Deserializer layer
 --
 **Explanation:**
-This abstraction layer consists of all software components transforming primitive data (byte vectors) into higher level data types (like scanner_reply::Message) and vice versa.
+This abstraction layer consists of all software components transforming primitive data (byte vectors) into higher level data types (like data_conversion_layer::scanner_reply::Message) and vice versa.
 </panel_attributes>
     <additional_attributes/>
   </element>
@@ -160,7 +160,7 @@ This abstraction layer consists of all software components transforming primitiv
       <h>96</h>
     </coordinates>
     <panel_attributes>lt=..&gt;
-scanner_reply::Message,
+data_conversion_layer::scanner_reply::Message,
 monitoring_frame::Message</panel_attributes>
     <additional_attributes>10.0;100.0;10.0;10.0</additional_attributes>
   </element>
@@ -186,7 +186,7 @@ start_request::Message</panel_attributes>
     </coordinates>
     <panel_attributes>symbol=component
 style=wordwrap
-ScannerConfiguration
+configuration::ScannerConfiguration
 --
 **Explanation:**
 Higher level data type storing the configuration details of the scanner,
