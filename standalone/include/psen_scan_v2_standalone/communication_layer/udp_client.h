@@ -47,7 +47,6 @@ namespace communication_layer
 {
 using NewDataHandler = std::function<void(const data_conversion_layer::RawData&, const std::size_t&)>;
 using ErrorHandler = std::function<void(const std::string&)>;
-using TimeoutHandler = std::function<void(const std::string&)>;
 
 /**
  * @brief Lists the different possible receive modi.
