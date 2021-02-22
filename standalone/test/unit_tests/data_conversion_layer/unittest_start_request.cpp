@@ -20,10 +20,10 @@
 #include <gtest/gtest.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
-#include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
-#include "psen_scan_v2_standalone/configuration/scanner_config_builder.h"
+#include "psen_scan_v2_standalone/scanner_configuration.h"
+#include "psen_scan_v2_standalone/scanner_config_builder.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request.h"
-#include "psen_scan_v2_standalone/configuration/scan_range.h"
+#include "psen_scan_v2_standalone/scan_range.h"
 
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_data_test_helper.h"
 
@@ -70,10 +70,10 @@ TEST_F(StartRequestTest, constructorTest)
   const std::string& host_ip = "192.168.0.1";
   const uint16_t& host_udp_port_data = 65535;
 
-  const configuration::DefaultScanRange scan_range{ util::TenthOfDegree(0), util::TenthOfDegree::fromRad(4.71) };
+  const DefaultScanRange scan_range{ util::TenthOfDegree(0), util::TenthOfDegree::fromRad(4.71) };
 
   uint32_t sequence_number{ 123 };
-  data_conversion_layer::start_request::Message sr(configuration::ScannerConfigurationBuilder()
+  data_conversion_layer::start_request::Message sr(ScannerConfigurationBuilder()
                                                        .hostIP(host_ip)
                                                        .hostDataPort(host_udp_port_data)
                                                        .hostControlPort(1 /* irrelevant */)
@@ -139,16 +139,16 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_three_angle_resolution), 0));
 }
 
-static configuration::ScannerConfiguration createConfig(bool enable_diagnostics)
+static ScannerConfiguration createConfig(bool enable_diagnostics)
 {
-  configuration::ScannerConfigurationBuilder builder;
+  ScannerConfigurationBuilder builder;
   builder.hostIP("192.168.0.50")
       .hostDataPort(55115)
       .hostControlPort(5700)
       .scannerIp("192.168.0.10")
       .scannerDataPort(2000)
       .scannerControlPort(3000)
-      .scanRange(configuration::DefaultScanRange(util::TenthOfDegree(0), util::TenthOfDegree(2750)));
+      .scanRange(DefaultScanRange(util::TenthOfDegree(0), util::TenthOfDegree(2750)));
 
   if (enable_diagnostics)
   {
@@ -160,7 +160,7 @@ static configuration::ScannerConfiguration createConfig(bool enable_diagnostics)
 
 TEST_F(StartRequestTest, crcShouldBeCorrectIfDiagnosticIsDisabled)
 {
-  const configuration::ScannerConfiguration config{ createConfig(false) };
+  const ScannerConfiguration config{ createConfig(false) };
 
   const auto raw_start_request{ serialize(data_conversion_layer::start_request::Message(config)) };
   const std::array<unsigned char, 4> expected_crc = { 0xaf, 0xc8, 0xde, 0x79 };  // see wireshark for this number
@@ -172,7 +172,7 @@ TEST_F(StartRequestTest, crcShouldBeCorrectIfDiagnosticIsDisabled)
 
 TEST_F(StartRequestTest, crcShouldBeCorrectIfDiagnosticIsEnabled)
 {
-  const configuration::ScannerConfiguration config{ createConfig(true) };
+  const ScannerConfiguration config{ createConfig(true) };
 
   const auto raw_start_request{ serialize(data_conversion_layer::start_request::Message(config)) };
   const std::array<unsigned char, 4> expected_crc = { 0x18, 0x5b, 0xd5, 0x55 };  // see wireshark for this number

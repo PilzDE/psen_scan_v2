@@ -22,7 +22,7 @@
 
 #include <boost/optional.hpp>
 
-#include "psen_scan_v2_standalone/api/scanner_interface.h"
+#include "psen_scan_v2_standalone/scanner_interface.h"
 #include "psen_scan_v2_standalone/protocol_layer/scanner_events.h"
 #include "psen_scan_v2_standalone/protocol_layer/scanner_state_machine.h"
 
@@ -35,11 +35,6 @@
 namespace psen_scan_v2_standalone
 {
 class ScannerConfiguration;
-/**
- * @brief Contains the user API related code.
- */
-namespace api
-{
 using namespace psen_scan_v2_standalone::protocol_layer;
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -52,20 +47,20 @@ using std::placeholders::_2;
  * - the Udp connections.
  * - the guards to ensure threads save interaction between the user, udp connections and timeouts.
  *
- * It uses the passed configuration::ScannerConfiguration for all configurable parts of this process.
+ * It uses the passed ScannerConfiguration for all configurable parts of this process.
  *
  * The class creates two UdpClientImpl, a WatchdogFactory and passes them together with the @ref LaserScanCallback to
  * the scanner_protocol::ScannerStateMachine via scanner_protocol::StateMachineArgs.
  *
- * @see api::IScanner
+ * @see IScanner
  * @see communication_layer::UdpClientImpl
  * @see protocol_layer::ScannerStateMachine
- * @see configuration::ScannerConfiguration
+ * @see ScannerConfiguration
  */
 class ScannerV2 : public IScanner
 {
 public:
-  ScannerV2(const configuration::ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb);
+  ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb);
   ~ScannerV2();
 
 public:
@@ -137,7 +132,6 @@ void ScannerV2::triggerEvent()
   triggerEventWithParam<T>(T());
 }
 
-}  // namespace api
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_SCANNER_V2_H

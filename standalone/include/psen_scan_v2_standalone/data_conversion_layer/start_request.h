@@ -19,15 +19,12 @@
 #include <cstdint>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
-#include "psen_scan_v2_standalone/configuration/scan_range.h"
+#include "psen_scan_v2_standalone/scan_range.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
 {
-namespace configuration
-{
 class ScannerConfiguration;
-}
 
 namespace data_conversion_layer
 {
@@ -45,7 +42,7 @@ namespace start_request
 class Message
 {
 public:
-  Message(const configuration::ScannerConfiguration& scanner_configuration);
+  Message(const ScannerConfiguration& scanner_configuration);
 
   friend data_conversion_layer::RawData serialize(const data_conversion_layer::start_request::Message&,
                                                   const uint32_t&);
@@ -61,15 +58,15 @@ private:
   {
   public:
     constexpr LaserScanSettings() = default;
-    constexpr LaserScanSettings(const configuration::DefaultScanRange& scan_range,
+    constexpr LaserScanSettings(const DefaultScanRange& scan_range,
                                 const util::TenthOfDegree& resolution);
 
   public:
-    constexpr const configuration::DefaultScanRange& getScanRange() const;
+    constexpr const DefaultScanRange& getScanRange() const;
     constexpr util::TenthOfDegree getResolution() const;
 
   private:
-    const configuration::DefaultScanRange scan_range_{ configuration::DefaultScanRange::createInvalidScanRange() };
+    const DefaultScanRange scan_range_{ DefaultScanRange::createInvalidScanRange() };
     const util::TenthOfDegree resolution_{ 0 };
   };
 
@@ -100,13 +97,13 @@ private:
   const std::array<LaserScanSettings, NUM_SLAVES> slaves_;
 };
 
-constexpr Message::LaserScanSettings::LaserScanSettings(const configuration::DefaultScanRange& scan_range,
+constexpr Message::LaserScanSettings::LaserScanSettings(const DefaultScanRange& scan_range,
                                                         const util::TenthOfDegree& resolution)
   : scan_range_(scan_range), resolution_(resolution)
 {
 }
 
-constexpr const configuration::DefaultScanRange& Message::LaserScanSettings::getScanRange() const
+constexpr const DefaultScanRange& Message::LaserScanSettings::getScanRange() const
 {
   return scan_range_;
 };

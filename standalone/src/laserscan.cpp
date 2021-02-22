@@ -17,11 +17,9 @@
 #include <stdexcept>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
-#include "psen_scan_v2_standalone/api/laserscan.h"
+#include "psen_scan_v2_standalone/laserscan.h"
 
 namespace psen_scan_v2_standalone
-{
-namespace api
 {
 static const util::TenthOfDegree MAX_X_AXIS_ROTATION{ 275 };
 
@@ -61,7 +59,7 @@ const util::TenthOfDegree& LaserScan::getMaxScanAngle() const
   return max_scan_angle_;
 }
 
-const api::LaserScan::MeasurementData& LaserScan::getMeasurements() const
+const LaserScan::MeasurementData& LaserScan::getMeasurements() const
 {
   return measurements_;
 }
@@ -76,7 +74,7 @@ LaserScan::MeasurementData& LaserScan::getMeasurements()
   return measurements_;
 }
 
-const api::LaserScan::IntensityData& LaserScan::getIntensities() const
+const LaserScan::IntensityData& LaserScan::getIntensities() const
 {
   return intensities_;
 }
@@ -86,12 +84,11 @@ void LaserScan::setIntensities(const IntensityData& intensities)
   intensities_ = intensities;
 }
 
-bool LaserScan::operator==(const api::LaserScan& scan) const
+bool LaserScan::operator==(const LaserScan& scan) const
 {
   return ((max_scan_angle_ == scan.max_scan_angle_) && (min_scan_angle_ == scan.min_scan_angle_) &&
           (resolution_ == scan.resolution_) && (measurements_.size() == scan.measurements_.size()) &&
           std::equal(measurements_.begin(), measurements_.end(), scan.measurements_.begin()));
 }
 
-}  // namespace api
 }  // namespace psen_scan_v2_standalone

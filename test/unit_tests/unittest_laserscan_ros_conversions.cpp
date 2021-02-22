@@ -18,7 +18,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "psen_scan_v2_standalone/api/laserscan.h"
+#include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
 
 #include "psen_scan_v2/laserscan_ros_conversions.h"
@@ -38,17 +38,17 @@ const double EPSILON{ 1.0e-8 };
 
 namespace psen_scan_v2_test
 {
-static api::LaserScan createScan()
+static LaserScan createScan()
 {
   const util::TenthOfDegree angle_min_raw{ 0 };
   const util::TenthOfDegree angle_max_raw{ 20 };
   const util::TenthOfDegree angle_increment{ 1 };
 
-  api::LaserScan laserscan(angle_increment, angle_min_raw, angle_max_raw);
-  const api::LaserScan::MeasurementData measurements{ 1., 2., 3. };
+  LaserScan laserscan(angle_increment, angle_min_raw, angle_max_raw);
+  const LaserScan::MeasurementData measurements{ 1., 2., 3. };
   laserscan.setMeasurements(measurements);
 
-  const api::LaserScan::IntensityData intensities{ 707., 304., 0. };
+  const LaserScan::IntensityData intensities{ 707., 304., 0. };
   laserscan.setIntensities(intensities);
 
   return laserscan;
@@ -68,7 +68,7 @@ TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectHeaderAfterC
 
 TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectScanResolutionAfterConversion)
 {
-  const api::LaserScan laserscan{ createScan() };
+  const LaserScan laserscan{ createScan() };
   const sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(laserscan, "", 0, ros::Time::now());
 
   EXPECT_NEAR(laserscan_msg.angle_increment, laserscan.getScanResolution().toRad(), EPSILON)
@@ -77,7 +77,7 @@ TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectScanResoluti
 
 TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectMinMaxScanAngleAfterConversion)
 {
-  const api::LaserScan laserscan{ createScan() };
+  const LaserScan laserscan{ createScan() };
   constexpr double x_axis_rotation{ 0 };
   const sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(laserscan, "", x_axis_rotation, ros::Time::now());
 
@@ -87,10 +87,10 @@ TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectMinMaxScanAn
 
 TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectTimePerRadAfterConversion)
 {
-  const api::LaserScan laserscan{ createScan() };
+  const LaserScan laserscan{ createScan() };
   const sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(laserscan, "", 0, ros::Time::now());
 
-  const double time_per_rad = TIME_PER_SCAN_IN_S / (2 * M_PI);  // angle speed
+  const double time_per_rad = configuration::TIME_PER_SCAN_IN_S / (2 * M_PI);  // angle speed
   EXPECT_NEAR(laserscan_msg.time_increment, time_per_rad * laserscan.getScanResolution().toRad(), EPSILON);
 }
 
@@ -98,20 +98,20 @@ TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectMinMaxRangeA
 {
   const sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(createScan(), "", 0, ros::Time::now());
 
-  EXPECT_NEAR(laserscan_msg.range_min, RANGE_MIN_IN_M, EPSILON);
-  EXPECT_NEAR(laserscan_msg.range_max, RANGE_MAX_IN_M, EPSILON);
+  EXPECT_NEAR(laserscan_msg.range_min, configuration::RANGE_MIN_IN_M, EPSILON);
+  EXPECT_NEAR(laserscan_msg.range_max, configuration::RANGE_MAX_IN_M, EPSILON);
 }
 
 TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectScanTimeAfterConversion)
 {
   const sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(createScan(), "", 0, ros::Time::now());
 
-  EXPECT_NEAR(laserscan_msg.scan_time, TIME_PER_SCAN_IN_S, EPSILON);
+  EXPECT_NEAR(laserscan_msg.scan_time, configuration::TIME_PER_SCAN_IN_S, EPSILON);
 }
 
 TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectRangesAfterConversion)
 {
-  const api::LaserScan laserscan{ createScan() };
+  const LaserScan laserscan{ createScan() };
   const sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(laserscan, "", 0, ros::Time::now());
 
   ASSERT_EQ(laserscan_msg.ranges.size(), laserscan.getMeasurements().size());
@@ -124,7 +124,7 @@ TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectRangesAfterC
 
 TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectIntensitiesAfterConversion)
 {
-  const api::LaserScan laserscan{ createScan() };
+  const LaserScan laserscan{ createScan() };
   const sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(laserscan, "", 0, ros::Time::now());
 
   ASSERT_EQ(laserscan_msg.intensities.size(), laserscan.getIntensities().size());

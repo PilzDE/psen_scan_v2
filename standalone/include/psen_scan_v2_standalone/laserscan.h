@@ -23,8 +23,6 @@
 
 namespace psen_scan_v2_standalone
 {
-namespace api
-{
 /**
  *  @brief This class represents a single laser scan in the \<prefix\>_scan target frame.
  *
@@ -62,7 +60,7 @@ public:
   const IntensityData& getIntensities() const;
   void setIntensities(const IntensityData&);
 
-  bool operator==(const api::LaserScan& scan) const;
+  bool operator==(const LaserScan& scan) const;
 
 private:
   //! Measurement data of the laserscan (in Millimeters).
@@ -77,7 +75,6 @@ private:
   const util::TenthOfDegree max_scan_angle_;
 };
 
-}  // namespace api
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_LASERSCAN_H

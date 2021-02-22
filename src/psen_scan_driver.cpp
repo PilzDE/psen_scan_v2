@@ -22,9 +22,9 @@
 
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
 #include "psen_scan_v2_standalone/protocol_layer/function_pointers.h"
-#include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
-#include "psen_scan_v2_standalone/configuration/scanner_config_builder.h"
-#include "psen_scan_v2_standalone/configuration/scan_range.h"
+#include "psen_scan_v2_standalone/scanner_configuration.h"
+#include "psen_scan_v2_standalone/scanner_config_builder.h"
+#include "psen_scan_v2_standalone/scan_range.h"
 
 #include "psen_scan_v2/ros_parameter_handler.h"
 #include "psen_scan_v2/ros_scanner_node.h"
@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 
   try
   {
-    configuration::DefaultScanRange scan_range{
+    DefaultScanRange scan_range{
       util::TenthOfDegree::fromRad(
           configuration::DEFAULT_X_AXIS_ROTATION +
           getOptionalParamFromServer<double>(pnh, PARAM_ANGLE_START, configuration::DEFAULT_ANGLE_START)),
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
           getOptionalParamFromServer<double>(pnh, PARAM_ANGLE_END, configuration::DEFAULT_ANGLE_END))
     };
 
-    configuration::ScannerConfigurationBuilder config_builder;
+    ScannerConfigurationBuilder config_builder;
     config_builder.hostIP(getRequiredParamFromServer<std::string>(pnh, PARAM_HOST_IP))
         .hostDataPort(
             getOptionalParamFromServer<int>(pnh, PARAM_HOST_DATA_PORT, configuration::DATA_PORT_OF_HOST_DEVICE))
@@ -92,7 +92,7 @@ int main(int argc, char** argv)
         .scanRange(scan_range)
         .enableDiagnostics();
 
-    configuration::ScannerConfiguration scanner_configuration{ config_builder.build() };
+    ScannerConfiguration scanner_configuration{ config_builder.build() };
 
     ROSScannerNode ros_scanner_node(pnh,
                                     DEFAULT_PUBLISH_TOPIC,

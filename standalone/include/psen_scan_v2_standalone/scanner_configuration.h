@@ -18,17 +18,15 @@
 #include <boost/optional.hpp>
 
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
-#include "psen_scan_v2_standalone/configuration/scan_range.h"
+#include "psen_scan_v2_standalone/scan_range.h"
 
 namespace psen_scan_v2_standalone
-{
-namespace configuration
 {
 /**
  * @brief Higher level data type storing the configuration details of the scanner like scanner IP, port,
  * scan range, etc.
  *
- * @see configuration::ScanRange
+ * @see ScanRange
  */
 class ScannerConfiguration
 {
@@ -44,7 +42,7 @@ public:
   uint16_t scannerDataPort() const;
   uint16_t scannerControlPort() const;
 
-  const configuration::DefaultScanRange& scanRange() const;
+  const DefaultScanRange& scanRange() const;
 
   bool diagnosticsEnabled() const;
 
@@ -56,18 +54,17 @@ private:
 
 private:
   boost::optional<uint32_t> host_ip_;
-  uint16_t host_data_port_{ DATA_PORT_OF_HOST_DEVICE };
-  uint16_t host_control_port_{ CONTROL_PORT_OF_HOST_DEVICE };
+  uint16_t host_data_port_{ configuration::DATA_PORT_OF_HOST_DEVICE };
+  uint16_t host_control_port_{ configuration::CONTROL_PORT_OF_HOST_DEVICE };
 
   boost::optional<uint32_t> scanner_ip_;
-  uint16_t scanner_data_port_{ DATA_PORT_OF_SCANNER_DEVICE };
-  uint16_t scanner_control_port_{ CONTROL_PORT_OF_SCANNER_DEVICE };
+  uint16_t scanner_data_port_{ configuration::DATA_PORT_OF_SCANNER_DEVICE };
+  uint16_t scanner_control_port_{ configuration::CONTROL_PORT_OF_SCANNER_DEVICE };
 
   boost::optional<DefaultScanRange> scan_range_{};
   bool diagnostics_enabled_{ false };
 };
 
-}  // namespace configuration
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_SCANNER_CONFIGURATION_H

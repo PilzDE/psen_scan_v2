@@ -18,7 +18,7 @@
 
 #include <gtest/gtest.h>
 
-#include "psen_scan_v2_standalone/api/laserscan.h"
+#include "psen_scan_v2_standalone/laserscan.h"
 
 using namespace psen_scan_v2_standalone;
 
@@ -30,27 +30,27 @@ static const util::TenthOfDegree DEFAULT_END_ANGLE{ 2 };
 
 TEST(LaserScanTests, testInvalidZeroResolution)
 {
-  EXPECT_THROW(api::LaserScan laser_scan(util::TenthOfDegree(0), DEFAULT_START_ANGLE, DEFAULT_END_ANGLE),
+  EXPECT_THROW(LaserScan laser_scan(util::TenthOfDegree(0), DEFAULT_START_ANGLE, DEFAULT_END_ANGLE),
                std::invalid_argument);
 }
 
 TEST(LaserScanTests, testOutOfRangeResolution)
 {
-  EXPECT_THROW(api::LaserScan laser_scan(util::TenthOfDegree(10000), DEFAULT_START_ANGLE, DEFAULT_END_ANGLE),
+  EXPECT_THROW(LaserScan laser_scan(util::TenthOfDegree(10000), DEFAULT_START_ANGLE, DEFAULT_END_ANGLE),
                std::invalid_argument);
 }
 
 TEST(LaserScanTests, testInvalidStartEndAngle)
 {
-  EXPECT_THROW(api::LaserScan laser_scan(DEFAULT_RESOLUTION, DEFAULT_END_ANGLE, DEFAULT_START_ANGLE),
+  EXPECT_THROW(LaserScan laser_scan(DEFAULT_RESOLUTION, DEFAULT_END_ANGLE, DEFAULT_START_ANGLE),
                std::invalid_argument);
 }
 
 TEST(LaserScanTest, testGetScanResolution)
 {
   const util::TenthOfDegree expected_resolution{ DEFAULT_RESOLUTION };
-  std::unique_ptr<api::LaserScan> laser_scan;
-  ASSERT_NO_THROW(laser_scan.reset(new api::LaserScan(expected_resolution, DEFAULT_START_ANGLE, DEFAULT_END_ANGLE)););
+  std::unique_ptr<LaserScan> laser_scan;
+  ASSERT_NO_THROW(laser_scan.reset(new LaserScan(expected_resolution, DEFAULT_START_ANGLE, DEFAULT_END_ANGLE)););
 
   EXPECT_EQ(expected_resolution, laser_scan->getScanResolution());
 }
@@ -58,9 +58,9 @@ TEST(LaserScanTest, testGetScanResolution)
 TEST(LaserScanTest, testGetMinScanAngle)
 {
   const auto expected_min_scan_angle{ DEFAULT_START_ANGLE };
-  std::unique_ptr<api::LaserScan> laser_scan;
+  std::unique_ptr<LaserScan> laser_scan;
   ASSERT_NO_THROW(
-      laser_scan.reset(new api::LaserScan(DEFAULT_RESOLUTION, expected_min_scan_angle, DEFAULT_END_ANGLE)););
+      laser_scan.reset(new LaserScan(DEFAULT_RESOLUTION, expected_min_scan_angle, DEFAULT_END_ANGLE)););
 
   EXPECT_EQ(expected_min_scan_angle, laser_scan->getMinScanAngle());
 }
@@ -68,16 +68,16 @@ TEST(LaserScanTest, testGetMinScanAngle)
 TEST(LaserScanTest, testGetMaxScanAngle)
 {
   const auto expected_max_scan_angle{ DEFAULT_END_ANGLE };
-  std::unique_ptr<api::LaserScan> laser_scan;
+  std::unique_ptr<LaserScan> laser_scan;
   ASSERT_NO_THROW(
-      laser_scan.reset(new api::LaserScan(DEFAULT_RESOLUTION, DEFAULT_START_ANGLE, expected_max_scan_angle)););
+      laser_scan.reset(new LaserScan(DEFAULT_RESOLUTION, DEFAULT_START_ANGLE, expected_max_scan_angle)););
 
   EXPECT_EQ(expected_max_scan_angle, laser_scan->getMaxScanAngle());
 }
 
 TEST(LaserScanTest, testMinEqualsMax)
 {
-  ASSERT_NO_THROW(api::LaserScan(DEFAULT_RESOLUTION, util::TenthOfDegree(1000u), util::TenthOfDegree(1000u)););
+  ASSERT_NO_THROW(LaserScan(DEFAULT_RESOLUTION, util::TenthOfDegree(1000u), util::TenthOfDegree(1000u)););
 }
 
 }  // namespace psen_scan_v2_standalone_test

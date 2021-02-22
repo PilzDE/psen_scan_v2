@@ -29,25 +29,20 @@
 #include <WinSock2.h>
 #endif
 
-#include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
-#include "psen_scan_v2_standalone/configuration/scan_range.h"
+#include "psen_scan_v2_standalone/scanner_configuration.h"
+#include "psen_scan_v2_standalone/scan_range.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 
 namespace psen_scan_v2_standalone
 {
 /**
- * @brief Namespace for the scanner configuration.
- */
-namespace configuration
-{
-/**
  * @brief Helper class to simplify/improve the construction of the
- * psen_scan_v2_standalone::configuration::ScannerConfiguration.
+ * psen_scan_v2_standalone::ScannerConfiguration.
  */
 class ScannerConfigurationBuilder
 {
 public:
-  configuration::ScannerConfiguration build() const;
+  ScannerConfiguration build() const;
 
 public:
   ScannerConfigurationBuilder& hostIP(const std::string&);
@@ -56,7 +51,7 @@ public:
   ScannerConfigurationBuilder& scannerIp(const std::string&);
   ScannerConfigurationBuilder& scannerDataPort(const int&);
   ScannerConfigurationBuilder& scannerControlPort(const int&);
-  ScannerConfigurationBuilder& scanRange(const configuration::DefaultScanRange&);
+  ScannerConfigurationBuilder& scanRange(const DefaultScanRange&);
   ScannerConfigurationBuilder& enableDiagnostics();
 
 private:
@@ -149,7 +144,7 @@ inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scannerControlP
 }
 
 inline ScannerConfigurationBuilder&
-ScannerConfigurationBuilder::scanRange(const configuration::DefaultScanRange& scan_range)
+ScannerConfigurationBuilder::scanRange(const DefaultScanRange& scan_range)
 {
   config_.scan_range_ = scan_range;
   return *this;
@@ -160,7 +155,6 @@ inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableDiagnosti
   config_.diagnostics_enabled_ = true;
   return *this;
 }
-}  // namespace configuration
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_SCANNER_CONFIG_BUILDER_H

@@ -24,7 +24,7 @@ namespace psen_scan_v2
 {
 using namespace psen_scan_v2_standalone;
 
-sensor_msgs::LaserScan toLaserScanMsg(const api::LaserScan& laserscan,
+sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
                                       const std::string& prefix,
                                       const double x_axis_rotation,
                                       const ros::Time& timestamp = ros::Time::now())

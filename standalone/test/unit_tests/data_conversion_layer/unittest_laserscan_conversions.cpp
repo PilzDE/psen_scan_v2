@@ -20,7 +20,7 @@
 #include <gtest/gtest.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
-#include "psen_scan_v2_standalone/api/laserscan.h"
+#include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/laserscan_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
@@ -47,8 +47,8 @@ static data_conversion_layer::monitoring_frame::Message createMsg()
 TEST(LaserScanConversionsTest, laserScanShouldContainCorrectScanResolutionAfterConversion)
 {
   const data_conversion_layer::monitoring_frame::Message frame{ createMsg() };
-  std::unique_ptr<api::LaserScan> scan_ptr;
-  ASSERT_NO_THROW(scan_ptr.reset(new api::LaserScan{ data_conversion_layer::toLaserScan(frame) }););
+  std::unique_ptr<LaserScan> scan_ptr;
+  ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ data_conversion_layer::toLaserScan(frame) }););
 
   EXPECT_EQ(frame.resolution(), scan_ptr->getScanResolution()) << "Resolution incorrect in LaserScan";
 }
@@ -56,8 +56,8 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectScanResolutionAfterC
 TEST(LaserScanConversionsTest, laserScanShouldContainCorrectMinMaxScanAngleAfterConversion)
 {
   const data_conversion_layer::monitoring_frame::Message frame{ createMsg() };
-  std::unique_ptr<api::LaserScan> scan_ptr;
-  ASSERT_NO_THROW(scan_ptr.reset(new api::LaserScan{ data_conversion_layer::toLaserScan(frame) }););
+  std::unique_ptr<LaserScan> scan_ptr;
+  ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ data_conversion_layer::toLaserScan(frame) }););
 
   const util::TenthOfDegree expected_max_scan_angle{ frame.fromTheta() +
                                                      frame.resolution() * (int)frame.measurements().size() };
@@ -70,8 +70,8 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectMeasurementsAfterCon
 {
   const data_conversion_layer::monitoring_frame::Message frame{ createMsg() };
 
-  std::unique_ptr<api::LaserScan> scan_ptr;
-  ASSERT_NO_THROW(scan_ptr.reset(new api::LaserScan{ data_conversion_layer::toLaserScan(frame) }););
+  std::unique_ptr<LaserScan> scan_ptr;
+  ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ data_conversion_layer::toLaserScan(frame) }););
 
   EXPECT_EQ(frame.measurements().size(), scan_ptr->getMeasurements().size());
   const auto mismatch_pair = std::mismatch(
@@ -85,8 +85,8 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectIntensitiesAfterConv
 {
   const data_conversion_layer::monitoring_frame::Message frame{ createMsg() };
 
-  std::unique_ptr<api::LaserScan> scan_ptr;
-  ASSERT_NO_THROW(scan_ptr.reset(new api::LaserScan{ data_conversion_layer::toLaserScan(frame) }););
+  std::unique_ptr<LaserScan> scan_ptr;
+  ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ data_conversion_layer::toLaserScan(frame) }););
 
   EXPECT_EQ(frame.intensities().size(), scan_ptr->getIntensities().size());
   const auto mismatch_pair =
