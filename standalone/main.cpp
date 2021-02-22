@@ -37,11 +37,6 @@ void laserScanCallback(const LaserScan& scan)
 {
   const LaserScan::MeasurementData& measures = scan.getMeasurements();
 
-  if (measures.empty())
-  {
-    return;
-  }
-
   PSENSCAN_INFO_THROTTLE(1 /* sec */, "laserScanCallback()", "Ranges {}", util::formatRange(measures));
 }
 

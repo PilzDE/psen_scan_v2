@@ -161,6 +161,11 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
     }
 
     printUserMsgFor(complete_scan_validator_.validate(frame, DEFAULT_NUM_MSG_PER_ROUND));
+    if (frame.measurements().empty())
+    {
+      PSENSCAN_DEBUG("StateMachine", "No measurement data in this message, skipping laser scan callback.");
+      return;
+    }
     args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan(frame));
   }
   // LCOV_EXCL_START
