@@ -157,5 +157,5 @@ funiculars or roller coasters travel safely; they also guarantee fire protection
 supply in buildings.
 
 
-[sensor_msgs/LaserScan]: http://docs.ros.org/noetic/sensor_msgs/html/msg/LaserScan.html
+[sensor_msgs/LaserScan]: http://docs.ros.org/noetic/api/sensor_msgs/html/msg/LaserScan.html
 [gmapping]: http://wiki.ros.org/gmapping
