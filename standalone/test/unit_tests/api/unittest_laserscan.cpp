@@ -42,8 +42,7 @@ TEST(LaserScanTests, testOutOfRangeResolution)
 
 TEST(LaserScanTests, testInvalidStartEndAngle)
 {
-  EXPECT_THROW(LaserScan laser_scan(DEFAULT_RESOLUTION, DEFAULT_END_ANGLE, DEFAULT_START_ANGLE),
-               std::invalid_argument);
+  EXPECT_THROW(LaserScan laser_scan(DEFAULT_RESOLUTION, DEFAULT_END_ANGLE, DEFAULT_START_ANGLE), std::invalid_argument);
 }
 
 TEST(LaserScanTest, testGetScanResolution)
@@ -59,8 +58,7 @@ TEST(LaserScanTest, testGetMinScanAngle)
 {
   const auto expected_min_scan_angle{ DEFAULT_START_ANGLE };
   std::unique_ptr<LaserScan> laser_scan;
-  ASSERT_NO_THROW(
-      laser_scan.reset(new LaserScan(DEFAULT_RESOLUTION, expected_min_scan_angle, DEFAULT_END_ANGLE)););
+  ASSERT_NO_THROW(laser_scan.reset(new LaserScan(DEFAULT_RESOLUTION, expected_min_scan_angle, DEFAULT_END_ANGLE)););
 
   EXPECT_EQ(expected_min_scan_angle, laser_scan->getMinScanAngle());
 }
@@ -69,8 +67,7 @@ TEST(LaserScanTest, testGetMaxScanAngle)
 {
   const auto expected_max_scan_angle{ DEFAULT_END_ANGLE };
   std::unique_ptr<LaserScan> laser_scan;
-  ASSERT_NO_THROW(
-      laser_scan.reset(new LaserScan(DEFAULT_RESOLUTION, DEFAULT_START_ANGLE, expected_max_scan_angle)););
+  ASSERT_NO_THROW(laser_scan.reset(new LaserScan(DEFAULT_RESOLUTION, DEFAULT_START_ANGLE, expected_max_scan_angle)););
 
   EXPECT_EQ(expected_max_scan_angle, laser_scan->getMaxScanAngle());
 }

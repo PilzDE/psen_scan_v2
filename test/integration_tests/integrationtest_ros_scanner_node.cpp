@@ -120,7 +120,8 @@ protected:
 
 TEST_F(RosScannerNodeTests, testScannerInvocation)
 {
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(
+      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
   std::promise<void> start_stop_barrier;
   start_stop_barrier.set_value();
@@ -150,7 +151,8 @@ TEST_F(RosScannerNodeTests, testScanTopicReceived)
       .WillOnce(testing::Return())
       .WillOnce(ACTION_OPEN_BARRIER_VOID(LASER_SCAN_RECEIVED));
 
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(
+      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
   std::promise<void> start_stop_barrier;
   start_stop_barrier.set_value();
@@ -172,7 +174,8 @@ TEST_F(RosScannerNodeTests, testScanTopicReceived)
 
 TEST_F(RosScannerNodeTests, testMissingStopReply)
 {
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(
+      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
   std::promise<void> start_barrier;
   start_barrier.set_value();
@@ -201,10 +204,12 @@ TEST_F(RosScannerNodeTests, shouldNotInvokeUserCallbackInCaseOfEmptyLaserScan)
 
   const std::string prefix{ "scanner" };
   SubscriberMock subscriber;
-  EXPECT_CALL(subscriber, callback(IsRosScanEqual(toLaserScanMsg(scan_with_data, prefix, configuration::DEFAULT_X_AXIS_ROTATION))))
+  EXPECT_CALL(subscriber,
+              callback(IsRosScanEqual(toLaserScanMsg(scan_with_data, prefix, configuration::DEFAULT_X_AXIS_ROTATION))))
       .WillOnce(ACTION_OPEN_BARRIER_VOID(LASER_SCAN_RECEIVED));
 
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", prefix, configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(
+      nh_priv_, "scan", prefix, configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
   std::promise<void> start_stop_barrier;
   start_stop_barrier.set_value();

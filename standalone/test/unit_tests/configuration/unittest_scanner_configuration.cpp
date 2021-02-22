@@ -57,11 +57,7 @@ static ScannerConfiguration createValidConfig()
 
 static ScannerConfiguration createValidDefaultConfig()
 {
-  return ScannerConfigurationBuilder()
-      .hostIP(VALID_IP)
-      .scannerIp(VALID_IP)
-      .scanRange(SCAN_RANGE)
-      .build();
+  return ScannerConfigurationBuilder().hostIP(VALID_IP).scannerIp(VALID_IP).scanRange(SCAN_RANGE).build();
 }
 
 TEST_F(ScannerConfigurationTest, shouldNotThrowInCaseOfValidConfiguration)
@@ -131,14 +127,12 @@ TEST_F(ScannerConfigurationTest, shouldThrowIfHostDataPortTooLarge)
 
 TEST_F(ScannerConfigurationTest, shouldThrowIfHostControlPortTooSmall)
 {
-  EXPECT_THROW(ScannerConfigurationBuilder().hostControlPort(MINIMAL_PORT_NUMBER - 1),
-               std::out_of_range);
+  EXPECT_THROW(ScannerConfigurationBuilder().hostControlPort(MINIMAL_PORT_NUMBER - 1), std::out_of_range);
 }
 
 TEST_F(ScannerConfigurationTest, shouldThrowIfHostControlPortTooLarge)
 {
-  EXPECT_THROW(ScannerConfigurationBuilder().hostControlPort(MAXIMAL_PORT_NUMBER + 1),
-               std::out_of_range);
+  EXPECT_THROW(ScannerConfigurationBuilder().hostControlPort(MAXIMAL_PORT_NUMBER + 1), std::out_of_range);
 }
 
 TEST_F(ScannerConfigurationTest, shouldThrowIfScannerDataPortTooSmall)
@@ -148,20 +142,17 @@ TEST_F(ScannerConfigurationTest, shouldThrowIfScannerDataPortTooSmall)
 
 TEST_F(ScannerConfigurationTest, shouldThrowIfScannerDataPortTooLarge)
 {
-  EXPECT_THROW(ScannerConfigurationBuilder().scannerDataPort(MAXIMAL_PORT_NUMBER + 1),
-               std::out_of_range);
+  EXPECT_THROW(ScannerConfigurationBuilder().scannerDataPort(MAXIMAL_PORT_NUMBER + 1), std::out_of_range);
 }
 
 TEST_F(ScannerConfigurationTest, shouldThrowIfScannerControlPortTooSmall)
 {
-  EXPECT_THROW(ScannerConfigurationBuilder().scannerControlPort(MINIMAL_PORT_NUMBER - 1),
-               std::out_of_range);
+  EXPECT_THROW(ScannerConfigurationBuilder().scannerControlPort(MINIMAL_PORT_NUMBER - 1), std::out_of_range);
 }
 
 TEST_F(ScannerConfigurationTest, shouldThrowIfScannerControlPortTooLarge)
 {
-  EXPECT_THROW(ScannerConfigurationBuilder().scannerControlPort(MAXIMAL_PORT_NUMBER + 1),
-               std::out_of_range);
+  EXPECT_THROW(ScannerConfigurationBuilder().scannerControlPort(MAXIMAL_PORT_NUMBER + 1), std::out_of_range);
 }
 
 TEST_F(ScannerConfigurationTest, shouldReturnCorrectPortsAfterDefaultConstruction)

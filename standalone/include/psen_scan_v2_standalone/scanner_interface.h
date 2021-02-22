@@ -62,8 +62,7 @@ private:
   const LaserScanCallback laser_scan_cb_;
 };
 
-inline IScanner::IScanner(const ScannerConfiguration& scanner_config,
-                          const LaserScanCallback& laser_scan_callback)
+inline IScanner::IScanner(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback)
   : config_(scanner_config), laser_scan_cb_(laser_scan_callback)
 {
   if (!laser_scan_callback)

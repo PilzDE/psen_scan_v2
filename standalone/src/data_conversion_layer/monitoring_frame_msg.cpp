@@ -74,8 +74,8 @@ data_conversion_layer::monitoring_frame::Message::diagnosticMessages() const
   return diagnostic_messages_;
 }
 
-bool data_conversion_layer::monitoring_frame::Message::operator==(
-    const data_conversion_layer::monitoring_frame::Message& rhs) const
+bool data_conversion_layer::monitoring_frame::Message::
+operator==(const data_conversion_layer::monitoring_frame::Message& rhs) const
 {
   return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
           measurements() == rhs.measurements() && intensities() == rhs.intensities() &&

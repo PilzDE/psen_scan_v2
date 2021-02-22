@@ -248,14 +248,14 @@ protected:
   const PortHolder port_holder_{ ++GLOBAL_PORT_HOLDER };
 
   ScannerConfiguration config_{ ScannerConfigurationBuilder()
-                                                   .hostIP(HOST_IP_ADDRESS)
-                                                   .hostDataPort(port_holder_.data_port_host)
-                                                   .hostControlPort(port_holder_.control_port_host)
-                                                   .scannerIp(SCANNER_IP_ADDRESS)
-                                                   .scannerDataPort(port_holder_.data_port_scanner)
-                                                   .scannerControlPort(port_holder_.control_port_scanner)
-                                                   .scanRange(SCAN_RANGE)
-                                                   .build() };
+                                    .hostIP(HOST_IP_ADDRESS)
+                                    .hostDataPort(port_holder_.data_port_host)
+                                    .hostControlPort(port_holder_.control_port_host)
+                                    .scannerIp(SCANNER_IP_ADDRESS)
+                                    .scannerDataPort(port_holder_.data_port_scanner)
+                                    .scannerControlPort(port_holder_.control_port_scanner)
+                                    .scanRange(SCAN_RANGE)
+                                    .build() };
 };
 
 void ScannerAPITests::SetUp()
