@@ -52,7 +52,7 @@ uint16_t ScannerConfiguration::scannerControlPort() const
   return scanner_control_port_;
 }
 
-const DefaultScanRange& ScannerConfiguration::scanRange() const
+const ScanRange& configuration::ScannerConfiguration::scanRange() const
 {
   return *scan_range_;
 }

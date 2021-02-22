@@ -33,7 +33,7 @@ namespace psen_scan_v2_standalone_test
 {
 static constexpr int MINIMAL_PORT_NUMBER{ std::numeric_limits<uint16_t>::min() };
 static constexpr int MAXIMAL_PORT_NUMBER{ std::numeric_limits<uint16_t>::max() };
-static constexpr DefaultScanRange SCAN_RANGE{ util::TenthOfDegree(0), util::TenthOfDegree(2750) };
+static constexpr ScanRange SCAN_RANGE{ util::TenthOfDegree(0), util::TenthOfDegree(2750) };
 static const std::string VALID_IP{ "127.0.0.1" };
 static const std::string INVALID_IP{ "invalid_ip" };
 

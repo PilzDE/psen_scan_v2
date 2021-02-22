@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 
   try
   {
-    DefaultScanRange scan_range{
+    ScanRange scan_range{
       util::TenthOfDegree::fromRad(
           configuration::DEFAULT_X_AXIS_ROTATION +
           getOptionalParamFromServer<double>(pnh, PARAM_ANGLE_START, configuration::DEFAULT_ANGLE_START)),
