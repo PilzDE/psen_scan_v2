@@ -90,7 +90,7 @@ using InformUserAboutLaserScanCB = std::function<void(const api::LaserScan&)>;
  * Implementations of this Interface should create thread save timeout handlers that
  * call an event every time a defined timeout has run out and restart themselves until deleted.
  *
- * util::Watchdog
+ * @see util::Watchdog
  */
 class IWatchdogFactory
 {
