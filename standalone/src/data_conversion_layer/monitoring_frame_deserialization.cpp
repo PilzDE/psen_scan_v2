@@ -94,8 +94,7 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
         msg.scan_counter_ = scan_counter_read_buffer;
         break;
 
-      case AdditionalFieldHeaderID::measurements:
-      {
+      case AdditionalFieldHeaderID::measurements: {
         const size_t num_measurements{ static_cast<size_t>(additional_header.length()) /
                                        NUMBER_OF_BYTES_SINGLE_MEASUREMENT };
         raw_processing::readArray<uint16_t, double>(is, msg.measurements_, num_measurements, std::bind(toMeter, _1));
@@ -110,8 +109,7 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
         msg.diagnostic_data_enabled_ = true;
         break;
 
-      case AdditionalFieldHeaderID::intensities:
-      {
+      case AdditionalFieldHeaderID::intensities: {
         const size_t num_measurements{ static_cast<size_t>(additional_header.length()) /
                                        NUMBER_OF_BYTES_SINGLE_MEASUREMENT };
         raw_processing::readArray<uint16_t, double>(
