@@ -34,10 +34,10 @@ namespace psen_scan_v2_standalone
  * Every single frame **has to** contain some general information about the scan in the fixed fields
  * and **can** contain additional data like distances or intensities in additional fields.
  *
- * @see FixedFields
- * @see Header
- * @see HeaderID
- * @see ScanValidator
+ * @see data_conversion_layer::monitoring_frame::FixedFields
+ * @see data_conversion_layer::monitoring_frame::AdditionalFieldHeader
+ * @see data_conversion_layer::monitoring_frame::AdditionalFieldHeaderID
+ * @see protocol_layer::ScanValidator
  */
 namespace data_conversion_layer
 {
@@ -100,7 +100,7 @@ private:
  * Based on this information the data will be deserialized.
  *
  * @see monitoring_frame
- * @see HeaderID
+ * @see data_conversion_layer::monitoring_frame::AdditionalFieldHeaderID
  */
 class AdditionalFieldHeader
 {
@@ -155,9 +155,9 @@ public:
  * The length specified in the Header of the additional field "scan_counter"
  * must be exactly as defined in NUMBER_OF_BYTES_SCAN_COUNTER for it to be converted.
  *
- * @see Header
- * @see HeaderID
- * @see NUMBER_OF_BYTES_SCAN_COUNTER
+ * @see data_conversion_layer::monitoring_frame::AdditionalFieldHeader
+ * @see data_conversion_layer::monitoring_frame::AdditionalFieldHeaderID
+ * @see data_conversion_layer::monitoring_frame::NUMBER_OF_BYTES_SCAN_COUNTER
  */
 class ScanCounterUnexpectedSize : public DecodingFailure
 {

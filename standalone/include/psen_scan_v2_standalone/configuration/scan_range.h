@@ -26,6 +26,8 @@ namespace configuration
 {
 /**
  * @brief Higher level data type storing the range in which the scanner takes measurements.
+ *
+ * A ScanRange is given by a start- and an end-angle, which are represented in TenthOfDegree.
  */
 template <int16_t min_allowed_angle, int16_t max_allowed_angle>
 class ScanRange

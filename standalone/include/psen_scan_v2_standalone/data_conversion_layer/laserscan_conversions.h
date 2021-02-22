@@ -28,7 +28,7 @@ namespace data_conversion_layer
  * @brief Converts the technical monitoring_frame to the user friendly LaserScan type sent by the
  * IScanner::LaserScanCallback.
  * @see  data_conversion_layer::monitoring_frame::Message
- * @see ScannerV2
+ * @see api::ScannerV2
  */
 static api::LaserScan toLaserScan(const data_conversion_layer::monitoring_frame::Message& frame)
 {

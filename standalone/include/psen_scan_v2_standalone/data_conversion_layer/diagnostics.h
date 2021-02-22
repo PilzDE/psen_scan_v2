@@ -142,7 +142,7 @@ static const std::map<ErrorType, ErrorMessage> error_code_to_string
  *
  * This class helps defining the positions of those error bits.
  *
- * @see error_bits
+ * @see data_conversion_layer::monitoring_frame::diagnostic::error_bits
  * @see configuration::ScannerConfiguration
  */
 class ErrorLocation
@@ -172,9 +172,9 @@ private:
  * The Message object then can be used in an std::ostream to print the diagnostic message defined in the
  * `error_code_to_string` array.
  *
- * @see ErrorLocation
- * @see error_bits
- * @see error_code_to_string
+ * @see data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation
+ * @see data_conversion_layer::monitoring_frame::diagnostic::error_bits
+ * @see data_conversion_layer::monitoring_frame::diagnostic::error_code_to_string
  */
 class Message
 {

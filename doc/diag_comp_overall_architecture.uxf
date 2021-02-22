@@ -27,8 +27,8 @@ fontsize=10
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>272</x>
-      <y>1320</y>
+      <x>240</x>
+      <y>1136</y>
       <w>600</w>
       <h>48</h>
     </coordinates>
@@ -42,8 +42,8 @@ Scanner device</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>640</x>
-      <y>1240</y>
+      <x>608</x>
+      <y>1056</y>
       <w>72</w>
       <h>96</h>
     </coordinates>
@@ -54,8 +54,8 @@ UDP package</panel_attributes>
   <element>
     <id>UMLActor</id>
     <coordinates>
-      <x>528</x>
-      <y>32</y>
+      <x>496</x>
+      <y>0</y>
       <w>80</w>
       <h>96</h>
     </coordinates>
@@ -67,8 +67,8 @@ UDP package</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>272</x>
-      <y>1168</y>
+      <x>240</x>
+      <y>984</y>
       <w>600</w>
       <h>80</h>
     </coordinates>
@@ -85,8 +85,8 @@ The software components of this abstraction level delivere data as simple byte v
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>640</x>
-      <y>1080</y>
+      <x>608</x>
+      <y>896</y>
       <w>120</w>
       <h>104</h>
     </coordinates>
@@ -98,22 +98,21 @@ byte vector
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>272</x>
-      <y>176</y>
+      <x>240</x>
+      <y>144</y>
       <w>608</w>
-      <h>120</h>
+      <h>136</h>
     </coordinates>
     <panel_attributes>symbol=component
 style=wordwrap
 layer=-10
-&lt;&lt;User API&gt;&gt;
-ScannerV2
+User API layer
 --
 **Explanation:**
 This abstraction layer represents the user API (ROS-agnostic).
 It enables users to configurate, start and stop a single scanner by providing a high level API.
 --
-+ Scanner(configuration::ScannerConfiguration, LaserscanAvailableCallback)
++ Scanner(configuration::ScannerConfiguration, LaserscanCallback)
 
 + start()
 + stop()
@@ -124,8 +123,8 @@ It enables users to configurate, start and stop a single scanner by providing a 
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>560</x>
-      <y>112</y>
+      <x>528</x>
+      <y>80</y>
       <w>24</w>
       <h>80</h>
     </coordinates>
@@ -136,15 +135,15 @@ It enables users to configurate, start and stop a single scanner by providing a 
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>272</x>
-      <y>1008</y>
-      <w>600</w>
-      <h>80</h>
+      <x>928</x>
+      <y>472</y>
+      <w>200</w>
+      <h>168</h>
     </coordinates>
     <panel_attributes>symbol=component
 style=wordwrap
 layer=-10
-Data Serializer / Deserializer layer
+Data conversion layer
 --
 **Explanation:**
 This abstraction layer consists of all software components transforming primitive data (byte vectors) into higher level data types (like data_conversion_layer::scanner_reply::Message) and vice versa.
@@ -154,34 +153,21 @@ This abstraction layer consists of all software components transforming primitiv
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>648</x>
-      <y>928</y>
-      <w>136</w>
-      <h>96</h>
-    </coordinates>
-    <panel_attributes>lt=..&gt;
-data_conversion_layer::scanner_reply::Message,
-monitoring_frame::Message</panel_attributes>
-    <additional_attributes>10.0;100.0;10.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>456</x>
-      <y>928</y>
+      <x>832</x>
+      <y>560</y>
       <w>112</w>
-      <h>96</h>
+      <h>32</h>
     </coordinates>
     <panel_attributes>lt=&lt;..
-start_request::Message</panel_attributes>
-    <additional_attributes>10.0;100.0;10.0;10.0</additional_attributes>
+&lt;&lt;uses&gt;&gt;</panel_attributes>
+    <additional_attributes>120.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>960</x>
-      <y>176</y>
-      <w>176</w>
+      <x>928</x>
+      <y>144</y>
+      <w>200</w>
       <h>152</h>
     </coordinates>
     <panel_attributes>symbol=component
@@ -189,26 +175,15 @@ style=wordwrap
 configuration::ScannerConfiguration
 --
 **Explanation:**
-Higher level data type storing the configuration details of the scanner,
+This component helps storing the configuration details of the scanner,
 like scanner IP &amp; port, scan range, scan resolution, etc.</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>872</x>
-      <y>240</y>
-      <w>104</w>
-      <h>24</h>
-    </coordinates>
-    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>10.0;10.0;110.0;10.0</additional_attributes>
-  </element>
-  <element>
-    <id>Relation</id>
-    <coordinates>
-      <x>448</x>
-      <y>1080</y>
+      <x>416</x>
+      <y>896</y>
       <w>120</w>
       <h>104</h>
     </coordinates>
@@ -220,8 +195,8 @@ byte vector
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>440</x>
-      <y>1240</y>
+      <x>408</x>
+      <y>1056</y>
       <w>72</w>
       <h>96</h>
     </coordinates>
@@ -232,8 +207,8 @@ UDP package</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>272</x>
-      <y>360</y>
+      <x>240</x>
+      <y>328</y>
       <w>600</w>
       <h>576</h>
     </coordinates>
@@ -250,20 +225,20 @@ This abstraction layer implements the scanner protocol. In other words, this lay
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>576</x>
-      <y>288</y>
+      <x>544</x>
+      <y>272</y>
       <w>48</w>
-      <h>88</h>
+      <h>72</h>
     </coordinates>
     <panel_attributes>lt=&lt;..
 &lt;&lt;uses&gt;&gt;</panel_attributes>
-    <additional_attributes>10.0;90.0;10.0;10.0</additional_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>472</x>
-      <y>544</y>
+      <x>440</x>
+      <y>512</y>
       <w>144</w>
       <h>32</h>
     </coordinates>
@@ -276,8 +251,8 @@ group=1</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>472</x>
-      <y>616</y>
+      <x>440</x>
+      <y>584</y>
       <w>144</w>
       <h>32</h>
     </coordinates>
@@ -290,8 +265,8 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>536</x>
-      <y>568</y>
+      <x>504</x>
+      <y>536</y>
       <w>72</w>
       <h>64</h>
     </coordinates>
@@ -303,8 +278,8 @@ group=1</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>472</x>
-      <y>688</y>
+      <x>440</x>
+      <y>656</y>
       <w>144</w>
       <h>32</h>
     </coordinates>
@@ -317,8 +292,8 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>536</x>
-      <y>640</y>
+      <x>504</x>
+      <y>608</y>
       <w>160</w>
       <h>64</h>
     </coordinates>
@@ -330,8 +305,8 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>536</x>
-      <y>712</y>
+      <x>504</x>
+      <y>680</y>
       <w>72</w>
       <h>88</h>
     </coordinates>
@@ -343,8 +318,8 @@ group=1</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>472</x>
-      <y>784</y>
+      <x>440</x>
+      <y>752</y>
       <w>144</w>
       <h>32</h>
     </coordinates>
@@ -357,8 +332,8 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>608</x>
-      <y>688</y>
+      <x>576</x>
+      <y>656</y>
       <w>160</w>
       <h>40</h>
     </coordinates>
@@ -370,19 +345,18 @@ group=1</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>312</x>
-      <y>440</y>
+      <x>280</x>
+      <y>408</y>
       <w>504</w>
       <h>464</h>
     </coordinates>
     <panel_attributes>symbol=component
 style=wordwrap
 layer=0
-&lt;&lt;State machine&gt;&gt;
-ScannerProtocolDef
+ScannerStateMachine
 --
 **Explanation:**
-This component represents the scanner protocol/ state machine (indirectly) described in the Communication manual of the scanner on page 1.
+This component represents the scanner protocol/ state machine (indirectly) described in the communication manual of the scanner on page 1.
 --
 
 
@@ -393,8 +367,8 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>400</x>
-      <y>560</y>
+      <x>368</x>
+      <y>528</y>
       <w>88</w>
       <h>256</h>
     </coordinates>
@@ -406,8 +380,8 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>408</x>
-      <y>616</y>
+      <x>376</x>
+      <y>584</y>
       <w>80</w>
       <h>32</h>
     </coordinates>
@@ -419,8 +393,8 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>352</x>
-      <y>688</y>
+      <x>320</x>
+      <y>656</y>
       <w>136</w>
       <h>40</h>
     </coordinates>
@@ -432,8 +406,8 @@ group=1</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>472</x>
-      <y>856</y>
+      <x>440</x>
+      <y>824</y>
       <w>144</w>
       <h>32</h>
     </coordinates>
@@ -446,8 +420,8 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>536</x>
-      <y>808</y>
+      <x>504</x>
+      <y>776</y>
       <w>160</w>
       <h>64</h>
     </coordinates>
@@ -459,8 +433,8 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>608</x>
-      <y>616</y>
+      <x>576</x>
+      <y>584</y>
       <w>88</w>
       <h>40</h>
     </coordinates>
@@ -468,5 +442,17 @@ group=1</panel_attributes>
 StartTimeout
 group=1</panel_attributes>
     <additional_attributes>10.0;10.0;30.0;10.0;30.0;30.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>840</x>
+      <y>216</y>
+      <w>104</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;..
+&lt;&lt;uses&gt;&gt;</panel_attributes>
+    <additional_attributes>110.0;20.0;10.0;20.0</additional_attributes>
   </element>
 </diagram>
