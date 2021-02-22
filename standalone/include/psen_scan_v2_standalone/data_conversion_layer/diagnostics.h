@@ -137,13 +137,13 @@ static const std::map<ErrorType, ErrorMessage> error_code_to_string
 /**
  * @brief Defines a byte and bit position of an error in the diagnostic chunk.
  *
- * The diagnostic chunk provided by the scanner when diagnostics are enabled in the configuration::ScannerConfiguration
+ * The diagnostic chunk provided by the scanner when diagnostics are enabled in the ScannerConfiguration
  * is a set of error bits stored in consecutive bytes.
  *
  * This class helps defining the positions of those error bits.
  *
  * @see data_conversion_layer::monitoring_frame::diagnostic::error_bits
- * @see configuration::ScannerConfiguration
+ * @see ScannerConfiguration
  */
 class ErrorLocation
 {

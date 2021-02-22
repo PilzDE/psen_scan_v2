@@ -13,16 +13,14 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "psen_scan_v2_standalone/api/scanner_v2.h"
+#include "psen_scan_v2_standalone/scanner_v2.h"
 
 #include <cassert>
 #include <stdexcept>
 
-#include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
+#include "psen_scan_v2_standalone/scanner_configuration.h"
 
 namespace psen_scan_v2_standalone
-{
-namespace api
 {
 using namespace psen_scan_v2_standalone::protocol_layer::scanner_events;
 
@@ -84,7 +82,7 @@ StateMachineArgs* ScannerV2::createStateMachineArgs()
       std::unique_ptr<IWatchdogFactory>(new WatchdogFactory(this)));
 }  // namespace psen_scan_v2_standalone
 
-ScannerV2::ScannerV2(const configuration::ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb)
+ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb)
   : IScanner(scanner_config, laser_scan_cb), sm_(new ScannerStateMachine(createStateMachineArgs()))
 {
   const std::lock_guard<std::mutex> lock(member_mutex_);
@@ -155,5 +153,4 @@ void ScannerV2::scannerStoppedCB()
   scanner_has_stopped_ = boost::none;
 }
 
-}  // namespace api
 }  // namespace psen_scan_v2_standalone

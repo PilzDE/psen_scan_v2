@@ -22,8 +22,6 @@
 
 namespace psen_scan_v2_standalone
 {
-namespace configuration
-{
 /**
  * @brief Higher level data type storing the range in which the scanner takes measurements.
  *
@@ -99,9 +97,8 @@ const util::TenthOfDegree& ScanRangeTemplated<min_angle, max_angle>::getEnd() co
   return end_angle_;
 }
 
-using ScanRange = configuration::ScanRangeTemplated<0, 2750>;
+using ScanRange = ScanRangeTemplated<0, 2750>;
 
-}  // namespace configuration
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_SCAN_RANGE_H

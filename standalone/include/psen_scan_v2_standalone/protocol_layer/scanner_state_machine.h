@@ -36,7 +36,7 @@
 #include "psen_scan_v2_standalone/util/format_range.h"
 #include "psen_scan_v2_standalone/communication_layer/udp_client.h"
 
-#include "psen_scan_v2_standalone/api/laserscan.h"
+#include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/laserscan_conversions.h"
 
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request.h"
@@ -79,7 +79,7 @@ static constexpr uint32_t DEFAULT_NUM_MSG_PER_ROUND{ 6 };
 
 using ScannerStartedCB = std::function<void()>;
 using ScannerStoppedCB = std::function<void()>;
-using InformUserAboutLaserScanCB = std::function<void(const api::LaserScan&)>;
+using InformUserAboutLaserScanCB = std::function<void(const LaserScan&)>;
 
 /**
  * @brief Interface to create event timeout handlers.
@@ -105,7 +105,7 @@ public:
  */
 struct StateMachineArgs
 {
-  StateMachineArgs(const configuration::ScannerConfiguration& scanner_config,
+  StateMachineArgs(const ScannerConfiguration& scanner_config,
                    std::unique_ptr<communication_layer::UdpClientImpl> control_client,
                    std::unique_ptr<communication_layer::UdpClientImpl> data_client,
                    const ScannerStartedCB& started_cb,
@@ -122,7 +122,7 @@ struct StateMachineArgs
   {
   }
 
-  const configuration::ScannerConfiguration config_;
+  const ScannerConfiguration config_;
 
   // Callbacks
   const ScannerStartedCB scanner_started_cb{};

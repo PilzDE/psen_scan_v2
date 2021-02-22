@@ -21,11 +21,11 @@
  */
 
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
-#include "psen_scan_v2_standalone/api/laserscan.h"
+#include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/util/logging.h"
-#include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
-#include "psen_scan_v2_standalone/configuration/scanner_config_builder.h"
-#include "psen_scan_v2_standalone/api/scanner_v2.h"
-#include "psen_scan_v2_standalone/configuration/scan_range.h"
+#include "psen_scan_v2_standalone/scanner_configuration.h"
+#include "psen_scan_v2_standalone/scanner_config_builder.h"
+#include "psen_scan_v2_standalone/scanner_v2.h"
+#include "psen_scan_v2_standalone/scan_range.h"
 
 #endif  // PSEN_SCAN_V2_STANDALONE_CORE_H

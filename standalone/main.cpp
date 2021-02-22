@@ -20,8 +20,6 @@
 #include <psen_scan_v2_standalone/core.h>
 
 using namespace psen_scan_v2_standalone;
-using namespace psen_scan_v2_standalone::configuration;
-using namespace psen_scan_v2_standalone::api;
 
 /*
  * In this section we declare all necessary configuration parameters
@@ -35,9 +33,9 @@ const util::TenthOfDegree ANGLE_END{ data_conversion_layer::degreeToTenthDegree(
 /*
  * This function is used as a callback every time a new laserscan is received.
  */
-void laserScanCallback(const api::LaserScan& scan)
+void laserScanCallback(const LaserScan& scan)
 {
-  const api::LaserScan::MeasurementData& measures = scan.getMeasurements();
+  const LaserScan::MeasurementData& measures = scan.getMeasurements();
 
   if (measures.empty())
   {
@@ -51,9 +49,9 @@ int main(int argc, char** argv)
 {
   setLogLevel(CONSOLE_BRIDGE_LOG_INFO);
 
-  configuration::ScanRange scan_range{ ANGLE_START, ANGLE_END };
+  ScanRange scan_range{ ANGLE_START, ANGLE_END };
 
-  configuration::ScannerConfigurationBuilder config_builder;
+  ScannerConfigurationBuilder config_builder;
   config_builder.hostIP(HOST_IP).scannerIp(SCANNER_IP).scanRange(scan_range);
 
   ScannerV2 scanner(config_builder.build(), laserScanCallback);

@@ -51,13 +51,13 @@ include_directories(
 )
 
 set(${PROJECT_NAME}_sources
-  src/api/scanner_v2.cpp
-  src/api/laserscan.cpp
+  src/scanner_v2.cpp
+  src/laserscan.cpp
   src/data_conversion_layer/monitoring_frame_msg.cpp
   src/data_conversion_layer/start_request.cpp
   src/data_conversion_layer/start_request_serialization.cpp
   src/data_conversion_layer/stop_request_serialization.cpp
-  src/configuration/scanner_configuration.cpp
+  src/scanner_configuration.cpp
   src/data_conversion_layer/monitoring_frame_deserialization.cpp
   src/data_conversion_layer/diagnostics.cpp
   src/data_conversion_layer/scanner_reply_serialization_deserialization.cpp
@@ -272,11 +272,11 @@ ADD_TEST(NAME unittest_udp_client
 add_executable(integrationtest_scanner_api
         test/integration_tests/api/integrationtest_scanner_api.cpp
         test/src/data_conversion_layer/monitoring_frame_serialization.cpp
-        src/api/scanner_v2.cpp
-        src/api/laserscan.cpp
+        src/scanner_v2.cpp
+        src/laserscan.cpp
         src/data_conversion_layer/monitoring_frame_msg.cpp
         src/data_conversion_layer/monitoring_frame_deserialization.cpp
-        src/configuration/scanner_configuration.cpp
+        src/scanner_configuration.cpp
         src/data_conversion_layer/start_request.cpp
         src/data_conversion_layer/stop_request_serialization.cpp
         src/data_conversion_layer/diagnostics.cpp

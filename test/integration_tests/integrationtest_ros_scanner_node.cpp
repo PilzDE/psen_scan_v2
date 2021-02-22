@@ -27,11 +27,11 @@
 #include <pilz_testutils/async_test.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
-#include "psen_scan_v2_standalone/api/laserscan.h"
-#include "psen_scan_v2_standalone/configuration/scanner_configuration.h"
-#include "psen_scan_v2_standalone/configuration/scanner_config_builder.h"
+#include "psen_scan_v2_standalone/laserscan.h"
+#include "psen_scan_v2_standalone/scanner_configuration.h"
+#include "psen_scan_v2_standalone/scanner_config_builder.h"
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
-#include "psen_scan_v2_standalone/configuration/scan_range.h"
+#include "psen_scan_v2_standalone/scan_range.h"
 
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 #include "psen_scan_v2/ros_scanner_node.h"
@@ -93,20 +93,20 @@ static const std::string HOST_IP{ "127.0.0.1" };
 static constexpr int HOST_UDP_PORT_DATA{ 50505 };
 static constexpr int HOST_UDP_PORT_CONTROL{ 55055 };
 static const std::string DEVICE_IP{ "127.0.0.100" };
-static constexpr configuration::ScanRange SCAN_RANGE{ util::TenthOfDegree(0), util::TenthOfDegree(2750) };
+static constexpr ScanRange SCAN_RANGE{ util::TenthOfDegree(0), util::TenthOfDegree(2750) };
 static constexpr int SCANNER_STARTED_TIMEOUT_MS{ 3000 };
 static constexpr int SCANNER_STOPPED_TIMEOUT_MS{ 3000 };
 static constexpr int LASERSCAN_RECEIVED_TIMEOUT{ 3000 };
 
-static configuration::ScannerConfiguration createValidConfig()
+static ScannerConfiguration createValidConfig()
 {
-  return configuration::ScannerConfigurationBuilder()
+  return ScannerConfigurationBuilder()
       .hostIP(HOST_IP)
       .hostDataPort(HOST_UDP_PORT_DATA)
       .hostControlPort(HOST_UDP_PORT_CONTROL)
       .scannerIp(DEVICE_IP)
-      .scannerDataPort(DATA_PORT_OF_SCANNER_DEVICE)
-      .scannerControlPort(CONTROL_PORT_OF_SCANNER_DEVICE)
+      .scannerDataPort(configuration::DATA_PORT_OF_SCANNER_DEVICE)
+      .scannerControlPort(configuration::CONTROL_PORT_OF_SCANNER_DEVICE)
       .scanRange(SCAN_RANGE)
       .build();
 }
@@ -115,12 +115,13 @@ class RosScannerNodeTests : public testing::Test, public testing::AsyncTest
 {
 protected:
   ros::NodeHandle nh_priv_{ "~" };
-  configuration::ScannerConfiguration scanner_config_{ createValidConfig() };
+  ScannerConfiguration scanner_config_{ createValidConfig() };
 };
 
 TEST_F(RosScannerNodeTests, testScannerInvocation)
 {
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(
+      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
   std::promise<void> start_stop_barrier;
   start_stop_barrier.set_value();
@@ -150,7 +151,8 @@ TEST_F(RosScannerNodeTests, testScanTopicReceived)
       .WillOnce(testing::Return())
       .WillOnce(ACTION_OPEN_BARRIER_VOID(LASER_SCAN_RECEIVED));
 
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(
+      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
   std::promise<void> start_stop_barrier;
   start_stop_barrier.set_value();
@@ -172,7 +174,8 @@ TEST_F(RosScannerNodeTests, testScanTopicReceived)
 
 TEST_F(RosScannerNodeTests, testMissingStopReply)
 {
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(
+      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
   std::promise<void> start_barrier;
   start_barrier.set_value();
@@ -201,10 +204,12 @@ TEST_F(RosScannerNodeTests, shouldNotInvokeUserCallbackInCaseOfEmptyLaserScan)
 
   const std::string prefix{ "scanner" };
   SubscriberMock subscriber;
-  EXPECT_CALL(subscriber, callback(IsRosScanEqual(toLaserScanMsg(scan_with_data, prefix, DEFAULT_X_AXIS_ROTATION))))
+  EXPECT_CALL(subscriber,
+              callback(IsRosScanEqual(toLaserScanMsg(scan_with_data, prefix, configuration::DEFAULT_X_AXIS_ROTATION))))
       .WillOnce(ACTION_OPEN_BARRIER_VOID(LASER_SCAN_RECEIVED));
 
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", prefix, DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(
+      nh_priv_, "scan", prefix, configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
   std::promise<void> start_stop_barrier;
   start_stop_barrier.set_value();

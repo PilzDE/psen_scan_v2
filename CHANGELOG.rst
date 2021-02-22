@@ -6,6 +6,7 @@ Forthcoming
 -----------
 * Enable separate building of cpp-lib; extract sources into subproject psen_scan_v2_standalone
 * Renames ScanRange and DefaultScanRange to improve usability
+* Improve namespace hierarchy and move files to respective subfolders
 * Contributors: Pilz GmbH and Co. KG
 
 0.1.4 (2021-01-13)
