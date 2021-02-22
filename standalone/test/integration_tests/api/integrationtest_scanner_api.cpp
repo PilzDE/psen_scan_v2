@@ -53,7 +53,7 @@ using MaxSizeUdpRawData = std::array<char, 65507>;
 static const std::string SCANNER_IP_ADDRESS{ "127.0.0.1" };
 static const std::string HOST_IP_ADDRESS{ "127.0.0.1" };
 
-static constexpr configuration::DefaultScanRange SCAN_RANGE{ util::TenthOfDegree(0), util::TenthOfDegree(60) };
+static constexpr configuration::ScanRange SCAN_RANGE{ util::TenthOfDegree(0), util::TenthOfDegree(60) };
 
 static constexpr std::chrono::milliseconds FUTURE_WAIT_TIMEOUT{ 10 };
 static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 3 };

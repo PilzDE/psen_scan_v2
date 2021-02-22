@@ -28,7 +28,7 @@ namespace configuration
  * @brief Higher level data type storing the range in which the scanner takes measurements.
  */
 template <int16_t min_allowed_angle, int16_t max_allowed_angle>
-class ScanRange
+class ScanRangeTemplated
 {
   static_assert(min_allowed_angle < max_allowed_angle, "MIN-angle limit smaller than MAX-angle limit.");
 
@@ -39,16 +39,16 @@ public:
    * @param start_angle Start angle of measurement (scanner-zero = zero on the left).
    * @param end_angle End angle of measurement.
    */
-  constexpr ScanRange(const util::TenthOfDegree& start_angle, const util::TenthOfDegree& end_angle);
+  constexpr ScanRangeTemplated(const util::TenthOfDegree& start_angle, const util::TenthOfDegree& end_angle);
 
   const util::TenthOfDegree& getStart() const;
   const util::TenthOfDegree& getEnd() const;
 
 public:
-  static constexpr ScanRange<min_allowed_angle, max_allowed_angle> createInvalidScanRange();
+  static constexpr ScanRangeTemplated<min_allowed_angle, max_allowed_angle> createInvalidScanRange();
 
 private:
-  ScanRange() = default;
+  ScanRangeTemplated() = default;
 
 private:
   util::TenthOfDegree start_angle_{ 0 };
@@ -56,8 +56,8 @@ private:
 };
 
 template <int16_t min_angle, int16_t max_angle>
-constexpr ScanRange<min_angle, max_angle>::ScanRange(const util::TenthOfDegree& start_angle,
-                                                     const util::TenthOfDegree& end_angle)
+constexpr ScanRangeTemplated<min_angle, max_angle>::ScanRangeTemplated(const util::TenthOfDegree& start_angle,
+                                                                       const util::TenthOfDegree& end_angle)
   : start_angle_(start_angle), end_angle_(end_angle)
 {
   const util::TenthOfDegree MIN_ANGLE{ min_angle };
@@ -80,24 +80,24 @@ constexpr ScanRange<min_angle, max_angle>::ScanRange(const util::TenthOfDegree& 
 }
 
 template <int16_t min_angle, int16_t max_angle>
-constexpr ScanRange<min_angle, max_angle> ScanRange<min_angle, max_angle>::createInvalidScanRange()
+constexpr ScanRangeTemplated<min_angle, max_angle> ScanRangeTemplated<min_angle, max_angle>::createInvalidScanRange()
 {
-  return ScanRange<min_angle, max_angle>();
+  return ScanRangeTemplated<min_angle, max_angle>();
 }
 
 template <int16_t min_angle, int16_t max_angle>
-const util::TenthOfDegree& ScanRange<min_angle, max_angle>::getStart() const
+const util::TenthOfDegree& ScanRangeTemplated<min_angle, max_angle>::getStart() const
 {
   return start_angle_;
 }
 
 template <int16_t min_angle, int16_t max_angle>
-const util::TenthOfDegree& ScanRange<min_angle, max_angle>::getEnd() const
+const util::TenthOfDegree& ScanRangeTemplated<min_angle, max_angle>::getEnd() const
 {
   return end_angle_;
 }
 
-using DefaultScanRange = configuration::ScanRange<0, 2750>;
+using ScanRange = configuration::ScanRangeTemplated<0, 2750>;
 
 }  // namespace configuration
 }  // namespace psen_scan_v2_standalone

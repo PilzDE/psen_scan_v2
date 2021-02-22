@@ -51,7 +51,7 @@ int main(int argc, char** argv)
 {
   setLogLevel(CONSOLE_BRIDGE_LOG_INFO);
 
-  configuration::DefaultScanRange scan_range{ ANGLE_START, ANGLE_END };
+  configuration::ScanRange scan_range{ ANGLE_START, ANGLE_END };
 
   configuration::ScannerConfigurationBuilder config_builder;
   config_builder.hostIP(HOST_IP).scannerIp(SCANNER_IP).scanRange(scan_range);

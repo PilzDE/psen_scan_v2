@@ -61,15 +61,14 @@ private:
   {
   public:
     constexpr LaserScanSettings() = default;
-    constexpr LaserScanSettings(const configuration::DefaultScanRange& scan_range,
-                                const util::TenthOfDegree& resolution);
+    constexpr LaserScanSettings(const configuration::ScanRange& scan_range, const util::TenthOfDegree& resolution);
 
   public:
-    constexpr const configuration::DefaultScanRange& getScanRange() const;
+    constexpr const configuration::ScanRange& getScanRange() const;
     constexpr util::TenthOfDegree getResolution() const;
 
   private:
-    const configuration::DefaultScanRange scan_range_{ configuration::DefaultScanRange::createInvalidScanRange() };
+    const configuration::ScanRange scan_range_{ configuration::ScanRange::createInvalidScanRange() };
     const util::TenthOfDegree resolution_{ 0 };
   };
 
@@ -100,13 +99,13 @@ private:
   const std::array<LaserScanSettings, NUM_SLAVES> slaves_;
 };
 
-constexpr Message::LaserScanSettings::LaserScanSettings(const configuration::DefaultScanRange& scan_range,
+constexpr Message::LaserScanSettings::LaserScanSettings(const configuration::ScanRange& scan_range,
                                                         const util::TenthOfDegree& resolution)
   : scan_range_(scan_range), resolution_(resolution)
 {
 }
 
-constexpr const configuration::DefaultScanRange& Message::LaserScanSettings::getScanRange() const
+constexpr const configuration::ScanRange& Message::LaserScanSettings::getScanRange() const
 {
   return scan_range_;
 };

@@ -56,7 +56,7 @@ public:
   ScannerConfigurationBuilder& scannerIp(const std::string&);
   ScannerConfigurationBuilder& scannerDataPort(const int&);
   ScannerConfigurationBuilder& scannerControlPort(const int&);
-  ScannerConfigurationBuilder& scanRange(const configuration::DefaultScanRange&);
+  ScannerConfigurationBuilder& scanRange(const configuration::ScanRange&);
   ScannerConfigurationBuilder& enableDiagnostics();
 
 private:
@@ -148,8 +148,7 @@ inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scannerControlP
   return *this;
 }
 
-inline ScannerConfigurationBuilder&
-ScannerConfigurationBuilder::scanRange(const configuration::DefaultScanRange& scan_range)
+inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scanRange(const configuration::ScanRange& scan_range)
 {
   config_.scan_range_ = scan_range;
   return *this;
