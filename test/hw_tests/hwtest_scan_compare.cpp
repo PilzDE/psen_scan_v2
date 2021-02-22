@@ -16,8 +16,6 @@
 #include <ros/ros.h>
 #include <gtest/gtest.h>
 
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
 #include <functional>
 
 #include <algorithm>

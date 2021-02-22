@@ -29,9 +29,6 @@
 
 #include <boost/msm/back/tools.hpp>
 #include <boost/msm/back/metafunctions.hpp>
-#include <boost/mpl/for_each.hpp>
-
-#include <boost/core/demangle.hpp>
 
 #include "psen_scan_v2_standalone/protocol_layer/scanner_events.h"
 
