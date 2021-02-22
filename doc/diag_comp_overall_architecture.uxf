@@ -143,7 +143,7 @@ It enables users to configurate, start and stop a single scanner by providing a 
     <panel_attributes>symbol=component
 style=wordwrap
 layer=-10
-Data serializer / deserializer layer
+Data conversion layer
 --
 **Explanation:**
 This abstraction layer consists of all software components transforming primitive data (byte vectors) into higher level data types (like data_conversion_layer::scanner_reply::Message) and vice versa.
