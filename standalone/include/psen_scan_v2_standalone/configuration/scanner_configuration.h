@@ -44,7 +44,7 @@ public:
   uint16_t scannerDataPort() const;
   uint16_t scannerControlPort() const;
 
-  const configuration::DefaultScanRange& scanRange() const;
+  const configuration::ScanRange& scanRange() const;
 
   bool diagnosticsEnabled() const;
 
@@ -63,7 +63,7 @@ private:
   uint16_t scanner_data_port_{ DATA_PORT_OF_SCANNER_DEVICE };
   uint16_t scanner_control_port_{ CONTROL_PORT_OF_SCANNER_DEVICE };
 
-  boost::optional<DefaultScanRange> scan_range_{};
+  boost::optional<ScanRange> scan_range_{};
   bool diagnostics_enabled_{ false };
 };
 
