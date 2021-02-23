@@ -84,7 +84,31 @@ if (WIN32)
 include(CTest)
 
 if (BUILD_TESTING)
-find_package(GTest CONFIG REQUIRED)
+
+# Download + Install gtest (see https://github.com/google/googletest/blob/master/googletest/README.md)
+configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
+execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
+if(result)
+  message(FATAL_ERROR "CMake step for googletest failed: ${result}")
+endif()
+execute_process(COMMAND ${CMAKE_COMMAND} --build .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
+if(result)
+  message(FATAL_ERROR "Build step for googletest failed: ${result}")
+endif()
+
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
+                 ${CMAKE_CURRENT_BINARY_DIR}/googletest-build
+                 EXCLUDE_FROM_ALL)
+
+if (CMAKE_VERSION VERSION_LESS 2.8.11)
+  include_directories("${gtest_SOURCE_DIR}/include")
+endif()
 
 include_directories(
   test/include
@@ -95,8 +119,7 @@ ADD_EXECUTABLE(unittest_laserscan_conversions test/unit_tests/data_conversion_la
 
 TARGET_LINK_LIBRARIES(unittest_laserscan_conversions
     ${PROJECT_NAME}
-    ${GTEST_LIBRARIES}
-    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+    gtest
 )
 
 ADD_TEST(NAME unittest_laserscan_conversions
@@ -106,8 +129,7 @@ ADD_EXECUTABLE(unittest_laserscan test/unit_tests/api/unittest_laserscan.cpp)
 
 TARGET_LINK_LIBRARIES(unittest_laserscan
     ${PROJECT_NAME}
-    ${GTEST_LIBRARIES}
-    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+    gtest
 )
 
 ADD_TEST(NAME unittest_laserscan
@@ -117,8 +139,7 @@ ADD_EXECUTABLE(unittest_logging test/unit_tests/util/unittest_logging.cpp)
 
 TARGET_LINK_LIBRARIES(unittest_logging
     ${PROJECT_NAME}
-    ${GTEST_LIBRARIES}
-    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+    gtest gmock
 )
 
 ADD_TEST(NAME unittest_logging
@@ -129,8 +150,7 @@ ADD_EXECUTABLE(unittest_monitoring_frame_diagnostic_message test/unit_tests/data
 
 TARGET_LINK_LIBRARIES(unittest_monitoring_frame_diagnostic_message
     ${PROJECT_NAME}
-    ${GTEST_LIBRARIES}
-    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+    gtest
 )
 
 ADD_TEST(NAME unittest_monitoring_frame_diagnostic_message
@@ -140,8 +160,7 @@ ADD_EXECUTABLE(unittest_monitoring_frame_msg test/unit_tests/data_conversion_lay
 
 TARGET_LINK_LIBRARIES(unittest_monitoring_frame_msg
     ${PROJECT_NAME}
-    ${GTEST_LIBRARIES}
-    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+    gtest
 )
 
 ADD_TEST(NAME unittest_monitoring_frame_msg
@@ -153,8 +172,7 @@ ADD_EXECUTABLE(unittest_monitoring_frame_serialization_deserialization
 
 TARGET_LINK_LIBRARIES(unittest_monitoring_frame_serialization_deserialization
     ${PROJECT_NAME}
-    ${GTEST_LIBRARIES}
-    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+    gtest
 )
 
 ADD_TEST(NAME unittest_monitoring_frame_serialization_deserialization
@@ -165,8 +183,7 @@ ADD_EXECUTABLE(unittest_raw_processing test/unit_tests/data_conversion_layer/uni
 
 TARGET_LINK_LIBRARIES(unittest_raw_processing
     ${PROJECT_NAME}
-    ${GTEST_LIBRARIES}
-    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+    gtest
 )
 
 ADD_TEST(NAME unittest_raw_processing
@@ -177,8 +194,7 @@ ADD_EXECUTABLE(unittest_scan_range test/unit_tests/util/unittest_scan_range.cpp)
 
 TARGET_LINK_LIBRARIES(unittest_scan_range
     ${PROJECT_NAME}
-    ${GTEST_LIBRARIES}
-    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+    gtest
 )
 
 ADD_TEST(NAME unittest_scan_range
@@ -189,8 +205,7 @@ ADD_EXECUTABLE(unittest_scanner_configuration test/unit_tests/configuration/unit
 
 TARGET_LINK_LIBRARIES(unittest_scanner_configuration
     ${PROJECT_NAME}
-    ${GTEST_LIBRARIES}
-    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+    gtest
 )
 
 ADD_TEST(NAME unittest_scanner_configuration
@@ -201,8 +216,7 @@ ADD_EXECUTABLE(unittest_scanner_reply_msg test/unit_tests/data_conversion_layer/
 
 TARGET_LINK_LIBRARIES(unittest_scanner_reply_msg
     ${PROJECT_NAME}
-    ${GTEST_LIBRARIES}
-    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+    gtest
 )
 
 ADD_TEST(NAME unittest_scanner_reply_msg
@@ -213,8 +227,7 @@ ADD_EXECUTABLE(unittest_start_request test/unit_tests/data_conversion_layer/unit
 
 TARGET_LINK_LIBRARIES(unittest_start_request
     ${PROJECT_NAME}
-    ${GTEST_LIBRARIES}
-    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+    gtest
 )
 
 ADD_TEST(NAME unittest_start_request
@@ -225,8 +238,7 @@ ADD_EXECUTABLE(unittest_stop_request test/unit_tests/data_conversion_layer/unitt
 
 TARGET_LINK_LIBRARIES(unittest_stop_request
     ${PROJECT_NAME}
-    ${GTEST_LIBRARIES}
-    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+    gtest
 )
 
 ADD_TEST(NAME unittest_stop_request
@@ -237,8 +249,7 @@ ADD_EXECUTABLE(unittest_tenth_degree_conversion test/unit_tests/data_conversion_
 
 TARGET_LINK_LIBRARIES(unittest_tenth_degree_conversion
     ${PROJECT_NAME}
-    ${GTEST_LIBRARIES}
-    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+    gtest
 )
 
 ADD_TEST(NAME unittest_tenth_degree_conversion
@@ -249,8 +260,7 @@ ADD_EXECUTABLE(unittest_tenth_of_degree test/unit_tests/util/unittest_tenth_of_d
 
 TARGET_LINK_LIBRARIES(unittest_tenth_of_degree
     ${PROJECT_NAME}
-    ${GTEST_LIBRARIES}
-    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+    gtest
 )
 
 ADD_TEST(NAME unittest_tenth_of_degree
@@ -261,8 +271,7 @@ ADD_EXECUTABLE(unittest_udp_client test/unit_tests/communication_layer/unittest_
 
 TARGET_LINK_LIBRARIES(unittest_udp_client
     ${PROJECT_NAME}
-    ${GTEST_LIBRARIES}
-    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+    gtest gmock
 )
 
 ADD_TEST(NAME unittest_udp_client
@@ -285,8 +294,7 @@ add_executable(integrationtest_scanner_api
 
 target_link_libraries(integrationtest_scanner_api
     ${PROJECT_NAME}
-    ${GTEST_LIBRARIES}
-    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+    gtest gmock
 )
 
 add_test(NAME integrationtest_scanner_api
@@ -298,8 +306,7 @@ add_executable(integrationtest_udp_client
 
 target_link_libraries(integrationtest_udp_client
     ${PROJECT_NAME}
-    ${GTEST_LIBRARIES}
-    GTest::gmock GTest::gtest GTest::gmock_main GTest::gtest_main
+    gtest gmock
 )
 
 add_test(NAME integrationtest_udp_client
