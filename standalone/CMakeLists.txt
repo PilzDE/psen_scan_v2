@@ -80,11 +80,11 @@ target_link_libraries(${PROJECT_NAME}_app
 ###########
 ## Tests ##
 ###########
-include(CTest)
-
 if (BUILD_TESTING)
 
-# The standlone is included  with add_subdirectory from the top-level ROS CMakeLists.txt
+include(CTest)
+
+# The standalone is included  with add_subdirectory from the top-level ROS CMakeLists.txt
 # However the tests are build separately in the top-level and thus should be ignored here.
 # If you don't know what ROS is, simply ignore this line.
 if(NOT DEFINED ENV{ROS_DISTRO})
