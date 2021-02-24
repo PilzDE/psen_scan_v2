@@ -571,9 +571,7 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfMissingMeassuremen
 
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
-  EXPECT_LOG_SHORT(
-      DEBUG,
-      "StateMachine: No measurement data in this message, skipping laser scan callback.")
+  EXPECT_LOG_SHORT(DEBUG, "StateMachine: No measurement data in this message, skipping laser scan callback.")
       .Times(1)
       .WillOnce(OpenBarrier(&valid_msg_barrier));
 
@@ -582,7 +580,8 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfMissingMeassuremen
   promis.wait_for(DEFAULT_TIMEOUT);
 
   std::cout << "ScannerAPITests: Send monitoring frame without measurement data ..." << std::endl;
-  scanner_mock.sendMonitoringFrame(createValidMonitoringFrameMsg(42, util::TenthOfDegree{0}, util::TenthOfDegree{0}));
+  scanner_mock.sendMonitoringFrame(
+      createValidMonitoringFrameMsg(42, util::TenthOfDegree{ 0 }, util::TenthOfDegree{ 0 }));
   EXPECT_TRUE(valid_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Valid monitoring frame not received";
 }
 
