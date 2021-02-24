@@ -196,39 +196,6 @@ TEST_F(RosScannerNodeTests, testMissingStopReply)
   EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
 }
 
-TEST_F(RosScannerNodeTests, shouldNotInvokeUserCallbackInCaseOfEmptyLaserScan)
-{
-  LaserScan empty_scan(util::TenthOfDegree(1), util::TenthOfDegree(3), util::TenthOfDegree(5));
-  LaserScan scan_with_data(util::TenthOfDegree(1), util::TenthOfDegree(3), util::TenthOfDegree(5));
-  scan_with_data.getMeasurements().push_back(7);
-
-  const std::string prefix{ "scanner" };
-  SubscriberMock subscriber;
-  EXPECT_CALL(subscriber,
-              callback(IsRosScanEqual(toLaserScanMsg(scan_with_data, prefix, configuration::DEFAULT_X_AXIS_ROTATION))))
-      .WillOnce(ACTION_OPEN_BARRIER_VOID(LASER_SCAN_RECEIVED));
-
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(
-      nh_priv_, "scan", prefix, configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
-
-  std::promise<void> start_stop_barrier;
-  start_stop_barrier.set_value();
-  EXPECT_CALL(ros_scanner_node.scanner_, start())
-      .WillOnce(DoAll(ACTION_OPEN_BARRIER_VOID(SCANNER_STARTED), Return_Future(start_stop_barrier)));
-
-  subscriber.initialize(nh_priv_);
-  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
-
-  BARRIER(SCANNER_STARTED, SCANNER_STARTED_TIMEOUT_MS);
-
-  ros_scanner_node.scanner_.invokeLaserScanCallback(empty_scan);
-  ros_scanner_node.scanner_.invokeLaserScanCallback(scan_with_data);
-
-  BARRIER(LASER_SCAN_RECEIVED, LASERSCAN_RECEIVED_TIMEOUT);
-  ros_scanner_node.terminate();
-  EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
-}
-
 }  // namespace psen_scan_v2
 
 int main(int argc, char* argv[])
