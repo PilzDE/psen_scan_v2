@@ -38,7 +38,7 @@ jobs:
         set     BOOST_ROOT=%BOOST_ROOT_1_72_0%
         cmake -G "Visual Studio 16 2019" -A x64 ^
           -DCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%/scripts/buildsystems/vcpkg.cmake ^
-          -S . -B build
+          -S . -B build -DBUILD_TESTING=ON
         cmake --build build --config %BUILD_TYPE% --target ALL_BUILD
 
     - name: Test
