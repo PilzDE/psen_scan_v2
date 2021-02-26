@@ -243,8 +243,8 @@ class ScannerAPITests : public testing::Test
 {
 protected:
   void SetUp() override;
-  void SetUpNiceMockScanner();
-  void SetUpStrictMockScanner();
+  void setUpNiceMockScanner();
+  void setUpStrictMockScanner();
 
 protected:
   const PortHolder port_holder_{ ++GLOBAL_PORT_HOLDER };
@@ -270,12 +270,12 @@ void ScannerAPITests::SetUp()
   setLogLevel(CONSOLE_BRIDGE_LOG_DEBUG);
 }
 
-void ScannerAPITests::SetUpNiceMockScanner()
+void ScannerAPITests::setUpNiceMockScanner()
 {
   nice_scanner_mock_.reset(new NiceMock<ScannerMock>{ port_holder_ });
 }
 
-void ScannerAPITests::SetUpStrictMockScanner()
+void ScannerAPITests::setUpStrictMockScanner()
 {
   strict_scanner_mock_.reset(new StrictMock<ScannerMock>{ port_holder_ });
 }
@@ -324,7 +324,7 @@ void ScannerMock::sendEmptyMonitoringFrame()
 
 TEST_F(ScannerAPITests, testStartFunctionality)
 {
-  SetUpStrictMockScanner();
+  setUpStrictMockScanner();
   const data_conversion_layer::start_request::Message start_req(config_);
 
   util::Barrier start_req_received_barrier;
