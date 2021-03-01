@@ -80,10 +80,14 @@ target_link_libraries(${PROJECT_NAME}_app
 ###########
 ## Tests ##
 ###########
-if (WIN32)
+if (BUILD_TESTING)
+
 include(CTest)
 
-if (BUILD_TESTING)
+# The standalone is included  with add_subdirectory from the top-level ROS CMakeLists.txt
+# However the tests are build separately in the top-level and thus should be ignored here.
+# If you don't know what ROS is, simply ignore this line.
+if(NOT DEFINED catkin_FOUND)
 
 # Download + Install gtest (see https://github.com/google/googletest/blob/master/googletest/README.md)
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
@@ -312,5 +316,5 @@ target_link_libraries(integrationtest_udp_client
 add_test(NAME integrationtest_udp_client
         COMMAND integrationtest_udp_client)
 
-endif (BUILD_TESTING)
-endif (WIN32)
+endif ()
+endif ()

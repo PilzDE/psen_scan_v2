@@ -42,6 +42,12 @@ sudo apt-get install build-essential cmake git libboost-system-dev libconsole-br
 
 The library should now be built and available under `psen_scan_v2/standalone/build/libpsen_scan_v2_standalone.a`
 
+### Running the tests on Linux
+Same as above but as the last step run
+```
+cd build/ && cmake .. -DBUILD_TESTING=ON && make && ctest
+```
+
 ### Usage example
 An example application, which prints distance data to the screen, is built by default and can be executed in the `build` folder:
 ```
