@@ -347,15 +347,13 @@ TEST_F(ScannerAPITests, testStartFunctionality)
 TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStartIsCalledSecondTime)
 {
   NiceMock<ScannerMock> scanner_mock{ port_holder_ };
-  UserCallbacks cb;
-  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   scanner_mock.startListeningForControlMsg();
-  const auto start_future = scanner.start();
+  const auto start_future = scanner_.start();
   EXPECT_TRUE(start_future.valid()) << "First call too Scanner::start() should return VALID std::future";
   for (int i = 0; i < 5; ++i)
   {
-    EXPECT_FALSE(scanner.start().valid()) << "Subsequenct calls to Scanner::start() should return INVALID std::future";
+    EXPECT_FALSE(scanner_.start().valid()) << "Subsequenct calls to Scanner::start() should return INVALID std::future";
   }
   scanner_mock.sendStartReply();
   EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
@@ -482,9 +480,6 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
 {
   INJECT_LOG_MOCK
   StrictMock<ScannerMock> scanner_mock{ port_holder_ };
-  UserCallbacks cb;
-
-  ScannerV2 scanner(config_, std::bind(&UserCallbacks::LaserScanCallback, &cb, std::placeholders::_1));
 
   const data_conversion_layer::monitoring_frame::Message msg{ createValidMonitoringFrameMsg() };
 
@@ -499,7 +494,7 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
         .WillOnce(InvokeWithoutArgs([&scanner_mock]() { scanner_mock.sendStartReply(); }));
 
     // Check that toLaserScan(msg) == arg
-    EXPECT_CALL(cb, LaserScanCallback(data_conversion_layer::toLaserScan(msg)))
+    EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan(msg)))
         .WillOnce(OpenBarrier(&monitoring_frame_barrier));
   }
 
@@ -513,7 +508,7 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
       .WillOnce(OpenBarrier(&diagnostic_barrier));
 
   scanner_mock.startListeningForControlMsg();
-  auto promis = scanner.start();
+  auto promis = scanner_.start();
   promis.wait_for(DEFAULT_TIMEOUT);
 
   scanner_mock.sendMonitoringFrame(msg);
