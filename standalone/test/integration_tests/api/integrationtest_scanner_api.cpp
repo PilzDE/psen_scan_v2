@@ -13,13 +13,18 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <future>
-#include <thread>
-#include <chrono>
-#include <functional>
-#include <random>
 #include <algorithm>
+#include <chrono>
 #include <cmath>
+#include <cstddef>
+#include <functional>
+#include <future>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <thread>
+#include <vector>
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -28,24 +33,15 @@
 #include "psen_scan_v2_standalone/util/integrationtest_helper.h"
 #include "psen_scan_v2_standalone/util/mock_console_bridge_output_handler.h"
 #include "psen_scan_v2_standalone/communication_layer/scanner_mock.h"
-#include "psen_scan_v2_standalone/communication_layer/udp_frame_dumps.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
 
 // Software under testing
 #include "psen_scan_v2_standalone/util/async_barrier.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
-#include "psen_scan_v2_standalone/util/logging.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_serialization.h"
+#include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scanner_config_builder.h"
 #include "psen_scan_v2_standalone/scanner_v2.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request_serialization.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_msg.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_serialization_deserialization.h"
-#include "psen_scan_v2_standalone/scan_range.h"
-
-// TODO: clean up includes
 
 namespace psen_scan_v2_standalone_test
 {
