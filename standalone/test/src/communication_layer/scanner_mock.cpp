@@ -72,7 +72,7 @@ void PortHolder::printPorts() const
 using std::placeholders::_1;
 using std::placeholders::_2;
 
-ScannerMock::ScannerMock(const std::string host_ip, const PortHolder& port_holder)
+ScannerMock::ScannerMock(const std::string& host_ip, const PortHolder& port_holder)
   : control_msg_receiver_(
         udp::endpoint(boost::asio::ip::address_v4::from_string(host_ip), port_holder.control_port_host))
   , monitoring_frame_receiver_(

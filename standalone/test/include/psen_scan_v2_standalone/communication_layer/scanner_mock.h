@@ -66,7 +66,7 @@ using namespace psen_scan_v2_standalone;
 class ScannerMock
 {
 public:
-  ScannerMock(const std::string host_ip, const PortHolder& port_holder);
+  ScannerMock(const std::string& host_ip, const PortHolder& port_holder);
 
 public:
   MOCK_METHOD2(receiveControlMsg,
