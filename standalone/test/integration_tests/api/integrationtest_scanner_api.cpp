@@ -70,8 +70,7 @@ class ScannerAPITests : public testing::Test
 {
 protected:
   void SetUp() override;
-  void setUpNiceScannerMock();
-  void setUpStrictScannerMock();
+  void setUpScannerMock(bool strict = true);
   void prepareScannerMockStartReply();
 
 protected:
@@ -98,14 +97,16 @@ void ScannerAPITests::SetUp()
   setLogLevel(CONSOLE_BRIDGE_LOG_DEBUG);
 }
 
-void ScannerAPITests::setUpNiceScannerMock()
+void ScannerAPITests::setUpScannerMock(bool strict)
 {
-  nice_scanner_mock_.reset(new NiceMock<ScannerMock>{ HOST_IP_ADDRESS, port_holder_ });
-}
-
-void ScannerAPITests::setUpStrictScannerMock()
-{
-  strict_scanner_mock_.reset(new StrictMock<ScannerMock>{ HOST_IP_ADDRESS, port_holder_ });
+  if (strict)
+  {
+    strict_scanner_mock_.reset(new StrictMock<ScannerMock>{ HOST_IP_ADDRESS, port_holder_ });
+  }
+  else
+  {
+    nice_scanner_mock_.reset(new NiceMock<ScannerMock>{ HOST_IP_ADDRESS, port_holder_ });
+  }
 }
 
 void ScannerAPITests::prepareScannerMockStartReply()
@@ -130,7 +131,7 @@ void ScannerAPITests::prepareScannerMockStartReply()
 
 TEST_F(ScannerAPITests, testStartFunctionality)
 {
-  setUpStrictScannerMock();
+  setUpScannerMock();
   const data_conversion_layer::start_request::Message start_req(config_);
 
   util::Barrier start_req_received_barrier;
@@ -152,7 +153,7 @@ TEST_F(ScannerAPITests, testStartFunctionality)
 
 TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStartIsCalledSecondTime)
 {
-  setUpNiceScannerMock();
+  setUpScannerMock(false);
 
   nice_scanner_mock_->startListeningForControlMsg();
   const auto start_future = scanner_.start();
@@ -167,7 +168,7 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStartIsCalledSecondTime)
 
 TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
 {
-  setUpNiceScannerMock();
+  setUpScannerMock(false);
 
   util::Barrier start_req_received_barrier;
   ON_CALL(
@@ -192,7 +193,7 @@ TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
 
 TEST_F(ScannerAPITests, testStopFunctionality)
 {
-  setUpStrictScannerMock();
+  setUpScannerMock();
   prepareScannerMockStartReply();
 
   util::Barrier stop_req_received_barrier;
@@ -218,7 +219,7 @@ TEST_F(ScannerAPITests, testStopFunctionality)
 
 TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStopIsCalledSecondTime)
 {
-  setUpNiceScannerMock();
+  setUpScannerMock(false);
   prepareScannerMockStartReply();
 
   nice_scanner_mock_->startListeningForControlMsg();
@@ -240,7 +241,7 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStopIsCalledSecondTime)
 TEST_F(ScannerAPITests, testStartReplyTimeout)
 {
   INJECT_NICE_LOG_MOCK;
-  setUpStrictScannerMock();
+  setUpScannerMock();
 
   util::Barrier error_msg_barrier;
   util::Barrier twice_called_barrier;
@@ -275,7 +276,7 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
 TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFrameMsg)
 {
   INJECT_LOG_MOCK
-  setUpStrictScannerMock();
+  setUpScannerMock();
   prepareScannerMockStartReply();
 
   const data_conversion_layer::monitoring_frame::Message msg{ createValidMonitoringFrameMsg() };
@@ -310,7 +311,7 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
 TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFrame)
 {
   INJECT_NICE_LOG_MOCK;
-  setUpNiceScannerMock();
+  setUpScannerMock(false);
   prepareScannerMockStartReply();
 
   util::Barrier valid_msg_barrier;
@@ -342,7 +343,7 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
 TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfMissingMeassurements)
 {
   INJECT_NICE_LOG_MOCK;
-  setUpNiceScannerMock();
+  setUpScannerMock(false);
   prepareScannerMockStartReply();
 
   util::Barrier valid_msg_barrier;
@@ -373,7 +374,7 @@ TEST_F(ScannerAPITests, shouldThrowWhenConstructedWithInvalidLaserScanCallback)
 TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
 {
   INJECT_LOG_MOCK
-  setUpNiceScannerMock();
+  setUpScannerMock(false);
   prepareScannerMockStartReply();
 
   const std::size_t num_scans_per_round{ 6 };
@@ -425,7 +426,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
 TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
 {
   INJECT_LOG_MOCK
-  setUpNiceScannerMock();
+  setUpScannerMock(false);
   prepareScannerMockStartReply();
 
   const std::size_t num_scans_per_round{ 6 };
@@ -460,7 +461,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
 TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFrameReceiveTimeout)
 {
   INJECT_LOG_MOCK
-  setUpNiceScannerMock();
+  setUpScannerMock(false);
   prepareScannerMockStartReply();
 
   util::Barrier user_msg_barrier;
