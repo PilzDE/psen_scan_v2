@@ -72,6 +72,7 @@ protected:
   void SetUp() override;
   void setUpNiceScannerMock();
   void setUpStrictScannerMock();
+  void prepareScannerMockStartReply();
 
 protected:
   const PortHolder port_holder_{ ++GLOBAL_PORT_HOLDER };
@@ -105,6 +106,26 @@ void ScannerAPITests::setUpNiceScannerMock()
 void ScannerAPITests::setUpStrictScannerMock()
 {
   strict_scanner_mock_.reset(new StrictMock<ScannerMock>{ HOST_IP_ADDRESS, port_holder_ });
+}
+
+void ScannerAPITests::prepareScannerMockStartReply()
+{
+  if (strict_scanner_mock_)
+  {
+    EXPECT_CALL(
+        *strict_scanner_mock_,
+        receiveControlMsg(
+            _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
+        .WillOnce(InvokeWithoutArgs([this]() { strict_scanner_mock_->sendStartReply(); }));
+  }
+  else
+  {
+    ON_CALL(
+        *nice_scanner_mock_,
+        receiveControlMsg(
+            _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
+        .WillByDefault(InvokeWithoutArgs([this]() { nice_scanner_mock_->sendStartReply(); }));
+  }
 }
 
 TEST_F(ScannerAPITests, testStartFunctionality)
@@ -172,12 +193,7 @@ TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
 TEST_F(ScannerAPITests, testStopFunctionality)
 {
   setUpStrictScannerMock();
-
-  EXPECT_CALL(
-      *strict_scanner_mock_,
-      receiveControlMsg(
-          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
-      .WillOnce(InvokeWithoutArgs([this]() { strict_scanner_mock_->sendStartReply(); }));
+  prepareScannerMockStartReply();
 
   util::Barrier stop_req_received_barrier;
   EXPECT_CALL(*strict_scanner_mock_, receiveControlMsg(_, data_conversion_layer::stop_request::serialize()))
@@ -203,12 +219,7 @@ TEST_F(ScannerAPITests, testStopFunctionality)
 TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStopIsCalledSecondTime)
 {
   setUpNiceScannerMock();
-
-  ON_CALL(
-      *nice_scanner_mock_,
-      receiveControlMsg(
-          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
-      .WillByDefault(InvokeWithoutArgs([this]() { nice_scanner_mock_->sendStartReply(); }));
+  prepareScannerMockStartReply();
 
   nice_scanner_mock_->startListeningForControlMsg();
   const auto start_future = scanner_.start();
@@ -265,23 +276,16 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
 {
   INJECT_LOG_MOCK
   setUpStrictScannerMock();
+  prepareScannerMockStartReply();
 
   const data_conversion_layer::monitoring_frame::Message msg{ createValidMonitoringFrameMsg() };
 
   util::Barrier monitoring_frame_barrier;
   util::Barrier diagnostic_barrier;
-  {
-    InSequence seq;
-    EXPECT_CALL(
-        *strict_scanner_mock_,
-        receiveControlMsg(
-            _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
-        .WillOnce(InvokeWithoutArgs([this]() { strict_scanner_mock_->sendStartReply(); }));
 
-    // Check that toLaserScan(msg) == arg
-    EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan(msg)))
-        .WillOnce(OpenBarrier(&monitoring_frame_barrier));
-  }
+  // Check that toLaserScan(msg) == arg
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan(msg)))
+      .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
   EXPECT_LOG_SHORT(DEBUG, _).Times(AnyNumber());
   EXPECT_LOG_SHORT(INFO, "Scanner: Start scanner called.").Times(1);
@@ -307,12 +311,7 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
 {
   INJECT_NICE_LOG_MOCK;
   setUpNiceScannerMock();
-
-  ON_CALL(
-      *nice_scanner_mock_,
-      receiveControlMsg(
-          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
-      .WillByDefault(InvokeWithoutArgs([this]() { nice_scanner_mock_->sendStartReply(); }));
+  prepareScannerMockStartReply();
 
   util::Barrier valid_msg_barrier;
   EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).WillOnce(OpenBarrier(&valid_msg_barrier));
@@ -344,12 +343,7 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfMissingMeassuremen
 {
   INJECT_NICE_LOG_MOCK;
   setUpNiceScannerMock();
-
-  ON_CALL(
-      *nice_scanner_mock_,
-      receiveControlMsg(
-          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
-      .WillByDefault(InvokeWithoutArgs([this]() { nice_scanner_mock_->sendStartReply(); }));
+  prepareScannerMockStartReply();
 
   util::Barrier valid_msg_barrier;
   EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times(0);
@@ -380,6 +374,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
 {
   INJECT_LOG_MOCK
   setUpNiceScannerMock();
+  prepareScannerMockStartReply();
 
   const std::size_t num_scans_per_round{ 6 };
 
@@ -393,12 +388,6 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
   std::vector<data_conversion_layer::monitoring_frame::Message> invalid_scan_round_msgs{ createValidMonitoringFrameMsgs(
       scan_counter_invalid_round, num_scans_per_round - 1) };
   invalid_scan_round_msgs.emplace_back(createValidMonitoringFrameMsg(scan_counter_invalid_round + 1));
-
-  ON_CALL(
-      *nice_scanner_mock_,
-      receiveControlMsg(
-          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
-      .WillByDefault(InvokeWithoutArgs([this]() { nice_scanner_mock_->sendStartReply(); }));
 
   util::Barrier user_msg_barrier;
   // Needed to allow all other log messages which might be received
@@ -437,6 +426,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
 {
   INJECT_LOG_MOCK
   setUpNiceScannerMock();
+  prepareScannerMockStartReply();
 
   const std::size_t num_scans_per_round{ 6 };
 
@@ -444,12 +434,6 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
   std::vector<data_conversion_layer::monitoring_frame::Message> msgs{ createValidMonitoringFrameMsgs(
       scan_counter, num_scans_per_round + 1) };
   msgs.emplace_back(createValidMonitoringFrameMsg(scan_counter + 1));
-
-  ON_CALL(
-      *nice_scanner_mock_,
-      receiveControlMsg(
-          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
-      .WillByDefault(InvokeWithoutArgs([this]() { nice_scanner_mock_->sendStartReply(); }));
 
   util::Barrier user_msg_barrier;
   // Needed to allow all other log messages which might be received
@@ -477,12 +461,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFrameReceiveTimeout)
 {
   INJECT_LOG_MOCK
   setUpNiceScannerMock();
-
-  ON_CALL(
-      *nice_scanner_mock_,
-      receiveControlMsg(
-          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
-      .WillByDefault(InvokeWithoutArgs([this]() { nice_scanner_mock_->sendStartReply(); }));
+  prepareScannerMockStartReply();
 
   util::Barrier user_msg_barrier;
   // Needed to allow all other log messages which might be received
