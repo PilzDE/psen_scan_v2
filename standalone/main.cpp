@@ -32,7 +32,7 @@ const util::TenthOfDegree ANGLE_END{ data_conversion_layer::degreeToTenthDegree(
 
 /*
  * This function is used as a callback every time a new laserscan is received. It is skipped for Scans that contain no
- * measurement data. This can occur for smaller scan ranges.
+ * measurement data. This can happen with smaller scan ranges.
  */
 void laserScanCallback(const LaserScan& scan)
 {
