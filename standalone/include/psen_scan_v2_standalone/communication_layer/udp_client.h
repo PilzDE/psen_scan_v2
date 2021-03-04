@@ -140,7 +140,7 @@ public:
   /**
    * @brief Returns local ip address of current socket connection.
    */
-  std::string getHostIp();
+  uint32_t getHostIp();
 
 private:
   void asyncReceive(const ReceiveMode& modi);
@@ -224,9 +224,9 @@ inline void UdpClientImpl::close()
   // LCOV_EXCL_STOP
 }
 
-inline std::string UdpClientImpl::getHostIp()
+inline uint32_t UdpClientImpl::getHostIp()
 {
-  return socket_.local_endpoint().address().to_string();
+  return socket_.local_endpoint().address().to_v4().to_ulong();
 }
 
 inline UdpClientImpl::~UdpClientImpl()
