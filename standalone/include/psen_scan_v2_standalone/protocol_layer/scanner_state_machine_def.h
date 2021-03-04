@@ -107,7 +107,7 @@ inline void ScannerProtocolDef::sendStartRequest(const T& event)
   if (!args_->config_.hostIp())
   {
     args_->config_.setHostIp(util::convertIP(args_->control_client_->getHostIp()));
-    PSENSCAN_INFO("StateMachine", "No Ip address set! Using host ip:{}", args_->control_client_->getHostIp());
+    PSENSCAN_INFO("StateMachine", "No host ip set! Using local ip: {}", args_->control_client_->getHostIp());
   }
   args_->control_client_->write(serialize(data_conversion_layer::start_request::Message(args_->config_)));
 }
