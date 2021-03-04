@@ -140,7 +140,7 @@ public:
   /**
    * @brief Returns local ip address of current socket connection.
    */
-  uint32_t getHostIp();
+  boost::asio::ip::address_v4 getHostIp();
 
 private:
   void asyncReceive(const ReceiveMode& modi);
@@ -224,9 +224,9 @@ inline void UdpClientImpl::close()
   // LCOV_EXCL_STOP
 }
 
-inline uint32_t UdpClientImpl::getHostIp()
+inline boost::asio::ip::address_v4 UdpClientImpl::getHostIp()
 {
-  return socket_.local_endpoint().address().to_v4().to_ulong();
+  return socket_.local_endpoint().address().to_v4();
 }
 
 inline UdpClientImpl::~UdpClientImpl()

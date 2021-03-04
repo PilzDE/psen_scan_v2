@@ -46,8 +46,6 @@ public:
 
   bool diagnosticsEnabled() const;
 
-  void setHostIp(const uint32_t& ip);
-
 private:
   friend class ScannerConfigurationBuilder;
 
@@ -110,11 +108,6 @@ inline const ScanRange& ScannerConfiguration::scanRange() const
 inline bool ScannerConfiguration::diagnosticsEnabled() const
 {
   return diagnostics_enabled_;
-}
-
-inline void ScannerConfiguration::setHostIp(const uint32_t& ip)
-{
-  host_ip_ = ip;
 }
 
 }  // namespace psen_scan_v2_standalone

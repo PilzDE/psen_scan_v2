@@ -104,12 +104,15 @@ template <class T>
 inline void ScannerProtocolDef::sendStartRequest(const T& event)
 {
   PSENSCAN_DEBUG("StateMachine", "Action: sendStartRequest");
-  if (!args_->config_.hostIp())
+
+  auto ip{args_->config_.hostIp()};
+  if (!ip)
   {
-    args_->config_.setHostIp(args_->control_client_->getHostIp());
-    PSENSCAN_INFO("StateMachine", "No host ip set! Using local ip: {}", args_->control_client_->getHostIp());
+    auto host_ip{args_->control_client_->getHostIp()};
+    ip = host_ip.to_ulong();
+    PSENSCAN_INFO("StateMachine", "No host ip set! Using local ip: {}", host_ip.to_string());
   }
-  args_->control_client_->write(serialize(data_conversion_layer::start_request::Message(args_->config_)));
+  args_->control_client_->write(serialize(data_conversion_layer::start_request::Message(args_->config_, *ip)));
 }
 
 inline void ScannerProtocolDef::handleStartRequestTimeout(const scanner_events::StartTimeout& event)
