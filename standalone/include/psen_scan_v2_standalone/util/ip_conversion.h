@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <cassert>
 #include <stdexcept>
+#include <limits>
 
 #ifdef __linux__
 #include <arpa/inet.h>
@@ -57,6 +58,15 @@ uint32_t convertIP(const std::string& ip)
   return htonl(static_cast<uint32_t>(ip_number));
 }
 #endif
+
+inline uint16_t convertPort(const int& port)
+{
+  if (port < std::numeric_limits<uint16_t>::min() || port > std::numeric_limits<uint16_t>::max())
+  {
+    throw std::out_of_range("Port out of range");
+  }
+  return static_cast<uint16_t>(port);
+}
 
 }  // namespace util
 }  // namespace psen_scan_v2_standalone

@@ -19,8 +19,6 @@
 #include <cmath>
 #include <stdexcept>
 #include <string>
-#include <limits>
-
 
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scan_range.h"
@@ -71,42 +69,33 @@ inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::hostIP(const st
   return *this;
 }
 
-inline uint16_t ScannerConfigurationBuilder::convertPort(const int& port)
-{
-  if (port < std::numeric_limits<uint16_t>::min() || port > std::numeric_limits<uint16_t>::max())
-  {
-    throw std::out_of_range("Port out of range");
-  }
-  return static_cast<uint16_t>(port);
-}
-
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::hostDataPort(const int& port)
 {
-  config_.host_data_port_ = convertPort(port);
+  config_.host_data_port_ = util::convertPort(port);
   return *this;
 }
 
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::hostControlPort(const int& port)
 {
-  config_.host_control_port_ = convertPort(port);
+  config_.host_control_port_ = util::convertPort(port);
   return *this;
 }
 
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scannerIp(const std::string& ip)
 {
-  config_.scanner_ip_ = convertIP(ip);
+  config_.scanner_ip_ = util::convertIP(ip);
   return *this;
 }
 
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scannerDataPort(const int& port)
 {
-  config_.scanner_data_port_ = convertPort(port);
+  config_.scanner_data_port_ = util::convertPort(port);
   return *this;
 }
 
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scannerControlPort(const int& port)
 {
-  config_.scanner_control_port_ = convertPort(port);
+  config_.scanner_control_port_ = util::convertPort(port);
   return *this;
 }
 
