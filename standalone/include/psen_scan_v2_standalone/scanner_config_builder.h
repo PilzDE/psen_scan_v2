@@ -64,8 +64,10 @@ inline ScannerConfiguration ScannerConfigurationBuilder::build() const
 
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::hostIP(const std::string& ip)
 {
-  config_.host_ip_ = util::convertIP(ip);
-
+  if (ip != "" && ip != "auto")
+  {
+    config_.host_ip_ = util::convertIP(ip);
+  }
   return *this;
 }
 

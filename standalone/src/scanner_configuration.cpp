@@ -19,7 +19,7 @@ namespace psen_scan_v2_standalone
 {
 bool ScannerConfiguration::isValid() const
 {
-  return host_ip_ && scanner_ip_ && scan_range_;
+  return scanner_ip_ && scan_range_;
 }
 
 uint32_t ScannerConfiguration::hostIp() const
