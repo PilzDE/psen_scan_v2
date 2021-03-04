@@ -34,7 +34,7 @@ private:
   ScannerConfiguration() = default;
 
 public:
-  uint32_t hostIp() const;
+  boost::optional<uint32_t> hostIp() const;
   uint16_t hostUDPPortData() const;
   uint16_t hostUDPPortControl() const;
 
@@ -45,6 +45,8 @@ public:
   const ScanRange& scanRange() const;
 
   bool diagnosticsEnabled() const;
+
+  void setHostIp(const uint32_t& ip);
 
 private:
   friend class ScannerConfigurationBuilder;
@@ -64,6 +66,56 @@ private:
   boost::optional<ScanRange> scan_range_{};
   bool diagnostics_enabled_{ false };
 };
+
+inline bool ScannerConfiguration::isValid() const
+{
+  return scanner_ip_ && scan_range_;
+}
+
+inline boost::optional<uint32_t> ScannerConfiguration::hostIp() const
+{
+  return host_ip_;
+}
+
+inline uint16_t ScannerConfiguration::hostUDPPortData() const
+{
+  return host_data_port_;
+}
+
+inline uint16_t ScannerConfiguration::hostUDPPortControl() const
+{
+  return host_control_port_;
+}
+
+inline uint32_t ScannerConfiguration::clientIp() const
+{
+  return *scanner_ip_;
+}
+
+inline uint16_t ScannerConfiguration::scannerDataPort() const
+{
+  return scanner_data_port_;
+}
+
+inline uint16_t ScannerConfiguration::scannerControlPort() const
+{
+  return scanner_control_port_;
+}
+
+inline const ScanRange& ScannerConfiguration::scanRange() const
+{
+  return *scan_range_;
+}
+
+inline bool ScannerConfiguration::diagnosticsEnabled() const
+{
+  return diagnostics_enabled_;
+}
+
+inline void ScannerConfiguration::setHostIp(const uint32_t& ip)
+{
+  host_ip_ = ip;
+}
 
 }  // namespace psen_scan_v2_standalone
 

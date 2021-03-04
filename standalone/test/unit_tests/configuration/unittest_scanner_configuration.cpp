@@ -176,7 +176,7 @@ TEST_F(ScannerConfigurationTest, shouldReturnCorrectHostIpAfterConstruction)
 {
   ScannerConfiguration sc{ createValidConfig() };
 
-  const auto host_ip = sc.hostIp();
+  const auto host_ip = *sc.hostIp();
   EXPECT_EQ(4U, sizeof(host_ip));
 
   const std::string host_ip_string(boost::asio::ip::address_v4(host_ip).to_string());

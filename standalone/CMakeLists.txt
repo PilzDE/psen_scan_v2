@@ -57,7 +57,6 @@ set(${PROJECT_NAME}_sources
   src/data_conversion_layer/start_request.cpp
   src/data_conversion_layer/start_request_serialization.cpp
   src/data_conversion_layer/stop_request_serialization.cpp
-  src/scanner_configuration.cpp
   src/data_conversion_layer/monitoring_frame_deserialization.cpp
   src/data_conversion_layer/diagnostics.cpp
   src/data_conversion_layer/scanner_reply_serialization_deserialization.cpp
@@ -291,7 +290,6 @@ add_executable(integrationtest_scanner_api
         src/laserscan.cpp
         src/data_conversion_layer/monitoring_frame_msg.cpp
         src/data_conversion_layer/monitoring_frame_deserialization.cpp
-        src/scanner_configuration.cpp
         src/data_conversion_layer/start_request.cpp
         src/data_conversion_layer/stop_request_serialization.cpp
         src/data_conversion_layer/diagnostics.cpp

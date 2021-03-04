@@ -137,6 +137,11 @@ public:
    */
   void close();
 
+  /**
+   * @brief Returns local ip address of current socket connection.
+   */
+  std::string getHostIp();
+
 private:
   void asyncReceive(const ReceiveMode& modi);
 
@@ -217,6 +222,11 @@ inline void UdpClientImpl::close()
     throw CloseConnectionFailure(ex.what());
   }
   // LCOV_EXCL_STOP
+}
+
+inline std::string UdpClientImpl::getHostIp()
+{
+  return socket_.local_endpoint().address().to_string();
 }
 
 inline UdpClientImpl::~UdpClientImpl()
