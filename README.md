@@ -4,7 +4,7 @@
 
 ## Package: psen_scan_v2
 
-The **psen_scan_v2** package is a ROS integration driver for the PSENscan safety laser scanner product. It lets you integrate the laser scanner data into your ROS Environment easily. Using the standard [sensor_msgs/LaserScan][] message format ensures compatibility with other laserscan-post-processing nodes such as [gmapping][]. For a general overview and link collection we refer to the [wiki page](http://wiki.ros.org/psen_scan_v2).
+The **psen_scan_v2** package is a ROS integration driver for the PSENscan safety laser scanner product. It lets you integrate the laser scanner data into your ROS Environment easily. Using the standard [sensor_msgs/LaserScan][] message format ensures compatibility with other laserscan-post-processing nodes such as [gmapping][]. For a general overview, link collection and tutorials we refer to the [ROS wiki page](http://wiki.ros.org/psen_scan_v2).
 
 <p align="center">
 <img src="img/PSENscan.jpg" alt="PILZ safety laser scanner" title="PILZ safety laser scanner">
@@ -23,14 +23,14 @@ PSENscan firmware >= 3.1.0 is supported on the following models:
 | PSEN sc M 5.5 08-12	5.5 m | safety zone, 8 or 12-pin exchangeable memory module	| 6D000017 |
 
 ## C++ standalone library
-If you are interested in using the PSENscan safety laser scanner without ROS, please take a look at our C++ standalone library. You can read more about it [here](https://github.com/PilzDE/psen_scan_v2/blob/main/standalone/README.md)
+If you are interested in using the PSENscan safety laser scanner without ROS, please take a look at our C++ standalone library. You can read more about it [in the `standalone` folder](https://github.com/PilzDE/psen_scan_v2/blob/main/standalone/README.md)
 
 ## Table of Contents
 
 1. [Installation](#installation)
 2. [Usage](#usage)
    + [Parameters](#parameters)
-   + [Further Parameters (optional)](#further-parameters--optional-)
+   + [Further Parameters (optional)](#further-parameters-optional)
    + [Published Topics](#published-topics)
    + [TF Frames](#tf-frames)
    + [Defining the scan range](#defining-the-scan-range)
@@ -52,9 +52,9 @@ sudo apt install ros-$ROS_DISTRO-psen-scan-v2
 ```
 
 ## Usage
-To start reading from the safety laser scanner and publishing complete scans execute `roslaunch psen_scan_v2 psen_scan_v2.launch` in a command line. This will launch the ROS Node with the default configuration.
+To start reading data from the safety laser scanner and publishing scans execute `roslaunch psen_scan_v2 psen_scan_v2.launch` in a command line. This will launch the ROS Node with the default configuration.
 
-If you wish to set parameters from the command line, add them to the end of the command as follows: `parameter:=value`, separated by spaces.
+If you wish to set parameters from the command line, add them to the end of the command as `parameter:=value`, separated by spaces.
 
 ```bash
 roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10 host_ip:=192.168.0.20 host_udp_port_data:=3050
