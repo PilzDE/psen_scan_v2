@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 <launch>
   <!-- IP-Address of host machine -->
-  <arg name="host_ip" default="192.168.0.50" />
+  <arg name="host_ip" default="auto" />
 
   <!-- UDP Port on which monitoring frames (scans) should be received -->
   <arg name="host_udp_port_data" default="55115" />
