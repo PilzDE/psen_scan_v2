@@ -42,7 +42,7 @@ namespace start_request
 class Message
 {
 public:
-  Message(const ScannerConfiguration& scanner_configuration, const uint32_t ip);
+  Message(const ScannerConfiguration& scanner_configuration, const uint32_t ip = 0);
 
   friend data_conversion_layer::RawData serialize(const data_conversion_layer::start_request::Message&,
                                                   const uint32_t&);

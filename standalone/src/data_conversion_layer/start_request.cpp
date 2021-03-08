@@ -26,7 +26,7 @@ namespace data_conversion_layer
 namespace start_request
 {
 Message::Message(const ScannerConfiguration& scanner_configuration, const uint32_t ip)
-  : host_ip_(ip)
+  : host_ip_(ip == 0 ? *scanner_configuration.hostIp() : ip)
   , host_udp_port_data_(scanner_configuration.hostUDPPortData())  // Write is deduced by the scanner
   , master_device_settings_(scanner_configuration.diagnosticsEnabled())
   , master_(scanner_configuration.scanRange(), MASTER_RESOLUTION)

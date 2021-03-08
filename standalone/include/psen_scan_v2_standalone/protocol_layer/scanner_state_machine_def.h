@@ -105,10 +105,10 @@ inline void ScannerProtocolDef::sendStartRequest(const T& event)
 {
   PSENSCAN_DEBUG("StateMachine", "Action: sendStartRequest");
 
-  auto ip{args_->config_.hostIp()};
+  auto ip{ args_->config_.hostIp() };
   if (!ip)
   {
-    auto host_ip{args_->control_client_->getHostIp()};
+    auto host_ip{ args_->control_client_->getHostIp() };
     ip = host_ip.to_ulong();
     PSENSCAN_INFO("StateMachine", "No host ip set! Using local ip: {}", host_ip.to_string());
   }
