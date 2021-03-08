@@ -34,7 +34,7 @@ namespace psen_scan_v2_standalone
 namespace util
 {
 #ifdef __linux__
-uint32_t convertIP(const std::string& ip)
+inline uint32_t convertIP(const std::string& ip)
 {
   const auto ip_number = inet_network(ip.c_str());
   if (static_cast<in_addr_t>(-1) == ip_number)
@@ -47,7 +47,7 @@ uint32_t convertIP(const std::string& ip)
 #endif
 
 #ifdef _WIN32
-uint32_t convertIP(const std::string& ip)
+inline uint32_t convertIP(const std::string& ip)
 {
   const auto ip_number = inet_addr(ip.c_str());
   if (INADDR_NONE == ip_number)
