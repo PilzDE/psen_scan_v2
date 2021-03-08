@@ -24,7 +24,7 @@ using namespace psen_scan_v2_standalone;
 /*
  * In this section we declare all necessary configuration parameters
  */
-const std::string SCANNER_IP{ "192.168.0.100" };
+const std::string SCANNER_IP{ "192.168.0.10" };
 // Start- and end-angle have been configured to be in the middle of the scan range.
 const util::TenthOfDegree ANGLE_START{ data_conversion_layer::degreeToTenthDegree(137) };
 const util::TenthOfDegree ANGLE_END{ data_conversion_layer::degreeToTenthDegree(138) };
