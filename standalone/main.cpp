@@ -24,8 +24,7 @@ using namespace psen_scan_v2_standalone;
 /*
  * In this section we declare all necessary configuration parameters
  */
-const std::string HOST_IP{ "192.168.0.50" };
-const std::string SCANNER_IP{ "192.168.0.10" };
+const std::string SCANNER_IP{ "192.168.0.100" };
 // Start- and end-angle have been configured to be in the middle of the scan range.
 const util::TenthOfDegree ANGLE_START{ data_conversion_layer::degreeToTenthDegree(137) };
 const util::TenthOfDegree ANGLE_END{ data_conversion_layer::degreeToTenthDegree(138) };
@@ -48,7 +47,7 @@ int main(int argc, char** argv)
   ScanRange scan_range{ ANGLE_START, ANGLE_END };
 
   ScannerConfigurationBuilder config_builder;
-  config_builder.hostIP(HOST_IP).scannerIp(SCANNER_IP).scanRange(scan_range);
+  config_builder.scannerIp(SCANNER_IP).scanRange(scan_range);
 
   ScannerV2 scanner(config_builder.build(), laserScanCallback);
   scanner.start();
