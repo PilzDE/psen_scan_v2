@@ -26,6 +26,8 @@ namespace psen_scan_v2_standalone
  * @brief Higher level data type storing the configuration details of the scanner like scanner IP, port,
  * scan range, etc.
  *
+ * If no host IP is set the driver will determine it automatically.
+ *
  * @see ScanRange
  */
 class ScannerConfiguration
