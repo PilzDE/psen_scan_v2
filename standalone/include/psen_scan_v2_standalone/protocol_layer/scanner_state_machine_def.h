@@ -105,14 +105,13 @@ inline void ScannerProtocolDef::sendStartRequest(const T& event)
 {
   PSENSCAN_DEBUG("StateMachine", "Action: sendStartRequest");
 
-  auto ip{ args_->config_.hostIp() };
-  if (!ip)
+  if (!args_->config_.hostIp())
   {
     auto host_ip{ args_->control_client_->getHostIp() };
-    ip = host_ip.to_ulong();
+    args_->config_.setHostIp(host_ip.to_ulong());
     PSENSCAN_INFO("StateMachine", "No host ip set! Using local ip: {}", host_ip.to_string());
   }
-  args_->control_client_->write(serialize(data_conversion_layer::start_request::Message(args_->config_, *ip)));
+  args_->control_client_->write(serialize(data_conversion_layer::start_request::Message(args_->config_)));
 }
 
 inline void ScannerProtocolDef::handleStartRequestTimeout(const scanner_events::StartTimeout& event)

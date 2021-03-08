@@ -123,7 +123,7 @@ struct StateMachineArgs
   {
   }
 
-  const ScannerConfiguration config_;
+  ScannerConfiguration config_;
 
   // Callbacks
   const ScannerStartedCB scanner_started_cb{};
