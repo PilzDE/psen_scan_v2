@@ -34,7 +34,6 @@ If you are interested in using the PSENscan safety laser scanner without ROS, pl
    + [Published Topics](#published-topics)
    + [TF Frames](#tf-frames)
    + [Defining the scan range](#defining-the-scan-range)
-   + [Adjust expert parameters](#adjust-expert-parameters)
 3. [Developer Information](#developer-information)
    + [Build Status](#build-status)
    + [Branching model](#branching-model)
@@ -60,6 +59,9 @@ If you wish to set parameters from the command line, add them to the end of the 
 roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10 host_ip:=192.168.0.20 host_udp_port_data:=3050
 ```
 This example configures the safety laser scanner at 192.168.0.10 to send it´s frames to 192.168.0.20:3050.
+
+The [tutorials](http://wiki.ros.org/psen_scan_v2/Tutorials/) describe how to create an application package with your own launch file, where
+you can easily adjust the configuration parameters.
 
 ### Parameters
 _host_ip_ (_string_, default: "192.168.0.50")<br/>
@@ -105,11 +107,6 @@ Both limits are defined within the _laser_1_scan_ frame as shown in the image be
 <p align="center">
 <img src="img/angle_limits.png" width="800px" alt="Limit visualization" title="Limit visualization">
 </p>
-
-### Adjust expert parameters
-If you've created an application package with your own launch file as described in the
-[tutorials](http://wiki.ros.org/psen_scan_v2/Tutorials/),
-you can easily adjust the aforementioned configuration parameters.
 
 ## Developer Information
 ### Build Status
