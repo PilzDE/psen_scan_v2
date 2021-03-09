@@ -168,16 +168,15 @@ TEST_F(ScannerAPITests, testStartFunctionality)
 
 TEST_F(ScannerAPITests, shouldReceiveStartRequestWithCorrectHostIpWhenUsingAutoInConfigAsHostIp)
 {
-  setUpScannerConfig();
+  setUpScannerConfig("auto");
+  setUpScannerV2();
   setUpNiceScannerMock();
-  ScannerV2 scanner{ generateScannerConfig("auto"),
-                     std::bind(&UserCallbacks::LaserScanCallback, &user_callbacks_, std::placeholders::_1) };
   const data_conversion_layer::start_request::Message start_req(generateScannerConfig(HOST_IP_ADDRESS));
 
   EXPECT_CALL(*nice_scanner_mock_, receiveControlMsg(_, data_conversion_layer::start_request::serialize(start_req)));
 
   nice_scanner_mock_->startListeningForControlMsg();
-  scanner.start();
+  scanner_->start();
 }
 
 TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStartIsCalledSecondTime)
