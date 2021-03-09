@@ -120,6 +120,11 @@ ACTION_P(OpenBarrier, barrier)
   barrier->release();
 }
 
+TEST_F(UdpClientTests, testGetHostIp)
+{
+  EXPECT_EQ(HOST_IP_ADDRESS, udp_client_->getHostIp().to_string());
+}
+
 TEST_F(UdpClientTests, testAsyncReadOperation)
 {
   util::Barrier client_received_data_barrier;
