@@ -4,6 +4,7 @@ Changelog for package psen_scan_v2
 
 Forthcoming
 -----------
+* Make specifying host ip optional
 * API change: A scan is published only if it contains measurement data
 * Enable separate building of cpp-lib; extract sources into subproject psen_scan_v2_standalone
 * Renames ScanRange and DefaultScanRange to improve usability
