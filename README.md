@@ -89,7 +89,7 @@ End angle of measurement. (Radian)
 
 ### Published Topics
 /laser_scanner/scan ([sensor_msgs/LaserScan][])<br/>
-Publishes a complete scan from the PSENscan safety laser scanner.
+Publishes a complete scan from the PSENscan safety laser scanner. Scan fragments that contain no measurement data are not published. This can happen with smaller scan ranges.
 
 ### TF Frames
 The location of the TF frames is shown in the image below.

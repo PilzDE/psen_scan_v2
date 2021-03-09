@@ -16,13 +16,12 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_TEST_MOCK_UDP_SERVER_H
 #define PSEN_SCAN_V2_STANDALONE_TEST_MOCK_UDP_SERVER_H
 
-#include <memory>
-#include <thread>
 #include <functional>
-#include <stdexcept>
+#include <string>
+#include <thread>
 
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
+#include <boost/system/error_code.hpp>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 
@@ -87,89 +86,6 @@ private:
 
   NewDataHandler new_data_handler_;
 };
-
-MockUDPServer::MockUDPServer(const unsigned short port, const NewDataHandler& new_data_handler)
-  : socket_(io_service_, udp::endpoint(boost::asio::ip::address_v4::from_string(MOCK_IP_ADDRESS), port))
-  , new_data_handler_(new_data_handler)
-{
-  if (!new_data_handler_)
-  {
-    throw std::invalid_argument("New data handler must not be null");
-  }
-
-  recv_buffer_.resize(psen_scan_v2_standalone::data_conversion_layer::MAX_UDP_PAKET_SIZE);
-  io_service_thread_ = std::thread([this]() { io_service_.run(); });
-}
-
-MockUDPServer::~MockUDPServer()
-{
-  io_service_.stop();
-  if (io_service_thread_.joinable())
-  {
-    io_service_thread_.join();
-  }
-  socket_.close();
-}
-
-void MockUDPServer::handleSend(const boost::system::error_code& error, std::size_t bytes_transferred)
-{
-  if (error)
-  {
-    std::cerr << "UDP server mock failed to send data. Error msg: " << error.message() << std::endl;
-  }
-  std::cout << "MockUDPServer: Data successfully send" << std::endl;
-}
-
-void MockUDPServer::asyncSend(const udp::endpoint& receiver_of_data,
-                              const psen_scan_v2_standalone::data_conversion_layer::RawData& data)
-{
-  io_service_.post([this, receiver_of_data, data]() {
-    socket_.async_send_to(boost::asio::buffer(data.data(), data.size()),
-                          receiver_of_data,
-                          boost::bind(&MockUDPServer::handleSend,
-                                      this,
-                                      boost::asio::placeholders::error,
-                                      boost::asio::placeholders::bytes_transferred));
-  });
-}
-
-void MockUDPServer::handleReceive(const ReceiveMode& modi,
-                                  const boost::system::error_code& error,
-                                  std::size_t bytes_received)
-{
-  if (error)
-  {
-    std::cerr << "UDP server mock failed to receive data. Error msg: " << error.message() << std::endl;
-    return;
-  }
-
-  if (bytes_received == 0)
-  {
-    std::cerr << __FUNCTION__ << ": Received UDP msg contained no data." << std::endl;
-    return;
-  }
-
-  const psen_scan_v2_standalone::data_conversion_layer::RawData recv_data(recv_buffer_.cbegin(),
-                                                                          recv_buffer_.cbegin() + bytes_received);
-  new_data_handler_(remote_endpoint_, recv_data);
-  if (modi == ReceiveMode::continuous)
-  {
-    asyncReceive(ReceiveMode::continuous);
-  }
-}
-
-void MockUDPServer::asyncReceive(const ReceiveMode& modi)
-{
-  io_service_.post([this, modi]() {
-    socket_.async_receive_from(boost::asio::buffer(recv_buffer_),
-                               remote_endpoint_,
-                               boost::bind(&MockUDPServer::handleReceive,
-                                           this,
-                                           modi,
-                                           boost::asio::placeholders::error,
-                                           boost::asio::placeholders::bytes_transferred));
-  });
-}
 
 }  // namespace psen_scan_v2_standalone_test
 

@@ -284,6 +284,8 @@ ADD_TEST(NAME unittest_udp_client
 
 add_executable(integrationtest_scanner_api
         test/integration_tests/api/integrationtest_scanner_api.cpp
+        test/src/communication_layer/mock_udp_server.cpp
+        test/src/communication_layer/scanner_mock.cpp
         test/src/data_conversion_layer/monitoring_frame_serialization.cpp
         src/scanner_v2.cpp
         src/laserscan.cpp
@@ -306,7 +308,8 @@ add_test(NAME integrationtest_scanner_api
 
 
 add_executable(integrationtest_udp_client
-        test/integration_tests/communication_layer/integrationtest_udp_client.cpp)
+        test/integration_tests/communication_layer/integrationtest_udp_client.cpp
+        test/src/communication_layer/mock_udp_server.cpp)
 
 target_link_libraries(integrationtest_udp_client
     ${PROJECT_NAME}

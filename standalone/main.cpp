@@ -31,16 +31,12 @@ const util::TenthOfDegree ANGLE_START{ data_conversion_layer::degreeToTenthDegre
 const util::TenthOfDegree ANGLE_END{ data_conversion_layer::degreeToTenthDegree(138) };
 
 /*
- * This function is used as a callback every time a new laserscan is received.
+ * This function is used as a callback every time a new laserscan is received. It is skipped for Scans that contain no
+ * measurement data. This can happen with smaller scan ranges.
  */
 void laserScanCallback(const LaserScan& scan)
 {
   const LaserScan::MeasurementData& measures = scan.getMeasurements();
-
-  if (measures.empty())
-  {
-    return;
-  }
 
   PSENSCAN_INFO_THROTTLE(1 /* sec */, "laserScanCallback()", "Ranges {}", util::formatRange(measures));
 }
