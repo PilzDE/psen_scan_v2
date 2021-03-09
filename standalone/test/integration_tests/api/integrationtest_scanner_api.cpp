@@ -154,10 +154,7 @@ TEST_F(ScannerAPITests, testStartFunctionality)
       .WillOnce(OpenBarrier(&start_req_received_barrier));
 
   strict_scanner_mock_->startListeningForControlMsg();
-  const auto start_future{ std::async(std::launch::async, [this]() {
-    const auto start_future = scanner_->start();
-    start_future.wait();
-  }) };
+  const auto start_future = scanner_->start();
 
   ASSERT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
   ASSERT_EQ(start_future.wait_for(FUTURE_WAIT_TIMEOUT), std::future_status::timeout)
@@ -178,14 +175,11 @@ TEST_F(ScannerAPITests, shouldReceiveStartRequestWithCorrectHostIpWhenUsingAutoI
       .WillOnce(OpenBarrier(&start_req_received_barrier));
 
   nice_scanner_mock_->startListeningForControlMsg();
-  const auto start_future{ std::async(std::launch::async, [this]() {
-    const auto start_future = scanner_->start();
-    start_future.wait();
-  }) };
+  const auto start_future = scanner_->start();
 
   ASSERT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
   nice_scanner_mock_->sendStartReply();
-  ASSERT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
+  start_future.wait();
 }
 
 TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStartIsCalledSecondTime)
