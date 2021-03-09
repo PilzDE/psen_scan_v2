@@ -35,6 +35,8 @@ public:
   ::testing::NiceMock<MockConsoleBridgeOutputHandler> mock;                                                            \
   console_bridge::useOutputHandler(&mock);
 
+#define REMOVE_LOG_MOCK console_bridge::restorePreviousOutputHandler();
+
 #define EXPECT_LOG(level, msg, file, line)                                                                             \
   EXPECT_CALL(mock, log(msg, console_bridge::CONSOLE_BRIDGE_LOG_##level, file, line))
 

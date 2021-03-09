@@ -67,7 +67,7 @@ Needed Equipment:
 
 ### Published Topics
 /laser_scanner/scan ([sensor_msgs/LaserScan][])<br/>
-Publishes a complete scan from the PSENscan safety laser scanner.
+Publishes single scans from the PSENscan safety laser scanner. Scans that contain no measurement data are not published. This can happen with smaller scan ranges.
 
 ### Parameters
 _host_ip_ (_string_, default: "192.168.0.50")<br/>
