@@ -173,10 +173,19 @@ TEST_F(ScannerAPITests, shouldReceiveStartRequestWithCorrectHostIpWhenUsingAutoI
   setUpNiceScannerMock();
   const data_conversion_layer::start_request::Message start_req(generateScannerConfig(HOST_IP_ADDRESS));
 
-  EXPECT_CALL(*nice_scanner_mock_, receiveControlMsg(_, data_conversion_layer::start_request::serialize(start_req)));
+  util::Barrier start_req_received_barrier;
+  EXPECT_CALL(*nice_scanner_mock_, receiveControlMsg(_, data_conversion_layer::start_request::serialize(start_req)))
+      .WillOnce(OpenBarrier(&start_req_received_barrier));
 
   nice_scanner_mock_->startListeningForControlMsg();
-  scanner_->start();
+  const auto start_future{ std::async(std::launch::async, [this]() {
+    const auto start_future = scanner_->start();
+    start_future.wait();
+  }) };
+
+  ASSERT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
+  nice_scanner_mock_->sendStartReply();
+  ASSERT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
 }
 
 TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStartIsCalledSecondTime)
