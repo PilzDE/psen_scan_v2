@@ -48,7 +48,7 @@ public:
 
 #define EXPECT_ALL_PREVIOUS_DEBUG_LOGS EXPECT_LOG_SHORT(DEBUG, _).Times(AnyNumber())
 
-#define EXPECT_LOG_WITH_BARIER(severity, msg, times)                                                                   \
+#define EXPECT_LOG_WITH_BARRIER(severity, msg, times)                                                                  \
   util::Barrier log_msg_barrier;                                                                                       \
   EXPECT_LOG_SHORT(severity, msg).Times(times).WillOnce(OpenBarrier(&log_msg_barrier))
 
