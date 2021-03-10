@@ -35,25 +35,20 @@ const util::TenthOfDegree ANGLE_END{ data_conversion_layer::degreeToTenthDegree(
  */
 void laserScanCallback(const LaserScan& scan)
 {
-  const LaserScan::MeasurementData& measures = scan.getMeasurements();
-
-  PSENSCAN_INFO_THROTTLE(1 /* sec */, "laserScanCallback()", "Ranges {}", util::formatRange(measures));
+  PSENSCAN_INFO_THROTTLE(1 /* sec */, "laserScanCallback()", "Ranges {}", util::formatRange(scan.getMeasurements()));
 }
 
 int main(int argc, char** argv)
 {
   setLogLevel(CONSOLE_BRIDGE_LOG_INFO);
 
-  ScanRange scan_range{ ANGLE_START, ANGLE_END };
-
   ScannerConfigurationBuilder config_builder;
-  config_builder.scannerIp(SCANNER_IP).scanRange(scan_range);
+  config_builder.scannerIp(SCANNER_IP).scanRange(ScanRange{ANGLE_START, ANGLE_END});
 
   ScannerV2 scanner(config_builder.build(), laserScanCallback);
+
   scanner.start();
-
   std::this_thread::sleep_for(std::chrono::seconds(10));
-
   scanner.stop();
 
   return 0;
