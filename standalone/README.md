@@ -4,6 +4,10 @@
 
 The PSENscan Standalone C++ Library allows you to easily integrate the PSENscan safety laser scanner into your application without depending on ROS. You will be able to read both distance and intensity values from the PSENscan safety laser scanner, which can subsequently be used for navigation algorithms and much more.
 
+<p align="center">
+<img src="../img/cpp-standalone-graphic-detailed.png" width="800px" alt="PSENscan C++ Standalone Library use cases." title="PSENscan C++ Standalone Library use cases.">
+</p>
+
 ## Build Status
 [![CI-Standalone](https://github.com/PilzDE/psen_scan_v2/workflows/CI-Standalone/badge.svg?event=push)](https://github.com/PilzDE/psen_scan_v2/actions?query=event%3Apush+workflow%3ACI-Standalone+branch%3Amain)
 
