@@ -43,16 +43,17 @@ public:
 #define EXPECT_LOG_SHORT(level, msg)                                                                                   \
   EXPECT_CALL(mock, log(msg, console_bridge::CONSOLE_BRIDGE_LOG_##level, ::testing::_, ::testing::_))
 
-#define EXPECT_ALL_PREVIOUS_LOGS EXPECT_CALL(mock, log(::testing::_, ::testing::_, ::testing::_, ::testing::_)).Times(AnyNumber())
+#define EXPECT_ALL_PREVIOUS_LOGS                                                                                       \
+  EXPECT_CALL(mock, log(::testing::_, ::testing::_, ::testing::_, ::testing::_)).Times(AnyNumber())
 
 #define EXPECT_ALL_PREVIOUS_DEBUG_LOGS EXPECT_LOG_SHORT(DEBUG, _).Times(AnyNumber())
 
-#define EXPECT_LOG_WITH_BARIER(severity, msg, times) \
-util::Barrier log_msg_barrier; \
-EXPECT_LOG_SHORT(severity, msg).Times(times).WillOnce(OpenBarrier(&log_msg_barrier))
+#define EXPECT_LOG_WITH_BARIER(severity, msg, times)                                                                   \
+  util::Barrier log_msg_barrier;                                                                                       \
+  EXPECT_LOG_SHORT(severity, msg).Times(times).WillOnce(OpenBarrier(&log_msg_barrier))
 
-#define EXPECT_LOG_MSG_RECEIVED \
-EXPECT_TRUE(log_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Expected message not received"
+#define EXPECT_LOG_MSG_RECEIVED                                                                                        \
+  EXPECT_TRUE(log_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Expected message not received"
 
 }  // namespace psen_scan_v2_standalone_test
 
