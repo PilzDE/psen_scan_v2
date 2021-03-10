@@ -79,7 +79,8 @@ int main(int argc, char** argv)
                                                            pnh, PARAM_ANGLE_END, configuration::DEFAULT_ANGLE_END)) };
 
     ScannerConfigurationBuilder config_builder;
-    config_builder.hostIP(getRequiredParamFromServer<std::string>(pnh, PARAM_HOST_IP))
+    config_builder
+        .hostIP(getOptionalParamFromServer<std::string>(pnh, PARAM_HOST_IP, configuration::DEFAULT_HOST_IP_STRING))
         .hostDataPort(
             getOptionalParamFromServer<int>(pnh, PARAM_HOST_DATA_PORT, configuration::DATA_PORT_OF_HOST_DEVICE))
         .hostControlPort(

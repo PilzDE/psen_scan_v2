@@ -66,6 +66,9 @@ class ScannerAPITests : public testing::Test
 {
 protected:
   void SetUp() override;
+  void setUpScannerConfig(const std::string& host_ip = HOST_IP_ADDRESS);
+  ScannerConfiguration generateScannerConfig(const std::string& host_ip);
+  void setUpScannerV2();
   void setUpNiceScannerMock();
   void setUpStrictScannerMock();
   void prepareScannerMockStartReply();
@@ -74,24 +77,39 @@ protected:
   const PortHolder port_holder_{ ++GLOBAL_PORT_HOLDER };
   std::unique_ptr<NiceMock<ScannerMock>> nice_scanner_mock_;
   std::unique_ptr<StrictMock<ScannerMock>> strict_scanner_mock_;
-
-  ScannerConfiguration config_{ ScannerConfigurationBuilder()
-                                    .hostIP(HOST_IP_ADDRESS)
-                                    .hostDataPort(port_holder_.data_port_host)
-                                    .hostControlPort(port_holder_.control_port_host)
-                                    .scannerIp(SCANNER_IP_ADDRESS)
-                                    .scannerDataPort(port_holder_.data_port_scanner)
-                                    .scannerControlPort(port_holder_.control_port_scanner)
-                                    .scanRange(DEFAULT_SCAN_RANGE)
-                                    .build() };
+  std::unique_ptr<ScannerConfiguration> config_;
   UserCallbacks user_callbacks_;
-  ScannerV2 scanner_{ config_, std::bind(&UserCallbacks::LaserScanCallback, &user_callbacks_, std::placeholders::_1) };
+  std::unique_ptr<ScannerV2> scanner_;
 };
 
 void ScannerAPITests::SetUp()
 {
   port_holder_.printPorts();
   setLogLevel(CONSOLE_BRIDGE_LOG_DEBUG);
+}
+
+void ScannerAPITests::setUpScannerConfig(const std::string& host_ip)
+{
+  config_.reset(new ScannerConfiguration(generateScannerConfig(host_ip)));
+}
+
+ScannerConfiguration ScannerAPITests::generateScannerConfig(const std::string& host_ip)
+{
+  return ScannerConfigurationBuilder()
+      .hostIP(host_ip)
+      .hostDataPort(port_holder_.data_port_host)
+      .hostControlPort(port_holder_.control_port_host)
+      .scannerIp(SCANNER_IP_ADDRESS)
+      .scannerDataPort(port_holder_.data_port_scanner)
+      .scannerControlPort(port_holder_.control_port_scanner)
+      .scanRange(DEFAULT_SCAN_RANGE)
+      .build();
+}
+
+void ScannerAPITests::setUpScannerV2()
+{
+  scanner_.reset(
+      new ScannerV2(*config_, std::bind(&UserCallbacks::LaserScanCallback, &user_callbacks_, std::placeholders::_1)));
 }
 
 void ScannerAPITests::setUpNiceScannerMock()
@@ -108,36 +126,35 @@ void ScannerAPITests::prepareScannerMockStartReply()
 {
   if (strict_scanner_mock_)
   {
-    EXPECT_CALL(
-        *strict_scanner_mock_,
-        receiveControlMsg(
-            _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
+    EXPECT_CALL(*strict_scanner_mock_,
+                receiveControlMsg(_,
+                                  data_conversion_layer::start_request::serialize(
+                                      data_conversion_layer::start_request::Message(*config_))))
         .WillOnce(InvokeWithoutArgs([this]() { strict_scanner_mock_->sendStartReply(); }));
   }
   else
   {
-    ON_CALL(
-        *nice_scanner_mock_,
-        receiveControlMsg(
-            _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
+    ON_CALL(*nice_scanner_mock_,
+            receiveControlMsg(_,
+                              data_conversion_layer::start_request::serialize(
+                                  data_conversion_layer::start_request::Message(*config_))))
         .WillByDefault(InvokeWithoutArgs([this]() { nice_scanner_mock_->sendStartReply(); }));
   }
 }
 
 TEST_F(ScannerAPITests, testStartFunctionality)
 {
+  setUpScannerConfig();
+  setUpScannerV2();
   setUpStrictScannerMock();
-  const data_conversion_layer::start_request::Message start_req(config_);
+  const data_conversion_layer::start_request::Message start_req(*config_);
 
   util::Barrier start_req_received_barrier;
   EXPECT_CALL(*strict_scanner_mock_, receiveControlMsg(_, data_conversion_layer::start_request::serialize(start_req)))
       .WillOnce(OpenBarrier(&start_req_received_barrier));
 
   strict_scanner_mock_->startListeningForControlMsg();
-  const auto start_future{ std::async(std::launch::async, [this]() {
-    const auto start_future = scanner_.start();
-    start_future.wait();
-  }) };
+  const auto start_future = scanner_->start();
 
   ASSERT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
   ASSERT_EQ(start_future.wait_for(FUTURE_WAIT_TIMEOUT), std::future_status::timeout)
@@ -146,16 +163,38 @@ TEST_F(ScannerAPITests, testStartFunctionality)
   ASSERT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
 }
 
+TEST_F(ScannerAPITests, shouldReceiveStartRequestWithCorrectHostIpWhenUsingAutoInConfigAsHostIp)
+{
+  setUpScannerConfig("auto");
+  setUpScannerV2();
+  setUpNiceScannerMock();
+  const data_conversion_layer::start_request::Message start_req(generateScannerConfig(HOST_IP_ADDRESS));
+
+  util::Barrier start_req_received_barrier;
+  EXPECT_CALL(*nice_scanner_mock_, receiveControlMsg(_, data_conversion_layer::start_request::serialize(start_req)))
+      .WillOnce(OpenBarrier(&start_req_received_barrier));
+
+  nice_scanner_mock_->startListeningForControlMsg();
+  const auto start_future = scanner_->start();
+
+  ASSERT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
+  nice_scanner_mock_->sendStartReply();
+  start_future.wait();
+}
+
 TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStartIsCalledSecondTime)
 {
+  setUpScannerConfig();
+  setUpScannerV2();
   setUpNiceScannerMock();
 
   nice_scanner_mock_->startListeningForControlMsg();
-  const auto start_future = scanner_.start();
+  const auto start_future = scanner_->start();
   EXPECT_TRUE(start_future.valid()) << "First call too Scanner::start() should return VALID std::future";
   for (int i = 0; i < 5; ++i)
   {
-    EXPECT_FALSE(scanner_.start().valid()) << "Subsequenct calls to Scanner::start() should return INVALID std::future";
+    EXPECT_FALSE(scanner_->start().valid())
+        << "Subsequenct calls to Scanner::start() should return INVALID std::future";
   }
   nice_scanner_mock_->sendStartReply();
   EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
@@ -163,18 +202,20 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStartIsCalledSecondTime)
 
 TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
 {
+  setUpScannerConfig();
+  setUpScannerV2();
   setUpNiceScannerMock();
 
   util::Barrier start_req_received_barrier;
   ON_CALL(
       *nice_scanner_mock_,
       receiveControlMsg(
-          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_))))
+          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(*config_))))
       .WillByDefault(OpenBarrier(&start_req_received_barrier));
   EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times(0);
 
   nice_scanner_mock_->startListeningForControlMsg();
-  const auto start_future = scanner_.start();
+  const auto start_future = scanner_->start();
 
   ASSERT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
 
@@ -188,6 +229,8 @@ TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
 
 TEST_F(ScannerAPITests, testStopFunctionality)
 {
+  setUpScannerConfig();
+  setUpScannerV2();
   setUpStrictScannerMock();
   prepareScannerMockStartReply();
 
@@ -196,12 +239,12 @@ TEST_F(ScannerAPITests, testStopFunctionality)
       .WillOnce(OpenBarrier(&stop_req_received_barrier));
 
   strict_scanner_mock_->startListeningForControlMsg();
-  const auto scanner_start = scanner_.start();
+  const auto scanner_start = scanner_->start();
   scanner_start.wait();
 
   strict_scanner_mock_->startListeningForControlMsg();
   const auto stop_future{ std::async(std::launch::async, [this]() {
-    const auto stop_future = scanner_.stop();
+    const auto stop_future = scanner_->stop();
     stop_future.wait();
   }) };
 
@@ -214,19 +257,21 @@ TEST_F(ScannerAPITests, testStopFunctionality)
 
 TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStopIsCalledSecondTime)
 {
+  setUpScannerConfig();
+  setUpScannerV2();
   setUpNiceScannerMock();
   prepareScannerMockStartReply();
 
   nice_scanner_mock_->startListeningForControlMsg();
-  const auto start_future = scanner_.start();
+  const auto start_future = scanner_->start();
   start_future.wait();
 
   nice_scanner_mock_->startListeningForControlMsg();
-  const auto stop_future = scanner_.stop();
+  const auto stop_future = scanner_->stop();
   EXPECT_TRUE(stop_future.valid()) << "First call too Scanner::stop() should return VALID std::future";
   for (int i = 0; i < 5; ++i)
   {
-    EXPECT_FALSE(scanner_.stop().valid()) << "Subsequenct calls to Scanner::stop() should return INVALID std::future";
+    EXPECT_FALSE(scanner_->stop().valid()) << "Subsequenct calls to Scanner::stop() should return INVALID std::future";
   }
 
   nice_scanner_mock_->sendStopReply();
@@ -236,6 +281,8 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStopIsCalledSecondTime)
 TEST_F(ScannerAPITests, testStartReplyTimeout)
 {
   INJECT_NICE_LOG_MOCK;
+  setUpScannerConfig();
+  setUpScannerV2();
   setUpStrictScannerMock();
 
   util::Barrier error_msg_barrier;
@@ -257,7 +304,7 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
 
   strict_scanner_mock_->startContinuousListeningForControlMsg();
   const auto start_future{ std::async(std::launch::async, [this]() {
-    const auto scanner_start = scanner_.start();
+    const auto scanner_start = scanner_->start();
     scanner_start.wait();
   }) };
 
@@ -271,6 +318,8 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
 TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFrameMsg)
 {
   INJECT_LOG_MOCK
+  setUpScannerConfig();
+  setUpScannerV2();
   setUpStrictScannerMock();
   prepareScannerMockStartReply();
 
@@ -293,7 +342,7 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
       .WillOnce(OpenBarrier(&diagnostic_barrier));
 
   strict_scanner_mock_->startListeningForControlMsg();
-  auto promis = scanner_.start();
+  auto promis = scanner_->start();
   promis.wait_for(DEFAULT_TIMEOUT);
 
   strict_scanner_mock_->sendMonitoringFrame(msg);
@@ -306,6 +355,8 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
 TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFrame)
 {
   INJECT_NICE_LOG_MOCK;
+  setUpScannerConfig();
+  setUpScannerV2();
   setUpNiceScannerMock();
   prepareScannerMockStartReply();
 
@@ -322,7 +373,7 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
       .WillOnce(OpenBarrier(&empty_msg_received));
 
   nice_scanner_mock_->startListeningForControlMsg();
-  auto promis = scanner_.start();
+  auto promis = scanner_->start();
   promis.wait_for(DEFAULT_TIMEOUT);
 
   std::cout << "ScannerAPITests: Send empty monitoring frame..." << std::endl;
@@ -338,6 +389,8 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
 TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfMissingMeassurements)
 {
   INJECT_NICE_LOG_MOCK;
+  setUpScannerConfig();
+  setUpScannerV2();
   setUpNiceScannerMock();
   prepareScannerMockStartReply();
 
@@ -351,7 +404,7 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfMissingMeassuremen
       .WillOnce(OpenBarrier(&valid_msg_barrier));
 
   nice_scanner_mock_->startListeningForControlMsg();
-  auto promis = scanner_.start();
+  auto promis = scanner_->start();
   promis.wait_for(DEFAULT_TIMEOUT);
 
   std::cout << "ScannerAPITests: Send monitoring frame without measurement data ..." << std::endl;
@@ -363,12 +416,15 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfMissingMeassuremen
 
 TEST_F(ScannerAPITests, shouldThrowWhenConstructedWithInvalidLaserScanCallback)
 {
-  EXPECT_THROW(ScannerV2 scanner(config_, nullptr);, std::invalid_argument);
+  setUpScannerConfig();
+  EXPECT_THROW(ScannerV2 scanner(*config_, nullptr);, std::invalid_argument);
 }
 
 TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
 {
   INJECT_LOG_MOCK
+  setUpScannerConfig();
+  setUpScannerV2();
   setUpNiceScannerMock();
   prepareScannerMockStartReply();
 
@@ -395,7 +451,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
   nice_scanner_mock_->startListeningForControlMsg();
-  auto start_done = scanner_.start();
+  auto start_done = scanner_->start();
   start_done.wait_for(DEFAULT_TIMEOUT);
 
   // Send MonitoringFrames of valid scan round
@@ -421,6 +477,8 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
 TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
 {
   INJECT_LOG_MOCK
+  setUpScannerConfig();
+  setUpScannerV2();
   setUpNiceScannerMock();
   prepareScannerMockStartReply();
 
@@ -439,7 +497,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
   nice_scanner_mock_->startListeningForControlMsg();
-  auto start_done = scanner_.start();
+  auto start_done = scanner_->start();
   start_done.wait_for(DEFAULT_TIMEOUT);
 
   for (const auto& msg : msgs)
@@ -456,6 +514,8 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
 TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFrameReceiveTimeout)
 {
   INJECT_LOG_MOCK
+  setUpScannerConfig();
+  setUpScannerV2();
   setUpNiceScannerMock();
   prepareScannerMockStartReply();
 
@@ -469,7 +529,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFrameReceiveTimeout)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
   nice_scanner_mock_->startListeningForControlMsg();
-  auto start_done = scanner_.start();
+  auto start_done = scanner_->start();
   start_done.wait_for(DEFAULT_TIMEOUT);
 
   EXPECT_TRUE(user_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "User message not received";

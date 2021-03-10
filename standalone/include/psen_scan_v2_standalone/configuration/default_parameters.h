@@ -22,6 +22,8 @@ namespace psen_scan_v2_standalone
 {
 namespace configuration
 {
+static const std::string DEFAULT_HOST_IP_STRING{ "auto" };
+
 static constexpr unsigned short DATA_PORT_OF_SCANNER_DEVICE{ 2000 };
 static constexpr unsigned short CONTROL_PORT_OF_SCANNER_DEVICE{ 3000 };
 

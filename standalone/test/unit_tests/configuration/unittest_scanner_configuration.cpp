@@ -23,6 +23,7 @@
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
+#include "psen_scan_v2_standalone/util/ip_conversion.h"
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scanner_config_builder.h"
 #include "psen_scan_v2_standalone/scan_range.h"
@@ -35,7 +36,10 @@ static constexpr int MINIMAL_PORT_NUMBER{ std::numeric_limits<uint16_t>::min() }
 static constexpr int MAXIMAL_PORT_NUMBER{ std::numeric_limits<uint16_t>::max() };
 static constexpr ScanRange SCAN_RANGE{ util::TenthOfDegree(0), util::TenthOfDegree(2750) };
 static const std::string VALID_IP{ "127.0.0.1" };
+static const std::string VALID_IP_OTHER{ "192.168.0.1" };
 static const std::string INVALID_IP{ "invalid_ip" };
+static const std::string EMPTY_IP{ "" };
+static const std::string AUTO_IP{ "auto" };
 
 class ScannerConfigurationTest : public testing::Test
 {
@@ -55,28 +59,29 @@ static ScannerConfiguration createValidConfig()
       .build();
 }
 
+static ScannerConfiguration createValidConfig(const std::string& host_ip)
+{
+  return ScannerConfigurationBuilder()
+      .hostIP(host_ip)
+      .hostDataPort(MAXIMAL_PORT_NUMBER - 1)
+      .hostControlPort(MAXIMAL_PORT_NUMBER)
+      .scannerIp(VALID_IP)
+      .scannerDataPort(MINIMAL_PORT_NUMBER + 1)
+      .scannerControlPort(MINIMAL_PORT_NUMBER + 2)
+      .scanRange(SCAN_RANGE)
+      .enableDiagnostics()
+      .build();
+}
+
 static ScannerConfiguration createValidDefaultConfig()
 {
-  return ScannerConfigurationBuilder().hostIP(VALID_IP).scannerIp(VALID_IP).scanRange(SCAN_RANGE).build();
+  return ScannerConfigurationBuilder().scannerIp(VALID_IP).scanRange(SCAN_RANGE).build();
 }
 
 TEST_F(ScannerConfigurationTest, shouldNotThrowInCaseOfValidConfiguration)
 {
   EXPECT_NO_THROW(createValidConfig());
   EXPECT_NO_THROW(createValidDefaultConfig());
-}
-
-TEST_F(ScannerConfigurationTest, shouldThrowIfHostIPMissing)
-{
-  EXPECT_THROW(ScannerConfigurationBuilder()
-                   .hostDataPort(MAXIMAL_PORT_NUMBER - 1)
-                   .hostControlPort(MAXIMAL_PORT_NUMBER)
-                   .scannerIp(VALID_IP)
-                   .scannerDataPort(MINIMAL_PORT_NUMBER)
-                   .scannerControlPort(MINIMAL_PORT_NUMBER + 1)
-                   .scanRange(SCAN_RANGE)
-                   .build(),
-               std::runtime_error);
 }
 
 TEST_F(ScannerConfigurationTest, shouldThrowIfScannerIPMissing)
@@ -108,6 +113,16 @@ TEST_F(ScannerConfigurationTest, shouldThrowIfScanRangeMissing)
 TEST_F(ScannerConfigurationTest, shouldThrowInCaseOfInvalidHostIp)
 {
   EXPECT_THROW(ScannerConfigurationBuilder().hostIP(INVALID_IP), std::invalid_argument);
+}
+
+TEST_F(ScannerConfigurationTest, shouldNotThrowInCaseOfEmptyHostIp)
+{
+  EXPECT_NO_THROW(ScannerConfigurationBuilder().hostIP(EMPTY_IP));
+}
+
+TEST_F(ScannerConfigurationTest, shouldNotThrowInCaseOfAutoHostIp)
+{
+  EXPECT_NO_THROW(ScannerConfigurationBuilder().hostIP(AUTO_IP));
 }
 
 TEST_F(ScannerConfigurationTest, shouldThrowInCaseOfInvalidScannerIp)
@@ -176,12 +191,30 @@ TEST_F(ScannerConfigurationTest, shouldReturnCorrectHostIpAfterConstruction)
 {
   ScannerConfiguration sc{ createValidConfig() };
 
-  const auto host_ip = sc.hostIp();
+  const auto host_ip = *sc.hostIp();
   EXPECT_EQ(4U, sizeof(host_ip));
 
   const std::string host_ip_string(boost::asio::ip::address_v4(host_ip).to_string());
 
   EXPECT_EQ(VALID_IP, host_ip_string);
+}
+
+TEST_F(ScannerConfigurationTest, shouldReturnNoHostIpByDefault)
+{
+  ScannerConfiguration sc{ createValidDefaultConfig() };
+  EXPECT_EQ(boost::none, sc.hostIp());
+}
+
+TEST_F(ScannerConfigurationTest, shouldReturnNoHostIpIfSetEmpty)
+{
+  ScannerConfiguration sc{ createValidConfig(EMPTY_IP) };
+  EXPECT_EQ(boost::none, sc.hostIp());
+}
+
+TEST_F(ScannerConfigurationTest, shouldReturnNoHostIpIfSetAuto)
+{
+  ScannerConfiguration sc{ createValidConfig(AUTO_IP) };
+  EXPECT_EQ(boost::none, sc.hostIp());
 }
 
 TEST_F(ScannerConfigurationTest, shouldReturnCorrectScannerIpAfterConstruction)
@@ -234,6 +267,16 @@ TEST_F(ScannerConfigurationTest, shouldReturnCorrectEndAngleAfterConstruction)
   const ScannerConfiguration sc{ createValidConfig() };
 
   EXPECT_EQ(SCAN_RANGE.getEnd(), sc.scanRange().getEnd());
+}
+
+TEST_F(ScannerConfigurationTest, shouldReturnSetHostIp)
+{
+  ScannerConfiguration sc{ createValidConfig() };
+
+  const uint32_t host_ip{ util::convertIP(VALID_IP_OTHER) };
+  sc.setHostIp(host_ip);
+
+  EXPECT_EQ(host_ip, sc.hostIp());
 }
 
 }  // namespace psen_scan_v2_standalone_test

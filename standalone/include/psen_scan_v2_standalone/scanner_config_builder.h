@@ -17,21 +17,13 @@
 #define PSEN_SCAN_V2_STANDALONE_SCANNER_CONFIG_BUILDER_H
 
 #include <cmath>
-#include <cassert>
 #include <stdexcept>
 #include <string>
-#include <limits>
-
-#ifdef __linux__
-#include <arpa/inet.h>
-#endif
-#ifdef _WIN32
-#include <WinSock2.h>
-#endif
 
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scan_range.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
+#include "psen_scan_v2_standalone/util/ip_conversion.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -56,7 +48,6 @@ public:
 
 private:
   static uint16_t convertPort(const int& port);
-  static uint32_t convertIP(const std::string& ip);
 
 private:
   ScannerConfiguration config_;
@@ -71,75 +62,42 @@ inline ScannerConfiguration ScannerConfigurationBuilder::build() const
   return config_;
 }
 
-#ifdef __linux__
-uint32_t ScannerConfigurationBuilder::convertIP(const std::string& ip)
-{
-  const auto ip_number = inet_network(ip.c_str());
-  if (static_cast<in_addr_t>(-1) == ip_number)
-  {
-    throw std::invalid_argument("IP invalid");
-  }
-  assert(sizeof(ip_number) == 4 && "ip_number has not the expected size");
-  return static_cast<uint32_t>(ip_number);
-}
-#endif
-
-#ifdef _WIN32
-uint32_t ScannerConfigurationBuilder::convertIP(const std::string& ip)
-{
-  const auto ip_number = inet_addr(ip.c_str());
-  if (INADDR_NONE == ip_number)
-  {
-    throw std::invalid_argument("IP invalid");
-  }
-  assert(sizeof(ip_number) == 4 && "ip_number has not the expected size");
-  return htonl(static_cast<uint32_t>(ip_number));
-}
-#endif
-
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::hostIP(const std::string& ip)
 {
-  config_.host_ip_ = convertIP(ip);
-
-  return *this;
-}
-
-inline uint16_t ScannerConfigurationBuilder::convertPort(const int& port)
-{
-  if (port < std::numeric_limits<uint16_t>::min() || port > std::numeric_limits<uint16_t>::max())
+  if (ip != "" && ip != "auto")
   {
-    throw std::out_of_range("Port out of range");
+    config_.host_ip_ = util::convertIP(ip);
   }
-  return static_cast<uint16_t>(port);
+  return *this;
 }
 
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::hostDataPort(const int& port)
 {
-  config_.host_data_port_ = convertPort(port);
+  config_.host_data_port_ = util::convertPort(port);
   return *this;
 }
 
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::hostControlPort(const int& port)
 {
-  config_.host_control_port_ = convertPort(port);
+  config_.host_control_port_ = util::convertPort(port);
   return *this;
 }
 
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scannerIp(const std::string& ip)
 {
-  config_.scanner_ip_ = convertIP(ip);
+  config_.scanner_ip_ = util::convertIP(ip);
   return *this;
 }
 
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scannerDataPort(const int& port)
 {
-  config_.scanner_data_port_ = convertPort(port);
+  config_.scanner_data_port_ = util::convertPort(port);
   return *this;
 }
 
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scannerControlPort(const int& port)
 {
-  config_.scanner_control_port_ = convertPort(port);
+  config_.scanner_control_port_ = util::convertPort(port);
   return *this;
 }
 

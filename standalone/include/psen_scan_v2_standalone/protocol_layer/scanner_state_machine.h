@@ -34,6 +34,7 @@
 
 #include "psen_scan_v2_standalone/util/logging.h"
 #include "psen_scan_v2_standalone/util/format_range.h"
+#include "psen_scan_v2_standalone/util/ip_conversion.h"
 #include "psen_scan_v2_standalone/communication_layer/udp_client.h"
 
 #include "psen_scan_v2_standalone/laserscan.h"
@@ -122,7 +123,7 @@ struct StateMachineArgs
   {
   }
 
-  const ScannerConfiguration config_;
+  ScannerConfiguration config_;
 
   // Callbacks
   const ScannerStartedCB scanner_started_cb{};
