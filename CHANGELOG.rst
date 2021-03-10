@@ -2,8 +2,8 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.5 (2021-03-10)
+------------------
 * Make specifying host ip optional
 * Reorder Readme sections
 * API change: A scan is published only if it contains measurement data
