@@ -285,7 +285,6 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
   setUpScannerV2();
   setUpStrictScannerMock();
 
-  util::Barrier error_msg_barrier;
   util::Barrier twice_called_barrier;
   {
     InSequence seq;
@@ -293,13 +292,12 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
     EXPECT_CALL(*strict_scanner_mock_, receiveControlMsg(_, _)).Times(1).WillOnce(OpenBarrier(&twice_called_barrier));
   }
 
-  EXPECT_LOG_SHORT(DEBUG, _).Times(AnyNumber());
+  EXPECT_ALL_PREVIOUS_DEBUG_LOGS;
   EXPECT_LOG_SHORT(INFO, "Scanner: Start scanner called.").Times(1);
-  EXPECT_LOG_SHORT(ERROR,
-                   "StateMachine: Timeout while waiting for the scanner to start! Retrying... "
-                   "(Please check the ethernet connection or contact PILZ support if the error persists.)")
-      .Times(AtLeast(1))
-      .WillOnce(OpenBarrier(&error_msg_barrier));
+  EXPECT_LOG_WITH_BARIER(ERROR,
+                         "StateMachine: Timeout while waiting for the scanner to start! Retrying... "
+                         "(Please check the ethernet connection or contact PILZ support if the error persists.)",
+                         AtLeast(1));
   EXPECT_LOG_SHORT(INFO, "ScannerController: Scanner started successfully.").Times(1);
 
   strict_scanner_mock_->startContinuousListeningForControlMsg();
@@ -308,7 +306,7 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
     scanner_start.wait();
   }) };
 
-  EXPECT_TRUE(error_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Error message not received";
+  EXPECT_LOG_MSG_RECEIVED;
   EXPECT_TRUE(twice_called_barrier.waitTillRelease(5000ms)) << "Start reply not send at least twice in time";
   strict_scanner_mock_->sendStartReply();
   EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
@@ -326,20 +324,19 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
   const data_conversion_layer::monitoring_frame::Message msg{ createValidMonitoringFrameMsg() };
 
   util::Barrier monitoring_frame_barrier;
-  util::Barrier diagnostic_barrier;
 
   // Check that toLaserScan(msg) == arg
   EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan(msg)))
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
-  EXPECT_LOG_SHORT(DEBUG, _).Times(AnyNumber());
+  EXPECT_ALL_PREVIOUS_LOGS;
   EXPECT_LOG_SHORT(INFO, "Scanner: Start scanner called.").Times(1);
   EXPECT_LOG_SHORT(INFO, "ScannerController: Scanner started successfully.").Times(1);
-  EXPECT_LOG_SHORT(WARN,
-                   "StateMachine: The scanner reports an error: {Device: Master - Alarm: The front panel of the safety "
-                   "laser scanner must be cleaned.}")
-      .Times(1)
-      .WillOnce(OpenBarrier(&diagnostic_barrier));
+  EXPECT_LOG_WITH_BARIER(
+      WARN,
+      "StateMachine: The scanner reports an error: {Device: Master - Alarm: The front panel of the safety "
+      "laser scanner must be cleaned.}",
+      1);
 
   strict_scanner_mock_->startListeningForControlMsg();
   auto promis = scanner_->start();
@@ -348,7 +345,7 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
   strict_scanner_mock_->sendMonitoringFrame(msg);
 
   EXPECT_TRUE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
-  EXPECT_TRUE(diagnostic_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Diagnostic message not received";
+  EXPECT_LOG_MSG_RECEIVED;
   REMOVE_LOG_MOCK
 }
 
@@ -363,14 +360,11 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
   util::Barrier valid_msg_barrier;
   EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).WillOnce(OpenBarrier(&valid_msg_barrier));
 
-  util::Barrier empty_msg_received;
-  // Needed to allow all other log messages which might be received
-  EXPECT_ANY_LOG().Times(AnyNumber());
-  EXPECT_LOG_SHORT(
+  EXPECT_ALL_PREVIOUS_LOGS;
+  EXPECT_LOG_WITH_BARIER(
       WARN,
-      "StateMachine: No transition in state \"WaitForMonitoringFrame\" for event \"MonitoringFrameReceivedError\".")
-      .Times(1)
-      .WillOnce(OpenBarrier(&empty_msg_received));
+      "StateMachine: No transition in state \"WaitForMonitoringFrame\" for event \"MonitoringFrameReceivedError\".",
+      1);
 
   nice_scanner_mock_->startListeningForControlMsg();
   auto promis = scanner_->start();
@@ -378,7 +372,7 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
 
   std::cout << "ScannerAPITests: Send empty monitoring frame..." << std::endl;
   nice_scanner_mock_->sendEmptyMonitoringFrame();
-  EXPECT_TRUE(empty_msg_received.waitTillRelease(DEFAULT_TIMEOUT)) << "Empty monitoring frame not received";
+  EXPECT_LOG_MSG_RECEIVED;
 
   std::cout << "ScannerAPITests: Send valid monitoring frame..." << std::endl;
   nice_scanner_mock_->sendMonitoringFrame(createValidMonitoringFrameMsg());
@@ -394,14 +388,10 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfMissingMeassuremen
   setUpNiceScannerMock();
   prepareScannerMockStartReply();
 
-  util::Barrier valid_msg_barrier;
   EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times(0);
 
-  // Needed to allow all other log messages which might be received
-  EXPECT_ANY_LOG().Times(AnyNumber());
-  EXPECT_LOG_SHORT(DEBUG, "StateMachine: No measurement data in this message, skipping laser scan callback.")
-      .Times(1)
-      .WillOnce(OpenBarrier(&valid_msg_barrier));
+  EXPECT_ALL_PREVIOUS_LOGS;
+  EXPECT_LOG_WITH_BARIER(DEBUG, "StateMachine: No measurement data in this message, skipping laser scan callback.", 1);
 
   nice_scanner_mock_->startListeningForControlMsg();
   auto promis = scanner_->start();
@@ -410,7 +400,7 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfMissingMeassuremen
   std::cout << "ScannerAPITests: Send monitoring frame without measurement data ..." << std::endl;
   nice_scanner_mock_->sendMonitoringFrame(
       createValidMonitoringFrameMsg(42, util::TenthOfDegree{ 0 }, util::TenthOfDegree{ 0 }));
-  EXPECT_TRUE(valid_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Valid monitoring frame not received";
+  EXPECT_LOG_MSG_RECEIVED;
   REMOVE_LOG_MOCK
 }
 
@@ -441,14 +431,11 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
       scan_counter_invalid_round, num_scans_per_round - 1) };
   invalid_scan_round_msgs.emplace_back(createValidMonitoringFrameMsg(scan_counter_invalid_round + 1));
 
-  util::Barrier user_msg_barrier;
-  // Needed to allow all other log messages which might be received
-  EXPECT_ANY_LOG().Times(AnyNumber());
-  EXPECT_LOG_SHORT(WARN,
-                   "StateMachine: Detected dropped MonitoringFrame."
-                   " (Please check the ethernet connection or contact PILZ support if the error persists.)")
-      .Times(1)
-      .WillOnce(OpenBarrier(&user_msg_barrier));
+  EXPECT_ALL_PREVIOUS_LOGS;
+  EXPECT_LOG_WITH_BARIER(WARN,
+                         "StateMachine: Detected dropped MonitoringFrame."
+                         " (Please check the ethernet connection or contact PILZ support if the error persists.)",
+                         1);
 
   nice_scanner_mock_->startListeningForControlMsg();
   auto start_done = scanner_->start();
@@ -470,7 +457,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 
-  EXPECT_TRUE(user_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "User message not received";
+  EXPECT_LOG_MSG_RECEIVED;
   REMOVE_LOG_MOCK
 }
 
@@ -489,12 +476,8 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
       scan_counter, num_scans_per_round + 1) };
   msgs.emplace_back(createValidMonitoringFrameMsg(scan_counter + 1));
 
-  util::Barrier user_msg_barrier;
-  // Needed to allow all other log messages which might be received
-  EXPECT_ANY_LOG().Times(AnyNumber());
-  EXPECT_LOG_SHORT(WARN, "StateMachine: Unexpected: Too many MonitoringFrames for one scan round received.")
-      .Times(1)
-      .WillOnce(OpenBarrier(&user_msg_barrier));
+  EXPECT_ALL_PREVIOUS_LOGS;
+  EXPECT_LOG_WITH_BARIER(WARN, "StateMachine: Unexpected: Too many MonitoringFrames for one scan round received.", 1);
 
   nice_scanner_mock_->startListeningForControlMsg();
   auto start_done = scanner_->start();
@@ -507,7 +490,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 
-  EXPECT_TRUE(user_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "User message not received";
+  EXPECT_LOG_MSG_RECEIVED;
   REMOVE_LOG_MOCK
 }
 
@@ -519,20 +502,17 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFrameReceiveTimeout)
   setUpNiceScannerMock();
   prepareScannerMockStartReply();
 
-  util::Barrier user_msg_barrier;
-  // Needed to allow all other log messages which might be received
-  EXPECT_ANY_LOG().Times(AnyNumber());
-  EXPECT_LOG_SHORT(WARN,
-                   "StateMachine: Timeout while waiting for MonitoringFrame message."
-                   " (Please check the ethernet connection or contact PILZ support if the error persists.)")
-      .Times(1)
-      .WillOnce(OpenBarrier(&user_msg_barrier));
+  EXPECT_ALL_PREVIOUS_LOGS;
+  EXPECT_LOG_WITH_BARIER(WARN,
+                         "StateMachine: Timeout while waiting for MonitoringFrame message."
+                         " (Please check the ethernet connection or contact PILZ support if the error persists.)",
+                         1);
 
   nice_scanner_mock_->startListeningForControlMsg();
   auto start_done = scanner_->start();
   start_done.wait_for(DEFAULT_TIMEOUT);
 
-  EXPECT_TRUE(user_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "User message not received";
+  EXPECT_LOG_MSG_RECEIVED;
   REMOVE_LOG_MOCK
 }
 
