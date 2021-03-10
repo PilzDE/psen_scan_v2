@@ -68,19 +68,10 @@ you can easily adjust the configuration parameters.
 _sensor_ip_ (_string_, default: "192.168.0.10")<br/>
 IP-Address of safety laser scanner.
 
-### Further Parameters (optional)
-
-_host_ip_ (_string_, default: "auto")<br/>
-IP-Address of host machine. The IP of the local machine is used by default.
-
-_host_udp_port_data_ (_int_, default: 55115)<br/>
-UDP Port on which monitoring frames (scans) should be received.
-
-_host_udp_port_control_ (_int_, default: 55116)<br/>
-UDP Port used to send commands (start/stop) and receive the corresponding replies.
+### Optional Parameters
 
 _prefix_ (_string_, default: "laser_1")<br/>
-Name of this scanner that can be changed to differentiate between multiple units.
+Name of this scanner that can be changed to differentiate between multiple devices.
 
 _angle_start_ (_double_, default: -2.40 (= -137.5 deg))<br/>
 Start angle of measurement. (Radian)
