@@ -43,7 +43,7 @@ int main(int argc, char** argv)
   setLogLevel(CONSOLE_BRIDGE_LOG_INFO);
 
   ScannerConfigurationBuilder config_builder;
-  config_builder.scannerIp(SCANNER_IP).scanRange(ScanRange{ANGLE_START, ANGLE_END});
+  config_builder.scannerIp(SCANNER_IP).scanRange(ScanRange{ ANGLE_START, ANGLE_END });
 
   ScannerV2 scanner(config_builder.build(), laserScanCallback);
 
