@@ -292,7 +292,7 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
     EXPECT_CALL(*strict_scanner_mock_, receiveControlMsg(_, _)).Times(1).WillOnce(OpenBarrier(&twice_called_barrier));
   }
 
-  EXPECT_ALL_PREVIOUS_DEBUG_LOGS;
+  EXPECT_ALL_PREVIOUS_LOGS;
   EXPECT_LOG_SHORT(INFO, "Scanner: Start scanner called.").Times(1);
   EXPECT_LOG_WITH_BARRIER(ERROR,
                           "StateMachine: Timeout while waiting for the scanner to start! Retrying... "
