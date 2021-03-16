@@ -85,6 +85,7 @@ include_directories(
   standalone/include
   ${console_bridge_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
 )
 
 set(${PROJECT_NAME}_standalone_sources
