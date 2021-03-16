@@ -48,6 +48,8 @@ public:
 
   bool diagnosticsEnabled() const;
 
+  bool fragmentedScansEnabled() const;
+
   void setHostIp(const uint32_t& host_ip);
 
 private:
@@ -67,6 +69,7 @@ private:
 
   boost::optional<ScanRange> scan_range_{};
   bool diagnostics_enabled_{ false };
+  bool fragmented_scans_{ false };
 };
 
 inline bool ScannerConfiguration::isValid() const
@@ -112,6 +115,11 @@ inline const ScanRange& ScannerConfiguration::scanRange() const
 inline bool ScannerConfiguration::diagnosticsEnabled() const
 {
   return diagnostics_enabled_;
+}
+
+inline bool ScannerConfiguration::fragmentedScansEnabled() const
+{
+  return fragmented_scans_;
 }
 
 inline void ScannerConfiguration::setHostIp(const uint32_t& host_ip)
