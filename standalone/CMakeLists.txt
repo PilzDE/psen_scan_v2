@@ -77,6 +77,14 @@ target_link_libraries(${PROJECT_NAME}_app
 )
 
 ###########
+# Install #
+###########
+
+install(TARGETS
+  ${PROJECT_NAME}
+)
+
+###########
 ## Tests ##
 ###########
 if (BUILD_TESTING)
