@@ -30,6 +30,8 @@ static constexpr unsigned short CONTROL_PORT_OF_SCANNER_DEVICE{ 3000 };
 static constexpr unsigned short DATA_PORT_OF_HOST_DEVICE{ 55115 };
 static constexpr unsigned short CONTROL_PORT_OF_HOST_DEVICE{ 55116 };
 
+static constexpr bool DEFAULT_FRAGMENTED_SCANS{ false };
+
 //! @brief Start angle of measurement.
 static constexpr double DEFAULT_ANGLE_START(-data_conversion_layer::degreeToRadian(137.5));
 //! @brief  End angle of measurement.
