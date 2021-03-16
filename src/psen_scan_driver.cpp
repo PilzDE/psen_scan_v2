@@ -46,6 +46,7 @@ const std::string PARAM_PREFIX{ "prefix" };
 const std::string PARAM_ANGLE_START{ "angle_start" };
 const std::string PARAM_ANGLE_END{ "angle_end" };
 const std::string PARAM_X_AXIS_ROTATION{ "x_axis_rotation" };
+const std::string PARAM_FRAGMENTED_SCANS{ "fragmented_scans" };
 
 static const std::string DEFAULT_PREFIX = "scanner";
 
@@ -90,8 +91,15 @@ int main(int argc, char** argv)
           .scannerControlPort(configuration::CONTROL_PORT_OF_SCANNER_DEVICE)
           .scanRange(scan_range)
           .enableDiagnostics()
+          .enableFragmentedScans(
+              getOptionalParamFromServer<bool>(pnh, PARAM_FRAGMENTED_SCANS, configuration::DEFAULT_FRAGMENTED_SCANS))
           .build()
     };
+
+    if (scanner_configuration.fragmentedScansEnabled())
+    {
+      ROS_INFO("Using fragmented scans.");
+    }
 
     ROSScannerNode ros_scanner_node(pnh,
                                     DEFAULT_PUBLISH_TOPIC,
