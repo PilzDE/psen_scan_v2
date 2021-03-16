@@ -70,6 +70,7 @@ static ScannerConfiguration createValidConfig(const std::string& host_ip)
       .scannerControlPort(MINIMAL_PORT_NUMBER + 2)
       .scanRange(SCAN_RANGE)
       .enableDiagnostics()
+      .enableFragmentedScans()
       .build();
 }
 
