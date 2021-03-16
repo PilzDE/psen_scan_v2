@@ -91,6 +91,9 @@ UDP Port on which monitoring frames (scans) should be received.
 _host_udp_port_control_ (_int_, default: 55116)<br/>
 UDP Port used to send commands (start/stop) and receive the corresponding replies.
 
+_fragmented_scans_ (_bool_, default: false)<br/>
+Publish scan data as soon as a UDP packet is ready, do not wait for a full scan.
+
 ### Published Topics
 /laser_scanner/scan ([sensor_msgs/LaserScan][])<br/>
 Publishes a complete scan from the PSENscan safety laser scanner. Scan fragments that contain no measurement data are not published. This can happen with smaller scan ranges.
