@@ -76,21 +76,41 @@ if(CATKIN_ENABLE_CLANG_TIDY)
     set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
   endif()
 endif()
+######################
+## Build Standalone ##
+######################
+
+include_directories(
+  include
+  standalone/include
+  ${console_bridge_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
+)
+
+set(${PROJECT_NAME}_standalone_sources
+  standalone/src/scanner_v2.cpp
+  standalone/src/laserscan.cpp
+  standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
+  standalone/src/data_conversion_layer/start_request.cpp
+  standalone/src/data_conversion_layer/start_request_serialization.cpp
+  standalone/src/data_conversion_layer/stop_request_serialization.cpp
+  standalone/src/data_conversion_layer/monitoring_frame_deserialization.cpp
+  standalone/src/data_conversion_layer/diagnostics.cpp
+  standalone/src/data_conversion_layer/scanner_reply_serialization_deserialization.cpp
+)
+
+add_library(${PROJECT_NAME}_standalone ${${PROJECT_NAME}_standalone_sources})
+
+target_link_libraries(${PROJECT_NAME}_standalone
+  ${Boost_LIBRARIES}
+  ${console_bridge_LIBRARIES}
+  fmt::fmt
+)
+target_include_directories(${PROJECT_NAME}_standalone PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 ###########
 ## Build ##
 ###########
-
-#catkin_lint: ignore duplicate_cmd
-#catkin_lint: ignore subproject
-add_subdirectory(standalone)
-#catkin_lint: report duplicate_cmd
-#catkin_lint: report subproject
-
-include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-)
 
 set(${PROJECT_NAME}_node_sources
   src/psen_scan_driver.cpp
@@ -120,6 +140,7 @@ install(DIRECTORY urdf/
 
 install(TARGETS
   ${PROJECT_NAME}_node
+  ${PROJECT_NAME}_standalone
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
