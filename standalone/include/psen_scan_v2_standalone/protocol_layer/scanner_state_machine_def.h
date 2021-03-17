@@ -175,15 +175,15 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
         PSENSCAN_DEBUG("StateMachine", "No measurement data in this message, skipping laser scan callback.");
         return;
       }
-      args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan({frame}));
+      args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan({ frame }));
     }
     else
     {
       if (!message_buffer_.empty() and message_buffer_[0].scanCounter() != frame.scanCounter())
       {
         PSENSCAN_WARN("StateMachine",
-                  "Detected dropped MonitoringFrame."
-                  " (Please check the ethernet connection or contact PILZ support if the error persists.)");
+                      "Detected dropped MonitoringFrame."
+                      " (Please check the ethernet connection or contact PILZ support if the error persists.)");
         message_buffer_.clear();
       }
       message_buffer_.push_back(frame);

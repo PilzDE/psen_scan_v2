@@ -48,7 +48,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectScanResolutionAfterC
 {
   const data_conversion_layer::monitoring_frame::Message frame{ createMsg() };
   std::unique_ptr<LaserScan> scan_ptr;
-  ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ data_conversion_layer::toLaserScan({frame}) }););
+  ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ data_conversion_layer::toLaserScan({ frame }) }););
 
   EXPECT_EQ(frame.resolution(), scan_ptr->getScanResolution()) << "Resolution incorrect in LaserScan";
 }
@@ -57,7 +57,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectMinMaxScanAngleAfter
 {
   const data_conversion_layer::monitoring_frame::Message frame{ createMsg() };
   std::unique_ptr<LaserScan> scan_ptr;
-  ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ data_conversion_layer::toLaserScan({frame}) }););
+  ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ data_conversion_layer::toLaserScan({ frame }) }););
 
   const util::TenthOfDegree expected_max_scan_angle{ frame.fromTheta() +
                                                      frame.resolution() * (int)frame.measurements().size() };
@@ -71,7 +71,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectMeasurementsAfterCon
   const data_conversion_layer::monitoring_frame::Message frame{ createMsg() };
 
   std::unique_ptr<LaserScan> scan_ptr;
-  ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ data_conversion_layer::toLaserScan({frame}) }););
+  ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ data_conversion_layer::toLaserScan({ frame }) }););
 
   EXPECT_EQ(frame.measurements().size(), scan_ptr->getMeasurements().size());
   const auto mismatch_pair = std::mismatch(
@@ -86,7 +86,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectIntensitiesAfterConv
   const data_conversion_layer::monitoring_frame::Message frame{ createMsg() };
 
   std::unique_ptr<LaserScan> scan_ptr;
-  ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ data_conversion_layer::toLaserScan({frame}) }););
+  ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ data_conversion_layer::toLaserScan({ frame }) }););
 
   EXPECT_EQ(frame.intensities().size(), scan_ptr->getIntensities().size());
   const auto mismatch_pair =

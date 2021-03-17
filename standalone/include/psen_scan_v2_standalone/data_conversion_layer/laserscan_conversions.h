@@ -39,9 +39,7 @@ static LaserScan toLaserScan(const std::vector<data_conversion_layer::monitoring
   assert(!frames.empty());
   const auto resolution = frames[0].resolution();
   assert(std::all_of(
-      frames.begin(), frames.end(), [resolution](const auto& frame) {
-        return frame.resolution() == resolution;
-      }));
+      frames.begin(), frames.end(), [resolution](const auto& frame) { return frame.resolution() == resolution; }));
 
   std::vector<int> sorted_frames_indices(frames.size());
   std::iota(sorted_frames_indices.begin(), sorted_frames_indices.end(), 0);
@@ -50,8 +48,8 @@ static LaserScan toLaserScan(const std::vector<data_conversion_layer::monitoring
   });
 
   const auto min_angle = frames[sorted_frames_indices[0]].fromTheta();
-  const uint16_t number_of_samples = std::accumulate(
-      frames.begin(), frames.end(), uint16_t{0}, [](uint16_t total, const auto& frame) {
+  const uint16_t number_of_samples =
+      std::accumulate(frames.begin(), frames.end(), uint16_t{ 0 }, [](uint16_t total, const auto& frame) {
         return total + frame.measurements().size();
       });
   const auto max_angle = (min_angle + resolution * static_cast<int>(number_of_samples));

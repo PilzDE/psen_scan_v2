@@ -329,7 +329,7 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
   util::Barrier diagnostic_barrier;
 
   // Check that toLaserScan({msg}) == arg
-  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan({msg})))
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan({ msg })))
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
   EXPECT_LOG_SHORT(DEBUG, _).Times(AnyNumber());
