@@ -4,6 +4,8 @@ on: [push, pull_request]
 
 env:
   BUILD_TYPE: "Release"
+  BOOST_ROOT: ${{github.workspace}}/3rdparty/boost
+  BOOST_URL: https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_72_0.tar.bz2/download
 
 jobs:
   build:
@@ -11,6 +13,26 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
+    - name: Restore Boost cache
+      uses: actions/cache@v2
+      id: cache-boost
+      with:
+        path: ${{env.BOOST_ROOT}}
+        key: boost
+
+    - name: Install Boost
+      if: steps.cache-boost.outputs.cache-hit != 'true'
+      run: |
+        # fix up paths to be forward slashes consistently
+        BOOST_ROOT=$(echo $BOOST_ROOT | sed 's/\\/\//g')
+        mkdir -p $BOOST_ROOT
+        curl --progress-bar --location --output $BOOST_ROOT/download.tar.bz2 $BOOST_URL
+        7z -o$BOOST_ROOT x $BOOST_ROOT/download.tar.bz2 -y -bd
+        7z -o$BOOST_ROOT x $BOOST_ROOT/download.tar -y -bd
+        cd $BOOST_ROOT && cp -r boost_*/* .
+        rm -rf boost_*/* download.tar.bz2 download.tar
+      shell: bash
 
     - name: Install deps with vcpkg
       shell: bash
@@ -35,7 +57,6 @@ jobs:
       shell: cmd
       working-directory: ${{runner.workspace}}/psen_scan_v2/standalone
       run: |
-        set     BOOST_ROOT=%BOOST_ROOT_1_72_0%
         cmake -G "Visual Studio 16 2019" -A x64 ^
           -DCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%/scripts/buildsystems/vcpkg.cmake ^
           -S . -B build -DBUILD_TESTING=ON
