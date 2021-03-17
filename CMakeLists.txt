@@ -356,6 +356,12 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES}
     ${pilz_testutils_LIBRARIES}
   )
+  
+  ####################
+  ##  Startup-Test  ##
+  ####################
+  # run the default launch file to prevent segfaults or missing libraries
+  add_rostest(launch/psen_scan_v2.launch)
 
   ######################
   ##  Hardware-Tests  ##
