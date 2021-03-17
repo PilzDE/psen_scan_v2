@@ -62,7 +62,7 @@ An example application, which prints distance data to the screen, is built by de
 ### Build and install dependencies
 #### Visual Studio
 - Get Visual Studio from https://visualstudio.microsoft.com/de/
-- Open `Visual Studio Developer Console`, the version you want
+- Open `Visual Studio Developer Command Prompt`, the version you want
 - Use this Console for the next steps
 
 #### Boost
