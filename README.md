@@ -57,7 +57,7 @@ To start reading data from the safety laser scanner and publishing scans execute
 If you wish to set parameters from the command line, add them to the end of the command as `parameter:=value`, separated by spaces.
 
 ```bash
-roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10 host_ip:=192.168.0.20 host_udp_port_data:=3050
+roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10
 ```
 This example configures the safety laser scanner at 192.168.0.10 to send it´s frames to 192.168.0.20:3050.
 
