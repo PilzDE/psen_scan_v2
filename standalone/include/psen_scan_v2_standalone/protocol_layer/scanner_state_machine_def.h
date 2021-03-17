@@ -175,7 +175,7 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
         PSENSCAN_DEBUG("StateMachine", "No measurement data in this message, skipping laser scan callback.");
         return;
       }
-      args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan(frame));
+      args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan({frame}));
     }
     else
     {
@@ -189,9 +189,8 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
       message_buffer_.push_back(frame);
       if (message_buffer_.size() == DEFAULT_NUM_MSG_PER_ROUND)
       {
-        std::for_each(std::begin(message_buffer_), std::end(message_buffer_), [this](auto value) {
-          args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan(frame));
-        });
+        args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan(message_buffer_));
+        message_buffer_.clear();
       }
       if (message_buffer_.size() > DEFAULT_NUM_MSG_PER_ROUND)
       {
