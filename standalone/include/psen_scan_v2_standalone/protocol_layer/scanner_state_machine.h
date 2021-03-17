@@ -21,6 +21,7 @@
 #include <mutex>
 #include <chrono>
 #include <stdexcept>
+#include <vector>
 
 // back-end
 #include <boost/msm/back/state_machine.hpp>
@@ -242,6 +243,7 @@ private:
 
   std::unique_ptr<util::Watchdog> monitoring_frame_watchdog_{};
   ScanValidator complete_scan_validator_;
+  std::vector<data_conversion_layer::monitoring_frame::Message> message_buffer_{};
 };
 
 // Pick a back-end

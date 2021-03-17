@@ -167,13 +167,38 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
                              util::formatRange(frame.diagnosticMessages()));
     }
 
-    printUserMsgFor(complete_scan_validator_.validate(frame, DEFAULT_NUM_MSG_PER_ROUND));
-    if (frame.measurements().empty())
+    if (args_->config_.fragmentedScansEnabled())
     {
-      PSENSCAN_DEBUG("StateMachine", "No measurement data in this message, skipping laser scan callback.");
-      return;
+      printUserMsgFor(complete_scan_validator_.validate(frame, DEFAULT_NUM_MSG_PER_ROUND));
+      if (frame.measurements().empty())
+      {
+        PSENSCAN_DEBUG("StateMachine", "No measurement data in this message, skipping laser scan callback.");
+        return;
+      }
+      args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan(frame));
     }
-    args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan(frame));
+    else
+    {
+      if (!message_buffer_.empty() and message_buffer_[0].scanCounter() != frame.scanCounter())
+      {
+        PSENSCAN_WARN("StateMachine",
+                  "Detected dropped MonitoringFrame."
+                  " (Please check the ethernet connection or contact PILZ support if the error persists.)");
+        message_buffer_.clear();
+      }
+      message_buffer_.push_back(frame);
+      if (message_buffer_.size() == DEFAULT_NUM_MSG_PER_ROUND)
+      {
+        std::for_each(std::begin(message_buffer_), std::end(message_buffer_), [this](auto value) {
+          args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan(frame));
+        });
+      }
+      if (message_buffer_.size() > DEFAULT_NUM_MSG_PER_ROUND)
+      {
+        PSENSCAN_WARN("StateMachine", "Unexpected: Too many MonitoringFrames for one scan round received.");
+        message_buffer_.clear();
+      }
+    }
   }
   // LCOV_EXCL_START
   catch (const data_conversion_layer::monitoring_frame::ScanCounterMissing& e)
