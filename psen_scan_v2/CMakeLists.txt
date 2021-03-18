@@ -357,12 +357,6 @@ if(CATKIN_ENABLE_TESTING)
     ${pilz_testutils_LIBRARIES}
   )
   
-  ####################
-  ##  Startup-Test  ##
-  ####################
-  # run the default launch file to prevent segfaults or missing libraries
-  add_rostest(test/integration_tests/integrationtest_ros_scanner_launch.test)
-
   ######################
   ##  Hardware-Tests  ##
   ######################
