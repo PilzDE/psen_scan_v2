@@ -78,20 +78,20 @@ int main(int argc, char** argv)
                                                        getOptionalParamFromServer<double>(
                                                            pnh, PARAM_ANGLE_END, configuration::DEFAULT_ANGLE_END)) };
 
-    ScannerConfigurationBuilder config_builder;
-    config_builder
-        .hostIP(getOptionalParamFromServer<std::string>(pnh, PARAM_HOST_IP, configuration::DEFAULT_HOST_IP_STRING))
-        .hostDataPort(
-            getOptionalParamFromServer<int>(pnh, PARAM_HOST_DATA_PORT, configuration::DATA_PORT_OF_HOST_DEVICE))
-        .hostControlPort(
-            getOptionalParamFromServer<int>(pnh, PARAM_HOST_CONTROL_PORT, configuration::CONTROL_PORT_OF_HOST_DEVICE))
-        .scannerIp(getRequiredParamFromServer<std::string>(pnh, PARAM_SCANNER_IP))
-        .scannerDataPort(configuration::DATA_PORT_OF_SCANNER_DEVICE)
-        .scannerControlPort(configuration::CONTROL_PORT_OF_SCANNER_DEVICE)
-        .scanRange(scan_range)
-        .enableDiagnostics();
-
-    ScannerConfiguration scanner_configuration{ config_builder.build() };
+    ScannerConfiguration scanner_configuration{
+      ScannerConfigurationBuilder()
+          .hostIP(getOptionalParamFromServer<std::string>(pnh, PARAM_HOST_IP, configuration::DEFAULT_HOST_IP_STRING))
+          .hostDataPort(
+              getOptionalParamFromServer<int>(pnh, PARAM_HOST_DATA_PORT, configuration::DATA_PORT_OF_HOST_DEVICE))
+          .hostControlPort(
+              getOptionalParamFromServer<int>(pnh, PARAM_HOST_CONTROL_PORT, configuration::CONTROL_PORT_OF_HOST_DEVICE))
+          .scannerIp(getRequiredParamFromServer<std::string>(pnh, PARAM_SCANNER_IP))
+          .scannerDataPort(configuration::DATA_PORT_OF_SCANNER_DEVICE)
+          .scannerControlPort(configuration::CONTROL_PORT_OF_SCANNER_DEVICE)
+          .scanRange(scan_range)
+          .enableDiagnostics()
+          .build()
+    };
 
     ROSScannerNode ros_scanner_node(pnh,
                                     DEFAULT_PUBLISH_TOPIC,
