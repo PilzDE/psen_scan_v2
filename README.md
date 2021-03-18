@@ -1,4 +1,4 @@
-[![PILZ](img/pilz-logo.png)](https://www.pilz.com)
+[![PILZ](psen_scan_v2/img/pilz-logo.png)](https://www.pilz.com)
 
 # PILZ safety laser scanner PSENscan
 
@@ -7,7 +7,7 @@
 The **psen_scan_v2** package is a ROS integration driver for the PSENscan safety laser scanner product. It lets you integrate the laser scanner data into your ROS Environment easily. Using the standard [sensor_msgs/LaserScan][] message format ensures compatibility with other laserscan-post-processing nodes such as [gmapping][]. For a general overview, link collection and tutorials we refer to the [ROS wiki page](http://wiki.ros.org/psen_scan_v2).
 
 <p align="center">
-<img src="img/PSENscan.jpg" alt="PILZ safety laser scanner" title="PILZ safety laser scanner">
+<img src="psen_scan_v2/img/PSENscan.jpg" alt="PILZ safety laser scanner" title="PILZ safety laser scanner">
 </p>
 
 PSENscan firmware >= 3.1.0 is supported on the following models:
@@ -23,7 +23,7 @@ PSENscan firmware >= 3.1.0 is supported on the following models:
 | PSEN sc M 5.5 08-12	5.5 m | safety zone, 8 or 12-pin exchangeable memory module	| 6D000017 |
 
 ## C++ standalone library
-If you are interested in using the PSENscan safety laser scanner without ROS, please take a look at our C++ standalone library. You can read more about it [in the `standalone` folder](https://github.com/PilzDE/psen_scan_v2/blob/main/standalone/README.md)
+If you are interested in using the PSENscan safety laser scanner without ROS, please take a look at our C++ standalone library. You can read more about it [in the `standalone` folder](psen_scan_v2/standalone/README.md)
 
 ## Table of Contents
 
@@ -100,7 +100,7 @@ The location of the TF frames is shown in the image below.
 These names are defined by the aforementioned launchfile parameter `prefix`.
 Changing them is necessary for instance when running multiple scanners.
 <p align="center">
-<img src="img/frames.png" width="800px" alt="PILZ safety laser scanner frames" title="frames">
+<img src="psen_scan_v2/img/frames.png" width="800px" alt="PILZ safety laser scanner frames" title="frames">
 </p>
 
 ### Defining the scan range
@@ -109,7 +109,7 @@ The published ([sensor_msgs/LaserScan][]) will only contain data within the give
 Both limits are defined within the _laser_1_scan_ frame as shown in the image below.
 
 <p align="center">
-<img src="img/angle_limits.png" width="800px" alt="Limit visualization" title="Limit visualization">
+<img src="psen_scan_v2/img/angle_limits.png" width="800px" alt="Limit visualization" title="Limit visualization">
 </p>
 
 ## Developer Information
@@ -125,7 +125,7 @@ Both limits are defined within the _laser_1_scan_ frame as shown in the image be
 `main` is considered to be the active development branch, it targets the ROS distributions `melodic` and `noetic`.
 
 ### Test concept
-![psen_scan_test_concept](doc/test_architecture.svg)
+![psen_scan_test_concept](psen_scan_v2/doc/test_architecture.svg)
 
 ## Migration
 To update your ROS environment from the former `psen_scan` package (which supported firmware versions up to 3.0), please execute the following steps:
