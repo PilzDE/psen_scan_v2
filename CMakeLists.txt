@@ -28,6 +28,14 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
 )
 
+## System dependencies are found with CMake's conventions
+find_package(Boost 1.69) ## Boost::system is header-only since 1.69
+if(NOT Boost_FOUND)
+  find_package(Boost REQUIRED COMPONENTS system)
+endif()
+find_package(console_bridge REQUIRED)
+find_package(fmt REQUIRED)
+
 catkin_package(
   CATKIN_DEPENDS
     roscpp
@@ -101,7 +109,7 @@ set(${PROJECT_NAME}_standalone_sources
 )
 
 add_library(
-  ${PROJECT_NAME}_standalone 
+  ${PROJECT_NAME}_standalone
   ${${PROJECT_NAME}_standalone_sources}
 )
 
