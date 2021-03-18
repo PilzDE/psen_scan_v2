@@ -31,6 +31,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## System dependencies are found with CMake's conventions
 find_package(Boost 1.69) ## Boost::system is header-only since 1.69
 if(NOT Boost_FOUND)
+  #catkin_lint: ignore_once shadowed_find
   find_package(Boost REQUIRED COMPONENTS system)
 endif()
 find_package(console_bridge REQUIRED)
