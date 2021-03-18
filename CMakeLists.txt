@@ -100,7 +100,10 @@ set(${PROJECT_NAME}_standalone_sources
   standalone/src/data_conversion_layer/scanner_reply_serialization_deserialization.cpp
 )
 
-add_library(${PROJECT_NAME}_standalone ${${PROJECT_NAME}_standalone_sources})
+add_library(
+  ${PROJECT_NAME}_standalone 
+  ${${PROJECT_NAME}_standalone_sources}
+)
 
 target_link_libraries(${PROJECT_NAME}_standalone
   ${Boost_LIBRARIES}
