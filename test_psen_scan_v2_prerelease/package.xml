@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>test_psen_scan_v2_prerelease</name>
+  <version>0.0.0</version>
+  <description>Checks before release of the psen_scan_v2 package</description>
+
+  <maintainer email="a.gutenkunst@pilz.de">Alexander Gutenkunst</maintainer>
+  <maintainer email="c.doehn@pilz.de">Christian Döhn</maintainer>
+  <maintainer email="c.henkel@pilz.de">Christian Henkel</maintainer>
+  <maintainer email="i.martini@pilz.de">Immanuel Martini</maintainer>
+  <maintainer email="r.feistenauer@pilz.de">Richard Feistenauer</maintainer>
+
+  <license>LGPLv3</license>
+
+
+  <!-- Url tags are optional, but multiple are allowed, one per tag -->
+  <!-- Optional attribute type can be: website, bugtracker, or repository -->
+  <!-- Example: -->
+  <!-- <url type="website">http://wiki.ros.org/psen_scan_v2_prerelease_tests</url> -->
+
+
+
+  <exec_depend>psen_scan_v2</exec_depend>
+  <test_depend>rostest</test_depend>
+  <buildtool_depend>catkin</buildtool_depend>
+
+</package>
