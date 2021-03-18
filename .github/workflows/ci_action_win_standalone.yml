@@ -55,7 +55,7 @@ jobs:
 
     - name: Configure and build CMake
       shell: cmd
-      working-directory: ${{runner.workspace}}/psen_scan_v2/standalone
+      working-directory: ${{runner.workspace}}/psen_scan_v2/psen_scan_v2/standalone
       run: |
         cmake -G "Visual Studio 16 2019" -A x64 ^
           -DCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%/scripts/buildsystems/vcpkg.cmake ^
@@ -63,7 +63,7 @@ jobs:
         cmake --build build --config %BUILD_TYPE% --target ALL_BUILD
 
     - name: Test
-      working-directory: ${{runner.workspace}}/psen_scan_v2/standalone
+      working-directory: ${{runner.workspace}}/psen_scan_v2/psen_scan_v2/standalone
       shell: bash
       run: cmake --build build --config $BUILD_TYPE --target RUN_TESTS
 
