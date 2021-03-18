@@ -47,6 +47,7 @@ namespace psen_scan_v2_standalone_test
 {
 using namespace psen_scan_v2_standalone;
 
+static const bool FRAGMENTED_SCAN{ true };
 static const std::string HOST_IP_ADDRESS{ "127.0.0.1" };
 static const std::string SCANNER_IP_ADDRESS{ "127.0.0.1" };
 
@@ -66,8 +67,8 @@ class ScannerAPITests : public testing::Test
 {
 protected:
   void SetUp() override;
-  void setUpScannerConfig(const std::string& host_ip = HOST_IP_ADDRESS);
-  ScannerConfiguration generateScannerConfig(const std::string& host_ip);
+  void setUpScannerConfig(const std::string& host_ip = HOST_IP_ADDRESS, bool fragmented = FRAGMENTED_SCAN);
+  ScannerConfiguration generateScannerConfig(const std::string& host_ip, bool fragmented);
   void setUpScannerV2();
   void setUpNiceScannerMock();
   void setUpStrictScannerMock();
@@ -88,23 +89,26 @@ void ScannerAPITests::SetUp()
   setLogLevel(CONSOLE_BRIDGE_LOG_DEBUG);
 }
 
-void ScannerAPITests::setUpScannerConfig(const std::string& host_ip)
+void ScannerAPITests::setUpScannerConfig(const std::string& host_ip, bool fragmented)
 {
-  config_.reset(new ScannerConfiguration(generateScannerConfig(host_ip)));
+  config_.reset(new ScannerConfiguration(generateScannerConfig(host_ip, fragmented)));
 }
 
-ScannerConfiguration ScannerAPITests::generateScannerConfig(const std::string& host_ip)
+ScannerConfiguration ScannerAPITests::generateScannerConfig(const std::string& host_ip, bool fragmented)
 {
-  return ScannerConfigurationBuilder()
-      .hostIP(host_ip)
-      .hostDataPort(port_holder_.data_port_host)
-      .hostControlPort(port_holder_.control_port_host)
-      .scannerIp(SCANNER_IP_ADDRESS)
-      .scannerDataPort(port_holder_.data_port_scanner)
-      .scannerControlPort(port_holder_.control_port_scanner)
-      .scanRange(DEFAULT_SCAN_RANGE)
-      .enableFragmentedScans()
-      .build();
+  auto config_builder = ScannerConfigurationBuilder()
+                            .hostIP(host_ip)
+                            .hostDataPort(port_holder_.data_port_host)
+                            .hostControlPort(port_holder_.control_port_host)
+                            .scannerIp(SCANNER_IP_ADDRESS)
+                            .scannerDataPort(port_holder_.data_port_scanner)
+                            .scannerControlPort(port_holder_.control_port_scanner)
+                            .scanRange(DEFAULT_SCAN_RANGE);
+  if (fragmented)
+  {
+    config_builder.enableFragmentedScans();
+  }
+  return config_builder.build();
 }
 
 void ScannerAPITests::setUpScannerV2()
@@ -169,7 +173,8 @@ TEST_F(ScannerAPITests, shouldReceiveStartRequestWithCorrectHostIpWhenUsingAutoI
   setUpScannerConfig("auto");
   setUpScannerV2();
   setUpNiceScannerMock();
-  const data_conversion_layer::start_request::Message start_req(generateScannerConfig(HOST_IP_ADDRESS));
+  const data_conversion_layer::start_request::Message start_req(
+      generateScannerConfig(HOST_IP_ADDRESS, FRAGMENTED_SCAN));
 
   util::Barrier start_req_received_barrier;
   EXPECT_CALL(*nice_scanner_mock_, receiveControlMsg(_, data_conversion_layer::start_request::serialize(start_req)))
