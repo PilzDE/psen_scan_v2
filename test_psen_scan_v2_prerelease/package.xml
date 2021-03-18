@@ -21,6 +21,7 @@
 
 
   <exec_depend>psen_scan_v2</exec_depend>
+  <test_depend>psen_scan_v2</test_depend>
   <test_depend>rostest</test_depend>
   <buildtool_depend>catkin</buildtool_depend>
 

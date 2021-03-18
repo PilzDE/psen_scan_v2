@@ -17,7 +17,6 @@ catkin_package(
 #############
 if(CATKIN_ENABLE_TESTING)
   find_package(rostest REQUIRED)
-  find_package(roslaunch REQUIRED)
   find_package(psen_scan_v2 REQUIRED)
 
   ####################
