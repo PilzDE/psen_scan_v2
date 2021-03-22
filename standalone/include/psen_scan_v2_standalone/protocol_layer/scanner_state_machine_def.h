@@ -188,7 +188,7 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
     }
     else
     {
-      if (!message_buffer_.empty() and message_buffer_[0].scanCounter() != frame.scanCounter())
+      if (!message_buffer_.empty() && message_buffer_[0].scanCounter() != frame.scanCounter())
       {
         PSENSCAN_WARN("StateMachine",
                       "Detected dropped MonitoringFrame."

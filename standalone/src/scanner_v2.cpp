@@ -52,7 +52,7 @@ std::unique_ptr<util::Watchdog> ScannerV2::WatchdogFactory::create(const util::W
   }
 
   // LCOV_EXCL_START
-  throw std::runtime_error("WatchdogFactory called with event for which no creation process existiert.");
+  throw std::runtime_error("WatchdogFactory called with event for which no creation process exists.");
   // LCOV_EXCL_STOP
 }
 
