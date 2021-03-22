@@ -2,8 +2,8 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.6 (2021-03-22)
+------------------
 * Separate ROS and standalone CMakeLists: Closes #169
 * Minor restructuring. Closes #175
 * Contributors: Pilz GmbH and Co. KG
