@@ -192,11 +192,6 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
         args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan(message_buffer_));
         message_buffer_.clear();
       }
-      if (message_buffer_.size() > DEFAULT_NUM_MSG_PER_ROUND)
-      {
-        PSENSCAN_WARN("StateMachine", "Unexpected: Too many MonitoringFrames for one scan round received.");
-        message_buffer_.clear();
-      }
     }
   }
   // LCOV_EXCL_START

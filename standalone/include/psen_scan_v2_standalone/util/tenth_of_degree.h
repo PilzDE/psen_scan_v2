@@ -71,6 +71,11 @@ public:
     return *this;
   }
 
+  constexpr TenthOfDegree operator/(const int& rhs) const
+  {
+    return TenthOfDegree(value() / rhs);
+  }
+
   constexpr TenthOfDegree& operator/(const int& rhs)
   {
     tenth_of_degree_ = value() / rhs;

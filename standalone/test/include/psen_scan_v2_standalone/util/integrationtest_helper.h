@@ -96,6 +96,21 @@ createValidMonitoringFrameMsgs(const uint32_t scan_counter, const std::size_t nu
   return msgs;
 }
 
+static std::vector<data_conversion_layer::monitoring_frame::Message>
+createMonitoringFrameMsgsForScanRound(const uint32_t scan_counter, const std::size_t num_elements)
+{
+  std::vector<data_conversion_layer::monitoring_frame::Message> msgs(num_elements);
+  for (std::size_t i=0; i < msgs.size(); ++i)
+  {
+    const util::TenthOfDegree start_angle =
+        (DEFAULT_SCAN_RANGE.getEnd() / static_cast<int>(num_elements)) * static_cast<int>(i);
+    const util::TenthOfDegree end_angle =
+        (DEFAULT_SCAN_RANGE.getEnd() / static_cast<int>(num_elements)) * static_cast<int>(i + 1);
+    msgs[i] = createValidMonitoringFrameMsg(scan_counter, start_angle, end_angle);
+  }
+  return msgs;
+}
+
 ACTION_P(OpenBarrier, barrier)
 {
   barrier->release();

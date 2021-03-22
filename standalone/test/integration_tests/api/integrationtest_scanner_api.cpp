@@ -48,6 +48,7 @@ namespace psen_scan_v2_standalone_test
 using namespace psen_scan_v2_standalone;
 
 static const bool FRAGMENTED_SCAN{ true };
+static const bool UNFRAGMENTED_SCAN{ false };
 static const std::string HOST_IP_ADDRESS{ "127.0.0.1" };
 static const std::string SCANNER_IP_ADDRESS{ "127.0.0.1" };
 
@@ -355,6 +356,38 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
 
   EXPECT_TRUE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
   EXPECT_TRUE(diagnostic_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Diagnostic message not received";
+  REMOVE_LOG_MOCK
+}
+
+TEST_F(ScannerAPITests, ShouldCallLaserScanCBOnlyOneTimeWithAllInformationWhenUnfragmentedScanIsEnabled)
+{
+  INJECT_LOG_MOCK
+  setUpScannerConfig(HOST_IP_ADDRESS, UNFRAGMENTED_SCAN);
+  setUpScannerV2();
+  setUpNiceScannerMock();
+  prepareScannerMockStartReply();
+
+  std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> msgs =
+      createMonitoringFrameMsgsForScanRound(2, 6);
+
+  util::Barrier monitoring_frame_barrier;
+
+  // Check that toLaserScan({msg}) == arg
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan( msgs )))
+      .Times(1).WillOnce(OpenBarrier(&monitoring_frame_barrier));
+
+  EXPECT_ANY_LOG().Times(AnyNumber());
+
+  nice_scanner_mock_->startListeningForControlMsg();
+  auto promis = scanner_->start();
+  promis.wait_for(DEFAULT_TIMEOUT);
+
+  for (auto msg: msgs)
+  {
+    nice_scanner_mock_->sendMonitoringFrame(msg);
+  }
+
+  EXPECT_TRUE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
   REMOVE_LOG_MOCK
 }
 
