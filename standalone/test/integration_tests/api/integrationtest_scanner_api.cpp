@@ -359,7 +359,7 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
   REMOVE_LOG_MOCK
 }
 
-TEST_F(ScannerAPITests, ShouldCallLaserScanCBOnlyOneTimeWithAllInformationWhenUnfragmentedScanIsEnabled)
+TEST_F(ScannerAPITests, shouldCallLaserScanCBOnlyOneTimeWithAllInformationWhenUnfragmentedScanIsEnabled)
 {
   INJECT_LOG_MOCK
   setUpScannerConfig(HOST_IP_ADDRESS, UNFRAGMENTED_SCAN);
@@ -392,7 +392,7 @@ TEST_F(ScannerAPITests, ShouldCallLaserScanCBOnlyOneTimeWithAllInformationWhenUn
   REMOVE_LOG_MOCK
 }
 
-TEST_F(ScannerAPITests, ShouldShowUserMsgIfNewScanRoundStartsBeforeOldOneFinished)
+TEST_F(ScannerAPITests, shouldShowUserMsgIfNewScanRoundStartsBeforeOldOneFinished)
 {
   INJECT_LOG_MOCK
   setUpScannerConfig(HOST_IP_ADDRESS, UNFRAGMENTED_SCAN);
@@ -416,7 +416,7 @@ TEST_F(ScannerAPITests, ShouldShowUserMsgIfNewScanRoundStartsBeforeOldOneFinishe
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(WARN,
-                   "StateMachine: Detected dropped MonitoringFrame."
+                   "StateMachine: Detected a MonitoringFrame from a new scan round. The current scan round is dropped."
                    " (Please check the ethernet connection or contact PILZ support if the error persists.)")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));

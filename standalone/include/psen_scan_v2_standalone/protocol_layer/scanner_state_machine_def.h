@@ -188,12 +188,22 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
     }
     else
     {
-      if (!message_buffer_.empty() && message_buffer_[0].scanCounter() != frame.scanCounter())
+      if (!message_buffer_.empty())
       {
-        PSENSCAN_WARN("StateMachine",
-                      "Detected dropped MonitoringFrame."
-                      " (Please check the ethernet connection or contact PILZ support if the error persists.)");
-        message_buffer_.clear();
+        if (message_buffer_[0].scanCounter() < frame.scanCounter())
+        {
+          PSENSCAN_WARN("StateMachine",
+                        "Detected a MonitoringFrame from a new scan round. The current scan round is dropped."
+                        " (Please check the ethernet connection or contact PILZ support if the error persists.)");
+          message_buffer_.clear();
+        }
+        else if (message_buffer_[0].scanCounter() > frame.scanCounter())
+        {
+          PSENSCAN_DEBUG(
+              "StateMachine",
+              "Detected a MonitoringFrame with a ScanCounter from an earlier round. This MonitoringFrame is ignored.");
+          return;
+        }
       }
       message_buffer_.push_back(frame);
       if (message_buffer_.size() == DEFAULT_NUM_MSG_PER_ROUND)
