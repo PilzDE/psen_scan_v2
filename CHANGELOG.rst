@@ -2,6 +2,12 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Separate ROS and standalone CMakeLists: Closes #169
+* Minor restructuring. Closes #175
+* Contributors: Pilz GmbH and Co. KG
+
 0.1.5 (2021-03-10)
 ------------------
 * Make specifying host ip optional
