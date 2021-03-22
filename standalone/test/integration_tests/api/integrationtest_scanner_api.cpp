@@ -383,7 +383,7 @@ TEST_F(ScannerAPITests, ShouldCallLaserScanCBOnlyOneTimeWithAllInformationWhenUn
   auto promis = scanner_->start();
   promis.wait_for(DEFAULT_TIMEOUT);
 
-  for (auto msg : msgs)
+  for (const auto& msg : msgs)
   {
     nice_scanner_mock_->sendMonitoringFrame(msg);
   }
@@ -425,12 +425,12 @@ TEST_F(ScannerAPITests, ShouldShowUserMsgIfNewScanRoundStartsBeforeOldOneFinishe
   auto promis = scanner_->start();
   promis.wait_for(DEFAULT_TIMEOUT);
 
-  for (auto msg : msgs1)
+  for (const auto& msg : msgs1)
   {
     nice_scanner_mock_->sendMonitoringFrame(msg);
   }
 
-  for (auto msg : msgs2)
+  for (const auto& msg : msgs2)
   {
     nice_scanner_mock_->sendMonitoringFrame(msg);
   }
