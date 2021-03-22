@@ -391,6 +391,53 @@ TEST_F(ScannerAPITests, ShouldCallLaserScanCBOnlyOneTimeWithAllInformationWhenUn
   REMOVE_LOG_MOCK
 }
 
+TEST_F(ScannerAPITests, ShouldShowUserMsgIfNewScanRoundStartsBeforeOldOneFinished)
+{
+  INJECT_LOG_MOCK
+  setUpScannerConfig(HOST_IP_ADDRESS, UNFRAGMENTED_SCAN);
+  setUpScannerV2();
+  setUpNiceScannerMock();
+  prepareScannerMockStartReply();
+
+  std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> msgs1 =
+      createMonitoringFrameMsgsForScanRound(2, 5);
+  std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> msgs2 =
+      createMonitoringFrameMsgsForScanRound(3, 6);
+
+  util::Barrier monitoring_frame_barrier;
+
+  // Check that toLaserScan({msg}) == arg
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan( msgs2 )))
+      .Times(1).WillOnce(OpenBarrier(&monitoring_frame_barrier));
+
+  util::Barrier user_msg_barrier;
+  // Needed to allow all other log messages which might be received
+  EXPECT_ANY_LOG().Times(AnyNumber());
+  EXPECT_LOG_SHORT(WARN,
+                   "StateMachine: Detected dropped MonitoringFrame."
+                   " (Please check the ethernet connection or contact PILZ support if the error persists.)")
+      .Times(1)
+      .WillOnce(OpenBarrier(&user_msg_barrier));
+
+  nice_scanner_mock_->startListeningForControlMsg();
+  auto promis = scanner_->start();
+  promis.wait_for(DEFAULT_TIMEOUT);
+
+  for (auto msg: msgs1)
+  {
+    nice_scanner_mock_->sendMonitoringFrame(msg);
+  }
+
+  for (auto msg: msgs2)
+  {
+    nice_scanner_mock_->sendMonitoringFrame(msg);
+  }
+
+  EXPECT_TRUE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
+  EXPECT_TRUE(user_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Dropped Monitoring frame not recognized";
+  REMOVE_LOG_MOCK
+}
+
 TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFrame)
 {
   INJECT_NICE_LOG_MOCK;
