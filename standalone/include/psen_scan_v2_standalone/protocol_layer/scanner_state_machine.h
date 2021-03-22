@@ -235,6 +235,7 @@ private:
 
   using ScanValidatorResult = ScanValidator::OptionalResult;
   void printUserMsgFor(const ScanValidatorResult& validation_result);
+  bool framesContainMeasurements(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames);
 
 private:
   const std::unique_ptr<StateMachineArgs> args_;

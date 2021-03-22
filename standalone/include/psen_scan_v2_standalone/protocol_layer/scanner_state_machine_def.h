@@ -150,6 +150,17 @@ inline void ScannerProtocolDef::printUserMsgFor(const ScanValidatorResult& res)
   PSENSCAN_WARN("StateMachine", "Unexpected: Too many MonitoringFrames for one scan round received.");
 }
 
+inline bool ScannerProtocolDef::framesContainMeasurements(
+    const std::vector<data_conversion_layer::monitoring_frame::Message>& frames)
+{
+  if (std::any_of(frames.begin(), frames.end(), [](const auto& frame) { return frame.measurements().empty(); }))
+  {
+    PSENSCAN_DEBUG("StateMachine", "No measurement data in this message, skipping laser scan callback.");
+    return false;
+  }
+  return true;
+}
+
 inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawMonitoringFrameReceived& event)
 {
   PSENSCAN_DEBUG("StateMachine", "Action: handleMonitoringFrame");
@@ -170,12 +181,10 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
     if (args_->config_.fragmentedScansEnabled())
     {
       printUserMsgFor(complete_scan_validator_.validate(frame, DEFAULT_NUM_MSG_PER_ROUND));
-      if (frame.measurements().empty())
+      if (framesContainMeasurements({ frame }))
       {
-        PSENSCAN_DEBUG("StateMachine", "No measurement data in this message, skipping laser scan callback.");
-        return;
+        args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan({ frame }));
       }
-      args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan({ frame }));
     }
     else
     {
@@ -189,7 +198,10 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
       message_buffer_.push_back(frame);
       if (message_buffer_.size() == DEFAULT_NUM_MSG_PER_ROUND)
       {
-        args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan(message_buffer_));
+        if (framesContainMeasurements(message_buffer_))
+        {
+          args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan(message_buffer_));
+        }
         message_buffer_.clear();
       }
     }
