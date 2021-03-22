@@ -436,6 +436,49 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfNewScanRoundStartsBeforeOldOneFinishe
   }
 
   EXPECT_TRUE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
+  EXPECT_TRUE(user_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame of new scan round not recognized";
+  REMOVE_LOG_MOCK
+}
+
+TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
+{
+  INJECT_LOG_MOCK
+  setUpScannerConfig(HOST_IP_ADDRESS, UNFRAGMENTED_SCAN);
+  setUpScannerV2();
+  setUpNiceScannerMock();
+  prepareScannerMockStartReply();
+
+  auto msg_round2 = createValidMonitoringFrameMsg(2);
+  auto msgs_round3 = createMonitoringFrameMsgsForScanRound(3, 6);
+
+  util::Barrier monitoring_frame_barrier;
+
+  // Check that toLaserScan({msg}) == arg
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan(msgs_round3)))
+      .Times(1)
+      .WillOnce(OpenBarrier(&monitoring_frame_barrier));
+
+  util::Barrier user_msg_barrier;
+  // Needed to allow all other log messages which might be received
+  EXPECT_ANY_LOG().Times(AnyNumber());
+  EXPECT_LOG_SHORT(DEBUG,
+                   "StateMachine: Detected a MonitoringFrame with a ScanCounter from an earlier round. This "
+                   "MonitoringFrame is ignored.")
+      .Times(1)
+      .WillOnce(OpenBarrier(&user_msg_barrier));
+
+  nice_scanner_mock_->startListeningForControlMsg();
+  auto promis = scanner_->start();
+  promis.wait_for(DEFAULT_TIMEOUT);
+
+  for (auto it = msgs_round3.begin(); it < std::prev(msgs_round3.end()); ++it)
+  {
+    nice_scanner_mock_->sendMonitoringFrame(*it);
+  }
+  nice_scanner_mock_->sendMonitoringFrame(msg_round2);
+  nice_scanner_mock_->sendMonitoringFrame(msgs_round3.back());
+
+  EXPECT_TRUE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
   EXPECT_TRUE(user_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Dropped Monitoring frame not recognized";
   REMOVE_LOG_MOCK
 }
