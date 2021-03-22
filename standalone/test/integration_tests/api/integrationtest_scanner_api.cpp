@@ -373,8 +373,9 @@ TEST_F(ScannerAPITests, ShouldCallLaserScanCBOnlyOneTimeWithAllInformationWhenUn
   util::Barrier monitoring_frame_barrier;
 
   // Check that toLaserScan({msg}) == arg
-  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan( msgs )))
-      .Times(1).WillOnce(OpenBarrier(&monitoring_frame_barrier));
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan(msgs)))
+      .Times(1)
+      .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
   EXPECT_ANY_LOG().Times(AnyNumber());
 
@@ -382,7 +383,7 @@ TEST_F(ScannerAPITests, ShouldCallLaserScanCBOnlyOneTimeWithAllInformationWhenUn
   auto promis = scanner_->start();
   promis.wait_for(DEFAULT_TIMEOUT);
 
-  for (auto msg: msgs)
+  for (auto msg : msgs)
   {
     nice_scanner_mock_->sendMonitoringFrame(msg);
   }
@@ -407,8 +408,9 @@ TEST_F(ScannerAPITests, ShouldShowUserMsgIfNewScanRoundStartsBeforeOldOneFinishe
   util::Barrier monitoring_frame_barrier;
 
   // Check that toLaserScan({msg}) == arg
-  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan( msgs2 )))
-      .Times(1).WillOnce(OpenBarrier(&monitoring_frame_barrier));
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan(msgs2)))
+      .Times(1)
+      .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
   util::Barrier user_msg_barrier;
   // Needed to allow all other log messages which might be received
@@ -423,12 +425,12 @@ TEST_F(ScannerAPITests, ShouldShowUserMsgIfNewScanRoundStartsBeforeOldOneFinishe
   auto promis = scanner_->start();
   promis.wait_for(DEFAULT_TIMEOUT);
 
-  for (auto msg: msgs1)
+  for (auto msg : msgs1)
   {
     nice_scanner_mock_->sendMonitoringFrame(msg);
   }
 
-  for (auto msg: msgs2)
+  for (auto msg : msgs2)
   {
     nice_scanner_mock_->sendMonitoringFrame(msg);
   }
