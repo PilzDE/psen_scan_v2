@@ -53,14 +53,14 @@ public:
    * @param msg Current received MonitoringFrames.
    * @return See Result type.
    */
-  ScanRound::Result add_valid(const data_conversion_layer::monitoring_frame::Message& msg);
+  ScanRound::Result addValid(const data_conversion_layer::monitoring_frame::Message& msg);
 
   /**
    * @brief Readies the validator for a new validation round. This function has to be called whenever
    * there is an expected brake in the receiving of MonitoringFrames.
    */
   void reset();
-  std::vector<data_conversion_layer::monitoring_frame::Message> get_msgs();
+  std::vector<data_conversion_layer::monitoring_frame::Message> getMsgs();
 
 private:
   ScanRound::Result validate();
@@ -79,12 +79,12 @@ inline void ScanRound::reset()
   curr_scan_round_.clear();
 }
 
-inline std::vector<data_conversion_layer::monitoring_frame::Message> ScanRound::get_msgs()
+inline std::vector<data_conversion_layer::monitoring_frame::Message> ScanRound::getMsgs()
 {
   return curr_scan_round_;
 }
 
-inline ScanRound::Result ScanRound::add_valid(const data_conversion_layer::monitoring_frame::Message& msg)
+inline ScanRound::Result ScanRound::addValid(const data_conversion_layer::monitoring_frame::Message& msg)
 {
   if (curr_scan_round_.empty() || msg.scanCounter() == curr_scan_round_[0].scanCounter())
   {

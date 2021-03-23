@@ -18,7 +18,7 @@ namespace psen_scan_v2_standalone
 namespace protocol_layer
 {
 inline ScannerProtocolDef::ScannerProtocolDef(StateMachineArgs* const args)
-  : args_(args), complete_scan_validator_(DEFAULT_NUM_MSG_PER_ROUND)
+  : args_(args), scan_round_(DEFAULT_NUM_MSG_PER_ROUND)
 {
 }
 
@@ -76,7 +76,7 @@ template <class Event, class FSM>
 void ScannerProtocolDef::WaitForMonitoringFrame::on_entry(Event const&, FSM& fsm)
 {
   PSENSCAN_DEBUG("StateMachine", fmt::format("Entering state: {}", "WaitForMonitoringFrame"));
-  fsm.complete_scan_validator_.reset();
+  fsm.scan_round_.reset();
   // Start watchdog...
   fsm.monitoring_frame_watchdog_ = fsm.args_->watchdog_factory_->create(WATCHDOG_TIMEOUT, "MonitoringFrameTimeout");
   fsm.args_->scanner_started_cb();
@@ -193,7 +193,7 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
                              util::formatRange(frame.diagnosticMessages()));
     }
 
-    const ScanRound::Result& round_status = complete_scan_validator_.add_valid(frame);
+    const ScanRound::Result& round_status = scan_round_.addValid(frame);
     printUserMsgFor(round_status);
     if (args_->config_.fragmentedScansEnabled() && framesContainMeasurements({ frame }))
     {
@@ -201,7 +201,7 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
     }
     else if (round_status == ScanRound::Result::is_complete)
     {
-      const auto scan_round = complete_scan_validator_.get_msgs();
+      const auto scan_round = scan_round_.getMsgs();
       if (framesContainMeasurements(scan_round))
       {
         args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan(scan_round));
