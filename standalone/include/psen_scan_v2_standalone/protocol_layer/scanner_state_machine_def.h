@@ -17,7 +17,8 @@ namespace psen_scan_v2_standalone
 {
 namespace protocol_layer
 {
-inline ScannerProtocolDef::ScannerProtocolDef(StateMachineArgs* const args) : args_(args)
+inline ScannerProtocolDef::ScannerProtocolDef(StateMachineArgs* const args)
+  : args_(args), complete_scan_validator_(DEFAULT_NUM_MSG_PER_ROUND)
 {
 }
 
@@ -131,23 +132,37 @@ inline void ScannerProtocolDef::sendStopRequest(const T& event)
   args_->control_client_->write(data_conversion_layer::stop_request::serialize());
 }
 
-inline void ScannerProtocolDef::printUserMsgFor(const ScanValidatorResult& res)
+inline void ScannerProtocolDef::printUserMsgFor(const ScanRound::Result& res)
 {
-  using Result = ScanValidator::Result;
-  if (!res || res.value() == Result::valid)
+  if (res == ScanRound::Result::ended_undersaturated)
   {
-    return;
+    if (args_->config_.fragmentedScansEnabled())
+    {
+      PSENSCAN_WARN("StateMachine",
+                    "Detected dropped MonitoringFrame."
+                    " (Please check the ethernet connection or contact PILZ support if the error persists.)");
+    }
+    else
+    {
+      PSENSCAN_WARN("StateMachine",
+                    "Detected a MonitoringFrame from a new scan round before the old one was complete."
+                    " The current scan round is dropped."
+                    " (Please check the ethernet connection or contact PILZ support if the error persists.)");
+    }
   }
-
-  if (res.value() == Result::undersaturated)
+  else if (res == ScanRound::Result::msg_was_to_old)
   {
-    PSENSCAN_WARN("StateMachine",
-                  "Detected dropped MonitoringFrame."
-                  " (Please check the ethernet connection or contact PILZ support if the error persists.)");
-    return;
+    if (!args_->config_.fragmentedScansEnabled())
+    {
+      PSENSCAN_DEBUG(
+          "StateMachine",
+          "Detected a MonitoringFrame with a ScanCounter from an earlier round. This MonitoringFrame is ignored.");
+    }
   }
-
-  PSENSCAN_WARN("StateMachine", "Unexpected: Too many MonitoringFrames for one scan round received.");
+  else if (res == ScanRound::Result::is_oversaturated)
+  {
+    PSENSCAN_WARN("StateMachine", "Unexpected: Too many MonitoringFrames for one scan round received.");
+  }
 }
 
 inline bool ScannerProtocolDef::framesContainMeasurements(
@@ -178,41 +193,18 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
                              util::formatRange(frame.diagnosticMessages()));
     }
 
-    if (args_->config_.fragmentedScansEnabled())
+    const ScanRound::Result& round_status = complete_scan_validator_.add_valid(frame);
+    printUserMsgFor(round_status);
+    if (args_->config_.fragmentedScansEnabled() && framesContainMeasurements({ frame }))
     {
-      printUserMsgFor(complete_scan_validator_.validate(frame, DEFAULT_NUM_MSG_PER_ROUND));
-      if (framesContainMeasurements({ frame }))
-      {
-        args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan({ frame }));
-      }
+      args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan({ frame }));
     }
-    else
+    else if (round_status == ScanRound::Result::is_complete)
     {
-      if (!message_buffer_.empty())
+      const auto scan_round = complete_scan_validator_.get_msgs();
+      if (framesContainMeasurements(scan_round))
       {
-        if (message_buffer_[0].scanCounter() < frame.scanCounter())
-        {
-          PSENSCAN_WARN("StateMachine",
-                        "Detected a MonitoringFrame from a new scan round. The current scan round is dropped."
-                        " (Please check the ethernet connection or contact PILZ support if the error persists.)");
-          message_buffer_.clear();
-        }
-        else if (message_buffer_[0].scanCounter() > frame.scanCounter())
-        {
-          PSENSCAN_DEBUG(
-              "StateMachine",
-              "Detected a MonitoringFrame with a ScanCounter from an earlier round. This MonitoringFrame is ignored.");
-          return;
-        }
-      }
-      message_buffer_.push_back(frame);
-      if (message_buffer_.size() == DEFAULT_NUM_MSG_PER_ROUND)
-      {
-        if (framesContainMeasurements(message_buffer_))
-        {
-          args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan(message_buffer_));
-        }
-        message_buffer_.clear();
+        args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan(scan_round));
       }
     }
   }

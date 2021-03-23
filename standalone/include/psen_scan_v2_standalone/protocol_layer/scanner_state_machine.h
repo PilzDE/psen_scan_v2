@@ -233,8 +233,7 @@ private:
   // LCOV_EXCL_STOP
   void checkForInternalErrors(const data_conversion_layer::scanner_reply::Message& msg);
 
-  using ScanValidatorResult = ScanValidator::OptionalResult;
-  void printUserMsgFor(const ScanValidatorResult& validation_result);
+  void printUserMsgFor(const ScanRound::Result& validation_result);
   bool framesContainMeasurements(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames);
 
 private:
@@ -243,8 +242,7 @@ private:
   std::unique_ptr<util::Watchdog> start_reply_watchdog_{};
 
   std::unique_ptr<util::Watchdog> monitoring_frame_watchdog_{};
-  ScanValidator complete_scan_validator_;
-  std::vector<data_conversion_layer::monitoring_frame::Message> message_buffer_{};
+  ScanRound complete_scan_validator_;
 };
 
 // Pick a back-end

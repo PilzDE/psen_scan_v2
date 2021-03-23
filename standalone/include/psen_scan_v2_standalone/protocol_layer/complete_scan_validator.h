@@ -27,121 +27,102 @@ namespace protocol_layer
 {
 //! @brief Validates complete scan rounds and detects if MonitoringFrames are missing for a complete scan or
 //! if to many MonitoringFrames were received.
-class ScanValidator
+class ScanRound
 {
 public:
-  enum class Result
+  enum Result
   {
-    //! Less than expected MonitoringFrames received.
-    undersaturated,
-    //! To much MonitoringFrames received.
-    oversaturated,
-    //! Complete scan is valid.
-    valid
+    msg_was_to_old,
+    ended_undersaturated,
+    is_oversaturated,
+    is_complete,
+    is_waiting_for_more_frames
   };
 
-  using OptionalResult = boost::optional<Result>;
-
 public:
+  ScanRound(const uint32_t& num_expected_msgs);
   /**
-   * @brief Whenever a scan round is complete this function validates the finished scan and
-   * returns the corresponding result.
+   * @brief Adds the message to the current ScanRound if it is considered valid. Returns the status of the scan_round.
    *
    * @note:
-   * A scan round is considered to be complete whenever the next scan round starts.
+   * A scan round is considered to be complete whenever the next scan round starts or the expected number of messages
+   * arived.
+   *
+   * @see ScanRound::Result
    *
    * @param msg Current received MonitoringFrames.
-   * @param num_expected_msgs Number of MonitoringFrames which are needed for a scan round to be complete.
    * @return See Result type.
    */
-  OptionalResult validate(const data_conversion_layer::monitoring_frame::Message& msg,
-                          const uint32_t& num_expected_msgs);
+  ScanRound::Result add_valid(const data_conversion_layer::monitoring_frame::Message& msg);
 
   /**
    * @brief Readies the validator for a new validation round. This function has to be called whenever
    * there is an expected brake in the receiving of MonitoringFrames.
    */
   void reset();
+  std::vector<data_conversion_layer::monitoring_frame::Message> get_msgs();
 
 private:
-  /**
-   * @brief Helper class storing all information needed to evaluate a complete scan round.
-   */
-  class ScanRoundInfo
-  {
-  public:
-    ScanRoundInfo(const uint32_t& scan_counter);
-
-  public:
-    Result validate(const uint32_t expected_num_msgs) const;
-    uint32_t scanCounter() const;
-    ScanRoundInfo& operator++();
-
-  private:
-    uint32_t scan_counter_{ 0 };
-    unsigned short int num_received_msgs_{ 0 };
-  };
+  ScanRound::Result validate();
 
 private:
-  boost::optional<ScanRoundInfo> curr_scan_round_;
+  std::vector<data_conversion_layer::monitoring_frame::Message> curr_scan_round_{};
+  const uint32_t& num_expected_msgs_;
 };
 
-inline ScanValidator::ScanRoundInfo::ScanRoundInfo(const uint32_t& scan_counter) : scan_counter_(scan_counter)
+inline ScanRound::ScanRound(const uint32_t& num_expected_msgs) : num_expected_msgs_(num_expected_msgs)
 {
 }
 
-inline ScanValidator::Result ScanValidator::ScanRoundInfo::validate(const uint32_t expected_num_msgs) const
+inline void ScanRound::reset()
 {
-  if (num_received_msgs_ < expected_num_msgs)
+  curr_scan_round_.clear();
+}
+
+inline std::vector<data_conversion_layer::monitoring_frame::Message> ScanRound::get_msgs()
+{
+  return curr_scan_round_;
+}
+
+inline ScanRound::Result ScanRound::add_valid(const data_conversion_layer::monitoring_frame::Message& msg)
+{
+  if (curr_scan_round_.empty() || msg.scanCounter() == curr_scan_round_[0].scanCounter())
   {
-    return Result::undersaturated;
+    curr_scan_round_.push_back(msg);
+    return validate();
   }
-
-  if (num_received_msgs_ == expected_num_msgs)
+  else if (msg.scanCounter() < curr_scan_round_[0].scanCounter())
   {
-    return Result::valid;
+    return Result::msg_was_to_old;
   }
-
-  return Result::oversaturated;
-}
-
-inline uint32_t ScanValidator::ScanRoundInfo::scanCounter() const
-{
-  return scan_counter_;
-}
-
-inline ScanValidator::ScanRoundInfo& ScanValidator::ScanRoundInfo::operator++()
-{
-  ++num_received_msgs_;
-  return *this;
-}
-
-inline void ScanValidator::reset()
-{
-  curr_scan_round_ = boost::none;
-}
-
-inline ScanValidator::OptionalResult
-ScanValidator::validate(const data_conversion_layer::monitoring_frame::Message& msg, const uint32_t& num_expected_msgs)
-{
-  if (curr_scan_round_ == boost::none)
+  else
   {
-    curr_scan_round_ = ScanRoundInfo(msg.scanCounter());
+    Result old_round = validate();
+    reset();
+    curr_scan_round_.push_back(msg);
+    if (old_round == Result::is_waiting_for_more_frames)
+    {
+      return Result::ended_undersaturated;
+    }
+    return Result::is_waiting_for_more_frames;
   }
-
-  auto& curr_info = curr_scan_round_.value();
-  if (curr_info.scanCounter() == msg.scanCounter())
-  {
-    ++curr_info;
-    return boost::none;
-  }
-
-  const auto old_info = curr_info;
-  curr_scan_round_ = ScanRoundInfo(msg.scanCounter());
-  ++(curr_scan_round_.value());
-  return old_info.validate(num_expected_msgs);
 }
 
+inline ScanRound::Result ScanRound::validate()
+{
+  if (curr_scan_round_.size() == num_expected_msgs_)
+  {
+    return Result::is_complete;
+  }
+  else if (curr_scan_round_.size() < num_expected_msgs_)
+  {
+    return Result::is_waiting_for_more_frames;
+  }
+  else
+  {
+    return Result::is_oversaturated;
+  }
+}
 }  // namespace protocol_layer
 }  // namespace psen_scan_v2_standalone
 
