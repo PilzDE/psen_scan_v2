@@ -104,11 +104,8 @@ ScannerConfiguration ScannerAPITests::generateScannerConfig(const std::string& h
                             .scannerIp(SCANNER_IP_ADDRESS)
                             .scannerDataPort(port_holder_.data_port_scanner)
                             .scannerControlPort(port_holder_.control_port_scanner)
-                            .scanRange(DEFAULT_SCAN_RANGE);
-  if (fragmented)
-  {
-    config_builder.enableFragmentedScans();
-  }
+                            .scanRange(DEFAULT_SCAN_RANGE)
+                            .enableFragmentedScans(fragmented);
   return config_builder.build();
 }
 
@@ -392,7 +389,7 @@ TEST_F(ScannerAPITests, shouldCallLaserScanCBOnlyOneTimeWithAllInformationWhenUn
   REMOVE_LOG_MOCK
 }
 
-TEST_F(ScannerAPITests, shouldShowUserMsgIfNewScanRoundStartsBeforeOldOneFinished)
+TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
 {
   INJECT_LOG_MOCK
   setUpScannerConfig(HOST_IP_ADDRESS, UNFRAGMENTED_SCAN);
@@ -400,17 +397,17 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfNewScanRoundStartsBeforeOldOneFinishe
   setUpNiceScannerMock();
   prepareScannerMockStartReply();
 
-  std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> msgs1 =
+  std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> ignored_short_first_round =
       createMonitoringFrameMsgsForScanRound(2, 1);
-  std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> msgs2 =
+  std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> accounted_short_round =
       createMonitoringFrameMsgsForScanRound(3, 5);
-  std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> msgs3 =
+  std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> valid_round =
       createMonitoringFrameMsgsForScanRound(4, 6);
 
   util::Barrier monitoring_frame_barrier;
 
   // Check that toLaserScan({msg}) == arg
-  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan(msgs3)))
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan(valid_round)))
       .Times(1)
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
@@ -428,7 +425,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfNewScanRoundStartsBeforeOldOneFinishe
   auto promis = scanner_->start();
   promis.wait_for(DEFAULT_TIMEOUT);
 
-  for (const auto& msgs : { msgs1, msgs2, msgs3 })
+  for (const auto& msgs : { ignored_short_first_round, accounted_short_round, valid_round })
   {
     for (const auto& msg : msgs)
     {
