@@ -17,8 +17,7 @@ namespace psen_scan_v2_standalone
 {
 namespace protocol_layer
 {
-inline ScannerProtocolDef::ScannerProtocolDef(StateMachineArgs* const args)
-  : args_(args), scan_round_(DEFAULT_NUM_MSG_PER_ROUND)
+inline ScannerProtocolDef::ScannerProtocolDef(StateMachineArgs* const args) : args_(args)
 {
 }
 

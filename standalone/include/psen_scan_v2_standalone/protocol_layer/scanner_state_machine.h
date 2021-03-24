@@ -244,7 +244,7 @@ private:
   std::unique_ptr<util::Watchdog> start_reply_watchdog_{};
 
   std::unique_ptr<util::Watchdog> monitoring_frame_watchdog_{};
-  ScanRound scan_round_;
+  ScanRound scan_round_{ DEFAULT_NUM_MSG_PER_ROUND };
 };
 
 // Pick a back-end
