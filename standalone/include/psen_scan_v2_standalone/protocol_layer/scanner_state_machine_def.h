@@ -131,78 +131,6 @@ inline void ScannerProtocolDef::sendStopRequest(const T& event)
   args_->control_client_->write(data_conversion_layer::stop_request::serialize());
 }
 
-inline void ScannerProtocolDef::printUserMsgFor(const ScanRound::Result& res)
-{
-  if (res == ScanRound::Result::started_new_round_early)
-  {
-    if (args_->config_.fragmentedScansEnabled())
-    {
-      PSENSCAN_WARN("StateMachine",
-                    "Detected dropped MonitoringFrame."
-                    " (Please check the ethernet connection or contact PILZ support if the error persists.)");
-    }
-    else
-    {
-      PSENSCAN_WARN("StateMachine",
-                    "Detected a MonitoringFrame from a new scan round before the old one was complete."
-                    " The uncomplete scan round will be dropped."
-                    " (Please check the ethernet connection or contact PILZ support if the error persists.)");
-    }
-  }
-  else if (res == ScanRound::Result::msg_was_too_old)
-  {
-    if (!args_->config_.fragmentedScansEnabled())
-    {
-      PSENSCAN_DEBUG(
-          "StateMachine",
-          "Detected a MonitoringFrame with a ScanCounter from an earlier round. This MonitoringFrame is ignored.");
-    }
-  }
-  else if (res == ScanRound::Result::is_oversaturated)
-  {
-    PSENSCAN_WARN("StateMachine", "Unexpected: Too many MonitoringFrames for one scan round received.");
-  }
-}
-
-inline bool ScannerProtocolDef::framesContainMeasurements(
-    const std::vector<data_conversion_layer::monitoring_frame::Message>& frames)
-{
-  if (std::any_of(frames.begin(), frames.end(), [](const auto& frame) { return frame.measurements().empty(); }))
-  {
-    PSENSCAN_DEBUG("StateMachine", "No measurement data in this message, skipping laser scan callback.");
-    return false;
-  }
-  return true;
-}
-inline void
-ScannerProtocolDef::informUserAboutDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& frame)
-{
-  if (!frame.diagnosticMessages().empty())
-  {
-    PSENSCAN_WARN_THROTTLE(
-        1 /* sec */, "StateMachine", "The scanner reports an error: {}", util::formatRange(frame.diagnosticMessages()));
-  }
-}
-
-inline void
-ScannerProtocolDef::informUserAboutTheScanData(const data_conversion_layer::monitoring_frame::Message& frame)
-{
-  const ScanRound::Result& round_status = scan_round_.addValid(frame);
-  printUserMsgFor(round_status);
-  if (args_->config_.fragmentedScansEnabled() && framesContainMeasurements({ frame }))
-  {
-    args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan({ frame }));
-  }
-  else if (round_status == ScanRound::Result::is_complete)
-  {
-    const auto scan_round = scan_round_.getMsgs();
-    if (framesContainMeasurements(scan_round))
-    {
-      args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan(scan_round));
-    }
-  }
-}
-
 inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawMonitoringFrameReceived& event)
 {
   PSENSCAN_DEBUG("StateMachine", "Action: handleMonitoringFrame");
@@ -221,6 +149,67 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
     PSENSCAN_ERROR("StateMachine", e.what());
   }
   // LCOV_EXCL_STOP
+}
+
+inline void
+ScannerProtocolDef::informUserAboutDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& frame)
+{
+  if (!frame.diagnosticMessages().empty())
+  {
+    PSENSCAN_WARN_THROTTLE(
+        1 /* sec */, "StateMachine", "The scanner reports an error: {}", util::formatRange(frame.diagnosticMessages()));
+  }
+}
+
+inline void
+ScannerProtocolDef::informUserAboutTheScanData(const data_conversion_layer::monitoring_frame::Message& frame)
+{
+  const ScanRound::Result& round_status = scan_round_.addValid(frame);
+  if (args_->config_.fragmentedScansEnabled())
+  {
+    sendMessageWithMeasurements({ frame });
+  }
+  else
+  {
+    sendScanRoundInformation(round_status);
+  }
+}
+
+inline void ScannerProtocolDef::sendMessageWithMeasurements(
+    const std::vector<data_conversion_layer::monitoring_frame::Message>& frames)
+{
+  if (framesContainMeasurements(frames))
+  {
+    args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan(frames));
+  }
+}
+
+inline bool ScannerProtocolDef::framesContainMeasurements(
+    const std::vector<data_conversion_layer::monitoring_frame::Message>& frames)
+{
+  if (std::any_of(frames.begin(), frames.end(), [](const auto& frame) { return frame.measurements().empty(); }))
+  {
+    PSENSCAN_DEBUG("StateMachine", "No measurement data in this message, skipping laser scan callback.");
+    return false;
+  }
+  return true;
+}
+
+inline void ScannerProtocolDef::sendScanRoundInformation(const ScanRound::Result& round_status)
+{
+  if (round_status == ScanRound::Result::started_new_round_early)
+  {
+    PSENSCAN_WARN("StateMachine", "Dropping incomplete scan round");
+  }
+  else if (round_status == ScanRound::Result::msg_was_too_old)
+  {
+    PSENSCAN_DEBUG("StateMachine", "Ignoring old Monitoring Frame");
+  }
+  else if (round_status == ScanRound::Result::is_complete)
+  {
+    const auto scan_round = scan_round_.getMsgs();
+    sendMessageWithMeasurements(scan_round);
+  }
 }
 
 inline void ScannerProtocolDef::handleMonitoringFrameTimeout(const scanner_events::MonitoringFrameTimeout& event)

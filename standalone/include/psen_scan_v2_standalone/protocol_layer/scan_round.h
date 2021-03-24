@@ -72,6 +72,7 @@ public:
 
 private:
   ScanRound::Result validate();
+  ScanRound::Result startNewRound(const data_conversion_layer::monitoring_frame::Message& msg);
 
 private:
   std::vector<data_conversion_layer::monitoring_frame::Message> curr_scan_round_{};
@@ -102,26 +103,36 @@ inline ScanRound::Result ScanRound::addValid(const data_conversion_layer::monito
   }
   else if (msg.scanCounter() < curr_scan_round_[0].scanCounter())
   {
+    PSENSCAN_DEBUG("ScanRound", "Detected a MonitoringFrame with a ScanCounter from an earlier round.");
     return Result::msg_was_too_old;
   }
   else
   {
-    Result old_round = validate();
-    reset();
-    curr_scan_round_.push_back(msg);
-    if (old_round == Result::is_waiting_for_more_frames && !first_scan_round_)
-    {
-      return Result::started_new_round_early;
-    }
-    first_scan_round_ = false;
-    return Result::is_waiting_for_more_frames;
+    return startNewRound(msg);
   }
+}
+
+inline ScanRound::Result ScanRound::startNewRound(const data_conversion_layer::monitoring_frame::Message& msg)
+{
+  bool old_round_undersaturated = curr_scan_round_.size() < num_expected_msgs_;
+  reset();
+  curr_scan_round_.push_back(msg);
+  if (old_round_undersaturated && !first_scan_round_)
+  {
+    PSENSCAN_WARN("ScanRound",
+                  "Detected a MonitoringFrame from a new scan round before the old one was complete."
+                  " (Please check the ethernet connection or contact PILZ support if the error persists.)");
+    return Result::started_new_round_early;
+  }
+  first_scan_round_ = false;
+  return Result::is_waiting_for_more_frames;
 }
 
 inline ScanRound::Result ScanRound::validate()
 {
   if (curr_scan_round_.size() == num_expected_msgs_)
   {
+    PSENSCAN_DEBUG("ScanRound", "Completed a scan round");
     return Result::is_complete;
   }
   else if (curr_scan_round_.size() < num_expected_msgs_)
@@ -130,6 +141,7 @@ inline ScanRound::Result ScanRound::validate()
   }
   else
   {
+    PSENSCAN_WARN("ScanRound", "Received too many MonitoringFrames for one scan round.");
     return Result::is_oversaturated;
   }
 }

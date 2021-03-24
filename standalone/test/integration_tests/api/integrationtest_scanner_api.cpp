@@ -415,9 +415,9 @@ TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(WARN,
-                   "StateMachine: Detected a MonitoringFrame from a new scan round before the old one was complete."
-                   " The uncomplete scan round will be dropped."
-                   " (Please check the ethernet connection or contact PILZ support if the error persists.)")
+                   "ScanRound: Detected a MonitoringFrame from a new scan round before the old one was complete."
+                   " (Please check the ethernet connection or contact PILZ support if the error persists.)").Times(1);
+  EXPECT_LOG_SHORT(WARN, "StateMachine: Dropping incomplete scan round")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
@@ -459,9 +459,8 @@ TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
   util::Barrier user_msg_barrier;
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
-  EXPECT_LOG_SHORT(DEBUG,
-                   "StateMachine: Detected a MonitoringFrame with a ScanCounter from an earlier round. This "
-                   "MonitoringFrame is ignored.")
+  EXPECT_LOG_SHORT(DEBUG, "ScanRound: Detected a MonitoringFrame with a ScanCounter from an earlier round.");
+  EXPECT_LOG_SHORT(DEBUG, "StateMachine: Ignoring old Monitoring Frame")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
@@ -574,7 +573,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(WARN,
-                   "StateMachine: Detected dropped MonitoringFrame."
+                   "ScanRound: Detected a MonitoringFrame from a new scan round before the old one was complete."
                    " (Please check the ethernet connection or contact PILZ support if the error persists.)")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
@@ -621,7 +620,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
   util::Barrier user_msg_barrier;
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
-  EXPECT_LOG_SHORT(WARN, "StateMachine: Unexpected: Too many MonitoringFrames for one scan round received.")
+  EXPECT_LOG_SHORT(WARN, "ScanRound: Received too many MonitoringFrames for one scan round.")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
