@@ -149,7 +149,7 @@ inline void ScannerProtocolDef::printUserMsgFor(const ScanRound::Result& res)
                     " (Please check the ethernet connection or contact PILZ support if the error persists.)");
     }
   }
-  else if (res == ScanRound::Result::msg_was_to_old)
+  else if (res == ScanRound::Result::msg_was_too_old)
   {
     if (!args_->config_.fragmentedScansEnabled())
     {

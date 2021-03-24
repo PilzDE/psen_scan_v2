@@ -102,7 +102,7 @@ inline ScanRound::Result ScanRound::addValid(const data_conversion_layer::monito
   }
   else if (msg.scanCounter() < curr_scan_round_[0].scanCounter())
   {
-    return Result::msg_was_to_old;
+    return Result::msg_was_too_old;
   }
   else
   {
