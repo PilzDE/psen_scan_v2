@@ -13,10 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef PSEN_SCAN_V2_STANDALONE_COMPLETE_SCAN_VALIDATOR_H
-#define PSEN_SCAN_V2_STANDALONE_COMPLETE_SCAN_VALIDATOR_H
-
-#include <boost/optional.hpp>
+#ifndef PSEN_SCAN_V2_STANDALONE_SCAN_ROUND_H
+#define PSEN_SCAN_V2_STANDALONE_SCAN_ROUND_H
 
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/util/logging.h"
@@ -26,11 +24,11 @@ namespace psen_scan_v2_standalone
 namespace protocol_layer
 {
 /**
- * @brief Bufferes and validates monitoring frames for a scan round.
+ * @brief Buffers and validates monitoring frames for a scan round.
  *
- * Discoveres if there are to many monitoring frames in a scan round.
- * Informes when a scan round ended incomplete.
- * Discoveres and omits old messages.
+ * Discovers if there are to many monitoring frames in a scan round.
+ * Informs when a scan round ended incomplete.
+ * Discovers and omits old messages.
  */
 class ScanRound
 {
@@ -38,12 +36,12 @@ public:
   enum class Result
   {
     /* Message was not added due to being part of a previous scan round */
-    msg_was_to_old,
+    msg_was_too_old,
     /* New scan round started, but the last one was not completed */
     started_new_round_early,
-    /* To many messages arrived in this scan round */
+    /* Too many messages arrived in this scan round */
     is_oversaturated,
-    /* Message count of current scan round equals expected one */
+    /* The expected message count is reached */
     is_complete,
     /* The expected message count is not yet reached */
     is_waiting_for_more_frames
@@ -138,4 +136,4 @@ inline ScanRound::Result ScanRound::validate()
 }  // namespace protocol_layer
 }  // namespace psen_scan_v2_standalone
 
-#endif  // PSEN_SCAN_V2_STANDALONE_COMPLETE_SCAN_VALIDATOR_H
+#endif  // PSEN_SCAN_V2_STANDALONE_SCAN_ROUND_H

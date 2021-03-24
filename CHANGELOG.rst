@@ -5,7 +5,7 @@ Changelog for package psen_scan_v2
 Forthcoming
 -----------
 * API change: Driver waits for scan round to complete before sending measurement data by default
-* Introducing new Parameter fragmented_scans to switch back to faster fragmented laser_scan messages
+* Introducing new parameter fragmented_scans to switch back to faster fragmented laser_scan messages
 * Contributors: Pilz GmbH and Co. KG
 
 0.1.6 (2021-03-22)
