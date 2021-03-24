@@ -235,6 +235,8 @@ private:
 
   void printUserMsgFor(const ScanRound::Result& validation_result);
   bool framesContainMeasurements(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames);
+  void informUserAboutDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& frame);
+  void informUserAboutTheScanData(const data_conversion_layer::monitoring_frame::Message& frame);
 
 private:
   const std::unique_ptr<StateMachineArgs> args_;

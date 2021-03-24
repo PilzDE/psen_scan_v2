@@ -25,24 +25,34 @@ namespace psen_scan_v2_standalone
 {
 namespace protocol_layer
 {
-//! @brief Validates complete scan rounds and detects if MonitoringFrames are missing for a complete scan or
-//! if to many MonitoringFrames were received.
+/**
+ * @brief Bufferes and validates monitoring frames for a scan round.
+ *
+ * Discoveres if there are to many monitoring frames in a scan round.
+ * Informes when a scan round ended incomplete.
+ * Discoveres and omits old messages.
+ */
 class ScanRound
 {
 public:
-  enum Result
+  enum class Result
   {
+    /* Message was not added due to being part of a previous scan round */
     msg_was_to_old,
-    ended_undersaturated,
+    /* New scan round started, but the last one was not completed */
+    started_new_round_early,
+    /* To many messages arrived in this scan round */
     is_oversaturated,
+    /* Message count of current scan round equals expected one */
     is_complete,
+    /* The expected message count is not yet reached */
     is_waiting_for_more_frames
   };
 
 public:
   ScanRound(const uint32_t& num_expected_msgs);
   /**
-   * @brief Adds the message to the current ScanRound if it is considered valid. Returns the status of the scan_round.
+   * @brief Adds the message to the current scan round if it is considered valid. Returns the current status.
    *
    * @note:
    * A scan round is considered to be complete whenever the next scan round starts or the expected number of messages
@@ -51,7 +61,7 @@ public:
    * @see ScanRound::Result
    *
    * @param msg Current received MonitoringFrames.
-   * @return See Result type.
+   * @return Status of current scan round
    */
   ScanRound::Result addValid(const data_conversion_layer::monitoring_frame::Message& msg);
 
@@ -102,7 +112,7 @@ inline ScanRound::Result ScanRound::addValid(const data_conversion_layer::monito
     curr_scan_round_.push_back(msg);
     if (old_round == Result::is_waiting_for_more_frames)
     {
-      return Result::ended_undersaturated;
+      return Result::started_new_round_early;
     }
     return Result::is_waiting_for_more_frames;
   }
