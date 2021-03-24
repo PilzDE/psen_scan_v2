@@ -416,7 +416,8 @@ TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
   EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(WARN,
                    "ScanRound: Detected a MonitoringFrame from a new scan round before the old one was complete."
-                   " (Please check the ethernet connection or contact PILZ support if the error persists.)").Times(1);
+                   " (Please check the ethernet connection or contact PILZ support if the error persists.)")
+      .Times(1);
   EXPECT_LOG_SHORT(WARN, "StateMachine: Dropping incomplete scan round")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
