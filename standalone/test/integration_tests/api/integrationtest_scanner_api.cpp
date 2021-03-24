@@ -401,14 +401,16 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfNewScanRoundStartsBeforeOldOneFinishe
   prepareScannerMockStartReply();
 
   std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> msgs1 =
-      createMonitoringFrameMsgsForScanRound(2, 5);
+      createMonitoringFrameMsgsForScanRound(2, 1);
   std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> msgs2 =
-      createMonitoringFrameMsgsForScanRound(3, 6);
+      createMonitoringFrameMsgsForScanRound(3, 5);
+  std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> msgs3 =
+      createMonitoringFrameMsgsForScanRound(4, 6);
 
   util::Barrier monitoring_frame_barrier;
 
   // Check that toLaserScan({msg}) == arg
-  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan(msgs2)))
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan(msgs3)))
       .Times(1)
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
@@ -426,14 +428,12 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfNewScanRoundStartsBeforeOldOneFinishe
   auto promis = scanner_->start();
   promis.wait_for(DEFAULT_TIMEOUT);
 
-  for (const auto& msg : msgs1)
+  for (const auto& msgs : { msgs1, msgs2, msgs3 })
   {
-    nice_scanner_mock_->sendMonitoringFrame(msg);
-  }
-
-  for (const auto& msg : msgs2)
-  {
-    nice_scanner_mock_->sendMonitoringFrame(msg);
+    for (const auto& msg : msgs)
+    {
+      nice_scanner_mock_->sendMonitoringFrame(msg);
+    }
   }
 
   EXPECT_TRUE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";

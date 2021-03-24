@@ -78,6 +78,7 @@ private:
 private:
   std::vector<data_conversion_layer::monitoring_frame::Message> curr_scan_round_{};
   const uint32_t& num_expected_msgs_;
+  bool first_scan_round_ = true;
 };
 
 inline ScanRound::ScanRound(const uint32_t& num_expected_msgs) : num_expected_msgs_(num_expected_msgs)
@@ -110,10 +111,11 @@ inline ScanRound::Result ScanRound::addValid(const data_conversion_layer::monito
     Result old_round = validate();
     reset();
     curr_scan_round_.push_back(msg);
-    if (old_round == Result::is_waiting_for_more_frames)
+    if (old_round == Result::is_waiting_for_more_frames && !first_scan_round_)
     {
       return Result::started_new_round_early;
     }
+    first_scan_round_ = false;
     return Result::is_waiting_for_more_frames;
   }
 }

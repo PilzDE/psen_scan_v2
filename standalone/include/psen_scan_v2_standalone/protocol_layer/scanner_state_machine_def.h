@@ -175,18 +175,18 @@ inline bool ScannerProtocolDef::framesContainMeasurements(
   }
   return true;
 }
-inline void ScannerProtocolDef::informUserAboutDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& frame)
+inline void
+ScannerProtocolDef::informUserAboutDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& frame)
 {
   if (!frame.diagnosticMessages().empty())
   {
-    PSENSCAN_WARN_THROTTLE(1 /* sec */,
-                          "StateMachine",
-                          "The scanner reports an error: {}",
-                          util::formatRange(frame.diagnosticMessages()));
+    PSENSCAN_WARN_THROTTLE(
+        1 /* sec */, "StateMachine", "The scanner reports an error: {}", util::formatRange(frame.diagnosticMessages()));
   }
 }
 
-inline void ScannerProtocolDef::informUserAboutTheScanData(const data_conversion_layer::monitoring_frame::Message& frame)
+inline void
+ScannerProtocolDef::informUserAboutTheScanData(const data_conversion_layer::monitoring_frame::Message& frame)
 {
   const ScanRound::Result& round_status = scan_round_.addValid(frame);
   printUserMsgFor(round_status);
