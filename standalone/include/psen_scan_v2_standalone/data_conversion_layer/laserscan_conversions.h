@@ -29,9 +29,12 @@ namespace psen_scan_v2_standalone
 namespace data_conversion_layer
 {
 /**
- * @brief Converts the technical monitoring_frame to the user friendly LaserScan type sent by the
+ * @brief Converts monitoring_frames of a scan_round to the user friendly LaserScan type sent by the
  * IScanner::LaserScanCallback.
- * @see  data_conversion_layer::monitoring_frame::Message
+ *
+ * @note expects all monitoring frames to have the same resolution.
+ *
+ * @see data_conversion_layer::monitoring_frame::Message
  * @see ScannerV2
  */
 static LaserScan toLaserScan(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames)

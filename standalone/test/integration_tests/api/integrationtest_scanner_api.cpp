@@ -415,10 +415,9 @@ TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(WARN,
-                   "ScanRound: Detected a MonitoringFrame from a new scan round before the old one was complete."
+                   "ScanBuffer: Detected a MonitoringFrame from a new scan round before the old one was complete."
+                   " Dropping the incomplete round."
                    " (Please check the ethernet connection or contact PILZ support if the error persists.)")
-      .Times(1);
-  EXPECT_LOG_SHORT(WARN, "StateMachine: Dropping incomplete scan round")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
@@ -460,8 +459,9 @@ TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
   util::Barrier user_msg_barrier;
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
-  EXPECT_LOG_SHORT(DEBUG, "ScanRound: Detected a MonitoringFrame with a ScanCounter from an earlier round.");
-  EXPECT_LOG_SHORT(DEBUG, "StateMachine: Ignoring old Monitoring Frame")
+  EXPECT_LOG_SHORT(WARN,
+                   "ScanBuffer: Detected a MonitoringFrame from an earlier round. "
+                   " The scan round will ignore it.")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
@@ -574,7 +574,8 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(WARN,
-                   "ScanRound: Detected a MonitoringFrame from a new scan round before the old one was complete."
+                   "ScanBuffer: Detected a MonitoringFrame from a new scan round before the old one was complete."
+                   " Dropping the incomplete round."
                    " (Please check the ethernet connection or contact PILZ support if the error persists.)")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
@@ -621,7 +622,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
   util::Barrier user_msg_barrier;
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
-  EXPECT_LOG_SHORT(WARN, "ScanRound: Received too many MonitoringFrames for one scan round.")
+  EXPECT_LOG_SHORT(WARN, "ScanBuffer: Received too many MonitoringFrames for one scan round.")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 

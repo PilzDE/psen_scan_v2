@@ -48,7 +48,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_serialization_deserialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
-#include "psen_scan_v2_standalone/protocol_layer/scan_round.h"
+#include "psen_scan_v2_standalone/protocol_layer/scan_buffer.h"
 #include "psen_scan_v2_standalone/util/watchdog.h"
 
 namespace psen_scan_v2_standalone
@@ -233,11 +233,10 @@ private:
   // LCOV_EXCL_STOP
   void checkForInternalErrors(const data_conversion_layer::scanner_reply::Message& msg);
 
-  void sendScanRoundInformation(const ScanRound::Result& validation_result);
-  bool framesContainMeasurements(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames);
-  void informUserAboutDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& frame);
+  void checkForDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& frame);
   void informUserAboutTheScanData(const data_conversion_layer::monitoring_frame::Message& frame);
   void sendMessageWithMeasurements(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames);
+  bool framesContainMeasurements(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames);
 
 private:
   const std::unique_ptr<StateMachineArgs> args_;
@@ -245,7 +244,7 @@ private:
   std::unique_ptr<util::Watchdog> start_reply_watchdog_{};
 
   std::unique_ptr<util::Watchdog> monitoring_frame_watchdog_{};
-  ScanRound scan_round_{ DEFAULT_NUM_MSG_PER_ROUND };
+  ScanBuffer scan_buffer_{ DEFAULT_NUM_MSG_PER_ROUND };
 };
 
 // Pick a back-end

@@ -75,7 +75,7 @@ template <class Event, class FSM>
 void ScannerProtocolDef::WaitForMonitoringFrame::on_entry(Event const&, FSM& fsm)
 {
   PSENSCAN_DEBUG("StateMachine", fmt::format("Entering state: {}", "WaitForMonitoringFrame"));
-  fsm.scan_round_.reset();
+  fsm.scan_buffer_.reset();
   // Start watchdog...
   fsm.monitoring_frame_watchdog_ = fsm.args_->watchdog_factory_->create(WATCHDOG_TIMEOUT, "MonitoringFrameTimeout");
   fsm.args_->scanner_started_cb();
@@ -140,7 +140,7 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
   {
     const data_conversion_layer::monitoring_frame::Message frame{ data_conversion_layer::monitoring_frame::deserialize(
         event.data_, event.num_bytes_) };
-    informUserAboutDiagnosticErrors(frame);
+    checkForDiagnosticErrors(frame);
     informUserAboutTheScanData(frame);
   }
   // LCOV_EXCL_START
@@ -151,8 +151,7 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
   // LCOV_EXCL_STOP
 }
 
-inline void
-ScannerProtocolDef::informUserAboutDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& frame)
+inline void ScannerProtocolDef::checkForDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& frame)
 {
   if (!frame.diagnosticMessages().empty())
   {
@@ -164,14 +163,21 @@ ScannerProtocolDef::informUserAboutDiagnosticErrors(const data_conversion_layer:
 inline void
 ScannerProtocolDef::informUserAboutTheScanData(const data_conversion_layer::monitoring_frame::Message& frame)
 {
-  const ScanRound::Result& round_status = scan_round_.addValid(frame);
-  if (args_->config_.fragmentedScansEnabled())
+  try
+  {
+    scan_buffer_.add(frame);
+    if (!args_->config_.fragmentedScansEnabled() && scan_buffer_.isRoundComplete())
+    {
+      sendMessageWithMeasurements(scan_buffer_.getMsgs());
+    }
+  }
+  catch (const ScanRoundError& ex)
+  {
+    PSENSCAN_WARN("ScanBuffer", ex.what());
+  }
+  if (args_->config_.fragmentedScansEnabled())  // Send the scan fragment in any case.
   {
     sendMessageWithMeasurements({ frame });
-  }
-  else
-  {
-    sendScanRoundInformation(round_status);
   }
 }
 
@@ -193,23 +199,6 @@ inline bool ScannerProtocolDef::framesContainMeasurements(
     return false;
   }
   return true;
-}
-
-inline void ScannerProtocolDef::sendScanRoundInformation(const ScanRound::Result& round_status)
-{
-  if (round_status == ScanRound::Result::started_new_round_early)
-  {
-    PSENSCAN_WARN("StateMachine", "Dropping incomplete scan round");
-  }
-  else if (round_status == ScanRound::Result::msg_was_too_old)
-  {
-    PSENSCAN_DEBUG("StateMachine", "Ignoring old Monitoring Frame");
-  }
-  else if (round_status == ScanRound::Result::is_complete)
-  {
-    const auto scan_round = scan_round_.getMsgs();
-    sendMessageWithMeasurements(scan_round);
-  }
 }
 
 inline void ScannerProtocolDef::handleMonitoringFrameTimeout(const scanner_events::MonitoringFrameTimeout& event)
