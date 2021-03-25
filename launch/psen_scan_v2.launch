@@ -37,7 +37,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- End angle of measurement in radian -->
   <arg name="angle_end" default="$(eval 137.5 /180.0 * pi)" />
 
-  <!-- Publish scan data as soon as a UDP packet is ready, do not wait for a full scan -->
+  <!-- Set the following to true in order to publish scan data as soon as a UDP packet is ready, instead of waiting for a full scan -->
   <arg name="fragmented_scans" default="false" />
 
   <node name="laser_scanner" type="psen_scan_v2_node" pkg="psen_scan_v2" output="screen" required="true">
