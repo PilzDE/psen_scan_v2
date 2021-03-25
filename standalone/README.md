@@ -114,11 +114,13 @@ An example application, which prints distance data to the screen, is built by de
 - Open the `standalone`-folder, with the `CMakeLists.txt` in it
 - Create a build folder and open it 
   ```
-  mkdir build64 & pushd build64
+  mkdir build64
+  pushd build64
   ```
 - Generate Visual Studio Project 
+  Note that you will have to replace `<PATH_TO_BOOST>` according to the previous step.
   ```
-  cmake -DBUILD_TESTING=OFF -G "Visual Studio 15 2017 Win64" \path_to_source\
+  cmake -DBoost_INCLUDE_DIR="<PATH_TO_BOOST>/boost_1_75_0" -DBUILD_TESTING=OFF -G "Visual Studio 15 2017 Win64" ..
   ```
 - Go back to `standalone`-folder 
   ```
