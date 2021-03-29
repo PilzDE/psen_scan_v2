@@ -333,7 +333,7 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
   util::Barrier diagnostic_barrier;
 
   // Check that toLaserScan({msg}) == arg
-  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan({ msg })))
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::LaserScanConverter::toLaserScan({ msg })))
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
   EXPECT_LOG_SHORT(DEBUG, _).Times(AnyNumber());
@@ -370,7 +370,7 @@ TEST_F(ScannerAPITests, shouldCallLaserScanCBOnlyOneTimeWithAllInformationWhenUn
   util::Barrier monitoring_frame_barrier;
 
   // Check that toLaserScan({msg}) == arg
-  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan(msgs)))
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::LaserScanConverter::toLaserScan(msgs)))
       .Times(1)
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
@@ -407,7 +407,7 @@ TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
   util::Barrier monitoring_frame_barrier;
 
   // Check that toLaserScan({msg}) == arg
-  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan(valid_round)))
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::LaserScanConverter::toLaserScan(valid_round)))
       .Times(1)
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
@@ -452,7 +452,7 @@ TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
   util::Barrier monitoring_frame_barrier;
 
   // Check that toLaserScan({msg}) == arg
-  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::toLaserScan(msgs_round3)))
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::LaserScanConverter::toLaserScan(msgs_round3)))
       .Times(1)
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 

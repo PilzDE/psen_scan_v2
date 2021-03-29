@@ -186,7 +186,7 @@ inline void ScannerProtocolDef::sendMessageWithMeasurements(
 {
   if (framesContainMeasurements(frames))
   {
-    args_->inform_user_about_laser_scan_cb(data_conversion_layer::toLaserScan(frames));
+    args_->inform_user_about_laser_scan_cb(data_conversion_layer::LaserScanConverter::toLaserScan(frames));
   }
 }
 
