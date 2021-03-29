@@ -34,6 +34,9 @@ public:
   ScannerProtocolViolationError(const std::string& msg) : std::runtime_error(msg){};
 };
 
+/**
+ * @brief: Responsible for converting Monitoring frames into LaserScan messages.
+ */
 class LaserScanConverter
 {
 public:

@@ -186,7 +186,16 @@ inline void ScannerProtocolDef::sendMessageWithMeasurements(
 {
   if (framesContainMeasurements(frames))
   {
-    args_->inform_user_about_laser_scan_cb(data_conversion_layer::LaserScanConverter::toLaserScan(frames));
+    try
+    {
+      args_->inform_user_about_laser_scan_cb(data_conversion_layer::LaserScanConverter::toLaserScan(frames));
+    }
+    // LCOV_EXCL_START
+    catch (const data_conversion_layer::ScannerProtocolViolationError& ex)
+    {
+      PSENSCAN_ERROR("StateMachine", ex.what());
+    }
+    // LCOV_EXCL_STOP
   }
 }
 
