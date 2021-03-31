@@ -58,7 +58,7 @@ static std::vector<data_conversion_layer::monitoring_frame::Message> createMsgs(
 }
 
 static data_conversion_layer::monitoring_frame::Message
-copyMsgWIthNewMeasurements(const data_conversion_layer::monitoring_frame::Message& msg,
+copyMsgWithNewMeasurements(const data_conversion_layer::monitoring_frame::Message& msg,
                            const std::vector<double>& new_measurements)
 {
   return data_conversion_layer::monitoring_frame::Message(msg.fromTheta(),
@@ -167,12 +167,12 @@ TEST(LaserScanConversionsTest, laserScanShouldContainMeasurementsOrderedByThetaA
   // Change first measurement value.
   auto new_measurements1 = msgs[0].measurements();
   new_measurements1[0] += 10;
-  auto new_first_msg = copyMsgWIthNewMeasurements(msgs[0], new_measurements1);
+  auto new_first_msg = copyMsgWithNewMeasurements(msgs[0], new_measurements1);
 
   // Change last measurement value.
   auto new_measurements2 = msgs[2].measurements();
   new_measurements2[new_measurements2.size() - 1] += 10;
-  auto new_last_msg = copyMsgWIthNewMeasurements(msgs[2], new_measurements2);
+  auto new_last_msg = copyMsgWithNewMeasurements(msgs[2], new_measurements2);
 
   // Build LaserScan with wrong message order.
   std::unique_ptr<LaserScan> scan_ptr;

@@ -98,9 +98,9 @@ Publish scan data as soon as a UDP packet is ready, do not wait for a full scan.
 /laser_scanner/scan ([sensor_msgs/LaserScan][])<br/>
 
 * If _fragmented_scans_ is set to false (default) the driver will publish complete scan rounds from the PSENscan safety laser scanner as a single message.
-* If _fragmented_scans_ is enabled the driver will send the measurement data as soon as they arive, instead of waiting for the scan round to be completed. This way the scan data is received sooner but is split into several sensor messages.
+* If _fragmented_scans_ is enabled the driver will send the measurement data as soon as they arrive, instead of waiting for the scan round to be completed. This way the scan data is received sooner but is split into several sensor messages.
 
-Scan Rounds/Fragments that contain no measurement data are not published. This can happen with smaller scan ranges.
+Scan rounds and fragments that contain no measurement data are not published. This can happen with smaller scan ranges.
 
 ### TF Frames
 The location of the TF frames is shown in the image below.
