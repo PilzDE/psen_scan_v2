@@ -91,9 +91,18 @@ UDP Port on which monitoring frames (scans) should be received.
 _host_udp_port_control_ (_int_, default: 55116)<br/>
 UDP Port used to send commands (start/stop) and receive the corresponding replies.
 
+_fragmented_scans_ (_bool_, default: false)<br/>
+Publish scan data as soon as a UDP packet is ready, do not wait for a full scan.
+
 ### Published Topics
 /laser_scanner/scan ([sensor_msgs/LaserScan][])<br/>
-Publishes a complete scan from the PSENscan safety laser scanner. Scan fragments that contain no measurement data are not published. This can happen with smaller scan ranges.
+
+* If _fragmented_scans_ is set to false (default) the driver will publish complete scan rounds from the PSENscan safety laser scanner as a single message.
+* If _fragmented_scans_ is enabled the driver will send the measurement data as soon as they arrive, instead of waiting for the scan round to be completed. This way the scan data is received sooner but is split into several sensor messages.
+
+`Hint 1: Scan rounds and fragments that contain no measurement data are not published. This can happen with smaller scan ranges.`
+
+`Hint 2: Frequency of the laser scan messages is about 33hz for the combined and 200hz for the fragmented scans.`
 
 ### TF Frames
 The location of the TF frames is shown in the image below.

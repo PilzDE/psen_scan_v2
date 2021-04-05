@@ -45,6 +45,7 @@ public:
   ScannerConfigurationBuilder& scannerControlPort(const int&);
   ScannerConfigurationBuilder& scanRange(const ScanRange&);
   ScannerConfigurationBuilder& enableDiagnostics();
+  ScannerConfigurationBuilder& enableFragmentedScans(const bool&);
 
 private:
   static uint16_t convertPort(const int& port);
@@ -110,6 +111,12 @@ inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scanRange(const
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableDiagnostics()
 {
   config_.diagnostics_enabled_ = true;
+  return *this;
+}
+
+inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableFragmentedScans(const bool& enable)
+{
+  config_.fragmented_scans_ = enable;
   return *this;
 }
 }  // namespace psen_scan_v2_standalone

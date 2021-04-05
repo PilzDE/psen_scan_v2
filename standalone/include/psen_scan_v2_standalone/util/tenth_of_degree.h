@@ -34,7 +34,7 @@ namespace util
 class TenthOfDegree
 {
 public:
-  static util::TenthOfDegree fromRad(const double& angle_in_rad)
+  static TenthOfDegree fromRad(const double& angle_in_rad)
   {
     return TenthOfDegree(data_conversion_layer::radToTenthDegree(angle_in_rad));
   }
@@ -54,57 +54,72 @@ public:
     return data_conversion_layer::tenthDegreeToRad(tenth_of_degree_);
   }
 
-  constexpr util::TenthOfDegree& operator*(const util::TenthOfDegree& rhs)
+  constexpr TenthOfDegree& operator*(const TenthOfDegree& rhs)
   {
     tenth_of_degree_ = value() * rhs.value();
     return *this;
   }
 
-  constexpr util::TenthOfDegree& operator*(const int& rhs)
+  constexpr TenthOfDegree operator*(const int& rhs) const
+  {
+    return TenthOfDegree(value() * rhs);
+  }
+
+  constexpr TenthOfDegree& operator*(const int& rhs)
   {
     tenth_of_degree_ = value() * rhs;
     return *this;
   }
 
-  constexpr util::TenthOfDegree& operator/(const int& rhs)
+  constexpr TenthOfDegree operator/(const int& rhs) const
+  {
+    return TenthOfDegree(value() / rhs);
+  }
+
+  constexpr TenthOfDegree& operator/(const int& rhs)
   {
     tenth_of_degree_ = value() / rhs;
     return *this;
   }
 
-  constexpr util::TenthOfDegree& operator+(const util::TenthOfDegree& rhs)
+  constexpr TenthOfDegree operator+(const TenthOfDegree& rhs) const
+  {
+    return TenthOfDegree(value() + rhs.value());
+  }
+
+  constexpr TenthOfDegree& operator+(const TenthOfDegree& rhs)
   {
     tenth_of_degree_ = value() + rhs.value();
     return *this;
   }
 
-  util::TenthOfDegree& operator-(const util::TenthOfDegree& rhs)
+  TenthOfDegree& operator-(const TenthOfDegree& rhs)
   {
     tenth_of_degree_ = value() - rhs.value();
     return *this;
   }
 
-  constexpr bool operator==(const util::TenthOfDegree& rhs) const
+  constexpr bool operator==(const TenthOfDegree& rhs) const
   {
     return value() == rhs.value();
   }
 
-  constexpr bool operator>=(const util::TenthOfDegree& rhs) const
+  constexpr bool operator>=(const TenthOfDegree& rhs) const
   {
     return value() >= rhs.value();
   }
 
-  constexpr bool operator<=(const util::TenthOfDegree& rhs) const
+  constexpr bool operator<=(const TenthOfDegree& rhs) const
   {
     return value() <= rhs.value();
   }
 
-  constexpr bool operator>(const util::TenthOfDegree& rhs) const
+  constexpr bool operator>(const TenthOfDegree& rhs) const
   {
     return value() > rhs.value();
   }
 
-  constexpr bool operator<(const util::TenthOfDegree& rhs) const
+  constexpr bool operator<(const TenthOfDegree& rhs) const
   {
     return value() < rhs.value();
   }
