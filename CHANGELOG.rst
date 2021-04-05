@@ -2,8 +2,8 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.0 (2021-04-05)
+------------------
 * Combine multiple monitoring frames into one scan (`#173 <https://github.com/PilzDE/psen_scan_v2/issues/173>`_)
 * Contributors: Pilz GmbH and Co. KG
 
