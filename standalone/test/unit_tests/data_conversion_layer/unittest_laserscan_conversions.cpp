@@ -85,7 +85,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectMinMaxScanAngleAfter
   ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan({ frame }) }););
 
   const util::TenthOfDegree expected_max_scan_angle{ frame.fromTheta() +
-                                                     frame.resolution() * (int)frame.measurements().size() };
+                                                     frame.resolution() * ((int)frame.measurements().size() - 1) };
 
   EXPECT_EQ(frame.fromTheta(), scan_ptr->getMinScanAngle()) << "Min scan-angle incorrect in LaserScan";
   EXPECT_EQ(expected_max_scan_angle, scan_ptr->getMaxScanAngle()) << "Max scan-angle incorrect in LaserScan";
