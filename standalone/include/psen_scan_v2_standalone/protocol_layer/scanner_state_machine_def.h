@@ -184,30 +184,16 @@ ScannerProtocolDef::informUserAboutTheScanData(const data_conversion_layer::moni
 inline void ScannerProtocolDef::sendMessageWithMeasurements(
     const std::vector<data_conversion_layer::monitoring_frame::Message>& frames)
 {
-  if (framesContainMeasurements(frames))
+  try
   {
-    try
-    {
-      args_->inform_user_about_laser_scan_cb(data_conversion_layer::LaserScanConverter::toLaserScan(frames));
-    }
-    // LCOV_EXCL_START
-    catch (const data_conversion_layer::ScannerProtocolViolationError& ex)
-    {
-      PSENSCAN_ERROR("StateMachine", ex.what());
-    }
-    // LCOV_EXCL_STOP
+    args_->inform_user_about_laser_scan_cb(data_conversion_layer::LaserScanConverter::toLaserScan(frames));
   }
-}
-
-inline bool ScannerProtocolDef::framesContainMeasurements(
-    const std::vector<data_conversion_layer::monitoring_frame::Message>& frames)
-{
-  if (std::any_of(frames.begin(), frames.end(), [](const auto& frame) { return frame.measurements().empty(); }))
+  // LCOV_EXCL_START
+  catch (const data_conversion_layer::ScannerProtocolViolationError& ex)
   {
-    PSENSCAN_DEBUG("StateMachine", "No measurement data in this message, skipping laser scan callback.");
-    return false;
+    PSENSCAN_ERROR("StateMachine", ex.what());
   }
-  return true;
+  // LCOV_EXCL_STOP
 }
 
 inline void ScannerProtocolDef::handleMonitoringFrameTimeout(const scanner_events::MonitoringFrameTimeout& event)
