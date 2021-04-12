@@ -61,8 +61,6 @@ private:
                                        const std::vector<int>& sorted_frames_indices);
   static bool allResolutionsMatch(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames);
   static bool allScanCountersMatch(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames);
-  static bool thetaAnglesFitTogether(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames,
-                                     const std::vector<int>& sorted_frames_indices);
 };
 
 inline LaserScan
@@ -130,10 +128,6 @@ inline void LaserScanConverter::validateMonitoringFrames(
   {
     throw ScannerProtocolViolationError("The scan counters of all monitoring frames have to be the same.");
   }
-  else if (!thetaAnglesFitTogether(frames, sorted_frames_indices))
-  {
-    throw ScannerProtocolViolationError("The monitoring frame ranges do not cover the whole scan range");
-  }
 }
 
 inline bool
@@ -150,23 +144,6 @@ LaserScanConverter::allScanCountersMatch(const std::vector<data_conversion_layer
   const auto scan_counter = frames[0].scanCounter();
   return std::all_of(
       frames.begin(), frames.end(), [scan_counter](const auto& frame) { return frame.scanCounter() == scan_counter; });
-}
-
-inline bool
-LaserScanConverter::thetaAnglesFitTogether(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames,
-                                           const std::vector<int>& sorted_frames_indices)
-{
-  util::TenthOfDegree lastEnd = frames[sorted_frames_indices[0]].fromTheta();
-  for (auto index : sorted_frames_indices)
-  {
-    const auto& frame = frames[index];
-    if (lastEnd != frame.fromTheta())
-    {
-      return false;
-    }
-    lastEnd = frame.fromTheta() + frame.resolution() * static_cast<int>(frame.measurements().size());
-  }
-  return true;
 }
 
 }  // namespace data_conversion_layer
