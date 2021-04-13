@@ -236,6 +236,7 @@ private:
   void checkForDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& frame);
   void informUserAboutTheScanData(const data_conversion_layer::monitoring_frame::Message& frame);
   void sendMessageWithMeasurements(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames);
+  bool framesContainMeasurements(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames);
 
 private:
   const std::unique_ptr<StateMachineArgs> args_;
