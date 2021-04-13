@@ -160,7 +160,7 @@ LaserScanConverter::thetaAnglesFitTogether(const std::vector<data_conversion_lay
   for (auto index : sorted_frames_indices)
   {
     const auto& frame = frames[index];
-    if (lastEnd != frame.fromTheta())
+    if ((lastEnd != frame.fromTheta()) && (!frame.measurements().empty()))
     {
       return false;
     }
