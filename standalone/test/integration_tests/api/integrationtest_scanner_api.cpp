@@ -528,7 +528,7 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfMissingMeassuremen
 
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
-  EXPECT_LOG_SHORT(DEBUG, "StateMachine: No measurement data in this message, skipping laser scan callback.")
+  EXPECT_LOG_SHORT(DEBUG, "StateMachine: No measurement data in this monitoring frames, skipping laser scan callback.")
       .Times(1)
       .WillOnce(OpenBarrier(&valid_msg_barrier));
 
