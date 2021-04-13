@@ -202,9 +202,9 @@ inline void ScannerProtocolDef::sendMessageWithMeasurements(
 inline bool ScannerProtocolDef::framesContainMeasurements(
     const std::vector<data_conversion_layer::monitoring_frame::Message>& frames)
 {
-  if (std::any_of(frames.begin(), frames.end(), [](const auto& frame) { return frame.measurements().empty(); }))
+  if (std::all_of(frames.begin(), frames.end(), [](const auto& frame) { return frame.measurements().empty(); }))
   {
-    PSENSCAN_DEBUG("StateMachine", "No measurement data in this message, skipping laser scan callback.");
+    PSENSCAN_DEBUG("StateMachine", "No measurement data in this monitoring frames, skipping laser scan callback.");
     return false;
   }
   return true;
