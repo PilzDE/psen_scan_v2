@@ -190,6 +190,7 @@ TEST(LaserScanConversionTest, conversionShouldIgnoreEmptyFramesForMonitoringFram
   using Tenth = util::TenthOfDegree;
 
   // The following from_theta's are a real example from wireshark.
+  // (angle_start:=-0.1, angle_end:=0.1)
   std::vector<Message> messages = { Message(Tenth(2500), Tenth(2), 42, {}, {}, {}),
                                     Message(Tenth(0), Tenth(2), 42, {}, {}, {}),
                                     Message(Tenth(500), Tenth(2), 42, {}, {}, {}),
