@@ -204,7 +204,7 @@ inline bool ScannerProtocolDef::framesContainMeasurements(
 {
   if (std::all_of(frames.begin(), frames.end(), [](const auto& frame) { return frame.measurements().empty(); }))
   {
-    PSENSCAN_DEBUG("StateMachine", "No measurement data in this monitoring frames, skipping laser scan callback.");
+    PSENSCAN_DEBUG("StateMachine", "No measurement data in current monitoring frame(s), skipping laser scan callback.");
     return false;
   }
   return true;
