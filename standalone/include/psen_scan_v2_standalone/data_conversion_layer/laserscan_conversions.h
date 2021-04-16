@@ -104,10 +104,12 @@ inline std::vector<int> LaserScanConverter::getFilledFramesIndicesSortedByThetaA
     return frames[i1].fromTheta() < frames[i2].fromTheta();
   });
 
+  // LCOV_EXCL_START
   sorted_filled_frames_indices.erase(std::remove_if(sorted_filled_frames_indices.begin(),
                                                     sorted_filled_frames_indices.end(),
                                                     [frames](int i) { return frames[i].measurements().empty(); }),
                                      sorted_filled_frames_indices.end());
+  // LCOV_EXCL_STOP
 
   return sorted_filled_frames_indices;
 }
