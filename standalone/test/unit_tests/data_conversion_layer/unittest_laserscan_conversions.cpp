@@ -184,7 +184,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainMeasurementsOrderedByThetaA
   ASSERT_EQ(scan_ptr->getMeasurements().back(), new_measurements2.back());
 }
 
-TEST(LaserScanConversionTest, conversionShouldIgnoreEmptyFramesForMonitoringFrameValidation)
+TEST(LaserScanConversionTest, conversionShouldIgnoreEmptyFramesForMonitoringFramesValidation)
 {
   using Message = data_conversion_layer::monitoring_frame::Message;
   using Tenth = util::TenthOfDegree;
@@ -197,8 +197,7 @@ TEST(LaserScanConversionTest, conversionShouldIgnoreEmptyFramesForMonitoringFram
                                     Message(Tenth(1500), Tenth(2), 42, {}, {}, {}),
                                     Message(Tenth(2000), Tenth(2), 42, {}, {}, {}) };
 
-  std::unique_ptr<LaserScan> scan_ptr;
-  ASSERT_NO_THROW(scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(messages) }););
+  ASSERT_NO_THROW(data_conversion_layer::LaserScanConverter::toLaserScan(messages));
 }
 
 }  // namespace psen_scan_v2_standalone_test
