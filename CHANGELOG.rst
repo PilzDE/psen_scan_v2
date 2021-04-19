@@ -2,6 +2,11 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix issues with smaller scan range than default range. Closes #181
+* Contributors: Pilz GmbH and Co. KG
+
 0.2.0 (2021-04-05)
 ------------------
 * Combine multiple monitoring frames into one scan (`#173 <https://github.com/PilzDE/psen_scan_v2/issues/173>`_)
