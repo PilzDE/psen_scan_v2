@@ -47,6 +47,7 @@ DEFAULT_STATE_IMPL(WaitForStopReply)
 
 DEFAULT_ON_ENTRY_IMPL(Idle)
 
+// \cond Ignore "was not declared or defined" warnings from doxygen
 template <class Event, class FSM>
 void ScannerProtocolDef::Idle::on_exit(Event const&, FSM& fsm)
 {
@@ -98,6 +99,7 @@ void ScannerProtocolDef::Stopped::on_entry(Event const&, FSM& fsm)
 
 DEFAULT_ON_EXIT_IMPL(Stopped)
 
+// \endcond
 //+++++++++++++++++++++++++++++++++ Actions +++++++++++++++++++++++++++++++++++
 
 template <class T>
