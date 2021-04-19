@@ -4,7 +4,8 @@ Changelog for package psen_scan_v2
 
 Forthcoming
 -----------
-* Fix issues with smaller scan range than default range. Closes #181
+* Fix issues with smaller angle ranges than default range (`#183 <https://github.com/PilzDE/psen_scan_v2/issues/183>`_)
+* Add action for pull request todos (`#184 <https://github.com/PilzDE/psen_scan_v2/issues/184>`_)
 * Contributors: Pilz GmbH and Co. KG
 
 0.2.0 (2021-04-05)
