@@ -36,7 +36,6 @@ namespace start_request
 {
 static constexpr std::size_t SIZE{ 58 };  // See protocol description
 static constexpr uint64_t RESERVED{ 0 };
-static constexpr uint32_t DEFAULT_SEQ_NUMBER{ 0 };
 
 static const uint32_t OPCODE{ 0x35 };
 }  // namespace start_request
@@ -121,9 +120,5 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
   return raw_data_with_crc;
 }
 
-RawData data_conversion_layer::start_request::serialize(const data_conversion_layer::start_request::Message& msg)
-{
-  return serialize(msg, data_conversion_layer::start_request::DEFAULT_SEQ_NUMBER);
-}
 }  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone

@@ -23,6 +23,7 @@
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scanner_config_builder.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/start_request_serialization.h"
 #include "psen_scan_v2_standalone/scan_range.h"
 
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_data_test_helper.h"
@@ -174,7 +175,8 @@ TEST_F(StartRequestTest, crcShouldBeCorrectIfDiagnosticIsEnabled)
 {
   const ScannerConfiguration config{ createConfig(true) };
 
-  const auto raw_start_request{ serialize(data_conversion_layer::start_request::Message(config)) };
+  const auto raw_start_request{ data_conversion_layer::start_request::serialize(
+      data_conversion_layer::start_request::Message(config)) };
   const std::array<unsigned char, 4> expected_crc = { 0x18, 0x5b, 0xd5, 0x55 };  // see wireshark for this number
   for (size_t i = 0; i < expected_crc.size(); ++i)
   {
