@@ -104,6 +104,7 @@ inline std::vector<int> LaserScanConverter::getFilledFramesIndicesSortedByThetaA
     return frames[i1].fromTheta() < frames[i2].fromTheta();
   });
 
+  // The following contains a missing line in the coverage report, which does not make sense.
   // LCOV_EXCL_START
   sorted_filled_frames_indices.erase(std::remove_if(sorted_filled_frames_indices.begin(),
                                                     sorted_filled_frames_indices.end(),
