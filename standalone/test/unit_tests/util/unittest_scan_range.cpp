@@ -64,6 +64,11 @@ TEST(ScanRangeTest, testEndAngleSmallerThanStartAngle)
   EXPECT_THROW(TestScanRange(util::TenthOfDegree(17), util::TenthOfDegree(15)), std::invalid_argument);
 }
 
+TEST(ScanRangeTest, testEndAngleEqualStartAngle)
+{
+  EXPECT_THROW(TestScanRange(util::TenthOfDegree(15), util::TenthOfDegree(15)), std::invalid_argument);
+}
+
 }  // namespace psen_scan_v2_standalone_test
 
 int main(int argc, char* argv[])
