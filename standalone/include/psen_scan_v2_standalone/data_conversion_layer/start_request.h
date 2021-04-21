@@ -46,7 +46,6 @@ public:
 
   friend data_conversion_layer::RawData serialize(const data_conversion_layer::start_request::Message&,
                                                   const uint32_t&);
-  friend data_conversion_layer::RawData serialize(const data_conversion_layer::start_request::Message&);
 
 private:
   /**

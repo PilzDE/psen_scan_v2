@@ -24,8 +24,10 @@ namespace data_conversion_layer
 {
 namespace start_request
 {
-RawData serialize(const data_conversion_layer::start_request::Message& start_request, const uint32_t& seq_number);
-RawData serialize(const data_conversion_layer::start_request::Message& start_request);
+static const uint32_t DEFAULT_SEQ_NUMBER{ 0 };
+
+RawData serialize(const data_conversion_layer::start_request::Message& start_request,
+                  const uint32_t& seq_number = DEFAULT_SEQ_NUMBER);
 }  // namespace start_request
 }  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone

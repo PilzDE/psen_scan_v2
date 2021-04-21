@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include "psen_scan_v2_standalone/data_conversion_layer/start_request_serialization.h"
 namespace psen_scan_v2_standalone
 {
 namespace protocol_layer
@@ -111,7 +112,8 @@ inline void ScannerProtocolDef::sendStartRequest(const T& event)
     args_->config_.setHostIp(host_ip.to_ulong());
     PSENSCAN_INFO("StateMachine", "No host ip set! Using local ip: {}", host_ip.to_string());
   }
-  args_->control_client_->write(serialize(data_conversion_layer::start_request::Message(args_->config_)));
+  args_->control_client_->write(
+      data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(args_->config_)));
 }
 
 inline void ScannerProtocolDef::handleStartRequestTimeout(const scanner_events::StartTimeout& event)
