@@ -64,7 +64,8 @@ enum class ReceiveMode
  * @brief Helper for asynchronously sending and receiving data via UDP.
  *
  * This class provides methods for opening and closing the UDP connection, writing and receiving data via UDP. The data
- * is represented by @ref RawData. Upon receiving data a @ref NewDataHandler is invoked. When something goes wrong an
+ * is represented by @ref data_conversion_layer::RawData. Upon receiving data a @ref NewDataHandler is invoked. When
+ * something goes wrong an
  * @ref ErrorHandler is invoked.
  *
  * The ScannerV2 constructs two UDP clients, which are then used by the scanner_protocol::ScannerProtocolDef.
