@@ -208,6 +208,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_start_request
     ${catkin_LIBRARIES}
+    fmt::fmt
   )
 
   catkin_add_gtest(unittest_stop_request
