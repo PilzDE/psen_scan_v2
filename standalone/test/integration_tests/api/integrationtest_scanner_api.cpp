@@ -298,6 +298,10 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
   }
 
   EXPECT_LOG_SHORT(DEBUG, _).Times(AnyNumber());
+  EXPECT_LOG_SHORT(INFO,
+                   "StartRequestSerialization: Serializing start request with angle_start=0 angle_end=60 resolution=2 "
+                   "tenths of degree.")
+      .Times(AnyNumber());
   EXPECT_LOG_SHORT(INFO, "Scanner: Start scanner called.").Times(1);
   EXPECT_LOG_SHORT(ERROR,
                    "StateMachine: Timeout while waiting for the scanner to start! Retrying... "
@@ -337,6 +341,10 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
   EXPECT_LOG_SHORT(DEBUG, _).Times(AnyNumber());
+  EXPECT_LOG_SHORT(INFO,
+                   "StartRequestSerialization: Serializing start request with angle_start=0 angle_end=60 resolution=2 "
+                   "tenths of degree.")
+      .Times(AnyNumber());
   EXPECT_LOG_SHORT(INFO, "Scanner: Start scanner called.").Times(1);
   EXPECT_LOG_SHORT(INFO, "ScannerController: Scanner started successfully.").Times(1);
   EXPECT_LOG_SHORT(WARN,
