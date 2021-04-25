@@ -29,6 +29,7 @@
 #include "psen_scan_v2_standalone/scanner_v2.h"
 
 #include "psen_scan_v2/laserscan_ros_conversions.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 
 using namespace std;
 
@@ -110,10 +111,10 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
   PSENSCAN_INFO_THROTTLE(
       10000 /* sec */,
       "ScannerNode",
-      "Publishing laser scan with angle_min={} angle_max={} angle_increment={} radians. {} angle values.",
-      to_string(laserScanMsg.angle_min),
-      to_string(laserScanMsg.angle_max),
-      to_string(laserScanMsg.angle_increment),
+      "Publishing laser scan with angle_min={} angle_max={} angle_increment={} degrees. {} angle values.",
+      to_string(data_conversion_layer::radianToDegree(laserScanMsg.angle_min)),
+      to_string(data_conversion_layer::radianToDegree(laserScanMsg.angle_max)),
+      to_string(data_conversion_layer::radianToDegree(laserScanMsg.angle_increment)),
       to_string(laserScanMsg.ranges.size()));
   pub_.publish(laserScanMsg);
 }
