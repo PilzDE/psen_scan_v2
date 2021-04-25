@@ -30,6 +30,8 @@
 
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 
+using namespace std;
+
 /**
  * @brief Root namespace for the ROS part
  */
@@ -104,7 +106,13 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
 template <typename S>
 void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
 {
-  pub_.publish(toLaserScanMsg(scan, prefix_, x_axis_rotation_));
+  const auto laserScanMsg = toLaserScanMsg(scan, prefix_, x_axis_rotation_);
+  PSENSCAN_INFO_THROTTLE(10000 /* sec */,
+                         "ScannerNode",
+                         string("Publishing laser scan with angle_min=" + to_string(laserScanMsg.angle_min) +
+                                " angle_max=" + to_string(laserScanMsg.angle_max) +
+                                " angle_increment=" + to_string(laserScanMsg.angle_increment) + " radians."));
+  pub_.publish(laserScanMsg);
 }
 
 template <typename S>
