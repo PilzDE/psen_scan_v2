@@ -69,4 +69,13 @@ using namespace console_bridge;
 #define PSENSCAN_DEBUG_THROTTLE(period, name, ...)                                                                     \
   PSENSCAN_LOG_THROTTLE(period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_DEBUG, __VA_ARGS__)
 
+#define PSENSCAN_ERROR_ONCE(name, ...)                                                                                 \
+  PSENSCAN_LOG_THROTTLE(1e9, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, __VA_ARGS__)
+#define PSENSCAN_INFO_ONCE(name, ...)                                                                                  \
+  PSENSCAN_LOG_THROTTLE(1e9, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_INFO, __VA_ARGS__)
+#define PSENSCAN_WARN_ONCE(name, ...)                                                                                  \
+  PSENSCAN_LOG_THROTTLE(1e9, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_WARN, __VA_ARGS__)
+#define PSENSCAN_DEBUG_ONCE(name, ...)                                                                                 \
+  PSENSCAN_LOG_THROTTLE(1e9, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_DEBUG, __VA_ARGS__)
+
 #endif  // PSEN_SCAN_V2_STANDALONE_LOGGING_H

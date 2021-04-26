@@ -108,8 +108,7 @@ template <typename S>
 void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
 {
   const auto laserScanMsg = toLaserScanMsg(scan, prefix_, x_axis_rotation_);
-  PSENSCAN_INFO_THROTTLE(
-      10000 /* sec */,
+  PSENSCAN_INFO_ONCE(
       "ScannerNode",
       "Publishing laser scan with angle_min={} angle_max={} angle_increment={} degrees. {} angle values.",
       to_string(data_conversion_layer::radianToDegree(laserScanMsg.angle_min)),
