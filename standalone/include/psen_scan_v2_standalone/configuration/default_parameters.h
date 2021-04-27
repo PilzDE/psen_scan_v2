@@ -35,7 +35,8 @@ static constexpr bool DEFAULT_FRAGMENTED_SCANS{ false };
 //! @brief Start angle of measurement.
 static constexpr double DEFAULT_ANGLE_START(-data_conversion_layer::degreeToRadian(137.5));
 //! @brief  End angle of measurement.
-static constexpr double DEFAULT_ANGLE_END(data_conversion_layer::degreeToRadian(137.5));
+static constexpr double DEFAULT_ANGLE_END(data_conversion_layer::degreeToRadian(137.3));
+static constexpr double DEFAULT_RESOLUTION(data_conversion_layer::degreeToRadian(0.2));
 
 static constexpr uint16_t NUMBER_OF_SAMPLES_FULL_SCAN_MASTER{ 2750 };
 
