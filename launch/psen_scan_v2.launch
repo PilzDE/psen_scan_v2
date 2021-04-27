@@ -35,7 +35,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <arg name="angle_start" default="$(eval -137.5 /180.0 * pi)" />
 
   <!-- End angle of measurement in radian -->
-  <arg name="angle_end" default="$(eval 137.5 /180.0 * pi)" />
+  <arg name="angle_end" default="$(eval 137.3 /180.0 * pi)" />
 
   <!-- Set the following to true in order to publish scan data as soon as a UDP packet is ready, instead of waiting for a full scan -->
   <arg name="fragmented_scans" default="false" />
