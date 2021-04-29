@@ -55,7 +55,7 @@ static constexpr double toMeter(const uint16_t& value)
 {
   if ((value == NO_SIGNAL_ARRIVED) || (value == SIGNAL_TOO_LATE))
   {
-    return INFINITY;
+    return std::numeric_limits<double>::infinity();
   }
   return static_cast<double>(value) / 1000.;
 }

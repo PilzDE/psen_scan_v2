@@ -59,7 +59,7 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& frame)
       frame.measurements_.size() * NUMBER_OF_BYTES_SINGLE_MEASUREMENT);
   write(os, measurements_header);
   data_conversion_layer::raw_processing::writeArray<uint16_t, double>(os, frame.measurements_, [](double elem) {
-    if (elem == INFINITY)
+    if (elem == std::numeric_limits<double>::infinity())
     {
       return NO_SIGNAL_ARRIVED;
     }
