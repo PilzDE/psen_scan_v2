@@ -29,6 +29,17 @@
     console_bridge::log(file, line, level, fmt::format("{}: {}", name, fmt::format(__VA_ARGS__)).c_str());             \
   } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
 
+#define PSENSCAN_LOG_ONCE(name, file, line, level, ...)                                                                \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    static bool already_logged = false;                                                                                \
+    if (!already_logged)                                                                                               \
+    {                                                                                                                  \
+      console_bridge::log(file, line, level, fmt::format("{}: {}", name, fmt::format(__VA_ARGS__)).c_str());           \
+      already_logged = true;                                                                                           \
+    }                                                                                                                  \
+  } while (false)
+
 #define PSENSCAN_LOG_THROTTLE(period, name, file, line, level, ...)                                                    \
   PSENSCAN_LOG_THROTTLE_INTERNAL(std::chrono::system_clock::now(), period, name, file, line, level, __VA_ARGS__)
 
@@ -68,5 +79,12 @@ using namespace console_bridge;
   PSENSCAN_LOG_THROTTLE(period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_WARN, __VA_ARGS__)
 #define PSENSCAN_DEBUG_THROTTLE(period, name, ...)                                                                     \
   PSENSCAN_LOG_THROTTLE(period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_DEBUG, __VA_ARGS__)
+
+#define PSENSCAN_ERROR_ONCE(name, ...)                                                                                 \
+  PSENSCAN_LOG_ONCE(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, __VA_ARGS__)
+#define PSENSCAN_INFO_ONCE(name, ...) PSENSCAN_LOG_ONCE(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_INFO, __VA_ARGS__)
+#define PSENSCAN_WARN_ONCE(name, ...) PSENSCAN_LOG_ONCE(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_WARN, __VA_ARGS__)
+#define PSENSCAN_DEBUG_ONCE(name, ...)                                                                                 \
+  PSENSCAN_LOG_ONCE(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_DEBUG, __VA_ARGS__)
 
 #endif  // PSEN_SCAN_V2_STANDALONE_LOGGING_H
