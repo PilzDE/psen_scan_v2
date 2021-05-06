@@ -1,0 +1,43 @@
+<!--
+Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<launch>
+  <arg name="host_ip" default="auto" />
+  <arg name="host_udp_port_data" default="55115" />
+  <arg name="host_udp_port_control" default="55116" />
+  <arg name="sensor_ip" default="192.168.0.10" />
+  <arg name="prefix" default="laser_1" />
+  <arg name="angle_start" default="$(eval -137.5 /180.0 * pi)" />
+  <arg name="angle_end" default="$(eval 137.3 /180.0 * pi)" />
+  <arg name="fragmented_scans" default="false" />
+
+  <node name="laser_scanner" type="psen_scan_v2_node" pkg="psen_scan_v2" output="screen" required="true">
+    <param name="host_ip" value="$(arg host_ip)" />
+    <param name="host_udp_port_data" value="$(arg host_udp_port_data)" />
+    <param name="host_udp_port_control" value="$(arg host_udp_port_control)" />
+    <param name="sensor_ip" value="$(arg sensor_ip)" />
+    <param name="prefix" value="$(arg prefix)" />
+    <param name="angle_start" value="$(arg angle_start)" />
+    <param name="angle_end" value="$(arg angle_end)" />
+    <param name="fragmented_scans" value="$(arg fragmented_scans)" />
+  </node>
+
+  <test test-name="scan_range" pkg="psen_scan_v2" type="hwtest_scan_range.py">
+    <param name="angle_start" value="$(arg angle_start)"/>
+    <param name="angle_end" value="$(arg angle_end)"/>
+  </test>
+</launch>
