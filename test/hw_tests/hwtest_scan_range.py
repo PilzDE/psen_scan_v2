@@ -9,6 +9,8 @@ from sensor_msgs.msg import LaserScan
 
 import pytest
 
+PLACES = 6
+
 
 class HwtestScanRange(unittest.TestCase):
     def setUp(self):
@@ -22,22 +24,29 @@ class HwtestScanRange(unittest.TestCase):
         self.received_msgs.append(msg)
 
     def test_one_message_received(self):
-        rospy.logwarn(self.angle_end)
         while len(self.received_msgs) <= 0:
             rospy.sleep(.1)
         self.assertGreaterEqual(len(self.received_msgs), 1)
 
         message: LaserScan = self.received_msgs[0]
-        rospy.logwarn(f"param angle_start:\n {degrees(self.angle_start)}")
-        rospy.logwarn(f"param angle_end:\n {degrees(self.angle_end)}")
-        rospy.logwarn(f"msg angle_min:\n {degrees(message.angle_min)}")
-        rospy.logwarn(f"msg angle_max:\n {degrees(message.angle_max)}")
-        rospy.logwarn(
+        rospy.loginfo(f"param angle_start:\n {degrees(self.angle_start)}")
+        rospy.loginfo(f"param angle_end:\n {degrees(self.angle_end)}")
+        rospy.loginfo(f"msg angle_min:\n {degrees(message.angle_min)}")
+        rospy.loginfo(f"msg angle_max:\n {degrees(message.angle_max)}")
+        rospy.loginfo(
             f"msg angle_increment:\n {degrees(message.angle_increment)}")
-        rospy.logwarn("msg angle_increment * len(ranges):\n" +
+        rospy.loginfo("msg angle_increment * len(ranges):\n" +
                       f" {degrees(message.angle_increment * len(message.ranges))}")
-        rospy.logwarn("msg angle_min + angle_increment * len(ranges):\n" +
-                      f" {degrees(message.angle_min + message.angle_increment * len(message.ranges))}")
+        rospy.loginfo("msg angle_increment * (len(ranges)-1):\n" +
+                      f" {degrees(message.angle_increment * (len(message.ranges)-1))}")
+        rospy.loginfo("msg angle_min + angle_increment * (len(ranges)-1):\n" +
+                      f" {degrees(message.angle_min + message.angle_increment * (len(message.ranges)-1))}")
+
+        self.assertAlmostEqual(self.angle_start, message.angle_min, PLACES)
+        self.assertAlmostEqual(self.angle_end,
+                               message.angle_min + message.angle_increment *
+                               (len(message.ranges)-1),
+                               PLACES)
 
 
 if __name__ == '__main__':
