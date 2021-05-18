@@ -28,6 +28,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- End angle of measurement in radian -->
   <arg name="angle_end" default="$(eval 137.5 /180.0 * pi)" />
 
+  <!-- Publishing of intensities -->
+  <arg name="intensities" default="false" />
+
+  <!-- Scan resolution in radian -->
+  <arg name="resolution" default="$(eval 0.1 /180.0 * pi)" />
+
   <!-- IP-Address of host machine -->
   <arg name="host_ip" default="auto" />
 
@@ -45,6 +51,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <param name="prefix" value="$(arg prefix)" />
     <param name="angle_start" value="$(arg angle_start)" />
     <param name="angle_end" value="$(arg angle_end)" />
+    <param name="intensities" value="$(arg intensities)" />
+    <param name="resolution" value="$(arg resolution)" />
     <param name="host_ip" value="$(arg host_ip)" />
     <param name="host_udp_port_data" value="$(arg host_udp_port_data)" />
     <param name="host_udp_port_control" value="$(arg host_udp_port_control)" />
