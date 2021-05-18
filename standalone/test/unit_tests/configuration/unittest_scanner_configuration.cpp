@@ -291,16 +291,22 @@ TEST_F(ScannerConfigurationTest, shouldReturnCorrectResolutionAfterConstruction)
   EXPECT_EQ(SCAN_RESOLUTION, sc.scanResolution());
 }
 
+TEST_F(ScannerConfigurationTest, shouldHaveCorrectResolutionOnDefault)
+{
+  const ScannerConfiguration sc{ createValidDefaultConfig() };
+  EXPECT_EQ(configuration::SCAN_RESOLUTION, sc.scanResolution());
+}
+
 TEST_F(ScannerConfigurationTest, shouldHaveEnabledIntensitiesAfterConstruction)
 {
   const ScannerConfiguration sc{ createValidConfig() };
-  EXPECT_EQ(true, sc.intensitiesEnabled());
+  EXPECT_TRUE(sc.intensitiesEnabled());
 }
 
 TEST_F(ScannerConfigurationTest, shouldHaveDisabledIntensitiesByDefault)
 {
   const ScannerConfiguration sc{ createValidDefaultConfig() };
-  EXPECT_EQ(false, sc.intensitiesEnabled());
+  EXPECT_FALSE(sc.intensitiesEnabled());
 }
 
 }  // namespace psen_scan_v2_standalone_test
