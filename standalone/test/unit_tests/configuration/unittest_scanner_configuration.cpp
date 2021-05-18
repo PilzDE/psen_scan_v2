@@ -35,6 +35,7 @@ namespace psen_scan_v2_standalone_test
 static constexpr int MINIMAL_PORT_NUMBER{ std::numeric_limits<uint16_t>::min() };
 static constexpr int MAXIMAL_PORT_NUMBER{ std::numeric_limits<uint16_t>::max() };
 static constexpr ScanRange SCAN_RANGE{ util::TenthOfDegree(0), util::TenthOfDegree(2750) };
+static constexpr util::TenthOfDegree SCAN_RESOLUTION{ 2u };
 static const std::string VALID_IP{ "127.0.0.1" };
 static const std::string VALID_IP_OTHER{ "192.168.0.1" };
 static const std::string INVALID_IP{ "invalid_ip" };
@@ -55,7 +56,9 @@ static ScannerConfiguration createValidConfig()
       .scannerDataPort(MINIMAL_PORT_NUMBER + 1)
       .scannerControlPort(MINIMAL_PORT_NUMBER + 2)
       .scanRange(SCAN_RANGE)
+      .scanResolution(SCAN_RESOLUTION)
       .enableDiagnostics()
+      .enableIntensities()
       .build();
 }
 
@@ -69,7 +72,9 @@ static ScannerConfiguration createValidConfig(const std::string& host_ip)
       .scannerDataPort(MINIMAL_PORT_NUMBER + 1)
       .scannerControlPort(MINIMAL_PORT_NUMBER + 2)
       .scanRange(SCAN_RANGE)
+      .scanResolution(SCAN_RESOLUTION)
       .enableDiagnostics()
+      .enableIntensities()
       .enableFragmentedScans(true)
       .build();
 }
