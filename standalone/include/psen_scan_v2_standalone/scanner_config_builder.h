@@ -44,7 +44,9 @@ public:
   ScannerConfigurationBuilder& scannerDataPort(const int&);
   ScannerConfigurationBuilder& scannerControlPort(const int&);
   ScannerConfigurationBuilder& scanRange(const ScanRange&);
-  ScannerConfigurationBuilder& enableDiagnostics();
+  ScannerConfigurationBuilder& scanResolution(const util::TenthOfDegree&);
+  ScannerConfigurationBuilder& enableDiagnostics(const bool&);
+  ScannerConfigurationBuilder& enableIntensities(const bool&);
   ScannerConfigurationBuilder& enableFragmentedScans(const bool&);
 
 private:
@@ -108,13 +110,25 @@ inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scanRange(const
   return *this;
 }
 
-inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableDiagnostics()
+inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scanResolution(const util::TenthOfDegree& scan_resolution)
 {
-  config_.diagnostics_enabled_ = true;
+  config_.scan_resolution_ = scan_resolution;
   return *this;
 }
 
-inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableFragmentedScans(const bool& enable)
+inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableDiagnostics(const bool& enable=true)
+{
+  config_.diagnostics_enabled_ = enable;
+  return *this;
+}
+
+inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableIntensities(const bool& enable=true)
+{
+  config_.intensities_enabled_ = enable;
+  return *this;
+}
+
+inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableFragmentedScans(const bool& enable=true)
 {
   config_.fragmented_scans_ = enable;
   return *this;

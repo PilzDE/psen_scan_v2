@@ -294,7 +294,7 @@ TEST_F(ScannerConfigurationTest, shouldReturnCorrectResolutionAfterConstruction)
 TEST_F(ScannerConfigurationTest, shouldHaveCorrectResolutionOnDefault)
 {
   const ScannerConfiguration sc{ createValidDefaultConfig() };
-  EXPECT_EQ(configuration::SCAN_RESOLUTION, sc.scanResolution());
+  EXPECT_EQ(configuration::SCAN_ANGLE_RESOLUTION, sc.scanResolution());
 }
 
 TEST_F(ScannerConfigurationTest, shouldHaveEnabledIntensitiesAfterConstruction)
@@ -303,18 +303,17 @@ TEST_F(ScannerConfigurationTest, shouldHaveEnabledIntensitiesAfterConstruction)
   EXPECT_TRUE(sc.intensitiesEnabled());
 }
 
-TEST_F(ScannerConfigurationTest, shouldHaveDisabledIntensitiesByDefault)
+TEST_F(ScannerConfigurationTest, shouldLoadIntensitiesFromConfigByDefault)
 {
   const ScannerConfiguration sc{ createValidDefaultConfig() };
-  EXPECT_FALSE(sc.intensitiesEnabled());
+  EXPECT_EQ(configuration::INTENSITIES, sc.intensitiesEnabled());
 }
 
 TEST_F(ScannerConfigurationTest, shouldThrowInvalidArgumentWithLowResolutionAndEnabledIntensitiesOnBuild)
 {
-  const ScannerConfiguration sc{ createValidDefaultConfig() };
-  sc.scanResolution(util::TenthOfDegree{ data_conversion_layer::degreeToTenthDegree(0.19) });
-  sc.enableIntensities();
-  EXPECT_THROW(sc.build(), std::invalid_argument);
+  ScannerConfigurationBuilder sb{};
+  sb.scannerIp(VALID_IP).scanRange(SCAN_RANGE).enableIntensities().scanResolution(util::TenthOfDegree{ 1u });
+  EXPECT_THROW(sb.build(), std::invalid_argument);
 }
 
 }  // namespace psen_scan_v2_standalone_test

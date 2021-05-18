@@ -45,8 +45,10 @@ public:
   uint16_t scannerControlPort() const;
 
   const ScanRange& scanRange() const;
+  const util::TenthOfDegree& scanResolution() const;
 
   bool diagnosticsEnabled() const;
+  bool intensitiesEnabled() const;
 
   bool fragmentedScansEnabled() const;
 
@@ -68,8 +70,10 @@ private:
   uint16_t scanner_control_port_{ configuration::CONTROL_PORT_OF_SCANNER_DEVICE };
 
   boost::optional<ScanRange> scan_range_{};
-  bool diagnostics_enabled_{ false };
-  bool fragmented_scans_{ false };
+  util::TenthOfDegree scan_resolution_{ configuration::SCAN_ANGLE_RESOLUTION };
+  bool diagnostics_enabled_{ configuration::DIAGNOSTICS };
+  bool intensities_enabled_{ configuration::INTENSITIES };
+  bool fragmented_scans_{ configuration::FRAGMENTED_SCANS };
 };
 
 inline bool ScannerConfiguration::isValid() const
@@ -112,9 +116,19 @@ inline const ScanRange& ScannerConfiguration::scanRange() const
   return *scan_range_;
 }
 
+inline const util::TenthOfDegree& ScannerConfiguration::scanResolution() const
+{
+  return scan_resolution_;
+}
+
 inline bool ScannerConfiguration::diagnosticsEnabled() const
 {
   return diagnostics_enabled_;
+}
+
+inline bool ScannerConfiguration::intensitiesEnabled() const
+{
+  return intensities_enabled_;
 }
 
 inline bool ScannerConfiguration::fragmentedScansEnabled() const

@@ -92,7 +92,7 @@ int main(int argc, char** argv)
           .scanRange(scan_range)
           .enableDiagnostics()
           .enableFragmentedScans(
-              getOptionalParamFromServer<bool>(pnh, PARAM_FRAGMENTED_SCANS, configuration::DEFAULT_FRAGMENTED_SCANS))
+              getOptionalParamFromServer<bool>(pnh, PARAM_FRAGMENTED_SCANS, configuration::FRAGMENTED_SCANS))
           .build()
     };
 
