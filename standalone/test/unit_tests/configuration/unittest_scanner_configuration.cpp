@@ -309,6 +309,14 @@ TEST_F(ScannerConfigurationTest, shouldHaveDisabledIntensitiesByDefault)
   EXPECT_FALSE(sc.intensitiesEnabled());
 }
 
+TEST_F(ScannerConfigurationTest, shouldThrowInvalidArgumentWithLowResolutionAndEnabledIntensitiesOnBuild)
+{
+  const ScannerConfiguration sc{ createValidDefaultConfig() };
+  sc.scanResolution(util::TenthOfDegree{ data_conversion_layer::degreeToTenthDegree(0.19) });
+  sc.enableIntensities();
+  EXPECT_THROW(sc.build(), std::invalid_argument);
+}
+
 }  // namespace psen_scan_v2_standalone_test
 
 int main(int argc, char* argv[])
