@@ -285,6 +285,13 @@ TEST_F(ScannerConfigurationTest, shouldReturnSetHostIp)
   EXPECT_EQ(host_ip, sc.hostIp());
 }
 
+TEST_F(ScannerConfigurationTest, shouldReturnCorrectResolutionAfterConstruction)
+{
+  const ScannerConfiguration sc{ createValidConfig() };
+
+  EXPECT_EQ(SCAN_RESOLUTION, sc.scanResolution());
+}
+
 }  // namespace psen_scan_v2_standalone_test
 
 int main(int argc, char* argv[])
