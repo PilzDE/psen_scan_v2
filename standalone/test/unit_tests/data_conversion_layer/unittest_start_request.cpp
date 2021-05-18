@@ -82,6 +82,8 @@ TEST_F(StartRequestTest, constructorTest)
                                                        .scannerDataPort(77)
                                                        .scannerControlPort(78)
                                                        .scanRange(scan_range)
+                                                       .scanResolution(util::TenthOfDegree(2u))
+                                                       .enableIntensities()
                                                        .build());
 
   auto data = serialize(sr, sequence_number);
@@ -149,6 +151,8 @@ static ScannerConfiguration createConfig(bool enable_diagnostics)
       .scannerIp("192.168.0.10")
       .scannerDataPort(2000)
       .scannerControlPort(3000)
+      .scanResolution(util::TenthOfDegree(2u))
+      .enableIntensities()
       .scanRange(ScanRange(util::TenthOfDegree(0), util::TenthOfDegree(2750)));
 
   if (enable_diagnostics)
