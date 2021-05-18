@@ -288,8 +288,19 @@ TEST_F(ScannerConfigurationTest, shouldReturnSetHostIp)
 TEST_F(ScannerConfigurationTest, shouldReturnCorrectResolutionAfterConstruction)
 {
   const ScannerConfiguration sc{ createValidConfig() };
-
   EXPECT_EQ(SCAN_RESOLUTION, sc.scanResolution());
+}
+
+TEST_F(ScannerConfigurationTest, shouldHaveEnabledIntensitiesAfterConstruction)
+{
+  const ScannerConfiguration sc{ createValidConfig() };
+  EXPECT_EQ(true, sc.intensitiesEnabled());
+}
+
+TEST_F(ScannerConfigurationTest, shouldHaveDisabledIntensitiesByDefault)
+{
+  const ScannerConfiguration sc{ createValidDefaultConfig() };
+  EXPECT_EQ(false, sc.intensitiesEnabled());
 }
 
 }  // namespace psen_scan_v2_standalone_test
