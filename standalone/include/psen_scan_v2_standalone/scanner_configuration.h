@@ -58,6 +58,7 @@ private:
   friend class ScannerConfigurationBuilder;
 
 private:
+  bool isComplete() const;
   bool isValid() const;
 
 private:
@@ -76,9 +77,14 @@ private:
   bool fragmented_scans_{ configuration::FRAGMENTED_SCANS };
 };
 
-inline bool ScannerConfiguration::isValid() const
+inline bool ScannerConfiguration::isComplete() const
 {
   return scanner_ip_ && scan_range_;
+}
+
+inline bool ScannerConfiguration::isValid() const
+{
+  return scan_resolution_ >= util::TenthOfDegree(2u) || !intensities_enabled_;
 }
 
 inline boost::optional<uint32_t> ScannerConfiguration::hostIp() const

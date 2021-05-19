@@ -58,10 +58,15 @@ private:
 
 inline ScannerConfiguration ScannerConfigurationBuilder::build() const
 {
-  if (!config_.isValid())
+  if (!config_.isComplete())
   {
     throw std::runtime_error("Scanner configuration not complete");
   }
+  else if (!config_.isValid())
+  {
+    throw std::invalid_argument("Requires a resolution of min: 0.2 degree when intensities are enabled");
+  }
+
   return config_;
 }
 
