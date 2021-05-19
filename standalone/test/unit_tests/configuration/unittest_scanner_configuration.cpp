@@ -319,15 +319,15 @@ TEST_F(ScannerConfigurationTest, shouldThrowInvalidArgumentWithLowResolutionAndE
 TEST_F(ScannerConfigurationTest, shouldThrowInvalidArgumentWithResolutionViolatingLowerLimit)
 {
   ScannerConfigurationBuilder sb{};
-  sb.scannerIp(VALID_IP).scanRange(SCAN_RANGE).scanResolution(util::TenthOfDegree{ 0u });
-  EXPECT_THROW(sb.build(), std::invalid_argument);
+  sb.scannerIp(VALID_IP).scanRange(SCAN_RANGE);
+  EXPECT_THROW(sb.scanResolution(util::TenthOfDegree{ 0u }), std::invalid_argument);
 }
 
 TEST_F(ScannerConfigurationTest, shouldThrowInvalidArgumentWithResolutionViolatingUpperLimit)
 {
   ScannerConfigurationBuilder sb{};
-  sb.scannerIp(VALID_IP).scanRange(SCAN_RANGE).scanResolution(util::TenthOfDegree{ 101u });
-  EXPECT_THROW(sb.build(), std::invalid_argument);
+  sb.scannerIp(VALID_IP).scanRange(SCAN_RANGE);
+  EXPECT_THROW(sb.scanResolution(util::TenthOfDegree{ 101u }), std::invalid_argument);
 }
 
 }  // namespace psen_scan_v2_standalone_test
