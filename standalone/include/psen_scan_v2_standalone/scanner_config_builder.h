@@ -118,6 +118,10 @@ inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scanRange(const
 inline ScannerConfigurationBuilder&
 ScannerConfigurationBuilder::scanResolution(const util::TenthOfDegree& scan_resolution)
 {
+  if (scan_resolution < util::TenthOfDegree(1) || scan_resolution > util::TenthOfDegree(100))
+  {
+    throw std::invalid_argument("Scan resolution has to be between 0.1 and 10 degrees.");
+  }
   config_.scan_resolution_ = scan_resolution;
   return *this;
 }
