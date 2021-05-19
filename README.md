@@ -84,7 +84,7 @@ _intensities_ (_bool_, default: false)<br/>
 Publish intensities. If this is enabled, the resolution needs to be increased (at least 0.2 deg).
 
 _resolution_ (_double_, default: 0.0017 (= 0.1 deg))<br/>
-Scan resolution. (Radian) The value is rounded to a multiple of 0.1 deg.
+Scan angle resolution. (Radian) The value is rounded to a multiple of 0.1 deg and has to be in the range [0.1, 10] degrees.
 
 ### Expert Parameters (optional)
 
