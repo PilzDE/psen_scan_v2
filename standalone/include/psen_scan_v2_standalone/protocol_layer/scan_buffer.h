@@ -26,7 +26,7 @@ namespace psen_scan_v2_standalone
 namespace protocol_layer
 {
 /**
- * @brief Exception indicating problems monitoring frames of a scan round.
+ * @brief Exception indicating problems with the monitoring frames of a scan round.
  */
 class ScanRoundError : public std::runtime_error
 {
