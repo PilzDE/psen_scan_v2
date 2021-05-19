@@ -28,6 +28,9 @@ namespace psen_scan_v2_standalone
 {
 namespace data_conversion_layer
 {
+/**
+ * @brief: Exception thrown if data received from the scanner hardware could not be processed according to protocol.
+ */
 class ScannerProtocolViolationError : public std::runtime_error
 {
 public:
