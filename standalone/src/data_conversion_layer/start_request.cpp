@@ -19,8 +19,6 @@
 
 namespace psen_scan_v2_standalone
 {
-static constexpr util::TenthOfDegree MASTER_RESOLUTION{ util::TenthOfDegree(2u) };
-
 namespace data_conversion_layer
 {
 namespace start_request
@@ -28,8 +26,8 @@ namespace start_request
 Message::Message(const ScannerConfiguration& scanner_configuration)
   : host_ip_(*scanner_configuration.hostIp())
   , host_udp_port_data_(scanner_configuration.hostUDPPortData())  // Write is deduced by the scanner
-  , master_device_settings_(scanner_configuration.diagnosticsEnabled())
-  , master_(scanner_configuration.scanRange(), MASTER_RESOLUTION)
+  , master_device_settings_(scanner_configuration.diagnosticsEnabled(), scanner_configuration.intensitiesEnabled())
+  , master_(scanner_configuration.scanRange(), scanner_configuration.scanResolution())
 {
 }
 
