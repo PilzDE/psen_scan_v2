@@ -105,6 +105,8 @@ ScannerConfiguration ScannerAPITests::generateScannerConfig(const std::string& h
                             .scannerDataPort(port_holder_.data_port_scanner)
                             .scannerControlPort(port_holder_.control_port_scanner)
                             .scanRange(DEFAULT_SCAN_RANGE)
+                            .scanResolution(DEFAULT_SCAN_RESOLUTION)
+                            .enableIntensities()
                             .enableFragmentedScans(fragmented);
   return config_builder.build();
 }

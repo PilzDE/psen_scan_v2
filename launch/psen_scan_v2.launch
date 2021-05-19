@@ -16,15 +16,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <launch>
-  <!-- IP-Address of host machine -->
-  <arg name="host_ip" default="auto" />
-
-  <!-- UDP Port on which monitoring frames (scans) should be received -->
-  <arg name="host_udp_port_data" default="55115" />
-
-  <!-- UDP Port used to send commands (start/stop) and receive the corresponding replies -->
-  <arg name="host_udp_port_control" default="55116" />
-
   <!-- IP-Address of Safety laser scanner -->
   <arg name="sensor_ip" default="192.168.0.10" />
 
@@ -37,17 +28,34 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- End angle of measurement in radian -->
   <arg name="angle_end" default="$(eval 137.5 /180.0 * pi)" />
 
+  <!-- Publishing of intensities -->
+  <arg name="intensities" default="false" />
+
+  <!-- Scan resolution in radian -->
+  <arg name="resolution" default="$(eval 0.1 /180.0 * pi)" />
+
+  <!-- IP-Address of host machine -->
+  <arg name="host_ip" default="auto" />
+
+  <!-- UDP Port on which monitoring frames (scans) should be received -->
+  <arg name="host_udp_port_data" default="55115" />
+
+  <!-- UDP Port used to send commands (start/stop) and receive the corresponding replies -->
+  <arg name="host_udp_port_control" default="55116" />
+
   <!-- Set the following to true in order to publish scan data as soon as a UDP packet is ready, instead of waiting for a full scan -->
   <arg name="fragmented_scans" default="false" />
 
   <node name="laser_scanner" type="psen_scan_v2_node" pkg="psen_scan_v2" output="screen" required="true">
-    <param name="host_ip" value="$(arg host_ip)" />
-    <param name="host_udp_port_data" value="$(arg host_udp_port_data)" />
-    <param name="host_udp_port_control" value="$(arg host_udp_port_control)" />
     <param name="sensor_ip" value="$(arg sensor_ip)" />
     <param name="prefix" value="$(arg prefix)" />
     <param name="angle_start" value="$(arg angle_start)" />
     <param name="angle_end" value="$(arg angle_end)" />
+    <param name="intensities" value="$(arg intensities)" />
+    <param name="resolution" value="$(arg resolution)" />
+    <param name="host_ip" value="$(arg host_ip)" />
+    <param name="host_udp_port_data" value="$(arg host_udp_port_data)" />
+    <param name="host_udp_port_control" value="$(arg host_udp_port_control)" />
     <param name="fragmented_scans" value="$(arg fragmented_scans)" />
   </node>
 
