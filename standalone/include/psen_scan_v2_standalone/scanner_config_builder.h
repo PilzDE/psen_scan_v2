@@ -64,7 +64,7 @@ inline ScannerConfiguration ScannerConfigurationBuilder::build() const
   }
   else if (!config_.isValid())
   {
-    throw std::invalid_argument("Requires a resolution of min: 0.2 degree when intensities are enabled");
+    throw std::invalid_argument("Scanner configuration not valid");
   }
 
   return config_;
