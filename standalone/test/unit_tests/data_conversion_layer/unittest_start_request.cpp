@@ -91,10 +91,6 @@ TEST_F(StartRequestTest, constructorTest)
 
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::crc), (uint32_t)result.checksum()));
 
-  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::crc), 0xeb447fb));  // CRC - Fixed for now, Note:
-                                                                                   // Other byte order as in
-                                                                                   // wireshark
-
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::seq_number), (uint32_t)sequence_number));
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::reserved), (uint64_t)0));
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::opcode), (uint32_t)0x35));
