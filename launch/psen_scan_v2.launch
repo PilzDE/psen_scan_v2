@@ -23,16 +23,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <arg name="prefix" default="laser_1" />
 
   <!-- Start angle of measurement in radian -->
-  <arg name="angle_start" default="$(eval -137.5 /180.0 * pi)" />
+  <arg name="angle_start" default="$(eval radians(-137.5))" />
 
   <!-- End angle of measurement in radian -->
-  <arg name="angle_end" default="$(eval 137.5 /180.0 * pi)" />
+  <arg name="angle_end" default="$(eval radians(137.5))" />
 
   <!-- Publishing of intensities -->
   <arg name="intensities" default="false" />
 
   <!-- Scan resolution in radian -->
-  <arg name="resolution" default="$(eval 0.1 /180.0 * pi)" />
+  <arg name="resolution" default="$(eval radians(0.1))" />
 
   <!-- IP-Address of host machine -->
   <arg name="host_ip" default="auto" />
