@@ -109,9 +109,9 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
 
   PSENSCAN_DEBUG("StartRequestSerialization",
                  "Serializing start request with angle_start={} angle_end={} resolution={} tenths of degree.",
-                 to_string(start),
-                 to_string(end),
-                 to_string(resolution));
+                 start,
+                 end,
+                 resolution);
 
   for (const auto& slave : msg.slaves_)
   {
