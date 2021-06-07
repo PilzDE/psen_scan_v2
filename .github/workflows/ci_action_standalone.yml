@@ -3,7 +3,7 @@ name: CI-Standalone
 on: [push, pull_request]
 
 env:
-  BUILD_TYPE: ""
+  BUILD_TYPE: "Release"
 
 jobs:
   build:
@@ -25,12 +25,12 @@ jobs:
     - name: Configure CMake
       shell: bash
       working-directory: ${{runner.workspace}}/build
-      run: cmake $GITHUB_WORKSPACE/standalone -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+      run: cmake $GITHUB_WORKSPACE/standalone -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_TESTING=ON
 
     - name: Build
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: cmake --build . --config $BUILD_TYPE -DBUILD_TESTING=ON
+      run: cmake --build .
 
     - name: Test
       working-directory: ${{runner.workspace}}/build
