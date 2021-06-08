@@ -5,6 +5,7 @@ Changelog for package psen_scan_v2
 Forthcoming
 -----------
 * Add options for modifying resolution and enabling intensities
+* Add launchfile option for disabling rviz at startup (default: enable)
 * Contributors: Pilz GmbH and Co. KG
 
 
