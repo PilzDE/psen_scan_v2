@@ -294,7 +294,7 @@ TEST_F(ScannerConfigurationTest, shouldReturnCorrectResolutionAfterConstruction)
 TEST_F(ScannerConfigurationTest, shouldHaveCorrectResolutionOnDefault)
 {
   const ScannerConfiguration sc{ createValidDefaultConfig() };
-  EXPECT_EQ(configuration::SCAN_ANGLE_RESOLUTION, sc.scanResolution());
+  EXPECT_EQ(data_conversion_layer::radToTenthDegree(configuration::DEFAULT_SCAN_ANGLE_RESOLUTION), sc.scanResolution());
 }
 
 TEST_F(ScannerConfigurationTest, shouldHaveEnabledIntensitiesAfterConstruction)

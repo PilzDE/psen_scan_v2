@@ -39,7 +39,6 @@ static constexpr double DEFAULT_ANGLE_START(-data_conversion_layer::degreeToRadi
 //! @brief  End angle of measurement.
 static constexpr double DEFAULT_ANGLE_END(data_conversion_layer::degreeToRadian(137.3));
 static constexpr double DEFAULT_SCAN_ANGLE_RESOLUTION(data_conversion_layer::degreeToRadian(0.1));
-static constexpr int16_t SCAN_ANGLE_RESOLUTION{ 1 };
 
 static constexpr double TIME_PER_SCAN_IN_S{ 0.03 };
 

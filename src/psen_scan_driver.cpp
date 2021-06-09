@@ -74,14 +74,15 @@ int main(int argc, char** argv)
 
   try
   {
-    double angle_end = configuration::DEFAULT_X_AXIS_ROTATION +
-                       getOptionalParamFromServer<double>(pnh, PARAM_ANGLE_END, configuration::DEFAULT_ANGLE_END);
+    double angle_end_from_user_perspective =
+        configuration::DEFAULT_X_AXIS_ROTATION +
+        getOptionalParamFromServer<double>(pnh, PARAM_ANGLE_END, configuration::DEFAULT_ANGLE_END);
 
     double resolution =
         getOptionalParamFromServer<double>(pnh, PARAM_RESOLUTION, configuration::DEFAULT_SCAN_ANGLE_RESOLUTION);
 
-    // For the user, the last value is included in the range
-    angle_end = angle_end + resolution;
+    // For the user, the last value is included in the range, internally the last value is NOT included
+    double angle_end = angle_end_from_user_perspective + resolution;
 
     ScanRange scan_range{ util::TenthOfDegree::fromRad(configuration::DEFAULT_X_AXIS_ROTATION +
                                                        getOptionalParamFromServer<double>(
