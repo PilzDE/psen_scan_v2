@@ -184,6 +184,23 @@ TEST(LaserScanConversionsTest, laserScanShouldContainMeasurementsOrderedByThetaA
   ASSERT_EQ(scan_ptr->getMeasurements().back(), new_measurements2.back());
 }
 
+TEST(LaserScanConversionTest, conversionShouldIgnoreEmptyFramesForMonitoringFramesValidation)
+{
+  using Message = data_conversion_layer::monitoring_frame::Message;
+  using Tenth = util::TenthOfDegree;
+
+  // The following from_theta's are a real example from wireshark.
+  // (angle_start:=-0.1, angle_end:=0.1)
+  std::vector<Message> messages = { Message(Tenth(2500), Tenth(2), 42, {}, {}, {}),
+                                    Message(Tenth(0), Tenth(2), 42, {}, {}, {}),
+                                    Message(Tenth(500), Tenth(2), 42, {}, {}, {}),
+                                    Message(Tenth(1318), Tenth(2), 42, { 1., 2., 3. }, { 4., 5., 6. }, {}),
+                                    Message(Tenth(1500), Tenth(2), 42, {}, {}, {}),
+                                    Message(Tenth(2000), Tenth(2), 42, {}, {}, {}) };
+
+  ASSERT_NO_THROW(data_conversion_layer::LaserScanConverter::toLaserScan(messages));
+}
+
 }  // namespace psen_scan_v2_standalone_test
 
 int main(int argc, char* argv[])

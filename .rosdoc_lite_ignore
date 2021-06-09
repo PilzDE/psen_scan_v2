@@ -1,0 +1,7 @@
+warning: Tag 'PERL_PATH' at line [0-9]+ of file '/tmp/[a-zA-Z0-9_]+' has become obsolete.
+To avoid this warning please remove this line from your configuration file or upgrade it using "doxygen -u"
+warning: Tag 'MSCGEN_PATH' at line [0-9]+ of file '/tmp/[a-zA-Z0-9_]+' has become obsolete.
+warning: tag INCLUDE_PATH: include path '\$INCLUDE_PATH' does not exist
+warning: source \$INCLUDE_PATH is not a readable file or directory... skipping.
+warning: found more than one \\mainpage comment block!
+^$

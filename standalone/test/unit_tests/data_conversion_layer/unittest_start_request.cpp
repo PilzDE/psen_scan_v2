@@ -23,6 +23,7 @@
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scanner_config_builder.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/start_request_serialization.h"
 #include "psen_scan_v2_standalone/scan_range.h"
 
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_data_test_helper.h"
@@ -81,6 +82,7 @@ TEST_F(StartRequestTest, constructorTest)
                                                        .scannerDataPort(77)
                                                        .scannerControlPort(78)
                                                        .scanRange(scan_range)
+                                                       .scanResolution(util::TenthOfDegree(10))
                                                        .build());
 
   auto data = serialize(sr, sequence_number);
@@ -88,10 +90,6 @@ TEST_F(StartRequestTest, constructorTest)
   result.process_bytes(&data[sizeof(uint32_t)], data.size() - sizeof(uint32_t));
 
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::crc), (uint32_t)result.checksum()));
-
-  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::crc), 0xeb447fb));  // CRC - Fixed for now, Note:
-                                                                                   // Other byte order as in
-                                                                                   // wireshark
 
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::seq_number), (uint32_t)sequence_number));
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::reserved), (uint64_t)0));
@@ -115,7 +113,7 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::udp_port), host_udp_port_data));
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::device_enabled), (uint8_t)0b00001000));
 
-  EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::intensities_enabled), 0b00001000));
+  EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::intensities_enabled), 0b00000000));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::point_in_safety_enabled), 0));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::active_zone_set_enabled), 0));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::io_pin_enabled), 0));
@@ -126,7 +124,7 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::master_start_angle), scan_range.getStart().value()));
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::master_end_angle), scan_range.getEnd().value()));
   EXPECT_TRUE(DecodingEquals(
-      data, static_cast<size_t>(Offset::master_angle_resolution), data_conversion_layer::degreeToTenthDegree(0.2)));
+      data, static_cast<size_t>(Offset::master_angle_resolution), data_conversion_layer::degreeToTenthDegree(1.0)));
 
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_one_start_angle), 0));
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_one_end_angle), 0));
@@ -148,6 +146,8 @@ static ScannerConfiguration createConfig(bool enable_diagnostics)
       .scannerIp("192.168.0.10")
       .scannerDataPort(2000)
       .scannerControlPort(3000)
+      .scanResolution(util::TenthOfDegree(2u))
+      .enableIntensities()
       .scanRange(ScanRange(util::TenthOfDegree(0), util::TenthOfDegree(2750)));
 
   if (enable_diagnostics)
@@ -174,7 +174,8 @@ TEST_F(StartRequestTest, crcShouldBeCorrectIfDiagnosticIsEnabled)
 {
   const ScannerConfiguration config{ createConfig(true) };
 
-  const auto raw_start_request{ serialize(data_conversion_layer::start_request::Message(config)) };
+  const auto raw_start_request{ data_conversion_layer::start_request::serialize(
+      data_conversion_layer::start_request::Message(config)) };
   const std::array<unsigned char, 4> expected_crc = { 0x18, 0x5b, 0xd5, 0x55 };  // see wireshark for this number
   for (size_t i = 0; i < expected_crc.size(); ++i)
   {

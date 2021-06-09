@@ -2,6 +2,18 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add options for modifying resolution and enabling intensities
+* Contributors: Pilz GmbH and Co. KG
+
+
+0.2.1 (2021-04-19)
+------------------
+* Fix issues with smaller angle ranges than default range (`#183 <https://github.com/PilzDE/psen_scan_v2/issues/183>`_)
+* Add action for pull request todos (`#184 <https://github.com/PilzDE/psen_scan_v2/issues/184>`_)
+* Contributors: Pilz GmbH and Co. KG
+
 0.2.0 (2021-04-05)
 ------------------
 * Combine multiple monitoring frames into one scan (`#173 <https://github.com/PilzDE/psen_scan_v2/issues/173>`_)

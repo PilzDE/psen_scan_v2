@@ -44,7 +44,9 @@ public:
   ScannerConfigurationBuilder& scannerDataPort(const int&);
   ScannerConfigurationBuilder& scannerControlPort(const int&);
   ScannerConfigurationBuilder& scanRange(const ScanRange&);
-  ScannerConfigurationBuilder& enableDiagnostics();
+  ScannerConfigurationBuilder& scanResolution(const util::TenthOfDegree&);
+  ScannerConfigurationBuilder& enableDiagnostics(const bool&);
+  ScannerConfigurationBuilder& enableIntensities(const bool&);
   ScannerConfigurationBuilder& enableFragmentedScans(const bool&);
 
 private:
@@ -56,10 +58,15 @@ private:
 
 inline ScannerConfiguration ScannerConfigurationBuilder::build() const
 {
-  if (!config_.isValid())
+  if (!config_.isComplete())
   {
     throw std::runtime_error("Scanner configuration not complete");
   }
+  else if (!config_.isValid())
+  {
+    throw std::invalid_argument("Scanner configuration not valid");
+  }
+
   return config_;
 }
 
@@ -108,13 +115,30 @@ inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::scanRange(const
   return *this;
 }
 
-inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableDiagnostics()
+inline ScannerConfigurationBuilder&
+ScannerConfigurationBuilder::scanResolution(const util::TenthOfDegree& scan_resolution)
 {
-  config_.diagnostics_enabled_ = true;
+  if (scan_resolution < util::TenthOfDegree(1) || scan_resolution > util::TenthOfDegree(100))
+  {
+    throw std::invalid_argument("Scan resolution has to be between 0.1 and 10 degrees.");
+  }
+  config_.scan_resolution_ = scan_resolution;
   return *this;
 }
 
-inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableFragmentedScans(const bool& enable)
+inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableDiagnostics(const bool& enable = true)
+{
+  config_.diagnostics_enabled_ = enable;
+  return *this;
+}
+
+inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableIntensities(const bool& enable = true)
+{
+  config_.intensities_enabled_ = enable;
+  return *this;
+}
+
+inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableFragmentedScans(const bool& enable = true)
 {
   config_.fragmented_scans_ = enable;
   return *this;

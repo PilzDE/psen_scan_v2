@@ -73,9 +73,9 @@ constexpr ScanRangeTemplated<min_angle, max_angle>::ScanRangeTemplated(const uti
     throw std::out_of_range("End angle out of range");
   }
 
-  if (start_angle > end_angle)
+  if (start_angle >= end_angle)
   {
-    throw std::invalid_argument("Start angle must be smaller or equal to end angle");
+    throw std::invalid_argument("Start angle must be smaller than end angle");
   }
 }
 

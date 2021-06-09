@@ -105,6 +105,8 @@ ScannerConfiguration ScannerAPITests::generateScannerConfig(const std::string& h
                             .scannerDataPort(port_holder_.data_port_scanner)
                             .scannerControlPort(port_holder_.control_port_scanner)
                             .scanRange(DEFAULT_SCAN_RANGE)
+                            .scanResolution(DEFAULT_SCAN_RESOLUTION)
+                            .enableIntensities()
                             .enableFragmentedScans(fragmented);
   return config_builder.build();
 }
@@ -528,7 +530,8 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfMissingMeassuremen
 
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
-  EXPECT_LOG_SHORT(DEBUG, "StateMachine: No measurement data in this message, skipping laser scan callback.")
+  EXPECT_LOG_SHORT(DEBUG,
+                   "StateMachine: No measurement data in current monitoring frame(s), skipping laser scan callback.")
       .Times(1)
       .WillOnce(OpenBarrier(&valid_msg_barrier));
 

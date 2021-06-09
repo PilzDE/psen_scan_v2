@@ -28,6 +28,9 @@ namespace psen_scan_v2_standalone
 {
 namespace data_conversion_layer
 {
+/**
+ * @brief: Exception thrown if data received from the scanner hardware could not be processed according to protocol.
+ */
 class ScannerProtocolViolationError : public std::runtime_error
 {
 public:
@@ -53,7 +56,7 @@ public:
 
 private:
   static std::vector<int>
-  getIndicesSortedByThetaAngle(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames);
+  getFilledFramesIndicesSortedByThetaAngle(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames);
   static util::TenthOfDegree
   calculateMaxAngle(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames,
                     const util::TenthOfDegree& min_angle);
@@ -73,7 +76,7 @@ LaserScanConverter::toLaserScan(const std::vector<data_conversion_layer::monitor
     throw ScannerProtocolViolationError("At least one monitoring frame is necessary to create a LaserScan");
   }
 
-  std::vector<int> sorted_frames_indices = getIndicesSortedByThetaAngle(frames);
+  std::vector<int> sorted_frames_indices = getFilledFramesIndicesSortedByThetaAngle(frames);
   validateMonitoringFrames(frames, sorted_frames_indices);
 
   const auto min_angle = frames[sorted_frames_indices[0]].fromTheta();
@@ -95,15 +98,24 @@ LaserScanConverter::toLaserScan(const std::vector<data_conversion_layer::monitor
   return scan;
 }
 
-inline std::vector<int> LaserScanConverter::getIndicesSortedByThetaAngle(
+inline std::vector<int> LaserScanConverter::getFilledFramesIndicesSortedByThetaAngle(
     const std::vector<data_conversion_layer::monitoring_frame::Message>& frames)
 {
-  std::vector<int> sorted_frames_indices(frames.size());
-  std::iota(sorted_frames_indices.begin(), sorted_frames_indices.end(), 0);
-  std::sort(sorted_frames_indices.begin(), sorted_frames_indices.end(), [frames](int i1, int i2) {
+  std::vector<int> sorted_filled_frames_indices(frames.size());
+  std::iota(sorted_filled_frames_indices.begin(), sorted_filled_frames_indices.end(), 0);
+  std::sort(sorted_filled_frames_indices.begin(), sorted_filled_frames_indices.end(), [frames](int i1, int i2) {
     return frames[i1].fromTheta() < frames[i2].fromTheta();
   });
-  return sorted_frames_indices;
+
+  // The following contains a missing line in the coverage report, which does not make sense.
+  // LCOV_EXCL_START
+  sorted_filled_frames_indices.erase(std::remove_if(sorted_filled_frames_indices.begin(),
+                                                    sorted_filled_frames_indices.end(),
+                                                    [frames](int i) { return frames[i].measurements().empty(); }),
+                                     sorted_filled_frames_indices.end());
+  // LCOV_EXCL_STOP
+
+  return sorted_filled_frames_indices;
 }
 
 inline util::TenthOfDegree
@@ -154,10 +166,10 @@ LaserScanConverter::allScanCountersMatch(const std::vector<data_conversion_layer
 
 inline bool
 LaserScanConverter::thetaAnglesFitTogether(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames,
-                                           const std::vector<int>& sorted_frames_indices)
+                                           const std::vector<int>& sorted_filled_frames_indices)
 {
-  util::TenthOfDegree lastEnd = frames[sorted_frames_indices[0]].fromTheta();
-  for (auto index : sorted_frames_indices)
+  util::TenthOfDegree lastEnd = frames[sorted_filled_frames_indices[0]].fromTheta();
+  for (auto index : sorted_filled_frames_indices)
   {
     const auto& frame = frames[index];
     if (lastEnd != frame.fromTheta())

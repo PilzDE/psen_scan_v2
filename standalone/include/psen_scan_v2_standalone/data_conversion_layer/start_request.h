@@ -46,7 +46,6 @@ public:
 
   friend data_conversion_layer::RawData serialize(const data_conversion_layer::start_request::Message&,
                                                   const uint32_t&);
-  friend data_conversion_layer::RawData serialize(const data_conversion_layer::start_request::Message&);
 
 private:
   /**
@@ -75,13 +74,15 @@ private:
   class DeviceSettings
   {
   public:
-    constexpr DeviceSettings(const bool diagnostics_enabled);
+    constexpr DeviceSettings(const bool diagnostics_enabled, const bool intensities_enabled);
 
   public:
-    constexpr bool isDiagnosticsEnabled() const;
+    constexpr bool diagnosticsEnabled() const;
+    constexpr bool intensitiesEnabled() const;
 
   private:
     const bool diagnostics_enabled_;
+    const bool intensities_enabled_;
   };
 
 private:
@@ -112,14 +113,19 @@ constexpr util::TenthOfDegree Message::LaserScanSettings::getResolution() const
   return resolution_;
 };
 
-constexpr Message::DeviceSettings::DeviceSettings(const bool diagnostics_enabled)
-  : diagnostics_enabled_(diagnostics_enabled)
+constexpr Message::DeviceSettings::DeviceSettings(const bool diagnostics_enabled, const bool intensities_enabled)
+  : diagnostics_enabled_(diagnostics_enabled), intensities_enabled_(intensities_enabled)
 {
 }
 
-constexpr bool Message::DeviceSettings::isDiagnosticsEnabled() const
+constexpr bool Message::DeviceSettings::diagnosticsEnabled() const
 {
   return diagnostics_enabled_;
+};
+
+constexpr bool Message::DeviceSettings::intensitiesEnabled() const
+{
+  return intensities_enabled_;
 };
 
 }  // namespace start_request
