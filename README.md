@@ -100,6 +100,9 @@ UDP Port used to send commands (start/stop) and receive the corresponding replie
 _fragmented_scans_ (_bool_, default: false)<br/>
 Publish scan data as soon as a UDP packet is ready, do not wait for a full scan.
 
+_rviz_ (_bool_, default: true)<br/>
+Start a preconfigured rviz visualizing the scan data.
+
 ### Published Topics
 /laser_scanner/scan ([sensor_msgs/LaserScan][])<br/>
 

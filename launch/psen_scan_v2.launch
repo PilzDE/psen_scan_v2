@@ -47,6 +47,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- Set the following to true in order to publish scan data as soon as a UDP packet is ready, instead of waiting for a full scan -->
   <arg name="fragmented_scans" default="false" />
 
+  <!-- Start rviz -->
+  <arg name="rviz" default="true" />
+
   <node name="laser_scanner" type="psen_scan_v2_node" pkg="psen_scan_v2" output="screen" required="true">
     <param name="sensor_ip" value="$(arg sensor_ip)" />
     <param name="prefix" value="$(arg prefix)" />
@@ -66,5 +69,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
   <!-- Start rviz -->
-  <node name="rviz" type="rviz" pkg="rviz" args="-d $(find psen_scan_v2)/config/config.rviz" />
+  <group if="$(arg rviz)">
+    <node name="rviz" type="rviz" pkg="rviz" args="-d $(find psen_scan_v2)/config/config.rviz" />
+  </group>
 </launch>
