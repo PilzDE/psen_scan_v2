@@ -397,6 +397,7 @@ if(CATKIN_ENABLE_TESTING)
   # See ./hwtest_readme.md for details on the hardware tests.
   if(ENABLE_HARDWARE_TESTING)
 
+
     # This test is intended to be run on in a dedicated environment with a prerecorded reference scan
     # and thus needs to be enabled seperately.
     if(ENABLE_HARDWARE_TESTING_WITH_REFERENCE_SCAN)
