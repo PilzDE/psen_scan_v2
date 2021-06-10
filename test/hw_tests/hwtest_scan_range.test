@@ -22,7 +22,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <arg name="sensor_ip" default="192.168.0.10" />
   <arg name="prefix" default="laser_1" />
   <arg name="angle_start" default="$(eval -137.4 /180.0 * pi)" />
-  <arg name="angle_end" default="$(eval 137.2 /180.0 * pi)" />
+  <arg name="angle_end" default="$(eval 137.4 /180.0 * pi)" />
+  <arg name="resolution" default="$(eval 0.1 /180.0 * pi)" />
   <arg name="fragmented_scans" default="false" />
 
   <node name="laser_scanner" type="psen_scan_v2_node" pkg="psen_scan_v2" output="screen" required="true">
