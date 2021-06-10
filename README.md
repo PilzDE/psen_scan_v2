@@ -74,11 +74,11 @@ IP-Address of safety laser scanner.
 _prefix_ (_string_, default: "laser_1")<br/>
 Name of this scanner that can be changed to differentiate between multiple devices.
 
-_angle_start_ (_double_, default: -2.40 (= -137.5 deg))<br/>
+_angle_start_ (_double_, default: -2.398 (= -137.4 deg))<br/>
 Start angle of measurement. (Radian)
 
-_angle_end_ (_double_, default: 2.40 (= 137.5 deg))<br/>
-End angle of measurement. (Radian)
+_angle_end_ (_double_, default: 2.398 (= 137.4 deg))<br/>
+End angle of measurement. It is included in the measurements. (Radian)
 
 _intensities_ (_bool_, default: false)<br/>
 Publish intensities. If this is enabled, the resolution needs to be increased (at least 0.2 deg).
