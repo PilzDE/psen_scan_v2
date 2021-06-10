@@ -76,7 +76,8 @@ int main(int argc, char** argv)
   {
     double angle_end_from_user_perspective =
         configuration::DEFAULT_X_AXIS_ROTATION +
-        getOptionalParamFromServer<double>(pnh, PARAM_ANGLE_END, configuration::DEFAULT_ANGLE_END);
+        getOptionalParamFromServer<double>(
+            pnh, PARAM_ANGLE_END, configuration::DEFAULT_ANGLE_END_FROM_USER_PERSPECTIVE);
 
     double resolution =
         getOptionalParamFromServer<double>(pnh, PARAM_RESOLUTION, configuration::DEFAULT_SCAN_ANGLE_RESOLUTION);
