@@ -417,6 +417,15 @@ if(CATKIN_ENABLE_TESTING)
     endif()
 
     add_rostest(test/hw_tests/hwtest_publish.test)
+
+    add_rostest(test/hw_tests/hwtest_scan_range.test
+      ARGS config:=default.yaml)
+    add_rostest(test/hw_tests/hwtest_scan_range.test
+      ARGS config:=subrange.yaml)
+    add_rostest(test/hw_tests/hwtest_scan_range.test
+      ARGS config:=with_intensities.yaml)
+    add_rostest(test/hw_tests/hwtest_scan_range.test
+      ARGS config:=big_resolution.yaml)
   endif()
 
 
