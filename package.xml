@@ -28,6 +28,5 @@
   <test_depend>roslaunch</test_depend>
   <test_depend>pilz_testutils</test_depend>
   <test_depend>rosbag</test_depend>
-  <test_depend>pytest</test_depend>
 
 </package>
