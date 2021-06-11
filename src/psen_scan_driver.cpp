@@ -74,21 +74,13 @@ int main(int argc, char** argv)
 
   try
   {
-    double angle_end_from_user_perspective =
-        configuration::DEFAULT_X_AXIS_ROTATION +
-        getOptionalParamFromServer<double>(
-            pnh, PARAM_ANGLE_END, configuration::DEFAULT_ANGLE_END_FROM_USER_PERSPECTIVE);
-
-    double resolution =
-        getOptionalParamFromServer<double>(pnh, PARAM_RESOLUTION, configuration::DEFAULT_SCAN_ANGLE_RESOLUTION);
-
-    // For the user, the last value is included in the range, internally the last value is NOT included
-    double angle_end = angle_end_from_user_perspective + resolution;
-
     ScanRange scan_range{ util::TenthOfDegree::fromRad(configuration::DEFAULT_X_AXIS_ROTATION +
                                                        getOptionalParamFromServer<double>(
                                                            pnh, PARAM_ANGLE_START, configuration::DEFAULT_ANGLE_START)),
-                          util::TenthOfDegree::fromRad(angle_end) };
+                          util::TenthOfDegree::fromRad(
+                              configuration::DEFAULT_X_AXIS_ROTATION +
+                              getOptionalParamFromServer<double>(
+                                  pnh, PARAM_ANGLE_END, configuration::DEFAULT_ANGLE_END_FROM_USER_PERSPECTIVE)) };
 
     ScannerConfiguration scanner_configuration{
       ScannerConfigurationBuilder()
@@ -105,7 +97,8 @@ int main(int argc, char** argv)
           .enableFragmentedScans(
               getOptionalParamFromServer<bool>(pnh, PARAM_FRAGMENTED_SCANS, configuration::FRAGMENTED_SCANS))
           .enableIntensities(getOptionalParamFromServer<bool>(pnh, PARAM_INTENSITIES, configuration::INTENSITIES))
-          .scanResolution(util::TenthOfDegree::fromRad(resolution))
+          .scanResolution(util::TenthOfDegree::fromRad(
+              getOptionalParamFromServer<double>(pnh, PARAM_RESOLUTION, configuration::DEFAULT_SCAN_ANGLE_RESOLUTION)))
           .build()
     };
 

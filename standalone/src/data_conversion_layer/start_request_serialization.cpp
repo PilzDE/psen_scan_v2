@@ -100,9 +100,15 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
   raw_processing::write(os, diagnostics_enabled);
 
   const auto start = msg.master_.getScanRange().getStart().value();
-  const auto end = msg.master_.getScanRange().getEnd().value();
+  auto end = msg.master_.getScanRange().getEnd().value();
   const auto resolution = msg.master_.getResolution().value();
 
+  /* In order to get all the data points we want, the scanner needs a value
+     that is strictly greater than the end point */
+  if (end % resolution == 0)
+  {
+    end++;
+  }
   raw_processing::write(os, start);
   raw_processing::write(os, end);
   raw_processing::write(os, resolution);
