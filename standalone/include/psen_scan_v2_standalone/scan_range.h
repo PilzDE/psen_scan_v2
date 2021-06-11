@@ -97,7 +97,7 @@ const util::TenthOfDegree& ScanRangeTemplated<min_angle, max_angle>::getEnd() co
   return end_angle_;
 }
 
-using ScanRange = ScanRangeTemplated<0, 2750>;
+using ScanRange = ScanRangeTemplated<1, 2749>;
 
 }  // namespace psen_scan_v2_standalone
 
