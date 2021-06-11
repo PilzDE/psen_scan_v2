@@ -77,10 +77,9 @@ int main(int argc, char** argv)
     ScanRange scan_range{ util::TenthOfDegree::fromRad(configuration::DEFAULT_X_AXIS_ROTATION +
                                                        getOptionalParamFromServer<double>(
                                                            pnh, PARAM_ANGLE_START, configuration::DEFAULT_ANGLE_START)),
-                          util::TenthOfDegree::fromRad(
-                              configuration::DEFAULT_X_AXIS_ROTATION +
-                              getOptionalParamFromServer<double>(
-                                  pnh, PARAM_ANGLE_END, configuration::DEFAULT_ANGLE_END_FROM_USER_PERSPECTIVE)) };
+                          util::TenthOfDegree::fromRad(configuration::DEFAULT_X_AXIS_ROTATION +
+                                                       getOptionalParamFromServer<double>(
+                                                           pnh, PARAM_ANGLE_END, configuration::DEFAULT_ANGLE_END)) };
 
     ScannerConfiguration scanner_configuration{
       ScannerConfigurationBuilder()

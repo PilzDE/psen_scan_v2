@@ -148,7 +148,7 @@ static ScannerConfiguration createConfig(bool enable_diagnostics)
       .scannerControlPort(3000)
       .scanResolution(util::TenthOfDegree(2u))
       .enableIntensities()
-      .scanRange(ScanRange(util::TenthOfDegree(0), util::TenthOfDegree(2750)));
+      .scanRange(ScanRange(util::TenthOfDegree(1), util::TenthOfDegree(2749)));
 
   if (enable_diagnostics)
   {
