@@ -112,6 +112,19 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
         end_of_frame = true;
         break;
 
+      case AdditionalFieldHeaderID::zone_set:
+        if (additional_header.length() != NUMBER_OF_BYTES_ZONE_SET)
+        {
+          throw ZoneSetUnexpectedSize(fmt::format("Length of zone set field is {}, but should be {}.",
+                                                  additional_header.length(),
+                                                  NUMBER_OF_BYTES_ZONE_SET));
+        }
+        uint8_t zone_set_read_buffer;
+        raw_processing::read<uint8_t>(ss, zone_set_read_buffer);
+        std::cout << "ZONE SET: " << (int)zone_set_read_buffer << std::endl;
+        // TODO msg.zone_set_ = zone_set_read_buffer;
+        break;
+
       case AdditionalFieldHeaderID::diagnostics:
         msg.diagnostic_messages_ = diagnostic::deserializeMessages(ss);
         msg.diagnostic_data_enabled_ = true;
