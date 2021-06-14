@@ -137,46 +137,25 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_three_angle_resolution), 0));
 }
 
-static ScannerConfiguration createConfig(bool enable_diagnostics)
+TEST_F(StartRequestTest, crcWithIntensities)
 {
   ScannerConfigurationBuilder builder;
   builder.hostIP("192.168.0.50")
-      .hostDataPort(55115)
-      .hostControlPort(5700)
       .scannerIp("192.168.0.10")
-      .scannerDataPort(2000)
-      .scannerControlPort(3000)
       .scanResolution(util::TenthOfDegree(2u))
       .enableIntensities()
-      .scanRange(ScanRange(util::TenthOfDegree(1), util::TenthOfDegree(2749)));
+      .scanRange(ScanRange(util::TenthOfDegree(1), util::TenthOfDegree(2749)))
+      .enableDiagnostics();
 
-  if (enable_diagnostics)
-  {
-    builder.enableDiagnostics();
-  }
-
-  return builder.build();
-}
-
-TEST_F(StartRequestTest, crcShouldBeCorrectIfDiagnosticIsDisabled)
-{
-  const ScannerConfiguration config{ createConfig(false) };
-
-  const auto raw_start_request{ serialize(data_conversion_layer::start_request::Message(config)) };
-  const std::array<unsigned char, 4> expected_crc = { 0xaf, 0xc8, 0xde, 0x79 };  // see wireshark for this number
-  for (size_t i = 0; i < expected_crc.size(); ++i)
-  {
-    EXPECT_EQ(static_cast<unsigned int>(static_cast<unsigned char>(raw_start_request[i])), expected_crc[i]);
-  }
-}
-
-TEST_F(StartRequestTest, crcShouldBeCorrectIfDiagnosticIsEnabled)
-{
-  const ScannerConfiguration config{ createConfig(true) };
+  const ScannerConfiguration config = builder.build();
 
   const auto raw_start_request{ data_conversion_layer::start_request::serialize(
       data_conversion_layer::start_request::Message(config)) };
-  const std::array<unsigned char, 4> expected_crc = { 0x18, 0x5b, 0xd5, 0x55 };  // see wireshark for this number
+
+  // see wireshark for this number
+  // generated with `roslaunch psen_scan_v2 psen_scan_v2.launch intensities:=true resolution:=0.0035`
+  const std::array<unsigned char, 4> expected_crc = { 0x7f, 0x93, 0x88, 0xed };
+
   for (size_t i = 0; i < expected_crc.size(); ++i)
   {
     EXPECT_EQ(static_cast<unsigned int>(static_cast<unsigned char>(raw_start_request[i])), expected_crc[i]);
