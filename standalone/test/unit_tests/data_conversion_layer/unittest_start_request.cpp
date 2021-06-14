@@ -137,6 +137,27 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_three_angle_resolution), 0));
 }
 
+TEST_F(StartRequestTest, endAngleIncreasedWhenMatchingDataPoint)
+{
+  const ScanRange scan_range{ util::TenthOfDegree(1u), util::TenthOfDegree(100u) };
+  const util::TenthOfDegree resolution{ 1u };
+
+  ScannerConfigurationBuilder builder;
+  builder.hostIP("192.168.0.50").scannerIp("192.168.0.10").scanResolution(resolution).scanRange(scan_range);
+
+  const ScannerConfiguration config = builder.build();
+
+  const auto raw_start_request{ data_conversion_layer::start_request::serialize(
+      data_conversion_layer::start_request::Message(config)) };
+
+  EXPECT_TRUE(DecodingEquals(
+      raw_start_request, static_cast<size_t>(Offset::master_start_angle), scan_range.getStart().value()));
+  EXPECT_TRUE(DecodingEquals<uint16_t>(
+      raw_start_request, static_cast<size_t>(Offset::master_end_angle), scan_range.getEnd().value() + 1));
+  EXPECT_TRUE(
+      DecodingEquals(raw_start_request, static_cast<size_t>(Offset::master_angle_resolution), resolution.value()));
+}
+
 TEST_F(StartRequestTest, crcWithIntensities)
 {
   ScannerConfigurationBuilder builder;
