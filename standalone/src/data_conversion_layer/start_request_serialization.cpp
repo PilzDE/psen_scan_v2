@@ -105,7 +105,7 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
 
   /* In order to get all the data points we want, the scanner needs a value
      that is strictly greater than the end point */
-  if (end % resolution == 0)
+  if ((end - start) % resolution == 0)
   {
     end++;
   }

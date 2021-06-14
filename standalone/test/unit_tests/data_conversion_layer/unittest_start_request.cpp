@@ -139,8 +139,8 @@ TEST_F(StartRequestTest, constructorTest)
 
 TEST_F(StartRequestTest, endAngleIncreasedWhenMatchingDataPoint)
 {
-  const ScanRange scan_range{ util::TenthOfDegree(1u), util::TenthOfDegree(100u) };
-  const util::TenthOfDegree resolution{ 1u };
+  const ScanRange scan_range{ util::TenthOfDegree(1u), util::TenthOfDegree(2749u) };
+  const util::TenthOfDegree resolution{ 2u };
 
   ScannerConfigurationBuilder builder;
   builder.hostIP("192.168.0.50").scannerIp("192.168.0.10").scanResolution(resolution).scanRange(scan_range);
