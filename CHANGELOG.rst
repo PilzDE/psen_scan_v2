@@ -4,6 +4,8 @@ Changelog for package psen_scan_v2
 
 Forthcoming
 -----------
+* Distance value at angle_end is now included in the scan range
+* Default scan range changed to [-137.4..137.4]deg at 0.1 deg resolution
 * Add options for modifying resolution and enabling intensities
 * Add launchfile option for disabling rviz at startup (default: enable)
 * Contributors: Pilz GmbH and Co. KG
