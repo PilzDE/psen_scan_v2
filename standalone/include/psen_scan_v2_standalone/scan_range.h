@@ -37,7 +37,7 @@ public:
    * @brief Constructor.
    *
    * @param start_angle Start angle of measurement (scanner-zero = zero on the left).
-   * @param end_angle End angle of measurement.
+   * @param end_angle End angle of measurement. Closed interval. (End angle included.)
    */
   constexpr ScanRangeTemplated(const util::TenthOfDegree& start_angle, const util::TenthOfDegree& end_angle);
 
