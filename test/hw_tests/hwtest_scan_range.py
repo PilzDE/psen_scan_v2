@@ -28,8 +28,8 @@ class HwtestScanRange(unittest.TestCase):
     def test_one_message_received(self):
         while len(self.received_msgs) <= 5:  # Avoid testing a message with an old config (can happen at scanner start)
             rospy.sleep(.1)
-        self.assertGreaterEqual(len(self.received_msgs), 5)
 
+        self.assertTrue(self.received_msgs)
         message: LaserScan = self.received_msgs[-1]
 
         num_intervals = floor((self.angle_end - self.angle_start) / self.resolution)
