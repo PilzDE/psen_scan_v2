@@ -2,7 +2,7 @@
 
 import sys
 import unittest
-from math import degrees
+from math import floor
 
 import rospy
 from sensor_msgs.msg import LaserScan
@@ -19,25 +19,28 @@ class HwtestScanRange(unittest.TestCase):
         self.received_msgs = []
         self.angle_start = rospy.get_param("~angle_start")
         self.angle_end = rospy.get_param("~angle_end")
+        self.resolution = rospy.get_param("~resolution")
         rospy.Subscriber("/laser_scanner/scan", LaserScan, self.callback)
 
     def callback(self, msg):
         self.received_msgs.append(msg)
 
     def test_one_message_received(self):
-        while len(self.received_msgs) <= 0:
+        while len(self.received_msgs) <= 5:  # Avoid testing a message with an old config (can happen at scanner start)
             rospy.sleep(.1)
-        self.assertGreaterEqual(len(self.received_msgs), 1)
+        self.assertGreaterEqual(len(self.received_msgs), 5)
 
-        message: LaserScan = self.received_msgs[0]
+        message: LaserScan = self.received_msgs[-1]
+
+        num_intervals = floor((self.angle_end - self.angle_start) / self.resolution)
+        expected_max_angle = self.angle_start + self.resolution * num_intervals
 
         self.assertAlmostEqual(self.angle_start, message.angle_min, DECIMAL_PLACE_ACCURACY,
                                "angle_min of the laserscan message is " + str(message.angle_min) +
                                " but should be " + str(self.angle_start) + ".")
-        angle_max = message.angle_min + message.angle_increment * (len(message.ranges)-1)
-        self.assertAlmostEqual(self.angle_end, angle_max, DECIMAL_PLACE_ACCURACY,
-                               "angle_max of the laserscan message is " + str(angle_max) +
-                               " but should be " + str(self.angle_end) + ".")
+        self.assertAlmostEqual(expected_max_angle, message.angle_max, DECIMAL_PLACE_ACCURACY,
+                               "angle_max of the laserscan message is " + str(message.angle_max) +
+                               " but should be " + str(expected_max_angle) + ".")
 
 
 if __name__ == '__main__':
