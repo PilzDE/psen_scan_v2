@@ -34,7 +34,7 @@ namespace psen_scan_v2_standalone_test
 {
 static constexpr int MINIMAL_PORT_NUMBER{ std::numeric_limits<uint16_t>::min() };
 static constexpr int MAXIMAL_PORT_NUMBER{ std::numeric_limits<uint16_t>::max() };
-static constexpr ScanRange SCAN_RANGE{ util::TenthOfDegree(0), util::TenthOfDegree(2750) };
+static constexpr ScanRange SCAN_RANGE{ util::TenthOfDegree(1), util::TenthOfDegree(2749) };
 static constexpr util::TenthOfDegree SCAN_RESOLUTION{ 2u };
 static const std::string VALID_IP{ "127.0.0.1" };
 static const std::string VALID_IP_OTHER{ "192.168.0.1" };
@@ -294,7 +294,7 @@ TEST_F(ScannerConfigurationTest, shouldReturnCorrectResolutionAfterConstruction)
 TEST_F(ScannerConfigurationTest, shouldHaveCorrectResolutionOnDefault)
 {
   const ScannerConfiguration sc{ createValidDefaultConfig() };
-  EXPECT_EQ(configuration::SCAN_ANGLE_RESOLUTION, sc.scanResolution());
+  EXPECT_EQ(data_conversion_layer::radToTenthDegree(configuration::DEFAULT_SCAN_ANGLE_RESOLUTION), sc.scanResolution());
 }
 
 TEST_F(ScannerConfigurationTest, shouldHaveEnabledIntensitiesAfterConstruction)

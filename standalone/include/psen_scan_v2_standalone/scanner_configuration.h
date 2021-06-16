@@ -72,7 +72,8 @@ private:
   uint16_t scanner_control_port_{ configuration::CONTROL_PORT_OF_SCANNER_DEVICE };
 
   boost::optional<ScanRange> scan_range_{};
-  util::TenthOfDegree scan_resolution_{ configuration::SCAN_ANGLE_RESOLUTION };
+  util::TenthOfDegree scan_resolution_{ data_conversion_layer::radToTenthDegree(
+      configuration::DEFAULT_SCAN_ANGLE_RESOLUTION) };
   bool diagnostics_enabled_{ configuration::DIAGNOSTICS };
   bool intensities_enabled_{ configuration::INTENSITIES };
   bool fragmented_scans_{ configuration::FRAGMENTED_SCANS };

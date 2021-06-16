@@ -97,7 +97,7 @@ int main(int argc, char** argv)
               getOptionalParamFromServer<bool>(pnh, PARAM_FRAGMENTED_SCANS, configuration::FRAGMENTED_SCANS))
           .enableIntensities(getOptionalParamFromServer<bool>(pnh, PARAM_INTENSITIES, configuration::INTENSITIES))
           .scanResolution(util::TenthOfDegree::fromRad(
-              getOptionalParamFromServer<double>(pnh, PARAM_RESOLUTION, configuration::SCAN_ANGLE_RESOLUTION)))
+              getOptionalParamFromServer<double>(pnh, PARAM_RESOLUTION, configuration::DEFAULT_SCAN_ANGLE_RESOLUTION)))
           .build()
     };
 
