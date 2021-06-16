@@ -20,6 +20,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
   <node name="laser_scanner" type="psen_scan_v2_node" pkg="psen_scan_v2" output="screen" required="true">
     <rosparam command="load" file="$(find psen_scan_v2)/test/hw_tests/config/$(arg config)" />
+    <param name="sensor_ip" value="$(optenv SENSOR_IP 192.168.0.10)" />
+    <param name="host_ip" value="$(optenv HOST_IP auto)" />
   </node>
 
   <test test-name="scan_range" pkg="psen_scan_v2" type="hwtest_scan_range.py">
