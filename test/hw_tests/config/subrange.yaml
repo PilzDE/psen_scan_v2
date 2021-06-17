@@ -1,7 +1,5 @@
-host_ip: "auto"
-host_udp_port_data: 55115
+host_udp_port_data: 55003
 host_udp_port_control: 55116
-sensor_ip: "192.168.0.10"
 prefix: laser_1
 angle_start: deg(-100.)
 angle_end: deg(100.)

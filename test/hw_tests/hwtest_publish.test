@@ -24,6 +24,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <arg name="sensor_ip" value="$(optenv SENSOR_IP 192.168.0.10)" />
     <arg name="host_ip" value="$(optenv HOST_IP auto)" />
     <arg name="rviz" value="False" />
+    <arg name="host_udp_port_data" value="55000"/>
   </include>
 
   <test name="publishtest"
