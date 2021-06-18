@@ -61,8 +61,7 @@ roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10
 ```
 This example configures the safety laser scanner at 192.168.0.10 to send it´s frames to 192.168.0.20:3050.
 
-The [tutorials](http://wiki.ros.org/psen_scan_v2/Tutorials/) describe how to create an application package with your own launch file, where
-you can easily adjust the configuration parameters.
+In order to create an application with your own launch file, you can include the `bringup.launch`, where you can easily adjust the configuration parameters. A more detailed explanation can be found in the [tutorials](http://wiki.ros.org/psen_scan_v2/Tutorials/).
 
 ### Parameters
 

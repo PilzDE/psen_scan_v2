@@ -4,6 +4,7 @@ Changelog for package psen_scan_v2
 
 Forthcoming
 -----------
+* Introduce bringup.launch for starting only the scanner node
 * Omit closing the data client before destruction. Fixes #212
 * Distance value at angle_end is now included in the scan range
 * Default scan range changed to [-137.4..137.4]deg at 0.1 deg resolution
