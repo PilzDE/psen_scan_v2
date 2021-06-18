@@ -71,7 +71,7 @@ IP-Address of safety laser scanner.
 ### Optional Parameters
 
 _prefix_ (_string_, default: "laser_1")<br/>
-Name of this scanner that can be changed to differentiate between multiple devices.
+Name of this scanner that can be changed to differentiate between multiple devices. By convention this is used both for the node name and the urdf description.
 
 _angle_start_ (_double_, default: -2.398 (= -137.4 deg))<br/>
 Start angle of measurement. (Radian)
@@ -103,7 +103,7 @@ _rviz_ (_bool_, default: true)<br/>
 Start a preconfigured rviz visualizing the scan data.
 
 ### Published Topics
-/laser_scanner/scan ([sensor_msgs/LaserScan][])<br/>
+/\<prefix\>_node/scan ([sensor_msgs/LaserScan][])<br/>
 
 * If _fragmented_scans_ is set to false (default) the driver will publish complete scan rounds from the PSENscan safety laser scanner as a single message.
 * If _fragmented_scans_ is enabled the driver will send the measurement data as soon as they arrive, instead of waiting for the scan round to be completed. This way the scan data is received sooner but is split into several sensor messages.

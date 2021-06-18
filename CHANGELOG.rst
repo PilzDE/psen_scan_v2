@@ -4,6 +4,7 @@ Changelog for package psen_scan_v2
 
 Forthcoming
 -----------
+* Set prefix for node name (same value as for tf frames)
 * Introduce bringup.launch for starting only the scanner node
 * Omit closing the data client before destruction. Fixes #212
 * Distance value at angle_end is now included in the scan range
