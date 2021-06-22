@@ -573,6 +573,8 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
       scan_counter_invalid_round, num_scans_per_round - 1) };
   invalid_scan_round_msgs.emplace_back(createValidMonitoringFrameMsg(scan_counter_invalid_round + 1));
 
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times(num_scans_per_round + (num_scans_per_round-1) + 1);
+
   util::Barrier user_msg_barrier;
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
@@ -621,6 +623,8 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
   std::vector<data_conversion_layer::monitoring_frame::Message> msgs{ createValidMonitoringFrameMsgs(
       scan_counter, num_scans_per_round + 1) };
   msgs.emplace_back(createValidMonitoringFrameMsg(scan_counter + 1));
+
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times((num_scans_per_round + 1) + 1);
 
   util::Barrier user_msg_barrier;
   // Needed to allow all other log messages which might be received
