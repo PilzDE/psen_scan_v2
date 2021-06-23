@@ -8,6 +8,7 @@ Forthcoming
 * Default scan range changed to [-137.4..137.4]deg at 0.1 deg resolution
 * Add options for modifying resolution and enabling intensities
 * Add launchfile option for disabling rviz at startup (default: enable)
+* Handle the infinity codes from the scanner correctly
 * Contributors: Pilz GmbH and Co. KG
 
 
