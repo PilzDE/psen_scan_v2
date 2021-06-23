@@ -58,8 +58,13 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& frame)
       static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::measurements),
       frame.measurements_.size() * NUMBER_OF_BYTES_SINGLE_MEASUREMENT);
   write(os, measurements_header);
-  data_conversion_layer::raw_processing::writeArray<uint16_t, double>(
-      os, frame.measurements_, [](double elem) { return (static_cast<uint16_t>(std::round(elem * 1000.))); });
+  data_conversion_layer::raw_processing::writeArray<uint16_t, double>(os, frame.measurements_, [](double elem) {
+    if (elem == std::numeric_limits<double>::infinity())
+    {
+      return NO_SIGNAL_ARRIVED;
+    }
+    return (static_cast<uint16_t>(std::round(elem * 1000.)));
+  });
 
   if (!frame.intensities_.empty())
   {

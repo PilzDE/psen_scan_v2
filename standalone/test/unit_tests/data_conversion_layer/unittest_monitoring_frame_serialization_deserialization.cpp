@@ -84,7 +84,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
       util::TenthOfDegree(25),
       util::TenthOfDegree(1),
       456,
-      { 10, 20, 30, 40 },
+      { 10, 20, std::numeric_limits<double>::infinity(), 40 },
       { 15, 25, 35, 45 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(configuration::ScannerId::master,
                                                                      error_locations.at(0)),

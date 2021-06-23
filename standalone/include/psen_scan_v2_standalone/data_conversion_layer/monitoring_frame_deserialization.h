@@ -49,6 +49,8 @@ static constexpr uint32_t ONLINE_WORKING_MODE{ 0x00 };
 static constexpr uint32_t GUI_MONITORING_TRANSACTION{ 0x05 };
 static constexpr uint16_t NUMBER_OF_BYTES_SCAN_COUNTER{ 4 };
 static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_MEASUREMENT{ 2 };
+static constexpr uint16_t NO_SIGNAL_ARRIVED{ 59956 };
+static constexpr uint16_t SIGNAL_TOO_LATE{ 59958 };
 static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_INTENSITY{ 2 };
 
 /**
