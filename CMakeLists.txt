@@ -208,6 +208,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_start_request
     ${catkin_LIBRARIES}
+    fmt::fmt
   )
 
   catkin_add_gtest(unittest_stop_request
@@ -230,6 +231,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_scanner_configuration
     ${catkin_LIBRARIES}
+    fmt::fmt
   )
 
   catkin_add_gtest(unittest_tenth_of_degree
@@ -392,21 +394,38 @@ if(CATKIN_ENABLE_TESTING)
   ##  Hardware-Tests  ##
   ######################
 
-  # build this using catkin_make -DENABLE_HARDWARE_TESTING=ON
+  # See ./hwtest_readme.md for details on the hardware tests.
   if(ENABLE_HARDWARE_TESTING)
-    find_package(rosbag REQUIRED)
 
-    add_rostest_gtest(hwtest_scan_compare
-        test/hw_tests/hwtest_scan_compare.test
-        test/hw_tests/hwtest_scan_compare.cpp
-        standalone/src/laserscan.cpp
-    )
-    target_link_libraries(hwtest_scan_compare
-      ${catkin_LIBRARIES}
-      ${pilz_testutils_LIBRARIES}
-      ${rosbag_LIBRARIES}
-      fmt::fmt
-    )
+
+    # This test is intended to be run on in a dedicated environment with a prerecorded reference scan
+    # and thus needs to be enabled seperately.
+    if(ENABLE_HARDWARE_TESTING_WITH_REFERENCE_SCAN)
+      find_package(rosbag REQUIRED)
+
+      add_rostest_gtest(hwtest_scan_compare
+          test/hw_tests/hwtest_scan_compare.test
+          test/hw_tests/hwtest_scan_compare.cpp
+          standalone/src/laserscan.cpp
+      )
+      target_link_libraries(hwtest_scan_compare
+        ${catkin_LIBRARIES}
+        ${pilz_testutils_LIBRARIES}
+        ${rosbag_LIBRARIES}
+        fmt::fmt
+      )
+    endif()
+
+    add_rostest(test/hw_tests/hwtest_publish.test)
+
+    add_rostest(test/hw_tests/hwtest_scan_range.test
+      ARGS config:=default.yaml)
+    add_rostest(test/hw_tests/hwtest_scan_range.test
+      ARGS config:=subrange.yaml)
+    add_rostest(test/hw_tests/hwtest_scan_range.test
+      ARGS config:=with_intensities.yaml)
+    add_rostest(test/hw_tests/hwtest_scan_range.test
+      ARGS config:=big_resolution.yaml)
   endif()
 
 

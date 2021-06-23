@@ -74,11 +74,17 @@ IP-Address of safety laser scanner.
 _prefix_ (_string_, default: "laser_1")<br/>
 Name of this scanner that can be changed to differentiate between multiple devices.
 
-_angle_start_ (_double_, default: -2.40 (= -137.5 deg))<br/>
+_angle_start_ (_double_, default: -2.398 (= -137.4 deg))<br/>
 Start angle of measurement. (Radian)
 
-_angle_end_ (_double_, default: 2.40 (= 137.5 deg))<br/>
-End angle of measurement. (Radian)
+_angle_end_ (_double_, default: 2.398 (= 137.4 deg))<br/>
+End angle of measurement. It is included in the measurements. (Radian)
+
+_intensities_ (_bool_, default: false)<br/>
+Publish intensities. If this is enabled, the resolution needs to be increased (at least 0.2 deg).
+
+_resolution_ (_double_, default: 0.0017 (= 0.1 deg))<br/>
+Scan angle resolution. (Radian) The value is rounded to a multiple of 0.1 deg and has to be in the range [0.1, 10] degrees.
 
 ### Expert Parameters (optional)
 
@@ -93,6 +99,9 @@ UDP Port used to send commands (start/stop) and receive the corresponding replie
 
 _fragmented_scans_ (_bool_, default: false)<br/>
 Publish scan data as soon as a UDP packet is ready, do not wait for a full scan.
+
+_rviz_ (_bool_, default: true)<br/>
+Start a preconfigured rviz visualizing the scan data.
 
 ### Published Topics
 /laser_scanner/scan ([sensor_msgs/LaserScan][])<br/>

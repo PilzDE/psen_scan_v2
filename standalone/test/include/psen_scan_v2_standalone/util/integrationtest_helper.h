@@ -33,7 +33,8 @@ namespace psen_scan_v2_standalone_test
 {
 using namespace psen_scan_v2_standalone;
 
-static constexpr ScanRange DEFAULT_SCAN_RANGE{ util::TenthOfDegree(0), util::TenthOfDegree(60) };
+static constexpr ScanRange DEFAULT_SCAN_RANGE{ util::TenthOfDegree(1), util::TenthOfDegree(60) };
+static constexpr util::TenthOfDegree DEFAULT_SCAN_RESOLUTION{ 2 };
 
 static double randDouble(double low, double high)
 {

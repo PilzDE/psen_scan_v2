@@ -25,6 +25,9 @@ namespace psen_scan_v2_standalone
 {
 namespace protocol_layer
 {
+/**
+ * @brief Exception indicating problems with the monitoring frames of a scan round.
+ */
 class ScanRoundError : public std::runtime_error
 {
 public:
@@ -32,7 +35,7 @@ public:
 };
 
 /**
- * @brief Exception which is thrown if the incoming frame has an outdated scan_counter.
+ * @brief Exception thrown if the incoming frame has an outdated scan_counter.
  */
 class OutdatedMessageError : public ScanRoundError
 {
@@ -43,7 +46,7 @@ public:
 };
 
 /**
- * @brief Exception which is thrown if a new scan round started without the last one finishing.
+ * @brief Exception thrown if a new scan round started without the last one finishing.
  */
 class ScanRoundEndedEarlyError : public ScanRoundError
 {
@@ -57,7 +60,7 @@ public:
 };
 
 /**
- * @brief Exception which is thrown if a scan round has to many messages.
+ * @brief Exception thrown if a scan round has to many messages.
  */
 class ScanRoundOversaturatedError : public ScanRoundError
 {

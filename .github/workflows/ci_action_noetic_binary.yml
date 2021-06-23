@@ -1,0 +1,52 @@
+name: CI-Noetic Binary Test
+
+on: [push, pull_request]
+
+jobs:
+  debian:
+    name: "Create debian binary for psen_scan_v2"
+    runs-on: ubuntu-20.04
+    container: ros:noetic-ros-core
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Initialize ROS environment
+        run: |
+          apt-get update && apt install python3-bloom fakeroot dpkg-dev debhelper -y
+          rosdep init && rosdep update
+          rosdep install --from-paths . -r -y
+
+      - name: Generate debian binary
+        run: |
+          source /opt/ros/noetic/setup.bash
+          bloom-generate rosdebian --ros-distro noetic
+          fakeroot debian/rules binary
+          cp ../ros-noetic-psen-scan-v2_*.deb cached_binary.deb
+        shell: bash
+
+      - uses: actions/cache@v2
+        with:
+          key: debian-${{ github.sha }}
+          path: cached_binary.deb
+
+  launch-check:
+    name: "Launch check for psen_scan_v2"
+    needs: debian
+    runs-on: ubuntu-20.04
+    container: ros:noetic-ros-core
+    steps:
+      - uses: actions/cache@v2
+        with:
+          key: debian-${{ github.sha }}
+          path: cached_binary.deb
+
+      - name: Install debian
+        run: apt-get update && apt-get install ./cached_binary.deb -y
+
+      - uses: actions/checkout@v1
+
+      - name: Launch test
+        run: |
+          source /opt/ros/noetic/setup.bash
+          rostest test/integration_tests/integrationtest_ros_scanner_launch.test
+        shell: bash

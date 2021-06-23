@@ -27,6 +27,9 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request_serialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/util/logging.h"
+
+using namespace std;
 
 namespace psen_scan_v2_standalone
 {
@@ -77,14 +80,15 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
    */
 
   const uint8_t device_enabled{ 0b00001000 };
-  const uint8_t intensity_enabled{ 0b00001000 };
+  const uint8_t intensity_enabled{ static_cast<uint8_t>(
+      msg.master_device_settings_.intensitiesEnabled() ? 0b00001000 : 0b00000000) };
   const uint8_t point_in_safety_enabled{ 0 };
   const uint8_t active_zone_set_enabled{ 0 };
   const uint8_t io_pin_enabled{ 0 };
   const uint8_t scan_counter_enabled{ 0b00001000 };
   const uint8_t speed_encoder_enabled{ 0 }; /**< 0000000bin disabled, 00001111bin enabled.*/
   const uint8_t diagnostics_enabled{ static_cast<uint8_t>(
-      msg.master_device_settings_.isDiagnosticsEnabled() ? 0b00001000 : 0b00000000) };
+      msg.master_device_settings_.diagnosticsEnabled() ? 0b00001000 : 0b00000000) };
 
   raw_processing::write(os, device_enabled);
   raw_processing::write(os, intensity_enabled);
@@ -95,9 +99,25 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
   raw_processing::write(os, speed_encoder_enabled);
   raw_processing::write(os, diagnostics_enabled);
 
-  raw_processing::write(os, msg.master_.getScanRange().getStart().value());
-  raw_processing::write(os, msg.master_.getScanRange().getEnd().value());
-  raw_processing::write(os, msg.master_.getResolution().value());
+  const auto start = msg.master_.getScanRange().getStart().value();
+  auto end = msg.master_.getScanRange().getEnd().value();
+  const auto resolution = msg.master_.getResolution().value();
+
+  /* In order to get all the data points we want, the scanner needs a value
+     that is strictly greater than the end point */
+  if ((end - start) % resolution == 0)
+  {
+    end++;
+  }
+  raw_processing::write(os, start);
+  raw_processing::write(os, end);
+  raw_processing::write(os, resolution);
+
+  PSENSCAN_DEBUG("StartRequestSerialization",
+                 "Serializing start request with angle_start={} angle_end={} resolution={} tenths of degree.",
+                 start,
+                 end,
+                 resolution);
 
   for (const auto& slave : msg.slaves_)
   {

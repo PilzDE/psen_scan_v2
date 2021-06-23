@@ -16,19 +16,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <launch>
-  <arg name="test_duration" default="10"/>
+  <arg name="config" default="default.yaml" />
 
-  <include file="$(find psen_scan_v2)/launch/psen_scan_v2.launch">
-    <arg name="angle_start" value="-1.2" />
-    <arg name="angle_end" value="1.2" />
-    <arg name="sensor_ip" value="$(optenv SENSOR_IP 192.168.0.10)" />
-    <arg name="host_ip" value="$(optenv HOST_IP auto)" />
-    <arg name="rviz" value="False" />
-  </include>
+  <node name="laser_scanner" type="psen_scan_v2_node" pkg="psen_scan_v2" output="screen" required="true">
+    <rosparam command="load" file="$(find psen_scan_v2)/test/hw_tests/config/$(arg config)" />
+    <param name="sensor_ip" value="$(optenv SENSOR_IP 192.168.0.10)" />
+    <param name="host_ip" value="$(optenv HOST_IP auto)" />
+  </node>
 
-  <test test-name="scan_compare" pkg="psen_scan_v2" type="hwtest_scan_compare" time-limit="$(eval test_duration + 10)">
-    <param name="testfile" value="$(env HW_TEST_SCAN_COMPARE_TESTFILE)"/>
-    <param name="test_duration" value="$(arg test_duration)"/>
+  <test test-name="scan_range" pkg="psen_scan_v2" type="hwtest_scan_range.py">
+    <rosparam command="load" file="$(find psen_scan_v2)/test/hw_tests/config/$(arg config)" />
   </test>
-
 </launch>

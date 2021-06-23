@@ -18,6 +18,7 @@
 #include <boost/optional.hpp>
 
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
+#include "psen_scan_v2_standalone/util/logging.h"
 #include "psen_scan_v2_standalone/scan_range.h"
 
 namespace psen_scan_v2_standalone
@@ -45,8 +46,10 @@ public:
   uint16_t scannerControlPort() const;
 
   const ScanRange& scanRange() const;
+  const util::TenthOfDegree& scanResolution() const;
 
   bool diagnosticsEnabled() const;
+  bool intensitiesEnabled() const;
 
   bool fragmentedScansEnabled() const;
 
@@ -56,6 +59,7 @@ private:
   friend class ScannerConfigurationBuilder;
 
 private:
+  bool isComplete() const;
   bool isValid() const;
 
 private:
@@ -68,13 +72,26 @@ private:
   uint16_t scanner_control_port_{ configuration::CONTROL_PORT_OF_SCANNER_DEVICE };
 
   boost::optional<ScanRange> scan_range_{};
-  bool diagnostics_enabled_{ false };
-  bool fragmented_scans_{ false };
+  util::TenthOfDegree scan_resolution_{ data_conversion_layer::radToTenthDegree(
+      configuration::DEFAULT_SCAN_ANGLE_RESOLUTION) };
+  bool diagnostics_enabled_{ configuration::DIAGNOSTICS };
+  bool intensities_enabled_{ configuration::INTENSITIES };
+  bool fragmented_scans_{ configuration::FRAGMENTED_SCANS };
 };
+
+inline bool ScannerConfiguration::isComplete() const
+{
+  return scanner_ip_ && scan_range_;
+}
 
 inline bool ScannerConfiguration::isValid() const
 {
-  return scanner_ip_ && scan_range_;
+  if (intensities_enabled_ && scan_resolution_ < util::TenthOfDegree(2u))
+  {
+    PSENSCAN_ERROR("ScannerConfiguration", "Requires a resolution of min: 0.2 degree when intensities are enabled");
+    return false;
+  }
+  return true;
 }
 
 inline boost::optional<uint32_t> ScannerConfiguration::hostIp() const
@@ -112,9 +129,19 @@ inline const ScanRange& ScannerConfiguration::scanRange() const
   return *scan_range_;
 }
 
+inline const util::TenthOfDegree& ScannerConfiguration::scanResolution() const
+{
+  return scan_resolution_;
+}
+
 inline bool ScannerConfiguration::diagnosticsEnabled() const
 {
   return diagnostics_enabled_;
+}
+
+inline bool ScannerConfiguration::intensitiesEnabled() const
+{
+  return intensities_enabled_;
 }
 
 inline bool ScannerConfiguration::fragmentedScansEnabled() const

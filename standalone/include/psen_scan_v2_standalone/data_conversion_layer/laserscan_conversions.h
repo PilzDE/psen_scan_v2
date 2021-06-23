@@ -28,6 +28,9 @@ namespace psen_scan_v2_standalone
 {
 namespace data_conversion_layer
 {
+/**
+ * @brief: Exception thrown if data received from the scanner hardware could not be processed according to protocol.
+ */
 class ScannerProtocolViolationError : public std::runtime_error
 {
 public:
@@ -124,7 +127,7 @@ LaserScanConverter::calculateMaxAngle(const std::vector<data_conversion_layer::m
       std::accumulate(frames.begin(), frames.end(), uint16_t{ 0 }, [](uint16_t total, const auto& frame) {
         return total + frame.measurements().size();
       });
-  return min_angle + resolution * static_cast<int>(number_of_samples);
+  return min_angle + resolution * static_cast<int>(number_of_samples - 1);
 }
 
 inline void LaserScanConverter::validateMonitoringFrames(

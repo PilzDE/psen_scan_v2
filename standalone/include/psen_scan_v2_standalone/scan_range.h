@@ -37,7 +37,7 @@ public:
    * @brief Constructor.
    *
    * @param start_angle Start angle of measurement (scanner-zero = zero on the left).
-   * @param end_angle End angle of measurement.
+   * @param end_angle End angle of measurement. Closed interval. (End angle included.)
    */
   constexpr ScanRangeTemplated(const util::TenthOfDegree& start_angle, const util::TenthOfDegree& end_angle);
 
@@ -97,7 +97,7 @@ const util::TenthOfDegree& ScanRangeTemplated<min_angle, max_angle>::getEnd() co
   return end_angle_;
 }
 
-using ScanRange = ScanRangeTemplated<0, 2750>;
+using ScanRange = ScanRangeTemplated<1, 2749>;
 
 }  // namespace psen_scan_v2_standalone
 

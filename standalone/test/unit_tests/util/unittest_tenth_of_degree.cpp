@@ -63,6 +63,14 @@ TEST(TenthOfDegreeTest, MultiplicationWithInteger)
   EXPECT_EQ((tenth_of_degree * int_value).value(), 6);
 }
 
+TEST(TenthOfDegreeTest, MultiplicationWithSizeT)
+{
+  util::TenthOfDegree tenth_of_degree{ 2 };
+  const size_t int_value{ 3 };
+
+  EXPECT_EQ((tenth_of_degree * int_value).value(), 6);
+}
+
 TEST(TenthOfDegreeTest, DivisionWithInteger)
 {
   util::TenthOfDegree tenth_of_degree{ 6 };
@@ -91,6 +99,12 @@ TEST(TenthOfDegreeTest, EqualityComparison)
 {
   EXPECT_TRUE(util::TenthOfDegree(1) == util::TenthOfDegree(1));
   EXPECT_FALSE(util::TenthOfDegree(1) == util::TenthOfDegree(2));
+}
+
+TEST(TenthOfDegreeTest, NotEqualityComparison)
+{
+  EXPECT_FALSE(util::TenthOfDegree(1) != util::TenthOfDegree(1));
+  EXPECT_TRUE(util::TenthOfDegree(1) != util::TenthOfDegree(2));
 }
 
 TEST(TenthOfDegreeTest, LessThanComparison)

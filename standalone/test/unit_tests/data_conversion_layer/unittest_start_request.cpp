@@ -71,7 +71,7 @@ TEST_F(StartRequestTest, constructorTest)
   const std::string& host_ip = "192.168.0.1";
   const uint16_t& host_udp_port_data = 65535;
 
-  const ScanRange scan_range{ util::TenthOfDegree(0), util::TenthOfDegree::fromRad(4.71) };
+  const ScanRange scan_range{ util::TenthOfDegree(1), util::TenthOfDegree::fromRad(4.71) };
 
   uint32_t sequence_number{ 123 };
   data_conversion_layer::start_request::Message sr(ScannerConfigurationBuilder()
@@ -82,6 +82,7 @@ TEST_F(StartRequestTest, constructorTest)
                                                        .scannerDataPort(77)
                                                        .scannerControlPort(78)
                                                        .scanRange(scan_range)
+                                                       .scanResolution(util::TenthOfDegree(10))
                                                        .build());
 
   auto data = serialize(sr, sequence_number);
@@ -89,10 +90,6 @@ TEST_F(StartRequestTest, constructorTest)
   result.process_bytes(&data[sizeof(uint32_t)], data.size() - sizeof(uint32_t));
 
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::crc), (uint32_t)result.checksum()));
-
-  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::crc), 0xeb447fb));  // CRC - Fixed for now, Note:
-                                                                                   // Other byte order as in
-                                                                                   // wireshark
 
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::seq_number), (uint32_t)sequence_number));
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::reserved), (uint64_t)0));
@@ -116,7 +113,7 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::udp_port), host_udp_port_data));
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::device_enabled), (uint8_t)0b00001000));
 
-  EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::intensities_enabled), 0b00001000));
+  EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::intensities_enabled), 0b00000000));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::point_in_safety_enabled), 0));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::active_zone_set_enabled), 0));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::io_pin_enabled), 0));
@@ -127,7 +124,7 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::master_start_angle), scan_range.getStart().value()));
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::master_end_angle), scan_range.getEnd().value()));
   EXPECT_TRUE(DecodingEquals(
-      data, static_cast<size_t>(Offset::master_angle_resolution), data_conversion_layer::degreeToTenthDegree(0.2)));
+      data, static_cast<size_t>(Offset::master_angle_resolution), data_conversion_layer::degreeToTenthDegree(1.0)));
 
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_one_start_angle), 0));
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_one_end_angle), 0));
@@ -140,44 +137,46 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::slave_three_angle_resolution), 0));
 }
 
-static ScannerConfiguration createConfig(bool enable_diagnostics)
+TEST_F(StartRequestTest, endAngleIncreasedWhenMatchingDataPoint)
 {
+  const ScanRange scan_range{ util::TenthOfDegree(1u), util::TenthOfDegree(2749u) };
+  const util::TenthOfDegree resolution{ 2u };
+
   ScannerConfigurationBuilder builder;
-  builder.hostIP("192.168.0.50")
-      .hostDataPort(55115)
-      .hostControlPort(5700)
-      .scannerIp("192.168.0.10")
-      .scannerDataPort(2000)
-      .scannerControlPort(3000)
-      .scanRange(ScanRange(util::TenthOfDegree(0), util::TenthOfDegree(2750)));
+  builder.hostIP("192.168.0.50").scannerIp("192.168.0.10").scanResolution(resolution).scanRange(scan_range);
 
-  if (enable_diagnostics)
-  {
-    builder.enableDiagnostics();
-  }
-
-  return builder.build();
-}
-
-TEST_F(StartRequestTest, crcShouldBeCorrectIfDiagnosticIsDisabled)
-{
-  const ScannerConfiguration config{ createConfig(false) };
-
-  const auto raw_start_request{ serialize(data_conversion_layer::start_request::Message(config)) };
-  const std::array<unsigned char, 4> expected_crc = { 0xaf, 0xc8, 0xde, 0x79 };  // see wireshark for this number
-  for (size_t i = 0; i < expected_crc.size(); ++i)
-  {
-    EXPECT_EQ(static_cast<unsigned int>(static_cast<unsigned char>(raw_start_request[i])), expected_crc[i]);
-  }
-}
-
-TEST_F(StartRequestTest, crcShouldBeCorrectIfDiagnosticIsEnabled)
-{
-  const ScannerConfiguration config{ createConfig(true) };
+  const ScannerConfiguration config = builder.build();
 
   const auto raw_start_request{ data_conversion_layer::start_request::serialize(
       data_conversion_layer::start_request::Message(config)) };
-  const std::array<unsigned char, 4> expected_crc = { 0x18, 0x5b, 0xd5, 0x55 };  // see wireshark for this number
+
+  EXPECT_TRUE(DecodingEquals(
+      raw_start_request, static_cast<size_t>(Offset::master_start_angle), scan_range.getStart().value()));
+  EXPECT_TRUE(DecodingEquals<uint16_t>(
+      raw_start_request, static_cast<size_t>(Offset::master_end_angle), scan_range.getEnd().value() + 1));
+  EXPECT_TRUE(
+      DecodingEquals(raw_start_request, static_cast<size_t>(Offset::master_angle_resolution), resolution.value()));
+}
+
+TEST_F(StartRequestTest, crcWithIntensities)
+{
+  ScannerConfigurationBuilder builder;
+  builder.hostIP("192.168.0.50")
+      .scannerIp("192.168.0.10")
+      .scanResolution(util::TenthOfDegree(2u))
+      .enableIntensities()
+      .scanRange(ScanRange(util::TenthOfDegree(1), util::TenthOfDegree(2749)))
+      .enableDiagnostics();
+
+  const ScannerConfiguration config = builder.build();
+
+  const auto raw_start_request{ data_conversion_layer::start_request::serialize(
+      data_conversion_layer::start_request::Message(config)) };
+
+  // see wireshark for this number
+  // generated with `roslaunch psen_scan_v2 psen_scan_v2.launch intensities:=true resolution:=0.0035`
+  const std::array<unsigned char, 4> expected_crc = { 0x3f, 0x3e, 0xf0, 0xd4 };
+
   for (size_t i = 0; i < expected_crc.size(); ++i)
   {
     EXPECT_EQ(static_cast<unsigned int>(static_cast<unsigned char>(raw_start_request[i])), expected_crc[i]);

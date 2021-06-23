@@ -34,7 +34,8 @@ namespace psen_scan_v2_standalone_test
 {
 static constexpr int MINIMAL_PORT_NUMBER{ std::numeric_limits<uint16_t>::min() };
 static constexpr int MAXIMAL_PORT_NUMBER{ std::numeric_limits<uint16_t>::max() };
-static constexpr ScanRange SCAN_RANGE{ util::TenthOfDegree(0), util::TenthOfDegree(2750) };
+static constexpr ScanRange SCAN_RANGE{ util::TenthOfDegree(1), util::TenthOfDegree(2749) };
+static constexpr util::TenthOfDegree SCAN_RESOLUTION{ 2u };
 static const std::string VALID_IP{ "127.0.0.1" };
 static const std::string VALID_IP_OTHER{ "192.168.0.1" };
 static const std::string INVALID_IP{ "invalid_ip" };
@@ -55,7 +56,9 @@ static ScannerConfiguration createValidConfig()
       .scannerDataPort(MINIMAL_PORT_NUMBER + 1)
       .scannerControlPort(MINIMAL_PORT_NUMBER + 2)
       .scanRange(SCAN_RANGE)
+      .scanResolution(SCAN_RESOLUTION)
       .enableDiagnostics()
+      .enableIntensities()
       .build();
 }
 
@@ -69,7 +72,9 @@ static ScannerConfiguration createValidConfig(const std::string& host_ip)
       .scannerDataPort(MINIMAL_PORT_NUMBER + 1)
       .scannerControlPort(MINIMAL_PORT_NUMBER + 2)
       .scanRange(SCAN_RANGE)
+      .scanResolution(SCAN_RESOLUTION)
       .enableDiagnostics()
+      .enableIntensities()
       .enableFragmentedScans(true)
       .build();
 }
@@ -278,6 +283,51 @@ TEST_F(ScannerConfigurationTest, shouldReturnSetHostIp)
   sc.setHostIp(host_ip);
 
   EXPECT_EQ(host_ip, sc.hostIp());
+}
+
+TEST_F(ScannerConfigurationTest, shouldReturnCorrectResolutionAfterConstruction)
+{
+  const ScannerConfiguration sc{ createValidConfig() };
+  EXPECT_EQ(SCAN_RESOLUTION, sc.scanResolution());
+}
+
+TEST_F(ScannerConfigurationTest, shouldHaveCorrectResolutionOnDefault)
+{
+  const ScannerConfiguration sc{ createValidDefaultConfig() };
+  EXPECT_EQ(data_conversion_layer::radToTenthDegree(configuration::DEFAULT_SCAN_ANGLE_RESOLUTION), sc.scanResolution());
+}
+
+TEST_F(ScannerConfigurationTest, shouldHaveEnabledIntensitiesAfterConstruction)
+{
+  const ScannerConfiguration sc{ createValidConfig() };
+  EXPECT_TRUE(sc.intensitiesEnabled());
+}
+
+TEST_F(ScannerConfigurationTest, shouldLoadIntensitiesFromConfigByDefault)
+{
+  const ScannerConfiguration sc{ createValidDefaultConfig() };
+  EXPECT_EQ(configuration::INTENSITIES, sc.intensitiesEnabled());
+}
+
+TEST_F(ScannerConfigurationTest, shouldThrowInvalidArgumentWithLowResolutionAndEnabledIntensitiesOnBuild)
+{
+  ScannerConfigurationBuilder sb{};
+  sb.scannerIp(VALID_IP).scanRange(SCAN_RANGE).enableIntensities().scanResolution(util::TenthOfDegree{ 1u });
+  EXPECT_THROW(sb.build(), std::invalid_argument);
+}
+
+TEST_F(ScannerConfigurationTest, shouldThrowInvalidArgumentWithResolutionViolatingLowerLimit)
+{
+  ScannerConfigurationBuilder sb{};
+  sb.scannerIp(VALID_IP).scanRange(SCAN_RANGE);
+  EXPECT_THROW(sb.scanResolution(util::TenthOfDegree{ 0u }), std::invalid_argument);
+}
+
+TEST_F(ScannerConfigurationTest, shouldThrowInvalidArgumentWithResolutionViolatingUpperLimit)
+{
+  ScannerConfigurationBuilder sb{};
+  sb.scannerIp(VALID_IP).scanRange(SCAN_RANGE);
+  EXPECT_THROW(sb.scanResolution(util::TenthOfDegree{ 101u }), std::invalid_argument);
 }
 
 }  // namespace psen_scan_v2_standalone_test

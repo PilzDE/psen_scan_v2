@@ -47,6 +47,8 @@ const std::string PARAM_ANGLE_START{ "angle_start" };
 const std::string PARAM_ANGLE_END{ "angle_end" };
 const std::string PARAM_X_AXIS_ROTATION{ "x_axis_rotation" };
 const std::string PARAM_FRAGMENTED_SCANS{ "fragmented_scans" };
+const std::string PARAM_INTENSITIES{ "intensities" };
+const std::string PARAM_RESOLUTION{ "resolution" };
 
 static const std::string DEFAULT_PREFIX = "scanner";
 
@@ -92,7 +94,10 @@ int main(int argc, char** argv)
           .scanRange(scan_range)
           .enableDiagnostics()
           .enableFragmentedScans(
-              getOptionalParamFromServer<bool>(pnh, PARAM_FRAGMENTED_SCANS, configuration::DEFAULT_FRAGMENTED_SCANS))
+              getOptionalParamFromServer<bool>(pnh, PARAM_FRAGMENTED_SCANS, configuration::FRAGMENTED_SCANS))
+          .enableIntensities(getOptionalParamFromServer<bool>(pnh, PARAM_INTENSITIES, configuration::INTENSITIES))
+          .scanResolution(util::TenthOfDegree::fromRad(
+              getOptionalParamFromServer<double>(pnh, PARAM_RESOLUTION, configuration::DEFAULT_SCAN_ANGLE_RESOLUTION)))
           .build()
     };
 

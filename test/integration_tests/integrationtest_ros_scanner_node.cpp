@@ -93,7 +93,7 @@ static const std::string HOST_IP{ "127.0.0.1" };
 static constexpr int HOST_UDP_PORT_DATA{ 50505 };
 static constexpr int HOST_UDP_PORT_CONTROL{ 55055 };
 static const std::string DEVICE_IP{ "127.0.0.100" };
-static constexpr ScanRange SCAN_RANGE{ util::TenthOfDegree(0), util::TenthOfDegree(2750) };
+static constexpr ScanRange SCAN_RANGE{ util::TenthOfDegree(1), util::TenthOfDegree(2749) };
 static constexpr int SCANNER_STARTED_TIMEOUT_MS{ 3000 };
 static constexpr int SCANNER_STOPPED_TIMEOUT_MS{ 3000 };
 static constexpr int LASERSCAN_RECEIVED_TIMEOUT{ 3000 };
