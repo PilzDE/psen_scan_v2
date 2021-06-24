@@ -324,6 +324,7 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
 TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFrameMsg)
 {
   INJECT_LOG_MOCK
+  EXPECT_ANY_LOG().Times(AnyNumber());
   setUpScannerConfig();
   setUpScannerV2();
   setUpStrictScannerMock();
@@ -338,9 +339,6 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
   EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::LaserScanConverter::toLaserScan({ msg })))
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
-  EXPECT_LOG_SHORT(DEBUG, _).Times(AnyNumber());
-  EXPECT_LOG_SHORT(INFO, "Scanner: Start scanner called.").Times(1);
-  EXPECT_LOG_SHORT(INFO, "ScannerController: Scanner started successfully.").Times(1);
   EXPECT_LOG_SHORT(WARN,
                    "StateMachine: The scanner reports an error: {Device: Master - Alarm: The front panel of the safety "
                    "laser scanner must be cleaned.}")
@@ -360,7 +358,6 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
 
 TEST_F(ScannerAPITests, shouldCallLaserScanCBOnlyOneTimeWithAllInformationWhenUnfragmentedScanIsEnabled)
 {
-  INJECT_LOG_MOCK
   setUpScannerConfig(HOST_IP_ADDRESS, UNFRAGMENTED_SCAN);
   setUpScannerV2();
   setUpNiceScannerMock();
@@ -376,8 +373,6 @@ TEST_F(ScannerAPITests, shouldCallLaserScanCBOnlyOneTimeWithAllInformationWhenUn
       .Times(1)
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
-  EXPECT_ANY_LOG().Times(AnyNumber());
-
   nice_scanner_mock_->startListeningForControlMsg();
   auto promis = scanner_->start();
   promis.wait_for(DEFAULT_TIMEOUT);
@@ -388,12 +383,12 @@ TEST_F(ScannerAPITests, shouldCallLaserScanCBOnlyOneTimeWithAllInformationWhenUn
   }
 
   EXPECT_TRUE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
-  REMOVE_LOG_MOCK
 }
 
 TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
 {
   INJECT_LOG_MOCK
+  EXPECT_ANY_LOG().Times(AnyNumber());
   setUpScannerConfig(HOST_IP_ADDRESS, UNFRAGMENTED_SCAN);
   setUpScannerV2();
   setUpNiceScannerMock();
@@ -414,8 +409,6 @@ TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
   util::Barrier user_msg_barrier;
-  // Needed to allow all other log messages which might be received
-  EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(WARN,
                    "ScanBuffer: Detected a MonitoringFrame from a new scan round before the old one was complete."
                    " Dropping the incomplete round."
@@ -443,6 +436,7 @@ TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
 TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
 {
   INJECT_LOG_MOCK
+  EXPECT_ANY_LOG().Times(AnyNumber());
   setUpScannerConfig(HOST_IP_ADDRESS, UNFRAGMENTED_SCAN);
   setUpScannerV2();
   setUpNiceScannerMock();
@@ -459,8 +453,6 @@ TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
   util::Barrier user_msg_barrier;
-  // Needed to allow all other log messages which might be received
-  EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(WARN,
                    "ScanBuffer: Detected a MonitoringFrame from an earlier round. "
                    " The scan round will ignore it.")
@@ -555,6 +547,7 @@ TEST_F(ScannerAPITests, shouldThrowWhenConstructedWithInvalidLaserScanCallback)
 TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
 {
   INJECT_LOG_MOCK
+  EXPECT_ANY_LOG().Times(AnyNumber());
   setUpScannerConfig();
   setUpScannerV2();
   setUpNiceScannerMock();
@@ -573,9 +566,9 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
       scan_counter_invalid_round, num_scans_per_round - 1) };
   invalid_scan_round_msgs.emplace_back(createValidMonitoringFrameMsg(scan_counter_invalid_round + 1));
 
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times(num_scans_per_round + (num_scans_per_round - 1) + 1);
+
   util::Barrier user_msg_barrier;
-  // Needed to allow all other log messages which might be received
-  EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(WARN,
                    "ScanBuffer: Detected a MonitoringFrame from a new scan round before the old one was complete."
                    " Dropping the incomplete round."
@@ -610,6 +603,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
 TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
 {
   INJECT_LOG_MOCK
+  EXPECT_ANY_LOG().Times(AnyNumber());
   setUpScannerConfig();
   setUpScannerV2();
   setUpNiceScannerMock();
@@ -622,9 +616,9 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
       scan_counter, num_scans_per_round + 1) };
   msgs.emplace_back(createValidMonitoringFrameMsg(scan_counter + 1));
 
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times((num_scans_per_round + 1) + 1);
+
   util::Barrier user_msg_barrier;
-  // Needed to allow all other log messages which might be received
-  EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(WARN, "ScanBuffer: Received too many MonitoringFrames for one scan round.")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
@@ -647,14 +641,13 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
 TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFrameReceiveTimeout)
 {
   INJECT_LOG_MOCK
+  EXPECT_ANY_LOG().Times(AnyNumber());
   setUpScannerConfig();
   setUpScannerV2();
   setUpNiceScannerMock();
   prepareScannerMockStartReply();
 
   util::Barrier user_msg_barrier;
-  // Needed to allow all other log messages which might be received
-  EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(WARN,
                    "StateMachine: Timeout while waiting for MonitoringFrame message."
                    " (Please check the ethernet connection or contact PILZ support if the error persists.)")
