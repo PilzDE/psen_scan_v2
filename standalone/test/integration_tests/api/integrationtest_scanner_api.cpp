@@ -13,6 +13,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -26,22 +29,19 @@
 #include <thread>
 #include <vector>
 
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
-
 // Test frameworks
+#include "psen_scan_v2_standalone/communication_layer/scanner_mock.h"
 #include "psen_scan_v2_standalone/util/integrationtest_helper.h"
 #include "psen_scan_v2_standalone/util/mock_console_bridge_output_handler.h"
-#include "psen_scan_v2_standalone/communication_layer/scanner_mock.h"
 
 // Software under testing
-#include "psen_scan_v2_standalone/util/async_barrier.h"
-#include "psen_scan_v2_standalone/laserscan.h"
-#include "psen_scan_v2_standalone/scanner_configuration.h"
-#include "psen_scan_v2_standalone/scanner_config_builder.h"
-#include "psen_scan_v2_standalone/scanner_v2.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request_serialization.h"
+#include "psen_scan_v2_standalone/laserscan.h"
+#include "psen_scan_v2_standalone/scanner_config_builder.h"
+#include "psen_scan_v2_standalone/scanner_configuration.h"
+#include "psen_scan_v2_standalone/scanner_v2.h"
+#include "psen_scan_v2_standalone/util/async_barrier.h"
 
 namespace psen_scan_v2_standalone_test
 {
@@ -74,6 +74,7 @@ protected:
   void setUpNiceScannerMock();
   void setUpStrictScannerMock();
   void prepareScannerMockStartReply();
+  std::shared_ptr<util::Barrier> prepareStrictMockStartRequestBarrier(const ScannerConfiguration& config);
 
 protected:
   const PortHolder port_holder_{ ++GLOBAL_PORT_HOLDER };
@@ -132,19 +133,25 @@ void ScannerAPITests::prepareScannerMockStartReply()
   if (strict_scanner_mock_)
   {
     EXPECT_CALL(*strict_scanner_mock_,
-                receiveControlMsg(_,
-                                  data_conversion_layer::start_request::serialize(
-                                      data_conversion_layer::start_request::Message(*config_))))
+                receiveControlMsg(_, data_conversion_layer::start_request::serialize(
+                                         data_conversion_layer::start_request::Message(*config_))))
         .WillOnce(InvokeWithoutArgs([this]() { strict_scanner_mock_->sendStartReply(); }));
   }
   else
   {
-    ON_CALL(*nice_scanner_mock_,
-            receiveControlMsg(_,
-                              data_conversion_layer::start_request::serialize(
-                                  data_conversion_layer::start_request::Message(*config_))))
+    ON_CALL(*nice_scanner_mock_, receiveControlMsg(_, data_conversion_layer::start_request::serialize(
+                                                          data_conversion_layer::start_request::Message(*config_))))
         .WillByDefault(InvokeWithoutArgs([this]() { nice_scanner_mock_->sendStartReply(); }));
   }
+}
+
+std::shared_ptr<util::Barrier> ScannerAPITests::prepareStrictMockStartRequestBarrier(const ScannerConfiguration& config)
+{
+  const data_conversion_layer::start_request::Message start_req(config);
+  auto start_req_received_barrier = std::make_shared<util::Barrier>();
+  EXPECT_CALL(*strict_scanner_mock_, receiveControlMsg(_, data_conversion_layer::start_request::serialize(start_req)))
+      .WillOnce(OpenBarrier(start_req_received_barrier.get()));
+  return start_req_received_barrier;
 }
 
 TEST_F(ScannerAPITests, testStartFunctionality)
@@ -152,18 +159,14 @@ TEST_F(ScannerAPITests, testStartFunctionality)
   setUpScannerConfig();
   setUpScannerV2();
   setUpStrictScannerMock();
-  const data_conversion_layer::start_request::Message start_req(*config_);
-
-  util::Barrier start_req_received_barrier;
-  EXPECT_CALL(*strict_scanner_mock_, receiveControlMsg(_, data_conversion_layer::start_request::serialize(start_req)))
-      .WillOnce(OpenBarrier(&start_req_received_barrier));
+  const auto start_req_received_barrier = prepareStrictMockStartRequestBarrier(*config_);
 
   strict_scanner_mock_->startListeningForControlMsg();
   const auto start_future = scanner_->start();
 
-  ASSERT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
-  ASSERT_EQ(start_future.wait_for(FUTURE_WAIT_TIMEOUT), std::future_status::timeout)
-      << "Scanner::start() finished too early";
+  ASSERT_TRUE(start_req_received_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
+  ASSERT_EQ(start_future.wait_for(FUTURE_WAIT_TIMEOUT), std::future_status::timeout) << "Scanner::start() finished too "
+                                                                                        "early";
   strict_scanner_mock_->sendStartReply();
   ASSERT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
 }
@@ -172,19 +175,15 @@ TEST_F(ScannerAPITests, shouldReceiveStartRequestWithCorrectHostIpWhenUsingAutoI
 {
   setUpScannerConfig("auto");
   setUpScannerV2();
-  setUpNiceScannerMock();
-  const data_conversion_layer::start_request::Message start_req(
-      generateScannerConfig(HOST_IP_ADDRESS, FRAGMENTED_SCAN));
+  setUpStrictScannerMock();
+  const auto start_req_received_barrier =
+      prepareStrictMockStartRequestBarrier(generateScannerConfig(HOST_IP_ADDRESS, FRAGMENTED_SCAN));
 
-  util::Barrier start_req_received_barrier;
-  EXPECT_CALL(*nice_scanner_mock_, receiveControlMsg(_, data_conversion_layer::start_request::serialize(start_req)))
-      .WillOnce(OpenBarrier(&start_req_received_barrier));
-
-  nice_scanner_mock_->startListeningForControlMsg();
+  strict_scanner_mock_->startListeningForControlMsg();
   const auto start_future = scanner_->start();
 
-  ASSERT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
-  nice_scanner_mock_->sendStartReply();
+  ASSERT_TRUE(start_req_received_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
+  strict_scanner_mock_->sendStartReply();
   start_future.wait();
 }
 
@@ -199,8 +198,8 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStartIsCalledSecondTime)
   EXPECT_TRUE(start_future.valid()) << "First call too Scanner::start() should return VALID std::future";
   for (int i = 0; i < 5; ++i)
   {
-    EXPECT_FALSE(scanner_->start().valid())
-        << "Subsequenct calls to Scanner::start() should return INVALID std::future";
+    EXPECT_FALSE(scanner_->start().valid()) << "Subsequenct calls to Scanner::start() should return INVALID "
+                                               "std::future";
   }
   nice_scanner_mock_->sendStartReply();
   EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
@@ -213,10 +212,8 @@ TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
   setUpNiceScannerMock();
 
   util::Barrier start_req_received_barrier;
-  ON_CALL(
-      *nice_scanner_mock_,
-      receiveControlMsg(
-          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(*config_))))
+  ON_CALL(*nice_scanner_mock_, receiveControlMsg(_, data_conversion_layer::start_request::serialize(
+                                                        data_conversion_layer::start_request::Message(*config_))))
       .WillByDefault(OpenBarrier(&start_req_received_barrier));
   EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times(0);
 
@@ -226,8 +223,8 @@ TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
   ASSERT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
 
   nice_scanner_mock_->sendMonitoringFrame(createValidMonitoringFrameMsg());
-  ASSERT_EQ(start_future.wait_for(FUTURE_WAIT_TIMEOUT), std::future_status::timeout)
-      << "Scanner::start() finished too early ";
+  ASSERT_EQ(start_future.wait_for(FUTURE_WAIT_TIMEOUT), std::future_status::timeout) << "Scanner::start() finished too "
+                                                                                        "early ";
 
   nice_scanner_mock_->sendStartReply();
   EXPECT_EQ(start_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::start() not finished";
@@ -255,8 +252,8 @@ TEST_F(ScannerAPITests, testStopFunctionality)
   }) };
 
   EXPECT_TRUE(stop_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Stop request not received";
-  EXPECT_EQ(stop_future.wait_for(FUTURE_WAIT_TIMEOUT), std::future_status::timeout)
-      << "Scanner::stop() finished too early";
+  EXPECT_EQ(stop_future.wait_for(FUTURE_WAIT_TIMEOUT), std::future_status::timeout) << "Scanner::stop() finished too "
+                                                                                       "early";
   strict_scanner_mock_->sendStopReply();
   EXPECT_EQ(stop_future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << "Scanner::stop() not finished";
 }
@@ -286,7 +283,8 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStopIsCalledSecondTime)
 
 TEST_F(ScannerAPITests, testStartReplyTimeout)
 {
-  INJECT_NICE_LOG_MOCK;
+  INJECT_LOG_MOCK;
+  EXPECT_ANY_LOG().Times(AnyNumber());
   setUpScannerConfig();
   setUpScannerV2();
   setUpStrictScannerMock();
@@ -299,11 +297,9 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
     EXPECT_CALL(*strict_scanner_mock_, receiveControlMsg(_, _)).Times(1).WillOnce(OpenBarrier(&twice_called_barrier));
   }
 
-  EXPECT_LOG_SHORT(DEBUG, _).Times(AnyNumber());
   EXPECT_LOG_SHORT(INFO, "Scanner: Start scanner called.").Times(1);
-  EXPECT_LOG_SHORT(ERROR,
-                   "StateMachine: Timeout while waiting for the scanner to start! Retrying... "
-                   "(Please check the ethernet connection or contact PILZ support if the error persists.)")
+  EXPECT_LOG_SHORT(ERROR, "StateMachine: Timeout while waiting for the scanner to start! Retrying... "
+                          "(Please check the ethernet connection or contact PILZ support if the error persists.)")
       .Times(AtLeast(1))
       .WillOnce(OpenBarrier(&error_msg_barrier));
   EXPECT_LOG_SHORT(INFO, "ScannerController: Scanner started successfully.").Times(1);
@@ -339,9 +335,9 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
   EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::LaserScanConverter::toLaserScan({ msg })))
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
-  EXPECT_LOG_SHORT(WARN,
-                   "StateMachine: The scanner reports an error: {Device: Master - Alarm: The front panel of the safety "
-                   "laser scanner must be cleaned.}")
+  EXPECT_LOG_SHORT(WARN, "StateMachine: The scanner reports an error: {Device: Master - Alarm: The front panel of the "
+                         "safety "
+                         "laser scanner must be cleaned.}")
       .Times(1)
       .WillOnce(OpenBarrier(&diagnostic_barrier));
 
@@ -409,10 +405,9 @@ TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
   util::Barrier user_msg_barrier;
-  EXPECT_LOG_SHORT(WARN,
-                   "ScanBuffer: Detected a MonitoringFrame from a new scan round before the old one was complete."
-                   " Dropping the incomplete round."
-                   " (Please check the ethernet connection or contact PILZ support if the error persists.)")
+  EXPECT_LOG_SHORT(WARN, "ScanBuffer: Detected a MonitoringFrame from a new scan round before the old one was complete."
+                         " Dropping the incomplete round."
+                         " (Please check the ethernet connection or contact PILZ support if the error persists.)")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
@@ -453,9 +448,8 @@ TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
   util::Barrier user_msg_barrier;
-  EXPECT_LOG_SHORT(WARN,
-                   "ScanBuffer: Detected a MonitoringFrame from an earlier round. "
-                   " The scan round will ignore it.")
+  EXPECT_LOG_SHORT(WARN, "ScanBuffer: Detected a MonitoringFrame from an earlier round. "
+                         " The scan round will ignore it.")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
@@ -489,9 +483,8 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
   util::Barrier empty_msg_received;
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
-  EXPECT_LOG_SHORT(
-      WARN,
-      "StateMachine: No transition in state \"WaitForMonitoringFrame\" for event \"MonitoringFrameReceivedError\".")
+  EXPECT_LOG_SHORT(WARN, "StateMachine: No transition in state \"WaitForMonitoringFrame\" for event "
+                         "\"MonitoringFrameReceivedError\".")
       .Times(1)
       .WillOnce(OpenBarrier(&empty_msg_received));
 
@@ -522,8 +515,8 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfMissingMeassuremen
 
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
-  EXPECT_LOG_SHORT(DEBUG,
-                   "StateMachine: No measurement data in current monitoring frame(s), skipping laser scan callback.")
+  EXPECT_LOG_SHORT(DEBUG, "StateMachine: No measurement data in current monitoring frame(s), skipping laser scan "
+                          "callback.")
       .Times(1)
       .WillOnce(OpenBarrier(&valid_msg_barrier));
 
@@ -569,10 +562,9 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
   EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times(num_scans_per_round + (num_scans_per_round - 1) + 1);
 
   util::Barrier user_msg_barrier;
-  EXPECT_LOG_SHORT(WARN,
-                   "ScanBuffer: Detected a MonitoringFrame from a new scan round before the old one was complete."
-                   " Dropping the incomplete round."
-                   " (Please check the ethernet connection or contact PILZ support if the error persists.)")
+  EXPECT_LOG_SHORT(WARN, "ScanBuffer: Detected a MonitoringFrame from a new scan round before the old one was complete."
+                         " Dropping the incomplete round."
+                         " (Please check the ethernet connection or contact PILZ support if the error persists.)")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
@@ -648,9 +640,8 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFrameReceiveTimeout)
   prepareScannerMockStartReply();
 
   util::Barrier user_msg_barrier;
-  EXPECT_LOG_SHORT(WARN,
-                   "StateMachine: Timeout while waiting for MonitoringFrame message."
-                   " (Please check the ethernet connection or contact PILZ support if the error persists.)")
+  EXPECT_LOG_SHORT(WARN, "StateMachine: Timeout while waiting for MonitoringFrame message."
+                         " (Please check the ethernet connection or contact PILZ support if the error persists.)")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
