@@ -133,14 +133,17 @@ void ScannerAPITests::prepareScannerMockStartReply()
   if (strict_scanner_mock_)
   {
     EXPECT_CALL(*strict_scanner_mock_,
-                receiveControlMsg(_, data_conversion_layer::start_request::serialize(
-                                         data_conversion_layer::start_request::Message(*config_))))
+                receiveControlMsg(_,
+                                  data_conversion_layer::start_request::serialize(
+                                      data_conversion_layer::start_request::Message(*config_))))
         .WillOnce(InvokeWithoutArgs([this]() { strict_scanner_mock_->sendStartReply(); }));
   }
   else
   {
-    ON_CALL(*nice_scanner_mock_, receiveControlMsg(_, data_conversion_layer::start_request::serialize(
-                                                          data_conversion_layer::start_request::Message(*config_))))
+    ON_CALL(*nice_scanner_mock_,
+            receiveControlMsg(_,
+                              data_conversion_layer::start_request::serialize(
+                                  data_conversion_layer::start_request::Message(*config_))))
         .WillByDefault(InvokeWithoutArgs([this]() { nice_scanner_mock_->sendStartReply(); }));
   }
 }
@@ -212,8 +215,10 @@ TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
   setUpNiceScannerMock();
 
   util::Barrier start_req_received_barrier;
-  ON_CALL(*nice_scanner_mock_, receiveControlMsg(_, data_conversion_layer::start_request::serialize(
-                                                        data_conversion_layer::start_request::Message(*config_))))
+  ON_CALL(
+      *nice_scanner_mock_,
+      receiveControlMsg(
+          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(*config_))))
       .WillByDefault(OpenBarrier(&start_req_received_barrier));
   EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times(0);
 
@@ -298,8 +303,9 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
   }
 
   EXPECT_LOG_SHORT(INFO, "Scanner: Start scanner called.").Times(1);
-  EXPECT_LOG_SHORT(ERROR, "StateMachine: Timeout while waiting for the scanner to start! Retrying... "
-                          "(Please check the ethernet connection or contact PILZ support if the error persists.)")
+  EXPECT_LOG_SHORT(ERROR,
+                   "StateMachine: Timeout while waiting for the scanner to start! Retrying... "
+                   "(Please check the ethernet connection or contact PILZ support if the error persists.)")
       .Times(AtLeast(1))
       .WillOnce(OpenBarrier(&error_msg_barrier));
   EXPECT_LOG_SHORT(INFO, "ScannerController: Scanner started successfully.").Times(1);
@@ -335,9 +341,10 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
   EXPECT_CALL(user_callbacks_, LaserScanCallback(data_conversion_layer::LaserScanConverter::toLaserScan({ msg })))
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
-  EXPECT_LOG_SHORT(WARN, "StateMachine: The scanner reports an error: {Device: Master - Alarm: The front panel of the "
-                         "safety "
-                         "laser scanner must be cleaned.}")
+  EXPECT_LOG_SHORT(WARN,
+                   "StateMachine: The scanner reports an error: {Device: Master - Alarm: The front panel of the "
+                   "safety "
+                   "laser scanner must be cleaned.}")
       .Times(1)
       .WillOnce(OpenBarrier(&diagnostic_barrier));
 
@@ -405,9 +412,10 @@ TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
   util::Barrier user_msg_barrier;
-  EXPECT_LOG_SHORT(WARN, "ScanBuffer: Detected a MonitoringFrame from a new scan round before the old one was complete."
-                         " Dropping the incomplete round."
-                         " (Please check the ethernet connection or contact PILZ support if the error persists.)")
+  EXPECT_LOG_SHORT(WARN,
+                   "ScanBuffer: Detected a MonitoringFrame from a new scan round before the old one was complete."
+                   " Dropping the incomplete round."
+                   " (Please check the ethernet connection or contact PILZ support if the error persists.)")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
@@ -448,8 +456,9 @@ TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
   util::Barrier user_msg_barrier;
-  EXPECT_LOG_SHORT(WARN, "ScanBuffer: Detected a MonitoringFrame from an earlier round. "
-                         " The scan round will ignore it.")
+  EXPECT_LOG_SHORT(WARN,
+                   "ScanBuffer: Detected a MonitoringFrame from an earlier round. "
+                   " The scan round will ignore it.")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
@@ -483,8 +492,9 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
   util::Barrier empty_msg_received;
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
-  EXPECT_LOG_SHORT(WARN, "StateMachine: No transition in state \"WaitForMonitoringFrame\" for event "
-                         "\"MonitoringFrameReceivedError\".")
+  EXPECT_LOG_SHORT(WARN,
+                   "StateMachine: No transition in state \"WaitForMonitoringFrame\" for event "
+                   "\"MonitoringFrameReceivedError\".")
       .Times(1)
       .WillOnce(OpenBarrier(&empty_msg_received));
 
@@ -515,8 +525,9 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfMissingMeassuremen
 
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
-  EXPECT_LOG_SHORT(DEBUG, "StateMachine: No measurement data in current monitoring frame(s), skipping laser scan "
-                          "callback.")
+  EXPECT_LOG_SHORT(DEBUG,
+                   "StateMachine: No measurement data in current monitoring frame(s), skipping laser scan "
+                   "callback.")
       .Times(1)
       .WillOnce(OpenBarrier(&valid_msg_barrier));
 
@@ -562,9 +573,10 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
   EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times(num_scans_per_round + (num_scans_per_round - 1) + 1);
 
   util::Barrier user_msg_barrier;
-  EXPECT_LOG_SHORT(WARN, "ScanBuffer: Detected a MonitoringFrame from a new scan round before the old one was complete."
-                         " Dropping the incomplete round."
-                         " (Please check the ethernet connection or contact PILZ support if the error persists.)")
+  EXPECT_LOG_SHORT(WARN,
+                   "ScanBuffer: Detected a MonitoringFrame from a new scan round before the old one was complete."
+                   " Dropping the incomplete round."
+                   " (Please check the ethernet connection or contact PILZ support if the error persists.)")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
@@ -640,8 +652,9 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFrameReceiveTimeout)
   prepareScannerMockStartReply();
 
   util::Barrier user_msg_barrier;
-  EXPECT_LOG_SHORT(WARN, "StateMachine: Timeout while waiting for MonitoringFrame message."
-                         " (Please check the ethernet connection or contact PILZ support if the error persists.)")
+  EXPECT_LOG_SHORT(WARN,
+                   "StateMachine: Timeout while waiting for MonitoringFrame message."
+                   " (Please check the ethernet connection or contact PILZ support if the error persists.)")
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
