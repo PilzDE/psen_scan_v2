@@ -213,7 +213,9 @@ public:  // Definition of state machine via table
       a_irow < WaitForMonitoringFrame,    e::MonitoringFrameTimeout,                                &m::handleMonitoringFrameTimeout                          >,
       a_row  < WaitForStartReply,         e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                       >,
       a_row  < WaitForMonitoringFrame,    e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                       >,
-      g_row  < WaitForStopReply,          e::RawReplyReceived,          Stopped,                                                  &m::isStopReply             >
+      _irow  < WaitForStopReply,          e::RawMonitoringFrameReceived                                                                                       >,
+      g_row  < WaitForStopReply,          e::RawReplyReceived,          Stopped,                                                  &m::isStopReply             >,
+      _irow  < Stopped,                   e::RawMonitoringFrameReceived                                                                                       >
       //  +------------------------------+----------------------------+--------------------------+--------------------------------+-----------------------------+
       > {};
   // clang-format on
