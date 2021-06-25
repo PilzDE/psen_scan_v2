@@ -4,7 +4,7 @@ Changelog for package psen_scan_v2
 
 Forthcoming
 -----------
-* Appies hotfix for (`#212 <https://github.com/PilzDE/psen_scan_v2/issues/212>`_) ensuring stop request is shutdown
+* Applies hotfix for (`#212 <https://github.com/PilzDE/psen_scan_v2/issues/212>`_) ensuring stop request is shutdown
 * Distance value at angle_end is now included in the scan range
 * Default scan range changed to [-137.4..137.4]deg at 0.1 deg resolution
 * Add options for modifying resolution and enabling intensities
