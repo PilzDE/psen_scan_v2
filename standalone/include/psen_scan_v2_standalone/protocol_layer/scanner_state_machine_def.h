@@ -131,7 +131,6 @@ template <class T>
 inline void ScannerProtocolDef::sendStopRequest(const T& event)
 {
   PSENSCAN_DEBUG("StateMachine", "Action: sendStopRequest");
-  args_->data_client_->close();
   args_->control_client_->write(data_conversion_layer::stop_request::serialize());
 }
 
