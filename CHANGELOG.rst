@@ -12,6 +12,8 @@ Forthcoming
 * Add options for modifying resolution and enabling intensities
 * Add launchfile option for disabling rviz at startup (default: enable)
 * Handle the infinity codes from the scanner correctly
+* Inform user about current scan range
+* Fix wrong behavior when angle_start and angle_end are equal
 * Contributors: Pilz GmbH and Co. KG
 
 
