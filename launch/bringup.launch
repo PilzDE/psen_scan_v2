@@ -15,12 +15,13 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
-<!-- Includes starting the scanner driver together with a robot model and preconfigured rviz. -->
+<!-- Use this launch-file for starting the scanner driver exclusively. -->
 <launch>
   <!-- IP-Address of Safety laser scanner -->
   <arg name="sensor_ip" default="192.168.0.10" />
 
-  <!-- Prefix i. e. name of the scanner (required to run multiple scanners) -->
+  <!-- Prefix i. e. name of the scanner (required to run multiple scanners)
+       By convention this should also be used as prefix for the urdf description. -->
   <arg name="prefix" default="laser_1" />
 
   <!-- Start angle of measurement in radian -->
@@ -48,30 +49,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- Set the following to true in order to publish scan data as soon as a UDP packet is ready, instead of waiting for a full scan -->
   <arg name="fragmented_scans" default="false" />
 
-  <!-- Start rviz -->
-  <arg name="rviz" default="true" />
+  <node name="$(arg prefix)_node" type="psen_scan_v2_node" pkg="psen_scan_v2" output="screen" required="true">
+    <param name="sensor_ip" value="$(arg sensor_ip)" />
+    <param name="prefix" value="$(arg prefix)" />
+    <param name="angle_start" value="$(arg angle_start)" />
+    <param name="angle_end" value="$(arg angle_end)" />
+    <param name="intensities" value="$(arg intensities)" />
+    <param name="resolution" value="$(arg resolution)" />
+    <param name="host_ip" value="$(arg host_ip)" />
+    <param name="host_udp_port_data" value="$(arg host_udp_port_data)" />
+    <param name="host_udp_port_control" value="$(arg host_udp_port_control)" />
+    <param name="fragmented_scans" value="$(arg fragmented_scans)" />
+  </node>
 
-  <!-- Start scanner driver -->
-  <include file="$(find psen_scan_v2)/launch/bringup.launch">
-    <arg name="sensor_ip" value="$(arg sensor_ip)" />
-    <arg name="prefix" value="$(arg prefix)" />
-    <arg name="angle_start" value="$(arg angle_start)" />
-    <arg name="angle_end" value="$(arg angle_end)" />
-    <arg name="intensities" value="$(arg intensities)" />
-    <arg name="resolution" value="$(arg resolution)" />
-    <arg name="host_ip" value="$(arg host_ip)" />
-    <arg name="host_udp_port_data" value="$(arg host_udp_port_data)" />
-    <arg name="host_udp_port_control" value="$(arg host_udp_port_control)" />
-    <arg name="fragmented_scans" value="$(arg fragmented_scans)" />
-  </include>
-
-  <!-- Publish tf frames for the device -->
-  <param name="robot_description" command="$(find xacro)/xacro
-    '$(find psen_scan_v2)/urdf/example.urdf.xacro' prefix:=$(arg prefix)" />
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-
-  <!-- Start rviz -->
-  <group if="$(arg rviz)">
-    <node name="rviz" type="rviz" pkg="rviz" args="-d $(find psen_scan_v2)/config/config.rviz" />
-  </group>
 </launch>

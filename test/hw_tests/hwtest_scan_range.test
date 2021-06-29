@@ -18,11 +18,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 <launch>
   <arg name="config" default="default.yaml" />
 
-  <node name="laser_scanner" type="psen_scan_v2_node" pkg="psen_scan_v2" output="screen" required="true">
-    <rosparam command="load" file="$(find psen_scan_v2)/test/hw_tests/config/$(arg config)" />
-    <param name="sensor_ip" value="$(optenv SENSOR_IP 192.168.0.10)" />
-    <param name="host_ip" value="$(optenv HOST_IP auto)" />
-  </node>
+  <include file="$(find psen_scan_v2)/launch/bringup.launch">
+    <arg name="sensor_ip" value="$(optenv SENSOR_IP 192.168.0.10)" />
+    <arg name="host_ip" value="$(optenv HOST_IP auto)" />
+  </include>
+
+  <rosparam ns="laser_1_node" command="load" file="$(find psen_scan_v2)/test/hw_tests/config/$(arg config)" />
 
   <test test-name="scan_range" pkg="psen_scan_v2" type="hwtest_scan_range.py">
     <rosparam command="load" file="$(find psen_scan_v2)/test/hw_tests/config/$(arg config)" />
