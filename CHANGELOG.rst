@@ -2,8 +2,8 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.0 (2021-06-29)
+------------------
 * Set prefix for node name (same value as for tf frames)
 * Introduce bringup.launch for starting only the scanner node
 * Omit closing the data client before destruction. Fixes #212
