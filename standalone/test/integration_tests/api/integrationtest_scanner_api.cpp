@@ -74,7 +74,7 @@ protected:
   void setUpNiceScannerMock();
   void setUpStrictScannerMock();
   void prepareScannerMockStartReply();
-  std::shared_ptr<util::Barrier> prepareStrictMockStartRequestBarrier(const ScannerConfiguration& config);
+  std::unique_ptr<util::Barrier> prepareStrictMockStartRequestBarrier(const ScannerConfiguration& config);
 
 protected:
   const PortHolder port_holder_{ ++GLOBAL_PORT_HOLDER };
@@ -148,10 +148,10 @@ void ScannerAPITests::prepareScannerMockStartReply()
   }
 }
 
-std::shared_ptr<util::Barrier> ScannerAPITests::prepareStrictMockStartRequestBarrier(const ScannerConfiguration& config)
+std::unique_ptr<util::Barrier> ScannerAPITests::prepareStrictMockStartRequestBarrier(const ScannerConfiguration& config)
 {
   const data_conversion_layer::start_request::Message start_req(config);
-  auto start_req_received_barrier = std::make_shared<util::Barrier>();
+  auto start_req_received_barrier = std::make_unique<util::Barrier>();
   EXPECT_CALL(*strict_scanner_mock_, receiveControlMsg(_, data_conversion_layer::start_request::serialize(start_req)))
       .WillOnce(OpenBarrier(start_req_received_barrier.get()));
   return start_req_received_barrier;
