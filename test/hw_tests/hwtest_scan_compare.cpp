@@ -38,6 +38,8 @@ namespace psen_scan_v2_test
 typedef sensor_msgs::LaserScan ScanType;
 typedef boost::shared_ptr<ScanType const> ScanConstPtr;
 
+static constexpr int32_t WAIT_FOR_MESSAGE_TIMEOUT_S{ 5 };
+
 std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
 {
   std::map<int16_t, NormalDist> bins;
@@ -63,7 +65,8 @@ std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
 class ScanComparisonTests : public ::testing::Test
 {
 public:
-  static void SetUpTestSuite()
+  void SetUp() override  // Omit using SetUpTestSuite() for googletest below v1.11.0, see
+                         // https://github.com/google/googletest/issues/247
   {
     ros::NodeHandle pnh{ "~" };
 
@@ -90,12 +93,9 @@ public:
   }
 
 protected:
-  static std::map<int16_t, NormalDist> bins_expected_;
-  static int test_duration_;
+  std::map<int16_t, NormalDist> bins_expected_{};
+  int test_duration_{ 0 };
 };
-
-std::map<int16_t, NormalDist> ScanComparisonTests::bins_expected_{};
-int ScanComparisonTests::test_duration_{ 0 };
 
 TEST_F(ScanComparisonTests, simpleCompare)
 {
@@ -109,6 +109,10 @@ TEST_F(ScanComparisonTests, simpleCompare)
       "/laser_1_node/scan",
       1000,
       boost::bind(&LaserScanValidator<ScanType>::scanCb, &laser_scan_validator, boost::placeholders::_1, window_size));
+
+  ros::topic::waitForMessage<ScanType>("/laser_1_node/scan", ros::Duration(WAIT_FOR_MESSAGE_TIMEOUT_S, 0));
+  ASSERT_EQ(1, scan_subscriber.getNumPublishers())
+      << "Failed to establish connection with publisher on laserscan-topic";
 
   ASSERT_TRUE(laser_scan_validator.waitForResult(test_duration_));
 }
