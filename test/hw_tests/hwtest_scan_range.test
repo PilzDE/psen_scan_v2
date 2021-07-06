@@ -23,7 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <arg name="host_ip" value="$(optenv HOST_IP auto)" />
   </include>
 
-  <rosparam ns="laser_1_node" command="load" file="$(find psen_scan_v2)/test/hw_tests/config/$(arg config)" />
+  <rosparam ns="laser_1" command="load" file="$(find psen_scan_v2)/test/hw_tests/config/$(arg config)" />
 
   <test test-name="scan_range" pkg="psen_scan_v2" type="hwtest_scan_range.py">
     <rosparam command="load" file="$(find psen_scan_v2)/test/hw_tests/config/$(arg config)" />

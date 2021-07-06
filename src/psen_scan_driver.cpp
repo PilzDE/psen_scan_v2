@@ -42,7 +42,7 @@ const std::string PARAM_HOST_IP{ "host_ip" };
 const std::string PARAM_HOST_DATA_PORT{ "host_udp_port_data" };
 const std::string PARAM_HOST_CONTROL_PORT{ "host_udp_port_control" };
 const std::string PARAM_SCANNER_IP{ "sensor_ip" };
-const std::string PARAM_PREFIX{ "prefix" };
+const std::string PARAM_PREFIX{ "name" };
 const std::string PARAM_ANGLE_START{ "angle_start" };
 const std::string PARAM_ANGLE_END{ "angle_end" };
 const std::string PARAM_X_AXIS_ROTATION{ "x_axis_rotation" };

@@ -46,7 +46,7 @@ std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
   bag.open(filepath, rosbag::bagmode::Read);
 
   std::vector<std::string> topics;
-  topics.push_back(std::string("/laser_1_node/scan"));
+  topics.push_back(std::string("/laser_1/scan"));
 
   rosbag::View view(bag, rosbag::TopicQuery(topics));
 
@@ -106,7 +106,7 @@ TEST_F(ScanComparisonTests, simpleCompare)
   LaserScanValidator<ScanType> laser_scan_validator(bins_expected_);
   laser_scan_validator.reset();
   auto scan_subscriber = nh.subscribe<ScanType>(
-      "/laser_1_node/scan",
+      "/laser_1/scan",
       1000,
       boost::bind(&LaserScanValidator<ScanType>::scanCb, &laser_scan_validator, boost::placeholders::_1, window_size));
 

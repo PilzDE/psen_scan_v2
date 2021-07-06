@@ -20,7 +20,7 @@ class HwtestScanRange(unittest.TestCase):
         self.angle_start = rospy.get_param("~angle_start")
         self.angle_end = rospy.get_param("~angle_end")
         self.resolution = rospy.get_param("~resolution")
-        rospy.Subscriber("/laser_1_node/scan", LaserScan, self.callback)
+        rospy.Subscriber("/laser_1/scan", LaserScan, self.callback)
 
     def callback(self, msg):
         self.received_msgs.append(msg)
