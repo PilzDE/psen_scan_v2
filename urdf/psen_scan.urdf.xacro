@@ -10,14 +10,14 @@
     <!-- Location of mounting point at the lower back of device -->
     <link name="${prefix}_mount_link"/>
 
-    <joint name="${prefix}_mount_joint" type="fixed">
+    <joint name="${prefix}_body_joint" type="fixed">
       <parent link="${prefix}_mount_link" />
-      <child link="${prefix}" />
+      <child link="${prefix}_body_link" />
       <origin rpy="0 0 0" xyz="${radius} 0 0"/>
     </joint>
 
     <!-- Location of scanner body -->
-    <link name="${prefix}">
+    <link name="${prefix}_body_link">
       <visual>
         <geometry>
           <cylinder radius="${radius}" length="${height}" />
@@ -41,13 +41,13 @@
     </link>
 
     <joint name="${prefix}_scan_joint" type="fixed">
-      <parent link="${prefix}" />
-      <child link="${prefix}_scan" />
+      <parent link="${prefix}_body_link" />
+      <child link="${prefix}" />
       <origin rpy="${pi} 0 0" xyz="0 ${radius - dist_scanning_axis_rear} ${height / 2 - dist_scanning_plane_top}"/>
     </joint>
 
     <!-- This is the location of the laser scan -->
-    <link name="${prefix}_scan">
+    <link name="${prefix}">
     </link>
   </xacro:macro>
 </robot>

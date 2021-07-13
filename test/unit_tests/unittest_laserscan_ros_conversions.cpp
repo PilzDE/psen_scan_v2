@@ -57,7 +57,7 @@ static LaserScan createScan()
 TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectHeaderAfterConversion)
 {
   const std::string prefix{ "prefix" };
-  const std::string frame_id{ prefix + "_scan" };
+  const std::string frame_id{ prefix };
   const ros::Time now = ros::Time::now();
   const sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(createScan(), prefix, 0, now);
 
