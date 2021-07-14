@@ -29,7 +29,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         pkg="rostest" type="publishtest">
     <rosparam>
       topics:
-        - name: laser_1_node/scan
+        - name: laser_1/scan
           timeout: 10
           negative: False
     </rosparam>

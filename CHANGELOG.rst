@@ -2,6 +2,10 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Apply tf prefix equals node name
+
 0.3.0 (2021-06-29)
 ------------------
 * Set prefix for node name (same value as for tf frames)
