@@ -149,8 +149,8 @@ To update your ROS environment from the former `psen_scan` package (which suppor
 1. Update scanner firmware using PSENscan Configurator (unless the device has firmware 3.1 already)
 2. Install the new ROS package ```sudo apt install ros-$ROS_DISTRO-psen-scan-v2```
 3. Replace the launch file arguments:
-	* `password` and `x_axis_rotation` are obsolete and should be dropped
-	* `angle_start` and `angle_end` are now in radians, in direction of the x axis of the scanner tf frame
+   * `password` and `x_axis_rotation` are obsolete and should be dropped
+   * `angle_start` and `angle_end` are now in radians, in direction of the x axis of the scanner tf frame
    * `prefix` is replaced by `tf_prefix`
 4. In your application launch file / roslaunch command: replace all occurrences of `psen_scan` with `psen_scan_v2`
 
