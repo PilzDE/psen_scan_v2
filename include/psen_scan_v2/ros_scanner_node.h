@@ -54,13 +54,13 @@ public:
    *
    * @param nh Node handle for the ROS node on which the scanner topic is advertised.
    * @param topic Name of the ROS topic under which the scanner data are published.
-   * @param prefix Prefix for the frame ids.
+   * @param tf_prefix Prefix for the frame ids.
    * @param x_axis_rotation Rotation of 2D scan around the z-axis.
    * @param scanner_config Scanner configuration.
    */
   ROSScannerNodeT(ros::NodeHandle& nh,
                   const std::string& topic,
-                  const std::string& prefix,
+                  const std::string& tf_prefix,
                   const double& x_axis_rotation,
                   const ScannerConfiguration& scanner_config);
 
@@ -75,7 +75,7 @@ private:
 private:
   ros::NodeHandle nh_;
   ros::Publisher pub_;
-  std::string prefix_;
+  std::string tf_prefix_;
   double x_axis_rotation_;
   S scanner_;
   std::atomic_bool terminate_{ false };
@@ -93,11 +93,11 @@ typedef ROSScannerNodeT<> ROSScannerNode;
 template <typename S>
 ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
                                     const std::string& topic,
-                                    const std::string& prefix,
+                                    const std::string& tf_prefix,
                                     const double& x_axis_rotation,
                                     const ScannerConfiguration& scanner_config)
   : nh_(nh)
-  , prefix_(prefix)
+  , tf_prefix_(tf_prefix)
   , x_axis_rotation_(x_axis_rotation)
   , scanner_(scanner_config, std::bind(&ROSScannerNodeT<S>::laserScanCallback, this, std::placeholders::_1))
 {
@@ -107,7 +107,7 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
 template <typename S>
 void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
 {
-  const auto laserScanMsg = toLaserScanMsg(scan, prefix_, x_axis_rotation_);
+  const auto laserScanMsg = toLaserScanMsg(scan, tf_prefix_, x_axis_rotation_);
   PSENSCAN_INFO_ONCE(
       "ScannerNode",
       "Publishing laser scan with angle_min={:.1f} angle_max={:.1f} angle_increment={:.1f} degrees. {} angle values.",

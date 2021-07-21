@@ -4,7 +4,9 @@ Changelog for package psen_scan_v2
 
 Forthcoming
 -----------
+* Rename urdf links
 * Apply tf prefix equals node name
+* Contributors: Pilz GmbH and Co. KG
 
 0.3.0 (2021-06-29)
 ------------------
