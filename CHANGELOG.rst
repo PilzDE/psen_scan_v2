@@ -2,8 +2,8 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.1 (2021-07-21)
+------------------
 * Rename urdf links
 * Apply tf prefix equals node name
 * API change: rename launch-file argument prefix->tf_prefix
