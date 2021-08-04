@@ -18,6 +18,9 @@
 
 #include <gtest/gtest.h>
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 #include "psen_scan_v2_standalone/laserscan.h"
 
 using namespace psen_scan_v2_standalone;
@@ -142,6 +145,27 @@ TEST(LaserScanTest, testGetTimestamp)
   std::unique_ptr<LaserScan> laser_scan;
   ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
   EXPECT_EQ(DEFAULT_TIMESTAMP, laser_scan->getTimestamp());
+}
+
+TEST(LaserScanTest, testPrintMessageSuccess)
+{
+  LaserScanBuilder laser_scan_builder;
+  std::unique_ptr<LaserScan> laser_scan;
+  ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
+
+  laser_scan->setMeasurements({ 45.0, 44.0, 43.0, 42.0 });
+
+// For compatibility with different ubuntu versions (resp. fmt), we need to take account of changes in
+// the default formatting of floating point numbers
+#if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
+  EXPECT_EQ(fmt::format("{}", *laser_scan),
+            "LaserScan(timestamp = 1 nsec, scanCounter = 1, minScanAngle = 0.1 deg, maxScanAngle = 0.2 deg, resolution "
+            "= 0.1 deg, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {})");
+#else
+  EXPECT_EQ(fmt::format("{}", *laser_scan),
+            "LaserScan(timestamp = 1 nsec, scanCounter = 1, minScanAngle = 0.1 deg, maxScanAngle = 0.2 deg, resolution "
+            "= 0.1 deg, measurements = {45, 44, 43, 42}, intensities = {})");
+#endif
 }
 
 }  // namespace psen_scan_v2_standalone_test

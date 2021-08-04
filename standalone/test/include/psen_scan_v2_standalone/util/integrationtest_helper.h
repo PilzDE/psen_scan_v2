@@ -145,9 +145,21 @@ ACTION_P(OpenBarrier, barrier)
   barrier->release();
 }
 
+using namespace ::testing;
+
+MATCHER_P(PointwiseDoubleEq, vec, "")
+{
+  return std::equal(vec.begin(), vec.end(), arg.begin(), arg.end(), [](const double& a, const double& b) {
+    return Matches(DoubleEq(b))(a);
+  });
+}
+
 MATCHER_P(ScanDataEqual, scan, "")
 {
-  return arg == scan;  // ToDo: misleading?!
+  return arg.getScanCounter() == scan.getScanCounter() && arg.getScanResolution() == scan.getScanResolution() &&
+         arg.getMinScanAngle() == scan.getMinScanAngle() && arg.getMaxScanAngle() == scan.getMaxScanAngle() &&
+         Matches(PointwiseDoubleEq(scan.getMeasurements()))(arg.getMeasurements()) &&
+         Matches(PointwiseDoubleEq(scan.getIntensities()))(arg.getIntensities());
 }
 
 using namespace ::testing;
@@ -155,8 +167,9 @@ using namespace ::testing;
 MATCHER_P2(TimestampInExpectedTimeframe, reference_scan, reference_timestamp, "")
 {
   const int64_t elapsed_time{ getCurrentTime() - reference_timestamp };
-  return ExplainMatchResult(Gt(reference_scan.getTimestamp()), arg.getTimestamp(), result_listener) &&
-         ExplainMatchResult(Lt(reference_scan.getTimestamp() + elapsed_time), arg.getTimestamp(), result_listener);
+  *result_listener << "where the elapsed time is " << elapsed_time << " nsec";
+  return arg.getTimestamp() > reference_scan.getTimestamp() &&
+         arg.getTimestamp() < (reference_scan.getTimestamp() + elapsed_time);
 }
 
 }  // namespace psen_scan_v2_standalone_test

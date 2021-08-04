@@ -259,6 +259,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_laserscan
     ${catkin_LIBRARIES}
+    fmt::fmt
   )
 
   catkin_add_gtest(unittest_laserscan_conversions
