@@ -26,8 +26,10 @@
 
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/laserscan_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
+#include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/scan_range.h"
 
 namespace psen_scan_v2_standalone_test
@@ -132,6 +134,12 @@ stampMonitoringFrameMsgs(const std::vector<data_conversion_layer::monitoring_fra
   return stamped_msgs;
 }
 
+static LaserScan createReferenceScan(const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs,
+                                     int64_t reference_timestamp)
+{
+  return data_conversion_layer::LaserScanConverter::toLaserScan(stampMonitoringFrameMsgs(msgs, reference_timestamp));
+}
+
 ACTION_P(OpenBarrier, barrier)
 {
   barrier->release();
@@ -142,11 +150,13 @@ MATCHER_P(ScanDataEqual, scan, "")
   return arg == scan;  // ToDo: misleading?!
 }
 
-MATCHER_P2(TimestampInExpectedTimeframe, conversion_time_of_last_scan, prior_scan_timestamp, "")
+using namespace ::testing;
+
+MATCHER_P2(TimestampInExpectedTimeframe, reference_scan, reference_timestamp, "")
 {
-  const int64_t time_since_prior_scan_conversion{ getCurrentTime() - conversion_time_of_last_scan };
-  return arg.getTimestamp() > prior_scan_timestamp &&
-         arg.getTimestamp() < prior_scan_timestamp + time_since_prior_scan_conversion;
+  const int64_t elapsed_time{ getCurrentTime() - reference_timestamp };
+  return ExplainMatchResult(Gt(reference_scan.getTimestamp()), arg.getTimestamp(), result_listener) &&
+         ExplainMatchResult(Lt(reference_scan.getTimestamp() + elapsed_time), arg.getTimestamp(), result_listener);
 }
 
 }  // namespace psen_scan_v2_standalone_test

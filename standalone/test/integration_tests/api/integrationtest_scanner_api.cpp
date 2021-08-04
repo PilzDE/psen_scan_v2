@@ -333,16 +333,14 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
   prepareScannerMockStartReply();
 
   const auto msg{ createValidMonitoringFrameMsg() };
-  const auto msg_timestamp{ getCurrentTime() };
-  const auto scan{ data_conversion_layer::LaserScanConverter::toLaserScan(
-      { data_conversion_layer::monitoring_frame::MessageStamped(msg, msg_timestamp) }) };
+  const auto timestamp{ getCurrentTime() };
+  const auto scan{ createReferenceScan({ msg }, timestamp) };
 
   util::Barrier monitoring_frame_barrier;
   util::Barrier diagnostic_barrier;
 
-  EXPECT_CALL(
-      user_callbacks_,
-      LaserScanCallback(AllOf(ScanDataEqual(scan), TimestampInExpectedTimeframe(msg_timestamp, scan.getTimestamp()))))
+  EXPECT_CALL(user_callbacks_,
+              LaserScanCallback(AllOf(ScanDataEqual(scan), TimestampInExpectedTimeframe(scan, timestamp))))
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
   EXPECT_LOG_SHORT(WARN,
@@ -371,15 +369,13 @@ TEST_F(ScannerAPITests, shouldCallLaserScanCBOnlyOneTimeWithAllInformationWhenUn
   prepareScannerMockStartReply();
 
   const auto msgs{ createMonitoringFrameMsgsForScanRound(2, 6) };
-  const auto msg_timestamp{ getCurrentTime() };
-  const auto scan{ data_conversion_layer::LaserScanConverter::toLaserScan(
-      { stampMonitoringFrameMsgs(msgs, msg_timestamp) }) };
+  const auto timestamp{ getCurrentTime() };
+  const auto scan{ createReferenceScan(msgs, timestamp) };
 
   util::Barrier monitoring_frame_barrier;
 
-  EXPECT_CALL(
-      user_callbacks_,
-      LaserScanCallback(AllOf(ScanDataEqual(scan), TimestampInExpectedTimeframe(msg_timestamp, scan.getTimestamp()))))
+  EXPECT_CALL(user_callbacks_,
+              LaserScanCallback(AllOf(ScanDataEqual(scan), TimestampInExpectedTimeframe(scan, timestamp))))
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
   nice_scanner_mock_->startListeningForControlMsg();
@@ -409,15 +405,13 @@ TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
       createMonitoringFrameMsgsForScanRound(3, 5);
   std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> valid_round =
       createMonitoringFrameMsgsForScanRound(4, 6);
-  const auto msg_timestamp{ getCurrentTime() };
-  const auto scan{ data_conversion_layer::LaserScanConverter::toLaserScan(
-      { stampMonitoringFrameMsgs(valid_round, msg_timestamp) }) };
+  const auto timestamp{ getCurrentTime() };
+  const auto scan{ createReferenceScan(valid_round, timestamp) };
 
   util::Barrier monitoring_frame_barrier;
 
-  EXPECT_CALL(
-      user_callbacks_,
-      LaserScanCallback(AllOf(ScanDataEqual(scan), TimestampInExpectedTimeframe(msg_timestamp, scan.getTimestamp()))))
+  EXPECT_CALL(user_callbacks_,
+              LaserScanCallback(AllOf(ScanDataEqual(scan), TimestampInExpectedTimeframe(scan, timestamp))))
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
   util::Barrier user_msg_barrier;
@@ -457,15 +451,13 @@ TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
 
   auto msg_round2 = createValidMonitoringFrameMsg(2);
   auto msgs_round3 = createMonitoringFrameMsgsForScanRound(3, 6);
-  const auto msg_timestamp{ getCurrentTime() };
-  const auto scan{ data_conversion_layer::LaserScanConverter::toLaserScan(
-      { stampMonitoringFrameMsgs(msgs_round3, msg_timestamp) }) };
+  const auto timestamp{ getCurrentTime() };
+  const auto scan{ createReferenceScan(msgs_round3, timestamp) };
 
   util::Barrier monitoring_frame_barrier;
 
-  EXPECT_CALL(
-      user_callbacks_,
-      LaserScanCallback(AllOf(ScanDataEqual(scan), TimestampInExpectedTimeframe(msg_timestamp, scan.getTimestamp()))))
+  EXPECT_CALL(user_callbacks_,
+              LaserScanCallback(AllOf(ScanDataEqual(scan), TimestampInExpectedTimeframe(scan, timestamp))))
       .WillOnce(OpenBarrier(&monitoring_frame_barrier));
 
   util::Barrier user_msg_barrier;
