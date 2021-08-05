@@ -235,10 +235,12 @@ private:
   // LCOV_EXCL_STOP
   void checkForInternalErrors(const data_conversion_layer::scanner_reply::Message& msg);
 
-  void checkForDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& frame);
-  void informUserAboutTheScanData(const data_conversion_layer::monitoring_frame::Message& frame);
-  void sendMessageWithMeasurements(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames);
-  bool framesContainMeasurements(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames);
+  void checkForDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& msg);
+  void informUserAboutTheScanData(const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg);
+  void
+  sendMessageWithMeasurements(const std::vector<data_conversion_layer::monitoring_frame::MessageStamped>& stamped_msg);
+  bool
+  framesContainMeasurements(const std::vector<data_conversion_layer::monitoring_frame::MessageStamped>& stamped_msg);
 
 private:
   const std::unique_ptr<StateMachineArgs> args_;

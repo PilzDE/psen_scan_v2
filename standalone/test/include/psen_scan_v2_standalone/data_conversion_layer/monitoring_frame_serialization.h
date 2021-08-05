@@ -26,7 +26,7 @@ namespace data_conversion_layer
 {
 namespace monitoring_frame
 {
-RawData serialize(const data_conversion_layer::monitoring_frame::Message& frame);
+RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg);
 namespace diagnostic
 {
 RawChunk serialize(const std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message>& messages);

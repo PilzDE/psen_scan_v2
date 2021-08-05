@@ -45,12 +45,13 @@ static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 5 };
 
 using std::placeholders::_1;
 using std::placeholders::_2;
+using std::placeholders::_3;
 
 class UdpClientTests : public testing::Test
 {
 public:
   UdpClientTests();
-  MOCK_METHOD2(handleNewData, void(const data_conversion_layer::RawData&, const std::size_t&));
+  MOCK_METHOD3(handleNewData, void(const data_conversion_layer::RawData&, const std::size_t&, const int64_t&));
   MOCK_METHOD1(handleError, void(const std::string&));
 
   MOCK_METHOD2(receivedUdpMsg,
@@ -65,21 +66,21 @@ protected:
 
 #if BOOST_VERSION > 107000
   std::unique_ptr<communication_layer::UdpClientImpl> udp_client_{ new communication_layer::UdpClientImpl(
-      std::bind(&UdpClientTests::handleNewData, this, _1, _2),
+      std::bind(&UdpClientTests::handleNewData, this, _1, _2, _3),
       std::bind(&UdpClientTests::handleError, this, _1),
       HOST_UDP_PORT,
       boost::asio::ip::make_address_v4(UDP_MOCK_IP_ADDRESS.c_str()).to_uint(),
       UDP_MOCK_PORT) };
 #elif BOOST_VERSION >= 106900
   std::unique_ptr<communication_layer::UdpClientImpl> udp_client_{ new communication_layer::UdpClientImpl(
-      std::bind(&UdpClientTests::handleNewData, this, _1, _2),
+      std::bind(&UdpClientTests::handleNewData, this, _1, _2, _3),
       std::bind(&UdpClientTests::handleError, this, _1),
       HOST_UDP_PORT,
       boost::asio::ip::address_v4::make_address_v4(UDP_MOCK_IP_ADDRESS.c_str()).to_uint(),
       UDP_MOCK_PORT) };
 #else
   std::unique_ptr<communication_layer::UdpClientImpl> udp_client_{ new communication_layer::UdpClientImpl(
-      std::bind(&UdpClientTests::handleNewData, this, _1, _2),
+      std::bind(&UdpClientTests::handleNewData, this, _1, _2, _3),
       std::bind(&UdpClientTests::handleError, this, _1),
       HOST_UDP_PORT,
       boost::asio::ip::address_v4::from_string(UDP_MOCK_IP_ADDRESS.c_str()).to_ulong(),
@@ -128,7 +129,7 @@ TEST_F(UdpClientTests, testGetHostIp)
 TEST_F(UdpClientTests, testAsyncReadOperation)
 {
   util::Barrier client_received_data_barrier;
-  EXPECT_CALL(*this, handleNewData(_, send_array_.size())).WillOnce(OpenBarrier(&client_received_data_barrier));
+  EXPECT_CALL(*this, handleNewData(_, send_array_.size(), _)).WillOnce(OpenBarrier(&client_received_data_barrier));
 
   udp_client_->startAsyncReceiving();
   sendTestDataToClient();
@@ -138,7 +139,7 @@ TEST_F(UdpClientTests, testAsyncReadOperation)
 TEST_F(UdpClientTests, testSingleAsyncReadOperation)
 {
   util::Barrier client_received_data_barrier;
-  EXPECT_CALL(*this, handleNewData(_, send_array_.size())).WillOnce(OpenBarrier(&client_received_data_barrier));
+  EXPECT_CALL(*this, handleNewData(_, send_array_.size(), _)).WillOnce(OpenBarrier(&client_received_data_barrier));
 
   udp_client_->startAsyncReceiving(communication_layer::ReceiveMode::single);
   sendTestDataToClient();
@@ -186,7 +187,7 @@ TEST_F(UdpClientTests, testWritingWhileReceiving)
 
   util::Barrier client_received_data_barrier;
   util::Barrier server_mock_received_data_barrier;
-  EXPECT_CALL(*this, handleNewData(_, send_array_.size())).WillOnce(OpenBarrier(&client_received_data_barrier));
+  EXPECT_CALL(*this, handleNewData(_, send_array_.size(), _)).WillOnce(OpenBarrier(&client_received_data_barrier));
   EXPECT_CALL(*this, receivedUdpMsg(_, write_buf))
       .WillOnce(DoAll(InvokeWithoutArgs(this, &UdpClientTests::sendTestDataToClient),
                       OpenBarrier(&server_mock_received_data_barrier)));

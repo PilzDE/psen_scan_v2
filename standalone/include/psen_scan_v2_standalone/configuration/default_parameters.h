@@ -20,6 +20,7 @@
 
 namespace psen_scan_v2_standalone
 {
+//! @brief Namespace for configuration defaults and definitions.
 namespace configuration
 {
 static const std::string DEFAULT_HOST_IP_STRING{ "auto" };

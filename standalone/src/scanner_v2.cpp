@@ -29,7 +29,7 @@ using namespace psen_scan_v2_standalone::protocol_layer::scanner_events;
   std::bind(&ScannerV2::triggerEvent<event_name>, this)
 
 #define BIND_RAW_DATA_EVENT(event_name)\
-  [this](const data_conversion_layer::RawData& data, const std::size_t& num_bytes){ triggerEventWithParam(event_name(data, num_bytes)); }
+  [this](const data_conversion_layer::RawData& data, const std::size_t& num_bytes, const int64_t& timestamp){ triggerEventWithParam(event_name(data, num_bytes, timestamp)); }
 // clang-format on
 
 ScannerV2::WatchdogFactory::WatchdogFactory(ScannerV2* scanner) : IWatchdogFactory(), scanner_(scanner)

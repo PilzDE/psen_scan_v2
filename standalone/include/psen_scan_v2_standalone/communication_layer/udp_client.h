@@ -45,7 +45,8 @@ namespace psen_scan_v2_standalone
  */
 namespace communication_layer
 {
-using NewDataHandler = std::function<void(const data_conversion_layer::RawData&, const std::size_t&)>;
+using NewDataHandler =
+    std::function<void(const data_conversion_layer::RawData&, const std::size_t&, const int64_t& timestamp)>;
 using ErrorHandler = std::function<void(const std::string&)>;
 
 /**
@@ -293,7 +294,11 @@ inline void UdpClientImpl::asyncReceive(const ReceiveMode& modi)
                           }
                           else
                           {
-                            data_handler_(received_data_, bytes_received);
+                            auto timestamp =
+                                std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now())
+                                    .time_since_epoch()
+                                    .count();
+                            data_handler_(received_data_, bytes_received, timestamp);
                           }
                           if (modi == ReceiveMode::continuous)
                           {

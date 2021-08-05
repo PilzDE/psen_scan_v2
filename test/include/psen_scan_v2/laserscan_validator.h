@@ -15,6 +15,7 @@
 #ifndef PSEN_SCAN_V2_LASERSCAN_VALIDATOR_H
 #define PSEN_SCAN_V2_LASERSCAN_VALIDATOR_H
 
+#include <chrono>
 #include <future>
 #include <map>
 #include <memory>

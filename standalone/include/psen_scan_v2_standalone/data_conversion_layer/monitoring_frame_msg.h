@@ -117,9 +117,20 @@ private:
   bool diagnostic_data_enabled_{ false };
 
 public:
-  friend data_conversion_layer::RawData serialize(const data_conversion_layer::monitoring_frame::Message& frame);
+  friend data_conversion_layer::RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg);
   friend data_conversion_layer::monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data,
                                                                       const std::size_t& num_bytes);
+};
+
+/**
+ * @brief Wrapping class for a Message and its corresponding timestamp
+ * @see Message
+ **/
+struct MessageStamped
+{
+  MessageStamped(const Message& message, const int64_t timestamp) : msg_(message), stamp_(timestamp){};
+  Message msg_;
+  int64_t stamp_;
 };
 
 inline ScanCounterMissing::ScanCounterMissing(const std::string& msg) : std::runtime_error(msg)

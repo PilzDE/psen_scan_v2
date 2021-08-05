@@ -107,15 +107,24 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
 template <typename S>
 void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
 {
-  const auto laserScanMsg = toLaserScanMsg(scan, tf_prefix_, x_axis_rotation_);
-  PSENSCAN_INFO_ONCE(
-      "ScannerNode",
-      "Publishing laser scan with angle_min={:.1f} angle_max={:.1f} angle_increment={:.1f} degrees. {} angle values.",
-      data_conversion_layer::radianToDegree(laserScanMsg.angle_min),
-      data_conversion_layer::radianToDegree(laserScanMsg.angle_max),
-      data_conversion_layer::radianToDegree(laserScanMsg.angle_increment),
-      laserScanMsg.ranges.size());
-  pub_.publish(laserScanMsg);
+  try
+  {
+    const auto laserScanMsg = toLaserScanMsg(scan, tf_prefix_, x_axis_rotation_);
+    PSENSCAN_INFO_ONCE(
+        "ScannerNode",
+        "Publishing laser scan with angle_min={:.1f} angle_max={:.1f} angle_increment={:.1f} degrees. {} angle values.",
+        data_conversion_layer::radianToDegree(laserScanMsg.angle_min),
+        data_conversion_layer::radianToDegree(laserScanMsg.angle_max),
+        data_conversion_layer::radianToDegree(laserScanMsg.angle_increment),
+        laserScanMsg.ranges.size());
+    pub_.publish(laserScanMsg);
+  }
+  // LCOV_EXCL_START
+  catch (const std::invalid_argument& e)
+  {
+    ROS_ERROR_STREAM(e.what());
+  }
+  // LCOV_EXCL_STOP
 }
 
 template <typename S>
