@@ -436,6 +436,8 @@ if(CATKIN_ENABLE_TESTING)
       ARGS config:=with_intensities.yaml)
     add_rostest(test/hw_tests/hwtest_scan_range.test
       ARGS config:=big_resolution.yaml)
+
+    add_rostest(test/hw_tests/hwtest_timestamp.test)
   endif()
 
 
