@@ -15,30 +15,44 @@
 #ifndef PSEN_SCAN_V2_LASERSCAN_VALIDATOR_H
 #define PSEN_SCAN_V2_LASERSCAN_VALIDATOR_H
 
+#include <algorithm>
+#include <atomic>
 #include <future>
 #include <map>
-#include <memory>
 #include <stdexcept>
+#include <string>
 #include <vector>
+
+#include <boost/shared_ptr.hpp>
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
-// #include <ros/ros.h>
+#include <gtest/gtest.h>
+
+#include <math.h>
+
+#include <ros/ros.h>
+
+#include <rosbag/bag.h>
+#include <rosbag/view.h>
+#include <sensor_msgs/LaserScan.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
+#include "psen_scan_v2_standalone/util/logging.h"
 
 #include "psen_scan_v2/dist.h"
 
 namespace psen_scan_v2_test
 {
+template <int16_t angle_offset = 0>
 void addScanToBin(const psen_scan_v2_standalone::LaserScan& scan, std::map<int16_t, NormalDist>& bin)
 {
   for (size_t i = 0; i < scan.getMeasurements().size(); ++i)
   {
-    auto bin_addr = (scan.getMinScanAngle() + scan.getScanResolution() * i).value();
+    auto bin_addr = (scan.getMinScanAngle() + scan.getScanResolution() * i).value() + angle_offset;
 
     if (bin.find(bin_addr) == bin.end())
     {
@@ -49,12 +63,14 @@ void addScanToBin(const psen_scan_v2_standalone::LaserScan& scan, std::map<int16
   }
 }
 
+template <int16_t angle_offset = 0>
 void addScanToBin(const sensor_msgs::LaserScan& scan, std::map<int16_t, NormalDist>& bin)
 {
   for (size_t i = 0; i < scan.ranges.size(); ++i)
   {
     auto bin_addr =
-        psen_scan_v2_standalone::data_conversion_layer::radToTenthDegree(scan.angle_min + scan.angle_increment * i);
+        psen_scan_v2_standalone::data_conversion_layer::radToTenthDegree(scan.angle_min + scan.angle_increment * i) +
+        angle_offset;
 
     if (bin.find(bin_addr) == bin.end())
     {
@@ -65,7 +81,7 @@ void addScanToBin(const sensor_msgs::LaserScan& scan, std::map<int16_t, NormalDi
   }
 }
 
-template <typename ScanConstPtr>
+template <typename ScanConstPtr, int16_t angle_offset = 0>
 std::map<int16_t, NormalDist> binsFromScans(const std::vector<ScanConstPtr>& scans)
 {
   std::map<int16_t, NormalDist> bins;
@@ -74,8 +90,30 @@ std::map<int16_t, NormalDist> binsFromScans(const std::vector<ScanConstPtr>& sca
     {
       throw std::invalid_argument("LaserScan pointer must not be null");
     }
+    addScanToBin<angle_offset>(*scan, bins);
+  });
+  return bins;
+}
+
+std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
+{
+  std::map<int16_t, NormalDist> bins;
+
+  rosbag::Bag bag;
+  bag.open(filepath, rosbag::bagmode::Read);
+
+  std::vector<std::string> topics;
+  topics.push_back(std::string("/laser_1_node/scan"));
+
+  rosbag::View view(bag, rosbag::TopicQuery(topics));
+
+  std::for_each(view.begin(), view.end(), [&bins](const rosbag::MessageInstance& msg) {
+    sensor_msgs::LaserScanConstPtr scan = msg.instantiate<sensor_msgs::LaserScan>();
     addScanToBin(*scan, bins);
   });
+
+  bag.close();
+
   return bins;
 }
 
@@ -87,9 +125,10 @@ public:
 
   typedef boost::shared_ptr<ScanType const> ScanConstPtr;
 
+  template <int16_t angle_offset = 0>
   void scanCb(const ScanConstPtr scan, size_t n_msgs)
   {
-    ROS_INFO_THROTTLE(5, "Checking messages for validity. So far looking good.");
+    PSENSCAN_INFO_THROTTLE(5, "LaserScanValidator", "Checking messages for validity. So far looking good.");
 
     if (check_done_)
     {
@@ -101,7 +140,7 @@ public:
     // To have only one call on the promise the subscriber is shut down
     if (msgs_.size() == n_msgs)
     {
-      auto bins_actual = binsFromScans(msgs_);
+      auto bins_actual = binsFromScans<ScanConstPtr, angle_offset>(msgs_);
 
       std::string error_string;
       std::size_t counter_deviations{ 0 };
