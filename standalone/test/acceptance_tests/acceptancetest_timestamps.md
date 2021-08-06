@@ -15,7 +15,6 @@ along with this program.  If not, see <https:#www.gnu.org/licenses/>.
 -->
 
 # Acceptancetest Timestamps
-
 Check if the calculation of the scan-timestamps (first ray time) is correct using wireshark.
 
 ## Build
