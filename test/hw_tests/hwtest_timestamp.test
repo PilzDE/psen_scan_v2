@@ -16,14 +16,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <launch>
-  <arg name="config" default="default.yaml" />
-
   <include file="$(find psen_scan_v2)/launch/bringup.launch">
     <arg name="sensor_ip" value="$(optenv SENSOR_IP 192.168.0.10)" />
     <arg name="host_ip" value="$(optenv HOST_IP auto)" />
+    <arg name="host_udp_port_data" value="55007" />
   </include>
-
-  <rosparam ns="laser_1" command="load" file="$(find psen_scan_v2)/test/hw_tests/config/$(arg config)" />
 
   <test test-name="timestamp" pkg="psen_scan_v2" type="hwtest_timestamp.py">
   </test>
