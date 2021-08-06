@@ -17,6 +17,8 @@
 
 #include <fmt/format.h>
 
+#include <math.h>
+#include <numeric>
 #include <vector>
 
 namespace psen_scan_v2_test

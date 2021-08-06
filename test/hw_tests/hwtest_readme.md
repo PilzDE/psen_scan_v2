@@ -50,7 +50,6 @@ DOCKER_RUN_OPTS="--env HOST_IP=192.168.0.122 --env SENSOR_IP=192.168.0.100 \
 -p 55000-55007:55000-55007/udp \
 -v /usr/local/share/ca-certificates:/usr/local/share/ca-certificates:ro" \
 APT_PROXY=http://172.20.20.104:3142
-
 ```
 
 ## Hardware Test `hwtest_scan_compare`
@@ -73,8 +72,15 @@ export HW_TEST_SCAN_COMPARE_TESTFILE=<your/desired/path/file.bag>
 rosbag record -a -O $HW_TEST_SCAN_COMPARE_TESTFILE --duration 10
 ```
 
-### Run using `rostest`
-To run the hardware tests execute
+### Run standalone test
+Execute
+```
+export HW_TEST_SCAN_COMPARE_TESTFILE=<path/to/reference/file.bag>
+./devel/lib/psen_scan_v2/hwtest_scan_compare_standalone
+```
+
+### Run `rostest`
+Execute
 ```
 export HW_TEST_SCAN_COMPARE_TESTFILE=<path/to/reference/file.bag>
 rostest psen_scan_v2 hwtest_scan_compare.test
