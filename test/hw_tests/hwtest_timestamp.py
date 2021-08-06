@@ -68,7 +68,7 @@ class HwtestTimestamp(unittest.TestCase):
         self.wait_for_msgs()
         self.assertEqual(len(self.received_stamps), len(self.receipt_times), "Lists have incompatible length")
         self.assertTrue(is_less_than(self.received_stamps, self.receipt_times),
-                        "Timestamp is not bounded by laserscan-msg receipt time")
+                        "Timestamp is not lower than the time the msg was received.")
 
 
 if __name__ == '__main__':
