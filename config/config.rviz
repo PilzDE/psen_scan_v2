@@ -80,7 +80,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.009999999776482582
       Style: Points
-      Topic: /laser_1_node/scan
+      Topic: /laser_1/scan
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: false
@@ -94,7 +94,7 @@ Visualization Manager:
           Value: true
         laser_1_mount_link:
           Value: true
-        laser_1_scan:
+        laser_1_body_link:
           Value: true
       Marker Scale: 0.5
       Name: TF
@@ -103,8 +103,8 @@ Visualization Manager:
       Show Names: true
       Tree:
         laser_1_mount_link:
-          laser_1:
-            laser_1_scan:
+          laser_1_body_link:
+            laser_1:
               {}
       Update Interval: 0
       Value: true
@@ -118,7 +118,7 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        laser_1:
+        laser_1_body_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -127,7 +127,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        laser_1_scan:
+        laser_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false

@@ -16,14 +16,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <launch>
-  <arg name="test_duration" default="10"/>
-
-  <include file="$(find psen_scan_v2)/launch/psen_scan_v2.launch">
+  <include file="$(find psen_scan_v2)/launch/bringup.launch">
     <arg name="angle_start" value="-1.2" />
     <arg name="angle_end" value="1.2" />
     <arg name="sensor_ip" value="$(optenv SENSOR_IP 192.168.0.10)" />
     <arg name="host_ip" value="$(optenv HOST_IP auto)" />
-    <arg name="rviz" value="False" />
     <arg name="host_udp_port_data" value="55000"/>
   </include>
 
@@ -32,7 +29,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         pkg="rostest" type="publishtest">
     <rosparam>
       topics:
-        - name: laser_1_node/scan
+        - name: laser_1/scan
           timeout: 10
           negative: False
     </rosparam>

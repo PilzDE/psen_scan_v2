@@ -1,6 +1,6 @@
 host_udp_port_data: 55001
 host_udp_port_control: 55116
-prefix: laser_1
+tf_prefix: laser_1
 angle_start: deg(-137.4)
 angle_end: deg(137.4)
 resolution: deg(1.0)

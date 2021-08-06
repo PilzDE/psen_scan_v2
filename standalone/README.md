@@ -62,19 +62,21 @@ An example application, which prints distance data to the screen, is built by de
 ### Build and install dependencies
 #### Visual Studio
 - Get Visual Studio from https://visualstudio.microsoft.com/de/
-- Open `Visual Studio Developer Command Prompt`, the version you want
+- Building is currently tested under `Visual Studio 16 2019`
+- Open `Visual Studio Developer Command Prompt`
 - Use this Console for the next steps
 
 #### Boost
 - First download source from https://www.boost.org/
-- Unzip the file and open the folder e.g. `boost_1_75_0` since the lib is used as header-only no install step is required.
+- Building is currently tested under `1.72.0`
+- Unzip the file and open the folder e.g. `boost_1_72_0` since the lib is used as header-only no install step is required.
 
 #### console_bridge
 - Download source from Github (https://github.com/ros/console_bridge)
 - Open the `console_bridge`-folder, with the `CMakeLists.txt` in it
 - Generate Visual Studio Project
   ```
-  cmake -G "Visual Studio 15 2017 Win64" .
+  cmake -G "Visual Studio 16 2019" .
   ```
   _With `cmake -G` you can check which generators are abailable_
 
@@ -92,10 +94,11 @@ An example application, which prints distance data to the screen, is built by de
 
 #### fmt
 - Download source from Github (https://github.com/fmtlib/fmt)
+- Building is currently tested under `6.1.2`
 - Open the `fmt`-folder, with the `CMakeLists.txt` in it
 - Generate Visual Studio Project: 
    ```
-   cmake -G "Visual Studio 15 2017 Win64" .
+   cmake -G "Visual Studio 16 2019" .
    ```
    _With `cmake -G` you can check which generators are abailable_
 - Build the generated project with 
@@ -120,7 +123,7 @@ An example application, which prints distance data to the screen, is built by de
 - Generate Visual Studio Project 
   Note that you will have to replace `<PATH_TO_BOOST>` according to the previous step.
   ```
-  cmake -DBoost_INCLUDE_DIR="<PATH_TO_BOOST>/boost_1_75_0" -DBUILD_TESTING=OFF -G "Visual Studio 15 2017 Win64" ..
+  cmake -DBoost_INCLUDE_DIR="<PATH_TO_BOOST>" -DBUILD_TESTING=OFF -G "Visual Studio 16 2019" ..
   ```
 - Go back to `standalone`-folder 
   ```

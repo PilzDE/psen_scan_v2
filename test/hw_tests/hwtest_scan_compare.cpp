@@ -78,7 +78,7 @@ TEST_F(ScanComparisonTests, simpleCompare)
   LaserScanValidator<ScanType> laser_scan_validator(bins_expected_);
   laser_scan_validator.reset();
   auto scan_subscriber = nh.subscribe<ScanType>(
-      "/laser_1_node/scan",
+      "/laser_1/scan",
       1000,
       boost::bind(&LaserScanValidator<ScanType>::scanCb, &laser_scan_validator, boost::placeholders::_1, window_size));
 

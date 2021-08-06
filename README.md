@@ -70,8 +70,8 @@ IP-Address of safety laser scanner.
 
 ### Optional Parameters
 
-_prefix_ (_string_, default: "laser_1")<br/>
-Name of this scanner that can be changed to differentiate between multiple devices. By convention this is used both for the node name and the urdf description.
+_tf_prefix_ (_string_, default: "laser_1")<br/>
+Name of this scanner that can be changed to differentiate between multiple devices. By convention this is used as tf prefix.
 
 _angle_start_ (_double_, default: -2.398 (= -137.4 deg))<br/>
 Start angle of measurement. (Radian)
@@ -103,7 +103,7 @@ _rviz_ (_bool_, default: true)<br/>
 Start a preconfigured rviz visualizing the scan data.
 
 ### Published Topics
-/\<prefix\>_node/scan ([sensor_msgs/LaserScan][])<br/>
+/\<name\>/scan ([sensor_msgs/LaserScan][])<br/>
 
 * If _fragmented_scans_ is set to false (default) the driver will publish complete scan rounds from the PSENscan safety laser scanner as a single message.
 * If _fragmented_scans_ is enabled the driver will send the measurement data as soon as they arrive, instead of waiting for the scan round to be completed. This way the scan data is received sooner but is split into several sensor messages.
@@ -114,7 +114,7 @@ Start a preconfigured rviz visualizing the scan data.
 
 ### TF Frames
 The location of the TF frames is shown in the image below.
-These names are defined by the aforementioned launchfile parameter `prefix`.
+These names are defined by the aforementioned launchfile parameter `name`.
 Changing them is necessary for instance when running multiple scanners.
 <p align="center">
 <img src="img/frames.png" width="800px" alt="PILZ safety laser scanner frames" title="frames">
@@ -123,7 +123,7 @@ Changing them is necessary for instance when running multiple scanners.
 ### Defining the scan range
 You can adjust the scan field to your needs by changing _angle_start_ and _angle_end_.
 The published ([sensor_msgs/LaserScan][]) will only contain data within the given angle limits.
-Both limits are defined within the _laser_1_scan_ frame as shown in the image below.
+Both limits are defined within the _laser_1_ frame as shown in the image below.
 
 <p align="center">
 <img src="img/angle_limits.png" width="800px" alt="Limit visualization" title="Limit visualization">
@@ -149,8 +149,9 @@ To update your ROS environment from the former `psen_scan` package (which suppor
 1. Update scanner firmware using PSENscan Configurator (unless the device has firmware 3.1 already)
 2. Install the new ROS package ```sudo apt install ros-$ROS_DISTRO-psen-scan-v2```
 3. Replace the launch file arguments:
-	* `password` and `x_axis_rotation` are obsolete and should be dropped
-	* `angle_start` and `angle_end` are now in radians, in direction of the x axis of the scanner tf frame
+   * `password` and `x_axis_rotation` are obsolete and should be dropped
+   * `angle_start` and `angle_end` are now in radians, in direction of the x axis of the scanner tf frame
+   * `prefix` is replaced by `tf_prefix`
 4. In your application launch file / roslaunch command: replace all occurrences of `psen_scan` with `psen_scan_v2`
 
 ## You need further information?

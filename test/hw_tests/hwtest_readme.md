@@ -50,7 +50,6 @@ DOCKER_RUN_OPTS="--env HOST_IP=192.168.0.122 --env SENSOR_IP=192.168.0.100 \
 -p 55000-55006:55000-55006/udp \
 -v /usr/local/share/ca-certificates:/usr/local/share/ca-certificates:ro" \
 APT_PROXY=http://172.20.20.104:3142
-
 ```
 
 ## Hardware Test `hwtest_scan_compare`

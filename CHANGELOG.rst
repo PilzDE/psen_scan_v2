@@ -2,6 +2,13 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.1 (2021-07-21)
+------------------
+* Rename urdf links
+* Apply tf prefix equals node name
+* API change: rename launch-file argument prefix->tf_prefix
+* Contributors: Pilz GmbH and Co. KG
+
 0.3.0 (2021-06-29)
 ------------------
 * Set prefix for node name (same value as for tf frames)

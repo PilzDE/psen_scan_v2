@@ -21,7 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   </include>
 
   <test pkg="rostest" type="paramtest" name="paramtest_nonempty" test-name="paramtest_nonempty">
-    <param name="param_name_target" value="laser_1_node/sensor_ip" />
+    <param name="param_name_target" value="laser_1/sensor_ip" />
     <param name="test_duration" value="5.0" />
     <param name="wait_time" value="30.0" />
   </test>

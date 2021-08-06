@@ -42,7 +42,7 @@ const std::string PARAM_HOST_IP{ "host_ip" };
 const std::string PARAM_HOST_DATA_PORT{ "host_udp_port_data" };
 const std::string PARAM_HOST_CONTROL_PORT{ "host_udp_port_control" };
 const std::string PARAM_SCANNER_IP{ "sensor_ip" };
-const std::string PARAM_PREFIX{ "prefix" };
+const std::string PARAM_TF_PREFIX{ "tf_prefix" };
 const std::string PARAM_ANGLE_START{ "angle_start" };
 const std::string PARAM_ANGLE_END{ "angle_end" };
 const std::string PARAM_X_AXIS_ROTATION{ "x_axis_rotation" };
@@ -50,7 +50,7 @@ const std::string PARAM_FRAGMENTED_SCANS{ "fragmented_scans" };
 const std::string PARAM_INTENSITIES{ "intensities" };
 const std::string PARAM_RESOLUTION{ "resolution" };
 
-static const std::string DEFAULT_PREFIX = "scanner";
+static const std::string DEFAULT_TF_PREFIX = "laser_1";
 
 //! @brief Topic on which the LaserScan data are published.
 static const std::string DEFAULT_PUBLISH_TOPIC = "scan";
@@ -108,7 +108,7 @@ int main(int argc, char** argv)
 
     ROSScannerNode ros_scanner_node(pnh,
                                     DEFAULT_PUBLISH_TOPIC,
-                                    getOptionalParamFromServer<std::string>(pnh, PARAM_PREFIX, DEFAULT_PREFIX),
+                                    getOptionalParamFromServer<std::string>(pnh, PARAM_TF_PREFIX, DEFAULT_TF_PREFIX),
                                     configuration::DEFAULT_X_AXIS_ROTATION,
                                     scanner_configuration);
 

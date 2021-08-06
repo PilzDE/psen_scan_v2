@@ -20,9 +20,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- IP-Address of Safety laser scanner -->
   <arg name="sensor_ip" default="192.168.0.10" />
 
-  <!-- Prefix i. e. name of the scanner (required to run multiple scanners)
-       By convention this should also be used as prefix for the urdf description. -->
-  <arg name="prefix" default="laser_1" />
+  <!-- Name of the scanner (required to run multiple scanners) which by convention
+       is the prefix for the urdf description. -->
+  <arg name="tf_prefix" default="laser_1" />
 
   <!-- Start angle of measurement in radian -->
   <arg name="angle_start" default="$(eval radians(-137.4))" />
@@ -49,9 +49,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- Set the following to true in order to publish scan data as soon as a UDP packet is ready, instead of waiting for a full scan -->
   <arg name="fragmented_scans" default="false" />
 
-  <node name="$(arg prefix)_node" type="psen_scan_v2_node" pkg="psen_scan_v2" output="screen" required="true">
+  <node name="$(arg tf_prefix)" type="psen_scan_v2_node" pkg="psen_scan_v2" output="screen" required="true">
     <param name="sensor_ip" value="$(arg sensor_ip)" />
-    <param name="prefix" value="$(arg prefix)" />
+    <param name="tf_prefix" value="$(arg tf_prefix)" />
     <param name="angle_start" value="$(arg angle_start)" />
     <param name="angle_end" value="$(arg angle_end)" />
     <param name="intensities" value="$(arg intensities)" />

@@ -57,13 +57,12 @@ static LaserScan createScan()
 TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectHeaderAfterConversion)
 {
   const std::string prefix{ "prefix" };
-  const std::string frame_id{ prefix + "_scan" };
   const ros::Time now = ros::Time::now();
   const sensor_msgs::LaserScan laserscan_msg = toLaserScanMsg(createScan(), prefix, 0, now);
 
   EXPECT_EQ(laserscan_msg.header.seq, 0u);
   EXPECT_EQ(laserscan_msg.header.stamp, now);
-  EXPECT_EQ(laserscan_msg.header.frame_id, frame_id);
+  EXPECT_EQ(laserscan_msg.header.frame_id, prefix);
 }
 
 TEST(LaserScanROSConversionsTest, laserSensorMsgShouldContainCorrectScanResolutionAfterConversion)
