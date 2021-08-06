@@ -38,9 +38,9 @@ def is_increasing(values: list):
 
 
 class HwtestTimestamp(unittest.TestCase):
-    """ Check if the timestamp of the laserscan message
+    """ Check if the timestamp of the laserscan messages
         - monotonically increases,
-        - is bounded by the laserscan-msg receipt time.
+        - is lower than the time the msg was received.
     """
     def setUp(self):
         rospy.init_node('hwtest_timestamp')
@@ -55,7 +55,7 @@ class HwtestTimestamp(unittest.TestCase):
 
     def wait_for_msgs(self):
         start_wait = rospy.Time.now()
-        while len(self.received_stamps) < DESIRED_NUMBER_OF_STAMPS:
+        while len(self.received_stamps) < DESIRED_NUMBER_OF_STAMPS and not rospy.is_shutdown():
             self.assertLess((rospy.Time.now() - start_wait).to_sec(), WAIT_TIMEOUT_S,
                             "Could not gather enough timestamps.")
             rospy.sleep(.1)
