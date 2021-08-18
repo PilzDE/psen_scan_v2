@@ -31,7 +31,21 @@ sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
 {
   sensor_msgs::LaserScan ros_message;
   ros_message.header.stamp = timestamp;
-  ros_message.header.frame_id = frame_id;
+
+  // tell the receiver where the origin of thre data is
+  if (laserscan.getScannerId() == configuration::ScannerId::master)
+  {
+    ros_message.header.frame_id = frame_id;
+  }
+  else if (laserscan.getScannerId() == configuration::ScannerId::slave0)
+  {
+    ros_message.header.frame_id = "laser_2";
+  } 
+  else
+  {
+    PSENSCAN_ERROR("", "unexpected scanner id");
+  }
+
   ros_message.angle_min = laserscan.getMinScanAngle().toRad() - x_axis_rotation;
   ros_message.angle_max = laserscan.getMaxScanAngle().toRad() - x_axis_rotation;
   ros_message.angle_increment = laserscan.getScanResolution().toRad();

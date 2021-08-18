@@ -20,6 +20,7 @@
 #include <cstdint>
 
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -46,12 +47,15 @@ public:
 public:
   LaserScan(const util::TenthOfDegree& resolution,
             const util::TenthOfDegree& min_scan_angle,
-            const util::TenthOfDegree& max_scan_angle);
+            const util::TenthOfDegree& max_scan_angle,
+            const configuration::ScannerId scanner_id);
 
-public:
+public: 
+// getters
   const util::TenthOfDegree& getScanResolution() const;
   const util::TenthOfDegree& getMinScanAngle() const;
   const util::TenthOfDegree& getMaxScanAngle() const;
+  configuration::ScannerId getScannerId() const;
 
   const MeasurementData& getMeasurements() const;
   MeasurementData& getMeasurements();
@@ -73,6 +77,8 @@ private:
   const util::TenthOfDegree min_scan_angle_;
   //! Highest angle the scanner is scanning (in radian).
   const util::TenthOfDegree max_scan_angle_;
+  //! distinction between master and slaves
+  configuration::ScannerId scanner_id_;
 };
 
 }  // namespace psen_scan_v2_standalone

@@ -97,6 +97,7 @@ public:
     };
 
 public:
+  configuration::ScannerId scannerId() const;
   util::TenthOfDegree fromTheta() const;
   util::TenthOfDegree resolution() const;
   uint32_t scanCounter() const;

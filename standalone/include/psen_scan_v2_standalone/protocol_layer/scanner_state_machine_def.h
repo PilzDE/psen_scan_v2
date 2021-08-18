@@ -166,6 +166,13 @@ inline void ScannerProtocolDef::checkForDiagnosticErrors(const data_conversion_l
 inline void
 ScannerProtocolDef::informUserAboutTheScanData(const data_conversion_layer::monitoring_frame::Message& frame)
 {
+  if (args_->config_.fragmentedScansEnabled())  // Send the scan fragment in any case.
+  {
+    sendMessageWithMeasurements({ frame });
+    return;
+  }
+
+  // unfragmented: assemble complete scan round
   try
   {
     scan_buffer_.add(frame);
@@ -177,10 +184,6 @@ ScannerProtocolDef::informUserAboutTheScanData(const data_conversion_layer::moni
   catch (const ScanRoundError& ex)
   {
     PSENSCAN_WARN("ScanBuffer", ex.what());
-  }
-  if (args_->config_.fragmentedScansEnabled())  // Send the scan fragment in any case.
-  {
-    sendMessageWithMeasurements({ frame });
   }
 }
 

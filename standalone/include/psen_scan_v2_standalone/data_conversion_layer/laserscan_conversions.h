@@ -16,13 +16,13 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_LASERSCAN_CONVERSIONS_H
 #define PSEN_SCAN_V2_STANDALONE_LASERSCAN_CONVERSIONS_H
 
-#include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
-#include "psen_scan_v2_standalone/laserscan.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
-
 #include <algorithm>
 #include <numeric>
 #include <vector>
+
+#include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
+#include "psen_scan_v2_standalone/laserscan.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -79,9 +79,11 @@ LaserScanConverter::toLaserScan(const std::vector<data_conversion_layer::monitor
   std::vector<int> sorted_frames_indices = getFilledFramesIndicesSortedByThetaAngle(frames);
   validateMonitoringFrames(frames, sorted_frames_indices);
 
+  // read properties from first frame
   const auto min_angle = frames[sorted_frames_indices[0]].fromTheta();
   const auto max_angle = calculateMaxAngle(frames, min_angle);
-
+  configuration::ScannerId scanner_id = frames[sorted_frames_indices[0]].scannerId();
+  
   std::vector<double> measurements;
   std::vector<double> intensities;
 
@@ -91,7 +93,7 @@ LaserScanConverter::toLaserScan(const std::vector<data_conversion_layer::monitor
     intensities.insert(intensities.end(), frames[index].intensities().begin(), frames[index].intensities().end());
   }
 
-  LaserScan scan(frames[0].resolution(), min_angle, max_angle);
+  LaserScan scan(frames[0].resolution(), min_angle, max_angle, scanner_id);
   scan.setMeasurements(measurements);
   scan.setIntensities(intensities);
 

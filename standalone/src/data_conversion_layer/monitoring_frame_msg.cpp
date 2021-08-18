@@ -36,6 +36,12 @@ namespace psen_scan_v2_standalone
 {
 namespace data_conversion_layer
 {
+
+configuration::ScannerId data_conversion_layer::monitoring_frame::Message::scannerId() const
+{
+  return scanner_id_;
+}
+
 util::TenthOfDegree data_conversion_layer::monitoring_frame::Message::fromTheta() const
 {
   return from_theta_;
