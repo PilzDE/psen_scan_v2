@@ -19,6 +19,7 @@
 #include <sensor_msgs/LaserScan.h>
 
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
+#include "psen_scan_v2_standalone/laserscan.h"
 
 namespace psen_scan_v2
 {
@@ -26,11 +27,15 @@ using namespace psen_scan_v2_standalone;
 
 sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
                                       const std::string& frame_id,
-                                      const double x_axis_rotation,
-                                      const ros::Time& timestamp = ros::Time::now())
+                                      const double x_axis_rotation)
 {
   sensor_msgs::LaserScan ros_message;
-  ros_message.header.stamp = timestamp;
+  if (laserscan.getTimestamp() < 0)
+  {
+    throw std::invalid_argument("Laserscan message has an invalid timestamp: " +
+                                std::to_string(laserscan.getTimestamp()));
+  }
+  ros_message.header.stamp = ros::Time{}.fromNSec(laserscan.getTimestamp());
   ros_message.header.frame_id = frame_id;
   ros_message.angle_min = laserscan.getMinScanAngle().toRad() - x_axis_rotation;
   ros_message.angle_max = laserscan.getMaxScanAngle().toRad() - x_axis_rotation;

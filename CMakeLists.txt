@@ -303,6 +303,16 @@ if(CATKIN_ENABLE_TESTING)
     fmt::fmt
   )
 
+  catkin_add_gtest(unittest_monitoring_frame_msg_stamped
+    standalone/test/unit_tests/data_conversion_layer/unittest_monitoring_frame_msg_stamped.cpp
+    standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
+    standalone/src/data_conversion_layer/diagnostics.cpp
+  )
+  target_link_libraries(unittest_monitoring_frame_msg_stamped
+    ${catkin_LIBRARIES}
+    fmt::fmt
+  )
+
   catkin_add_gtest(unittest_monitoring_frame_serialization_deserialization
     standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
     standalone/src/data_conversion_layer/monitoring_frame_deserialization.cpp
@@ -437,6 +447,8 @@ if(CATKIN_ENABLE_TESTING)
       ARGS config:=with_intensities.yaml)
     add_rostest(test/hw_tests/hwtest_scan_range.test
       ARGS config:=big_resolution.yaml)
+
+    add_rostest(test/hw_tests/hwtest_timestamp.test)
   endif()
 
 

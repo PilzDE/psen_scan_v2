@@ -2,6 +2,13 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Calculate timestamp as the time of the first ray (udp communication time is neglected)
+* API: Add timestamp (nanoseconds since epoch) to LaserScan
+* API: Add scan counter to LaserScan
+* Contributors: Pilz GmbH and Co. KG
+
 0.3.1 (2021-07-21)
 ------------------
 * Rename urdf links

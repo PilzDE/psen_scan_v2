@@ -25,8 +25,14 @@ static const util::TenthOfDegree MAX_X_AXIS_ROTATION{ 275 };
 
 LaserScan::LaserScan(const util::TenthOfDegree& resolution,
                      const util::TenthOfDegree& min_scan_angle,
-                     const util::TenthOfDegree& max_scan_angle)
-  : resolution_(resolution), min_scan_angle_(min_scan_angle), max_scan_angle_(max_scan_angle)
+                     const util::TenthOfDegree& max_scan_angle,
+                     const uint32_t scan_counter,
+                     const int64_t timestamp)
+  : resolution_(resolution)
+  , min_scan_angle_(min_scan_angle)
+  , max_scan_angle_(max_scan_angle)
+  , scan_counter_(scan_counter)
+  , timestamp_(timestamp)
 {
   if (getScanResolution() == util::TenthOfDegree(0))
   {
@@ -62,6 +68,16 @@ const util::TenthOfDegree& LaserScan::getMaxScanAngle() const
 const LaserScan::MeasurementData& LaserScan::getMeasurements() const
 {
   return measurements_;
+}
+
+uint32_t LaserScan::getScanCounter() const
+{
+  return scan_counter_;
+}
+
+int64_t LaserScan::getTimestamp() const
+{
+  return timestamp_;
 }
 
 void LaserScan::setMeasurements(const MeasurementData& measurements)

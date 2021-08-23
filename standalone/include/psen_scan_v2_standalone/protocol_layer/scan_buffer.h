@@ -87,23 +87,23 @@ public:
    * A scan round is considered to be complete whenever the next scan round starts or the expected number of messages
    * arrived.
    *
-   * @param msg Current received MonitoringFrame.
+   * @param stamped_msg Current received MonitoringFrame.
    */
-  void add(const data_conversion_layer::monitoring_frame::Message& msg);
+  void add(const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg);
 
   /**
    * @brief Readies the validator for a new validation round. This function has to be called whenever
    * there is an expected brake in the receiving of MonitoringFrames.
    */
   void reset();
-  std::vector<data_conversion_layer::monitoring_frame::Message> getMsgs();
+  std::vector<data_conversion_layer::monitoring_frame::MessageStamped> getMsgs();
   bool isRoundComplete();
 
 private:
-  void startNewRound(const data_conversion_layer::monitoring_frame::Message& msg);
+  void startNewRound(const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg);
 
 private:
-  std::vector<data_conversion_layer::monitoring_frame::Message> current_round_{};
+  std::vector<data_conversion_layer::monitoring_frame::MessageStamped> current_round_{};
   const uint32_t& num_expected_msgs_;
   bool first_scan_round_ = true;
 };
@@ -117,7 +117,7 @@ inline void ScanBuffer::reset()
   current_round_.clear();
 }
 
-inline std::vector<data_conversion_layer::monitoring_frame::Message> ScanBuffer::getMsgs()
+inline std::vector<data_conversion_layer::monitoring_frame::MessageStamped> ScanBuffer::getMsgs()
 {
   return current_round_;
 }
@@ -127,19 +127,19 @@ inline bool ScanBuffer::isRoundComplete()
   return current_round_.size() == num_expected_msgs_;
 }
 
-inline void ScanBuffer::add(const data_conversion_layer::monitoring_frame::Message& msg)
+inline void ScanBuffer::add(const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg)
 {
-  if (current_round_.empty() || msg.scanCounter() == current_round_[0].scanCounter())
+  if (current_round_.empty() || stamped_msg.msg_.scanCounter() == current_round_[0].msg_.scanCounter())
   {
-    current_round_.push_back(msg);
+    current_round_.push_back(stamped_msg);
     if (current_round_.size() > num_expected_msgs_)
     {
       throw ScanRoundOversaturatedError();
     }
   }
-  else if (msg.scanCounter() > current_round_[0].scanCounter())
+  else if (stamped_msg.msg_.scanCounter() > current_round_[0].msg_.scanCounter())
   {
-    startNewRound(msg);
+    startNewRound(stamped_msg);
   }
   else
   {
@@ -147,11 +147,11 @@ inline void ScanBuffer::add(const data_conversion_layer::monitoring_frame::Messa
   }
 }
 
-inline void ScanBuffer::startNewRound(const data_conversion_layer::monitoring_frame::Message& msg)
+inline void ScanBuffer::startNewRound(const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg)
 {
   bool old_round_undersaturated = current_round_.size() < num_expected_msgs_;
   reset();
-  current_round_.push_back(msg);
+  current_round_.push_back(stamped_msg);
   if (old_round_undersaturated && !first_scan_round_)
   {
     throw ScanRoundEndedEarlyError();

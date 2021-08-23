@@ -17,6 +17,7 @@
 #define PSEN_SCAN_V2_STANDALONE_TEST_INTEGRATIONTEST_HELPER_H
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <random>
 #include <vector>
@@ -35,6 +36,14 @@ using namespace psen_scan_v2_standalone;
 
 static constexpr ScanRange DEFAULT_SCAN_RANGE{ util::TenthOfDegree(1), util::TenthOfDegree(60) };
 static constexpr util::TenthOfDegree DEFAULT_SCAN_RESOLUTION{ 2 };
+static constexpr int64_t DEFAULT_TIMESTAMP{ 1000000000 };
+
+static int64_t getCurrentTime()
+{
+  return std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now())
+      .time_since_epoch()
+      .count();
+}
 
 static double randDouble(double low, double high)
 {
@@ -92,29 +101,52 @@ createValidMonitoringFrameMsg(const uint32_t scan_counter = 42,
 static std::vector<data_conversion_layer::monitoring_frame::Message>
 createValidMonitoringFrameMsgs(const uint32_t scan_counter, const std::size_t num_elements)
 {
-  std::vector<data_conversion_layer::monitoring_frame::Message> msgs(num_elements);
-  std::generate(msgs.begin(), msgs.end(), [scan_counter]() { return createValidMonitoringFrameMsg(scan_counter); });
+  std::vector<data_conversion_layer::monitoring_frame::Message> msgs;
+  std::generate_n(
+      std::back_inserter(msgs), num_elements, [scan_counter]() { return createValidMonitoringFrameMsg(scan_counter); });
   return msgs;
 }
 
 static std::vector<data_conversion_layer::monitoring_frame::Message>
 createMonitoringFrameMsgsForScanRound(const uint32_t scan_counter, const std::size_t num_elements)
 {
-  std::vector<data_conversion_layer::monitoring_frame::Message> msgs(num_elements);
-  for (std::size_t i = 0; i < msgs.size(); ++i)
+  std::vector<data_conversion_layer::monitoring_frame::Message> msgs;
+  for (std::size_t i = 0; i < num_elements; ++i)
   {
     const util::TenthOfDegree start_angle =
         (DEFAULT_SCAN_RANGE.getEnd() / static_cast<int>(num_elements)) * static_cast<int>(i);
     const util::TenthOfDegree end_angle =
         (DEFAULT_SCAN_RANGE.getEnd() / static_cast<int>(num_elements)) * static_cast<int>(i + 1);
-    msgs[i] = createValidMonitoringFrameMsg(scan_counter, start_angle, end_angle);
+    msgs.push_back(createValidMonitoringFrameMsg(scan_counter, start_angle, end_angle));
   }
   return msgs;
+}
+
+static std::vector<data_conversion_layer::monitoring_frame::MessageStamped>
+stampMonitoringFrameMsgs(const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs, int64_t stamp)
+{
+  std::vector<data_conversion_layer::monitoring_frame::MessageStamped> stamped_msgs;
+  std::for_each(msgs.begin(), msgs.end(), [&stamped_msgs, stamp](const auto& msg) {
+    stamped_msgs.push_back(data_conversion_layer::monitoring_frame::MessageStamped(msg, stamp));
+  });
+  return stamped_msgs;
 }
 
 ACTION_P(OpenBarrier, barrier)
 {
   barrier->release();
+}
+
+MATCHER_P(ScanDataEqual, scan, "")
+{
+  return arg == scan;  // ToDo: misleading?!
+}
+
+MATCHER_P2(TimestampInExpectedTimeframe, conversion_time_of_last_scan, prior_scan_timestamp, "")
+{
+  const int64_t time_since_prior_scan_conversion{ getCurrentTime() - conversion_time_of_last_scan };
+  return arg.getTimestamp() > prior_scan_timestamp &&
+         arg.getTimestamp() < prior_scan_timestamp + time_since_prior_scan_conversion;
 }
 
 }  // namespace psen_scan_v2_standalone_test

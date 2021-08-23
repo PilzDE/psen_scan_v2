@@ -26,7 +26,7 @@ namespace data_conversion_layer
 {
 namespace monitoring_frame
 {
-RawData serialize(const data_conversion_layer::monitoring_frame::Message& frame)
+RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
 {
   std::ostringstream os;
 
@@ -34,31 +34,31 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& frame)
   raw_processing::write(os, OP_CODE_MONITORING_FRAME);
   raw_processing::write(os, ONLINE_WORKING_MODE);
   raw_processing::write(os, GUI_MONITORING_TRANSACTION);
-  raw_processing::write(os, frame.scanner_id_);
-  raw_processing::write(os, frame.from_theta_.value());
-  raw_processing::write(os, frame.resolution_.value());
+  raw_processing::write(os, msg.scanner_id_);
+  raw_processing::write(os, msg.from_theta_.value());
+  raw_processing::write(os, msg.resolution_.value());
 
   AdditionalFieldHeader scan_counter_header(
-      static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::scan_counter), sizeof(frame.scan_counter_.get()));
+      static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::scan_counter), sizeof(msg.scan_counter_.get()));
   write(os, scan_counter_header);
-  uint32_t scan_counter_header_payload = frame.scan_counter_.get();
+  uint32_t scan_counter_header_payload = msg.scan_counter_.get();
   raw_processing::write(os, scan_counter_header_payload);
 
-  if (frame.diagnostic_data_enabled_)
+  if (msg.diagnostic_data_enabled_)
   {
     AdditionalFieldHeader diagnostic_data_field_header(
         static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::diagnostics),
         diagnostic::RAW_CHUNK_LENGTH_IN_BYTES);
     write(os, diagnostic_data_field_header);
-    diagnostic::RawChunk diagnostic_data_field_payload = diagnostic::serialize(frame.diagnostic_messages_);
+    diagnostic::RawChunk diagnostic_data_field_payload = diagnostic::serialize(msg.diagnostic_messages_);
     data_conversion_layer::raw_processing::write(os, diagnostic_data_field_payload);
   }
 
   AdditionalFieldHeader measurements_header(
       static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::measurements),
-      frame.measurements_.size() * NUMBER_OF_BYTES_SINGLE_MEASUREMENT);
+      msg.measurements_.size() * NUMBER_OF_BYTES_SINGLE_MEASUREMENT);
   write(os, measurements_header);
-  data_conversion_layer::raw_processing::writeArray<uint16_t, double>(os, frame.measurements_, [](double elem) {
+  data_conversion_layer::raw_processing::writeArray<uint16_t, double>(os, msg.measurements_, [](double elem) {
     if (elem == std::numeric_limits<double>::infinity())
     {
       return NO_SIGNAL_ARRIVED;
@@ -66,14 +66,14 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& frame)
     return (static_cast<uint16_t>(std::round(elem * 1000.)));
   });
 
-  if (!frame.intensities_.empty())
+  if (!msg.intensities_.empty())
   {
     AdditionalFieldHeader intensities_header(
         static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::intensities),
-        frame.intensities_.size() * NUMBER_OF_BYTES_SINGLE_INTENSITY);
+        msg.intensities_.size() * NUMBER_OF_BYTES_SINGLE_INTENSITY);
     write(os, intensities_header);
     data_conversion_layer::raw_processing::writeArray<uint16_t, double>(
-        os, frame.intensities_, [](double elem) { return (static_cast<uint16_t>(std::round(elem))); });
+        os, msg.intensities_, [](double elem) { return (static_cast<uint16_t>(std::round(elem))); });
   }
 
   AdditionalFieldHeader::Id end_of_frame_header_id =
