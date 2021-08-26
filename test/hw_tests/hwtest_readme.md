@@ -36,7 +36,7 @@ Then run
 ```
 rosrun industrial_ci run_ci ROS_DISTRO=noetic ROS_REPO=main \
 CMAKE_ARGS="-DENABLE_HARDWARE_TESTING=ON" DOCKER_RUN_OPTS="--env \
-HOST_IP=192.168.0.122 --env SENSOR_IP=192.168.0.100 -p 55000-55007:55000-55007/udp"
+HOST_IP=192.168.0.122 --env SENSOR_IP=192.168.0.100 -p 55000-55008:55000-55008/udp"
 ```
 note that you especially need to setup the `HOST_IP` to be the IP of your actually system
 in order to receive the data inside the docker container used by industrial_ci.
@@ -47,7 +47,7 @@ If you need to use a custom ROOT_CA and have a apt-proxy the command for running
 rosrun industrial_ci run_ci ROS_DISTRO=noetic ROS_REPO=main \
 CMAKE_ARGS="-DENABLE_HARDWARE_TESTING=ON" \
 DOCKER_RUN_OPTS="--env HOST_IP=192.168.0.122 --env SENSOR_IP=192.168.0.100 \
--p 55000-55007:55000-55007/udp \
+-p 55000-55008:55000-55008/udp \
 -v /usr/local/share/ca-certificates:/usr/local/share/ca-certificates:ro" \
 APT_PROXY=http://172.20.20.104:3142
 ```
