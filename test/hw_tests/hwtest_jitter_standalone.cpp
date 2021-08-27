@@ -13,105 +13,26 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <algorithm>
-#include <chrono>
-#include <condition_variable>
-#include <cstdlib>
-#include <functional>
-#include <mutex>
-#include <numeric>
-#include <thread>
-#include <vector>
-
 #include <gtest/gtest.h>
 
 #include "psen_scan_v2_standalone/core.h"
 
+#include "psen_scan_v2/jitter_validator.h"
+
 using namespace psen_scan_v2_standalone;
+using namespace psen_scan_v2_test;
 
 static const char* HOST_IP_ENV_VAR{ "HOST_IP" };
 static const char* SENSOR_IP_ENV_VAR{ "SENSOR_IP" };
 static constexpr int HOST_UDP_PORT_DATA{ 55008 };
 static constexpr std::size_t SAMPLE_SIZE{ 1000 };
 static constexpr int WAIT_TIME_SEC{ 50 };
+static constexpr int64_t MAX_JITTER_NSEC{ 1000000 };
+static constexpr int64_t SCAN_PERIOD_NSEC{ 30000000 };
+static const double MAX_OUTLIER_RATIO{ 0.002 };
 
-static int64_t getCurrentTime()
+static ScannerConfiguration setUpScannerConfiguration()
 {
-  return std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now())
-      .time_since_epoch()
-      .count();
-}
-
-class JitterValidator
-{
-public:
-  JitterValidator()
-  {
-    scan_timestamps_.reserve(SAMPLE_SIZE);
-    callback_invocation_times_.reserve(SAMPLE_SIZE);
-  }
-
-  void laserScanCallback(const LaserScan& scan)
-  {
-    if (!saturated_)
-    {
-      callback_invocation_times_.push_back(getCurrentTime());
-      scan_timestamps_.push_back(scan.getTimestamp());
-
-      if (scan_timestamps_.size() == SAMPLE_SIZE)
-      {
-        saturated_ = true;
-        condition_variable_.notify_all();
-      }
-    }
-  }
-
-  bool waitForSaturation()
-  {
-    std::unique_lock<std::mutex> lock(mutex_);
-    return condition_variable_.wait_for(lock, std::chrono::seconds(WAIT_TIME_SEC), [this] { return saturated_; });
-  }
-
-  ::testing::AssertionResult validateTimestamps() const
-  {
-    return validateVector(scan_timestamps_) << " (timestamps)";
-  }
-
-  ::testing::AssertionResult validateCallbackInvocationTimes() const
-  {
-    return validateVector(callback_invocation_times_) << " (callback invocation times)";
-  }
-
-private:
-  ::testing::AssertionResult validateVector(const std::vector<int64_t>& data) const
-  {
-    std::vector<int64_t> diffs(SAMPLE_SIZE);
-    std::adjacent_difference(data.begin(), data.end(), diffs.begin());
-    const auto number_of_violations{ std::count_if(
-        std::next(diffs.begin()), diffs.end(), [](int64_t diff) { return std::abs(diff - 30000000) > 1000000; }) };
-    if (number_of_violations > 0)
-    {
-      PSENSCAN_WARN("JitterValidator", "Found {} violations of 1ms jitter criteria.", number_of_violations);
-    }
-    if (number_of_violations > 4)
-    {
-      return ::testing::AssertionFailure() << "Too many violations of 1ms jitter criteria";
-    }
-    return ::testing::AssertionSuccess();
-  }
-
-private:
-  bool saturated_{ false };
-  std::mutex mutex_;
-  std::condition_variable condition_variable_;
-  std::vector<int64_t> scan_timestamps_;
-  std::vector<int64_t> callback_invocation_times_;
-};
-
-TEST(JitterStandaloneTests, testJitter)
-{
-  JitterValidator jitter_validator;
-
   const char* host_ip{ std::getenv(HOST_IP_ENV_VAR) };
   if (!host_ip)
   {
@@ -125,14 +46,28 @@ TEST(JitterStandaloneTests, testJitter)
   ScanRange scan_range{ util::TenthOfDegree{ 1 }, util::TenthOfDegree{ 2749 } };
   ScannerConfigurationBuilder config_builder;
   config_builder.hostIP(host_ip).scannerIp(scanner_ip).hostDataPort(HOST_UDP_PORT_DATA).scanRange(scan_range);
+  return config_builder.build();
+}
 
-  ScannerV2 scanner(config_builder.build(),
-                    std::bind(&JitterValidator::laserScanCallback, &jitter_validator, std::placeholders::_1));
+template <>
+int64_t psen_scan_v2_test::getTimestamp<LaserScan>(const LaserScan& scan)
+{
+  return scan.getTimestamp();
+}
+
+TEST(JitterStandaloneTests, testJitterIsBelowOneMillisecond)
+{
+  JitterValidator<LaserScan> jitter_validator(SAMPLE_SIZE, SCAN_PERIOD_NSEC);
+  ScannerV2 scanner(
+      setUpScannerConfiguration(),
+      std::bind(&JitterValidator<LaserScan>::laserScanCallback, &jitter_validator, std::placeholders::_1));
+
   scanner.start();
-  EXPECT_TRUE(jitter_validator.waitForSaturation()) << "Could not gather enough timing data from laserscan callbacks.";
+  EXPECT_TRUE(jitter_validator.waitForSaturation(WAIT_TIME_SEC));
   scanner.stop();
-  EXPECT_TRUE(jitter_validator.validateTimestamps());
-  EXPECT_TRUE(jitter_validator.validateCallbackInvocationTimes());
+
+  EXPECT_TRUE(jitter_validator.validateTimestamps(MAX_JITTER_NSEC, MAX_OUTLIER_RATIO));
+  EXPECT_TRUE(jitter_validator.validateCallbackInvocationTimes(MAX_JITTER_NSEC, MAX_OUTLIER_RATIO));
 }
 
 int main(int argc, char* argv[])
