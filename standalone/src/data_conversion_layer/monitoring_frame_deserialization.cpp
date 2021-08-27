@@ -71,7 +71,7 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
 {
   data_conversion_layer::monitoring_frame::Message msg;
 
-  std::istringstream is(std::string(data.cbegin(), data.cend()));
+  std::istringstream is(std::string(data.cbegin(), data.cbegin() + num_bytes));
 
   FixedFields frame_header = readFixedFields(is);
 
