@@ -15,7 +15,6 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_UDP_CLIENT_H
 #define PSEN_SCAN_V2_STANDALONE_UDP_CLIENT_H
 
-#include <chrono>
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -37,6 +36,7 @@
 
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/util/logging.h"
+#include "psen_scan_v2_standalone/util/timestamp.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -294,11 +294,7 @@ inline void UdpClientImpl::asyncReceive(const ReceiveMode& modi)
                           }
                           else
                           {
-                            auto timestamp =
-                                std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now())
-                                    .time_since_epoch()
-                                    .count();
-                            data_handler_(received_data_, bytes_received, timestamp);
+                            data_handler_(received_data_, bytes_received, util::getCurrentTime());
                           }
                           if (modi == ReceiveMode::continuous)
                           {

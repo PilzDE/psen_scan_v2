@@ -31,18 +31,12 @@
 #include <fmt/format.h>
 
 #include "psen_scan_v2_standalone/util/logging.h"
+#include "psen_scan_v2_standalone/util/timestamp.h"
 
 using namespace psen_scan_v2_standalone;
 
 namespace psen_scan_v2_test
 {
-static int64_t getCurrentTime()
-{
-  return std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now())
-      .time_since_epoch()
-      .count();
-}
-
 template <typename ScanType>
 int64_t getTimestamp(const ScanType& scan);
 
@@ -85,7 +79,7 @@ void JitterValidator<ScanType>::laserScanCallback(const ScanType& scan)
 {
   if (!saturated_)
   {
-    callback_invocation_times_.push_back(getCurrentTime());
+    callback_invocation_times_.push_back(util::getCurrentTime());
     scan_timestamps_.push_back(getTimestamp(scan));
 
     if (callback_invocation_times_.size() == sample_size_)

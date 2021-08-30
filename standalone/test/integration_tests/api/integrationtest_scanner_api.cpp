@@ -42,6 +42,7 @@
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scanner_v2.h"
 #include "psen_scan_v2_standalone/util/async_barrier.h"
+#include "psen_scan_v2_standalone/util/timestamp.h"
 
 namespace psen_scan_v2_standalone_test
 {
@@ -333,7 +334,7 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
   prepareScannerMockStartReply();
 
   const auto msg{ createValidMonitoringFrameMsg() };
-  const auto timestamp{ getCurrentTime() };
+  const auto timestamp{ util::getCurrentTime() };
   const auto scan{ createReferenceScan({ msg }, timestamp) };
 
   util::Barrier monitoring_frame_barrier;
@@ -369,7 +370,7 @@ TEST_F(ScannerAPITests, shouldCallLaserScanCBOnlyOneTimeWithAllInformationWhenUn
   prepareScannerMockStartReply();
 
   const auto msgs{ createMonitoringFrameMsgsForScanRound(2, 6) };
-  const auto timestamp{ getCurrentTime() };
+  const auto timestamp{ util::getCurrentTime() };
   const auto scan{ createReferenceScan(msgs, timestamp) };
 
   util::Barrier monitoring_frame_barrier;
@@ -405,7 +406,7 @@ TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
       createMonitoringFrameMsgsForScanRound(3, 5);
   std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> valid_round =
       createMonitoringFrameMsgsForScanRound(4, 6);
-  const auto timestamp{ getCurrentTime() };
+  const auto timestamp{ util::getCurrentTime() };
   const auto scan{ createReferenceScan(valid_round, timestamp) };
 
   util::Barrier monitoring_frame_barrier;
@@ -451,7 +452,7 @@ TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
 
   auto msg_round2 = createValidMonitoringFrameMsg(2);
   auto msgs_round3 = createMonitoringFrameMsgsForScanRound(3, 6);
-  const auto timestamp{ getCurrentTime() };
+  const auto timestamp{ util::getCurrentTime() };
   const auto scan{ createReferenceScan(msgs_round3, timestamp) };
 
   util::Barrier monitoring_frame_barrier;
