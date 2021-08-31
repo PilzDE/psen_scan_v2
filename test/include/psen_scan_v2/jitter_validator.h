@@ -48,13 +48,11 @@ public:
   JitterValidator(unsigned int sample_size, int64_t period);
   void laserScanCallback(const ScanType& scan);
   bool waitForSaturation(int64_t wait_time_sec);
-  ::testing::AssertionResult validateTimestamps(int64_t max_jitter, const double& max_outlier_ratio) const;
-  ::testing::AssertionResult validateCallbackInvocationTimes(int64_t max_jitter, const double& max_outlier_ratio) const;
+  ::testing::AssertionResult validateTimestamps(int64_t max_jitter) const;
+  ::testing::AssertionResult validateCallbackInvocationTimes(int64_t max_jitter) const;
 
 private:
-  ::testing::AssertionResult validateVector(const std::vector<int64_t>& data,
-                                            int64_t max_jitter_nsec,
-                                            const double& max_outlier_ratio) const;
+  ::testing::AssertionResult validateVector(const std::vector<int64_t>& data, int64_t max_jitter) const;
 
 private:
   unsigned int sample_size_;
@@ -98,23 +96,20 @@ bool JitterValidator<ScanType>::waitForSaturation(int64_t wait_time_sec)
 }
 
 template <typename ScanType>
-::testing::AssertionResult JitterValidator<ScanType>::validateTimestamps(int64_t max_jitter,
-                                                                         const double& max_outlier_ratio) const
+::testing::AssertionResult JitterValidator<ScanType>::validateTimestamps(int64_t max_jitter) const
 {
-  return validateVector(scan_timestamps_, max_jitter, max_outlier_ratio) << " (timestamps)";
+  return validateVector(scan_timestamps_, max_jitter) << " (timestamps)";
 }
 
 template <typename ScanType>
-::testing::AssertionResult
-JitterValidator<ScanType>::validateCallbackInvocationTimes(int64_t max_jitter, const double& max_outlier_ratio) const
+::testing::AssertionResult JitterValidator<ScanType>::validateCallbackInvocationTimes(int64_t max_jitter) const
 {
-  return validateVector(callback_invocation_times_, max_jitter, max_outlier_ratio) << " (callback invocation times)";
+  return validateVector(callback_invocation_times_, max_jitter) << " (callback invocation times)";
 }
 
 template <typename ScanType>
 ::testing::AssertionResult JitterValidator<ScanType>::validateVector(const std::vector<int64_t>& data,
-                                                                     int64_t max_jitter,
-                                                                     const double& max_outlier_ratio) const
+                                                                     int64_t max_jitter) const
 {
   std::vector<int64_t> diffs(data.size());
   std::adjacent_difference(data.begin(), data.end(), diffs.begin());
@@ -127,7 +122,7 @@ template <typename ScanType>
         }
         return false;
       }) };
-  if (number_of_violations > sample_size_ * max_outlier_ratio)
+  if (number_of_violations > 0)
   {
     return ::testing::AssertionFailure() << fmt::format("Found {}% violations of 1ms jitter criteria.",
                                                         100. * number_of_violations / sample_size_);

@@ -32,7 +32,6 @@ static constexpr std::size_t SAMPLE_SIZE{ 1000 };
 static constexpr int WAIT_TIME_SEC{ 50 };
 static constexpr int64_t MAX_JITTER_NSEC{ 1000000 };
 static constexpr int64_t SCAN_PERIOD_NSEC{ 30000000 };
-static const double MAX_OUTLIER_RATIO{ 0.002 };
 
 static ScannerConfiguration setUpScannerConfiguration()
 {
@@ -69,8 +68,8 @@ TEST(JitterStandaloneTests, testJitterIsBelowOneMillisecond)
   EXPECT_TRUE(jitter_validator.waitForSaturation(WAIT_TIME_SEC));
   scanner.stop();
 
-  EXPECT_TRUE(jitter_validator.validateTimestamps(MAX_JITTER_NSEC, MAX_OUTLIER_RATIO));
-  EXPECT_TRUE(jitter_validator.validateCallbackInvocationTimes(MAX_JITTER_NSEC, MAX_OUTLIER_RATIO));
+  EXPECT_TRUE(jitter_validator.validateTimestamps(MAX_JITTER_NSEC));
+  EXPECT_TRUE(jitter_validator.validateCallbackInvocationTimes(MAX_JITTER_NSEC));
 }
 
 int main(int argc, char* argv[])
