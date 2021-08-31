@@ -46,7 +46,7 @@ namespace psen_scan_v2_standalone
 namespace communication_layer
 {
 using NewDataHandler =
-    std::function<void(const data_conversion_layer::RawData&, const std::size_t&, const int64_t& timestamp)>;
+    std::function<void(const data_conversion_layer::RawDataConstPtr&, const std::size_t&, const int64_t& timestamp)>;
 using ErrorHandler = std::function<void(const std::string&)>;
 
 /**
@@ -155,7 +155,7 @@ private:
   boost::asio::io_service::work work_{ io_service_ };
   std::thread io_service_thread_;
 
-  data_conversion_layer::RawData received_data_;
+  data_conversion_layer::RawDataPtr received_data_;
 
   NewDataHandler data_handler_;
   ErrorHandler error_handler_;
@@ -184,7 +184,7 @@ inline communication_layer::UdpClientImpl::UdpClientImpl(const NewDataHandler& d
     throw std::invalid_argument("Error handler is invalid");
   }
 
-  received_data_.resize(psen_scan_v2_standalone::data_conversion_layer::MAX_UDP_PAKET_SIZE);
+  received_data_.reset(new data_conversion_layer::RawData(data_conversion_layer::MAX_UDP_PAKET_SIZE));
   try
   {
     socket_.connect(endpoint_);
@@ -286,7 +286,7 @@ inline void UdpClientImpl::startAsyncReceiving(const ReceiveMode& modi)
 
 inline void UdpClientImpl::asyncReceive(const ReceiveMode& modi)
 {
-  socket_.async_receive(boost::asio::buffer(received_data_, received_data_.size()),
+  socket_.async_receive(boost::asio::buffer(*received_data_, received_data_->size()),
                         [this, modi](const boost::system::error_code& error_code, const std::size_t& bytes_received) {
                           if (error_code || bytes_received == 0)
                           {
