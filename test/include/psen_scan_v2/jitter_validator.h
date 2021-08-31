@@ -115,9 +115,9 @@ template <typename ScanType>
   std::adjacent_difference(data.begin(), data.end(), diffs.begin());
   const auto number_of_violations{ std::count_if(
       std::next(diffs.begin()), diffs.end(), [this, max_jitter](int64_t diff) {
-        if (std::abs(diff - period_) > max_jitter)
+        if (std::abs(diff - period_ > max_jitter))
         {
-          PSENSCAN_WARN("JitterValidator", "Found jitter of {}ms.", diff / 1000000.);
+          PSENSCAN_WARN("JitterValidator", "Found jitter of {}ms.", std::abs(diff - period_) / 1000000.);
           return true;
         }
         return false;
