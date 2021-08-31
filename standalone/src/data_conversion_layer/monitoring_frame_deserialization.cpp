@@ -105,7 +105,7 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
       case AdditionalFieldHeaderID::measurements: {
         const size_t num_measurements{ static_cast<size_t>(additional_header.length()) /
                                        NUMBER_OF_BYTES_SINGLE_MEASUREMENT };
-        raw_processing::readArray<uint16_t, double>(ss, msg.measurements_, num_measurements, std::bind(toMeter, _1));
+        raw_processing::readArray<uint16_t, double>(ss, msg.measurements_, num_measurements, toMeter);
         break;
       }
       case AdditionalFieldHeaderID::end_of_frame:

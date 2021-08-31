@@ -72,7 +72,7 @@ template <class ReturnType, class RawType>
 using ConversionFunc = std::function<ReturnType(const RawType&)>;
 
 template <typename RawType, typename ReturnType>
-inline ReturnType read(std::istream& is, ConversionFunc<ReturnType, RawType> conversion_fcn)
+inline ReturnType read(std::istream& is, const ConversionFunc<ReturnType, RawType>& conversion_fcn)
 {
   return conversion_fcn(raw_processing::read<RawType>(is));
 }
@@ -87,7 +87,7 @@ template <typename RawType, typename ReturnType>
 inline void readArray(std::istream& is,
                       std::vector<ReturnType>& data,
                       const size_t& number_of_samples,
-                      ConversionFunc<ReturnType, RawType> conversion_fcn)
+                      const ConversionFunc<ReturnType, RawType>& conversion_fcn)
 {
   data.reserve(number_of_samples);
 
