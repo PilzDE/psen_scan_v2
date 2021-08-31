@@ -15,6 +15,7 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_MONITORING_FRAME_DESERIALIZATION_H
 #define PSEN_SCAN_V2_STANDALONE_MONITORING_FRAME_DESERIALIZATION_H
 
+#include <istream>
 #include <ostream>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
@@ -133,13 +134,13 @@ enum class AdditionalFieldHeaderID : AdditionalFieldHeader::Id
   end_of_frame = 0x09
 };
 
-AdditionalFieldHeader readAdditionalField(std::istringstream& is, const std::size_t& max_num_bytes);
+AdditionalFieldHeader readAdditionalField(std::istream& is, const std::size_t& max_num_bytes);
 
 monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data, const std::size_t& num_bytes);
-FixedFields readFixedFields(std::istringstream& is);
+FixedFields readFixedFields(std::istream& is);
 namespace diagnostic
 {
-std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is);
+std::vector<diagnostic::Message> deserializeMessages(std::istream& is);
 }
 
 /**
