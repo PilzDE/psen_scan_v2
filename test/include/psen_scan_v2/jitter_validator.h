@@ -50,6 +50,8 @@ public:
   bool waitForSaturation(int64_t wait_time_sec);
   ::testing::AssertionResult validateTimestamps(int64_t max_jitter) const;
   ::testing::AssertionResult validateCallbackInvocationTimes(int64_t max_jitter) const;
+  void printTimestamps() const;
+  void printCallbackInvocationTimes() const;
 
 private:
   ::testing::AssertionResult validateVector(const std::vector<int64_t>& data, int64_t max_jitter) const;
@@ -105,6 +107,22 @@ template <typename ScanType>
 ::testing::AssertionResult JitterValidator<ScanType>::validateCallbackInvocationTimes(int64_t max_jitter) const
 {
   return validateVector(callback_invocation_times_, max_jitter) << " (callback invocation times)";
+}
+
+template <typename ScanType>
+void JitterValidator<ScanType>::printTimestamps() const
+{
+  std::for_each(scan_timestamps_.begin(), scan_timestamps_.end(), [](uint64_t timestamp) {
+    PSENSCAN_DEBUG("JitterValidator", "timestamp: {}", timestamp);
+  });
+}
+
+template <typename ScanType>
+void JitterValidator<ScanType>::printCallbackInvocationTimes() const
+{
+  std::for_each(callback_invocation_times_.begin(), callback_invocation_times_.end(), [](uint64_t invoc_time) {
+    PSENSCAN_DEBUG("JitterValidator", "callback invocation time: {}", invoc_time);
+  });
 }
 
 template <typename ScanType>

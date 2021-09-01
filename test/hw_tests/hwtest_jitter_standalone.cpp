@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <chrono>
 #include <cstdlib>
 #include <functional>
 
@@ -68,8 +69,15 @@ TEST(JitterStandaloneTests, testJitterIsBelowOneMillisecond)
   EXPECT_TRUE(jitter_validator.waitForSaturation(WAIT_TIME_SEC));
   scanner.stop();
 
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  setLogLevel(CONSOLE_BRIDGE_LOG_DEBUG);
+
+  jitter_validator.printTimestamps();
+  jitter_validator.printCallbackInvocationTimes();
   EXPECT_TRUE(jitter_validator.validateTimestamps(MAX_JITTER_NSEC));
   EXPECT_TRUE(jitter_validator.validateCallbackInvocationTimes(MAX_JITTER_NSEC));
+
+  std::this_thread::sleep_for(std::chrono::seconds(3));
 }
 
 int main(int argc, char* argv[])
