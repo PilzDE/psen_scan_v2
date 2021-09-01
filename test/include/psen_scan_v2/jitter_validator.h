@@ -111,17 +111,20 @@ template <typename ScanType>
 ::testing::AssertionResult JitterValidator<ScanType>::validateVector(const std::vector<int64_t>& data,
                                                                      int64_t max_jitter) const
 {
-  std::vector<int64_t> diffs(data.size());
-  std::adjacent_difference(data.begin(), data.end(), diffs.begin());
-  const auto number_of_violations{ std::count_if(
-      std::next(diffs.begin()), diffs.end(), [this, max_jitter](int64_t diff) {
-        if (std::abs(diff - period_ > max_jitter))
-        {
-          PSENSCAN_WARN("JitterValidator", "Found jitter of {}ms.", std::abs(diff - period_) / 1000000.);
-          return true;
-        }
-        return false;
-      }) };
+  unsigned int number_of_violations{ 0 };
+  for (std::size_t i = 1; i < data.size(); ++i)
+  {
+    const auto diff{ data[i] - data[i - 1] };
+    if (std::abs(diff - period_ > max_jitter))
+    {
+      number_of_violations++;
+      PSENSCAN_WARN("JitterValidator",
+                    "Found jitter of {}ms at time {} (scan number {}).",
+                    (diff - period_) / 1000000.,
+                    data[i],
+                    i + 1);
+    }
+  }
   if (number_of_violations > 0)
   {
     return ::testing::AssertionFailure() << fmt::format("Found {}% violations of 1ms jitter criteria.",
