@@ -51,7 +51,7 @@ class UdpClientTests : public testing::Test
 {
 public:
   UdpClientTests();
-  MOCK_METHOD3(handleNewData, void(const data_conversion_layer::RawData&, const std::size_t&, const int64_t&));
+  MOCK_METHOD3(handleNewData, void(const data_conversion_layer::RawDataConstPtr&, const std::size_t&, const int64_t&));
   MOCK_METHOD1(handleError, void(const std::string&));
 
   MOCK_METHOD2(receivedUdpMsg,
