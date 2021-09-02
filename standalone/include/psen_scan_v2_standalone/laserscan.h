@@ -16,8 +16,9 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_LASERSCAN_H
 #define PSEN_SCAN_V2_STANDALONE_LASERSCAN_H
 
-#include <vector>
 #include <cstdint>
+#include <ostream>
+#include <vector>
 
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
@@ -66,8 +67,6 @@ public:
   const IntensityData& getIntensities() const;
   void setIntensities(const IntensityData&);
 
-  bool operator==(const LaserScan& scan) const;
-
 private:
   //! Measurement data of the laserscan (in Millimeters).
   MeasurementData measurements_;
@@ -84,6 +83,8 @@ private:
   //! Time of the first ray in this scan round (or fragment if fragmented_scans is enabled).
   const int64_t timestamp_;
 };
+
+std::ostream& operator<<(std::ostream& os, const LaserScan& scan);
 
 }  // namespace psen_scan_v2_standalone
 
