@@ -104,7 +104,7 @@ std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
   bag.open(filepath, rosbag::bagmode::Read);
 
   std::vector<std::string> topics;
-  topics.push_back(std::string("/laser_1_node/scan"));
+  topics.push_back(std::string("/laser_1/scan"));
 
   rosbag::View view(bag, rosbag::TopicQuery(topics));
 
