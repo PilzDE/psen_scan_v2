@@ -113,7 +113,7 @@ template <typename ScanType>
 void JitterValidator<ScanType>::printTimestamps() const
 {
   std::for_each(scan_timestamps_.begin(), scan_timestamps_.end(), [](uint64_t timestamp) {
-    PSENSCAN_DEBUG("JitterValidator", "timestamp: {}", timestamp);
+    PSENSCAN_INFO("JitterValidator", "timestamp: {}", timestamp);
   });
 }
 
@@ -121,7 +121,7 @@ template <typename ScanType>
 void JitterValidator<ScanType>::printCallbackInvocationTimes() const
 {
   std::for_each(callback_invocation_times_.begin(), callback_invocation_times_.end(), [](uint64_t invoc_time) {
-    PSENSCAN_DEBUG("JitterValidator", "callback invocation time: {}", invoc_time);
+    PSENSCAN_INFO("JitterValidator", "callback invocation time: {}", invoc_time);
   });
 }
 

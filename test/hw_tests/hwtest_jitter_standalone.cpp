@@ -26,6 +26,14 @@
 using namespace psen_scan_v2_standalone;
 using namespace psen_scan_v2_test;
 
+template <>
+int64_t psen_scan_v2_test::getTimestamp<LaserScan>(const LaserScan& scan)
+{
+  return scan.getTimestamp();
+}
+
+namespace psen_scan_v2_standalone_test
+{
 static const char* HOST_IP_ENV_VAR{ "HOST_IP" };
 static const char* SENSOR_IP_ENV_VAR{ "SENSOR_IP" };
 static constexpr int HOST_UDP_PORT_DATA{ 55008 };
@@ -33,6 +41,7 @@ static constexpr std::size_t SAMPLE_SIZE{ 1000 };
 static constexpr int WAIT_TIME_SEC{ 50 };
 static constexpr int64_t MAX_JITTER_NSEC{ 1000000 };
 static constexpr int64_t SCAN_PERIOD_NSEC{ 30000000 };
+static bool ENABLE_TIMEDATA_OUTPUT{ false };
 
 static ScannerConfiguration setUpScannerConfiguration()
 {
@@ -46,16 +55,16 @@ static ScannerConfiguration setUpScannerConfiguration()
   {
     scanner_ip = "192.168.0.10";
   }
-  ScanRange scan_range{ util::TenthOfDegree{ 1 }, util::TenthOfDegree{ 2749 } };
+  const ScanRange scan_range{ util::TenthOfDegree{ 1 }, util::TenthOfDegree{ 2749 } };
+  const util::TenthOfDegree resolution{ 2 };
   ScannerConfigurationBuilder config_builder;
-  config_builder.hostIP(host_ip).scannerIp(scanner_ip).hostDataPort(HOST_UDP_PORT_DATA).scanRange(scan_range);
+  config_builder.hostIP(host_ip)
+      .scannerIp(scanner_ip)
+      .hostDataPort(HOST_UDP_PORT_DATA)
+      .scanRange(scan_range)
+      .scanResolution(resolution)
+      .enableIntensities(true);
   return config_builder.build();
-}
-
-template <>
-int64_t psen_scan_v2_test::getTimestamp<LaserScan>(const LaserScan& scan)
-{
-  return scan.getTimestamp();
 }
 
 TEST(JitterStandaloneTests, testJitterIsBelowOneMillisecond)
@@ -69,19 +78,28 @@ TEST(JitterStandaloneTests, testJitterIsBelowOneMillisecond)
   EXPECT_TRUE(jitter_validator.waitForSaturation(WAIT_TIME_SEC));
   scanner.stop();
 
-  std::this_thread::sleep_for(std::chrono::seconds(1));
-  setLogLevel(CONSOLE_BRIDGE_LOG_DEBUG);
+  if (ENABLE_TIMEDATA_OUTPUT)
+  {
+    jitter_validator.printTimestamps();
+    jitter_validator.printCallbackInvocationTimes();
+  }
 
-  jitter_validator.printTimestamps();
-  jitter_validator.printCallbackInvocationTimes();
   EXPECT_TRUE(jitter_validator.validateTimestamps(MAX_JITTER_NSEC));
   EXPECT_TRUE(jitter_validator.validateCallbackInvocationTimes(MAX_JITTER_NSEC));
-
-  std::this_thread::sleep_for(std::chrono::seconds(3));
 }
+}  // namespace psen_scan_v2_standalone_test
 
 int main(int argc, char* argv[])
 {
   testing::InitGoogleTest(&argc, argv);
+  if (argc > 1)
+  {
+    std::istringstream is(argv[1]);
+    bool enable_timedata_output;
+    if (is >> std::boolalpha >> enable_timedata_output)
+    {
+      psen_scan_v2_standalone_test::ENABLE_TIMEDATA_OUTPUT = enable_timedata_output;
+    }
+  }
   return RUN_ALL_TESTS();
 }
