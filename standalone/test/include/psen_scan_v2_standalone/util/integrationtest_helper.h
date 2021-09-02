@@ -89,7 +89,7 @@ createValidMonitoringFrameMsg(const uint32_t scan_counter = 42,
   const std::vector<double> measurements{ generateMeasurements(num_elements, lowest_measurement, highest_measurement) };
 
   const double lowest_intensity{ 0. };
-  const double highest_intensity{ 17000. };
+  const double highest_intensity{ 16383. };  // only 14 of 16 bits can be used for the actual intensity value
   const std::vector<double> intensities{ generateIntensities(num_elements, lowest_intensity, highest_intensity) };
 
   const std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnostic_messages{
