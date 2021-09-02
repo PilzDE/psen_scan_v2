@@ -69,6 +69,8 @@ static ScannerConfiguration setUpScannerConfiguration()
 
 TEST(JitterStandaloneTests, testJitterIsBelowOneMillisecond)
 {
+  setLogLevel(CONSOLE_BRIDGE_LOG_INFO);
+
   JitterValidator<LaserScan> jitter_validator(SAMPLE_SIZE, SCAN_PERIOD_NSEC);
   ScannerV2 scanner(
       setUpScannerConfiguration(),
