@@ -30,6 +30,10 @@ endif (WIN32)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
+if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
 ## System dependencies are found with CMake's conventions
 find_package(Boost 1.69) ## Boost::system is header-only since 1.69
 if(Boost_FOUND)
