@@ -412,9 +412,22 @@ if(CATKIN_ENABLE_TESTING)
   # See ./hwtest_readme.md for details on the hardware tests.
   if(ENABLE_HARDWARE_TESTING)
 
+    # This test is intended to be run with a parallel wireshark process and thus needs to be enabled separately.
+    if(ENABLE_HARDWARE_TESTING_WITH_WIRESHARK)
+      catkin_add_gtest(hwtest_timestamp_standalone
+        test/hw_tests/hwtest_timestamp_standalone.cpp
+        test/src/test_data.cpp
+        test/src/test_data_assembler.cpp
+        test/src/udp_data_reader.cpp
+      )
+      target_link_libraries(hwtest_timestamp_standalone
+        ${catkin_LIBRARIES}
+        ${PROJECT_NAME}_standalone
+      )
+    endif()
 
-    # This test is intended to be run on in a dedicated environment with a prerecorded reference scan
-    # and thus needs to be enabled seperately.
+    # This test is intended to be run in a dedicated environment with a prerecorded reference scan
+    # and thus needs to be enabled separately.
     if(ENABLE_HARDWARE_TESTING_WITH_REFERENCE_SCAN)
       find_package(rosbag REQUIRED)
 
@@ -452,8 +465,6 @@ if(CATKIN_ENABLE_TESTING)
       ARGS config:=with_intensities.yaml)
     add_rostest(test/hw_tests/hwtest_scan_range.test
       ARGS config:=big_resolution.yaml)
-
-    add_rostest(test/hw_tests/hwtest_timestamp.test)
   endif()
 
 
