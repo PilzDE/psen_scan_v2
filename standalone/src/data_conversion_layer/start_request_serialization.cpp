@@ -37,7 +37,6 @@ namespace data_conversion_layer
 {
 namespace start_request
 {
-static constexpr std::size_t SIZE{ 58 };  // See protocol description
 static constexpr uint64_t RESERVED{ 0 };
 
 static const uint32_t OPCODE{ 0x35 };
@@ -135,7 +134,7 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
   std::string raw_data_with_crc_str(os_crc.str() + os.str());
   data_conversion_layer::RawData raw_data_with_crc{ raw_data_with_crc_str.cbegin(), raw_data_with_crc_str.cend() };
 
-  assert(raw_data_with_crc.size() == SIZE && "Message data of start request has not the expected size");
+  assert(raw_data_with_crc.size() == 58 && "Message data of start request has not the size expceted by protocol");
 
   return raw_data_with_crc;
 }

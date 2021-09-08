@@ -22,6 +22,10 @@ add_compile_options(-Wextra)
 add_compile_options(-Wno-unused-parameter)
 add_compile_options(-Werror)
 
+if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
 find_package(catkin REQUIRED COMPONENTS
   rosconsole_bridge
   roscpp
