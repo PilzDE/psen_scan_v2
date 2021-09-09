@@ -31,6 +31,7 @@
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 #include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/scan_range.h"
+#include "psen_scan_v2_standalone/util/timestamp.h"
 
 namespace psen_scan_v2_standalone_test
 {
@@ -39,13 +40,6 @@ using namespace psen_scan_v2_standalone;
 static constexpr ScanRange DEFAULT_SCAN_RANGE{ util::TenthOfDegree(1), util::TenthOfDegree(60) };
 static constexpr util::TenthOfDegree DEFAULT_SCAN_RESOLUTION{ 2 };
 static constexpr int64_t DEFAULT_TIMESTAMP{ 1000000000 };
-
-static int64_t getCurrentTime()
-{
-  return std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now())
-      .time_since_epoch()
-      .count();
-}
 
 static double randDouble(double low, double high)
 {
@@ -166,7 +160,7 @@ using namespace ::testing;
 
 MATCHER_P2(TimestampInExpectedTimeframe, reference_scan, reference_timestamp, "")
 {
-  const int64_t elapsed_time{ getCurrentTime() - reference_timestamp };
+  const int64_t elapsed_time{ util::getCurrentTime() - reference_timestamp };
   *result_listener << "where the elapsed time is " << elapsed_time << " nsec";
   return arg.getTimestamp() > reference_scan.getTimestamp() &&
          arg.getTimestamp() < (reference_scan.getTimestamp() + elapsed_time);

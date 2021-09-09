@@ -13,9 +13,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <array>
 #include <bitset>
-#include <iostream>
 #include <functional>
+#include <istream>
+#include <sstream>
+#include <vector>
 
 #include <fmt/format.h>
 
@@ -71,9 +74,10 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
 {
   data_conversion_layer::monitoring_frame::Message msg;
 
-  std::istringstream is(std::string(data.cbegin(), data.cend()));
+  std::stringstream ss;
+  ss.write(data.data(), num_bytes);
 
-  FixedFields frame_header = readFixedFields(is);
+  FixedFields frame_header = readFixedFields(ss);
 
   msg.scanner_id_ = frame_header.scanner_id();
   msg.from_theta_ = frame_header.from_theta();
@@ -82,7 +86,7 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
   bool end_of_frame{ false };
   while (!end_of_frame)
   {
-    const AdditionalFieldHeader additional_header{ readAdditionalField(is, num_bytes) };
+    const AdditionalFieldHeader additional_header{ readAdditionalField(ss, num_bytes) };
 
     switch (static_cast<AdditionalFieldHeaderID>(additional_header.id()))
     {
@@ -94,14 +98,14 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
                                                       NUMBER_OF_BYTES_SCAN_COUNTER));
         }
         uint32_t scan_counter_read_buffer;
-        raw_processing::read<uint32_t>(is, scan_counter_read_buffer);
+        raw_processing::read<uint32_t>(ss, scan_counter_read_buffer);
         msg.scan_counter_ = scan_counter_read_buffer;
         break;
 
       case AdditionalFieldHeaderID::measurements: {
         const size_t num_measurements{ static_cast<size_t>(additional_header.length()) /
                                        NUMBER_OF_BYTES_SINGLE_MEASUREMENT };
-        raw_processing::readArray<uint16_t, double>(is, msg.measurements_, num_measurements, std::bind(toMeter, _1));
+        raw_processing::readArray<uint16_t, double>(ss, msg.measurements_, num_measurements, toMeter);
         break;
       }
       case AdditionalFieldHeaderID::end_of_frame:
@@ -109,7 +113,7 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
         break;
 
       case AdditionalFieldHeaderID::diagnostics:
-        msg.diagnostic_messages_ = diagnostic::deserializeMessages(is);
+        msg.diagnostic_messages_ = diagnostic::deserializeMessages(ss);
         msg.diagnostic_data_enabled_ = true;
         break;
 
@@ -117,7 +121,7 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
         const size_t num_measurements{ static_cast<size_t>(additional_header.length()) /
                                        NUMBER_OF_BYTES_SINGLE_MEASUREMENT };
         raw_processing::readArray<uint16_t, double>(
-            is, msg.intensities_, num_measurements, std::bind(toIntensities, _1));
+            ss, msg.intensities_, num_measurements, std::bind(toIntensities, _1));
         break;
       }
       default:
@@ -128,7 +132,7 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
   return msg;
 }
 
-AdditionalFieldHeader readAdditionalField(std::istringstream& is, const std::size_t& max_num_bytes)
+AdditionalFieldHeader readAdditionalField(std::istream& is, const std::size_t& max_num_bytes)
 {
   auto const id = raw_processing::read<AdditionalFieldHeader::Id>(is);
   auto length = raw_processing::read<AdditionalFieldHeader::Length>(is);
@@ -147,7 +151,7 @@ AdditionalFieldHeader readAdditionalField(std::istringstream& is, const std::siz
 
 namespace diagnostic
 {
-std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is)
+std::vector<diagnostic::Message> deserializeMessages(std::istream& is)
 {
   std::vector<diagnostic::Message> diagnostic_messages;
 
@@ -175,7 +179,7 @@ std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is)
 }
 }  // namespace diagnostic
 
-FixedFields readFixedFields(std::istringstream& is)
+FixedFields readFixedFields(std::istream& is)
 {
   const auto device_status = raw_processing::read<FixedFields::DeviceStatus>(is);
   const auto op_code = raw_processing::read<FixedFields::OpCode>(is);

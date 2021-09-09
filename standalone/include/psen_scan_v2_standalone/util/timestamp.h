@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2021 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -12,21 +12,23 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#ifndef PSEN_SCAN_V2_STANDALONE_RAW_SCANNER_DATA_H
-#define PSEN_SCAN_V2_STANDALONE_RAW_SCANNER_DATA_H
 
-#include <memory>
-#include <vector>
+#ifndef PSEN_SCAN_V2_STANDALONE_TIMESTAMP_H
+#define PSEN_SCAN_V2_STANDALONE_TIMESTAMP_H
+
+#include <chrono>
 
 namespace psen_scan_v2_standalone
 {
-namespace data_conversion_layer
+namespace util
 {
-using RawData = std::vector<char>;
-static constexpr std::size_t MAX_UDP_PAKET_SIZE{ 65507 };
-using RawDataPtr = std::shared_ptr<RawData>;
-using RawDataConstPtr = std::shared_ptr<const RawData>;
-}  // namespace data_conversion_layer
+inline static auto getCurrentTime()
+{
+  return std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now())
+      .time_since_epoch()
+      .count();
+}
+}  // namespace util
 }  // namespace psen_scan_v2_standalone
 
-#endif  // PSEN_SCAN_V2_STANDALONE_RAW_SCANNER_DATA_H
+#endif  // PSEN_SCAN_V2_STANDALONE_TIMESTAMP_H

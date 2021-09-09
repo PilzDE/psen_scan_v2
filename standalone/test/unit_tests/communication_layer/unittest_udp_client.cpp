@@ -41,7 +41,7 @@ class CallbackHandler
 {
 public:
   MOCK_METHOD3(handleNewData,
-               void(const psen_scan_v2_standalone::data_conversion_layer::RawData&,
+               void(const psen_scan_v2_standalone::data_conversion_layer::RawDataConstPtr&,
                     const std::size_t&,
                     const int64_t&));
   MOCK_METHOD1(handleError, void(const std::string&));

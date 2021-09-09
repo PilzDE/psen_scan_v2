@@ -142,7 +142,7 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
   try
   {
     const data_conversion_layer::monitoring_frame::Message msg{ data_conversion_layer::monitoring_frame::deserialize(
-        event.data_, event.num_bytes_) };
+        *(event.data_), event.num_bytes_) };
     checkForDiagnosticErrors(msg);
     const data_conversion_layer::monitoring_frame::MessageStamped stamped_msg{ msg, event.timestamp_ };
     informUserAboutTheScanData(stamped_msg);
@@ -258,7 +258,7 @@ inline void ScannerProtocolDef::checkForInternalErrors(const data_conversion_lay
 inline bool ScannerProtocolDef::isStartReply(scanner_events::RawReplyReceived const& reply_event)
 {
   const data_conversion_layer::scanner_reply::Message msg{ data_conversion_layer::scanner_reply::deserialize(
-      reply_event.data_) };
+      *(reply_event.data_)) };
   checkForInternalErrors(msg);
   return msg.type() == data_conversion_layer::scanner_reply::Message::Type::start;
 }
@@ -266,7 +266,7 @@ inline bool ScannerProtocolDef::isStartReply(scanner_events::RawReplyReceived co
 inline bool ScannerProtocolDef::isStopReply(scanner_events::RawReplyReceived const& reply_event)
 {
   const data_conversion_layer::scanner_reply::Message msg{ data_conversion_layer::scanner_reply::deserialize(
-      reply_event.data_) };
+      *(reply_event.data_)) };
   checkForInternalErrors(msg);
   return msg.type() == data_conversion_layer::scanner_reply::Message::Type::stop;
 }

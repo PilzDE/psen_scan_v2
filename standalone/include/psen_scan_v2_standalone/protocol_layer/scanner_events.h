@@ -48,13 +48,15 @@ class StartTimeout
 class RawReplyReceived
 {
 public:
-  RawReplyReceived(const data_conversion_layer::RawData& data, const std::size_t& num_bytes, const int64_t& timestamp)
+  RawReplyReceived(const data_conversion_layer::RawDataConstPtr& data,
+                   const std::size_t& num_bytes,
+                   const int64_t& timestamp)
     : data_(data), num_bytes_(num_bytes), timestamp_(timestamp)
   {
   }
 
 public:
-  const data_conversion_layer::RawData data_;
+  const data_conversion_layer::RawDataConstPtr data_;
   const std::size_t num_bytes_;
   const int64_t timestamp_;
 };
@@ -68,7 +70,7 @@ class ReplyReceiveError
 class RawMonitoringFrameReceived
 {
 public:
-  RawMonitoringFrameReceived(const data_conversion_layer::RawData& data,
+  RawMonitoringFrameReceived(const data_conversion_layer::RawDataConstPtr& data,
                              const std::size_t& num_bytes,
                              const int64_t& timestamp)
     : data_(data), num_bytes_(num_bytes), timestamp_(timestamp)
@@ -76,7 +78,7 @@ public:
   }
 
 public:
-  const data_conversion_layer::RawData data_;
+  const data_conversion_layer::RawDataConstPtr data_;
   const std::size_t num_bytes_;
   const int64_t timestamp_;
 };

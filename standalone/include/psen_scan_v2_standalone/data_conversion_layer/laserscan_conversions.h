@@ -120,17 +120,18 @@ inline std::vector<int> LaserScanConverter::getFilledFramesIndicesSortedByThetaA
 {
   std::vector<int> sorted_filled_stamped_msgs_indices(stamped_msgs.size());
   std::iota(sorted_filled_stamped_msgs_indices.begin(), sorted_filled_stamped_msgs_indices.end(), 0);
-  std::sort(
-      sorted_filled_stamped_msgs_indices.begin(),
-      sorted_filled_stamped_msgs_indices.end(),
-      [stamped_msgs](int i1, int i2) { return stamped_msgs[i1].msg_.fromTheta() < stamped_msgs[i2].msg_.fromTheta(); });
+  std::sort(sorted_filled_stamped_msgs_indices.begin(),
+            sorted_filled_stamped_msgs_indices.end(),
+            [&stamped_msgs](int i1, int i2) {
+              return stamped_msgs[i1].msg_.fromTheta() < stamped_msgs[i2].msg_.fromTheta();
+            });
 
   // The following contains a missing line in the coverage report, which does not make sense.
   // LCOV_EXCL_START
   sorted_filled_stamped_msgs_indices.erase(
       std::remove_if(sorted_filled_stamped_msgs_indices.begin(),
                      sorted_filled_stamped_msgs_indices.end(),
-                     [stamped_msgs](int i) { return stamped_msgs[i].msg_.measurements().empty(); }),
+                     [&stamped_msgs](int i) { return stamped_msgs[i].msg_.measurements().empty(); }),
       sorted_filled_stamped_msgs_indices.end());
   // LCOV_EXCL_STOP
 
