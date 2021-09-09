@@ -4,6 +4,10 @@ Changelog for package psen_scan_v2
 
 Forthcoming
 -----------
+* Improve performance of standalone part
+    * Introduce RawDataPtr
+    * Write to std::stringstream instead of constructing from std::string
+    * Pass by reference wherever possible
 * Calculate timestamp as the time of the first ray (udp communication time is neglected)
 * API: Add timestamp (nanoseconds since epoch) to LaserScan
 * API: Add scan counter to LaserScan
