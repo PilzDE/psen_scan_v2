@@ -442,14 +442,6 @@ if(CATKIN_ENABLE_TESTING)
       )
     endif()
 
-    catkin_add_gtest(hwtest_jitter_standalone
-      test/hw_tests/hwtest_jitter_standalone.cpp
-    )
-    target_link_libraries(hwtest_jitter_standalone
-      ${catkin_LIBRARIES}
-      ${PROJECT_NAME}_standalone
-    )
-
     add_rostest(test/hw_tests/hwtest_publish.test)
 
     add_rostest(test/hw_tests/hwtest_scan_range.test
