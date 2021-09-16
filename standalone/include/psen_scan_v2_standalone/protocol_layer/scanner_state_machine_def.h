@@ -25,7 +25,9 @@ inline ScannerProtocolDef::ScannerProtocolDef(ScannerConfiguration config,
                                               const communication_layer::NewDataHandler& control_data_handler,
                                               const communication_layer::ErrorHandler& control_error_handler,
                                               const communication_layer::NewDataHandler& data_data_handler,
-                                              const communication_layer::ErrorHandler& data_error_handler)
+                                              const communication_layer::ErrorHandler& data_error_handler,
+                                              const ScannerStartedCB& scanner_started_cb,
+                                              const ScannerStoppedCB& scanner_stopped_cb)
   : config_(config)
   , args_(args)
   , control_client_(control_data_handler,
@@ -38,6 +40,8 @@ inline ScannerProtocolDef::ScannerProtocolDef(ScannerConfiguration config,
                  config.hostUDPPortData(),
                  config.clientIp(),
                  config.scannerDataPort())
+  , scanner_started_cb_(scanner_started_cb)
+  , scanner_stopped_cb_(scanner_stopped_cb)
 {
 }
 
@@ -99,7 +103,7 @@ void ScannerProtocolDef::WaitForMonitoringFrame::on_entry(Event const&, FSM& fsm
   fsm.scan_buffer_.reset();
   // Start watchdog...
   fsm.monitoring_frame_watchdog_ = fsm.args_->watchdog_factory_->create(WATCHDOG_TIMEOUT, "MonitoringFrameTimeout");
-  fsm.args_->scanner_started_cb();
+  fsm.scanner_started_cb_();
 }
 
 template <class Event, class FSM>
@@ -114,7 +118,7 @@ template <class Event, class FSM>
 void ScannerProtocolDef::Stopped::on_entry(Event const&, FSM& fsm)
 {
   PSENSCAN_DEBUG("StateMachine", fmt::format("Entering state: {}", "Stopped"));
-  fsm.args_->scanner_stopped_cb();
+  fsm.scanner_stopped_cb_();
 }
 
 DEFAULT_ON_EXIT_IMPL(Stopped)

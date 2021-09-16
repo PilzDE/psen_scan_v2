@@ -63,9 +63,6 @@ StateMachineArgs* ScannerV2::createStateMachineArgs()
       // The following includes calls to std::bind which are not marked correctly
       // by some gcc versions, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96006
 
-      // Callbacks
-      std::bind(&ScannerV2::scannerStartedCB, this),
-      std::bind(&ScannerV2::scannerStoppedCB, this),
       // LCOV_EXCL_STOP
       IScanner::getLaserScanCB(),
       std::unique_ptr<IWatchdogFactory>(new WatchdogFactory(this)));
@@ -78,7 +75,9 @@ ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScan
                                 BIND_RAW_DATA_EVENT(RawReplyReceived),
                                 BIND_EVENT(ReplyReceiveError),
                                 BIND_RAW_DATA_EVENT(RawMonitoringFrameReceived),
-                                BIND_EVENT(MonitoringFrameReceivedError)))
+                                BIND_EVENT(MonitoringFrameReceivedError),
+                                std::bind(&ScannerV2::scannerStartedCB, this),
+                                std::bind(&ScannerV2::scannerStoppedCB, this)))
 {
   const std::lock_guard<std::mutex> lock(member_mutex_);
   sm_->start();

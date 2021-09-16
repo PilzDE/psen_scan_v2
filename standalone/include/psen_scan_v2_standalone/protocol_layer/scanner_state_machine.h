@@ -23,7 +23,7 @@
 #include <stdexcept>
 #include <vector>
 
-#define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 7
+#define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 9
 
 // back-end
 #include <boost/msm/back/state_machine.hpp>
@@ -109,20 +109,12 @@ public:
  */
 struct StateMachineArgs
 {
-  StateMachineArgs(const ScannerStartedCB& started_cb,
-                   const ScannerStoppedCB& stopped_cb,
-                   const InformUserAboutLaserScanCB& laser_scan_cb,
-                   std::unique_ptr<IWatchdogFactory> watchdog_factory)
-    : scanner_started_cb(started_cb)
-    , scanner_stopped_cb(stopped_cb)
-    , inform_user_about_laser_scan_cb(laser_scan_cb)
-    , watchdog_factory_(std::move(watchdog_factory))
+  StateMachineArgs(const InformUserAboutLaserScanCB& laser_scan_cb, std::unique_ptr<IWatchdogFactory> watchdog_factory)
+    : inform_user_about_laser_scan_cb(laser_scan_cb), watchdog_factory_(std::move(watchdog_factory))
   {
   }
 
   // Callbacks
-  const ScannerStartedCB scanner_started_cb{};
-  const ScannerStoppedCB scanner_stopped_cb{};
   const InformUserAboutLaserScanCB inform_user_about_laser_scan_cb{};
 
   // Factories
@@ -155,7 +147,9 @@ public:
                      const communication_layer::NewDataHandler& control_data_handler,
                      const communication_layer::ErrorHandler& control_error_handler,
                      const communication_layer::NewDataHandler& data_data_handler,
-                     const communication_layer::ErrorHandler& data_error_handler);
+                     const communication_layer::ErrorHandler& data_error_handler,
+                     const ScannerStartedCB& scanner_started_cb,
+                     const ScannerStoppedCB& scanner_stopped_cb);
 
 public:  // States
   STATE(Idle);
@@ -247,6 +241,10 @@ private:
   // Udp Clients
   communication_layer::UdpClientImpl control_client_;
   communication_layer::UdpClientImpl data_client_;
+
+  // Callbacks
+  const ScannerStartedCB scanner_started_cb_;
+  const ScannerStoppedCB scanner_stopped_cb_;
 };
 
 // Pick a back-end
