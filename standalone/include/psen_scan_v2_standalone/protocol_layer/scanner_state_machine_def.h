@@ -14,11 +14,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request_serialization.h"
+#include "psen_scan_v2_standalone/scanner_configuration.h"
 namespace psen_scan_v2_standalone
 {
 namespace protocol_layer
 {
-inline ScannerProtocolDef::ScannerProtocolDef(StateMachineArgs* const args) : args_(args)
+inline ScannerProtocolDef::ScannerProtocolDef(ScannerConfiguration config, StateMachineArgs* const args)
+  : config_(config), args_(args)
 {
 }
 
@@ -108,14 +110,14 @@ inline void ScannerProtocolDef::sendStartRequest(const T& event)
 {
   PSENSCAN_DEBUG("StateMachine", "Action: sendStartRequest");
 
-  if (!args_->config_.hostIp())
+  if (!config_.hostIp())
   {
     auto host_ip{ args_->control_client_->getHostIp() };
-    args_->config_.setHostIp(host_ip.to_ulong());
+    config_.setHostIp(host_ip.to_ulong());
     PSENSCAN_INFO("StateMachine", "No host ip set! Using local ip: {}", host_ip.to_string());
   }
   args_->control_client_->write(
-      data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(args_->config_)));
+      data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_)));
 }
 
 inline void ScannerProtocolDef::handleStartRequestTimeout(const scanner_events::StartTimeout& event)
@@ -170,7 +172,7 @@ inline void ScannerProtocolDef::informUserAboutTheScanData(
   try
   {
     scan_buffer_.add(stamped_msg);
-    if (!args_->config_.fragmentedScansEnabled() && scan_buffer_.isRoundComplete())
+    if (!config_.fragmentedScansEnabled() && scan_buffer_.isRoundComplete())
     {
       sendMessageWithMeasurements(scan_buffer_.getMsgs());
     }
@@ -179,7 +181,7 @@ inline void ScannerProtocolDef::informUserAboutTheScanData(
   {
     PSENSCAN_WARN("ScanBuffer", ex.what());
   }
-  if (args_->config_.fragmentedScansEnabled())  // Send the scan fragment in any case.
+  if (config_.fragmentedScansEnabled())  // Send the scan fragment in any case.
   {
     sendMessageWithMeasurements({ stamped_msg });
   }

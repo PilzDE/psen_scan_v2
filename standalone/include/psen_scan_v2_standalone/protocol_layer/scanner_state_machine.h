@@ -23,6 +23,8 @@
 #include <stdexcept>
 #include <vector>
 
+#define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 2
+
 // back-end
 #include <boost/msm/back/state_machine.hpp>
 // front-end
@@ -107,15 +109,13 @@ public:
  */
 struct StateMachineArgs
 {
-  StateMachineArgs(const ScannerConfiguration& scanner_config,
-                   std::unique_ptr<communication_layer::UdpClientImpl> control_client,
+  StateMachineArgs(std::unique_ptr<communication_layer::UdpClientImpl> control_client,
                    std::unique_ptr<communication_layer::UdpClientImpl> data_client,
                    const ScannerStartedCB& started_cb,
                    const ScannerStoppedCB& stopped_cb,
                    const InformUserAboutLaserScanCB& laser_scan_cb,
                    std::unique_ptr<IWatchdogFactory> watchdog_factory)
-    : config_(scanner_config)
-    , scanner_started_cb(started_cb)
+    : scanner_started_cb(started_cb)
     , scanner_stopped_cb(stopped_cb)
     , inform_user_about_laser_scan_cb(laser_scan_cb)
     , watchdog_factory_(std::move(watchdog_factory))
@@ -123,8 +123,6 @@ struct StateMachineArgs
     , data_client_(std::move(data_client))
   {
   }
-
-  ScannerConfiguration config_;
 
   // Callbacks
   const ScannerStartedCB scanner_started_cb{};
@@ -162,7 +160,7 @@ struct StateMachineArgs
 class ScannerProtocolDef : public msm::front::state_machine_def<ScannerProtocolDef>
 {
 public:
-  ScannerProtocolDef(StateMachineArgs* const args);
+  ScannerProtocolDef(ScannerConfiguration config, StateMachineArgs* const args);
 
 public:  // States
   STATE(Idle);
@@ -243,6 +241,7 @@ private:
   framesContainMeasurements(const std::vector<data_conversion_layer::monitoring_frame::MessageStamped>& stamped_msg);
 
 private:
+  ScannerConfiguration config_;
   const std::unique_ptr<StateMachineArgs> args_;
 
   std::unique_ptr<util::Watchdog> start_reply_watchdog_{};

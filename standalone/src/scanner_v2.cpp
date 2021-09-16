@@ -59,7 +59,6 @@ std::unique_ptr<util::Watchdog> ScannerV2::WatchdogFactory::create(const util::W
 StateMachineArgs* ScannerV2::createStateMachineArgs()
 {
   return new StateMachineArgs(
-      IScanner::getConfig(),
       // LCOV_EXCL_START
       // The following includes calls to std::bind which are not marked correctly
       // by some gcc versions, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96006
@@ -83,7 +82,8 @@ StateMachineArgs* ScannerV2::createStateMachineArgs()
 }  // namespace psen_scan_v2_standalone
 
 ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb)
-  : IScanner(scanner_config, laser_scan_cb), sm_(new ScannerStateMachine(createStateMachineArgs()))
+  : IScanner(scanner_config, laser_scan_cb)
+  , sm_(new ScannerStateMachine(IScanner::getConfig(), createStateMachineArgs()))
 {
   const std::lock_guard<std::mutex> lock(member_mutex_);
   sm_->start();
