@@ -2,8 +2,8 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.2 (2021-09-16)
+------------------
 * Improve performance of standalone part
     * Introduce RawDataPtr
     * Write to std::stringstream instead of constructing from std::string

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>psen_scan_v2</name>
-  <version>0.3.1</version>
+  <version>0.3.2</version>
   <description>ROS support for the Pilz laser scanner</description>
 
   <maintainer email="a.gutenkunst@pilz.de">Alexander Gutenkunst</maintainer>
