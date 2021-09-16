@@ -109,13 +109,9 @@ public:
  */
 struct StateMachineArgs
 {
-  StateMachineArgs(const InformUserAboutLaserScanCB& laser_scan_cb, std::unique_ptr<IWatchdogFactory> watchdog_factory)
-    : inform_user_about_laser_scan_cb(laser_scan_cb), watchdog_factory_(std::move(watchdog_factory))
+  StateMachineArgs(std::unique_ptr<IWatchdogFactory> watchdog_factory) : watchdog_factory_(std::move(watchdog_factory))
   {
   }
-
-  // Callbacks
-  const InformUserAboutLaserScanCB inform_user_about_laser_scan_cb{};
 
   // Factories
   std::unique_ptr<IWatchdogFactory> watchdog_factory_{};
@@ -149,7 +145,8 @@ public:
                      const communication_layer::NewDataHandler& data_data_handler,
                      const communication_layer::ErrorHandler& data_error_handler,
                      const ScannerStartedCB& scanner_started_cb,
-                     const ScannerStoppedCB& scanner_stopped_cb);
+                     const ScannerStoppedCB& scanner_stopped_cb,
+                     const InformUserAboutLaserScanCB& laser_scan_cb);
 
 public:  // States
   STATE(Idle);
@@ -245,6 +242,7 @@ private:
   // Callbacks
   const ScannerStartedCB scanner_started_cb_;
   const ScannerStoppedCB scanner_stopped_cb_;
+  const InformUserAboutLaserScanCB inform_user_about_laser_scan_cb_;
 };
 
 // Pick a back-end

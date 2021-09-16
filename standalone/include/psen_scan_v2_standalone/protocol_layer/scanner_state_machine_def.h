@@ -27,7 +27,8 @@ inline ScannerProtocolDef::ScannerProtocolDef(ScannerConfiguration config,
                                               const communication_layer::NewDataHandler& data_data_handler,
                                               const communication_layer::ErrorHandler& data_error_handler,
                                               const ScannerStartedCB& scanner_started_cb,
-                                              const ScannerStoppedCB& scanner_stopped_cb)
+                                              const ScannerStoppedCB& scanner_stopped_cb,
+                                              const InformUserAboutLaserScanCB& laser_scan_cb)
   : config_(config)
   , args_(args)
   , control_client_(control_data_handler,
@@ -42,6 +43,7 @@ inline ScannerProtocolDef::ScannerProtocolDef(ScannerConfiguration config,
                  config.scannerDataPort())
   , scanner_started_cb_(scanner_started_cb)
   , scanner_stopped_cb_(scanner_stopped_cb)
+  , inform_user_about_laser_scan_cb_(laser_scan_cb)
 {
 }
 
@@ -215,7 +217,7 @@ inline void ScannerProtocolDef::sendMessageWithMeasurements(
   {
     try
     {
-      args_->inform_user_about_laser_scan_cb(data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs));
+      inform_user_about_laser_scan_cb_(data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs));
     }
     // LCOV_EXCL_START
     catch (const data_conversion_layer::ScannerProtocolViolationError& ex)
