@@ -15,12 +15,29 @@
 
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request_serialization.h"
 #include "psen_scan_v2_standalone/scanner_configuration.h"
+#include "psen_scan_v2_standalone/communication_layer/udp_client.h"
 namespace psen_scan_v2_standalone
 {
 namespace protocol_layer
 {
-inline ScannerProtocolDef::ScannerProtocolDef(ScannerConfiguration config, StateMachineArgs* const args)
-  : config_(config), args_(args)
+inline ScannerProtocolDef::ScannerProtocolDef(ScannerConfiguration config,
+                                              StateMachineArgs* const args,
+                                              const communication_layer::NewDataHandler& control_data_handler,
+                                              const communication_layer::ErrorHandler& control_error_handler,
+                                              const communication_layer::NewDataHandler& data_data_handler,
+                                              const communication_layer::ErrorHandler& data_error_handler)
+  : config_(config)
+  , args_(args)
+  , control_client_(control_data_handler,
+                    control_error_handler,
+                    config.hostUDPPortControl(),
+                    config.clientIp(),
+                    config.scannerControlPort())
+  , data_client_(data_data_handler,
+                 data_error_handler,
+                 config.hostUDPPortData(),
+                 config.clientIp(),
+                 config.scannerDataPort())
 {
 }
 
@@ -55,8 +72,8 @@ template <class Event, class FSM>
 void ScannerProtocolDef::Idle::on_exit(Event const&, FSM& fsm)
 {
   PSENSCAN_DEBUG("StateMachine", fmt::format("Exiting state: {}", "Idle"));
-  fsm.args_->control_client_->startAsyncReceiving();
-  fsm.args_->data_client_->startAsyncReceiving();
+  fsm.control_client_.startAsyncReceiving();
+  fsm.data_client_.startAsyncReceiving();
 }
 
 template <class Event, class FSM>
@@ -112,11 +129,11 @@ inline void ScannerProtocolDef::sendStartRequest(const T& event)
 
   if (!config_.hostIp())
   {
-    auto host_ip{ args_->control_client_->getHostIp() };
+    auto host_ip{ control_client_.getHostIp() };
     config_.setHostIp(host_ip.to_ulong());
     PSENSCAN_INFO("StateMachine", "No host ip set! Using local ip: {}", host_ip.to_string());
   }
-  args_->control_client_->write(
+  control_client_.write(
       data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_)));
 }
 
@@ -133,7 +150,7 @@ template <class T>
 inline void ScannerProtocolDef::sendStopRequest(const T& event)
 {
   PSENSCAN_DEBUG("StateMachine", "Action: sendStopRequest");
-  args_->control_client_->write(data_conversion_layer::stop_request::serialize());
+  control_client_.write(data_conversion_layer::stop_request::serialize());
 }
 
 inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawMonitoringFrameReceived& event)

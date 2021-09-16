@@ -62,17 +62,7 @@ StateMachineArgs* ScannerV2::createStateMachineArgs()
       // LCOV_EXCL_START
       // The following includes calls to std::bind which are not marked correctly
       // by some gcc versions, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96006
-      // UDP clients
-      std::make_unique<communication_layer::UdpClientImpl>(BIND_RAW_DATA_EVENT(RawReplyReceived),
-                                                           BIND_EVENT(ReplyReceiveError),
-                                                           IScanner::getConfig().hostUDPPortControl(),
-                                                           IScanner::getConfig().clientIp(),
-                                                           IScanner::getConfig().scannerControlPort()),
-      std::make_unique<communication_layer::UdpClientImpl>(BIND_RAW_DATA_EVENT(RawMonitoringFrameReceived),
-                                                           BIND_EVENT(MonitoringFrameReceivedError),
-                                                           IScanner::getConfig().hostUDPPortData(),
-                                                           IScanner::getConfig().clientIp(),
-                                                           IScanner::getConfig().scannerDataPort()),
+
       // Callbacks
       std::bind(&ScannerV2::scannerStartedCB, this),
       std::bind(&ScannerV2::scannerStoppedCB, this),
@@ -83,7 +73,12 @@ StateMachineArgs* ScannerV2::createStateMachineArgs()
 
 ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb)
   : IScanner(scanner_config, laser_scan_cb)
-  , sm_(new ScannerStateMachine(IScanner::getConfig(), createStateMachineArgs()))
+  , sm_(new ScannerStateMachine(IScanner::getConfig(),
+                                createStateMachineArgs(),
+                                BIND_RAW_DATA_EVENT(RawReplyReceived),
+                                BIND_EVENT(ReplyReceiveError),
+                                BIND_RAW_DATA_EVENT(RawMonitoringFrameReceived),
+                                BIND_EVENT(MonitoringFrameReceivedError)))
 {
   const std::lock_guard<std::mutex> lock(member_mutex_);
   sm_->start();

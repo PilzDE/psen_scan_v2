@@ -23,7 +23,7 @@
 #include <stdexcept>
 #include <vector>
 
-#define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 2
+#define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 7
 
 // back-end
 #include <boost/msm/back/state_machine.hpp>
@@ -109,9 +109,7 @@ public:
  */
 struct StateMachineArgs
 {
-  StateMachineArgs(std::unique_ptr<communication_layer::UdpClientImpl> control_client,
-                   std::unique_ptr<communication_layer::UdpClientImpl> data_client,
-                   const ScannerStartedCB& started_cb,
+  StateMachineArgs(const ScannerStartedCB& started_cb,
                    const ScannerStoppedCB& stopped_cb,
                    const InformUserAboutLaserScanCB& laser_scan_cb,
                    std::unique_ptr<IWatchdogFactory> watchdog_factory)
@@ -119,8 +117,6 @@ struct StateMachineArgs
     , scanner_stopped_cb(stopped_cb)
     , inform_user_about_laser_scan_cb(laser_scan_cb)
     , watchdog_factory_(std::move(watchdog_factory))
-    , control_client_(std::move(control_client))
-    , data_client_(std::move(data_client))
   {
   }
 
@@ -131,12 +127,6 @@ struct StateMachineArgs
 
   // Factories
   std::unique_ptr<IWatchdogFactory> watchdog_factory_{};
-
-  // UDP clients
-  // Note: The clients must be declared last, to ensure that they are desroyed first.
-  // If they are not declared last, segmentation default might occur!
-  std::unique_ptr<communication_layer::UdpClientImpl> control_client_{};
-  std::unique_ptr<communication_layer::UdpClientImpl> data_client_{};
 };
 
 // front-end: define the FSM structure
@@ -160,7 +150,12 @@ struct StateMachineArgs
 class ScannerProtocolDef : public msm::front::state_machine_def<ScannerProtocolDef>
 {
 public:
-  ScannerProtocolDef(ScannerConfiguration config, StateMachineArgs* const args);
+  ScannerProtocolDef(ScannerConfiguration config,
+                     StateMachineArgs* const args,
+                     const communication_layer::NewDataHandler& control_data_handler,
+                     const communication_layer::ErrorHandler& control_error_handler,
+                     const communication_layer::NewDataHandler& data_data_handler,
+                     const communication_layer::ErrorHandler& data_error_handler);
 
 public:  // States
   STATE(Idle);
@@ -248,6 +243,10 @@ private:
 
   std::unique_ptr<util::Watchdog> monitoring_frame_watchdog_{};
   ScanBuffer scan_buffer_{ DEFAULT_NUM_MSG_PER_ROUND };
+
+  // Udp Clients
+  communication_layer::UdpClientImpl control_client_;
+  communication_layer::UdpClientImpl data_client_;
 };
 
 // Pick a back-end
