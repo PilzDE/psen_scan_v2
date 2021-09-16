@@ -23,7 +23,7 @@
 #include <stdexcept>
 #include <vector>
 
-#define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 9
+#define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 11
 
 // back-end
 #include <boost/msm/back/state_machine.hpp>
@@ -100,7 +100,24 @@ public:
 
 public:
   virtual std::unique_ptr<util::Watchdog> create(const util::Watchdog::Timeout& timeout,
-                                                 const std::string& event_type) = 0;
+                                                 const std::function<void()>& timeout_handler) = 0;
+};
+
+/**
+ * @brief Watchdog factory implementation for scanner interaction timeouts
+ *
+ * Implements the IWatchdogFactory to add behavior to handle specific cases,
+ * where the interaction with the scanner hardware takes longer than expected.
+ *
+ * @see protocol_layer::IWatchdogFactory
+ * @see util::Watchdog
+ */
+class WatchdogFactory : public IWatchdogFactory
+{
+public:
+  WatchdogFactory() = default;
+  std::unique_ptr<util::Watchdog> create(const util::Watchdog::Timeout& timeout,
+                                         const std::function<void()>& timeout_handler) override;
 };
 
 /**
@@ -109,12 +126,9 @@ public:
  */
 struct StateMachineArgs
 {
-  StateMachineArgs(std::unique_ptr<IWatchdogFactory> watchdog_factory) : watchdog_factory_(std::move(watchdog_factory))
+  StateMachineArgs()
   {
   }
-
-  // Factories
-  std::unique_ptr<IWatchdogFactory> watchdog_factory_{};
 };
 
 // front-end: define the FSM structure
@@ -146,7 +160,9 @@ public:
                      const communication_layer::ErrorHandler& data_error_handler,
                      const ScannerStartedCB& scanner_started_cb,
                      const ScannerStoppedCB& scanner_stopped_cb,
-                     const InformUserAboutLaserScanCB& laser_scan_cb);
+                     const InformUserAboutLaserScanCB& laser_scan_cb,
+                     const std::function<void()>& start_timeout_handler,
+                     const std::function<void()>& monitoring_frame_timeout_handler);
 
 public:  // States
   STATE(Idle);
@@ -243,6 +259,13 @@ private:
   const ScannerStartedCB scanner_started_cb_;
   const ScannerStoppedCB scanner_stopped_cb_;
   const InformUserAboutLaserScanCB inform_user_about_laser_scan_cb_;
+
+  // Timeout Handler
+  const std::function<void()> start_timeout_handler_;
+  const std::function<void()> monitoring_frame_timeout_handler_;
+
+  // Factories
+  WatchdogFactory watchdog_factory_{};
 };
 
 // Pick a back-end

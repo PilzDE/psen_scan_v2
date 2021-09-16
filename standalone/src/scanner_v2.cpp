@@ -32,28 +32,10 @@ using namespace psen_scan_v2_standalone::protocol_layer::scanner_events;
   [this](const data_conversion_layer::RawDataConstPtr& data, const std::size_t& num_bytes, const int64_t& timestamp){ triggerEventWithParam(event_name(data, num_bytes, timestamp)); }
 // clang-format on
 
-ScannerV2::WatchdogFactory::WatchdogFactory(ScannerV2* scanner) : IWatchdogFactory(), scanner_(scanner)
+std::unique_ptr<util::Watchdog> WatchdogFactory::create(const util::Watchdog::Timeout& timeout,
+                                                        const std::function<void()>& timeout_handler)
 {
-  assert(scanner);
-}
-
-std::unique_ptr<util::Watchdog> ScannerV2::WatchdogFactory::create(const util::Watchdog::Timeout& timeout,
-                                                                   const std::string& event_type)
-{
-  if (event_type == "StartReplyTimeout")
-  {
-    return std::unique_ptr<util::Watchdog>(
-        new util::Watchdog(timeout, std::bind(&ScannerV2::triggerEvent<scanner_events::StartTimeout>, scanner_)));
-  }
-  if (event_type == "MonitoringFrameTimeout")
-  {
-    return std::unique_ptr<util::Watchdog>(new util::Watchdog(
-        timeout, std::bind(&ScannerV2::triggerEvent<scanner_events::MonitoringFrameTimeout>, scanner_)));
-  }
-
-  // LCOV_EXCL_START
-  throw std::runtime_error("WatchdogFactory called with event for which no creation process exists.");
-  // LCOV_EXCL_STOP
+  return std::unique_ptr<util::Watchdog>(new util::Watchdog(timeout, timeout_handler));
 }
 
 StateMachineArgs* ScannerV2::createStateMachineArgs()
@@ -64,7 +46,7 @@ StateMachineArgs* ScannerV2::createStateMachineArgs()
       // by some gcc versions, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96006
 
       // LCOV_EXCL_STOP
-      std::unique_ptr<IWatchdogFactory>(new WatchdogFactory(this)));
+  );
 }  // namespace psen_scan_v2_standalone
 
 ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb)
@@ -77,7 +59,9 @@ ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScan
                                 BIND_EVENT(MonitoringFrameReceivedError),
                                 std::bind(&ScannerV2::scannerStartedCB, this),
                                 std::bind(&ScannerV2::scannerStoppedCB, this),
-                                IScanner::getLaserScanCB()))
+                                IScanner::getLaserScanCB(),
+                                BIND_EVENT(scanner_events::StartTimeout),
+                                BIND_EVENT(scanner_events::MonitoringFrameTimeout)))
 {
   const std::lock_guard<std::mutex> lock(member_mutex_);
   sm_->start();

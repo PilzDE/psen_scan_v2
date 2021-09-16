@@ -82,27 +82,6 @@ private:
   void scannerStoppedCB();
 
 private:
-  /**
-   * @brief Watchdog factory implementation for scanner interaction timeouts
-   *
-   * Implements the IWatchdogFactory to add behavior to handle specific cases,
-   * where the interaction with the scanner hardware takes longer than expected.
-   *
-   * @see protocol_layer::IWatchdogFactory
-   * @see util::Watchdog
-   */
-  class WatchdogFactory : public IWatchdogFactory
-  {
-  public:
-    WatchdogFactory(ScannerV2* scanner);
-    std::unique_ptr<util::Watchdog> create(const util::Watchdog::Timeout& timeout,
-                                           const std::string& event_type) override;
-
-  private:
-    ScannerV2* scanner_;
-  };
-
-private:
   using OptionalPromise = boost::optional<std::promise<void>>;
 
 private:

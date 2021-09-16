@@ -28,7 +28,9 @@ inline ScannerProtocolDef::ScannerProtocolDef(ScannerConfiguration config,
                                               const communication_layer::ErrorHandler& data_error_handler,
                                               const ScannerStartedCB& scanner_started_cb,
                                               const ScannerStoppedCB& scanner_stopped_cb,
-                                              const InformUserAboutLaserScanCB& laser_scan_cb)
+                                              const InformUserAboutLaserScanCB& laser_scan_cb,
+                                              const std::function<void()>& start_timeout_handler,
+                                              const std::function<void()>& monitoring_frame_timeout_handler)
   : config_(config)
   , args_(args)
   , control_client_(control_data_handler,
@@ -44,6 +46,8 @@ inline ScannerProtocolDef::ScannerProtocolDef(ScannerConfiguration config,
   , scanner_started_cb_(scanner_started_cb)
   , scanner_stopped_cb_(scanner_stopped_cb)
   , inform_user_about_laser_scan_cb_(laser_scan_cb)
+  , start_timeout_handler_(start_timeout_handler)
+  , monitoring_frame_timeout_handler_(monitoring_frame_timeout_handler)
 {
 }
 
@@ -87,7 +91,7 @@ void ScannerProtocolDef::WaitForStartReply::on_entry(Event const&, FSM& fsm)
 {
   PSENSCAN_DEBUG("StateMachine", fmt::format("Entering state: {}", "WaitForStartReply"));
   // Start watchdog...
-  fsm.start_reply_watchdog_ = fsm.args_->watchdog_factory_->create(WATCHDOG_TIMEOUT, "StartReplyTimeout");
+  fsm.start_reply_watchdog_ = fsm.watchdog_factory_.create(WATCHDOG_TIMEOUT, fsm.start_timeout_handler_);
 }
 
 template <class Event, class FSM>
@@ -104,7 +108,8 @@ void ScannerProtocolDef::WaitForMonitoringFrame::on_entry(Event const&, FSM& fsm
   PSENSCAN_DEBUG("StateMachine", fmt::format("Entering state: {}", "WaitForMonitoringFrame"));
   fsm.scan_buffer_.reset();
   // Start watchdog...
-  fsm.monitoring_frame_watchdog_ = fsm.args_->watchdog_factory_->create(WATCHDOG_TIMEOUT, "MonitoringFrameTimeout");
+  fsm.monitoring_frame_watchdog_ =
+      fsm.watchdog_factory_.create(WATCHDOG_TIMEOUT, fsm.monitoring_frame_timeout_handler_);
   fsm.scanner_started_cb_();
 }
 
