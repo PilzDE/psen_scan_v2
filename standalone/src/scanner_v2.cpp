@@ -38,21 +38,9 @@ std::unique_ptr<util::Watchdog> WatchdogFactory::create(const util::Watchdog::Ti
   return std::unique_ptr<util::Watchdog>(new util::Watchdog(timeout, timeout_handler));
 }
 
-StateMachineArgs* ScannerV2::createStateMachineArgs()
-{
-  return new StateMachineArgs(
-      // LCOV_EXCL_START
-      // The following includes calls to std::bind which are not marked correctly
-      // by some gcc versions, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96006
-
-      // LCOV_EXCL_STOP
-  );
-}  // namespace psen_scan_v2_standalone
-
 ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb)
   : IScanner(scanner_config, laser_scan_cb)
   , sm_(new ScannerStateMachine(IScanner::getConfig(),
-                                createStateMachineArgs(),
                                 BIND_RAW_DATA_EVENT(RawReplyReceived),
                                 BIND_EVENT(ReplyReceiveError),
                                 BIND_RAW_DATA_EVENT(RawMonitoringFrameReceived),

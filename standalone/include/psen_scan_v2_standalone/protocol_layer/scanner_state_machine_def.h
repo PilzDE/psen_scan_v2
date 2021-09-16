@@ -21,7 +21,6 @@ namespace psen_scan_v2_standalone
 namespace protocol_layer
 {
 inline ScannerProtocolDef::ScannerProtocolDef(ScannerConfiguration config,
-                                              StateMachineArgs* const args,
                                               const communication_layer::NewDataHandler& control_data_handler,
                                               const communication_layer::ErrorHandler& control_error_handler,
                                               const communication_layer::NewDataHandler& data_data_handler,
@@ -32,7 +31,6 @@ inline ScannerProtocolDef::ScannerProtocolDef(ScannerConfiguration config,
                                               const std::function<void()>& start_timeout_handler,
                                               const std::function<void()>& monitoring_frame_timeout_handler)
   : config_(config)
-  , args_(args)
   , control_client_(control_data_handler,
                     control_error_handler,
                     config.hostUDPPortControl(),

@@ -68,10 +68,6 @@ public:
   std::future<void> stop() override;
 
 private:
-  // Raw pointer used here because "msm::back::state_machine" cannot properly pass
-  // a "std::unique_ptr" to "msm::front::state_machine_def".
-  StateMachineArgs* createStateMachineArgs();
-
   template <class T>
   void triggerEventWithParam(const T& event);
 

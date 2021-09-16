@@ -23,7 +23,7 @@
 #include <stdexcept>
 #include <vector>
 
-#define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 11
+#define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 10
 
 // back-end
 #include <boost/msm/back/state_machine.hpp>
@@ -120,17 +120,6 @@ public:
                                          const std::function<void()>& timeout_handler) override;
 };
 
-/**
- * @brief Helper class used to easily transfer data from the higher level ScannerV2 class
- * to the ScannerProtocolDef class during construction of the scanner_protocol::ScannerStateMachine.
- */
-struct StateMachineArgs
-{
-  StateMachineArgs()
-  {
-  }
-};
-
 // front-end: define the FSM structure
 /**
  * @brief Definition of the scanner protocol. It is initialized using the StateMachineArgs class.
@@ -153,7 +142,6 @@ class ScannerProtocolDef : public msm::front::state_machine_def<ScannerProtocolD
 {
 public:
   ScannerProtocolDef(ScannerConfiguration config,
-                     StateMachineArgs* const args,
                      const communication_layer::NewDataHandler& control_data_handler,
                      const communication_layer::ErrorHandler& control_error_handler,
                      const communication_layer::NewDataHandler& data_data_handler,
@@ -244,7 +232,6 @@ private:
 
 private:
   ScannerConfiguration config_;
-  const std::unique_ptr<StateMachineArgs> args_;
 
   std::unique_ptr<util::Watchdog> start_reply_watchdog_{};
 
