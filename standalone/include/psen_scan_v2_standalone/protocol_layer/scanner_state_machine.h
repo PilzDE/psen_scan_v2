@@ -141,7 +141,7 @@ public:
 class ScannerProtocolDef : public msm::front::state_machine_def<ScannerProtocolDef>
 {
 public:
-  ScannerProtocolDef(ScannerConfiguration config,
+  ScannerProtocolDef(const ScannerConfiguration config,
                      const communication_layer::NewDataHandler& control_data_handler,
                      const communication_layer::ErrorHandler& control_error_handler,
                      const communication_layer::NewDataHandler& data_data_handler,

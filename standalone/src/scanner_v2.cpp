@@ -41,6 +41,9 @@ std::unique_ptr<util::Watchdog> WatchdogFactory::create(const util::Watchdog::Ti
 ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb)
   : IScanner(scanner_config, laser_scan_cb)
   , sm_(new ScannerStateMachine(IScanner::getConfig(),
+                                // LCOV_EXCL_START
+                                // The following includes calls to std::bind which are not marked correctly
+                                // by some gcc versions, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96006
                                 BIND_RAW_DATA_EVENT(RawReplyReceived),
                                 BIND_EVENT(ReplyReceiveError),
                                 BIND_RAW_DATA_EVENT(RawMonitoringFrameReceived),
@@ -50,6 +53,7 @@ ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScan
                                 IScanner::getLaserScanCB(),
                                 BIND_EVENT(scanner_events::StartTimeout),
                                 BIND_EVENT(scanner_events::MonitoringFrameTimeout)))
+// LCOV_EXCL_STOP
 {
   const std::lock_guard<std::mutex> lock(member_mutex_);
   sm_->start();

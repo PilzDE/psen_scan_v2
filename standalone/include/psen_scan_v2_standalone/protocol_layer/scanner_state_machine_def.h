@@ -20,7 +20,7 @@ namespace psen_scan_v2_standalone
 {
 namespace protocol_layer
 {
-inline ScannerProtocolDef::ScannerProtocolDef(ScannerConfiguration config,
+inline ScannerProtocolDef::ScannerProtocolDef(const ScannerConfiguration config,
                                               const communication_layer::NewDataHandler& control_data_handler,
                                               const communication_layer::ErrorHandler& control_error_handler,
                                               const communication_layer::NewDataHandler& data_data_handler,
@@ -33,14 +33,14 @@ inline ScannerProtocolDef::ScannerProtocolDef(ScannerConfiguration config,
   : config_(config)
   , control_client_(control_data_handler,
                     control_error_handler,
-                    config.hostUDPPortControl(),
-                    config.clientIp(),
-                    config.scannerControlPort())
+                    config_.hostUDPPortControl(),  // LCOV_EXCL_LINE Lcov bug?
+                    config_.clientIp(),
+                    config_.scannerControlPort())
   , data_client_(data_data_handler,
                  data_error_handler,
-                 config.hostUDPPortData(),
-                 config.clientIp(),
-                 config.scannerDataPort())
+                 config_.hostUDPPortData(),  // LCOV_EXCL_LINE Lcov bug?
+                 config_.clientIp(),
+                 config_.scannerDataPort())
   , scanner_started_cb_(scanner_started_cb)
   , scanner_stopped_cb_(scanner_stopped_cb)
   , inform_user_about_laser_scan_cb_(laser_scan_cb)
