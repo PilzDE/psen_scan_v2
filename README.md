@@ -129,6 +129,13 @@ Both limits are defined within the _laser_1_ frame as shown in the image below.
 <img src="img/angle_limits.png" width="800px" alt="Limit visualization" title="Limit visualization">
 </p>
 
+### Additional Information
+The timestamps of the scan data published are computed to be close to reality and processing speed of incoming data was optimized to reduce the time for the scan data to be published. This should suffice for localization and slam algorithms. If you application benefits from getting the scan data any sooner there are two possiblities:
+
+* Use fragmented scans. This will publish the individual frames received by the PsenScan hardware imidiatly instead of waiting for a scan round to be completed and combined to a single laser scan message.
+* Use the tcp_nodelay flag in your ROS subscriber. This will disable the nagle's algorithm, which is a TCP optimization. This algorithm can produce a jitter of about 20ms in the ros topic.
+   * The cpp API of ROS does not support disabling this on the publisher side. If you don't have control over the subscriber e.g. due to using a third party package you can create a python node which acts as a repeater for the scan topic. rospy subscriber and publisher both allow setting this flag and thus can disable it for this driver and the third party package.
+
 ## Developer Information
 ### Build Status
 | Platform | Melodic | Noetic |
