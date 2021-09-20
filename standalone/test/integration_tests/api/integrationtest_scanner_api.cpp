@@ -79,8 +79,9 @@ protected:
   std::unique_ptr<util::Barrier> prepareStartRequestBarrier(const ScannerConfiguration& config);
   std::unique_ptr<util::Barrier>
   prepareMonitoringFrameBarrier(const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs);
-  void expectNotDoneYet(std::string method_name, const std::future<void>& future);
-  void expectIsDone(std::string method_name, const std::future<void>& future);
+  void expectNotDoneYet(const std::string& method_name, const std::future<void>& future);
+  void expectIsDone(const std::string& method_name, const std::future<void>& future);
+  void sendMonitoringFrames(const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs);
 
 protected:
   const PortHolder port_holder_{ ++GLOBAL_PORT_HOLDER };
@@ -200,14 +201,31 @@ void ScannerAPITests::startScanner()
   expectIsDone("Scanner::start()", start_future);
 }
 
-void ScannerAPITests::expectNotDoneYet(std::string method_name, const std::future<void>& future)
+void ScannerAPITests::expectNotDoneYet(const std::string& method_name, const std::future<void>& future)
 {
   EXPECT_EQ(future.wait_for(FUTURE_WAIT_TIMEOUT), std::future_status::timeout) << method_name << " finished to early";
 }
 
-void ScannerAPITests::expectIsDone(std::string method_name, const std::future<void>& future)
+void ScannerAPITests::expectIsDone(const std::string& method_name, const std::future<void>& future)
 {
   EXPECT_EQ(future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << method_name << " not finished";
+}
+
+void ScannerAPITests::sendMonitoringFrames(const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs)
+{
+  for (const auto& msg : msgs)
+  {
+    if (strict_scanner_mock_)
+    {
+      strict_scanner_mock_->sendMonitoringFrame(msg);
+    }
+    else
+    {
+      nice_scanner_mock_->sendMonitoringFrame(msg);
+    }
+    // Sleep to ensure that message are not sent too fast which might cause messages overwrite in socket buffer
+    std::this_thread::sleep_for(10ms);
+  }
 }
 
 TEST_F(ScannerAPITests, testStartFunctionality)
@@ -372,7 +390,7 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
   startScanner();
 
   const auto msg{ createValidMonitoringFrameMsg() };
-  auto monitoring_frame_barrier = prepareMonitoringFrameBarrier({msg});
+  auto monitoring_frame_barrier = prepareMonitoringFrameBarrier({ msg });
   util::Barrier diagnostic_barrier;
 
   EXPECT_LOG_SHORT(WARN,
@@ -400,10 +418,7 @@ TEST_F(ScannerAPITests, shouldCallLaserScanCBOnlyOneTimeWithAllInformationWhenUn
   const auto msgs{ createMonitoringFrameMsgsForScanRound(2, 6) };
   auto monitoring_frame_barrier = prepareMonitoringFrameBarrier(msgs);
 
-  for (const auto& msg : msgs)
-  {
-    nice_scanner_mock_->sendMonitoringFrame(msg);
-  }
+  sendMonitoringFrames(msgs);
 
   EXPECT_TRUE(monitoring_frame_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
 }
@@ -437,10 +452,7 @@ TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
 
   for (const auto& msgs : { ignored_short_first_round, accounted_short_round, valid_round })
   {
-    for (const auto& msg : msgs)
-    {
-      nice_scanner_mock_->sendMonitoringFrame(msg);
-    }
+    sendMonitoringFrames(msgs);
   }
 
   EXPECT_TRUE(monitoring_frame_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
@@ -471,10 +483,7 @@ TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
-  for (auto it = msgs_round3.begin(); it < std::prev(msgs_round3.end()); ++it)
-  {
-    nice_scanner_mock_->sendMonitoringFrame(*it);
-  }
+  sendMonitoringFrames(msgs_round3);
   nice_scanner_mock_->sendMonitoringFrame(msg_round2);
   nice_scanner_mock_->sendMonitoringFrame(msgs_round3.back());
 
@@ -580,21 +589,8 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
-  // Send MonitoringFrames of valid scan round
-  for (const auto& msg : valid_scan_round_msgs)
-  {
-    nice_scanner_mock_->sendMonitoringFrame(msg);
-    // Sleep to ensure that message are not sent too fast which might cause messages overwrite in socket buffer
-    std::this_thread::sleep_for(10ms);
-  }
-
-  // Send MonitoringFrames of invalid scan round
-  for (const auto& msg : invalid_scan_round_msgs)
-  {
-    nice_scanner_mock_->sendMonitoringFrame(msg);
-    // Sleep to ensure that message are not sent too fast which might cause messages overwrite in socket buffer
-    std::this_thread::sleep_for(10ms);
-  }
+  sendMonitoringFrames(valid_scan_round_msgs);
+  sendMonitoringFrames(invalid_scan_round_msgs);
 
   EXPECT_TRUE(user_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "User message not received";
   REMOVE_LOG_MOCK
@@ -624,12 +620,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
-  for (const auto& msg : msgs)
-  {
-    nice_scanner_mock_->sendMonitoringFrame(msg);
-    // Sleep to ensure that message are not sent too fast which might cause messages overwrite in socket buffer
-    std::this_thread::sleep_for(10ms);
-  }
+  sendMonitoringFrames(msgs);
 
   EXPECT_TRUE(user_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "User message not received";
   REMOVE_LOG_MOCK
