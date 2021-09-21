@@ -22,8 +22,6 @@
 #include <sstream>
 #include <string>
 
-#include <fmt/format.h>
-
 namespace psen_scan_v2_standalone
 {
 namespace util

@@ -21,9 +21,6 @@
 #include <string>
 #include <vector>
 
-#include <fmt/format.h>
-#include <fmt/ostream.h>
-
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
@@ -87,14 +84,11 @@ namespace monitoring_frame
 std::ostream& operator<<(std::ostream& os,
                          const psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message& msg)
 {
-  os << fmt::format("monitoring_frame::Message(fromTheta = {} deg, resolution = {} deg, scanCounter = "
-                    "{}, measurements = {}, intensities = {}, diagnostics = {})",
-                    msg.fromTheta().value() / 10.,
-                    msg.resolution().value() / 10.,
-                    msg.scanCounter(),
-                    util::formatRange(msg.measurements()),
-                    util::formatRange(msg.intensities()),
-                    util::formatRange(msg.diagnosticMessages()));
+  os << "monitoring_frame::Message(fromTheta = " << msg.fromTheta().value() / 10. << " deg"
+     << ", resolution = " << msg.resolution().value() / 10. << " deg"
+     << ", scanCounter = " << msg.scanCounter() << ", measurements = " << util::formatRange(msg.measurements())
+     << ", intensities = " << util::formatRange(msg.intensities())
+     << ", diagnostics = " << util::formatRange(msg.diagnosticMessages()) << ")";
   return os;
 }
 }  // namespace monitoring_frame

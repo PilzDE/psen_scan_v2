@@ -19,9 +19,6 @@
 
 #include <gtest/gtest.h>
 
-#include <fmt/format.h>
-#include <fmt/ostream.h>
-
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
@@ -254,17 +251,12 @@ TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)
   data_conversion_layer::monitoring_frame::Message msg(
       util::TenthOfDegree(1234), util::TenthOfDegree(56), 78, { 45, 44, 43, 42 });
 
-// For compatibility with different ubuntu versions (resp. fmt), we need to take account of changes in
-// the default formatting of floating point numbers
-#if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
-  EXPECT_EQ(fmt::format("{}", msg),
+  std::stringstream sstr;
+  sstr << msg;
+
+  EXPECT_EQ(sstr.str(),
             "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
             "measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {}, diagnostics = {})");
-#else
-  EXPECT_EQ(fmt::format("{}", msg),
-            "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-            "measurements = {45, 44, 43, 42}, intensities = {}, diagnostics = {})");
-#endif
 }
 
 }  // namespace psen_scan_v2

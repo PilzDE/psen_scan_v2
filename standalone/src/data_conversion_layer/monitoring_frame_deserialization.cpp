@@ -20,8 +20,6 @@
 #include <sstream>
 #include <vector>
 
-#include <fmt/format.h>
-
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
 
@@ -93,9 +91,9 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
       case AdditionalFieldHeaderID::scan_counter:
         if (additional_header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
         {
-          throw ScanCounterUnexpectedSize(fmt::format("Length of scan counter field is {}, but should be {}.",
-                                                      additional_header.length(),
-                                                      NUMBER_OF_BYTES_SCAN_COUNTER));
+          throw ScanCounterUnexpectedSize("Length of scan counter field is " +
+                                          std::to_string(additional_header.length()) + ", but should be " +
+                                          std::to_string(NUMBER_OF_BYTES_SCAN_COUNTER) + ".");
         }
         uint32_t scan_counter_read_buffer;
         raw_processing::read<uint32_t>(ss, scan_counter_read_buffer);
@@ -125,8 +123,10 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
         break;
       }
       default:
-        throw DecodingFailure(fmt::format(
-            "Header Id {:#04x} unknown. Cannot read additional field of monitoring frame.", additional_header.id()));
+        std::stringstream failure_stringstream;
+        failure_stringstream << "Header Id " << std::hex << additional_header.id()
+                             << " unknown. Cannot read additional field of monitoring frame.";
+        throw DecodingFailure(failure_stringstream.str());
     }
   }
   return msg;
@@ -139,8 +139,10 @@ AdditionalFieldHeader readAdditionalField(std::istream& is, const std::size_t& m
 
   if (length >= max_num_bytes)
   {
-    throw DecodingFailure(
-        fmt::format("Length given in header of additional field is too large: {}, id: {:#04x}", length, id));
+    std::stringstream decoding_failure_stringstream;
+    decoding_failure_stringstream << "Length given in header of additional field is too large: " << length
+                                  << ", id: " << std::hex << id;
+    throw DecodingFailure(decoding_failure_stringstream.str());
   }
   if (length > 0)
   {

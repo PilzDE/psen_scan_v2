@@ -26,9 +26,6 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include <fmt/format.h>
-#include <fmt/ostream.h>
-
 #include <gtest/gtest.h>
 
 #include <math.h>
@@ -143,7 +140,7 @@ public:
     {
       auto bins_actual = binsFromScans<ScanConstPtr, angle_offset>(msgs_);
 
-      std::string error_string;
+      std::stringstream error_stringstream;
       std::size_t counter_deviations{ 0 };
 
       // Compare
@@ -165,68 +162,63 @@ public:
         auto distance = bhattacharyya_distance(dist_actual, dist_expected);
         if (distance > 10.)
         {
-          error_string +=
-              fmt::format("On {:+.1f} deg  expected: {} actual: {} | dist: {:.1f}, dmean: {:.3f}, dstdev: {:.3f}\n",
-                          bin_actual.first / 10.,
-                          dist_expected,
-                          dist_actual,
-                          distance,
-                          abs(dist_expected.mean() - dist_actual.mean()),
-                          abs(dist_expected.stdev() - dist_actual.stdev()));
+          error_stringstream << "On " << std::setprecision(1) << bin_actual.first / 10. << " deg"
+                             << "  expected: " << dist_expected << " actual: " << dist_actual << "| dist: " << distance
+                             << std::setprecision(3) << ", dmean: " << abs(dist_expected.mean() - dist_actual.mean())
+                             << ", " << abs(dist_expected.stdev() - dist_actual.stdev()) << "\n";
           counter_deviations++;
         }
+
+        number_of_comparisons_++;
+
+        if (counter_deviations > 0)
+        {
+          check_result_.set_value(::testing::AssertionFailure() << "\n" << error_stringstream);
+          check_done_ = true;
+        }
+
+        msgs_.clear();
       }
-
-      number_of_comparisons_++;
-
-      if (counter_deviations > 0)
-      {
-        check_result_.set_value(::testing::AssertionFailure() << "\n" << error_string);
-        check_done_ = true;
-      }
-
-      msgs_.clear();
     }
-  }
 
-  void reset()
-  {
-    msgs_.clear();
-    check_result_ = std::promise<::testing::AssertionResult>();
-    check_result_future_ = check_result_.get_future();
-  }
-
-  ::testing::AssertionResult waitForResult(const int duration)
-  {
-    std::future_status status = check_result_future_.wait_for(std::chrono::seconds(duration));
-
-    // If the future timeouts no failure were detected, thus this means the test result is a success
-    if (status == std::future_status::timeout)
+    void reset()
     {
-      check_done_ = true;
-      if (number_of_comparisons_ == 0)
-      {
-        return ::testing::AssertionFailure() << "Did not perform any checks. Check if laserscans are published.";
-      }
-      return ::testing::AssertionSuccess();
+      msgs_.clear();
+      check_result_ = std::promise<::testing::AssertionResult>();
+      check_result_future_ = check_result_.get_future();
     }
 
-    return check_result_future_.get();
-  }
+    ::testing::AssertionResult waitForResult(const int duration)
+    {
+      std::future_status status = check_result_future_.wait_for(std::chrono::seconds(duration));
 
-private:
-  std::vector<ScanConstPtr> msgs_;
+      // If the future timeouts no failure were detected, thus this means the test result is a success
+      if (status == std::future_status::timeout)
+      {
+        check_done_ = true;
+        if (number_of_comparisons_ == 0)
+        {
+          return ::testing::AssertionFailure() << "Did not perform any checks. Check if laserscans are published.";
+        }
+        return ::testing::AssertionSuccess();
+      }
 
-  std::promise<::testing::AssertionResult> check_result_;
+      return check_result_future_.get();
+    }
 
-  std::future<::testing::AssertionResult> check_result_future_;
+  private:
+    std::vector<ScanConstPtr> msgs_;
 
-  std::map<int16_t, NormalDist> bins_expected_;
+    std::promise<::testing::AssertionResult> check_result_;
 
-  std::atomic_bool check_done_{ false };
+    std::future<::testing::AssertionResult> check_result_future_;
 
-  std::atomic_ulong number_of_comparisons_{ 0UL };
-};
+    std::map<int16_t, NormalDist> bins_expected_;
+
+    std::atomic_bool check_done_{ false };
+
+    std::atomic_ulong number_of_comparisons_{ 0UL };
+  };
 
 }  // namespace psen_scan_v2_test
 
