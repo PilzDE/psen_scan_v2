@@ -55,8 +55,9 @@ inline void read(std::istream& is, T& data)
   is.read(reinterpret_cast<char*>(&data), sizeof(T));
   if (!is)
   {
-    throw raw_processing::StringStreamFailure(
-        fmt::format("Failure reading {} characters from input stream, could only read {}.", sizeof(T), is.gcount()));
+    throw raw_processing::StringStreamFailure("Failure reading " + std::to_string(sizeof(T)) +
+                                              " characters from input stream, could only read " +
+                                              std::to_string(is.gcount()) + ".");
   }
 }
 
