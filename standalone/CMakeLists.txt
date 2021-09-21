@@ -152,6 +152,15 @@ TARGET_LINK_LIBRARIES(unittest_logging
 ADD_TEST(NAME unittest_logging
          COMMAND unittest_logging)
 
+ADD_EXECUTABLE(unittest_format_range test/unit_tests/util/unittest_format_range.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_format_range
+    ${PROJECT_NAME}
+    gtest gmock
+)
+
+ADD_TEST(NAME unittest_format_range
+         COMMAND unittest_format_range)
 
 ADD_EXECUTABLE(unittest_monitoring_frame_diagnostic_message test/unit_tests/data_conversion_layer/unittest_monitoring_frame_diagnostic_message.cpp)
 

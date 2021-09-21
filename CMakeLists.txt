@@ -339,6 +339,14 @@ if(CATKIN_ENABLE_TESTING)
     fmt::fmt
   )
 
+  catkin_add_gmock(unittest_format_range
+    standalone/test/unit_tests/util/unittest_format_range.cpp
+  )
+  target_link_libraries(unittest_format_range
+    ${catkin_LIBRARIES}
+    fmt::fmt
+  )
+
   catkin_add_gmock(unittest_monitoring_frame_diagnostic_message
     standalone/src/data_conversion_layer/diagnostics.cpp
     standalone/test/unit_tests/data_conversion_layer/unittest_monitoring_frame_diagnostic_message.cpp
