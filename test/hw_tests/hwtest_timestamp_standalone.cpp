@@ -110,7 +110,7 @@ TEST_F(TimestampTests, testTimestampIsGreaterThanLastUdpFrameTime)
   unsigned int failures{ 0 };
   for (std::size_t i = 1; i < testSize(); ++i)
   {
-    if (testData().at(i).timestamp() > testData().at(i - 1).lastFrameTime())
+    if (testData().at(i).timestamp() <= testData().at(i - 1).lastFrameTime())
     {
       failures++;
       PSENSCAN_WARN("TimestampHWTest",
@@ -128,7 +128,7 @@ TEST_F(TimestampTests, testTimestampIsLessThanFirstUdpFrameTime)
   unsigned int failures{ 0 };
   for (const auto& datum : testData())
   {
-    if (datum.timestamp() < datum.firstFrameTime())
+    if (datum.timestamp() >= datum.firstFrameTime())
     {
       failures++;
       PSENSCAN_WARN("TimestampHWTest",
