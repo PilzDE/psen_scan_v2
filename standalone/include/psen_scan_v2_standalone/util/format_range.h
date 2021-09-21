@@ -36,17 +36,19 @@ namespace util
  * \verbatim "{}" (Empty Range) \endverbatim
  */
 template <typename T>
-std::string formatRange(const T& range)
+std::string formatRange(const T& range, const size_t& precision = 1)
 {
   std::stringstream strstr;
   strstr << "{";
+  strstr << std::setprecision(precision);
+  strstr << std::fixed;
   for (auto it = range.begin(); std::next(it) < range.end(); ++it)
   {
-    strstr << fmt::format("{}, ", *it);
+    strstr << *it << ", ";
   }
   if (range.begin() < range.end())
   {
-    strstr << fmt::format("{}", *std::prev(range.end()));
+    strstr << *std::prev(range.end());
   }
   strstr << "}";
   return strstr.str();
