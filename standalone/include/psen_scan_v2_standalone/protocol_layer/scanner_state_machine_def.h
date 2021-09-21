@@ -25,11 +25,11 @@ inline ScannerProtocolDef::ScannerProtocolDef(const ScannerConfiguration config,
                                               const communication_layer::ErrorHandler& control_error_handler,
                                               const communication_layer::NewDataHandler& data_data_handler,
                                               const communication_layer::ErrorHandler& data_error_handler,
-                                              const ScannerStartedCB& scanner_started_cb,
-                                              const ScannerStoppedCB& scanner_stopped_cb,
-                                              const InformUserAboutLaserScanCB& laser_scan_cb,
-                                              const std::function<void()>& start_timeout_handler,
-                                              const std::function<void()>& monitoring_frame_timeout_handler)
+                                              const ScannerStartedCallback& scanner_started_callback,
+                                              const ScannerStoppedCallback& scanner_stopped_callback,
+                                              const InformUserAboutLaserScanCallback& laser_scan_callback,
+                                              const TimeoutCallback& start_timeout_callback,
+                                              const TimeoutCallback& monitoring_frame_timeout_callback)
   : config_(config)
   , control_client_(control_data_handler,
                     control_error_handler,
@@ -41,11 +41,11 @@ inline ScannerProtocolDef::ScannerProtocolDef(const ScannerConfiguration config,
                  config_.hostUDPPortData(),  // LCOV_EXCL_LINE Lcov bug?
                  config_.clientIp(),
                  config_.scannerDataPort())
-  , scanner_started_cb_(scanner_started_cb)
-  , scanner_stopped_cb_(scanner_stopped_cb)
-  , inform_user_about_laser_scan_cb_(laser_scan_cb)
-  , start_timeout_handler_(start_timeout_handler)
-  , monitoring_frame_timeout_handler_(monitoring_frame_timeout_handler)
+  , scanner_started_callback_(scanner_started_callback)
+  , scanner_stopped_callback_(scanner_stopped_callback)
+  , inform_user_about_laser_scan_callback_(laser_scan_callback)
+  , start_timeout_callback_(start_timeout_callback)
+  , monitoring_frame_timeout_callback_(monitoring_frame_timeout_callback)
 {
 }
 
@@ -89,7 +89,7 @@ void ScannerProtocolDef::WaitForStartReply::on_entry(Event const&, FSM& fsm)
 {
   PSENSCAN_DEBUG("StateMachine", fmt::format("Entering state: {}", "WaitForStartReply"));
   // Start watchdog...
-  fsm.start_reply_watchdog_ = fsm.watchdog_factory_.create(WATCHDOG_TIMEOUT, fsm.start_timeout_handler_);
+  fsm.start_reply_watchdog_ = fsm.watchdog_factory_.create(WATCHDOG_TIMEOUT, fsm.start_timeout_callback_);
 }
 
 template <class Event, class FSM>
@@ -107,8 +107,8 @@ void ScannerProtocolDef::WaitForMonitoringFrame::on_entry(Event const&, FSM& fsm
   fsm.scan_buffer_.reset();
   // Start watchdog...
   fsm.monitoring_frame_watchdog_ =
-      fsm.watchdog_factory_.create(WATCHDOG_TIMEOUT, fsm.monitoring_frame_timeout_handler_);
-  fsm.scanner_started_cb_();
+      fsm.watchdog_factory_.create(WATCHDOG_TIMEOUT, fsm.monitoring_frame_timeout_callback_);
+  fsm.scanner_started_callback_();
 }
 
 template <class Event, class FSM>
@@ -123,7 +123,7 @@ template <class Event, class FSM>
 void ScannerProtocolDef::Stopped::on_entry(Event const&, FSM& fsm)
 {
   PSENSCAN_DEBUG("StateMachine", fmt::format("Entering state: {}", "Stopped"));
-  fsm.scanner_stopped_cb_();
+  fsm.scanner_stopped_callback_();
 }
 
 DEFAULT_ON_EXIT_IMPL(Stopped)
@@ -220,7 +220,7 @@ inline void ScannerProtocolDef::sendMessageWithMeasurements(
   {
     try
     {
-      inform_user_about_laser_scan_cb_(data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs));
+      inform_user_about_laser_scan_callback_(data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs));
     }
     // LCOV_EXCL_START
     catch (const data_conversion_layer::ScannerProtocolViolationError& ex)

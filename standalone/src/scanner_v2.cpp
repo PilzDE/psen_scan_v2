@@ -38,8 +38,8 @@ std::unique_ptr<util::Watchdog> WatchdogFactory::create(const util::Watchdog::Ti
   return std::unique_ptr<util::Watchdog>(new util::Watchdog(timeout, timeout_handler));
 }
 
-ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb)
-  : IScanner(scanner_config, laser_scan_cb)
+ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback)
+  : IScanner(scanner_config, laser_scan_callback)
   , sm_(new ScannerStateMachine(IScanner::getConfig(),
                                 // LCOV_EXCL_START
                                 // The following includes calls to std::bind which are not marked correctly
@@ -48,9 +48,9 @@ ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScan
                                 BIND_EVENT(ReplyReceiveError),
                                 BIND_RAW_DATA_EVENT(RawMonitoringFrameReceived),
                                 BIND_EVENT(MonitoringFrameReceivedError),
-                                std::bind(&ScannerV2::scannerStartedCB, this),
-                                std::bind(&ScannerV2::scannerStoppedCB, this),
-                                IScanner::getLaserScanCB(),
+                                std::bind(&ScannerV2::scannerStartedCallback, this),
+                                std::bind(&ScannerV2::scannerStoppedCallback, this),
+                                IScanner::getLaserScanCallback(),
                                 BIND_EVENT(scanner_events::StartTimeout),
                                 BIND_EVENT(scanner_events::MonitoringFrameTimeout)))
 // LCOV_EXCL_STOP
@@ -106,7 +106,7 @@ std::future<void> ScannerV2::stop()
 // PLEASE NOTE:
 // The callback does not take a member lock because the callback is always called
 // via call to triggerEvent() or triggerEventWithParam() which already take the mutex.
-void ScannerV2::scannerStartedCB()
+void ScannerV2::scannerStartedCallback()
 {
   PSENSCAN_INFO("ScannerController", "Scanner started successfully.");
   scanner_has_started_.value().set_value();
@@ -116,7 +116,7 @@ void ScannerV2::scannerStartedCB()
 // PLEASE NOTE:
 // The callback does not take a member lock because the callback is always called
 // via call to triggerEvent() or triggerEventWithParam() which already take the mutex.
-void ScannerV2::scannerStoppedCB()
+void ScannerV2::scannerStoppedCallback()
 {
   PSENSCAN_INFO("ScannerController", "Scanner stopped successfully.");
   scanner_has_stopped_.value().set_value();

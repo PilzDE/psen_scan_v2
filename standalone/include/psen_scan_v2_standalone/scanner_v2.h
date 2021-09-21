@@ -60,7 +60,7 @@ using std::placeholders::_2;
 class ScannerV2 : public IScanner
 {
 public:
-  ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb);
+  ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback);
   ~ScannerV2();
 
 public:
@@ -74,8 +74,8 @@ private:
   template <class T>
   void triggerEvent();
 
-  void scannerStartedCB();
-  void scannerStoppedCB();
+  void scannerStartedCallback();
+  void scannerStoppedCallback();
 
 private:
   using OptionalPromise = boost::optional<std::promise<void>>;

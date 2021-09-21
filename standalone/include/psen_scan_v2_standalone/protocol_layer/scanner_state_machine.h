@@ -81,9 +81,10 @@ namespace e = psen_scan_v2_standalone::protocol_layer::scanner_events;
 static constexpr std::chrono::milliseconds WATCHDOG_TIMEOUT{ 1000 };
 static constexpr uint32_t DEFAULT_NUM_MSG_PER_ROUND{ 6 };
 
-using ScannerStartedCB = std::function<void()>;
-using ScannerStoppedCB = std::function<void()>;
-using InformUserAboutLaserScanCB = std::function<void(const LaserScan&)>;
+using ScannerStartedCallback = std::function<void()>;
+using ScannerStoppedCallback = std::function<void()>;
+using TimeoutCallback = std::function<void()>;
+using InformUserAboutLaserScanCallback = std::function<void(const LaserScan&)>;
 
 /**
  * @brief Interface to create event timeout handlers.
@@ -100,7 +101,7 @@ public:
 
 public:
   virtual std::unique_ptr<util::Watchdog> create(const util::Watchdog::Timeout& timeout,
-                                                 const std::function<void()>& timeout_handler) = 0;
+                                                 const TimeoutCallback& timeout_callback) = 0;
 };
 
 /**
@@ -117,7 +118,7 @@ class WatchdogFactory : public IWatchdogFactory
 public:
   WatchdogFactory() = default;
   std::unique_ptr<util::Watchdog> create(const util::Watchdog::Timeout& timeout,
-                                         const std::function<void()>& timeout_handler) override;
+                                         const TimeoutCallback& timeout_callback) override;
 };
 
 // front-end: define the FSM structure
@@ -146,11 +147,11 @@ public:
                      const communication_layer::ErrorHandler& control_error_handler,
                      const communication_layer::NewDataHandler& data_data_handler,
                      const communication_layer::ErrorHandler& data_error_handler,
-                     const ScannerStartedCB& scanner_started_cb,
-                     const ScannerStoppedCB& scanner_stopped_cb,
-                     const InformUserAboutLaserScanCB& laser_scan_cb,
-                     const std::function<void()>& start_timeout_handler,
-                     const std::function<void()>& monitoring_frame_timeout_handler);
+                     const ScannerStartedCallback& scanner_started_callback,
+                     const ScannerStoppedCallback& scanner_stopped_callback,
+                     const InformUserAboutLaserScanCallback& laser_scan_callback,
+                     const TimeoutCallback& start_timeout_callback,
+                     const TimeoutCallback& monitoring_frame_timeout_callback);
 
 public:  // States
   STATE(Idle);
@@ -243,13 +244,13 @@ private:
   communication_layer::UdpClientImpl data_client_;
 
   // Callbacks
-  const ScannerStartedCB scanner_started_cb_;
-  const ScannerStoppedCB scanner_stopped_cb_;
-  const InformUserAboutLaserScanCB inform_user_about_laser_scan_cb_;
+  const ScannerStartedCallback scanner_started_callback_;
+  const ScannerStoppedCallback scanner_stopped_callback_;
+  const InformUserAboutLaserScanCallback inform_user_about_laser_scan_callback_;
 
   // Timeout Handler
-  const std::function<void()> start_timeout_handler_;
-  const std::function<void()> monitoring_frame_timeout_handler_;
+  const std::function<void()> start_timeout_callback_;
+  const std::function<void()> monitoring_frame_timeout_callback_;
 
   // Factories
   WatchdogFactory watchdog_factory_{};

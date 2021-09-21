@@ -25,7 +25,7 @@ using namespace psen_scan_v2_standalone;
 
 void laserScanCallback(const LaserScan& scan)
 {
-  PSENSCAN_INFO("scanCB()", "{}: {}", scan.getTimestamp(), scan.getScanCounter());
+  PSENSCAN_INFO("scanCallback()", "{}: {}", scan.getTimestamp(), scan.getScanCounter());
 }
 
 int main(int argc, char** argv)
