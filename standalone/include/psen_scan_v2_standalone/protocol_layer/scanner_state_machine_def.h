@@ -21,23 +21,23 @@ namespace psen_scan_v2_standalone
 namespace protocol_layer
 {
 inline ScannerProtocolDef::ScannerProtocolDef(const ScannerConfiguration config,
-                                              const communication_layer::NewDataHandler& control_data_handler,
-                                              const communication_layer::ErrorHandler& control_error_handler,
-                                              const communication_layer::NewDataHandler& data_data_handler,
-                                              const communication_layer::ErrorHandler& data_error_handler,
+                                              const communication_layer::NewMessageCallback& control_msg_callback,
+                                              const communication_layer::ErrorCallback& control_error_callback,
+                                              const communication_layer::NewMessageCallback& data_msg_callback,
+                                              const communication_layer::ErrorCallback& data_error_callback,
                                               const ScannerStartedCallback& scanner_started_callback,
                                               const ScannerStoppedCallback& scanner_stopped_callback,
                                               const InformUserAboutLaserScanCallback& laser_scan_callback,
                                               const TimeoutCallback& start_timeout_callback,
                                               const TimeoutCallback& monitoring_frame_timeout_callback)
   : config_(config)
-  , control_client_(control_data_handler,
-                    control_error_handler,
+  , control_client_(control_msg_callback,
+                    control_error_callback,
                     config_.hostUDPPortControl(),  // LCOV_EXCL_LINE Lcov bug?
                     config_.clientIp(),
                     config_.scannerControlPort())
-  , data_client_(data_data_handler,
-                 data_error_handler,
+  , data_client_(data_msg_callback,
+                 data_error_callback,
                  config_.hostUDPPortData(),  // LCOV_EXCL_LINE Lcov bug?
                  config_.clientIp(),
                  config_.scannerDataPort())

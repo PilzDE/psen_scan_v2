@@ -87,9 +87,9 @@ using TimeoutCallback = std::function<void()>;
 using InformUserAboutLaserScanCallback = std::function<void(const LaserScan&)>;
 
 /**
- * @brief Interface to create event timeout handlers.
+ * @brief Interface to create event timeout callbacks.
  *
- * Implementations of this Interface should create thread save timeout handlers that
+ * Implementations of this Interface should create thread save timeout callbacks that
  * call an event every time a defined timeout has run out and restart themselves until deleted.
  *
  * @see util::Watchdog
@@ -143,10 +143,10 @@ class ScannerProtocolDef : public msm::front::state_machine_def<ScannerProtocolD
 {
 public:
   ScannerProtocolDef(const ScannerConfiguration config,
-                     const communication_layer::NewDataHandler& control_data_handler,
-                     const communication_layer::ErrorHandler& control_error_handler,
-                     const communication_layer::NewDataHandler& data_data_handler,
-                     const communication_layer::ErrorHandler& data_error_handler,
+                     const communication_layer::NewMessageCallback& control_msg_callback,
+                     const communication_layer::ErrorCallback& control_error_callback,
+                     const communication_layer::NewMessageCallback& data_msg_callback,
+                     const communication_layer::ErrorCallback& data_error_callback,
                      const ScannerStartedCallback& scanner_started_callback,
                      const ScannerStoppedCallback& scanner_stopped_callback,
                      const InformUserAboutLaserScanCallback& laser_scan_callback,

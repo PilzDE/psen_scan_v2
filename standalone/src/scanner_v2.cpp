@@ -33,9 +33,9 @@ using namespace psen_scan_v2_standalone::protocol_layer::scanner_events;
 // clang-format on
 
 std::unique_ptr<util::Watchdog> WatchdogFactory::create(const util::Watchdog::Timeout& timeout,
-                                                        const std::function<void()>& timeout_handler)
+                                                        const std::function<void()>& timeout_callback)
 {
-  return std::unique_ptr<util::Watchdog>(new util::Watchdog(timeout, timeout_handler));
+  return std::unique_ptr<util::Watchdog>(new util::Watchdog(timeout, timeout_callback));
 }
 
 ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback)
