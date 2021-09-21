@@ -189,6 +189,7 @@ std::unique_ptr<util::Barrier> ScannerAPITests::prepareMonitoringFrameBarrier(
 
 void ScannerAPITests::startScanner()
 {
+  prepareScannerMockStartReply();
   if (strict_scanner_mock_)
   {
     strict_scanner_mock_->startListeningForControlMsg();
@@ -303,7 +304,6 @@ TEST_F(ScannerAPITests, testStopFunctionality)
   setUpScannerConfig();
   setUpScannerV2();
   setUpStrictScannerMock();
-  prepareScannerMockStartReply();
   startScanner();
 
   util::Barrier stop_req_received_barrier;
@@ -327,7 +327,6 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStopIsCalledSecondTime)
   setUpScannerConfig();
   setUpScannerV2();
   setUpNiceScannerMock();
-  prepareScannerMockStartReply();
   startScanner();
 
   nice_scanner_mock_->startListeningForControlMsg();
@@ -386,7 +385,6 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
   setUpScannerConfig();
   setUpScannerV2();
   setUpStrictScannerMock();
-  prepareScannerMockStartReply();
   startScanner();
 
   const auto msg{ createValidMonitoringFrameMsg() };
@@ -412,7 +410,6 @@ TEST_F(ScannerAPITests, shouldCallLaserScanCBOnlyOneTimeWithAllInformationWhenUn
   setUpScannerConfig(HOST_IP_ADDRESS, UNFRAGMENTED_SCAN);
   setUpScannerV2();
   setUpNiceScannerMock();
-  prepareScannerMockStartReply();
   startScanner();
 
   const auto msgs{ createMonitoringFrameMsgsForScanRound(2, 6) };
@@ -430,7 +427,6 @@ TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
   setUpScannerConfig(HOST_IP_ADDRESS, UNFRAGMENTED_SCAN);
   setUpScannerV2();
   setUpNiceScannerMock();
-  prepareScannerMockStartReply();
   startScanner();
 
   std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> ignored_short_first_round =
@@ -468,7 +464,6 @@ TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
   setUpScannerConfig(HOST_IP_ADDRESS, UNFRAGMENTED_SCAN);
   setUpScannerV2();
   setUpNiceScannerMock();
-  prepareScannerMockStartReply();
   startScanner();
 
   auto msg_round2 = createValidMonitoringFrameMsg(2);
@@ -498,7 +493,6 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
   setUpScannerConfig();
   setUpScannerV2();
   setUpNiceScannerMock();
-  prepareScannerMockStartReply();
   startScanner();
 
   util::Barrier valid_msg_barrier;
@@ -529,7 +523,6 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfMissingMeassuremen
   setUpScannerConfig();
   setUpScannerV2();
   setUpNiceScannerMock();
-  prepareScannerMockStartReply();
   startScanner();
 
   util::Barrier valid_msg_barrier;
@@ -563,7 +556,6 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
   setUpScannerConfig();
   setUpScannerV2();
   setUpNiceScannerMock();
-  prepareScannerMockStartReply();
   startScanner();
 
   const std::size_t num_scans_per_round{ 6 };
@@ -603,7 +595,6 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
   setUpScannerConfig();
   setUpScannerV2();
   setUpNiceScannerMock();
-  prepareScannerMockStartReply();
   startScanner();
 
   const std::size_t num_scans_per_round{ 6 };
@@ -633,7 +624,6 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFrameReceiveTimeout)
   setUpScannerConfig();
   setUpScannerV2();
   setUpNiceScannerMock();
-  prepareScannerMockStartReply();
   startScanner();
 
   util::Barrier user_msg_barrier;
