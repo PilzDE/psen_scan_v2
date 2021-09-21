@@ -23,7 +23,7 @@
 #include <stdexcept>
 #include <vector>
 
-#define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 10
+#define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 10  // see https://www.boost.org/doc/libs/1_66_0/libs/msm/doc/HTML/ch03s05.html
 
 // back-end
 #include <boost/msm/back/state_machine.hpp>
