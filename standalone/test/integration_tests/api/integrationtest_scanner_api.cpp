@@ -65,6 +65,10 @@ public:
   MOCK_METHOD1(LaserScanCallback, void(const LaserScan&));
 };
 
+#define EXPECT_FUTURE_IS_READY(val1) EXPECT_EQ(val1.wait_for(DEFAULT_TIMEOUT), std::future_status::ready)
+
+#define EXPECT_FUTURE_NOT_READY(val1) EXPECT_EQ(val1.wait_for(DEFAULT_TIMEOUT), std::future_status::timeout)
+
 class ScannerAPITests : public testing::Test
 {
 protected:
@@ -79,8 +83,6 @@ protected:
   std::unique_ptr<util::Barrier> prepareStartRequestBarrier(const ScannerConfiguration& config);
   std::unique_ptr<util::Barrier>
   prepareMonitoringFrameBarrier(const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs);
-  void expectNotDoneYet(const std::string& method_name, const std::future<void>& future);
-  void expectIsDone(const std::string& method_name, const std::future<void>& future);
   void sendMonitoringFrames(const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs);
 
 protected:
@@ -199,17 +201,7 @@ void ScannerAPITests::startScanner()
     nice_scanner_mock_->startListeningForControlMsg();
   }
   const auto start_future = scanner_->start();
-  expectIsDone("Scanner::start()", start_future);
-}
-
-void ScannerAPITests::expectNotDoneYet(const std::string& method_name, const std::future<void>& future)
-{
-  EXPECT_EQ(future.wait_for(FUTURE_WAIT_TIMEOUT), std::future_status::timeout) << method_name << " finished to early";
-}
-
-void ScannerAPITests::expectIsDone(const std::string& method_name, const std::future<void>& future)
-{
-  EXPECT_EQ(future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready) << method_name << " not finished";
+  EXPECT_FUTURE_IS_READY(start_future) << "Scanner::start() not finished";
 }
 
 void ScannerAPITests::sendMonitoringFrames(const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs)
@@ -240,9 +232,9 @@ TEST_F(ScannerAPITests, testStartFunctionality)
   const auto start_future = scanner_->start();
 
   ASSERT_TRUE(start_req_received_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
-  expectNotDoneYet("Scanner::start()", start_future);
+  EXPECT_FUTURE_NOT_READY(start_future) << "Scanner::start() finished early";
   strict_scanner_mock_->sendStartReply();
-  expectIsDone("Scanner::start()", start_future);
+  EXPECT_FUTURE_IS_READY(start_future) << "Scanner::start() not finished";
 }
 
 TEST_F(ScannerAPITests, shouldReceiveStartRequestWithCorrectHostIpWhenUsingAutoInConfigAsHostIp)
@@ -258,7 +250,7 @@ TEST_F(ScannerAPITests, shouldReceiveStartRequestWithCorrectHostIpWhenUsingAutoI
 
   ASSERT_TRUE(start_req_received_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
   strict_scanner_mock_->sendStartReply();
-  expectIsDone("Scanner::start()", start_future);
+  EXPECT_FUTURE_IS_READY(start_future) << "Scanner::start() not finished";
 }
 
 TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStartIsCalledSecondTime)
@@ -276,7 +268,7 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStartIsCalledSecondTime)
                                                "std::future";
   }
   nice_scanner_mock_->sendStartReply();
-  expectIsDone("Scanner::start()", start_future);
+  EXPECT_FUTURE_IS_READY(start_future) << "Scanner::start() not finished";
 }
 
 TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
@@ -293,10 +285,10 @@ TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
   ASSERT_TRUE(start_req_received_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
 
   nice_scanner_mock_->sendMonitoringFrame(createValidMonitoringFrameMsg());
-  expectNotDoneYet("Scanner::start()", start_future);
+  EXPECT_FUTURE_NOT_READY(start_future) << "Scanner::start() finished early";
 
   nice_scanner_mock_->sendStartReply();
-  expectIsDone("Scanner::start()", start_future);
+  EXPECT_FUTURE_IS_READY(start_future) << "Scanner::start() not finished";
 }
 
 TEST_F(ScannerAPITests, testStopFunctionality)
@@ -317,9 +309,9 @@ TEST_F(ScannerAPITests, testStopFunctionality)
   }) };
 
   EXPECT_TRUE(stop_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Stop request not received";
-  expectNotDoneYet("Scanner::stop()", stop_future);
+  EXPECT_FUTURE_NOT_READY(stop_future) << "Scanner::stop() finished early";
   strict_scanner_mock_->sendStopReply();
-  expectIsDone("Scanner::stop()", stop_future);
+  EXPECT_FUTURE_IS_READY(stop_future) << "Scanner::stop() not finished";
 }
 
 TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStopIsCalledSecondTime)
@@ -338,7 +330,7 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStopIsCalledSecondTime)
   }
 
   nice_scanner_mock_->sendStopReply();
-  expectIsDone("Scanner::stop()", stop_future);
+  EXPECT_FUTURE_IS_READY(stop_future) << "Scanner::stop() not finished";
 }
 
 TEST_F(ScannerAPITests, testStartReplyTimeout)
@@ -374,7 +366,7 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
   EXPECT_TRUE(error_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Error message not received";
   EXPECT_TRUE(twice_called_barrier.waitTillRelease(5000ms)) << "Start reply not send at least twice in time";
   strict_scanner_mock_->sendStartReply();
-  expectIsDone("Scanner::start()", start_future);
+  EXPECT_FUTURE_IS_READY(start_future) << "Scanner::start() not finished";
   REMOVE_LOG_MOCK
 }
 
