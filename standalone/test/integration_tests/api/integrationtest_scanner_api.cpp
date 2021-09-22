@@ -67,7 +67,7 @@ public:
 
 #define EXPECT_FUTURE_IS_READY(val1) EXPECT_EQ(val1.wait_for(DEFAULT_TIMEOUT), std::future_status::ready)
 
-#define EXPECT_FUTURE_NOT_READY(val1) EXPECT_EQ(val1.wait_for(DEFAULT_TIMEOUT), std::future_status::timeout)
+#define EXPECT_FUTURE_NOT_READY(val1) EXPECT_EQ(val1.wait_for(FUTURE_WAIT_TIMEOUT), std::future_status::timeout)
 
 class ScannerAPITests : public testing::Test
 {
