@@ -40,7 +40,7 @@ static const util::TenthOfDegree ANGLE_END{ 2749 };
 
 static constexpr int64_t SCANNER_RUN_DURATION_S{ 30 };
 static constexpr std::size_t MINIMUM_TEST_SIZE{ 900 };
-static constexpr int64_t TIME_COMPARISON_EPSILON_NS{ 100000 };
+static constexpr int64_t TIME_COMPARISON_EPSILON_NS{ 1000000 };
 static const std::string UDP_DATA_FILENAME_ENV_VAR{ "UDP_DATA_FILENAME" };
 
 class TimestampTests : public ::testing::Test
