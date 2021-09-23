@@ -48,7 +48,7 @@ public:
                          // https://github.com/google/googletest/issues/247
   {
     setLogLevel(CONSOLE_BRIDGE_LOG_INFO);
-    PSENSCAN_INFO("ScanComparisonTests", "Using test duration={}", TEST_DURATION_S);
+    PSENSCAN_INFO_PURE("ScanComparisonTests", "Using test duration=%i", TEST_DURATION_S);
 
     const char* host_ip{ std::getenv(HOST_IP_ENV_VAR) };
     if (host_ip)
@@ -64,13 +64,13 @@ public:
     const char* filepath{ std::getenv(TESTFILE_ENV_VAR) };
     if (!filepath)
     {
-      PSENSCAN_ERROR("ScanComparisonTests", "Environment variable {} not set!", TESTFILE_ENV_VAR);
+      PSENSCAN_ERROR_PURE("ScanComparisonTests", "Environment variable {} not set!", TESTFILE_ENV_VAR);
       FAIL();
     }
-    PSENSCAN_INFO("ScanComparisonTests", "Using testfile {}", filepath);
+    PSENSCAN_INFO_PURE("ScanComparisonTests", "Using testfile {}", filepath);
     if (!boost::filesystem::exists(filepath))
     {
-      PSENSCAN_ERROR("ScanComparisonTests", "File {} not found!", filepath);
+      PSENSCAN_ERROR_PURE("ScanComparisonTests", "File {} not found!", filepath);
       FAIL();
     }
     bins_expected_ = binsFromRosbag(filepath);
