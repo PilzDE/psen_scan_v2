@@ -741,7 +741,7 @@ layer=2</panel_attributes>
       <h>32</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-
-scanner_stopped_cb()
+scanner_stopped_callback()
 layer=3</panel_attributes>
     <additional_attributes>10.0;20.0;320.0;20.0</additional_attributes>
   </element>
@@ -1112,7 +1112,7 @@ layer=3</panel_attributes>
       <h>32</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-
-scanner_started_cb()
+scanner_started_callback()
 layer=3</panel_attributes>
     <additional_attributes>10.0;20.0;320.0;20.0</additional_attributes>
   </element>
@@ -1149,7 +1149,7 @@ layer=2</panel_attributes>
       <h>32</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;-
-timeout_handler()</panel_attributes>
+timeout_callback()</panel_attributes>
     <additional_attributes>10.0;20.0;380.0;20.0</additional_attributes>
   </element>
   <element>

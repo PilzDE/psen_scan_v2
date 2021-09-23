@@ -60,7 +60,7 @@ using std::placeholders::_2;
 class ScannerV2 : public IScanner
 {
 public:
-  ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb);
+  ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback);
   ~ScannerV2();
 
 public:
@@ -68,39 +68,14 @@ public:
   std::future<void> stop() override;
 
 private:
-  // Raw pointer used here because "msm::back::state_machine" cannot properly pass
-  // a "std::unique_ptr" to "msm::front::state_machine_def".
-  StateMachineArgs* createStateMachineArgs();
-
   template <class T>
   void triggerEventWithParam(const T& event);
 
   template <class T>
   void triggerEvent();
 
-  void scannerStartedCB();
-  void scannerStoppedCB();
-
-private:
-  /**
-   * @brief Watchdog factory implementation for scanner interaction timeouts
-   *
-   * Implements the IWatchdogFactory to add behavior to handle specific cases,
-   * where the interaction with the scanner hardware takes longer than expected.
-   *
-   * @see protocol_layer::IWatchdogFactory
-   * @see util::Watchdog
-   */
-  class WatchdogFactory : public IWatchdogFactory
-  {
-  public:
-    WatchdogFactory(ScannerV2* scanner);
-    std::unique_ptr<util::Watchdog> create(const util::Watchdog::Timeout& timeout,
-                                           const std::string& event_type) override;
-
-  private:
-    ScannerV2* scanner_;
-  };
+  void scannerStartedCallback();
+  void scannerStoppedCallback();
 
 private:
   using OptionalPromise = boost::optional<std::promise<void>>;

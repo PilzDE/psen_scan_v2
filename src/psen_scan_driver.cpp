@@ -36,7 +36,7 @@ using namespace psen_scan_v2;
 using namespace psen_scan_v2_standalone;
 using namespace psen_scan_v2_standalone::configuration;
 
-std::function<void()> NODE_TERMINATE_CB;
+std::function<void()> NODE_TERMINATE_CALLBACK;
 
 const std::string PARAM_HOST_IP{ "host_ip" };
 const std::string PARAM_HOST_DATA_PORT{ "host_udp_port_data" };
@@ -57,7 +57,7 @@ static const std::string DEFAULT_PUBLISH_TOPIC = "scan";
 
 void delayed_shutdown_sig_handler(int sig)
 {
-  NODE_TERMINATE_CB();
+  NODE_TERMINATE_CALLBACK();
 
   // Delay the shutdown() to get full debug output. Workaround for https://github.com/ros/ros_comm/issues/688
   ros::Duration(0.2).sleep();  // TODO check if we can get rid of this sleep
@@ -112,7 +112,7 @@ int main(int argc, char** argv)
                                     configuration::DEFAULT_X_AXIS_ROTATION,
                                     scanner_configuration);
 
-    NODE_TERMINATE_CB = std::bind(&ROSScannerNode::terminate, &ros_scanner_node);
+    NODE_TERMINATE_CALLBACK = std::bind(&ROSScannerNode::terminate, &ros_scanner_node);
 
     auto f = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
     f.wait();
