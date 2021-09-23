@@ -241,7 +241,7 @@ inline UdpClientImpl::~UdpClientImpl()
   // No coverage check because testing the socket is not the objective here.
   catch (const CloseConnectionFailure& ex)
   {
-    PSENSCAN_ERROR("UdpClient", ex.what());
+    PSENSCAN_ERROR_PURE("UdpClient", "%s", ex.what());
   }
   // LCOV_EXCL_STOP
 }
@@ -252,11 +252,11 @@ inline void UdpClientImpl::sendCompleteHandler(const boost::system::error_code& 
   // No coverage check because testing the if-loop is extremly difficult.
   if (error || bytes_transferred == 0)
   {
-    PSENSCAN_ERROR("UdpClient", "Failed to send data. Error message: {}", error.message());
+    PSENSCAN_ERROR_PURE("UdpClient", "Failed to send data. Error message: %s", error.message().c_str());
   }
 
   // LCOV_EXCL_STOP
-  PSENSCAN_DEBUG("UdpClient", "Data successfully send.");
+  PSENSCAN_DEBUG_PURE("UdpClient", "Data successfully send.");
 }
 
 inline void UdpClientImpl::write(const data_conversion_layer::RawData& data)
