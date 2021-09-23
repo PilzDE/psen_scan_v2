@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <inttypes.h>
+
 #include <chrono>
 #include <iostream>
 #include <sstream>
@@ -25,7 +27,7 @@ using namespace psen_scan_v2_standalone;
 
 void laserScanCallback(const LaserScan& scan)
 {
-  PSENSCAN_INFO("scanCB()", "{}: {}", scan.getTimestamp(), scan.getScanCounter());
+  PSENSCAN_INFO_PURE("scanCB()", PRId64 ": " PRIu32, scan.getTimestamp(), scan.getScanCounter());
 }
 
 int main(int argc, char** argv)
