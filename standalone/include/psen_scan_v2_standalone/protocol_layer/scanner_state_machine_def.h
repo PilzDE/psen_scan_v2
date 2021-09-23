@@ -29,14 +29,14 @@ inline ScannerProtocolDef::ScannerProtocolDef(StateMachineArgs* const args) : ar
   template <class Event, class FSM>\
   void ScannerProtocolDef::state_name::on_entry(Event const&, FSM& fsm)\
   {\
-    PSENSCAN_DEBUG("StateMachine", "Entering state: " #state_name);\
+    PSENSCAN_DEBUG_PURE("StateMachine", "Entering state: " #state_name);\
   }\
 
 #define DEFAULT_ON_EXIT_IMPL(state_name)\
   template <class Event, class FSM>\
   void ScannerProtocolDef::state_name::on_exit(Event const&, FSM& fsm)\
   {\
-    PSENSCAN_DEBUG("StateMachine", "Exiting state: " #state_name);\
+    PSENSCAN_DEBUG_PURE("StateMachine", "Exiting state: " #state_name);\
   }
 
 #define DEFAULT_STATE_IMPL(state_name)\
@@ -52,7 +52,7 @@ DEFAULT_ON_ENTRY_IMPL(Idle)
 template <class Event, class FSM>
 void ScannerProtocolDef::Idle::on_exit(Event const&, FSM& fsm)
 {
-  PSENSCAN_DEBUG("StateMachine", "Exiting state: Idle");
+  PSENSCAN_DEBUG_PURE("StateMachine", "Exiting state: Idle");
   fsm.args_->control_client_->startAsyncReceiving();
   fsm.args_->data_client_->startAsyncReceiving();
 }
@@ -60,7 +60,7 @@ void ScannerProtocolDef::Idle::on_exit(Event const&, FSM& fsm)
 template <class Event, class FSM>
 void ScannerProtocolDef::WaitForStartReply::on_entry(Event const&, FSM& fsm)
 {
-  PSENSCAN_DEBUG("StateMachine", "Entering state: WaitForStartReply");
+  PSENSCAN_DEBUG_PURE("StateMachine", "Entering state: WaitForStartReply");
   // Start watchdog...
   fsm.start_reply_watchdog_ = fsm.args_->watchdog_factory_->create(WATCHDOG_TIMEOUT, "StartReplyTimeout");
 }
@@ -68,7 +68,7 @@ void ScannerProtocolDef::WaitForStartReply::on_entry(Event const&, FSM& fsm)
 template <class Event, class FSM>
 void ScannerProtocolDef::WaitForStartReply::on_exit(Event const&, FSM& fsm)
 {
-  PSENSCAN_DEBUG("StateMachine", "Exiting state: WaitForStartReply");
+  PSENSCAN_DEBUG_PURE("StateMachine", "Exiting state: WaitForStartReply");
   // Stops the watchdog by resetting the pointer
   fsm.start_reply_watchdog_.reset();
 }
@@ -76,7 +76,7 @@ void ScannerProtocolDef::WaitForStartReply::on_exit(Event const&, FSM& fsm)
 template <class Event, class FSM>
 void ScannerProtocolDef::WaitForMonitoringFrame::on_entry(Event const&, FSM& fsm)
 {
-  PSENSCAN_DEBUG("StateMachine", "Entering state: WaitForMonitoringFrame");
+  PSENSCAN_DEBUG_PURE("StateMachine", "Entering state: WaitForMonitoringFrame");
   fsm.scan_buffer_.reset();
   // Start watchdog...
   fsm.monitoring_frame_watchdog_ = fsm.args_->watchdog_factory_->create(WATCHDOG_TIMEOUT, "MonitoringFrameTimeout");
@@ -86,7 +86,7 @@ void ScannerProtocolDef::WaitForMonitoringFrame::on_entry(Event const&, FSM& fsm
 template <class Event, class FSM>
 void ScannerProtocolDef::WaitForMonitoringFrame::on_exit(Event const&, FSM& fsm)
 {
-  PSENSCAN_DEBUG("StateMachine", "Exiting state: WaitForMonitoringFrame");
+  PSENSCAN_DEBUG_PURE("StateMachine", "Exiting state: WaitForMonitoringFrame");
   // Stops the watchdog by resetting the pointer
   fsm.monitoring_frame_watchdog_.reset();
 }
@@ -94,7 +94,7 @@ void ScannerProtocolDef::WaitForMonitoringFrame::on_exit(Event const&, FSM& fsm)
 template <class Event, class FSM>
 void ScannerProtocolDef::Stopped::on_entry(Event const&, FSM& fsm)
 {
-  PSENSCAN_DEBUG("StateMachine", "Entering state: Stopped");
+  PSENSCAN_DEBUG_PURE("StateMachine", "Entering state: Stopped");
   fsm.args_->scanner_stopped_cb();
 }
 
@@ -106,7 +106,7 @@ DEFAULT_ON_EXIT_IMPL(Stopped)
 template <class T>
 inline void ScannerProtocolDef::sendStartRequest(const T& event)
 {
-  PSENSCAN_DEBUG("StateMachine", "Action: sendStartRequest");
+  PSENSCAN_DEBUG_PURE("StateMachine", "Action: sendStartRequest");
 
   if (!args_->config_.hostIp())
   {
@@ -120,23 +120,23 @@ inline void ScannerProtocolDef::sendStartRequest(const T& event)
 
 inline void ScannerProtocolDef::handleStartRequestTimeout(const scanner_events::StartTimeout& event)
 {
-  PSENSCAN_DEBUG("StateMachine", "Action: handleStartRequestTimeout");
-  PSENSCAN_ERROR("StateMachine",
-                 "Timeout while waiting for the scanner to start! Retrying... "
-                 "(Please check the ethernet connection or contact PILZ support if the error persists.)");
+  PSENSCAN_DEBUG_PURE("StateMachine", "Action: handleStartRequestTimeout");
+  PSENSCAN_ERROR_PURE("StateMachine",
+                      "Timeout while waiting for the scanner to start! Retrying... "
+                      "(Please check the ethernet connection or contact PILZ support if the error persists.)");
   sendStartRequest(event);
 }
 
 template <class T>
 inline void ScannerProtocolDef::sendStopRequest(const T& event)
 {
-  PSENSCAN_DEBUG("StateMachine", "Action: sendStopRequest");
+  PSENSCAN_DEBUG_PURE("StateMachine", "Action: sendStopRequest");
   args_->control_client_->write(data_conversion_layer::stop_request::serialize());
 }
 
 inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawMonitoringFrameReceived& event)
 {
-  PSENSCAN_DEBUG("StateMachine", "Action: handleMonitoringFrame");
+  PSENSCAN_DEBUG_PURE("StateMachine", "Action: handleMonitoringFrame");
   monitoring_frame_watchdog_->reset();
 
   try
@@ -210,7 +210,8 @@ inline bool ScannerProtocolDef::framesContainMeasurements(
         return stamped_msg.msg_.measurements().empty();
       }))
   {
-    PSENSCAN_DEBUG("StateMachine", "No measurement data in current monitoring frame(s), skipping laser scan callback.");
+    PSENSCAN_DEBUG_PURE("StateMachine",
+                        "No measurement data in current monitoring frame(s), skipping laser scan callback.");
     return false;
   }
   return true;
@@ -218,11 +219,11 @@ inline bool ScannerProtocolDef::framesContainMeasurements(
 
 inline void ScannerProtocolDef::handleMonitoringFrameTimeout(const scanner_events::MonitoringFrameTimeout& event)
 {
-  PSENSCAN_DEBUG("StateMachine", "Action: handleMonitoringFrameTimeout");
+  PSENSCAN_DEBUG_PURE("StateMachine", "Action: handleMonitoringFrameTimeout");
 
-  PSENSCAN_WARN("StateMachine",
-                "Timeout while waiting for MonitoringFrame message."
-                " (Please check the ethernet connection or contact PILZ support if the error persists.)");
+  PSENSCAN_WARN_PURE("StateMachine",
+                     "Timeout while waiting for MonitoringFrame message."
+                     " (Please check the ethernet connection or contact PILZ support if the error persists.)");
 }
 
 //+++++++++++++++++++++++++++++++++ Guards ++++++++++++++++++++++++++++++++++++
@@ -315,7 +316,7 @@ void ScannerProtocolDef::no_transition(Event const& event, FSM&, int state)
 template <class FSM>
 void ScannerProtocolDef::no_transition(const scanner_events::RawMonitoringFrameReceived&, FSM&, int state)
 {
-  PSENSCAN_WARN("StateMachine", "Received monitoring frame despite not waiting for it");
+  PSENSCAN_WARN_PURE("StateMachine", "Received monitoring frame despite not waiting for it");
 }
 
 }  // namespace protocol_layer
