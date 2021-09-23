@@ -29,7 +29,7 @@ TEST(LoggingTest, logInfo)
   INJECT_LOG_MOCK;
   setLogLevel(CONSOLE_BRIDGE_LOG_INFO);
   EXPECT_LOG(INFO, "Name: msg", __FILE__, __LINE__ + 1).Times(1);
-  PSENSCAN_INFO("Name", "msg");
+  PSENSCAN_INFO_PURE("Name", "msg");
 }
 
 TEST(LoggingTest, logDebug)
@@ -37,21 +37,21 @@ TEST(LoggingTest, logDebug)
   INJECT_LOG_MOCK;
   setLogLevel(CONSOLE_BRIDGE_LOG_DEBUG);
   EXPECT_LOG(DEBUG, "Name: msg", __FILE__, __LINE__ + 1).Times(1);
-  PSENSCAN_DEBUG("Name", "msg");
+  PSENSCAN_DEBUG_PURE("Name", "msg");
 }
 
 TEST(LoggingTest, logWarn)
 {
   INJECT_LOG_MOCK;
   EXPECT_LOG(WARN, "Name: msg", __FILE__, __LINE__ + 1).Times(1);
-  PSENSCAN_WARN("Name", "msg");
+  PSENSCAN_WARN_PURE("Name", "msg");
 }
 
 TEST(LoggingTest, logError)
 {
   INJECT_LOG_MOCK;
   EXPECT_LOG(ERROR, "Name: msg", __FILE__, __LINE__ + 1).Times(1);
-  PSENSCAN_ERROR("Name", "msg");
+  PSENSCAN_ERROR_PURE("Name", "msg");
 }
 
 TEST(LoggingTest, logInfoThrottle)
@@ -59,7 +59,7 @@ TEST(LoggingTest, logInfoThrottle)
   INJECT_LOG_MOCK;
   setLogLevel(CONSOLE_BRIDGE_LOG_INFO);
   EXPECT_LOG(INFO, "Name: msg", __FILE__, __LINE__ + 1).Times(1);
-  PSENSCAN_INFO_THROTTLE(0.1, "Name", "msg");
+  PSENSCAN_INFO_THROTTLE_PURE(0.1, "Name", "msg");
 }
 
 TEST(LoggingTest, logDebugThrottle)
@@ -67,21 +67,21 @@ TEST(LoggingTest, logDebugThrottle)
   INJECT_LOG_MOCK;
   setLogLevel(CONSOLE_BRIDGE_LOG_DEBUG);
   EXPECT_LOG(DEBUG, "Name: msg", __FILE__, __LINE__ + 1).Times(1);
-  PSENSCAN_DEBUG_THROTTLE(0.1, "Name", "msg");
+  PSENSCAN_DEBUG_THROTTLE_PURE(0.1, "Name", "msg");
 }
 
 TEST(LoggingTest, logWarnThrottle)
 {
   INJECT_LOG_MOCK;
   EXPECT_LOG(WARN, "Name: msg", __FILE__, __LINE__ + 1).Times(1);
-  PSENSCAN_WARN_THROTTLE(0.1, "Name", "msg");
+  PSENSCAN_WARN_THROTTLE_PURE(0.1, "Name", "msg");
 }
 
 TEST(LoggingTest, logErrorThrottle)
 {
   INJECT_LOG_MOCK;
   EXPECT_LOG(ERROR, "Name: msg", __FILE__, __LINE__ + 1).Times(1);
-  PSENSCAN_ERROR_THROTTLE(0.1, "Name", "msg");
+  PSENSCAN_ERROR_THROTTLE_PURE(0.1, "Name", "msg");
 }
 
 using system_clock = std::chrono::system_clock;
@@ -98,14 +98,14 @@ TEST(LoggingTest, logThrottleInternal)
   EXPECT_LOG(ERROR, "Name: msg", __FILE__, __LINE__ + 3).Times(1);
   for (unsigned int i = 0; i < 2; ++i)
   {
-    PSENSCAN_ERROR_THROTTLE_INTERNAL(now, period, "Name", "msg");
+    PSENSCAN_ERROR_THROTTLE_INTERNAL_PURE(now, period, "Name", "msg");
     now += std::chrono::milliseconds(99);
   }
 
   EXPECT_LOG(ERROR, "Name: msg", __FILE__, __LINE__ + 3).Times(2);
   for (unsigned int i = 0; i < 2; ++i)
   {
-    PSENSCAN_ERROR_THROTTLE_INTERNAL(now, period, "Name", "msg");
+    PSENSCAN_ERROR_THROTTLE_INTERNAL_PURE(now, period, "Name", "msg");
     now += std::chrono::milliseconds(101);
   }
 }
@@ -122,8 +122,8 @@ TEST(LoggingTest, logThrottleInternalConcurrent)
   EXPECT_LOG(ERROR, "Name: msg2", __FILE__, __LINE__ + 4).Times(1);
   for (unsigned int i = 0; i < 2; ++i)
   {
-    PSENSCAN_ERROR_THROTTLE_INTERNAL(now, period1, "Name", "msg1");
-    PSENSCAN_ERROR_THROTTLE_INTERNAL(now, period2, "Name", "msg2");
+    PSENSCAN_ERROR_THROTTLE_INTERNAL_PURE(now, period1, "Name", "msg1");
+    PSENSCAN_ERROR_THROTTLE_INTERNAL_PURE(now, period2, "Name", "msg2");
     now += std::chrono::milliseconds(101);
   }
 }
