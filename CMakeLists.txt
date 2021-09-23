@@ -27,6 +27,7 @@ if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
 endif()
 
 find_package(catkin REQUIRED COMPONENTS
+  rosfmt
   rosconsole_bridge
   roscpp
   sensor_msgs
@@ -39,12 +40,12 @@ if(NOT Boost_FOUND)
   find_package(Boost REQUIRED COMPONENTS system)
 endif()
 find_package(console_bridge REQUIRED)
-find_package(fmt REQUIRED)
 
 catkin_package(
   CATKIN_DEPENDS
     roscpp
     sensor_msgs
+    rosfmt
 )
 
 
@@ -121,7 +122,7 @@ add_library(
 target_link_libraries(${PROJECT_NAME}_standalone
   ${Boost_LIBRARIES}
   ${console_bridge_LIBRARIES}
-  fmt::fmt
+  ${catkin_LIBRARIES}
 )
 target_include_directories(${PROJECT_NAME}_standalone PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
@@ -202,7 +203,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_raw_processing
     ${catkin_LIBRARIES}
-    fmt::fmt
+    
   )
 
   catkin_add_gtest(unittest_start_request
@@ -212,7 +213,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_start_request
     ${catkin_LIBRARIES}
-    fmt::fmt
+    
   )
 
   catkin_add_gtest(unittest_stop_request
@@ -235,7 +236,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_scanner_configuration
     ${catkin_LIBRARIES}
-    fmt::fmt
+    
   )
 
   catkin_add_gtest(unittest_tenth_of_degree
@@ -247,7 +248,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_udp_client
     ${catkin_LIBRARIES}
-    fmt::fmt
+    
   )
 
   catkin_add_gtest(unittest_tenth_degree_conversion
@@ -263,7 +264,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_laserscan
     ${catkin_LIBRARIES}
-    fmt::fmt
+    
   )
 
   catkin_add_gtest(unittest_laserscan_conversions
@@ -274,7 +275,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_laserscan_conversions
     ${catkin_LIBRARIES}
-    fmt::fmt
+    
   )
 
   catkin_add_gtest(unittest_laserscan_ros_conversions
@@ -285,7 +286,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_laserscan_ros_conversions
     ${catkin_LIBRARIES}
-    fmt::fmt
+    
   )
 
   catkin_add_gtest(unittest_scanner_reply_msg
@@ -294,7 +295,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_scanner_reply_msg
     ${catkin_LIBRARIES}
-    fmt::fmt
+    
   )
 
   catkin_add_gtest(unittest_monitoring_frame_msg
@@ -305,7 +306,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_monitoring_frame_msg
     ${catkin_LIBRARIES}
-    fmt::fmt
+    
   )
 
   catkin_add_gtest(unittest_monitoring_frame_msg_stamped
@@ -315,7 +316,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_monitoring_frame_msg_stamped
     ${catkin_LIBRARIES}
-    fmt::fmt
+    
   )
 
   catkin_add_gtest(unittest_monitoring_frame_serialization_deserialization
@@ -327,7 +328,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_monitoring_frame_serialization_deserialization
     ${catkin_LIBRARIES}
-    fmt::fmt
+    
   )
 
   catkin_add_gmock(unittest_logging
@@ -336,7 +337,7 @@ if(CATKIN_ENABLE_TESTING)
   target_link_libraries(unittest_logging
     ${catkin_LIBRARIES}
     ${console_bridge_LIBRARIES}
-    fmt::fmt
+    
   )
 
   catkin_add_gmock(unittest_monitoring_frame_diagnostic_message
@@ -346,7 +347,7 @@ if(CATKIN_ENABLE_TESTING)
   target_link_libraries(unittest_monitoring_frame_diagnostic_message
     ${catkin_LIBRARIES}
     ${console_bridge_LIBRARIES}
-    fmt::fmt
+    
   )
 
   #########################
@@ -359,8 +360,12 @@ if(CATKIN_ENABLE_TESTING)
   target_link_libraries(integrationtest_udp_client
     ${catkin_LIBRARIES}
     ${pilz_testutils_LIBRARIES}
-    fmt::fmt
+    
   )
+
+  # Needs pilz_testutils in kinetic
+
+  if("$ENV{ROS_DISTRO}" STRGREATER "kinetic")
 
   catkin_add_gmock(integrationtest_scanner_api
     standalone/test/integration_tests/api/integrationtest_scanner_api.cpp
@@ -380,7 +385,7 @@ if(CATKIN_ENABLE_TESTING)
   target_link_libraries(integrationtest_scanner_api
     ${catkin_LIBRARIES}
     ${pilz_testutils_LIBRARIES}
-    fmt::fmt
+    
   )
 
   add_rostest_gmock(integrationtest_ros_scanner_node
@@ -393,8 +398,10 @@ if(CATKIN_ENABLE_TESTING)
   target_link_libraries(integrationtest_ros_scanner_node
     ${catkin_LIBRARIES}
     ${pilz_testutils_LIBRARIES}
-    fmt::fmt
+    
   )
+
+  endif()
 
   add_rostest_gmock(unittest_ros_parameter_handler
       test/unit_tests/unittest_ros_parameter_handler.test
@@ -426,7 +433,7 @@ if(CATKIN_ENABLE_TESTING)
         ${catkin_LIBRARIES}
         ${PROJECT_NAME}_standalone
         ${rosbag_LIBRARIES}
-        fmt::fmt
+        
       )
 
       add_rostest_gtest(hwtest_scan_compare
@@ -438,7 +445,7 @@ if(CATKIN_ENABLE_TESTING)
         ${catkin_LIBRARIES}
         ${pilz_testutils_LIBRARIES}
         ${rosbag_LIBRARIES}
-        fmt::fmt
+        
       )
     endif()
 

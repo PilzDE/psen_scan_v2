@@ -60,7 +60,7 @@ protected:
   }
 
 protected:
-  const std::array<double, 3> expected_measurements_{ 4.4, 4.3, 4.2 };
+  const std::array<double, 3> expected_measurements_{ { 4.4, 4.3, 4.2 } };
 };
 
 TEST(MonitoringFrameMsgEqualityTest, testCompareEqualSucces)

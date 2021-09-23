@@ -140,7 +140,7 @@ public:
     return value() < rhs.value();
   }
 
-  constexpr operator uint16_t() const
+  operator uint16_t() const
   {
     if (value() < 0)
     {
