@@ -35,7 +35,8 @@ const util::TenthOfDegree ANGLE_END{ data_conversion_layer::degreeToTenthDegree(
  */
 void laserScanCallback(const LaserScan& scan)
 {
-  PSENSCAN_INFO_THROTTLE(1 /* sec */, "laserScanCallback()", "Ranges {}", util::formatRange(scan.getMeasurements()));
+  PSENSCAN_INFO_THROTTLE_PURE(
+      1 /* sec */, "laserScanCallback()", "Ranges %s", util::formatRange(scan.getMeasurements()).c_str());
 }
 
 int main(int argc, char** argv)
