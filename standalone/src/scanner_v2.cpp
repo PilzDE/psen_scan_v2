@@ -91,7 +91,7 @@ ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScan
 
 ScannerV2::~ScannerV2()
 {
-  PSENSCAN_DEBUG("Scanner", "Destruction called.");
+  PSENSCAN_DEBUG_PURE("Scanner", "Destruction called.");
 
   const std::lock_guard<std::mutex> lock(member_mutex_);
   sm_->stop();
@@ -99,7 +99,7 @@ ScannerV2::~ScannerV2()
 
 std::future<void> ScannerV2::start()
 {
-  PSENSCAN_INFO("Scanner", "Start scanner called.");
+  PSENSCAN_INFO_PURE("Scanner", "Start scanner called.");
 
   const std::lock_guard<std::mutex> lock(member_mutex_);
   if (scanner_has_started_)
@@ -117,7 +117,7 @@ std::future<void> ScannerV2::start()
 
 std::future<void> ScannerV2::stop()
 {
-  PSENSCAN_INFO("Scanner", "Stop scanner called.");
+  PSENSCAN_INFO_PURE("Scanner", "Stop scanner called.");
 
   const std::lock_guard<std::mutex> lock(member_mutex_);
   if (scanner_has_stopped_)
@@ -138,7 +138,7 @@ std::future<void> ScannerV2::stop()
 // via call to triggerEvent() or triggerEventWithParam() which already take the mutex.
 void ScannerV2::scannerStartedCB()
 {
-  PSENSCAN_INFO("ScannerController", "Scanner started successfully.");
+  PSENSCAN_INFO_PURE("ScannerController", "Scanner started successfully.");
   scanner_has_started_.value().set_value();
   scanner_has_started_ = boost::none;
 }
@@ -148,7 +148,7 @@ void ScannerV2::scannerStartedCB()
 // via call to triggerEvent() or triggerEventWithParam() which already take the mutex.
 void ScannerV2::scannerStoppedCB()
 {
-  PSENSCAN_INFO("ScannerController", "Scanner stopped successfully.");
+  PSENSCAN_INFO_PURE("ScannerController", "Scanner stopped successfully.");
   scanner_has_stopped_.value().set_value();
   scanner_has_stopped_ = boost::none;
 }
