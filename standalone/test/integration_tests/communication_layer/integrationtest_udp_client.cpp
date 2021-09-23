@@ -146,7 +146,7 @@ TEST_F(UdpClientTests, testSingleAsyncReadOperation)
   EXPECT_TRUE(client_received_data_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Udp client did not receive data";
 }
 
-TEST_F(UdpClientTests, Should_NotCallErrorHandler_WhenDestroyedWhileAsyncReceivePending)
+TEST_F(UdpClientTests, Should_NotCallErrorCallback_WhenDestroyedWhileAsyncReceivePending)
 {
   EXPECT_CALL(*this, handleError(_)).Times(0);
 
@@ -156,12 +156,13 @@ TEST_F(UdpClientTests, Should_NotCallErrorHandler_WhenDestroyedWhileAsyncReceive
 
 TEST_F(UdpClientTests, testErrorHandlingForReceive)
 {
-  util::Barrier error_handler_called_barrier;
-  EXPECT_CALL(*this, handleError(_)).WillOnce(OpenBarrier(&error_handler_called_barrier));
+  util::Barrier error_callback_called_barrier;
+  EXPECT_CALL(*this, handleError(_)).WillOnce(OpenBarrier(&error_callback_called_barrier));
 
   udp_client_->startAsyncReceiving(communication_layer::ReceiveMode::single);
   sendEmptyTestDataToClient();
-  EXPECT_TRUE(error_handler_called_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Error handler should have been called";
+  EXPECT_TRUE(error_callback_called_barrier.waitTillRelease(DEFAULT_TIMEOUT))
+      << "Error callback should have been called";
 }
 
 TEST_F(UdpClientTests, testWriteOperation)

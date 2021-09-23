@@ -362,7 +362,7 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
   REMOVE_LOG_MOCK
 }
 
-TEST_F(ScannerAPITests, shouldCallLaserScanCBOnlyOneTimeWithAllInformationWhenUnfragmentedScanIsEnabled)
+TEST_F(ScannerAPITests, shouldCallLaserScanCallbackOnlyOneTimeWithAllInformationWhenUnfragmentedScanIsEnabled)
 {
   setUpScannerConfig(HOST_IP_ADDRESS, UNFRAGMENTED_SCAN);
   setUpScannerV2();

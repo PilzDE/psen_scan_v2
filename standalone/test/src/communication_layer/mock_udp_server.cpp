@@ -27,13 +27,13 @@
 
 namespace psen_scan_v2_standalone_test
 {
-MockUDPServer::MockUDPServer(const unsigned short port, const NewDataHandler& new_data_handler)
+MockUDPServer::MockUDPServer(const unsigned short port, const NewMessageCallback& new_msg_callback)
   : socket_(io_service_, udp::endpoint(boost::asio::ip::address_v4::from_string(MOCK_IP_ADDRESS), port))
-  , new_data_handler_(new_data_handler)
+  , new_msg_callback_(new_msg_callback)
 {
-  if (!new_data_handler_)
+  if (!new_msg_callback_)
   {
-    throw std::invalid_argument("New data handler must not be null");
+    throw std::invalid_argument("New message callback must not be null");
   }
 
   recv_buffer_.resize(psen_scan_v2_standalone::data_conversion_layer::MAX_UDP_PAKET_SIZE);
@@ -90,7 +90,7 @@ void MockUDPServer::handleReceive(const ReceiveMode& modi,
 
   const psen_scan_v2_standalone::data_conversion_layer::RawData recv_data(recv_buffer_.cbegin(),
                                                                           recv_buffer_.cbegin() + bytes_received);
-  new_data_handler_(remote_endpoint_, recv_data);
+  new_msg_callback_(remote_endpoint_, recv_data);
   if (modi == ReceiveMode::continuous)
   {
     asyncReceive(ReceiveMode::continuous);

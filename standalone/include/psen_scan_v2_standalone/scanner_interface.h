@@ -55,15 +55,15 @@ public:
 
 protected:
   const ScannerConfiguration& getConfig() const;
-  const LaserScanCallback& getLaserScanCB() const;
+  const LaserScanCallback& getLaserScanCallback() const;
 
 private:
   const ScannerConfiguration config_;
-  const LaserScanCallback laser_scan_cb_;
+  const LaserScanCallback laser_scan_callback_;
 };
 
 inline IScanner::IScanner(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback)
-  : config_(scanner_config), laser_scan_cb_(laser_scan_callback)
+  : config_(scanner_config), laser_scan_callback_(laser_scan_callback)
 {
   if (!laser_scan_callback)
   {
@@ -76,9 +76,9 @@ inline const ScannerConfiguration& IScanner::getConfig() const
   return config_;
 }
 
-inline const IScanner::LaserScanCallback& IScanner::getLaserScanCB() const
+inline const IScanner::LaserScanCallback& IScanner::getLaserScanCallback() const
 {
-  return laser_scan_cb_;
+  return laser_scan_callback_;
 }
 
 }  // namespace psen_scan_v2_standalone

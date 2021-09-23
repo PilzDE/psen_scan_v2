@@ -2,6 +2,10 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Internal refactorings
+
 0.3.2 (2021-09-16)
 ------------------
 * Improve performance of standalone part
