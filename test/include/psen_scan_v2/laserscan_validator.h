@@ -126,7 +126,7 @@ public:
   template <int16_t angle_offset = 0>
   void scanCb(const ScanConstPtr scan, size_t n_msgs)
   {
-    PSENSCAN_INFO_THROTTLE(5, "LaserScanValidator", "Checking messages for validity. So far looking good.");
+    PSENSCAN_INFO_THROTTLE_PURE(5, "LaserScanValidator", "Checking messages for validity. So far looking good.");
 
     if (check_done_)
     {
