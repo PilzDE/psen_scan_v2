@@ -87,4 +87,72 @@ using namespace console_bridge;
 #define PSENSCAN_DEBUG_ONCE(name, ...)                                                                                 \
   PSENSCAN_LOG_ONCE(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_DEBUG, __VA_ARGS__)
 
+#define PSENSCAN_LOG_PURE(name, file, line, level, fmt, ...)                                                           \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    console_bridge::log(file, line, level, "%s: " fmt, name, ##__VA_ARGS__);                                           \
+  } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
+
+#define PSENSCAN_LOG_ONCE_PURE(name, file, line, level, fmt, ...)                                                      \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    static bool already_logged = false;                                                                                \
+    if (!already_logged)                                                                                               \
+    {                                                                                                                  \
+      console_bridge::log(file, line, level, "%s: " fmt, name, ##__VA_ARGS__);                                         \
+      already_logged = true;                                                                                           \
+    }                                                                                                                  \
+  } while (false)
+
+#define PSENSCAN_LOG_THROTTLE_PURE(period, name, file, line, level, ...)                                               \
+  PSENSCAN_LOG_THROTTLE_INTERNAL_PURE(std::chrono::system_clock::now(), period, name, file, line, level, __VA_ARGS__)
+
+#define PSENSCAN_LOG_THROTTLE_INTERNAL_PURE(now, period, name, file, line, level, ...)                                 \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    static std::chrono::system_clock::time_point throttle_last_hit;                                                    \
+    auto throttle_now = now;                                                                                           \
+    if (throttle_last_hit + std::chrono::duration<double>(period) < throttle_now)                                      \
+    {                                                                                                                  \
+      throttle_last_hit = throttle_now;                                                                                \
+      PSENSCAN_LOG_PURE(name, file, line, level, __VA_ARGS__);                                                         \
+    }                                                                                                                  \
+  } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
+
+using namespace console_bridge;
+
+#define PSENSCAN_ERROR_PURE(name, ...)                                                                                 \
+  PSENSCAN_LOG_PURE(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, __VA_ARGS__)
+#define PSENSCAN_INFO_PURE(name, ...) PSENSCAN_LOG_PURE(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_INFO, __VA_ARGS__)
+#define PSENSCAN_WARN_PURE(name, ...) PSENSCAN_LOG_PURE(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_WARN, __VA_ARGS__)
+#define PSENSCAN_DEBUG_PURE(name, ...)                                                                                 \
+  PSENSCAN_LOG_PURE(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_DEBUG, __VA_ARGS__)
+
+#define PSENSCAN_ERROR_THROTTLE_INTERNAL_PURE(now, period, name, ...)                                                  \
+  PSENSCAN_LOG_THROTTLE_INTERNAL_PURE(now, period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, __VA_ARGS__)
+#define PSENSCAN_INFO_THROTTLE_INTERNAL_PURE(now, period, name, ...)                                                   \
+  PSENSCAN_LOG_THROTTLE_INTERNAL_PURE(now, period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_INFO, __VA_ARGS__)
+#define PSENSCAN_WARN_THROTTLE_INTERNAL_PURE(now, period, name, ...)                                                   \
+  PSENSCAN_LOG_THROTTLE_INTERNAL_PURE(now, period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_WARN, __VA_ARGS__)
+#define PSENSCAN_DEBUG_THROTTLE_INTERNAL_PURE(now, period, name, ...)                                                  \
+  PSENSCAN_LOG_THROTTLE_INTERNAL_PURE(now, period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_DEBUG, __VA_ARGS__)
+
+#define PSENSCAN_ERROR_THROTTLE_PURE(period, name, ...)                                                                \
+  PSENSCAN_LOG_THROTTLE_PURE(period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, __VA_ARGS__)
+#define PSENSCAN_INFO_THROTTLE_PURE(period, name, ...)                                                                 \
+  PSENSCAN_LOG_THROTTLE_PURE(period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_INFO, __VA_ARGS__)
+#define PSENSCAN_WARN_THROTTLE_PURE(period, name, ...)                                                                 \
+  PSENSCAN_LOG_THROTTLE_PURE(period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_WARN, __VA_ARGS__)
+#define PSENSCAN_DEBUG_THROTTLE_PURE(period, name, ...)                                                                \
+  PSENSCAN_LOG_THROTTLE_PURE(period, name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_DEBUG, __VA_ARGS__)
+
+#define PSENSCAN_ERROR_ONCE_PURE(name, ...)                                                                            \
+  PSENSCAN_LOG_ONCE_PURE(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_ERROR, __VA_ARGS__)
+#define PSENSCAN_INFO_ONCE_PURE(name, ...)                                                                             \
+  PSENSCAN_LOG_ONCE_PURE(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_INFO, __VA_ARGS__)
+#define PSENSCAN_WARN_ONCE_PURE(name, ...)                                                                             \
+  PSENSCAN_LOG_ONCE_PURE(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_WARN, __VA_ARGS__)
+#define PSENSCAN_DEBUG_ONCE_PURE(name, ...)                                                                            \
+  PSENSCAN_LOG_ONCE_PURE(name, __FILE__, __LINE__, CONSOLE_BRIDGE_LOG_DEBUG, __VA_ARGS__)
+
 #endif  // PSEN_SCAN_V2_STANDALONE_LOGGING_H
