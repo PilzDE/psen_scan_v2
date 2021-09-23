@@ -5,7 +5,7 @@ on: [push, pull_request]
 env:
   ADDITIONAL_DEBS: "clang-tidy libclang-dev"
   CATKIN_LINT: true
-  CATKIN_LINT_ARGS: '--strict'
+  CATKIN_LINT_ARGS: '--strict --ignore env_var'
   CMAKE_ARGS: "-DCATKIN_ENABLE_CLANG_TIDY=true"
   ROS_DISTRO: kinetic
 
