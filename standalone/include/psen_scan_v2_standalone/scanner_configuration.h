@@ -88,7 +88,8 @@ inline bool ScannerConfiguration::isValid() const
 {
   if (intensities_enabled_ && scan_resolution_ < util::TenthOfDegree(2u))
   {
-    PSENSCAN_ERROR("ScannerConfiguration", "Requires a resolution of min: 0.2 degree when intensities are enabled");
+    PSENSCAN_ERROR_PURE("ScannerConfiguration",
+                        "Requires a resolution of min: 0.2 degree when intensities are enabled");
     return false;
   }
   return true;
