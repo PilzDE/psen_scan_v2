@@ -195,23 +195,23 @@ FixedFields readFixedFields(std::istream& is)
   // LCOV_EXCL_START
   if (OP_CODE_MONITORING_FRAME != op_code)
   {
-    PSENSCAN_ERROR_THROTTLE(
+    PSENSCAN_ERROR_THROTTLE_PURE(
         0.1, "monitoring_frame::Message", "Unexpected opcode during deserialization of MonitoringFrame.");
   }
 
   if (ONLINE_WORKING_MODE != working_mode)
   {
-    PSENSCAN_ERROR_THROTTLE(0.1, "monitoring_frame::Message", "Invalid working mode (not online)");
+    PSENSCAN_ERROR_THROTTLE_PURE(0.1, "monitoring_frame::Message", "Invalid working mode (not online)");
   }
 
   if (GUI_MONITORING_TRANSACTION != transaction_type)
   {
-    PSENSCAN_ERROR_THROTTLE(0.1, "monitoring_frame::Message", "Invalid transaction type.");
+    PSENSCAN_ERROR_THROTTLE_PURE(0.1, "monitoring_frame::Message", "Invalid transaction type.");
   }
 
   if (MAX_SCANNER_ID < static_cast<uint8_t>(scanner_id))
   {
-    PSENSCAN_ERROR_THROTTLE(0.1, "monitoring_frame::Message", "Invalid Scanner id.");
+    PSENSCAN_ERROR_THROTTLE_PURE(0.1, "monitoring_frame::Message", "Invalid Scanner id.");
   }
   // LCOV_EXCL_STOP
 
