@@ -83,7 +83,7 @@ TEST_F(ScanComparisonTests, simpleCompare)
       boost::bind(&LaserScanValidator<ScanType>::scanCb, &laser_scan_validator, boost::placeholders::_1, window_size));
 
   ros::topic::waitForMessage<ScanType>("/laser_1/scan", ros::Duration(WAIT_FOR_MESSAGE_TIMEOUT_S, 0));
-  ASSERT_EQ(1, scan_subscriber.getNumPublishers())
+  ASSERT_EQ(1u, scan_subscriber.getNumPublishers())
       << "Failed to establish connection with publisher on laserscan-topic";
 
   ASSERT_TRUE(laser_scan_validator.waitForResult(test_duration_));
