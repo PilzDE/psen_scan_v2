@@ -56,14 +56,14 @@ inline ScannerProtocolDef::ScannerProtocolDef(const ScannerConfiguration config,
   template <class Event, class FSM>\
   void ScannerProtocolDef::state_name::on_entry(Event const&, FSM& fsm)\
   {\
-    PSENSCAN_DEBUG("StateMachine", fmt::format("Entering state: {}", #state_name));\
+    PSENSCAN_DEBUG("StateMachine", "Entering state: " #state_name);\
   }\
 
 #define DEFAULT_ON_EXIT_IMPL(state_name)\
   template <class Event, class FSM>\
   void ScannerProtocolDef::state_name::on_exit(Event const&, FSM& fsm)\
   {\
-    PSENSCAN_DEBUG("StateMachine", fmt::format("Exiting state: {}", #state_name));\
+    PSENSCAN_DEBUG("StateMachine", "Exiting state: " #state_name);\
   }
 
 #define DEFAULT_STATE_IMPL(state_name)\
@@ -79,7 +79,7 @@ DEFAULT_ON_ENTRY_IMPL(Idle)
 template <class Event, class FSM>
 void ScannerProtocolDef::Idle::on_exit(Event const&, FSM& fsm)
 {
-  PSENSCAN_DEBUG("StateMachine", fmt::format("Exiting state: {}", "Idle"));
+  PSENSCAN_DEBUG("StateMachine", "Exiting state: Idle");
   fsm.control_client_.startAsyncReceiving();
   fsm.data_client_.startAsyncReceiving();
 }
@@ -87,7 +87,7 @@ void ScannerProtocolDef::Idle::on_exit(Event const&, FSM& fsm)
 template <class Event, class FSM>
 void ScannerProtocolDef::WaitForStartReply::on_entry(Event const&, FSM& fsm)
 {
-  PSENSCAN_DEBUG("StateMachine", fmt::format("Entering state: {}", "WaitForStartReply"));
+  PSENSCAN_DEBUG("StateMachine", "Entering state: WaitForStartReply");
   // Start watchdog...
   fsm.start_reply_watchdog_ = fsm.watchdog_factory_.create(WATCHDOG_TIMEOUT, fsm.start_timeout_callback_);
 }
@@ -95,7 +95,7 @@ void ScannerProtocolDef::WaitForStartReply::on_entry(Event const&, FSM& fsm)
 template <class Event, class FSM>
 void ScannerProtocolDef::WaitForStartReply::on_exit(Event const&, FSM& fsm)
 {
-  PSENSCAN_DEBUG("StateMachine", fmt::format("Exiting state: {}", "WaitForStartReply"));
+  PSENSCAN_DEBUG("StateMachine", "Exiting state: {}", "WaitForStartReply");
   // Stops the watchdog by resetting the pointer
   fsm.start_reply_watchdog_.reset();
 }
@@ -103,7 +103,7 @@ void ScannerProtocolDef::WaitForStartReply::on_exit(Event const&, FSM& fsm)
 template <class Event, class FSM>
 void ScannerProtocolDef::WaitForMonitoringFrame::on_entry(Event const&, FSM& fsm)
 {
-  PSENSCAN_DEBUG("StateMachine", fmt::format("Entering state: {}", "WaitForMonitoringFrame"));
+  PSENSCAN_DEBUG("StateMachine", "Entering state: WaitForMonitoringFrame");
   fsm.scan_buffer_.reset();
   // Start watchdog...
   fsm.monitoring_frame_watchdog_ =
@@ -114,7 +114,7 @@ void ScannerProtocolDef::WaitForMonitoringFrame::on_entry(Event const&, FSM& fsm
 template <class Event, class FSM>
 void ScannerProtocolDef::WaitForMonitoringFrame::on_exit(Event const&, FSM& fsm)
 {
-  PSENSCAN_DEBUG("StateMachine", fmt::format("Exiting state: {}", "WaitForMonitoringFrame"));
+  PSENSCAN_DEBUG("StateMachine", "Exiting state: WaitForMonitoringFrame");
   // Stops the watchdog by resetting the pointer
   fsm.monitoring_frame_watchdog_.reset();
 }
@@ -122,7 +122,7 @@ void ScannerProtocolDef::WaitForMonitoringFrame::on_exit(Event const&, FSM& fsm)
 template <class Event, class FSM>
 void ScannerProtocolDef::Stopped::on_entry(Event const&, FSM& fsm)
 {
-  PSENSCAN_DEBUG("StateMachine", fmt::format("Entering state: {}", "Stopped"));
+  PSENSCAN_DEBUG("StateMachine", "Entering state: Stopped");
   fsm.scanner_stopped_callback_();
 }
 
