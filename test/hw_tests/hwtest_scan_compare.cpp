@@ -80,7 +80,7 @@ TEST_F(ScanComparisonTests, simpleCompare)
   auto scan_subscriber = nh.subscribe<ScanType>(
       "/laser_1/scan",
       1000,
-      std::bind(&LaserScanValidator<ScanType>::scanCb, &laser_scan_validator, std::placeholders::_1, window_size));
+      std::bind(&LaserScanValidator<ScanType>::scanCb<0>, &laser_scan_validator, std::placeholders::_1, window_size));
 
   ros::topic::waitForMessage<ScanType>("/laser_1/scan", ros::Duration(WAIT_FOR_MESSAGE_TIMEOUT_S, 0));
   ASSERT_EQ(1u, scan_subscriber.getNumPublishers())
