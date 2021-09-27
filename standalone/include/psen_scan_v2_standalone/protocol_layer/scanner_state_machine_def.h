@@ -95,7 +95,7 @@ void ScannerProtocolDef::WaitForStartReply::on_entry(Event const&, FSM& fsm)
 template <class Event, class FSM>
 void ScannerProtocolDef::WaitForStartReply::on_exit(Event const&, FSM& fsm)
 {
-  PSENSCAN_DEBUG("StateMachine", "Exiting state: {}", "WaitForStartReply");
+  PSENSCAN_DEBUG("StateMachine", "Exiting state: WaitForStartReply");
   // Stops the watchdog by resetting the pointer
   fsm.start_reply_watchdog_.reset();
 }
