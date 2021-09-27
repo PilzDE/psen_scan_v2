@@ -60,6 +60,7 @@ public:
 public:
   void sendTestDataToClient();
   void sendEmptyTestDataToClient();
+  data_conversion_layer::RawData createRawData(std::string dataString);
 
 protected:
   MockUDPServer mock_udp_server_{ UDP_MOCK_PORT, std::bind(&UdpClientTests::receivedUdpMsg, this, _1, _2) };
@@ -116,6 +117,13 @@ void UdpClientTests::sendEmptyTestDataToClient()
   mock_udp_server_.asyncSend(host_endpoint, data);
 }
 
+data_conversion_layer::RawData UdpClientTests::createRawData(std::string dataString)
+{
+  data_conversion_layer::RawData write_buf;
+  std::copy(dataString.begin(), dataString.end(), std::back_inserter(write_buf));
+  return write_buf;
+}
+
 ACTION_P(OpenBarrier, barrier)
 {
   barrier->release();
@@ -167,9 +175,7 @@ TEST_F(UdpClientTests, testErrorHandlingForReceive)
 
 TEST_F(UdpClientTests, testWriteOperation)
 {
-  std::string str = "Hello!";
-  data_conversion_layer::RawData write_buf;
-  std::copy(str.begin(), str.end(), std::back_inserter(write_buf));
+  auto write_buf = createRawData("Hello!");
 
   util::Barrier server_mock_received_data_barrier;
   EXPECT_CALL(*this, receivedUdpMsg(_, write_buf)).WillOnce(OpenBarrier(&server_mock_received_data_barrier));
@@ -182,9 +188,7 @@ TEST_F(UdpClientTests, testWriteOperation)
 
 TEST_F(UdpClientTests, testWritingWhileReceiving)
 {
-  std::string str = "Hello!";
-  data_conversion_layer::RawData write_buf;
-  std::copy(str.begin(), str.end(), std::back_inserter(write_buf));
+  auto write_buf = createRawData("Hello!");
 
   util::Barrier client_received_data_barrier;
   util::Barrier server_mock_received_data_barrier;
