@@ -26,8 +26,8 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include <fmt/format.h>
-#include <fmt/ostream.h>
+// #include <fmt/format.h>
+// #include <fmt/ostream.h>
 
 #include <gtest/gtest.h>
 
@@ -166,14 +166,14 @@ public:
         auto distance = bhattacharyya_distance(dist_actual, dist_expected);
         if (distance > 10.)
         {
-          error_string +=
-              fmt::format("On {:+.1f} deg  expected: {} actual: {} | dist: {:.1f}, dmean: {:.3f}, dstdev: {:.3f}\n",
-                          bin_actual.first / 10.,
-                          dist_expected,
-                          dist_actual,
-                          distance,
-                          abs(dist_expected.mean() - dist_actual.mean()),
-                          abs(dist_expected.stdev() - dist_actual.stdev()));
+          // error_string +=
+          //     fmt::format("On {:+.1f} deg  expected: {} actual: {} | dist: {:.1f}, dmean: {:.3f}, dstdev: {:.3f}\n",
+          //                 bin_actual.first / 10.,
+          //                 dist_expected,
+          //                 dist_actual,
+          //                 distance,
+          //                 abs(dist_expected.mean() - dist_actual.mean()),
+          //                 abs(dist_expected.stdev() - dist_actual.stdev()));
           counter_deviations++;
         }
       }

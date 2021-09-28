@@ -15,7 +15,7 @@
 #ifndef PSEN_SCAN_V2_DIST_H
 #define PSEN_SCAN_V2_DIST_H
 
-#include <fmt/format.h>
+//#include <fmt/format.h>
 
 #include <math.h>
 #include <numeric>
@@ -73,7 +73,7 @@ double bhattacharyya_distance(const NormalDist& dist1, const NormalDist& dist2)
 
 std::ostream& operator<<(std::ostream& os, const psen_scan_v2_test::NormalDist& dist)
 {
-  os << fmt::format("NormalDist(mean: {:+.3f}, stdev: {:+.3f} N: {})", dist.mean(), dist.stdev(), dist.N());
+  // os << fmt::format("NormalDist(mean: {:+.3f}, stdev: {:+.3f} N: {})", dist.mean(), dist.stdev(), dist.N());
   return os;
 }
 
