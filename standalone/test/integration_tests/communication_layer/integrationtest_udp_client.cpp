@@ -60,6 +60,7 @@ public:
 public:
   void sendTestDataToClient();
   void sendEmptyTestDataToClient();
+  data_conversion_layer::RawData createRawData(std::string dataString);
 
 protected:
   MockUDPServer mock_udp_server_{ UDP_MOCK_PORT, std::bind(&UdpClientTests::receivedUdpMsg, this, _1, _2) };
@@ -116,6 +117,13 @@ void UdpClientTests::sendEmptyTestDataToClient()
   mock_udp_server_.asyncSend(host_endpoint, data);
 }
 
+data_conversion_layer::RawData UdpClientTests::createRawData(std::string dataString)
+{
+  data_conversion_layer::RawData write_buf;
+  std::copy(dataString.begin(), dataString.end(), std::back_inserter(write_buf));
+  return write_buf;
+}
+
 ACTION_P(OpenBarrier, barrier)
 {
   barrier->release();
@@ -146,7 +154,7 @@ TEST_F(UdpClientTests, testSingleAsyncReadOperation)
   EXPECT_TRUE(client_received_data_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Udp client did not receive data";
 }
 
-TEST_F(UdpClientTests, Should_NotCallErrorHandler_WhenDestroyedWhileAsyncReceivePending)
+TEST_F(UdpClientTests, Should_NotCallErrorCallback_WhenDestroyedWhileAsyncReceivePending)
 {
   EXPECT_CALL(*this, handleError(_)).Times(0);
 
@@ -156,19 +164,18 @@ TEST_F(UdpClientTests, Should_NotCallErrorHandler_WhenDestroyedWhileAsyncReceive
 
 TEST_F(UdpClientTests, testErrorHandlingForReceive)
 {
-  util::Barrier error_handler_called_barrier;
-  EXPECT_CALL(*this, handleError(_)).WillOnce(OpenBarrier(&error_handler_called_barrier));
+  util::Barrier error_callback_called_barrier;
+  EXPECT_CALL(*this, handleError(_)).WillOnce(OpenBarrier(&error_callback_called_barrier));
 
   udp_client_->startAsyncReceiving(communication_layer::ReceiveMode::single);
   sendEmptyTestDataToClient();
-  EXPECT_TRUE(error_handler_called_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Error handler should have been called";
+  EXPECT_TRUE(error_callback_called_barrier.waitTillRelease(DEFAULT_TIMEOUT))
+      << "Error callback should have been called";
 }
 
 TEST_F(UdpClientTests, testWriteOperation)
 {
-  std::string str = "Hello!";
-  data_conversion_layer::RawData write_buf;
-  std::copy(str.begin(), str.end(), std::back_inserter(write_buf));
+  auto write_buf = createRawData("Hello!");
 
   util::Barrier server_mock_received_data_barrier;
   EXPECT_CALL(*this, receivedUdpMsg(_, write_buf)).WillOnce(OpenBarrier(&server_mock_received_data_barrier));
@@ -181,9 +188,7 @@ TEST_F(UdpClientTests, testWriteOperation)
 
 TEST_F(UdpClientTests, testWritingWhileReceiving)
 {
-  std::string str = "Hello!";
-  data_conversion_layer::RawData write_buf;
-  std::copy(str.begin(), str.end(), std::back_inserter(write_buf));
+  auto write_buf = createRawData("Hello!");
 
   util::Barrier client_received_data_barrier;
   util::Barrier server_mock_received_data_barrier;

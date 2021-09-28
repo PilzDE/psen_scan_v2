@@ -32,58 +32,28 @@ using namespace psen_scan_v2_standalone::protocol_layer::scanner_events;
   [this](const data_conversion_layer::RawDataConstPtr& data, const std::size_t& num_bytes, const int64_t& timestamp){ triggerEventWithParam(event_name(data, num_bytes, timestamp)); }
 // clang-format on
 
-ScannerV2::WatchdogFactory::WatchdogFactory(ScannerV2* scanner) : IWatchdogFactory(), scanner_(scanner)
+std::unique_ptr<util::Watchdog> WatchdogFactory::create(const util::Watchdog::Timeout& timeout,
+                                                        const std::function<void()>& timeout_callback)
 {
-  assert(scanner);
+  return std::unique_ptr<util::Watchdog>(new util::Watchdog(timeout, timeout_callback));
 }
 
-std::unique_ptr<util::Watchdog> ScannerV2::WatchdogFactory::create(const util::Watchdog::Timeout& timeout,
-                                                                   const std::string& event_type)
-{
-  if (event_type == "StartReplyTimeout")
-  {
-    return std::unique_ptr<util::Watchdog>(
-        new util::Watchdog(timeout, std::bind(&ScannerV2::triggerEvent<scanner_events::StartTimeout>, scanner_)));
-  }
-  if (event_type == "MonitoringFrameTimeout")
-  {
-    return std::unique_ptr<util::Watchdog>(new util::Watchdog(
-        timeout, std::bind(&ScannerV2::triggerEvent<scanner_events::MonitoringFrameTimeout>, scanner_)));
-  }
-
-  // LCOV_EXCL_START
-  throw std::runtime_error("WatchdogFactory called with event for which no creation process exists.");
-  // LCOV_EXCL_STOP
-}
-
-StateMachineArgs* ScannerV2::createStateMachineArgs()
-{
-  return new StateMachineArgs(
-      IScanner::getConfig(),
-      // LCOV_EXCL_START
-      // The following includes calls to std::bind which are not marked correctly
-      // by some gcc versions, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96006
-      // UDP clients
-      std::make_unique<communication_layer::UdpClientImpl>(BIND_RAW_DATA_EVENT(RawReplyReceived),
-                                                           BIND_EVENT(ReplyReceiveError),
-                                                           IScanner::getConfig().hostUDPPortControl(),
-                                                           IScanner::getConfig().clientIp(),
-                                                           IScanner::getConfig().scannerControlPort()),
-      std::make_unique<communication_layer::UdpClientImpl>(BIND_RAW_DATA_EVENT(RawMonitoringFrameReceived),
-                                                           BIND_EVENT(MonitoringFrameReceivedError),
-                                                           IScanner::getConfig().hostUDPPortData(),
-                                                           IScanner::getConfig().clientIp(),
-                                                           IScanner::getConfig().scannerDataPort()),
-      // Callbacks
-      std::bind(&ScannerV2::scannerStartedCB, this),
-      std::bind(&ScannerV2::scannerStoppedCB, this),
-      // LCOV_EXCL_STOP
-      IScanner::getLaserScanCB(),
-      std::unique_ptr<IWatchdogFactory>(new WatchdogFactory(this)));
-}  // namespace psen_scan_v2_standalone
-
-ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_cb)
-  : IScanner(scanner_config, laser_scan_cb), sm_(new ScannerStateMachine(createStateMachineArgs()))
+ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback)
+  : IScanner(scanner_config, laser_scan_callback)
+  , sm_(new ScannerStateMachine(IScanner::getConfig(),
+                                // LCOV_EXCL_START
+                                // The following includes calls to std::bind which are not marked correctly
+                                // by some gcc versions, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96006
+                                BIND_RAW_DATA_EVENT(RawReplyReceived),
+                                BIND_EVENT(ReplyReceiveError),
+                                BIND_RAW_DATA_EVENT(RawMonitoringFrameReceived),
+                                BIND_EVENT(MonitoringFrameReceivedError),
+                                std::bind(&ScannerV2::scannerStartedCallback, this),
+                                std::bind(&ScannerV2::scannerStoppedCallback, this),
+                                IScanner::getLaserScanCallback(),
+                                BIND_EVENT(scanner_events::StartTimeout),
+                                BIND_EVENT(scanner_events::MonitoringFrameTimeout)))
+// LCOV_EXCL_STOP
 {
   const std::lock_guard<std::mutex> lock(member_mutex_);
   sm_->start();
@@ -136,7 +106,7 @@ std::future<void> ScannerV2::stop()
 // PLEASE NOTE:
 // The callback does not take a member lock because the callback is always called
 // via call to triggerEvent() or triggerEventWithParam() which already take the mutex.
-void ScannerV2::scannerStartedCB()
+void ScannerV2::scannerStartedCallback()
 {
   PSENSCAN_INFO("ScannerController", "Scanner started successfully.");
   scanner_has_started_.value().set_value();
@@ -146,7 +116,7 @@ void ScannerV2::scannerStartedCB()
 // PLEASE NOTE:
 // The callback does not take a member lock because the callback is always called
 // via call to triggerEvent() or triggerEventWithParam() which already take the mutex.
-void ScannerV2::scannerStoppedCB()
+void ScannerV2::scannerStoppedCallback()
 {
   PSENSCAN_INFO("ScannerController", "Scanner stopped successfully.");
   scanner_has_stopped_.value().set_value();

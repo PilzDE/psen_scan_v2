@@ -14,11 +14,38 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request_serialization.h"
+#include "psen_scan_v2_standalone/scanner_configuration.h"
+#include "psen_scan_v2_standalone/communication_layer/udp_client.h"
 namespace psen_scan_v2_standalone
 {
 namespace protocol_layer
 {
-inline ScannerProtocolDef::ScannerProtocolDef(StateMachineArgs* const args) : args_(args)
+inline ScannerProtocolDef::ScannerProtocolDef(const ScannerConfiguration config,
+                                              const communication_layer::NewMessageCallback& control_msg_callback,
+                                              const communication_layer::ErrorCallback& control_error_callback,
+                                              const communication_layer::NewMessageCallback& data_msg_callback,
+                                              const communication_layer::ErrorCallback& data_error_callback,
+                                              const ScannerStartedCallback& scanner_started_callback,
+                                              const ScannerStoppedCallback& scanner_stopped_callback,
+                                              const InformUserAboutLaserScanCallback& laser_scan_callback,
+                                              const TimeoutCallback& start_timeout_callback,
+                                              const TimeoutCallback& monitoring_frame_timeout_callback)
+  : config_(config)
+  , control_client_(control_msg_callback,
+                    control_error_callback,
+                    config_.hostUDPPortControl(),  // LCOV_EXCL_LINE Lcov bug?
+                    config_.clientIp(),
+                    config_.scannerControlPort())
+  , data_client_(data_msg_callback,
+                 data_error_callback,
+                 config_.hostUDPPortData(),  // LCOV_EXCL_LINE Lcov bug?
+                 config_.clientIp(),
+                 config_.scannerDataPort())
+  , scanner_started_callback_(scanner_started_callback)
+  , scanner_stopped_callback_(scanner_stopped_callback)
+  , inform_user_about_laser_scan_callback_(laser_scan_callback)
+  , start_timeout_callback_(start_timeout_callback)
+  , monitoring_frame_timeout_callback_(monitoring_frame_timeout_callback)
 {
 }
 
@@ -29,14 +56,14 @@ inline ScannerProtocolDef::ScannerProtocolDef(StateMachineArgs* const args) : ar
   template <class Event, class FSM>\
   void ScannerProtocolDef::state_name::on_entry(Event const&, FSM& fsm)\
   {\
-    PSENSCAN_DEBUG("StateMachine", fmt::format("Entering state: {}", #state_name));\
+    PSENSCAN_DEBUG("StateMachine", "Entering state: " #state_name);\
   }\
 
 #define DEFAULT_ON_EXIT_IMPL(state_name)\
   template <class Event, class FSM>\
   void ScannerProtocolDef::state_name::on_exit(Event const&, FSM& fsm)\
   {\
-    PSENSCAN_DEBUG("StateMachine", fmt::format("Exiting state: {}", #state_name));\
+    PSENSCAN_DEBUG("StateMachine", "Exiting state: " #state_name);\
   }
 
 #define DEFAULT_STATE_IMPL(state_name)\
@@ -52,23 +79,23 @@ DEFAULT_ON_ENTRY_IMPL(Idle)
 template <class Event, class FSM>
 void ScannerProtocolDef::Idle::on_exit(Event const&, FSM& fsm)
 {
-  PSENSCAN_DEBUG("StateMachine", fmt::format("Exiting state: {}", "Idle"));
-  fsm.args_->control_client_->startAsyncReceiving();
-  fsm.args_->data_client_->startAsyncReceiving();
+  PSENSCAN_DEBUG("StateMachine", "Exiting state: Idle");
+  fsm.control_client_.startAsyncReceiving();
+  fsm.data_client_.startAsyncReceiving();
 }
 
 template <class Event, class FSM>
 void ScannerProtocolDef::WaitForStartReply::on_entry(Event const&, FSM& fsm)
 {
-  PSENSCAN_DEBUG("StateMachine", fmt::format("Entering state: {}", "WaitForStartReply"));
+  PSENSCAN_DEBUG("StateMachine", "Entering state: WaitForStartReply");
   // Start watchdog...
-  fsm.start_reply_watchdog_ = fsm.args_->watchdog_factory_->create(WATCHDOG_TIMEOUT, "StartReplyTimeout");
+  fsm.start_reply_watchdog_ = fsm.watchdog_factory_.create(WATCHDOG_TIMEOUT, fsm.start_timeout_callback_);
 }
 
 template <class Event, class FSM>
 void ScannerProtocolDef::WaitForStartReply::on_exit(Event const&, FSM& fsm)
 {
-  PSENSCAN_DEBUG("StateMachine", fmt::format("Exiting state: {}", "WaitForStartReply"));
+  PSENSCAN_DEBUG("StateMachine", "Exiting state: WaitForStartReply");
   // Stops the watchdog by resetting the pointer
   fsm.start_reply_watchdog_.reset();
 }
@@ -76,17 +103,18 @@ void ScannerProtocolDef::WaitForStartReply::on_exit(Event const&, FSM& fsm)
 template <class Event, class FSM>
 void ScannerProtocolDef::WaitForMonitoringFrame::on_entry(Event const&, FSM& fsm)
 {
-  PSENSCAN_DEBUG("StateMachine", fmt::format("Entering state: {}", "WaitForMonitoringFrame"));
+  PSENSCAN_DEBUG("StateMachine", "Entering state: WaitForMonitoringFrame");
   fsm.scan_buffer_.reset();
   // Start watchdog...
-  fsm.monitoring_frame_watchdog_ = fsm.args_->watchdog_factory_->create(WATCHDOG_TIMEOUT, "MonitoringFrameTimeout");
-  fsm.args_->scanner_started_cb();
+  fsm.monitoring_frame_watchdog_ =
+      fsm.watchdog_factory_.create(WATCHDOG_TIMEOUT, fsm.monitoring_frame_timeout_callback_);
+  fsm.scanner_started_callback_();
 }
 
 template <class Event, class FSM>
 void ScannerProtocolDef::WaitForMonitoringFrame::on_exit(Event const&, FSM& fsm)
 {
-  PSENSCAN_DEBUG("StateMachine", fmt::format("Exiting state: {}", "WaitForMonitoringFrame"));
+  PSENSCAN_DEBUG("StateMachine", "Exiting state: WaitForMonitoringFrame");
   // Stops the watchdog by resetting the pointer
   fsm.monitoring_frame_watchdog_.reset();
 }
@@ -94,8 +122,8 @@ void ScannerProtocolDef::WaitForMonitoringFrame::on_exit(Event const&, FSM& fsm)
 template <class Event, class FSM>
 void ScannerProtocolDef::Stopped::on_entry(Event const&, FSM& fsm)
 {
-  PSENSCAN_DEBUG("StateMachine", fmt::format("Entering state: {}", "Stopped"));
-  fsm.args_->scanner_stopped_cb();
+  PSENSCAN_DEBUG("StateMachine", "Entering state: Stopped");
+  fsm.scanner_stopped_callback_();
 }
 
 DEFAULT_ON_EXIT_IMPL(Stopped)
@@ -108,14 +136,14 @@ inline void ScannerProtocolDef::sendStartRequest(const T& event)
 {
   PSENSCAN_DEBUG("StateMachine", "Action: sendStartRequest");
 
-  if (!args_->config_.hostIp())
+  if (!config_.hostIp())
   {
-    auto host_ip{ args_->control_client_->getHostIp() };
-    args_->config_.setHostIp(host_ip.to_ulong());
+    auto host_ip{ control_client_.getHostIp() };
+    config_.setHostIp(host_ip.to_ulong());
     PSENSCAN_INFO("StateMachine", "No host ip set! Using local ip: {}", host_ip.to_string());
   }
-  args_->control_client_->write(
-      data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(args_->config_)));
+  control_client_.write(
+      data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config_)));
 }
 
 inline void ScannerProtocolDef::handleStartRequestTimeout(const scanner_events::StartTimeout& event)
@@ -131,7 +159,7 @@ template <class T>
 inline void ScannerProtocolDef::sendStopRequest(const T& event)
 {
   PSENSCAN_DEBUG("StateMachine", "Action: sendStopRequest");
-  args_->control_client_->write(data_conversion_layer::stop_request::serialize());
+  control_client_.write(data_conversion_layer::stop_request::serialize());
 }
 
 inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawMonitoringFrameReceived& event)
@@ -170,7 +198,7 @@ inline void ScannerProtocolDef::informUserAboutTheScanData(
   try
   {
     scan_buffer_.add(stamped_msg);
-    if (!args_->config_.fragmentedScansEnabled() && scan_buffer_.isRoundComplete())
+    if (!config_.fragmentedScansEnabled() && scan_buffer_.isRoundComplete())
     {
       sendMessageWithMeasurements(scan_buffer_.getMsgs());
     }
@@ -179,7 +207,7 @@ inline void ScannerProtocolDef::informUserAboutTheScanData(
   {
     PSENSCAN_WARN("ScanBuffer", ex.what());
   }
-  if (args_->config_.fragmentedScansEnabled())  // Send the scan fragment in any case.
+  if (config_.fragmentedScansEnabled())  // Send the scan fragment in any case.
   {
     sendMessageWithMeasurements({ stamped_msg });
   }
@@ -192,7 +220,7 @@ inline void ScannerProtocolDef::sendMessageWithMeasurements(
   {
     try
     {
-      args_->inform_user_about_laser_scan_cb(data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs));
+      inform_user_about_laser_scan_callback_(data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs));
     }
     // LCOV_EXCL_START
     catch (const data_conversion_layer::ScannerProtocolViolationError& ex)

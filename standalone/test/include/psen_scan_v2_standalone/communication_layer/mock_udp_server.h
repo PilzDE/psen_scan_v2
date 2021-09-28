@@ -51,14 +51,14 @@ public:
   };
 
 public:
-  using NewDataHandler =
+  using NewMessageCallback =
       std::function<void(const udp::endpoint&, const psen_scan_v2_standalone::data_conversion_layer::RawData&)>;
 
 public:
   ~MockUDPServer();
 
 public:
-  MockUDPServer(const unsigned short port, const NewDataHandler& new_data_handler);
+  MockUDPServer(const unsigned short port, const NewMessageCallback& new_msg_callback);
 
 public:
   void asyncReceive(const ReceiveMode& modi = ReceiveMode::single);
@@ -84,7 +84,7 @@ private:
 
   udp::socket socket_;
 
-  NewDataHandler new_data_handler_;
+  NewMessageCallback new_msg_callback_;
 };
 
 }  // namespace psen_scan_v2_standalone_test

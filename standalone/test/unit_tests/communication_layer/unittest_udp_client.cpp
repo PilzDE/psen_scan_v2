@@ -47,7 +47,7 @@ public:
   MOCK_METHOD1(handleError, void(const std::string&));
 };
 
-TEST(UdpClientTests, testInvalidNewDataHandler)
+TEST(UdpClientTests, testInvalidNewMessageCallback)
 {
   CallbackHandler handler;
 
@@ -78,7 +78,7 @@ TEST(UdpClientTests, testInvalidNewDataHandler)
 #endif
 }
 
-TEST(UdpClientTests, testInvalidErrorHandler)
+TEST(UdpClientTests, testInvalidErrorCallback)
 {
   CallbackHandler handler;
 #if BOOST_VERSION > 107000
