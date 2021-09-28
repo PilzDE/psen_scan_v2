@@ -73,38 +73,43 @@ static bool readAndCheckPortNumber(std::istringstream& is, const uint16_t expect
   return udp_port == expected_port;
 }
 
+static void readLine(const std::string& line, const uint16_t port, UdpData& udp_data)
+{
+  try
+  {
+    UdpDatum udp_datum;
+
+    std::istringstream is(line);
+    if (readAndCheckPortNumber(is, port))
+    {
+      readTimestamp(is, udp_datum.timestamp_sec_);
+      readHexValue(is, "scan_counter:", udp_datum.scan_counter_);
+      readHexValue(is, "from_theta:", udp_datum.from_theta_);
+
+      udp_data.push_back(udp_datum);
+    }
+  }
+  catch (const std::ios_base::failure& f)
+  {
+    PSENSCAN_WARN("udp_data::readLine()", f.what());
+  }
+}
+
 static void read(const std::string& filename, const uint16_t port, UdpData& udp_data)
 {
   std::ifstream filestr{ filename };
   if (!filestr.is_open())
   {
-    PSENSCAN_ERROR("UdpDataReader", "Could not open file {}", filename);
+    PSENSCAN_ERROR("udp_data::read()", "Could not open file {}", filename);
     return;
   }
 
   std::string line;
   while (std::getline(filestr, line))
   {
-    try
-    {
-      UdpDatum udp_datum;
-
-      std::istringstream is(line);
-      if (readAndCheckPortNumber(is, port))
-      {
-        readTimestamp(is, udp_datum.timestamp_sec_);
-        readHexValue(is, "scan_counter:", udp_datum.scan_counter_);
-        readHexValue(is, "from_theta:", udp_datum.from_theta_);
-
-        udp_data.push_back(udp_datum);
-      }
-    }
-    catch (const std::ios_base::failure& f)
-    {
-      PSENSCAN_WARN("UdpDataReader", f.what());
-    }
+    readLine(line, port, udp_data);
   }
-  PSENSCAN_INFO("UdpDataReader", "Read data from {} udp packets.", udp_data.size());
+  PSENSCAN_INFO("udp_data::read()", "Read data from {} udp packets.", udp_data.size());
   filestr.close();
 }
 

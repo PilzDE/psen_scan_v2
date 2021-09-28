@@ -103,7 +103,7 @@ static std::unique_ptr<TestData> assemble(const ScannerConfiguration& scanner_co
   runScanner(scanner_config, scanner_run_duration_sec, [&test_data_ptr](const LaserScan& scan) {
     extractDataFromScan(*test_data_ptr, scan);
   });
-  PSENSCAN_INFO("TestDataAssembler", "Extracted data from {} laserscan callbacks.", test_data_ptr->size());
+  PSENSCAN_INFO("test_data::assemble()", "Extracted data from {} laserscan callbacks.", test_data_ptr->size());
 
   udp_data::UdpData udp_data;
   udp_data::read(udp_data_filename, udp_port, udp_data);
