@@ -55,20 +55,29 @@ public:
 
     buildScannerConfig();
     setLogLevel(CONSOLE_BRIDGE_LOG_INFO);
+
+    assembleTestDataByRunningTheScanner();  // Only runs the scanner once for all test cases.
     ASSERT_GE(testSize(), MINIMUM_TEST_SIZE) << "Assembling test data failed.";
   }
 
 protected:
+  void assembleTestDataByRunningTheScanner()
+  {
+    // We use a static variable in order to avoid multiple setups with data assembly.
+    // If not for https://github.com/google/googletest/issues/247 this could be done via SetUpTestSuite().
+    static const std::shared_ptr<TestData> test_data_ptr{ TestDataAssembler::assemble(
+        *scanner_config_, SCANNER_RUN_DURATION_S, udp_data_filename_, HOST_UDP_DATA_PORT) };
+    test_data_ptr_ = test_data_ptr;
+  }
+
   const TestData& testData() const
   {
-    static const std::unique_ptr<TestData> test_data_ptr{ TestDataAssembler::assemble(
-        *scanner_config_, SCANNER_RUN_DURATION_S, udp_data_filename_, HOST_UDP_DATA_PORT) };
-    return *test_data_ptr;
+    return *test_data_ptr_;
   }
 
   std::size_t testSize() const
   {
-    return testData().size();
+    return test_data_ptr_->size();
   }
 
 private:
@@ -93,6 +102,7 @@ private:
   }
 
 private:
+  std::shared_ptr<TestData> test_data_ptr_;
   std::unique_ptr<ScannerConfiguration> scanner_config_;
   std::string udp_data_filename_;
 };
