@@ -476,13 +476,12 @@ if(CATKIN_ENABLE_TESTING)
 
   else()
     # always at least build the test to avoid build breaking changes
-    include_directories(${GTEST_INCLUDE_DIRS})
-    add_executable(hwtest_scan_compare EXCLUDE_FROM_ALL
+    catkin_add_executable_with_gtest(hwtest_scan_compare
     test/hw_tests/hwtest_scan_compare.cpp
     standalone/src/laserscan.cpp
+    EXCLUDE_FROM_ALL
     )
     add_dependencies(tests hwtest_scan_compare)
-    target_link_libraries(hwtest_scan_compare ${GTEST_LIBRARIES})
   endif()
 
 
