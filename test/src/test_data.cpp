@@ -21,6 +21,8 @@
 
 namespace psen_scan_v2_test
 {
+namespace test_data
+{
 TestDatum::TestDatum(const uint32_t scan_counter, const int64_t timestamp, const int64_t callback_invocation_time)
   : scan_counter_(scan_counter), timestamp_(timestamp), callback_invocation_time_(callback_invocation_time)
 {
@@ -66,4 +68,5 @@ int64_t TestDatum::lastFrameTime() const
   return last_frame_time_.get();
 }
 
+}  // namespace test_data
 }  // namespace psen_scan_v2_test

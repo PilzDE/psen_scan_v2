@@ -23,6 +23,8 @@
 
 namespace psen_scan_v2_test
 {
+namespace test_data
+{
 class TestDatum
 {
 public:
@@ -49,6 +51,7 @@ private:
 
 using TestData = std::vector<TestDatum>;
 
+}  // namespace test_data
 }  // namespace psen_scan_v2_test
 
 #endif  // PSEN_SCAN_V2_TEST_TEST_DATA_H

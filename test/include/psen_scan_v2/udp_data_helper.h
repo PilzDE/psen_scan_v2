@@ -13,6 +13,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#ifndef PSEN_SCAN_V2_TEST_UDP_DATA_HELPER_H
+#define PSEN_SCAN_V2_TEST_UDP_DATA_HELPER_H
+
+#include <cstdint>
 #include <fstream>
 #include <ios>
 #include <sstream>
@@ -25,11 +29,51 @@
 
 #include "psen_scan_v2_standalone/util/logging.h"
 
-#include "psen_scan_v2/udp_data_reader.h"
-
 namespace psen_scan_v2_test
 {
-void UdpDataReader::read(const std::string& filename, const uint16_t port, UdpData& udp_data)
+namespace udp_data
+{
+struct UdpDatum
+{
+  uint32_t scan_counter_;
+  uint16_t from_theta_;
+  double timestamp_sec_;
+};
+
+using UdpData = std::vector<UdpDatum>;
+
+template <typename T>
+static void readHexValue(std::istringstream& is, const std::string& expected_key, T& value)
+{
+  std::string key;
+  if (!(is >> key && key == expected_key && is >> std::hex >> value))
+  {
+    throw std::ios_base::failure(fmt::format("Could not read {} from udp data file.", expected_key));
+  }
+  boost::endian::big_to_native_inplace(value);
+}
+
+static void readTimestamp(std::istringstream& is, double& value)
+{
+  std::string key;
+  if (!(is >> key && key == "time_epoch:" && is >> std::dec >> value))
+  {
+    throw std::ios_base::failure("Could not read timestamp from udp data file.");
+  }
+}
+
+static bool readAndCheckPortNumber(std::istringstream& is, const uint16_t expected_port)
+{
+  std::string key;
+  uint16_t udp_port;
+  if (!(is >> key && key == "udp_port:" && is >> std::dec >> udp_port))
+  {
+    throw std::ios_base::failure("Could not read port number from udp data file.");
+  }
+  return udp_port == expected_port;
+}
+
+static void read(const std::string& filename, const uint16_t port, UdpData& udp_data)
 {
   std::ifstream filestr{ filename };
   if (!filestr.is_open())
@@ -64,35 +108,7 @@ void UdpDataReader::read(const std::string& filename, const uint16_t port, UdpDa
   filestr.close();
 }
 
-bool UdpDataReader::readAndCheckPortNumber(std::istringstream& is, const uint16_t expected_port)
-{
-  std::string key;
-  uint16_t udp_port;
-  if (!(is >> key && key == "udp_port:" && is >> std::dec >> udp_port))
-  {
-    throw std::ios_base::failure("Could not read port number from udp data file.");
-  }
-  return udp_port == expected_port;
-}
-
-template <typename T>
-void UdpDataReader::readHexValue(std::istringstream& is, const std::string& expected_key, T& value)
-{
-  std::string key;
-  if (!(is >> key && key == expected_key && is >> std::hex >> value))
-  {
-    throw std::ios_base::failure(fmt::format("Could not read {} from udp data file.", expected_key));
-  }
-  boost::endian::big_to_native_inplace(value);
-}
-
-void UdpDataReader::readTimestamp(std::istringstream& is, double& value)
-{
-  std::string key;
-  if (!(is >> key && key == "time_epoch:" && is >> std::dec >> value))
-  {
-    throw std::ios_base::failure("Could not read timestamp from udp data file.");
-  }
-}
-
+}  // namespace udp_data
 }  // namespace psen_scan_v2_test
+
+#endif  // PSEN_SCAN_V2_TEST_UDP_DATA_HELPER_H

@@ -27,7 +27,7 @@
 #include "psen_scan_v2_standalone/core.h"
 
 #include "psen_scan_v2/test_data.h"
-#include "psen_scan_v2/test_data_assembler.h"
+#include "psen_scan_v2/test_data_helper.h"
 
 using namespace psen_scan_v2_standalone;
 
@@ -50,7 +50,7 @@ public:
   {
     const char* udp_data_filename{ std::getenv(UDP_DATA_FILENAME_ENV_VAR.c_str()) };
     ASSERT_NE(udp_data_filename, nullptr)
-        << "Searching environment variable " << UDP_DATA_FILENAME_ENV_VAR << "failed.";
+        << "Searching environment variable " << UDP_DATA_FILENAME_ENV_VAR << " failed.";
     udp_data_filename_ = udp_data_filename;
 
     buildScannerConfig();
@@ -65,12 +65,12 @@ protected:
   {
     // We use a static variable in order to avoid multiple setups with data assembly.
     // If not for https://github.com/google/googletest/issues/247 this could be done via SetUpTestSuite().
-    static const std::shared_ptr<TestData> test_data_ptr{ TestDataAssembler::assemble(
+    static const std::shared_ptr<test_data::TestData> test_data_ptr{ test_data::assemble(
         *scanner_config_, SCANNER_RUN_DURATION_S, udp_data_filename_, HOST_UDP_DATA_PORT) };
     test_data_ptr_ = test_data_ptr;
   }
 
-  const TestData& testData() const
+  const test_data::TestData& testData() const
   {
     return *test_data_ptr_;
   }
@@ -102,7 +102,7 @@ private:
   }
 
 private:
-  std::shared_ptr<TestData> test_data_ptr_;
+  std::shared_ptr<test_data::TestData> test_data_ptr_;
   std::unique_ptr<ScannerConfiguration> scanner_config_;
   std::string udp_data_filename_;
 };

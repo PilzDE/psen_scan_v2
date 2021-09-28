@@ -417,8 +417,6 @@ if(CATKIN_ENABLE_TESTING)
       catkin_add_gtest(hwtest_timestamp_standalone
         test/hw_tests/hwtest_timestamp_standalone.cpp
         test/src/test_data.cpp
-        test/src/test_data_assembler.cpp
-        test/src/udp_data_reader.cpp
       )
       target_link_libraries(hwtest_timestamp_standalone
         ${catkin_LIBRARIES}
