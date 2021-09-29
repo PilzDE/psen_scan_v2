@@ -530,7 +530,12 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
       scan_counter_invalid_round, num_scans_per_round - 1) };
   invalid_scan_round_msgs.emplace_back(createValidMonitoringFrameMsg(scan_counter_invalid_round + 1));
 
-  EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times(num_scans_per_round + (num_scans_per_round - 1) + 1);
+  util::Barrier all_frames_received_barrier;
+  {
+    InSequence seq;
+    EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times(num_scans_per_round + (num_scans_per_round - 1));
+    EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).WillOnce(OpenBarrier(&all_frames_received_barrier));
+  }
 
   util::Barrier user_msg_barrier;
   EXPECT_LOG_SHORT(WARN,
@@ -544,6 +549,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
   sendMonitoringFrames(invalid_scan_round_msgs);
 
   EXPECT_TRUE(user_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "User message not received";
+  EXPECT_TRUE(all_frames_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Not all frames received";
   REMOVE_LOG_MOCK
 }
 
@@ -563,7 +569,12 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
       scan_counter, num_scans_per_round + 1) };
   msgs.emplace_back(createValidMonitoringFrameMsg(scan_counter + 1));
 
-  EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times((num_scans_per_round + 1) + 1);
+  util::Barrier all_frames_received;
+  {
+    InSequence sec;
+    EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times((num_scans_per_round + 1));
+    EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).WillOnce(OpenBarrier(&all_frames_received));
+  }
 
   util::Barrier user_msg_barrier;
   EXPECT_LOG_SHORT(WARN, "ScanBuffer: Received too many MonitoringFrames for one scan round.")
@@ -573,6 +584,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
   sendMonitoringFrames(msgs);
 
   EXPECT_TRUE(user_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "User message not received";
+  EXPECT_TRUE(all_frames_received.waitTillRelease(DEFAULT_TIMEOUT)) << "Not all frames received";
   REMOVE_LOG_MOCK
 }
 
