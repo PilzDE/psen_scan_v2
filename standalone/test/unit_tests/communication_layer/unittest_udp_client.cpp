@@ -28,8 +28,8 @@
 
 namespace psen_scan_v2_standalone_test
 {
-static constexpr unsigned short HOST_UDP_READ_PORT{ 45001 };
-static constexpr unsigned short UDP_MOCK_SEND_PORT{ HOST_UDP_READ_PORT + 1 };
+static constexpr unsigned short HOST_UDP_READ_PORT{ 40001 };
+static constexpr unsigned short UDP_MOCK_SEND_PORT{ HOST_UDP_READ_PORT + 100 };
 
 static const std::string UDP_MOCK_IP_ADDRESS{ "127.0.0.1" };
 
@@ -85,9 +85,9 @@ TEST(UdpClientTests, testInvalidErrorCallback)
   EXPECT_THROW(psen_scan_v2_standalone::communication_layer::UdpClientImpl reader(
                    std::bind(&CallbackHandler::handleNewData, &handler, _1, _2, _3),
                    nullptr,
-                   HOST_UDP_READ_PORT,
+                   HOST_UDP_READ_PORT + 1,
                    boost::asio::ip::make_address_v4(UDP_MOCK_IP_ADDRESS.c_str()).to_uint(),
-                   UDP_MOCK_SEND_PORT),
+                   UDP_MOCK_SEND_PORT + 1),
                std::invalid_argument);
 #elif BOOST_VERSION >= 106900
   EXPECT_THROW(psen_scan_v2_standalone::communication_layer::UdpClientImpl reader(
