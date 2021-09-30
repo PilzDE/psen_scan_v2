@@ -135,6 +135,14 @@ public:
   void write(const data_conversion_layer::RawData& data);
 
   /**
+   * @brief Stops the underlying io_service so that no messages are received anymore.
+   *
+   * Note: In contrary to close() this is non-blocking but note that after calling stop()
+   * calls to the msg_callback are still possible due to pending messages.
+   */
+  void stop();
+
+  /**
    * @brief Closes the UDP connection and stops all pending asynchronous operation.
    */
   void close();
@@ -199,6 +207,11 @@ inline communication_layer::UdpClientImpl::UdpClientImpl(const NewMessageCallbac
 
   assert(!io_service_thread_.joinable() && "io_service_thread_ is joinable!");
   io_service_thread_ = std::thread([this]() { io_service_.run(); });
+}
+
+inline void UdpClientImpl::stop()
+{
+  io_service_.stop();
 }
 
 inline void UdpClientImpl::close()
