@@ -62,6 +62,9 @@ ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScan
 ScannerV2::~ScannerV2()
 {
   PSENSCAN_DEBUG("Scanner", "Destruction called.");
+
+  const std::lock_guard<std::mutex> lock(member_mutex_);
+  sm_->stop();
 }
 
 std::future<void> ScannerV2::start()
