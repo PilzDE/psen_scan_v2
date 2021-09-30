@@ -97,7 +97,7 @@ TEST_F(ScanComparisonTests, simpleCompare)
   config_builder.hostIP(host_ip_).scannerIp(scanner_ip_).hostDataPort(HOST_UDP_PORT_DATA).scanRange(scan_range);
 
   ScannerV2 scanner(config_builder.build(), [&laser_scan_validator, &window_size](const ScanType& scan) {
-    return laser_scan_validator.scanCb<-1375>(boost::make_shared<ScanType const>(scan), window_size);
+    return laser_scan_validator.scanCb(boost::make_shared<ScanType const>(scan), window_size, -1375);
   });
   scanner.start();
 

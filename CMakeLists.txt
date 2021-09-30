@@ -412,47 +412,6 @@ if(CATKIN_ENABLE_TESTING)
   # See ./hwtest_readme.md for details on the hardware tests.
   if(ENABLE_HARDWARE_TESTING)
 
-    # This test is intended to be run with a parallel wireshark process and thus needs to be enabled separately.
-    if(ENABLE_HARDWARE_TESTING_WITH_WIRESHARK)
-      catkin_add_gtest(hwtest_timestamp_standalone
-        test/hw_tests/hwtest_timestamp_standalone.cpp
-        test/src/test_data.cpp
-      )
-      target_link_libraries(hwtest_timestamp_standalone
-        ${catkin_LIBRARIES}
-        ${PROJECT_NAME}_standalone
-      )
-    endif()
-
-    # This test is intended to be run in a dedicated environment with a prerecorded reference scan
-    # and thus needs to be enabled separately.
-    if(ENABLE_HARDWARE_TESTING_WITH_REFERENCE_SCAN)
-      find_package(rosbag REQUIRED)
-
-      catkin_add_gtest(hwtest_scan_compare_standalone
-        test/hw_tests/hwtest_scan_compare_standalone.cpp
-        standalone/src/laserscan.cpp
-      )
-      target_link_libraries(hwtest_scan_compare_standalone
-        ${catkin_LIBRARIES}
-        ${PROJECT_NAME}_standalone
-        ${rosbag_LIBRARIES}
-        fmt::fmt
-      )
-
-      add_rostest_gtest(hwtest_scan_compare
-          test/hw_tests/hwtest_scan_compare.test
-          test/hw_tests/hwtest_scan_compare.cpp
-          standalone/src/laserscan.cpp
-      )
-      target_link_libraries(hwtest_scan_compare
-        ${catkin_LIBRARIES}
-        ${pilz_testutils_LIBRARIES}
-        ${rosbag_LIBRARIES}
-        fmt::fmt
-      )
-    endif()
-
     add_rostest(test/hw_tests/hwtest_publish.test)
 
     add_rostest(test/hw_tests/hwtest_scan_range.test
@@ -464,6 +423,98 @@ if(CATKIN_ENABLE_TESTING)
     add_rostest(test/hw_tests/hwtest_scan_range.test
       ARGS config:=big_resolution.yaml)
   endif()
+
+  #########################################
+  ##  Hardware-Tests in Test Environment ##
+  #########################################
+
+  #---------------------------------
+  ### hwtest_scan_compare_standalone
+  #---------------------------------
+
+  # This test is intended to be run on in a dedicated environment with a prerecorded reference scan
+  # and thus needs to be enabled seperately.
+  find_package(rosbag REQUIRED)
+  if(ENABLE_HARDWARE_TESTING_WITH_REFERENCE_SCAN)
+
+    catkin_add_gtest(hwtest_scan_compare_standalone
+      test/hw_tests/hwtest_scan_compare_standalone.cpp
+      standalone/src/laserscan.cpp
+    )
+
+  else()
+    # always at least build the test to avoid build breaking changes
+    catkin_add_executable_with_gtest(hwtest_scan_compare_standalone
+                                            test/hw_tests/hwtest_scan_compare_standalone.cpp
+                                            standalone/src/laserscan.cpp
+                                            EXCLUDE_FROM_ALL)
+    add_dependencies(tests hwtest_scan_compare_standalone)
+
+  endif()
+
+  target_link_libraries(hwtest_scan_compare_standalone
+    ${catkin_LIBRARIES}
+    ${PROJECT_NAME}_standalone
+    ${rosbag_LIBRARIES}
+    fmt::fmt
+  )
+
+
+  #----------------------
+  ### hwtest_scan_compare
+  #----------------------
+
+  if(ENABLE_HARDWARE_TESTING_WITH_REFERENCE_SCAN)
+
+    add_rostest_gtest(hwtest_scan_compare
+      test/hw_tests/hwtest_scan_compare.test
+      test/hw_tests/hwtest_scan_compare.cpp
+      standalone/src/laserscan.cpp
+    )
+
+  else()
+    # always at least build the test to avoid build breaking changes
+    catkin_add_executable_with_gtest(hwtest_scan_compare
+    test/hw_tests/hwtest_scan_compare.cpp
+    standalone/src/laserscan.cpp
+    EXCLUDE_FROM_ALL
+    )
+    add_dependencies(tests hwtest_scan_compare)
+  endif()
+
+
+  target_link_libraries(hwtest_scan_compare
+    ${catkin_LIBRARIES}
+    ${pilz_testutils_LIBRARIES}
+    ${rosbag_LIBRARIES}
+    fmt::fmt
+  )
+
+
+  #------------------------------
+  ### hwtest_timestamp_standalone
+  #------------------------------
+
+  # This test is intended to be run with a parallel wireshark process and thus needs to be enabled separately.
+  if(ENABLE_HARDWARE_TESTING_WITH_WIRESHARK)
+    catkin_add_gtest(hwtest_timestamp_standalone
+      test/hw_tests/hwtest_timestamp_standalone.cpp
+      test/src/test_data.cpp
+    )
+  else()
+    # always at least build the test to avoid build breaking changes
+    catkin_add_executable_with_gtest(hwtest_timestamp_standalone
+      test/hw_tests/hwtest_timestamp_standalone.cpp
+      test/src/test_data.cpp
+      EXCLUDE_FROM_ALL
+    )
+    add_dependencies(tests hwtest_timestamp_standalone)
+  endif()
+
+  target_link_libraries(hwtest_timestamp_standalone
+    ${catkin_LIBRARIES}
+    ${PROJECT_NAME}_standalone
+  )
 
 
   # generate coverage report using CATKIN_MAKE:

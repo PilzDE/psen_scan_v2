@@ -27,7 +27,6 @@
 #include <boost/shared_ptr.hpp>
 
 #include <fmt/format.h>
-#include <fmt/ostream.h>
 
 #include <gtest/gtest.h>
 
@@ -48,8 +47,9 @@
 
 namespace psen_scan_v2_test
 {
-template <int16_t angle_offset = 0>
-void addScanToBin(const psen_scan_v2_standalone::LaserScan& scan, std::map<int16_t, NormalDist>& bin)
+void addScanToBin(const psen_scan_v2_standalone::LaserScan& scan,
+                  std::map<int16_t, NormalDist>& bin,
+                  const int16_t angle_offset = 0)
 {
   for (size_t i = 0; i < scan.getMeasurements().size(); ++i)
   {
@@ -64,8 +64,9 @@ void addScanToBin(const psen_scan_v2_standalone::LaserScan& scan, std::map<int16
   }
 }
 
-template <int16_t angle_offset = 0>
-void addScanToBin(const sensor_msgs::LaserScan& scan, std::map<int16_t, NormalDist>& bin)
+void addScanToBin(const sensor_msgs::LaserScan& scan,
+                  std::map<int16_t, NormalDist>& bin,
+                  const int16_t angle_offset = 0)
 {
   for (size_t i = 0; i < scan.ranges.size(); ++i)
   {
@@ -82,16 +83,16 @@ void addScanToBin(const sensor_msgs::LaserScan& scan, std::map<int16_t, NormalDi
   }
 }
 
-template <typename ScanConstPtr, int16_t angle_offset = 0>
-std::map<int16_t, NormalDist> binsFromScans(const std::vector<ScanConstPtr>& scans)
+template <typename ScanConstPtr>
+std::map<int16_t, NormalDist> binsFromScans(const std::vector<ScanConstPtr>& scans, const int16_t angle_offset = 0)
 {
   std::map<int16_t, NormalDist> bins;
-  std::for_each(scans.cbegin(), scans.cend(), [&bins](const ScanConstPtr& scan) {
+  std::for_each(scans.cbegin(), scans.cend(), [&bins, &angle_offset](const ScanConstPtr& scan) {
     if (scan == nullptr)
     {
       throw std::invalid_argument("LaserScan pointer must not be null");
     }
-    addScanToBin<angle_offset>(*scan, bins);
+    addScanToBin(*scan, bins, angle_offset);
   });
   return bins;
 }
@@ -126,8 +127,7 @@ public:
 
   typedef boost::shared_ptr<ScanType const> ScanConstPtr;
 
-  template <int16_t angle_offset = 0>
-  void scanCb(const ScanConstPtr scan, size_t n_msgs)
+  void scanCb(const ScanConstPtr scan, size_t n_msgs, const int16_t angle_offset = 0)
   {
     PSENSCAN_INFO_THROTTLE(5, "LaserScanValidator", "Checking messages for validity. So far looking good.");
 
@@ -141,7 +141,7 @@ public:
     // To have only one call on the promise the subscriber is shut down
     if (msgs_.size() == n_msgs)
     {
-      auto bins_actual = binsFromScans<ScanConstPtr, angle_offset>(msgs_);
+      auto bins_actual = binsFromScans<ScanConstPtr>(msgs_, angle_offset);
 
       std::string error_string;
       std::size_t counter_deviations{ 0 };
@@ -163,13 +163,13 @@ public:
         auto dist_actual = bin_actual.second;
         auto dist_expected = bin_expected->second;
         auto distance = bhattacharyya_distance(dist_actual, dist_expected);
-        if (distance > 10.)
+        if (distance > 20.)
         {
           error_string +=
               fmt::format("On {:+.1f} deg  expected: {} actual: {} | dist: {:.1f}, dmean: {:.3f}, dstdev: {:.3f}\n",
                           bin_actual.first / 10.,
-                          dist_expected,
-                          dist_actual,
+                          dist_expected.to_string(),
+                          dist_actual.to_string(),
                           distance,
                           abs(dist_expected.mean() - dist_actual.mean()),
                           abs(dist_expected.stdev() - dist_actual.stdev()));

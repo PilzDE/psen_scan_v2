@@ -4,6 +4,7 @@ Changelog for package psen_scan_v2
 
 Forthcoming
 -----------
+* Always build hardware tests
 * Internal refactorings
 
 0.3.2 (2021-09-16)
