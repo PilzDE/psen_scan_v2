@@ -71,6 +71,14 @@ TEST(TenthOfDegreeTest, MultiplicationWithSizeT)
   EXPECT_EQ((tenth_of_degree * int_value).value(), 6);
 }
 
+TEST(TenthOfDegreeTest, MultiplicationWithSizeTConst)
+{
+  const util::TenthOfDegree tenth_of_degree{ 2 };
+  const size_t int_value{ 3 };
+
+  EXPECT_EQ((tenth_of_degree * int_value).value(), 6);
+}
+
 TEST(TenthOfDegreeTest, DivisionWithInteger)
 {
   util::TenthOfDegree tenth_of_degree{ 6 };
