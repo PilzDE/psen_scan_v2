@@ -163,7 +163,7 @@ public:
         auto dist_actual = bin_actual.second;
         auto dist_expected = bin_expected->second;
         auto distance = bhattacharyya_distance(dist_actual, dist_expected);
-        if (distance > 10.)
+        if (distance > 20.)
         {
           error_string +=
               fmt::format("On {:+.1f} deg  expected: {} actual: {} | dist: {:.1f}, dmean: {:.3f}, dstdev: {:.3f}\n",
