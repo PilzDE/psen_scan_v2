@@ -65,9 +65,9 @@ protected:
   {
     // We use a static variable in order to avoid multiple setups with data assembly.
     // If not for https://github.com/google/googletest/issues/247 this could be done via SetUpTestSuite().
-    static const std::shared_ptr<test_data::TestData> test_data_ptr{ test_data::assemble(
+    static const std::shared_ptr<test_data::TestData> TEST_DATA_PTR{ test_data::assemble(
         *scanner_config_, SCANNER_RUN_DURATION_S, udp_data_filename_, HOST_UDP_DATA_PORT) };
-    test_data_ptr_ = test_data_ptr;
+    test_data_ptr_ = TEST_DATA_PTR;
   }
 
   const test_data::TestData& testData() const
