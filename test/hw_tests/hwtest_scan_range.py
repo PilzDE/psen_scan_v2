@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright (c) 2021 Pilz GmbH & Co. KG
 #
 # This program is free software: you can redistribute it and/or modify
@@ -28,6 +28,7 @@ DECIMAL_PLACE_ACCURACY = 6
 class HwtestScanRange(unittest.TestCase):
     """ Check if the laserscan message covers the scan range as expected.
     """
+
     def setUp(self):
         rospy.init_node('hwtest_scan_range')
         self.received_msgs = []
@@ -40,13 +41,15 @@ class HwtestScanRange(unittest.TestCase):
         self.received_msgs.append(msg)
 
     def test_one_message_received(self):
-        while len(self.received_msgs) <= 5:  # Avoid testing a message with an old config (can happen at scanner start)
+        # Avoid testing a message with an old config (can happen at scanner start)
+        while len(self.received_msgs) <= 5:
             rospy.sleep(.1)
 
         self.assertTrue(self.received_msgs)
         message: LaserScan = self.received_msgs[-1]
 
-        num_intervals = floor((self.angle_end - self.angle_start) / self.resolution)
+        num_intervals = floor(
+            (self.angle_end - self.angle_start) / self.resolution)
         expected_max_angle = self.angle_start + self.resolution * num_intervals
 
         self.assertAlmostEqual(self.angle_start, message.angle_min, DECIMAL_PLACE_ACCURACY,
