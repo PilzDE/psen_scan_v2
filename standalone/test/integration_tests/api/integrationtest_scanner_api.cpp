@@ -69,7 +69,12 @@ public:
 
 #define EXPECT_FUTURE_TIMEOUT(val1, val2) EXPECT_EQ(val1.wait_for(val2), std::future_status::timeout)
 
-#define EXPECT_DOES_NOT_BLOCK(statement) EXPECT_FUTURE_IS_READY(std::async(std::launch::async, [&]() { statement }))
+#define EXPECT_DOES_NOT_BLOCK(statement)                                                                               \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    const auto future = std::async(std::launch::async, [&]() { statement });                                           \
+    EXPECT_FUTURE_IS_READY(future) << #statement << " does not return.";                                               \
+  } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
 
 class ScannerAPITests : public testing::Test
 {
