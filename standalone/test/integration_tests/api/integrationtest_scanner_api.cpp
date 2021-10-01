@@ -65,9 +65,15 @@ public:
   MOCK_METHOD1(LaserScanCallback, void(const LaserScan&));
 };
 
-#define EXPECT_FUTURE_IS_READY(val1) EXPECT_EQ(val1.wait_for(DEFAULT_TIMEOUT), std::future_status::ready)
+#define EXPECT_FUTURE_IS_READY(future) EXPECT_EQ(future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready)
 
-#define EXPECT_FUTURE_TIMEOUT(val1, val2) EXPECT_EQ(val1.wait_for(val2), std::future_status::timeout)
+#define EXPECT_FUTURE_TIMEOUT(future, wait_timeout) EXPECT_EQ(future.wait_for(wait_timeout), std::future_status::timeout)
+
+#define EXPECT_START_REQUEST_CALL(mock, config)                                                                        \
+  EXPECT_CALL(                                                                                                         \
+      *mock,                                                                                                           \
+      receiveControlMsg(                                                                                               \
+          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(*config))))
 
 #define EXPECT_DOES_NOT_BLOCK(statement)                                                                               \
   do                                                                                                                   \
@@ -84,7 +90,6 @@ protected:
   ScannerConfiguration generateScannerConfig(const std::string& host_ip, bool fragmented);
   void setUpScannerV2();
   void setUpScannerMock();
-  void prepareScannerMockStartReply();
   void startScanner();
   void stopScanner();
   std::unique_ptr<util::Barrier> prepareStartRequestBarrier(const ScannerConfiguration& config);
@@ -139,15 +144,6 @@ void ScannerAPITests::setUpScannerMock()
   scanner_mock_.reset(new StrictMock<ScannerMock>{ HOST_IP_ADDRESS, port_holder_ });
 }
 
-void ScannerAPITests::prepareScannerMockStartReply()
-{
-  EXPECT_CALL(
-      *scanner_mock_,
-      receiveControlMsg(
-          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(*config_))))
-      .WillOnce(InvokeWithoutArgs([this]() { scanner_mock_->sendStartReply(); }));
-}
-
 std::unique_ptr<util::Barrier> ScannerAPITests::prepareStartRequestBarrier(const ScannerConfiguration& config)
 {
   const data_conversion_layer::start_request::Message start_req(config);
@@ -183,7 +179,9 @@ std::unique_ptr<util::Barrier> ScannerAPITests::prepareMonitoringFrameBarrier(
 
 void ScannerAPITests::startScanner()
 {
-  prepareScannerMockStartReply();
+  EXPECT_START_REQUEST_CALL(scanner_mock_, config_).WillOnce(InvokeWithoutArgs([this]() {
+    scanner_mock_->sendStartReply();
+  }));
   std::future<void> start_future;
   EXPECT_DOES_NOT_BLOCK(start_future = scanner_->start(););
   EXPECT_FUTURE_IS_READY(start_future) << "Scanner::start() not finished";
