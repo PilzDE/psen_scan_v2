@@ -67,13 +67,8 @@ public:
 
 #define EXPECT_FUTURE_IS_READY(future) EXPECT_EQ(future.wait_for(DEFAULT_TIMEOUT), std::future_status::ready)
 
-#define EXPECT_FUTURE_TIMEOUT(future, wait_timeout) EXPECT_EQ(future.wait_for(wait_timeout), std::future_status::timeout)
-
-#define EXPECT_START_REQUEST_CALL(mock, config)                                                                        \
-  EXPECT_CALL(                                                                                                         \
-      *mock,                                                                                                           \
-      receiveControlMsg(                                                                                               \
-          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(*config))))
+#define EXPECT_FUTURE_TIMEOUT(future, wait_timeout)                                                                    \
+  EXPECT_EQ(future.wait_for(wait_timeout), std::future_status::timeout)
 
 #define EXPECT_DOES_NOT_BLOCK(statement)                                                                               \
   do                                                                                                                   \
@@ -86,8 +81,6 @@ class ScannerAPITests : public testing::Test
 {
 protected:
   void SetUp() override;
-  void setUpScannerConfig(const std::string& host_ip = HOST_IP_ADDRESS, bool fragmented = FRAGMENTED_SCAN);
-  ScannerConfiguration generateScannerConfig(const std::string& host_ip, bool fragmented);
   void setUpScannerV2Driver();
   void setUpScannerHwMock();
   void startScanner();
@@ -179,11 +172,12 @@ std::unique_ptr<util::Barrier> ScannerAPITests::prepareMonitoringFrameBarrier(
 
 void ScannerAPITests::startScanner()
 {
-  EXPECT_START_REQUEST_CALL(hw_mock_, config_).WillOnce(InvokeWithoutArgs([this]() {
-    hw_mock_->sendStartReply();
-  }));
+  auto start_req_barrier = prepareStartRequestBarrier(*config_);
+
   std::future<void> start_future;
   EXPECT_DOES_NOT_BLOCK(start_future = driver_->start(););
+  EXPECT_TRUE(start_req_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
+
   EXPECT_FUTURE_IS_READY(start_future) << "Scanner::start() not finished";
 }  // namespace psen_scan_v2_standalone_test
 
@@ -543,8 +537,7 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfMissingMeassuremen
       .WillOnce(OpenBarrier(&valid_msg_barrier));
 
   std::cout << "ScannerAPITests: Send monitoring frame without measurement data ..." << std::endl;
-  hw_mock_->sendMonitoringFrame(
-      createValidMonitoringFrameMsg(42, util::TenthOfDegree{ 0 }, util::TenthOfDegree{ 0 }));
+  hw_mock_->sendMonitoringFrame(createValidMonitoringFrameMsg(42, util::TenthOfDegree{ 0 }, util::TenthOfDegree{ 0 }));
   EXPECT_TRUE(valid_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Valid monitoring frame not received";
 
   stopScanner();
