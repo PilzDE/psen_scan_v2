@@ -296,10 +296,7 @@ TEST_F(ScannerAPITests, testStopFunctionality)
       .WillOnce(OpenBarrier(&stop_req_received_barrier));
 
   scanner_mock_->startListeningForControlMsg();
-  const auto stop_future{ std::async(std::launch::async, [this]() {
-    const auto stop_future = scanner_->stop();
-    stop_future.wait();
-  }) };
+  const auto stop_future = scanner_->stop();
 
   EXPECT_TRUE(stop_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Stop request not received";
   EXPECT_FUTURE_TIMEOUT(stop_future, FUTURE_WAIT_TIMEOUT) << "Scanner::stop() finished without receiveing reply";
@@ -356,10 +353,7 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
   EXPECT_LOG_SHORT(INFO, "ScannerController: Scanner started successfully.").Times(1);
 
   scanner_mock_->startContinuousListeningForControlMsg();
-  const auto start_future{ std::async(std::launch::async, [this]() {
-    const auto scanner_start = scanner_->start();
-    scanner_start.wait();
-  }) };
+  const auto start_future = scanner_->start();
 
   EXPECT_TRUE(error_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Error message not received";
   EXPECT_TRUE(twice_called_barrier.waitTillRelease(5000ms)) << "Start reply not send at least twice in time";
