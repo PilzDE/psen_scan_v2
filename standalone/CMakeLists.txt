@@ -332,11 +332,5 @@ target_link_libraries(integrationtest_udp_client
 add_test(NAME integrationtest_udp_client
         COMMAND integrationtest_udp_client)
 
-# Acceptancetest scripts
-add_executable(acceptancetest_print_timestamps test/acceptance_tests/acceptancetest_timestamps.cpp)
-target_link_libraries(acceptancetest_print_timestamps
-  ${PROJECT_NAME}
-)
-
 endif ()
 endif ()
