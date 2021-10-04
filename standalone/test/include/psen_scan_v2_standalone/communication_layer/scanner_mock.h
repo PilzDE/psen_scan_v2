@@ -76,16 +76,13 @@ public:
                void(const udp::endpoint&, const psen_scan_v2_standalone::data_conversion_layer::RawData&));
 
 public:
-  void startListeningForControlMsg();
-  void startContinuousListeningForControlMsg();
-
-public:
   void sendStartReply();
   void sendStopReply();
   void sendMonitoringFrame(const data_conversion_layer::monitoring_frame::Message& msg);
   void sendEmptyMonitoringFrame();
 
 private:
+  void startContinuousListeningForControlMsg();
   void sendReply(const data_conversion_layer::scanner_reply::Message::Type& reply_type);
 
 private:
