@@ -88,6 +88,15 @@ public:
       receiveControlMsg(                                                                                               \
           _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config))))
 
+#define EXPECT_CALLBACK_WILL_OPEN_BARRIER(cb, msgs, barrier)                                                           \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    const auto timestamp{ util::getCurrentTime() };                                                                    \
+    const auto scan{ createReferenceScan(msgs, timestamp) };                                                           \
+    EXPECT_CALL(cb, LaserScanCallback(AllOf(ScanDataEqual(scan), TimestampInExpectedTimeframe(scan, timestamp))))      \
+        .WillOnce(OpenBarrier(&barrier));                                                                              \
+  } while (false)
+
 class ScannerAPITests : public testing::Test
 {
 protected:
@@ -97,8 +106,6 @@ protected:
   void setUpScannerHwMock();
   void startScanner();
   void stopScanner();
-  std::unique_ptr<util::Barrier>
-  prepareMonitoringFrameBarrier(const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs);
   ScannerConfiguration generateScannerConfig(const std::string& host_ip, bool fragmented);
   void sendMonitoringFrames(const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs);
 
@@ -146,20 +153,6 @@ void ScannerAPITests::setUpScannerV2Driver()
 void ScannerAPITests::setUpScannerHwMock()
 {
   hw_mock_.reset(new StrictMock<ScannerMock>{ HOST_IP_ADDRESS, port_holder_ });
-}
-
-std::unique_ptr<util::Barrier> ScannerAPITests::prepareMonitoringFrameBarrier(
-    const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs)
-{
-  const auto timestamp{ util::getCurrentTime() };
-  const auto scan{ createReferenceScan(msgs, timestamp) };
-
-  auto monitoring_frame_barrier = std::make_unique<util::Barrier>();
-
-  EXPECT_CALL(user_callbacks_,
-              LaserScanCallback(AllOf(ScanDataEqual(scan), TimestampInExpectedTimeframe(scan, timestamp))))
-      .WillOnce(OpenBarrier(monitoring_frame_barrier.get()));
-  return monitoring_frame_barrier;
 }
 
 void ScannerAPITests::startScanner()
@@ -375,7 +368,8 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
   startScanner();
 
   const auto msg{ createValidMonitoringFrameMsg() };
-  auto monitoring_frame_barrier = prepareMonitoringFrameBarrier({ msg });
+  util::Barrier monitoring_frame_barrier;
+  EXPECT_CALLBACK_WILL_OPEN_BARRIER(user_callbacks_, { msg }, monitoring_frame_barrier);
   util::Barrier diagnostic_barrier;
 
   EXPECT_LOG_SHORT(WARN,
@@ -387,7 +381,7 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
 
   hw_mock_->sendMonitoringFrame(msg);
 
-  EXPECT_TRUE(monitoring_frame_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
+  EXPECT_TRUE(monitoring_frame_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
   EXPECT_BARRIER_OPENS(diagnostic_barrier, DEFAULT_TIMEOUT) << "Diagnostic message not received";
 
   stopScanner();
@@ -402,11 +396,12 @@ TEST_F(ScannerAPITests, shouldCallLaserScanCallbackOnlyOneTimeWithAllInformation
   startScanner();
 
   const auto msgs{ createMonitoringFrameMsgsForScanRound(2, 6) };
-  auto monitoring_frame_barrier = prepareMonitoringFrameBarrier(msgs);
+  util::Barrier monitoring_frame_barrier;
+  EXPECT_CALLBACK_WILL_OPEN_BARRIER(user_callbacks_, msgs, monitoring_frame_barrier);
 
   sendMonitoringFrames(msgs);
 
-  EXPECT_TRUE(monitoring_frame_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
+  EXPECT_BARRIER_OPENS(monitoring_frame_barrier, DEFAULT_TIMEOUT) << "Monitoring frame not received";
 
   stopScanner();
 }
@@ -427,7 +422,8 @@ TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
   std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> valid_round =
       createMonitoringFrameMsgsForScanRound(4, 6);
 
-  auto monitoring_frame_barrier = prepareMonitoringFrameBarrier(valid_round);
+  util::Barrier monitoring_frame_barrier;
+  EXPECT_CALLBACK_WILL_OPEN_BARRIER(user_callbacks_, valid_round, monitoring_frame_barrier);
 
   util::Barrier user_msg_barrier;
   EXPECT_LOG_SHORT(WARN,
@@ -442,7 +438,7 @@ TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
     sendMonitoringFrames(msgs);
   }
 
-  EXPECT_TRUE(monitoring_frame_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
+  EXPECT_BARRIER_OPENS(monitoring_frame_barrier, DEFAULT_TIMEOUT) << "Monitoring frame not received";
   EXPECT_BARRIER_OPENS(user_msg_barrier, DEFAULT_TIMEOUT) << "Monitoring frame of new scan round not recognized ";
 
   stopScanner();
@@ -461,7 +457,8 @@ TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
   auto msg_round2 = createValidMonitoringFrameMsg(2);
   auto msgs_round3 = createMonitoringFrameMsgsForScanRound(3, 6);
 
-  auto monitoring_frame_barrier = prepareMonitoringFrameBarrier(msgs_round3);
+  util::Barrier monitoring_frame_barrier;
+  EXPECT_CALLBACK_WILL_OPEN_BARRIER(user_callbacks_, msgs_round3, monitoring_frame_barrier);
 
   util::Barrier user_msg_barrier;
   EXPECT_LOG_SHORT(WARN,
@@ -474,7 +471,7 @@ TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
   hw_mock_->sendMonitoringFrame(msg_round2);
   hw_mock_->sendMonitoringFrame(msgs_round3.back());
 
-  EXPECT_TRUE(monitoring_frame_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Monitoring frame not received";
+  EXPECT_BARRIER_OPENS(monitoring_frame_barrier, DEFAULT_TIMEOUT) << "Monitoring frame not received";
   EXPECT_BARRIER_OPENS(user_msg_barrier, DEFAULT_TIMEOUT) << "Dropped Monitoring frame not recognized";
 
   stopScanner();
