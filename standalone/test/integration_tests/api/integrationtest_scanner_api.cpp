@@ -77,10 +77,20 @@ public:
     EXPECT_FUTURE_IS_READY(future) << #statement << " does not return.";                                               \
   } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
 
+#define EXPECT_STOP_REQUEST_CALL(hw_mock)                                                                              \
+  EXPECT_CALL(hw_mock, receiveControlMsg(_, data_conversion_layer::stop_request::serialize()))
+
+#define EXPECT_START_REQUEST_CALL(hw_mock, config)                                                                     \
+  EXPECT_CALL(                                                                                                         \
+      hw_mock,                                                                                                         \
+      receiveControlMsg(                                                                                               \
+          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config))))
+
 class ScannerAPITests : public testing::Test
 {
 protected:
   void SetUp() override;
+  void setUpScannerConfig(const std::string& host_ip = HOST_IP_ADDRESS, bool fragmented = FRAGMENTED_SCAN);
   void setUpScannerV2Driver();
   void setUpScannerHwMock();
   void startScanner();
@@ -89,6 +99,7 @@ protected:
   std::unique_ptr<util::Barrier> prepareStopRequestBarrier();
   std::unique_ptr<util::Barrier>
   prepareMonitoringFrameBarrier(const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs);
+  ScannerConfiguration generateScannerConfig(const std::string& host_ip, bool fragmented);
   void sendMonitoringFrames(const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs);
 
 protected:
@@ -139,20 +150,15 @@ void ScannerAPITests::setUpScannerHwMock()
 
 std::unique_ptr<util::Barrier> ScannerAPITests::prepareStartRequestBarrier(const ScannerConfiguration& config)
 {
-  const data_conversion_layer::start_request::Message start_req(config);
   auto start_req_received_barrier = std::make_unique<util::Barrier>();
-
-  EXPECT_CALL(*hw_mock_, receiveControlMsg(_, data_conversion_layer::start_request::serialize(start_req)))
-      .WillOnce(OpenBarrier(start_req_received_barrier.get()));
+  EXPECT_START_REQUEST_CALL(*hw_mock_, config).WillOnce(OpenBarrier(start_req_received_barrier.get()));
   return start_req_received_barrier;
 }
 
 std::unique_ptr<util::Barrier> ScannerAPITests::prepareStopRequestBarrier()
 {
   auto stop_req_received_barrier = std::make_unique<util::Barrier>();
-
-  EXPECT_CALL(*hw_mock_, receiveControlMsg(_, data_conversion_layer::stop_request::serialize()))
-      .WillOnce(OpenBarrier(stop_req_received_barrier.get()));
+  EXPECT_STOP_REQUEST_CALL(*hw_mock_).WillOnce(OpenBarrier(stop_req_received_barrier.get()));
   return stop_req_received_barrier;
 }
 
@@ -178,8 +184,9 @@ void ScannerAPITests::startScanner()
   EXPECT_DOES_NOT_BLOCK(start_future = driver_->start(););
   EXPECT_TRUE(start_req_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
 
+  hw_mock_->sendStartReply();
   EXPECT_FUTURE_IS_READY(start_future) << "Scanner::start() not finished";
-}  // namespace psen_scan_v2_standalone_test
+}
 
 void ScannerAPITests::stopScanner()
 {
@@ -293,8 +300,7 @@ TEST_F(ScannerAPITests, testStopFunctionality)
   startScanner();
 
   util::Barrier stop_req_received_barrier;
-  EXPECT_CALL(*hw_mock_, receiveControlMsg(_, data_conversion_layer::stop_request::serialize()))
-      .WillOnce(OpenBarrier(&stop_req_received_barrier));
+  EXPECT_STOP_REQUEST_CALL(*hw_mock_).WillOnce(OpenBarrier(&stop_req_received_barrier));
 
   std::future<void> stop_future;
   EXPECT_DOES_NOT_BLOCK(stop_future = driver_->stop(););
