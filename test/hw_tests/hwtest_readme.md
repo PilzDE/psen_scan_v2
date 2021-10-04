@@ -36,7 +36,7 @@ Then run
 ```
 rosrun industrial_ci run_ci ROS_DISTRO=noetic ROS_REPO=main \
 CMAKE_ARGS="-DENABLE_HARDWARE_TESTING=ON" DOCKER_RUN_OPTS="--env \
-HOST_IP=192.168.0.122 --env SENSOR_IP=192.168.0.100 -p 55000-55007:55000-55007/udp"
+HOST_IP=192.168.0.122 --env SENSOR_IP=192.168.0.100 -p 55000-55020:55000-55020/udp"
 ```
 note that you especially need to setup the `HOST_IP` to be the IP of your actually system
 in order to receive the data inside the docker container used by industrial_ci.
@@ -47,7 +47,7 @@ If you need to use a custom ROOT_CA and have a apt-proxy the command for running
 rosrun industrial_ci run_ci ROS_DISTRO=noetic ROS_REPO=main \
 CMAKE_ARGS="-DENABLE_HARDWARE_TESTING=ON" \
 DOCKER_RUN_OPTS="--env HOST_IP=192.168.0.122 --env SENSOR_IP=192.168.0.100 \
--p 55000-55007:55000-55007/udp \
+-p 55000-55020:55000-55020/udp \
 -v /usr/local/share/ca-certificates:/usr/local/share/ca-certificates:ro" \
 APT_PROXY=http://172.20.20.104:3142
 ```
@@ -94,4 +94,34 @@ In addition to the arguments displayed above, you need to make the reference sca
 and the following to the `CMAKE_ARGS` option:
 ```
 -DENABLE_HARDWARE_TESTING_WITH_REFERENCE_SCAN=ON
+```
+
+## Hardware Test `hwtest_timestamp_standalone`
+The `hwtest_timestamp_standalone` compares the timestamp to data from udp packets which are captured via wireshark.
+
+### Build the test
+Same as above however **additionally** `-ENABLE_HARDWARE_TESTING_WITH_WIRESHARK=ON` needs to be defined at compile time. At runtime a text file needs to be set within the environment variable `UDP_DATA_FILENAME`, for details see the instructions below.
+
+### Setup wireshark
+Install the apt-package `tshark` which is required to run the following `sh`-script.
+
+### Run tests
+Firstly start recording udp packets in parallel to the tests execution:
+```
+./test/scripts/record_udp_packets.sh <network_interface> <timeout_in_seconds> 55000 55020 > $UDP_DATA_FILENAME
+```
+Then execute
+```
+export UDP_DATA_FILENAME=<path/to/udp/data/file.txt>
+./devel/lib/psen_scan_v2/hwtest_timestamp_standalone
+```
+
+### Build and run using `industrial_ci`
+In addition to the arguments displayed above, you need to make the udp data file available to the docker container. Firstly, create a folder to contain the udp data file. Remember to start recording the udp packets before running `industrial_ci`. Then add the following to the `DOCKER_RUN_OPTS`:
+```
+-v <your/desired/path/to/folder>:/testfiles --env UDP_DATA_FILENAME=/testfiles/<file.txt>
+```
+and the following to the `CMAKE_ARGS` option:
+```
+-DENABLE_HARDWARE_TESTING_WITH_WIRESHARK=ON
 ```

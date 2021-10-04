@@ -69,6 +69,13 @@ public:
 
 #define EXPECT_FUTURE_TIMEOUT(val1, val2) EXPECT_EQ(val1.wait_for(val2), std::future_status::timeout)
 
+#define EXPECT_DOES_NOT_BLOCK(statement)                                                                               \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    const auto future = std::async(std::launch::async, [&]() { statement });                                           \
+    EXPECT_FUTURE_IS_READY(future) << #statement << " does not return.";                                               \
+  } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
+
 class ScannerAPITests : public testing::Test
 {
 protected:
@@ -177,15 +184,17 @@ std::unique_ptr<util::Barrier> ScannerAPITests::prepareMonitoringFrameBarrier(
 void ScannerAPITests::startScanner()
 {
   prepareScannerMockStartReply();
-  const auto start_future = scanner_->start();
+  std::future<void> start_future;
+  EXPECT_DOES_NOT_BLOCK(start_future = scanner_->start(););
   EXPECT_FUTURE_IS_READY(start_future) << "Scanner::start() not finished";
-}
+}  // namespace psen_scan_v2_standalone_test
 
 void ScannerAPITests::stopScanner()
 {
   auto stop_req_barrier = prepareStopRequestBarrier();
 
-  const auto stop_future = scanner_->stop();
+  std::future<void> stop_future;
+  EXPECT_DOES_NOT_BLOCK(stop_future = scanner_->stop(););
   EXPECT_TRUE(stop_req_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Stop request not received";
 
   scanner_mock_->sendStopReply();
@@ -209,7 +218,8 @@ TEST_F(ScannerAPITests, testStartFunctionality)
   setUpScannerMock();
   const auto start_req_received_barrier = prepareStartRequestBarrier(*config_);
 
-  const auto start_future = scanner_->start();
+  std::future<void> start_future;
+  EXPECT_DOES_NOT_BLOCK(start_future = scanner_->start(););
 
   ASSERT_TRUE(start_req_received_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
   EXPECT_FUTURE_TIMEOUT(start_future, FUTURE_WAIT_TIMEOUT) << "Scanner::start() finished without receiveing reply";
@@ -227,7 +237,8 @@ TEST_F(ScannerAPITests, shouldReceiveStartRequestWithCorrectHostIpWhenUsingAutoI
   const auto start_req_received_barrier =
       prepareStartRequestBarrier(generateScannerConfig(HOST_IP_ADDRESS, FRAGMENTED_SCAN));
 
-  const auto start_future = scanner_->start();
+  std::future<void> start_future;
+  EXPECT_DOES_NOT_BLOCK(start_future = scanner_->start(););
 
   ASSERT_TRUE(start_req_received_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
   scanner_mock_->sendStartReply();
@@ -243,12 +254,15 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStartIsCalledSecondTime)
   setUpScannerMock();
   const auto start_req_received_barrier = prepareStartRequestBarrier(*config_);
 
-  const auto start_future = scanner_->start();
+  std::future<void> start_future;
+  EXPECT_DOES_NOT_BLOCK(start_future = scanner_->start(););
   EXPECT_TRUE(start_future.valid()) << "First call too Scanner::start() should return VALID std::future";
   for (int i = 0; i < 5; ++i)
   {
-    EXPECT_FALSE(scanner_->start().valid()) << "Subsequenct calls to Scanner::start() should return INVALID "
-                                               "std::future";
+    std::future<void> second_start_future;
+    EXPECT_DOES_NOT_BLOCK(second_start_future = scanner_->start(););
+    EXPECT_FALSE(second_start_future.valid()) << "Subsequenct calls to Scanner::start() should return INVALID "
+                                                 "std::future";
   }
   ASSERT_TRUE(start_req_received_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
   scanner_mock_->sendStartReply();
@@ -265,7 +279,8 @@ TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
 
   auto start_req_received_barrier = prepareStartRequestBarrier(*config_);
 
-  const auto start_future = scanner_->start();
+  std::future<void> start_future;
+  EXPECT_DOES_NOT_BLOCK(start_future = scanner_->start(););
 
   ASSERT_TRUE(start_req_received_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
 
@@ -289,10 +304,8 @@ TEST_F(ScannerAPITests, testStopFunctionality)
   EXPECT_CALL(*scanner_mock_, receiveControlMsg(_, data_conversion_layer::stop_request::serialize()))
       .WillOnce(OpenBarrier(&stop_req_received_barrier));
 
-  const auto stop_future{ std::async(std::launch::async, [this]() {
-    const auto stop_future = scanner_->stop();
-    stop_future.wait();
-  }) };
+  std::future<void> stop_future;
+  EXPECT_DOES_NOT_BLOCK(stop_future = scanner_->stop(););
 
   EXPECT_TRUE(stop_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Stop request not received";
   EXPECT_FUTURE_TIMEOUT(stop_future, FUTURE_WAIT_TIMEOUT) << "Scanner::stop() finished without receiveing reply";
@@ -311,11 +324,15 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStopIsCalledSecondTime)
   EXPECT_CALL(*scanner_mock_, receiveControlMsg(_, data_conversion_layer::stop_request::serialize()))
       .WillOnce(OpenBarrier(&stop_req_received_barrier));
 
-  const auto stop_future = scanner_->stop();
+  std::future<void> stop_future;
+  EXPECT_DOES_NOT_BLOCK(stop_future = scanner_->stop(););
   EXPECT_TRUE(stop_future.valid()) << "First call too Scanner::stop() should return VALID std::future";
   for (int i = 0; i < 5; ++i)
   {
-    EXPECT_FALSE(scanner_->stop().valid()) << "Subsequenct calls to Scanner::stop() should return INVALID std::future";
+    std::future<void> second_stop_future;
+    EXPECT_DOES_NOT_BLOCK(second_stop_future = scanner_->stop(););
+    EXPECT_FALSE(second_stop_future.valid())
+        << "Subsequenct calls to Scanner::stop() should return INVALID std::future";
   }
 
   EXPECT_TRUE(stop_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Stop request not received";
@@ -347,10 +364,8 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
       .WillOnce(OpenBarrier(&error_msg_barrier));
   EXPECT_LOG_SHORT(INFO, "ScannerController: Scanner started successfully.").Times(1);
 
-  const auto start_future{ std::async(std::launch::async, [this]() {
-    const auto scanner_start = scanner_->start();
-    scanner_start.wait();
-  }) };
+  std::future<void> start_future;
+  EXPECT_DOES_NOT_BLOCK(start_future = scanner_->start(););
 
   EXPECT_TRUE(error_msg_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Error message not received";
   EXPECT_TRUE(twice_called_barrier.waitTillRelease(5000ms)) << "Start reply not send at least twice in time";
