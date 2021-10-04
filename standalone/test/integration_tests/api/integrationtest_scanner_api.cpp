@@ -95,8 +95,6 @@ protected:
   void setUpScannerHwMock();
   void startScanner();
   void stopScanner();
-  std::unique_ptr<util::Barrier> prepareStartRequestBarrier(const ScannerConfiguration& config);
-  std::unique_ptr<util::Barrier> prepareStopRequestBarrier();
   std::unique_ptr<util::Barrier>
   prepareMonitoringFrameBarrier(const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs);
   ScannerConfiguration generateScannerConfig(const std::string& host_ip, bool fragmented);
@@ -148,20 +146,6 @@ void ScannerAPITests::setUpScannerHwMock()
   hw_mock_.reset(new StrictMock<ScannerMock>{ HOST_IP_ADDRESS, port_holder_ });
 }
 
-std::unique_ptr<util::Barrier> ScannerAPITests::prepareStartRequestBarrier(const ScannerConfiguration& config)
-{
-  auto start_req_received_barrier = std::make_unique<util::Barrier>();
-  EXPECT_START_REQUEST_CALL(*hw_mock_, config).WillOnce(OpenBarrier(start_req_received_barrier.get()));
-  return start_req_received_barrier;
-}
-
-std::unique_ptr<util::Barrier> ScannerAPITests::prepareStopRequestBarrier()
-{
-  auto stop_req_received_barrier = std::make_unique<util::Barrier>();
-  EXPECT_STOP_REQUEST_CALL(*hw_mock_).WillOnce(OpenBarrier(stop_req_received_barrier.get()));
-  return stop_req_received_barrier;
-}
-
 std::unique_ptr<util::Barrier> ScannerAPITests::prepareMonitoringFrameBarrier(
     const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs)
 {
@@ -178,24 +162,24 @@ std::unique_ptr<util::Barrier> ScannerAPITests::prepareMonitoringFrameBarrier(
 
 void ScannerAPITests::startScanner()
 {
-  auto start_req_barrier = prepareStartRequestBarrier(*config_);
+  util::Barrier start_req_barrier;
+  EXPECT_START_REQUEST_CALL(*hw_mock_, *config_).WillOnce(OpenBarrier(&start_req_barrier));
 
   std::future<void> start_future;
   EXPECT_DOES_NOT_BLOCK(start_future = driver_->start(););
-  EXPECT_TRUE(start_req_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
-
+  EXPECT_TRUE(start_req_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
   hw_mock_->sendStartReply();
   EXPECT_FUTURE_IS_READY(start_future) << "Scanner::start() not finished";
 }
 
 void ScannerAPITests::stopScanner()
 {
-  auto stop_req_barrier = prepareStopRequestBarrier();
+  util::Barrier stop_req_barrier;
+  EXPECT_STOP_REQUEST_CALL(*hw_mock_).WillOnce(OpenBarrier(&stop_req_barrier));
 
   std::future<void> stop_future;
   EXPECT_DOES_NOT_BLOCK(stop_future = driver_->stop(););
-  EXPECT_TRUE(stop_req_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Stop request not received";
-
+  EXPECT_TRUE(stop_req_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Stop request not received";
   hw_mock_->sendStopReply();
   EXPECT_FUTURE_IS_READY(stop_future) << "Scanner::stop() not finished";
 }
@@ -215,12 +199,13 @@ TEST_F(ScannerAPITests, testStartFunctionality)
   setUpScannerConfig();
   setUpScannerV2Driver();
   setUpScannerHwMock();
-  const auto start_req_received_barrier = prepareStartRequestBarrier(*config_);
+  util::Barrier start_req_received_barrier;
+  EXPECT_START_REQUEST_CALL(*hw_mock_, *config_).WillOnce(OpenBarrier(&start_req_received_barrier));
 
   std::future<void> start_future;
   EXPECT_DOES_NOT_BLOCK(start_future = driver_->start(););
 
-  ASSERT_TRUE(start_req_received_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
+  ASSERT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
   EXPECT_FUTURE_TIMEOUT(start_future, FUTURE_WAIT_TIMEOUT) << "Scanner::start() finished without receiveing reply";
   hw_mock_->sendStartReply();
   EXPECT_FUTURE_IS_READY(start_future) << "Scanner::start() not finished";
@@ -233,13 +218,14 @@ TEST_F(ScannerAPITests, shouldReceiveStartRequestWithCorrectHostIpWhenUsingAutoI
   setUpScannerConfig("auto");
   setUpScannerV2Driver();
   setUpScannerHwMock();
-  const auto start_req_received_barrier =
-      prepareStartRequestBarrier(generateScannerConfig(HOST_IP_ADDRESS, FRAGMENTED_SCAN));
+  util::Barrier start_req_received_barrier;
+  EXPECT_START_REQUEST_CALL(*hw_mock_, generateScannerConfig(HOST_IP_ADDRESS, FRAGMENTED_SCAN))
+      .WillOnce(OpenBarrier(&start_req_received_barrier));
 
   std::future<void> start_future;
   EXPECT_DOES_NOT_BLOCK(start_future = driver_->start(););
 
-  ASSERT_TRUE(start_req_received_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
+  ASSERT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
   hw_mock_->sendStartReply();
   EXPECT_FUTURE_IS_READY(start_future) << "Scanner::start() not finished";
 
@@ -251,7 +237,9 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStartIsCalledSecondTime)
   setUpScannerConfig();
   setUpScannerV2Driver();
   setUpScannerHwMock();
-  const auto start_req_received_barrier = prepareStartRequestBarrier(*config_);
+
+  util::Barrier start_req_received_barrier;
+  EXPECT_START_REQUEST_CALL(*hw_mock_, *config_).WillOnce(OpenBarrier(&start_req_received_barrier));
 
   std::future<void> start_future;
   EXPECT_DOES_NOT_BLOCK(start_future = driver_->start(););
@@ -263,7 +251,7 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStartIsCalledSecondTime)
     EXPECT_FALSE(second_start_future.valid()) << "Subsequenct calls to Scanner::start() should return INVALID "
                                                  "std::future";
   }
-  ASSERT_TRUE(start_req_received_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
+  ASSERT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
   hw_mock_->sendStartReply();
   EXPECT_FUTURE_IS_READY(start_future) << "Scanner::start() not finished";
 
@@ -276,12 +264,13 @@ TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
   setUpScannerV2Driver();
   setUpScannerHwMock();
 
-  auto start_req_received_barrier = prepareStartRequestBarrier(*config_);
+  util::Barrier start_req_received_barrier;
+  EXPECT_START_REQUEST_CALL(*hw_mock_, *config_).WillOnce(OpenBarrier(&start_req_received_barrier));
 
   std::future<void> start_future;
   EXPECT_DOES_NOT_BLOCK(start_future = driver_->start(););
 
-  ASSERT_TRUE(start_req_received_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
+  ASSERT_TRUE(start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Start request not received";
 
   hw_mock_->sendMonitoringFrame(createValidMonitoringFrameMsg());
   EXPECT_FUTURE_TIMEOUT(start_future, FUTURE_WAIT_TIMEOUT) << "Scanner::start() finished without receiveing reply";
