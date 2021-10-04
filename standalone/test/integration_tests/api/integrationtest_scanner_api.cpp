@@ -184,7 +184,6 @@ std::unique_ptr<util::Barrier> ScannerAPITests::prepareMonitoringFrameBarrier(
 void ScannerAPITests::startScanner()
 {
   prepareScannerMockStartReply();
-  scanner_mock_->startListeningForControlMsg();
   std::future<void> start_future;
   EXPECT_DOES_NOT_BLOCK(start_future = scanner_->start(););
   EXPECT_FUTURE_IS_READY(start_future) << "Scanner::start() not finished";
@@ -194,7 +193,6 @@ void ScannerAPITests::stopScanner()
 {
   auto stop_req_barrier = prepareStopRequestBarrier();
 
-  scanner_mock_->startListeningForControlMsg();
   std::future<void> stop_future;
   EXPECT_DOES_NOT_BLOCK(stop_future = scanner_->stop(););
   EXPECT_TRUE(stop_req_barrier->waitTillRelease(DEFAULT_TIMEOUT)) << "Stop request not received";
@@ -220,7 +218,6 @@ TEST_F(ScannerAPITests, testStartFunctionality)
   setUpScannerMock();
   const auto start_req_received_barrier = prepareStartRequestBarrier(*config_);
 
-  scanner_mock_->startListeningForControlMsg();
   std::future<void> start_future;
   EXPECT_DOES_NOT_BLOCK(start_future = scanner_->start(););
 
@@ -240,7 +237,6 @@ TEST_F(ScannerAPITests, shouldReceiveStartRequestWithCorrectHostIpWhenUsingAutoI
   const auto start_req_received_barrier =
       prepareStartRequestBarrier(generateScannerConfig(HOST_IP_ADDRESS, FRAGMENTED_SCAN));
 
-  scanner_mock_->startListeningForControlMsg();
   std::future<void> start_future;
   EXPECT_DOES_NOT_BLOCK(start_future = scanner_->start(););
 
@@ -258,7 +254,6 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStartIsCalledSecondTime)
   setUpScannerMock();
   const auto start_req_received_barrier = prepareStartRequestBarrier(*config_);
 
-  scanner_mock_->startListeningForControlMsg();
   std::future<void> start_future;
   EXPECT_DOES_NOT_BLOCK(start_future = scanner_->start(););
   EXPECT_TRUE(start_future.valid()) << "First call too Scanner::start() should return VALID std::future";
@@ -284,7 +279,6 @@ TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
 
   auto start_req_received_barrier = prepareStartRequestBarrier(*config_);
 
-  scanner_mock_->startListeningForControlMsg();
   std::future<void> start_future;
   EXPECT_DOES_NOT_BLOCK(start_future = scanner_->start(););
 
@@ -310,7 +304,6 @@ TEST_F(ScannerAPITests, testStopFunctionality)
   EXPECT_CALL(*scanner_mock_, receiveControlMsg(_, data_conversion_layer::stop_request::serialize()))
       .WillOnce(OpenBarrier(&stop_req_received_barrier));
 
-  scanner_mock_->startListeningForControlMsg();
   std::future<void> stop_future;
   EXPECT_DOES_NOT_BLOCK(stop_future = scanner_->stop(););
 
@@ -331,7 +324,6 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStopIsCalledSecondTime)
   EXPECT_CALL(*scanner_mock_, receiveControlMsg(_, data_conversion_layer::stop_request::serialize()))
       .WillOnce(OpenBarrier(&stop_req_received_barrier));
 
-  scanner_mock_->startListeningForControlMsg();
   std::future<void> stop_future;
   EXPECT_DOES_NOT_BLOCK(stop_future = scanner_->stop(););
   EXPECT_TRUE(stop_future.valid()) << "First call too Scanner::stop() should return VALID std::future";
@@ -372,7 +364,6 @@ TEST_F(ScannerAPITests, testStartReplyTimeout)
       .WillOnce(OpenBarrier(&error_msg_barrier));
   EXPECT_LOG_SHORT(INFO, "ScannerController: Scanner started successfully.").Times(1);
 
-  scanner_mock_->startContinuousListeningForControlMsg();
   std::future<void> start_future;
   EXPECT_DOES_NOT_BLOCK(start_future = scanner_->start(););
 

@@ -81,11 +81,7 @@ ScannerMock::ScannerMock(const std::string& host_ip, const PortHolder& port_hold
   , control_server_(port_holder.control_port_scanner, std::bind(&ScannerMock::receiveControlMsg, this, _1, _2))
   , data_server_(port_holder.data_port_scanner, std::bind(&ScannerMock::receiveDataMsg, this, _1, _2))
 {
-}
-
-void ScannerMock::startListeningForControlMsg()
-{
-  control_server_.asyncReceive();
+  startContinuousListeningForControlMsg();
 }
 
 void ScannerMock::startContinuousListeningForControlMsg()
