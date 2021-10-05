@@ -495,11 +495,9 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
       .Times(1)
       .WillOnce(OpenBarrier(&empty_msg_received));
 
-  std::cout << "ScannerAPITests: Send empty monitoring frame..." << std::endl;
   hw_mock_->sendEmptyMonitoringFrame();
   EXPECT_BARRIER_OPENS(empty_msg_received, DEFAULT_TIMEOUT) << "Empty monitoring frame not received";
 
-  std::cout << "ScannerAPITests: Send valid monitoring frame..." << std::endl;
   hw_mock_->sendMonitoringFrame(createValidMonitoringFrameMsg());
   EXPECT_BARRIER_OPENS(valid_msg_barrier, DEFAULT_TIMEOUT) << "Valid monitoring frame not received";
 
@@ -526,7 +524,6 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfMissingMeassuremen
       .Times(1)
       .WillOnce(OpenBarrier(&valid_msg_barrier));
 
-  std::cout << "ScannerAPITests: Send monitoring frame without measurement data ..." << std::endl;
   hw_mock_->sendMonitoringFrame(createValidMonitoringFrameMsg(42, util::TenthOfDegree{ 0 }, util::TenthOfDegree{ 0 }));
   EXPECT_BARRIER_OPENS(valid_msg_barrier, DEFAULT_TIMEOUT) << "Valid monitoring frame not received";
 
