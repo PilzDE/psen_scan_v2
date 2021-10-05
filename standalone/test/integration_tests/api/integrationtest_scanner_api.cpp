@@ -487,8 +487,7 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
   setUpScannerHwMock();
   EXPECT_SCANNER_TO_START_SUCCESSFULLY(hw_mock_, driver_, config_);
 
-  util::Barrier valid_msg_barrier;
-  EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).WillOnce(OpenBarrier(&valid_msg_barrier));
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times(0);
 
   util::Barrier empty_msg_received;
   // Needed to allow all other log messages which might be received
@@ -501,9 +500,6 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
 
   hw_mock_->sendEmptyMonitoringFrame();
   EXPECT_BARRIER_OPENS(empty_msg_received, DEFAULT_TIMEOUT) << "Empty monitoring frame not received";
-
-  hw_mock_->sendMonitoringFrame(createValidMonitoringFrameMsg());
-  EXPECT_BARRIER_OPENS(valid_msg_barrier, DEFAULT_TIMEOUT) << "Valid monitoring frame not received";
 
   EXPECT_SCANNER_TO_STOP_SUCCESSFULLY(hw_mock_, driver_);
   REMOVE_LOG_MOCK
