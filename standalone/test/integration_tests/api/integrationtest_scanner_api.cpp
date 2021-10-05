@@ -301,8 +301,7 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStopIsCalledSecondTime)
   EXPECT_SCANNER_TO_START_SUCCESSFULLY(hw_mock_, driver_, config_);
 
   util::Barrier stop_req_received_barrier;
-  EXPECT_CALL(*hw_mock_, receiveControlMsg(_, data_conversion_layer::stop_request::serialize()))
-      .WillOnce(OpenBarrier(&stop_req_received_barrier));
+  EXPECT_STOP_REQUEST_CALL(*hw_mock_).WillOnce(OpenBarrier(&stop_req_received_barrier));
 
   std::future<void> stop_future;
   EXPECT_DOES_NOT_BLOCK(stop_future = driver_->stop(););
