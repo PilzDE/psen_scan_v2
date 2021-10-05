@@ -513,19 +513,19 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfMissingMeassuremen
   setUpScannerHwMock();
   EXPECT_SCANNER_TO_START_SUCCESSFULLY(hw_mock_, driver_, config_);
 
-  util::Barrier valid_msg_barrier;
   EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times(0);
 
+  util::Barrier log_msgs_barrier;
   // Needed to allow all other log messages which might be received
   EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(DEBUG,
                    "StateMachine: No measurement data in current monitoring frame(s), skipping laser scan "
                    "callback.")
       .Times(1)
-      .WillOnce(OpenBarrier(&valid_msg_barrier));
+      .WillOnce(OpenBarrier(&log_msgs_barrier));
 
   hw_mock_->sendMonitoringFrame(createValidMonitoringFrameMsg(42, util::TenthOfDegree{ 0 }, util::TenthOfDegree{ 0 }));
-  EXPECT_BARRIER_OPENS(valid_msg_barrier, DEFAULT_TIMEOUT) << "Valid monitoring frame not received";
+  EXPECT_BARRIER_OPENS(log_msgs_barrier, DEFAULT_TIMEOUT) << "Valid monitoring frame not received";
 
   EXPECT_SCANNER_TO_STOP_SUCCESSFULLY(hw_mock_, driver_);
   REMOVE_LOG_MOCK
