@@ -187,7 +187,7 @@ void ScannerAPITests::sendMonitoringFrames(const std::vector<data_conversion_lay
   }
 }
 
-TEST_F(ScannerAPITests, testStartFunctionality)
+TEST_F(ScannerAPITests, shouldSendStartRequestAndReturnValidFutureWhenLaunchingWithValidConfig)
 {
   setUpScannerConfig();
   setUpScannerV2Driver();
@@ -274,7 +274,7 @@ TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
   EXPECT_SCANNER_TO_STOP_SUCCESSFULLY(hw_mock_, driver_);
 }
 
-TEST_F(ScannerAPITests, testStopFunctionality)
+TEST_F(ScannerAPITests, shouldSendStopRequestAndValidFutreOnStopCall)
 {
   setUpScannerConfig();
   setUpScannerV2Driver();
@@ -319,7 +319,7 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStopIsCalledSecondTime)
   EXPECT_FUTURE_IS_READY(stop_future) << "Scanner::stop() not finished";
 }
 
-TEST_F(ScannerAPITests, testStartReplyTimeout)
+TEST_F(ScannerAPITests, shouldResendStartRequestIfNoStartReplyIsSent)
 {
   INJECT_LOG_MOCK;
   EXPECT_ANY_LOG().Times(AnyNumber());
