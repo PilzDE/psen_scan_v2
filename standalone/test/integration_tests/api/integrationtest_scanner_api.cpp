@@ -274,7 +274,7 @@ TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
   EXPECT_SCANNER_TO_STOP_SUCCESSFULLY(hw_mock_, driver_);
 }
 
-TEST_F(ScannerAPITests, shouldSendStopRequestAndValidFutreOnStopCall)
+TEST_F(ScannerAPITests, shouldSendStopRequestAndValidFutureOnStopCall)
 {
   setUpScannerConfig();
   setUpScannerV2Driver();
@@ -457,6 +457,10 @@ TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
   util::Barrier monitoring_frame_barrier;
   EXPECT_CALLBACK_WILL_OPEN_BARRIER(user_callbacks_, msgs_round3, monitoring_frame_barrier);
 
+  auto last_msg_of_round_3 = msgs_round3.back();
+  msgs_round3.pop_back();
+  auto first_msgs_of_round_3 = msgs_round3;
+
   util::Barrier user_msg_barrier;
   EXPECT_LOG_SHORT(WARN,
                    "ScanBuffer: Detected a MonitoringFrame from an earlier round. "
@@ -464,9 +468,9 @@ TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
       .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
-  sendMonitoringFrames(msgs_round3);
+  sendMonitoringFrames(first_msgs_of_round_3);
   hw_mock_->sendMonitoringFrame(msg_round2);
-  hw_mock_->sendMonitoringFrame(msgs_round3.back());
+  hw_mock_->sendMonitoringFrame(last_msg_of_round_3);
 
   EXPECT_BARRIER_OPENS(monitoring_frame_barrier, DEFAULT_TIMEOUT) << "Monitoring frame not received";
   EXPECT_BARRIER_OPENS(user_msg_barrier, DEFAULT_TIMEOUT) << "Dropped Monitoring frame not recognized";
