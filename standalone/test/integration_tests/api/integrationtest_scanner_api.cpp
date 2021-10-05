@@ -26,7 +26,6 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include <thread>
 #include <vector>
 
 // Test frameworks
@@ -105,7 +104,7 @@ public:
     EXPECT_START_REQUEST_CALL(*hw_mock, *config).WillOnce(OpenBarrier(&start_req_barrier));                            \
     EXPECT_DOES_NOT_BLOCK(start_future = driver->start(););                                                            \
     EXPECT_BARRIER_OPENS(start_req_barrier, DEFAULT_TIMEOUT) << "Start request not received";                          \
-    hw_mock->sendStartReply();                                                                                         \
+    hw_mock_->sendStartReply();                                                                                        \
     EXPECT_FUTURE_IS_READY(start_future) << "Scanner::start() not finished";                                           \
   } while (false)
 
@@ -117,7 +116,7 @@ public:
     EXPECT_STOP_REQUEST_CALL(*hw_mock).WillOnce(OpenBarrier(&stop_req_barrier));                                       \
     EXPECT_DOES_NOT_BLOCK(stop_future = driver->stop(););                                                              \
     EXPECT_BARRIER_OPENS(stop_req_barrier, DEFAULT_TIMEOUT) << "Stop request not received";                            \
-    hw_mock->sendStopReply();                                                                                          \
+    hw_mock_->sendStopReply();                                                                                         \
     EXPECT_FUTURE_IS_READY(stop_future) << "Scanner::stop() not finished";                                             \
   } while (false)
 
@@ -129,7 +128,6 @@ protected:
   void setUpScannerV2Driver();
   void setUpScannerHwMock();
   ScannerConfiguration generateScannerConfig(const std::string& host_ip, bool fragmented);
-  void sendMonitoringFrames(const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs);
 
 protected:
   const PortHolder port_holder_{ ++GLOBAL_PORT_HOLDER };
@@ -175,16 +173,6 @@ void ScannerAPITests::setUpScannerV2Driver()
 void ScannerAPITests::setUpScannerHwMock()
 {
   hw_mock_.reset(new StrictMock<ScannerMock>{ HOST_IP_ADDRESS, port_holder_ });
-}
-
-void ScannerAPITests::sendMonitoringFrames(const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs)
-{
-  for (const auto& msg : msgs)
-  {
-    hw_mock_->sendMonitoringFrame(msg);
-    // Sleep to ensure that message are not sent too fast which might cause messages overwrite in socket buffer
-    std::this_thread::sleep_for(10ms);
-  }
 }
 
 TEST_F(ScannerAPITests, shouldSendStartRequestAndReturnValidFutureWhenLaunchingWithValidConfig)
@@ -395,7 +383,7 @@ TEST_F(ScannerAPITests, shouldCallLaserScanCallbackOnlyOneTimeWithAllInformation
   util::Barrier monitoring_frame_barrier;
   EXPECT_CALLBACK_WILL_OPEN_BARRIER(user_callbacks_, msgs, monitoring_frame_barrier);
 
-  sendMonitoringFrames(msgs);
+  hw_mock_->sendMonitoringFrames(msgs);
 
   EXPECT_BARRIER_OPENS(monitoring_frame_barrier, DEFAULT_TIMEOUT) << "Monitoring frame not received";
 
@@ -430,7 +418,7 @@ TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
 
   for (const auto& msgs : { ignored_short_first_round, accounted_short_round, valid_round })
   {
-    sendMonitoringFrames(msgs);
+    hw_mock_->sendMonitoringFrames(msgs);
   }
 
   EXPECT_BARRIER_OPENS(monitoring_frame_barrier, DEFAULT_TIMEOUT) << "Monitoring frame not received";
@@ -465,7 +453,7 @@ TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
                    " The scan round will ignore it.")
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
-  sendMonitoringFrames(first_msgs_of_round_3);
+  hw_mock_->sendMonitoringFrames(first_msgs_of_round_3);
   hw_mock_->sendMonitoringFrame(msg_round2);
   hw_mock_->sendMonitoringFrame(last_msg_of_round_3);
 
@@ -560,8 +548,8 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
                    " (Please check the ethernet connection or contact PILZ support if the error persists.)")
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
-  sendMonitoringFrames(valid_scan_msgs);
-  sendMonitoringFrames(invalid_scan_round_msgs);
+  hw_mock_->sendMonitoringFrames(valid_scan_msgs);
+  hw_mock_->sendMonitoringFrames(invalid_scan_round_msgs);
   hw_mock_->sendMonitoringFrame(new_scan_round_msg);
 
   EXPECT_BARRIER_OPENS(user_msg_barrier, DEFAULT_TIMEOUT) << "User message not received";
@@ -595,7 +583,7 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
   EXPECT_LOG_SHORT(WARN, "ScanBuffer: Received too many MonitoringFrames for one scan round.")
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
-  sendMonitoringFrames(invalid_scan_round);
+  hw_mock_->sendMonitoringFrames(invalid_scan_round);
 
   EXPECT_BARRIER_OPENS(user_msg_barrier, DEFAULT_TIMEOUT) << "User message not received";
   EXPECT_BARRIER_OPENS(all_frames_received, DEFAULT_TIMEOUT) << "Not all frames received";
