@@ -15,14 +15,6 @@
 
 #include <gtest/gtest.h>
 
-#ifdef __linux__
-#define UNUSED __attribute__((unused))
-#endif
-
-#ifdef _WIN32
-#define UNUSED
-#endif
-
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
@@ -147,13 +139,6 @@ TEST(TenthOfDegreeTest, LargerThanOrEqualComparison)
   EXPECT_TRUE(util::TenthOfDegree(2) >= util::TenthOfDegree(1));
   EXPECT_TRUE(util::TenthOfDegree(1) >= util::TenthOfDegree(1));
   EXPECT_FALSE(util::TenthOfDegree(1) >= util::TenthOfDegree(2));
-}
-
-TEST(TenthOfDegreeTest, shouldThrowUnderflowErrorOnCastToIntOfValuesUnderZero)
-{
-  uint16_t result UNUSED;  // Macro needed to suppress clang-tidy warning
-  EXPECT_THROW(result = static_cast<uint16_t>(util::TenthOfDegree(-1)), std::underflow_error)
-      << "Should throw underflow error";
 }
 
 }  // namespace psen_scan_v2_standalone_test
