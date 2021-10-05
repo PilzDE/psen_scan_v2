@@ -550,12 +550,12 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
 
   // Create valid scan round
   const uint32_t scan_counter_valid_round{ 42 };
-  std::vector<data_conversion_layer::monitoring_frame::Message> valid_scan_round_msgs{ createValidMonitoringFrameMsgs(
+  auto valid_scan_round_msgs{ createValidMonitoringFrameMsgs(
       scan_counter_valid_round, num_scans_per_round) };
 
   // Create invalid scan round -> invalid because one MonitoringFrame missing
   const uint32_t scan_counter_invalid_round{ scan_counter_valid_round + 1 };
-  std::vector<data_conversion_layer::monitoring_frame::Message> invalid_scan_round_msgs{ createValidMonitoringFrameMsgs(
+  auto invalid_scan_round_msgs{ createValidMonitoringFrameMsgs(
       scan_counter_invalid_round, num_scans_per_round - 1) };
   invalid_scan_round_msgs.emplace_back(createValidMonitoringFrameMsg(scan_counter_invalid_round + 1));
 
