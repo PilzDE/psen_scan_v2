@@ -373,7 +373,6 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
                    "StateMachine: The scanner reports an error: {Device: Master - Alarm: The front panel of the "
                    "safety "
                    "laser scanner must be cleaned.}")
-      .Times(1)
       .WillOnce(OpenBarrier(&diagnostic_barrier));
 
   hw_mock_->sendMonitoringFrame(msg);
@@ -427,7 +426,6 @@ TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
                    "ScanBuffer: Detected a MonitoringFrame from a new scan round before the old one was complete."
                    " Dropping the incomplete round."
                    " (Please check the ethernet connection or contact PILZ support if the error persists.)")
-      .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
   for (const auto& msgs : { ignored_short_first_round, accounted_short_round, valid_round })
@@ -465,7 +463,6 @@ TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
   EXPECT_LOG_SHORT(WARN,
                    "ScanBuffer: Detected a MonitoringFrame from an earlier round. "
                    " The scan round will ignore it.")
-      .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
   sendMonitoringFrames(first_msgs_of_round_3);
@@ -495,7 +492,6 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFra
   EXPECT_LOG_SHORT(WARN,
                    "StateMachine: No transition in state \"WaitForMonitoringFrame\" for event "
                    "\"MonitoringFrameReceivedError\".")
-      .Times(1)
       .WillOnce(OpenBarrier(&empty_msg_received));
 
   hw_mock_->sendEmptyMonitoringFrame();
@@ -521,7 +517,6 @@ TEST_F(ScannerAPITests, shouldNotCallLaserscanCallbackInCaseOfMissingMeassuremen
   EXPECT_LOG_SHORT(DEBUG,
                    "StateMachine: No measurement data in current monitoring frame(s), skipping laser scan "
                    "callback.")
-      .Times(1)
       .WillOnce(OpenBarrier(&log_msgs_barrier));
 
   hw_mock_->sendMonitoringFrame(createValidMonitoringFrameMsg(42, util::TenthOfDegree{ 0 }, util::TenthOfDegree{ 0 }));
@@ -547,22 +542,14 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
   EXPECT_SCANNER_TO_START_SUCCESSFULLY(hw_mock_, driver_, config_);
 
   const std::size_t num_scans_per_round{ 6 };
-
-  // Create valid scan round
-  const uint32_t scan_counter_valid_round{ 42 };
-  auto valid_scan_round_msgs{ createValidMonitoringFrameMsgs(
-      scan_counter_valid_round, num_scans_per_round) };
-
-  // Create invalid scan round -> invalid because one MonitoringFrame missing
-  const uint32_t scan_counter_invalid_round{ scan_counter_valid_round + 1 };
-  auto invalid_scan_round_msgs{ createValidMonitoringFrameMsgs(
-      scan_counter_invalid_round, num_scans_per_round - 1) };
-  invalid_scan_round_msgs.emplace_back(createValidMonitoringFrameMsg(scan_counter_invalid_round + 1));
+  auto valid_scan_msgs{ createValidMonitoringFrameMsgs(41, num_scans_per_round) };
+  auto invalid_scan_round_msgs{ createValidMonitoringFrameMsgs(42, num_scans_per_round - 1) };
+  auto new_scan_round_msg{ createValidMonitoringFrameMsg(43) };
 
   util::Barrier all_frames_received_barrier;
   {
     InSequence seq;
-    EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times(num_scans_per_round + (num_scans_per_round - 1));
+    EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times(num_scans_per_round + num_scans_per_round - 1);
     EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).WillOnce(OpenBarrier(&all_frames_received_barrier));
   }
 
@@ -571,11 +558,11 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFramesAreMissing)
                    "ScanBuffer: Detected a MonitoringFrame from a new scan round before the old one was complete."
                    " Dropping the incomplete round."
                    " (Please check the ethernet connection or contact PILZ support if the error persists.)")
-      .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
-  sendMonitoringFrames(valid_scan_round_msgs);
+  sendMonitoringFrames(valid_scan_msgs);
   sendMonitoringFrames(invalid_scan_round_msgs);
+  hw_mock_->sendMonitoringFrame(new_scan_round_msg);
 
   EXPECT_BARRIER_OPENS(user_msg_barrier, DEFAULT_TIMEOUT) << "User message not received";
   EXPECT_BARRIER_OPENS(all_frames_received_barrier, DEFAULT_TIMEOUT) << "Not all frames received";
@@ -595,24 +582,20 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfTooManyMonitoringFramesAreReceived)
 
   const std::size_t num_scans_per_round{ 6 };
 
-  const uint32_t scan_counter{ 42 };
-  std::vector<data_conversion_layer::monitoring_frame::Message> msgs{ createValidMonitoringFrameMsgs(
-      scan_counter, num_scans_per_round + 1) };
-  msgs.emplace_back(createValidMonitoringFrameMsg(scan_counter + 1));
+  auto invalid_scan_round{ createValidMonitoringFrameMsgs(42, num_scans_per_round + 1) };
 
   util::Barrier all_frames_received;
   {
     InSequence sec;
-    EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times((num_scans_per_round + 1));
+    EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times((num_scans_per_round));
     EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).WillOnce(OpenBarrier(&all_frames_received));
   }
 
   util::Barrier user_msg_barrier;
   EXPECT_LOG_SHORT(WARN, "ScanBuffer: Received too many MonitoringFrames for one scan round.")
-      .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
-  sendMonitoringFrames(msgs);
+  sendMonitoringFrames(invalid_scan_round);
 
   EXPECT_BARRIER_OPENS(user_msg_barrier, DEFAULT_TIMEOUT) << "User message not received";
   EXPECT_BARRIER_OPENS(all_frames_received, DEFAULT_TIMEOUT) << "Not all frames received";
@@ -634,7 +617,6 @@ TEST_F(ScannerAPITests, shouldShowUserMsgIfMonitoringFrameReceiveTimeout)
   EXPECT_LOG_SHORT(WARN,
                    "StateMachine: Timeout while waiting for MonitoringFrame message."
                    " (Please check the ethernet connection or contact PILZ support if the error persists.)")
-      .Times(1)
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
   EXPECT_BARRIER_OPENS(user_msg_barrier, DEFAULT_TIMEOUT) << "User message not received";
