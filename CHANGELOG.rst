@@ -4,6 +4,7 @@ Changelog for package psen_scan_v2
 
 Forthcoming
 -----------
+* Remove dependency on pilz_testutils
 * Always build hardware tests
 * Internal refactorings
 
