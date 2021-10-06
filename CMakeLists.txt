@@ -170,7 +170,6 @@ if(CATKIN_ENABLE_TESTING)
 
   find_package(rostest REQUIRED)
   find_package(roslaunch REQUIRED)
-  find_package(pilz_testutils REQUIRED)
 
   if(ENABLE_COVERAGE_TESTING)
     find_package(code_coverage REQUIRED)
@@ -179,7 +178,6 @@ if(CATKIN_ENABLE_TESTING)
 
   roslaunch_add_file_check(launch DEPENDENCIES ${PROJECT_NAME}_node)
 
-  include_directories(SYSTEM ${pilz_testutils_INCLUDE_DIRS})
   include_directories(
     standalone/include
     standalone/test/include
@@ -358,7 +356,6 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(integrationtest_udp_client
     ${catkin_LIBRARIES}
-    ${pilz_testutils_LIBRARIES}
     fmt::fmt
   )
 
@@ -379,7 +376,6 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(integrationtest_scanner_api
     ${catkin_LIBRARIES}
-    ${pilz_testutils_LIBRARIES}
     fmt::fmt
   )
 
@@ -392,7 +388,6 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(integrationtest_ros_scanner_node
     ${catkin_LIBRARIES}
-    ${pilz_testutils_LIBRARIES}
     fmt::fmt
   )
 
@@ -402,7 +397,6 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_ros_parameter_handler
     ${catkin_LIBRARIES}
-    ${pilz_testutils_LIBRARIES}
   )
 
   ######################
@@ -485,7 +479,6 @@ if(CATKIN_ENABLE_TESTING)
 
   target_link_libraries(hwtest_scan_compare
     ${catkin_LIBRARIES}
-    ${pilz_testutils_LIBRARIES}
     ${rosbag_LIBRARIES}
     fmt::fmt
   )
