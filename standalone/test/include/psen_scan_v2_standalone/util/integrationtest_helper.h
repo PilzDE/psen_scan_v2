@@ -77,7 +77,7 @@ createValidMonitoringFrameMsg(const uint32_t scan_counter = 42,
 {
   const auto resolution{ util::TenthOfDegree(10) };
 
-  const unsigned int num_elements = (end_angle - start_angle) / resolution;
+  const unsigned int num_elements = ((end_angle - start_angle) / resolution).value();
   const double lowest_measurement{ 0. };
   const double highest_measurement{ 10. };
   const std::vector<double> measurements{ generateMeasurements(num_elements, lowest_measurement, highest_measurement) };
