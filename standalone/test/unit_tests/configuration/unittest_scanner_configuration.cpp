@@ -24,6 +24,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
 #include "psen_scan_v2_standalone/util/ip_conversion.h"
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scanner_config_builder.h"
 #include "psen_scan_v2_standalone/scan_range.h"
@@ -294,7 +295,8 @@ TEST_F(ScannerConfigurationTest, shouldReturnCorrectResolutionAfterConstruction)
 TEST_F(ScannerConfigurationTest, shouldHaveCorrectResolutionOnDefault)
 {
   const ScannerConfiguration sc{ createValidDefaultConfig() };
-  EXPECT_EQ(data_conversion_layer::radToTenthDegree(configuration::DEFAULT_SCAN_ANGLE_RESOLUTION), sc.scanResolution());
+  EXPECT_EQ(psen_scan_v2_standalone::util::TenthOfDegree::fromRad(configuration::DEFAULT_SCAN_ANGLE_RESOLUTION),
+            sc.scanResolution());
 }
 
 TEST_F(ScannerConfigurationTest, shouldHaveEnabledIntensitiesAfterConstruction)
