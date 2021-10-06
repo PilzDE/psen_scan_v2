@@ -26,7 +26,6 @@
   <test_depend>rostest</test_depend>
   <test_depend>rosunit</test_depend>
   <test_depend>roslaunch</test_depend>
-  <test_depend>pilz_testutils</test_depend>
   <test_depend>rosbag</test_depend>
 
 </package>

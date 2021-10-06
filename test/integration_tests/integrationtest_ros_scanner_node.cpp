@@ -24,7 +24,6 @@
 #include <ros/ros.h>
 
 #include <sensor_msgs/LaserScan.h>
-#include <pilz_testutils/async_test.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/laserscan.h"
@@ -32,6 +31,7 @@
 #include "psen_scan_v2_standalone/scanner_config_builder.h"
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
 #include "psen_scan_v2_standalone/scan_range.h"
+#include "psen_scan_v2_standalone/util/async_barrier.h"
 
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 #include "psen_scan_v2/ros_scanner_node.h"
@@ -52,10 +52,6 @@ namespace psen_scan_v2
 static constexpr std::chrono::seconds LOOP_END_TIMEOUT{ 4 };
 
 static constexpr int QUEUE_SIZE{ 10 };
-
-static const std::string LASER_SCAN_RECEIVED{ "LASER_SCAN_RECEIVED" };
-static const std::string SCANNER_STARTED{ "SCANNER_STARTED" };
-static const std::string SCANNER_STOPPED{ "SCANNER_STOPPED" };
 
 MATCHER_P(IsRosScanEqual, expected_ros_scan, "")
 {
@@ -94,9 +90,7 @@ static constexpr int HOST_UDP_PORT_DATA{ 50505 };
 static constexpr int HOST_UDP_PORT_CONTROL{ 55055 };
 static const std::string DEVICE_IP{ "127.0.0.100" };
 static constexpr ScanRange SCAN_RANGE{ util::TenthOfDegree(1), util::TenthOfDegree(2749) };
-static constexpr int SCANNER_STARTED_TIMEOUT_MS{ 3000 };
-static constexpr int SCANNER_STOPPED_TIMEOUT_MS{ 3000 };
-static constexpr int LASERSCAN_RECEIVED_TIMEOUT{ 3000 };
+static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 3 };
 
 static ScannerConfiguration createValidConfig()
 {
@@ -111,12 +105,17 @@ static ScannerConfiguration createValidConfig()
       .build();
 }
 
-class RosScannerNodeTests : public testing::Test, public testing::AsyncTest
+class RosScannerNodeTests : public testing::Test
 {
 protected:
   ros::NodeHandle nh_priv_{ "~" };
   ScannerConfiguration scanner_config_{ createValidConfig() };
 };
+
+ACTION_P(OpenBarrier, barrier)
+{
+  barrier->release();
+}
 
 TEST_F(RosScannerNodeTests, testScannerInvocation)
 {
@@ -125,19 +124,21 @@ TEST_F(RosScannerNodeTests, testScannerInvocation)
 
   std::promise<void> start_stop_barrier;
   start_stop_barrier.set_value();
+  util::Barrier start_barrier;
+  util::Barrier stop_barrier;
 
   {
     ::testing::InSequence s;
     EXPECT_CALL(ros_scanner_node.scanner_, start())
-        .WillOnce(DoAll(ACTION_OPEN_BARRIER_VOID(SCANNER_STARTED), Return_Future(start_stop_barrier)));
+        .WillOnce(DoAll(OpenBarrier(&start_barrier), Return_Future(start_stop_barrier)));
     EXPECT_CALL(ros_scanner_node.scanner_, stop())
-        .WillRepeatedly(DoAll(ACTION_OPEN_BARRIER_VOID(SCANNER_STOPPED), Return_Future(start_stop_barrier)));
+        .WillOnce(DoAll(OpenBarrier(&stop_barrier), Return_Future(start_stop_barrier)));
   }
 
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
-  BARRIER(SCANNER_STARTED, SCANNER_STARTED_TIMEOUT_MS);
+  EXPECT_TRUE(start_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Scanner start was not called";
   ros_scanner_node.terminate();
-  BARRIER(SCANNER_STOPPED, SCANNER_STOPPED_TIMEOUT_MS);
+  EXPECT_TRUE(stop_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Scanner stop was not called";
   EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
 }
 
@@ -146,28 +147,30 @@ TEST_F(RosScannerNodeTests, testScanTopicReceived)
   LaserScan laser_scan_fake(util::TenthOfDegree(1), util::TenthOfDegree(3), util::TenthOfDegree(5), 14, 1000000000);
   laser_scan_fake.getMeasurements().push_back(1);
 
+  util::Barrier scan_topic_barrier;
   SubscriberMock subscriber;
   EXPECT_CALL(subscriber, callback(::testing::_))
       .WillOnce(testing::Return())
-      .WillOnce(ACTION_OPEN_BARRIER_VOID(LASER_SCAN_RECEIVED));
+      .WillOnce(OpenBarrier(&scan_topic_barrier));
 
   ROSScannerNodeT<ScannerMock> ros_scanner_node(
       nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
   std::promise<void> start_stop_barrier;
   start_stop_barrier.set_value();
+  util::Barrier start_barrier;
   EXPECT_CALL(ros_scanner_node.scanner_, start())
-      .WillOnce(DoAll(ACTION_OPEN_BARRIER_VOID(SCANNER_STARTED), Return_Future(start_stop_barrier)));
+      .WillOnce(DoAll(OpenBarrier(&start_barrier), Return_Future(start_stop_barrier)));
 
   subscriber.initialize(nh_priv_);
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
 
-  BARRIER(SCANNER_STARTED, SCANNER_STARTED_TIMEOUT_MS);
+  EXPECT_TRUE(start_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Scanner start was not called";
 
   ros_scanner_node.scanner_.invokeLaserScanCallback(laser_scan_fake);
   ros_scanner_node.scanner_.invokeLaserScanCallback(laser_scan_fake);
 
-  BARRIER(LASER_SCAN_RECEIVED, LASERSCAN_RECEIVED_TIMEOUT);
+  EXPECT_TRUE(scan_topic_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Scan message was not sended";
   ros_scanner_node.terminate();
   EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
 }
@@ -182,16 +185,17 @@ TEST_F(RosScannerNodeTests, testMissingStopReply)
 
   // Stop barrier is unset, in other words the stop()-future object does not finish.
   std::promise<void> stop_barrier;
+  util::Barrier start_async_barrier;
 
   {
     ::testing::InSequence s;
     EXPECT_CALL(ros_scanner_node.scanner_, start())
-        .WillOnce(DoAll(ACTION_OPEN_BARRIER_VOID(SCANNER_STARTED), Return_Future(start_barrier)));
+        .WillOnce(DoAll(OpenBarrier(&start_async_barrier), Return_Future(start_barrier)));
     EXPECT_CALL(ros_scanner_node.scanner_, stop()).WillOnce(Return_Future(stop_barrier));
   }
 
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
-  BARRIER(SCANNER_STARTED, SCANNER_STARTED_TIMEOUT_MS);
+  EXPECT_TRUE(start_async_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Scanner start was not called";
   ros_scanner_node.terminate();
   EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
 }

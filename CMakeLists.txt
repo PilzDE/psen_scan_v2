@@ -171,7 +171,6 @@ if(CATKIN_ENABLE_TESTING)
 
   find_package(rostest REQUIRED)
   find_package(roslaunch REQUIRED)
-  find_package(pilz_testutils REQUIRED)
 
   if(ENABLE_COVERAGE_TESTING)
     find_package(code_coverage REQUIRED)
@@ -180,7 +179,6 @@ if(CATKIN_ENABLE_TESTING)
 
   roslaunch_add_file_check(launch DEPENDENCIES ${PROJECT_NAME}_node)
 
-  include_directories(SYSTEM ${pilz_testutils_INCLUDE_DIRS})
   include_directories(
     standalone/include
     standalone/test/include
@@ -359,13 +357,8 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(integrationtest_udp_client
     ${catkin_LIBRARIES}
-    ${pilz_testutils_LIBRARIES}
     
   )
-
-  # Needs pilz_testutils in kinetic
-
-  if("$ENV{ROS_DISTRO}" STRGREATER "kinetic")
 
   catkin_add_gmock(integrationtest_scanner_api
     standalone/test/integration_tests/api/integrationtest_scanner_api.cpp
@@ -384,9 +377,12 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(integrationtest_scanner_api
     ${catkin_LIBRARIES}
-    ${pilz_testutils_LIBRARIES}
     
   )
+
+  # Does not compile since googlemock does not support mocking methods with move-only return types in xenial
+
+  if("$ENV{ROS_DISTRO}" STRGREATER "kinetic")
 
   add_rostest_gmock(integrationtest_ros_scanner_node
     test/integration_tests/integrationtest_ros_scanner_node.test
@@ -397,7 +393,6 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(integrationtest_ros_scanner_node
     ${catkin_LIBRARIES}
-    ${pilz_testutils_LIBRARIES}
     
   )
 
@@ -409,7 +404,6 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_ros_parameter_handler
     ${catkin_LIBRARIES}
-    ${pilz_testutils_LIBRARIES}
   )
 
   ######################
@@ -492,7 +486,6 @@ if(CATKIN_ENABLE_TESTING)
 
   target_link_libraries(hwtest_scan_compare
     ${catkin_LIBRARIES}
-    ${pilz_testutils_LIBRARIES}
     ${rosbag_LIBRARIES}
 
   )
