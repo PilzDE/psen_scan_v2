@@ -353,6 +353,9 @@ if(CATKIN_ENABLE_TESTING)
   catkin_add_gmock(integrationtest_udp_client
     standalone/test/integration_tests/communication_layer/integrationtest_udp_client.cpp
     standalone/test/src/communication_layer/mock_udp_server.cpp
+    standalone/src/laserscan.cpp
+    standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
+    standalone/src/data_conversion_layer/diagnostics.cpp
   )
   target_link_libraries(integrationtest_udp_client
     ${catkin_LIBRARIES}
