@@ -16,6 +16,8 @@
 #include <functional>
 #include <iostream>
 #include <string>
+#include <thread>
+#include <chrono>
 
 #include <boost/asio.hpp>
 
@@ -27,6 +29,8 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_serialization_deserialization.h"
+
+using namespace std::chrono_literals;
 
 namespace psen_scan_v2_standalone_test
 {
@@ -119,6 +123,16 @@ void ScannerMock::sendEmptyMonitoringFrame()
   psen_scan_v2_standalone::data_conversion_layer::RawData data;
   assert(data.empty());
   data_server_.asyncSend(monitoring_frame_receiver_, data);
+}
+
+void ScannerMock::sendMonitoringFrames(const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs)
+{
+  for (const auto& msg : msgs)
+  {
+    sendMonitoringFrame(msg);
+    // Sleep to ensure that message are not sent too fast which might cause messages overwrite in socket buffer
+    std::this_thread::sleep_for(10ms);
+  }
 }
 
 }  // namespace psen_scan_v2_standalone_test
