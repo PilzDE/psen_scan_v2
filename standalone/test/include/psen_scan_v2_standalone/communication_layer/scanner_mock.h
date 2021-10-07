@@ -80,6 +80,7 @@ public:
   void sendStopReply();
   void sendMonitoringFrame(const data_conversion_layer::monitoring_frame::Message& msg);
   void sendEmptyMonitoringFrame();
+  void sendMonitoringFrames(const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs);
 
 private:
   void startContinuousListeningForControlMsg();
