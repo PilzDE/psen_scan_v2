@@ -116,7 +116,7 @@ public:
     EXPECT_STOP_REQUEST_CALL(*hw_mock).WillOnce(OpenBarrier(&stop_req_barrier));                                       \
     EXPECT_DOES_NOT_BLOCK(stop_future = driver->stop(););                                                              \
     EXPECT_BARRIER_OPENS(stop_req_barrier, DEFAULT_TIMEOUT) << "Stop request not received";                            \
-    hw_mock_->sendStopReply();                                                                                         \
+    hw_mock->sendStopReply();                                                                                         \
     EXPECT_FUTURE_IS_READY(stop_future) << "Scanner::stop() not finished";                                             \
   } while (false)
 
