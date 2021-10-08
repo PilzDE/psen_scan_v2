@@ -241,6 +241,17 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
                , data_conversion_layer::monitoring_frame::ScanCounterUnexpectedSize);
 }
 
+TEST_F(MonitoringFrameDeserializationTest, shouldThrowZoneSetUnexpectedSizeErrorOnTooLargeZoneSetLength)
+{
+  scanner_udp_datagram_hexdumps::WithTooLargeActiveZoneSetLength with_too_large_active_zone_set_length;
+  const auto raw_frame_data = convertToRawData(with_too_large_active_zone_set_length.hex_dump);
+  const auto num_bytes = 2 * with_too_large_active_zone_set_length.hex_dump.size();
+
+  data_conversion_layer::monitoring_frame::Message msg;
+  EXPECT_THROW(msg = data_conversion_layer::monitoring_frame::deserialize(raw_frame_data, num_bytes);
+               , data_conversion_layer::monitoring_frame::ZoneSetUnexpectedSize);
+}
+
 }  // namespace psen_scan_v2_standalone_test
 
 int main(int argc, char* argv[])
