@@ -32,6 +32,8 @@
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
 #include "psen_scan_v2_standalone/scan_range.h"
 #include "psen_scan_v2_standalone/util/async_barrier.h"
+#include "psen_scan_v2_standalone/util/expectations.h"
+#include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 #include "psen_scan_v2/ros_scanner_node.h"
@@ -44,12 +46,11 @@ using namespace psen_scan_v2_test;
 
 using namespace ::testing;
 using namespace psen_scan_v2_standalone::configuration;
+using namespace psen_scan_v2_standalone_test;
 
 namespace psen_scan_v2
 {
 #define Return_Future(promise_obj) ::testing::InvokeWithoutArgs([&promise_obj]() { return promise_obj.get_future(); })
-
-static constexpr std::chrono::seconds LOOP_END_TIMEOUT{ 4 };
 
 static constexpr int QUEUE_SIZE{ 10 };
 
@@ -91,6 +92,7 @@ static constexpr int HOST_UDP_PORT_CONTROL{ 55055 };
 static const std::string DEVICE_IP{ "127.0.0.100" };
 static constexpr ScanRange SCAN_RANGE{ util::TenthOfDegree(1), util::TenthOfDegree(2749) };
 static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 3 };
+static constexpr std::chrono::seconds LOOP_END_TIMEOUT{ 4 };
 
 static ScannerConfiguration createValidConfig()
 {
@@ -111,11 +113,6 @@ protected:
   ros::NodeHandle nh_priv_{ "~" };
   ScannerConfiguration scanner_config_{ createValidConfig() };
 };
-
-ACTION_P(OpenBarrier, barrier)
-{
-  barrier->release();
-}
 
 TEST_F(RosScannerNodeTests, testScannerInvocation)
 {
@@ -139,7 +136,7 @@ TEST_F(RosScannerNodeTests, testScannerInvocation)
   EXPECT_TRUE(start_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Scanner start was not called";
   ros_scanner_node.terminate();
   EXPECT_TRUE(stop_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Scanner stop was not called";
-  EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
+  EXPECT_FUTURE_IS_READY(loop, LOOP_END_TIMEOUT);
 }
 
 TEST_F(RosScannerNodeTests, testScanTopicReceived)
@@ -172,7 +169,7 @@ TEST_F(RosScannerNodeTests, testScanTopicReceived)
 
   EXPECT_TRUE(scan_topic_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Scan message was not sended";
   ros_scanner_node.terminate();
-  EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
+  EXPECT_FUTURE_IS_READY(loop, LOOP_END_TIMEOUT);
 }
 
 TEST_F(RosScannerNodeTests, testMissingStopReply)
@@ -197,7 +194,7 @@ TEST_F(RosScannerNodeTests, testMissingStopReply)
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
   EXPECT_TRUE(start_async_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Scanner start was not called";
   ros_scanner_node.terminate();
-  EXPECT_EQ(loop.wait_for(LOOP_END_TIMEOUT), std::future_status::ready);
+  EXPECT_FUTURE_IS_READY(loop, LOOP_END_TIMEOUT);
 }
 
 }  // namespace psen_scan_v2
