@@ -24,6 +24,8 @@
 #include <gmock/gmock.h>
 
 #include "psen_scan_v2_standalone/util/async_barrier.h"
+#include "psen_scan_v2_standalone/util/expectations.h"
+#include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/communication_layer/udp_client.h"
 
@@ -32,6 +34,7 @@
 using namespace psen_scan_v2_standalone;
 using namespace ::testing;
 using boost::asio::ip::udp;
+using psen_scan_v2_standalone_test::OpenBarrier;
 
 namespace psen_scan_v2_standalone_test
 {
@@ -60,7 +63,6 @@ public:
 public:
   void sendTestDataToClient();
   void sendEmptyTestDataToClient();
-  data_conversion_layer::RawData createRawData(std::string dataString);
 
 protected:
   MockUDPServer mock_udp_server_{ UDP_MOCK_PORT, std::bind(&UdpClientTests::receivedUdpMsg, this, _1, _2) };
@@ -117,16 +119,11 @@ void UdpClientTests::sendEmptyTestDataToClient()
   mock_udp_server_.asyncSend(host_endpoint, data);
 }
 
-data_conversion_layer::RawData UdpClientTests::createRawData(std::string dataString)
+data_conversion_layer::RawData createRawData(std::string dataString)
 {
   data_conversion_layer::RawData write_buf;
   std::copy(dataString.begin(), dataString.end(), std::back_inserter(write_buf));
   return write_buf;
-}
-
-ACTION_P(OpenBarrier, barrier)
-{
-  barrier->release();
 }
 
 TEST_F(UdpClientTests, testGetHostIp)
