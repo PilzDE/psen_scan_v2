@@ -261,6 +261,15 @@ TEST(LaserScanConversionsTest, laserScanShouldContainMinimalTimestamp)
   EXPECT_EQ(EXPECTED_TIMESTAMP_AFTER_CONVERSION, scan_ptr->getTimestamp());
 }
 
+TEST(LaserScanConversionsTest, laserScanShouldContainActiveZoneset)
+{
+  auto stamped_msgs = createStampedMsgs(5);
+  std::unique_ptr<LaserScan> scan_ptr;
+  ASSERT_NO_THROW(
+      scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
+  EXPECT_EQ(0, scan_ptr->getActiveZoneset());
+}
+
 using Message = data_conversion_layer::monitoring_frame::Message;
 using Stamped = data_conversion_layer::monitoring_frame::MessageStamped;
 using Tenth = util::TenthOfDegree;
