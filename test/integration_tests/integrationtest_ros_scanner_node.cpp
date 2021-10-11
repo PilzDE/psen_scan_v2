@@ -133,9 +133,9 @@ TEST_F(RosScannerNodeTests, testScannerInvocation)
   }
 
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
-  EXPECT_TRUE(start_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Scanner start was not called";
+  EXPECT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
   ros_scanner_node.terminate();
-  EXPECT_TRUE(stop_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Scanner stop was not called";
+  EXPECT_BARRIER_OPENS(stop_barrier, DEFAULT_TIMEOUT) << "Scanner stop was not called";
   EXPECT_FUTURE_IS_READY(loop, LOOP_END_TIMEOUT);
 }
 
@@ -162,12 +162,12 @@ TEST_F(RosScannerNodeTests, testScanTopicReceived)
   subscriber.initialize(nh_priv_);
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
 
-  EXPECT_TRUE(start_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Scanner start was not called";
+  EXPECT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
 
   ros_scanner_node.scanner_.invokeLaserScanCallback(laser_scan_fake);
   ros_scanner_node.scanner_.invokeLaserScanCallback(laser_scan_fake);
 
-  EXPECT_TRUE(scan_topic_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Scan message was not sended";
+  EXPECT_BARRIER_OPENS(scan_topic_barrier, DEFAULT_TIMEOUT) << "Scan message was not sended";
   ros_scanner_node.terminate();
   EXPECT_FUTURE_IS_READY(loop, LOOP_END_TIMEOUT);
 }
@@ -192,7 +192,7 @@ TEST_F(RosScannerNodeTests, testMissingStopReply)
   }
 
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
-  EXPECT_TRUE(start_async_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Scanner start was not called";
+  EXPECT_BARRIER_OPENS(start_async_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
   ros_scanner_node.terminate();
   EXPECT_FUTURE_IS_READY(loop, LOOP_END_TIMEOUT);
 }
