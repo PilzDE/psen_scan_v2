@@ -121,8 +121,7 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
         }
         uint8_t zone_set_read_buffer;
         raw_processing::read<uint8_t>(ss, zone_set_read_buffer);
-        std::cout << "ZONE SET: " << (int)zone_set_read_buffer << std::endl;
-        // TODO msg.zone_set_ = zone_set_read_buffer;
+        msg.active_zoneset_ = zone_set_read_buffer;
         break;
 
       case AdditionalFieldHeaderID::diagnostics:
