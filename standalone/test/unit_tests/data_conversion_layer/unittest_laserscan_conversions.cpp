@@ -38,14 +38,15 @@ static data_conversion_layer::monitoring_frame::MessageStamped
 createStampedMsg(const int64_t timestamp = DEFAULT_TIMESTAMP,
                  const util::TenthOfDegree from_theta = util::TenthOfDegree{ 10 },
                  const util::TenthOfDegree resolution = util::TenthOfDegree{ 90 },
-                 const uint32_t scan_counter = uint32_t{ 42 })
+                 const uint32_t scan_counter = uint32_t{ 42 },
+                 const uint8_t active_zoneset = uint8_t{ 0 })
 {
   const std::vector<double> measurements{ 1., 2., 3., 4.5, 5., 42. };
   const std::vector<double> intensities{ 0., 4., 3., 1007., 508., 14000. };
   const std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnostic_messages{};
 
   const data_conversion_layer::monitoring_frame::Message msg(
-      from_theta, resolution, scan_counter, measurements, intensities, diagnostic_messages);
+      from_theta, resolution, scan_counter, active_zoneset, measurements, intensities, diagnostic_messages);
 
   return data_conversion_layer::monitoring_frame::MessageStamped(msg, timestamp);
 }
@@ -80,6 +81,7 @@ copyStampedMsgWithNewMeasurements(const data_conversion_layer::monitoring_frame:
   const data_conversion_layer::monitoring_frame::Message new_msg(stamped_msg.msg_.fromTheta(),
                                                                  stamped_msg.msg_.resolution(),
                                                                  stamped_msg.msg_.scanCounter(),
+                                                                 stamped_msg.msg_.activeZoneset(),
                                                                  new_measurements,
                                                                  stamped_msg.msg_.intensities(),
                                                                  stamped_msg.msg_.diagnosticMessages());
@@ -267,13 +269,14 @@ TEST(LaserScanConversionTest, conversionShouldIgnoreEmptyFramesForMonitoringFram
 {
   // The following from_theta's are a real example from wireshark.
   // (angle_start:=-0.1, angle_end:=0.1)
-  std::vector<Stamped> stamped_msgs = { Stamped(Message(Tenth(2500), Tenth(2), 42, {}, {}, {}), 3),
-                                        Stamped(Message(Tenth(0), Tenth(2), 42, {}, {}, {}), 4),
-                                        Stamped(Message(Tenth(500), Tenth(2), 42, {}, {}, {}), 5),
-                                        Stamped(Message(Tenth(1318), Tenth(2), 42, { 1., 2., 3. }, { 4., 5., 6. }, {}),
-                                                6),
-                                        Stamped(Message(Tenth(1500), Tenth(2), 42, {}, {}, {}), 7),
-                                        Stamped(Message(Tenth(2000), Tenth(2), 42, {}, {}, {}), 8) };
+  std::vector<Stamped> stamped_msgs = {
+    Stamped(Message(Tenth(2500), Tenth(2), 42, 1, {}, {}, {}), 3),
+    Stamped(Message(Tenth(0), Tenth(2), 42, 1, {}, {}, {}), 4),
+    Stamped(Message(Tenth(500), Tenth(2), 42, 1, {}, {}, {}), 5),
+    Stamped(Message(Tenth(1318), Tenth(2), 42, 1, { 1., 2., 3. }, { 4., 5., 6. }, {}), 6),
+    Stamped(Message(Tenth(1500), Tenth(2), 42, 1, {}, {}, {}), 7),
+    Stamped(Message(Tenth(2000), Tenth(2), 42, 1, {}, {}, {}), 8)
+  };
 
   ASSERT_NO_THROW(data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs));
 }
@@ -282,13 +285,14 @@ TEST(LaserScanConversionsTest, conversionShouldIgnoreEmptyFramesForTimestampsCom
 {
   // The following from_theta's are a real example from wireshark.
   // (angle_start:=-0.1, angle_end:=0.1)
-  std::vector<Stamped> stamped_msgs = { Stamped(Message(Tenth(2500), Tenth(2), 42, {}, {}, {}), 1),
-                                        Stamped(Message(Tenth(0), Tenth(2), 42, {}, {}, {}), 2),
-                                        Stamped(Message(Tenth(500), Tenth(2), 42, {}, {}, {}), 3),
-                                        Stamped(Message(Tenth(1318), Tenth(2), 42, { 1., 2., 3. }, { 4., 5., 6. }, {}),
-                                                40000),
-                                        Stamped(Message(Tenth(1500), Tenth(2), 42, {}, {}, {}), 5),
-                                        Stamped(Message(Tenth(2000), Tenth(2), 42, {}, {}, {}), 6) };
+  std::vector<Stamped> stamped_msgs = {
+    Stamped(Message(Tenth(2500), Tenth(2), 42, 1, {}, {}, {}), 1),
+    Stamped(Message(Tenth(0), Tenth(2), 42, 1, {}, {}, {}), 2),
+    Stamped(Message(Tenth(500), Tenth(2), 42, 1, {}, {}, {}), 3),
+    Stamped(Message(Tenth(1318), Tenth(2), 42, 1, { 1., 2., 3. }, { 4., 5., 6. }, {}), 40000),
+    Stamped(Message(Tenth(1500), Tenth(2), 42, 1, {}, {}, {}), 5),
+    Stamped(Message(Tenth(2000), Tenth(2), 42, 1, {}, {}, {}), 6)
+  };
   const int64_t expected_stamp{ 6667 };  // 40000 - ((0.4/360) * 30*10^6)
 
   std::unique_ptr<LaserScan> scan_ptr;

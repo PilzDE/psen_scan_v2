@@ -290,18 +290,18 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareNotEqualEmpty)
 TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)
 {
   data_conversion_layer::monitoring_frame::Message msg(
-      util::TenthOfDegree(1234), util::TenthOfDegree(56), 78, { 45, 44, 43, 42 });
+      util::TenthOfDegree(1234), util::TenthOfDegree(56), 78, 2, { 45, 44, 43, 42 });
 
 // For compatibility with different ubuntu versions (resp. fmt), we need to take account of changes in
 // the default formatting of floating point numbers
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
   EXPECT_EQ(fmt::format("{}", msg),
             "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-            "active_zoneset = 0, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {}, diagnostics = {})");
+            "active_zoneset = 2, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {}, diagnostics = {})");
 #else
   EXPECT_EQ(fmt::format("{}", msg),
             "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-            "active_zoneset = 0, measurements = {45, 44, 43, 42}, intensities = {}, diagnostics = {})");
+            "active_zoneset = 2, measurements = {45, 44, 43, 42}, intensities = {}, diagnostics = {})");
 #endif
 }
 
