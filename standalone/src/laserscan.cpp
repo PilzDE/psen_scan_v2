@@ -31,11 +31,13 @@ LaserScan::LaserScan(const util::TenthOfDegree& resolution,
                      const util::TenthOfDegree& min_scan_angle,
                      const util::TenthOfDegree& max_scan_angle,
                      const uint32_t scan_counter,
+                     const uint8_t active_zoneset,
                      const int64_t timestamp)
   : resolution_(resolution)
   , min_scan_angle_(min_scan_angle)
   , max_scan_angle_(max_scan_angle)
   , scan_counter_(scan_counter)
+  , active_zoneset_(active_zoneset)
   , timestamp_(timestamp)
 {
   if (getScanResolution() == util::TenthOfDegree(0))
@@ -77,6 +79,11 @@ const LaserScan::MeasurementData& LaserScan::getMeasurements() const
 uint32_t LaserScan::getScanCounter() const
 {
   return scan_counter_;
+}
+
+uint8_t LaserScan::getActiveZoneset() const
+{
+  return active_zoneset_;
 }
 
 int64_t LaserScan::getTimestamp() const

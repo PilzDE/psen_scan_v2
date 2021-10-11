@@ -141,7 +141,7 @@ TEST_F(RosScannerNodeTests, testScannerInvocation)
 
 TEST_F(RosScannerNodeTests, testScanTopicReceived)
 {
-  LaserScan laser_scan_fake(util::TenthOfDegree(1), util::TenthOfDegree(3), util::TenthOfDegree(5), 14, 1000000000);
+  LaserScan laser_scan_fake(util::TenthOfDegree(1), util::TenthOfDegree(3), util::TenthOfDegree(5), 14, 2, 1000000000);
   laser_scan_fake.getMeasurements().push_back(1);
 
   util::Barrier scan_topic_barrier;

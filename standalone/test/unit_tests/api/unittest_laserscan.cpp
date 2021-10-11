@@ -32,13 +32,14 @@ static const util::TenthOfDegree DEFAULT_START_ANGLE{ 1 };
 static const util::TenthOfDegree DEFAULT_END_ANGLE{ 2 };
 static const int64_t DEFAULT_TIMESTAMP{ 1 };
 static const uint32_t DEFAULT_SCAN_COUNTER{ 1 };
+static const uint8_t DEFAULT_ACTIVE_ZONESET{ 0 };
 
 class LaserScanBuilder
 {
 public:
   LaserScan build()
   {
-    return LaserScan(resolution_, start_angle_, end_angle_, scan_counter_, timestamp_);
+    return LaserScan(resolution_, start_angle_, end_angle_, scan_counter_, active_zoneset_, timestamp_);
   }
 
   LaserScanBuilder& resolution(const util::TenthOfDegree& resolution)
@@ -76,6 +77,7 @@ private:
   util::TenthOfDegree start_angle_{ DEFAULT_START_ANGLE };
   util::TenthOfDegree end_angle_{ DEFAULT_END_ANGLE };
   uint32_t scan_counter_{ DEFAULT_SCAN_COUNTER };
+  uint8_t active_zoneset_{ DEFAULT_ACTIVE_ZONESET };
   int64_t timestamp_{ DEFAULT_TIMESTAMP };
 };
 
