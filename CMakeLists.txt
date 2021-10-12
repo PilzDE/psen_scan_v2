@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.7)
 project(psen_scan_v2)
 
 add_compile_options(-std=c++14)
@@ -30,6 +30,7 @@ find_package(catkin REQUIRED COMPONENTS
   rosconsole_bridge
   roscpp
   sensor_msgs
+  cmake_modules # Needed for find_package(TinyXML2 REQUIRED)
 )
 
 ## System dependencies are found with CMake's conventions
@@ -41,10 +42,13 @@ endif()
 find_package(console_bridge REQUIRED)
 find_package(fmt REQUIRED)
 
+find_package(TinyXML2 REQUIRED)
+
 catkin_package(
   CATKIN_DEPENDS
     roscpp
     sensor_msgs
+  DEPENDS TinyXML2
 )
 
 
@@ -99,6 +103,7 @@ include_directories(
   ${console_bridge_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
+  ${TinyXML2_INCLUDE_DIRS}
 )
 
 set(${PROJECT_NAME}_standalone_sources
@@ -124,6 +129,19 @@ target_link_libraries(${PROJECT_NAME}_standalone
   fmt::fmt
 )
 target_include_directories(${PROJECT_NAME}_standalone PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
+add_library(
+  ${PROJECT_NAME}_standalone_xml_configuration_import
+  standalone/src/configuration/xml_configuration_parser.cpp
+)
+
+target_link_libraries(${PROJECT_NAME}_standalone_xml_configuration_import
+  ${console_bridge_LIBRARIES}
+  ${TinyXML_LIBRARIES} 
+  ${TinyXML2_LIBRARIES} 
+  fmt::fmt
+)
+target_include_directories(${PROJECT_NAME}_standalone_xml_configuration_import PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 ###########
 ## Build ##
@@ -346,6 +364,18 @@ if(CATKIN_ENABLE_TESTING)
     ${console_bridge_LIBRARIES}
     fmt::fmt
   )
+
+  catkin_add_gmock(unittest_xml_configuration_parser
+    standalone/test/unit_tests/configuration/unittest_xml_configuration_parser.cpp
+  )
+  target_link_libraries(unittest_xml_configuration_parser
+    ${catkin_LIBRARIES}
+    ${PROJECT_NAME}_standalone_xml_configuration_import
+    ${console_bridge_LIBRARIES}
+    fmt::fmt
+  )
+  file(COPY standalone/test/unit_tests/configuration/unittest_xml_configuration_parser-testfile-no-speedrange.xml DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/testfiles)
+  file(COPY standalone/test/unit_tests/configuration/unittest_xml_configuration_parser-testfile-with-speedrange.xml DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/testfiles)
 
   #########################
   ##  Integration-Tests  ##
