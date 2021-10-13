@@ -72,7 +72,7 @@ MATCHER_P(IsRosScanEqual, expected_ros_scan, "")
 class SubscriberMock
 {
 public:
-  void initialize(ros::NodeHandle& nh);
+  SubscriberMock(ros::NodeHandle& nh);
 
   MOCK_METHOD1(callback, void(const sensor_msgs::LaserScan& msg));
 
@@ -80,7 +80,7 @@ private:
   ros::Subscriber subscriber_;
 };
 
-inline void SubscriberMock::initialize(ros::NodeHandle& nh)
+inline SubscriberMock::SubscriberMock(ros::NodeHandle& nh)
 {
   subscriber_ = nh.subscribe("scan", QUEUE_SIZE, &SubscriberMock::callback, this);
 }
@@ -140,22 +140,24 @@ TEST_F(RosScannerNodeTests, testScannerInvocation)
 
 TEST_F(RosScannerNodeTests, testScanTopicReceived)
 {
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(
+      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+
   util::Barrier scan_topic_barrier;
-  SubscriberMock subscriber;
+  SubscriberMock subscriber(nh_priv_);
   EXPECT_CALL(subscriber, callback(::testing::_))
       .WillOnce(testing::Return())
       .WillOnce(OpenBarrier(&scan_topic_barrier));
 
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(
-      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
-
   std::promise<void> hw_finished_request;
   hw_finished_request.set_value();
   util::Barrier start_barrier;
+  util::Barrier stop_barrier;
   EXPECT_CALL(ros_scanner_node.scanner_, start())
       .WillOnce(DoAll(OpenBarrier(&start_barrier), Return_Future(hw_finished_request)));
+  EXPECT_CALL(ros_scanner_node.scanner_, stop())
+      .WillOnce(DoAll(OpenBarrier(&stop_barrier), Return_Future(hw_finished_request)));
 
-  subscriber.initialize(nh_priv_);
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
 
   EXPECT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
