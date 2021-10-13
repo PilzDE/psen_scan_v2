@@ -83,6 +83,7 @@ private:
   friend class RosScannerNodeTests;
   FRIEND_TEST(RosScannerNodeTests, shouldStartAndStopSuccessfullyIfScannerRespondsToRequests);
   FRIEND_TEST(RosScannerNodeTests, shouldPublishScansWhenLaserScanCallbackIsInvoked);
+  FRIEND_TEST(RosScannerNodeTests, shouldPublishActiveZonesetWhenLaserScanCallbackIsInvoked);
   FRIEND_TEST(RosScannerNodeTests, shouldWaitWhenStopRequestResponseIsMissing);
 };
 
