@@ -51,6 +51,16 @@ namespace psen_scan_v2
 {
 #define Return_Future(promise_obj) ::testing::InvokeWithoutArgs([&promise_obj]() { return promise_obj.get_future(); })
 
+#define EXPECT_SUCCESSFULL_START_WILL_OPEN_BARRIER(mock, barrier)                                                      \
+  std::promise<void> start_promise_object;                                                                             \
+  start_promise_object.set_value();                                                                                    \
+  EXPECT_CALL(mock, start()).WillOnce(DoAll(OpenBarrier(barrier), Return_Future(start_promise_object)));
+
+#define EXPECT_SUCCESSFULL_STOP_WILL_OPEN_BARRIER(mock, barrier)                                                       \
+  std::promise<void> stop_promise_object;                                                                              \
+  stop_promise_object.set_value();                                                                                     \
+  EXPECT_CALL(mock, stop()).WillOnce(DoAll(OpenBarrier(barrier), Return_Future(stop_promise_object)));
+
 static constexpr int QUEUE_SIZE{ 10 };
 
 MATCHER_P(IsRosScanEqual, expected_ros_scan, "")
@@ -149,14 +159,10 @@ TEST_F(RosScannerNodeTests, testScanTopicReceived)
       .WillOnce(testing::Return())
       .WillOnce(OpenBarrier(&scan_topic_barrier));
 
-  std::promise<void> hw_finished_request;
-  hw_finished_request.set_value();
   util::Barrier start_barrier;
   util::Barrier stop_barrier;
-  EXPECT_CALL(ros_scanner_node.scanner_, start())
-      .WillOnce(DoAll(OpenBarrier(&start_barrier), Return_Future(hw_finished_request)));
-  EXPECT_CALL(ros_scanner_node.scanner_, stop())
-      .WillOnce(DoAll(OpenBarrier(&stop_barrier), Return_Future(hw_finished_request)));
+  EXPECT_SUCCESSFULL_START_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &start_barrier);
+  EXPECT_SUCCESSFULL_STOP_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &stop_barrier);
 
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
 
@@ -175,21 +181,14 @@ TEST_F(RosScannerNodeTests, testMissingStopReply)
   ROSScannerNodeT<ScannerMock> ros_scanner_node(
       nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
-  std::promise<void> hw_finished_start;
-  hw_finished_start.set_value();
+  util::Barrier start_barrier;
+  EXPECT_SUCCESSFULL_START_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &start_barrier);
 
-  std::promise<void> hw_didnt_respond_to_stop;
-  util::Barrier start_async_barrier;
-
-  {
-    ::testing::InSequence s;
-    EXPECT_CALL(ros_scanner_node.scanner_, start())
-        .WillOnce(DoAll(OpenBarrier(&start_async_barrier), Return_Future(hw_finished_start)));
-    EXPECT_CALL(ros_scanner_node.scanner_, stop()).WillOnce(Return_Future(hw_didnt_respond_to_stop));
-  }
+  std::promise<void> unset_promise;
+  EXPECT_CALL(ros_scanner_node.scanner_, stop()).WillOnce(Return_Future(unset_promise));
 
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
-  EXPECT_BARRIER_OPENS(start_async_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
+  EXPECT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
   ros_scanner_node.terminate();
   EXPECT_FUTURE_IS_READY(loop, LOOP_END_TIMEOUT);
 }
