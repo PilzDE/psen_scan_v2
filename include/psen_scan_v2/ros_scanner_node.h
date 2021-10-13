@@ -81,11 +81,9 @@ private:
   std::atomic_bool terminate_{ false };
 
   friend class RosScannerNodeTests;
-  FRIEND_TEST(RosScannerNodeTests, testScannerInvocation);
-  FRIEND_TEST(RosScannerNodeTests, testScanTopicReceived);
-  FRIEND_TEST(RosScannerNodeTests, testScanBuildFailure);
-  FRIEND_TEST(RosScannerNodeTests, testMissingStopReply);
-  FRIEND_TEST(RosScannerNodeTests, shouldNotInvokeUserCallbackInCaseOfEmptyLaserScan);
+  FRIEND_TEST(RosScannerNodeTests, shouldStartAndStopSuccessfullyIfScannerRespondsToRequests);
+  FRIEND_TEST(RosScannerNodeTests, shouldPublishScansWhenLaserScanCallbackIsInvoked);
+  FRIEND_TEST(RosScannerNodeTests, shouldWaitWhenStopRequestResponseIsMissing);
 };
 
 typedef ROSScannerNodeT<> ROSScannerNode;
