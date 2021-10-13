@@ -25,6 +25,8 @@
 #include <gtest/gtest_prod.h>
 
 #include <ros/ros.h>
+#include <std_msgs/UInt8.h>
+#include <sensor_msgs/LaserScan.h>
 
 #include "psen_scan_v2_standalone/scanner_v2.h"
 
@@ -74,7 +76,8 @@ private:
 
 private:
   ros::NodeHandle nh_;
-  ros::Publisher pub_;
+  ros::Publisher pub_scan_;
+  ros::Publisher pub_zone_;
   std::string tf_prefix_;
   double x_axis_rotation_;
   S scanner_;
@@ -100,7 +103,8 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
   , x_axis_rotation_(x_axis_rotation)
   , scanner_(scanner_config, std::bind(&ROSScannerNodeT<S>::laserScanCallback, this, std::placeholders::_1))
 {
-  pub_ = nh_.advertise<sensor_msgs::LaserScan>(topic, 1);
+  pub_scan_ = nh_.advertise<sensor_msgs::LaserScan>(topic, 1);
+  pub_zone_ = nh_.advertise<std_msgs::UInt8>("active_zoneset", 1);
 }
 
 template <typename S>
@@ -116,7 +120,10 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
         data_conversion_layer::radianToDegree(laserScanMsg.angle_max),
         data_conversion_layer::radianToDegree(laserScanMsg.angle_increment),
         laserScanMsg.ranges.size());
-    pub_.publish(laserScanMsg);
+    pub_scan_.publish(laserScanMsg);
+    std_msgs::UInt8 active_zoneset;
+    active_zoneset.data = scan.getActiveZoneset();
+    pub_zone_.publish(active_zoneset);
   }
   // LCOV_EXCL_START
   catch (const std::invalid_argument& e)
