@@ -36,15 +36,22 @@ public:
   MOCK_METHOD0(start, std::future<void>());
   MOCK_METHOD0(stop, std::future<void>());
 
-  void invokeLaserScanCallback(const psen_scan_v2_standalone::LaserScan& scan);
+  void invokeLaserScanCallback();
 
 private:
   psen_scan_v2_standalone::protocol_layer::LaserScanCallback laser_scan_callback_;
 };
 
-inline void ScannerMock::invokeLaserScanCallback(const psen_scan_v2_standalone::LaserScan& scan)
+inline void ScannerMock::invokeLaserScanCallback()
 {
-  laser_scan_callback_(scan);
+  psen_scan_v2_standalone::LaserScan laser_scan_fake(psen_scan_v2_standalone::util::TenthOfDegree(1),
+                                                     psen_scan_v2_standalone::util::TenthOfDegree(3),
+                                                     psen_scan_v2_standalone::util::TenthOfDegree(5),
+                                                     14,
+                                                     2,
+                                                     1000000000);
+  laser_scan_fake.getMeasurements().push_back(1);
+  laser_scan_callback_(laser_scan_fake);
 }
 
 }  // namespace psen_scan_v2_test
