@@ -13,12 +13,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <functional>
+#include <chrono>
 #include <csignal>
+#include <functional>
 #include <future>
 #include <string>
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
 #include "psen_scan_v2_standalone/protocol_layer/function_pointers.h"
@@ -29,12 +30,9 @@
 #include "psen_scan_v2/ros_parameter_handler.h"
 #include "psen_scan_v2/ros_scanner_node.h"
 
-#include <rosconsole_bridge/bridge.h>
-REGISTER_ROSCONSOLE_BRIDGE;
-
 using namespace psen_scan_v2;
-using namespace psen_scan_v2_standalone;
 using namespace psen_scan_v2_standalone::configuration;
+using namespace std::chrono_literals;
 
 std::function<void()> NODE_TERMINATE_CALLBACK;
 
@@ -60,55 +58,56 @@ void delayed_shutdown_sig_handler(int sig)
   NODE_TERMINATE_CALLBACK();
 
   // Delay the shutdown() to get full debug output. Workaround for https://github.com/ros/ros_comm/issues/688
-  ros::Duration(0.2).sleep();  // TODO check if we can get rid of this sleep
+  rclcpp::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(0.2s));  // TODO check if we can get rid of
+                                                                                  // this
 
-  ros::shutdown();
+  rclcpp::shutdown();
 }
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "psen_scan_v2_node");
-  ros::NodeHandle pnh("~");
+  rclcpp::init(argc, argv);
+  rclcpp::NodeOptions node_options;
+  node_options.automatically_declare_parameters_from_overrides(true);
+  rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("psen_scan_v2_node", node_options);
 
   std::signal(SIGINT, delayed_shutdown_sig_handler);
 
   try
   {
-    ScanRange scan_range{ util::TenthOfDegree::fromRad(configuration::DEFAULT_X_AXIS_ROTATION +
-                                                       getOptionalParamFromServer<double>(
-                                                           pnh, PARAM_ANGLE_START, configuration::DEFAULT_ANGLE_START)),
-                          util::TenthOfDegree::fromRad(configuration::DEFAULT_X_AXIS_ROTATION +
-                                                       getOptionalParamFromServer<double>(
-                                                           pnh, PARAM_ANGLE_END, configuration::DEFAULT_ANGLE_END)) };
+    ScanRange scan_range{ util::TenthOfDegree::fromRad(
+                              configuration::DEFAULT_X_AXIS_ROTATION +
+                              getOptionalParam<double>(*node, PARAM_ANGLE_START, configuration::DEFAULT_ANGLE_START)),
+                          util::TenthOfDegree::fromRad(
+                              configuration::DEFAULT_X_AXIS_ROTATION +
+                              getOptionalParam<double>(*node, PARAM_ANGLE_END, configuration::DEFAULT_ANGLE_END)) };
 
     ScannerConfiguration scanner_configuration{
       ScannerConfigurationBuilder()
-          .hostIP(getOptionalParamFromServer<std::string>(pnh, PARAM_HOST_IP, configuration::DEFAULT_HOST_IP_STRING))
-          .hostDataPort(
-              getOptionalParamFromServer<int>(pnh, PARAM_HOST_DATA_PORT, configuration::DATA_PORT_OF_HOST_DEVICE))
+          .hostIP(getOptionalParam<std::string>(*node, PARAM_HOST_IP, configuration::DEFAULT_HOST_IP_STRING))
+          .hostDataPort(getOptionalParam<int>(*node, PARAM_HOST_DATA_PORT, configuration::DATA_PORT_OF_HOST_DEVICE))
           .hostControlPort(
-              getOptionalParamFromServer<int>(pnh, PARAM_HOST_CONTROL_PORT, configuration::CONTROL_PORT_OF_HOST_DEVICE))
-          .scannerIp(getRequiredParamFromServer<std::string>(pnh, PARAM_SCANNER_IP))
+              getOptionalParam<int>(*node, PARAM_HOST_CONTROL_PORT, configuration::CONTROL_PORT_OF_HOST_DEVICE))
+          .scannerIp(getRequiredParam<std::string>(*node, PARAM_SCANNER_IP))
           .scannerDataPort(configuration::DATA_PORT_OF_SCANNER_DEVICE)
           .scannerControlPort(configuration::CONTROL_PORT_OF_SCANNER_DEVICE)
           .scanRange(scan_range)
           .enableDiagnostics()
-          .enableFragmentedScans(
-              getOptionalParamFromServer<bool>(pnh, PARAM_FRAGMENTED_SCANS, configuration::FRAGMENTED_SCANS))
-          .enableIntensities(getOptionalParamFromServer<bool>(pnh, PARAM_INTENSITIES, configuration::INTENSITIES))
+          .enableFragmentedScans(getOptionalParam<bool>(*node, PARAM_FRAGMENTED_SCANS, configuration::FRAGMENTED_SCANS))
+          .enableIntensities(getOptionalParam<bool>(*node, PARAM_INTENSITIES, configuration::INTENSITIES))
           .scanResolution(util::TenthOfDegree::fromRad(
-              getOptionalParamFromServer<double>(pnh, PARAM_RESOLUTION, configuration::DEFAULT_SCAN_ANGLE_RESOLUTION)))
+              getOptionalParam<double>(*node, PARAM_RESOLUTION, configuration::DEFAULT_SCAN_ANGLE_RESOLUTION)))
           .build()
     };
 
     if (scanner_configuration.fragmentedScansEnabled())
     {
-      ROS_INFO("Using fragmented scans.");
+      RCLCPP_INFO(node->get_logger(), "Using fragmented scans.");
     }
 
-    ROSScannerNode ros_scanner_node(pnh,
+    ROSScannerNode ros_scanner_node(node,
                                     DEFAULT_PUBLISH_TOPIC,
-                                    getOptionalParamFromServer<std::string>(pnh, PARAM_TF_PREFIX, DEFAULT_TF_PREFIX),
+                                    getOptionalParam<std::string>(*node, PARAM_TF_PREFIX, DEFAULT_TF_PREFIX),
                                     configuration::DEFAULT_X_AXIS_ROTATION,
                                     scanner_configuration);
 
@@ -119,7 +118,7 @@ int main(int argc, char** argv)
   }
   catch (std::exception& e)
   {
-    ROS_ERROR_STREAM(e.what());
+    RCLCPP_ERROR_STREAM(node->get_logger(), e.what());
   }
 
   return 0;

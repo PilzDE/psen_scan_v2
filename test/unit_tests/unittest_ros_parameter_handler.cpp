@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
 #include "psen_scan_v2/ros_parameter_handler.h"
 
@@ -32,14 +32,14 @@ public:
   virtual ~ParamTestItem() = default;
 
 public:
-  T callRequiredGetter(const ros::NodeHandle& nh, const std::string& param_name)
+  T callRequiredGetter(const rclcpp::Node::SharedPtr& node, const std::string& param_name)
   {
-    return getRequiredParamFromServer<T>(nh, param_name);
+    return getRequiredParam<T>(*node, param_name);
   }
 
-  T callOptionalGetter(const ros::NodeHandle& nh, const std::string& param_name)
+  T callOptionalGetter(const rclcpp::Node::SharedPtr& node, const std::string& param_name)
   {
-    return getOptionalParamFromServer<T>(nh, param_name, getDefaultValue());
+    return getOptionalParam<T>(*node, param_name, getDefaultValue());
   }
 
   virtual T getDefaultValue() const = 0;
@@ -128,10 +128,10 @@ TYPED_TEST_CASE(ParamTestSuite, TypesToTest);
 TYPED_TEST(ParamTestSuite, testParamNotOnServer)
 {
   TypeParam test_item;
-  ros::NodeHandle nh;
+  rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("testParamNotOnServer_node");
   const std::string param_name{ "MissingParam" };
-  ASSERT_THROW(test_item.callRequiredGetter(nh, param_name), ParamMissingOnServer);
-  ASSERT_EQ(test_item.getDefaultValue(), test_item.callOptionalGetter(nh, param_name)) << "Default value incorrect";
+  ASSERT_THROW(test_item.callRequiredGetter(node, param_name), ParamMissingOnServer);
+  ASSERT_EQ(test_item.getDefaultValue(), test_item.callOptionalGetter(node, param_name)) << "Default value incorrect ";
 }
 
 TYPED_TEST(ParamTestSuite, testIncorrectParamType)
@@ -139,10 +139,10 @@ TYPED_TEST(ParamTestSuite, testIncorrectParamType)
   TypeParam test_item;
   const std::string param_name{ "ParamWithIncorrectType" };
 
-  ros::NodeHandle nh;
-  ros::param::set(param_name, test_item.getIncorrectTypeValue());
-  ASSERT_THROW(test_item.callRequiredGetter(nh, param_name), WrongParameterType);
-  ASSERT_THROW(test_item.callOptionalGetter(nh, param_name), WrongParameterType);
+  rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("testIncorrectParamType_node");
+  node->declare_parameter(param_name, test_item.getIncorrectTypeValue());
+  ASSERT_THROW(test_item.callRequiredGetter(node, param_name), rclcpp::exceptions::InvalidParameterTypeException);
+  ASSERT_THROW(test_item.callOptionalGetter(node, param_name), rclcpp::exceptions::InvalidParameterTypeException);
 }
 
 TYPED_TEST(ParamTestSuite, testGettingOfParam)
@@ -150,18 +150,17 @@ TYPED_TEST(ParamTestSuite, testGettingOfParam)
   TypeParam test_item;
   const std::string param_name{ "CorrectParam" };
 
-  ros::NodeHandle nh;
-  ros::param::set(param_name, test_item.getArbitraryValue());
-  ASSERT_EQ(test_item.getArbitraryValue(), test_item.callRequiredGetter(nh, param_name)) << "Param value incorrect";
-  ASSERT_EQ(test_item.getArbitraryValue(), test_item.callOptionalGetter(nh, param_name)) << "Param value incorrect";
+  rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("testGettingOfParam_node");
+  node->declare_parameter(param_name, test_item.getArbitraryValue());
+  ASSERT_EQ(test_item.getArbitraryValue(), test_item.callRequiredGetter(node, param_name)) << "Param value incorrect";
+  ASSERT_EQ(test_item.getArbitraryValue(), test_item.callOptionalGetter(node, param_name)) << "Param value incorrect";
 }
 
 }  // namespace psen_scan_v2_test
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "unittest_ros_parameter_handler");
-  ros::NodeHandle nh;
+  rclcpp::init(argc, argv);
 
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

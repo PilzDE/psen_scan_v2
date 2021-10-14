@@ -31,17 +31,6 @@ public:
   }
 };
 
-/**
- * @brief Exception thrown if a parameter can be found on the ROS parameter server but with an unexpected type.
- */
-class WrongParameterType : public std::runtime_error
-{
-public:
-  WrongParameterType(const std::string& msg) : std::runtime_error(msg)
-  {
-  }
-};
-
 }  // namespace psen_scan_v2
 
 #endif  // PSEN_SCAN_V2_GET_ROS_PARAMETER_EXCEPTION_H
