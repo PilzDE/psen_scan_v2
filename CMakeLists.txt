@@ -199,10 +199,15 @@ install(DIRECTORY urdf/
 install(TARGETS
   ${PROJECT_NAME}_node
   ${PROJECT_NAME}_standalone
+  config_server_node
+  ${PROJECT_NAME}_standalone_xml_configuration_import
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+
+catkin_install_python(PROGRAMS scripts/zone_switching_visualization.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 ############
 ##  Test  ##
