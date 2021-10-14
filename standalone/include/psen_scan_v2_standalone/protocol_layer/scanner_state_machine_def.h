@@ -173,6 +173,7 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
     const data_conversion_layer::monitoring_frame::Message msg{ data_conversion_layer::monitoring_frame::deserialize(
         *(event.data_), event.num_bytes_) };
     checkForDiagnosticErrors(msg);
+    checkForChangedActiveZoneset(msg);
     const data_conversion_layer::monitoring_frame::MessageStamped stamped_msg{ msg, event.timestamp_ };
     informUserAboutTheScanData(stamped_msg);
   }
@@ -190,6 +191,17 @@ inline void ScannerProtocolDef::checkForDiagnosticErrors(const data_conversion_l
   {
     PSENSCAN_WARN_THROTTLE(
         1 /* sec */, "StateMachine", "The scanner reports an error: {}", util::formatRange(msg.diagnosticMessages()));
+  }
+}
+
+inline void
+ScannerProtocolDef::checkForChangedActiveZoneset(const data_conversion_layer::monitoring_frame::Message& msg)
+{
+  if (!zoneset_reference_msg_.is_initialized() || (msg.scanCounter() >= zoneset_reference_msg_->scanCounter() &&
+                                                   msg.activeZoneset() != zoneset_reference_msg_->activeZoneset()))
+  {
+    PSENSCAN_INFO("Scanner", "The scanner switched to active zoneset {}", msg.activeZoneset());
+    zoneset_reference_msg_ = msg;
   }
 }
 
