@@ -1,4 +1,4 @@
-name: CI-Noetic Binary Test
+name: CI-Foxy Binary Test
 
 on: [push, pull_request]
 
@@ -6,7 +6,7 @@ jobs:
   debian:
     name: "Create debian binary for psen_scan_v2"
     runs-on: ubuntu-20.04
-    container: ros:noetic-ros-core
+    container: ros:foxy-ros-core
     steps:
       - uses: actions/checkout@v1
 
@@ -18,10 +18,10 @@ jobs:
 
       - name: Generate debian binary
         run: |
-          source /opt/ros/noetic/setup.bash
-          bloom-generate rosdebian --ros-distro noetic
+          source /opt/ros/foxy/setup.bash
+          bloom-generate rosdebian --ros-distro foxy
           fakeroot debian/rules binary
-          cp ../ros-noetic-psen-scan-v2_*.deb cached_binary.deb
+          cp ../ros-foxy-psen-scan-v2_*.deb cached_binary.deb
         shell: bash
 
       - uses: actions/cache@v2
@@ -33,7 +33,7 @@ jobs:
     name: "Launch check for psen_scan_v2"
     needs: debian
     runs-on: ubuntu-20.04
-    container: ros:noetic-ros-core
+    container: ros:foxy-ros-core
     steps:
       - uses: actions/cache@v2
         with:
@@ -47,6 +47,6 @@ jobs:
 
       - name: Launch test
         run: |
-          source /opt/ros/noetic/setup.bash
-          rostest test/integration_tests/integrationtest_ros_scanner_launch.test
+          source /opt/ros/foxy/setup.bash
+          ros2 test test/integration_tests/integrationtest_ros_scanner_launch.py
         shell: bash

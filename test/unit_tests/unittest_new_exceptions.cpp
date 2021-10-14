@@ -27,13 +27,6 @@ TEST(GetROSParameterExceptionTest, new_param_missing_on_server_exception)
   EXPECT_EQ(except_str, e->what());
 }
 
-TEST(GetROSParameterExceptionTest, new_wrong_parameter_type_exception)
-{
-  std::string except_str = "GetROSParameterException";
-  std::unique_ptr<WrongParameterType> e(new WrongParameterType(except_str));
-  EXPECT_EQ(except_str, e->what());
-}
-
 }  // namespace psen_scan_v2_test
 
 int main(int argc, char* argv[])
