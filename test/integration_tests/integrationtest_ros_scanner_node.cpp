@@ -134,7 +134,7 @@ static ScannerConfiguration createValidConfig()
       .build();
 }
 
-static LaserScan createValidLaserScan(const uint8_t active_zoneset=1)
+static LaserScan createValidLaserScan(const uint8_t active_zoneset = 1)
 {
   psen_scan_v2_standalone::LaserScan laser_scan_fake(psen_scan_v2_standalone::util::TenthOfDegree(1),
                                                      psen_scan_v2_standalone::util::TenthOfDegree(3),
