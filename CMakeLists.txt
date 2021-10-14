@@ -31,6 +31,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   cmake_modules # Needed for find_package(TinyXML2 REQUIRED)
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -44,10 +45,22 @@ find_package(fmt REQUIRED)
 
 find_package(TinyXML2 REQUIRED)
 
+add_message_files(
+  FILES
+  ZoneSet.msg
+  ZoneSetConfiguration.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  sensor_msgs
+)
+
 catkin_package(
   CATKIN_DEPENDS
     roscpp
     sensor_msgs
+    message_runtime
   DEPENDS TinyXML2
 )
 
@@ -93,6 +106,7 @@ if(CATKIN_ENABLE_CLANG_TIDY)
     set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
   endif()
 endif()
+
 ######################
 ## Build Standalone ##
 ######################
@@ -155,6 +169,15 @@ add_executable(${PROJECT_NAME}_node ${${PROJECT_NAME}_node_sources})
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_standalone
+)
+
+
+add_executable(config_server_node
+  src/config_server_node_main.cpp
+  src/config_server_node.cpp)
+target_link_libraries(config_server_node
+  ${catkin_LIBRARIES}
+  ${PROJECT_NAME}_standalone_xml_configuration_import
 )
 
 #############
@@ -419,6 +442,16 @@ if(CATKIN_ENABLE_TESTING)
   target_link_libraries(integrationtest_ros_scanner_node
     ${catkin_LIBRARIES}
     fmt::fmt
+  )
+
+  add_rostest_gmock(integrationtest_config_server_node
+    test/integration_tests/integrationtest_config_server_node.test
+    test/integration_tests/integrationtest_config_server_node.cpp
+    src/config_server_node.cpp
+  )
+  target_link_libraries(integrationtest_config_server_node
+    ${catkin_LIBRARIES}
+    ${PROJECT_NAME}_standalone_xml_configuration_import
   )
 
   add_rostest_gmock(unittest_ros_parameter_handler
