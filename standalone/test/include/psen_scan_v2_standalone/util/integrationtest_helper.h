@@ -72,10 +72,10 @@ static std::vector<double> generateIntensities(const unsigned int& num_elements,
 static data_conversion_layer::monitoring_frame::Message
 createValidMonitoringFrameMsg(const uint32_t scan_counter = 42,
                               const util::TenthOfDegree start_angle = DEFAULT_SCAN_RANGE.getStart(),
-                              const util::TenthOfDegree end_angle = DEFAULT_SCAN_RANGE.getEnd())
+                              const util::TenthOfDegree end_angle = DEFAULT_SCAN_RANGE.getEnd(),
+                              const uint8_t active_zoneset = 1)
 {
   const auto resolution{ util::TenthOfDegree(10) };
-  const uint8_t active_zoneset{ 1 };
 
   const unsigned int num_elements = ((end_angle - start_angle) / resolution).value();
   const double lowest_measurement{ 0. };
@@ -92,6 +92,12 @@ createValidMonitoringFrameMsg(const uint32_t scan_counter = 42,
 
   return data_conversion_layer::monitoring_frame::Message(
       start_angle, resolution, scan_counter, active_zoneset, measurements, intensities, diagnostic_messages);
+}
+
+static data_conversion_layer::monitoring_frame::Message
+createValidMonitoringFrameMsgWithZoneset(const uint8_t active_zoneset)
+{
+  return createValidMonitoringFrameMsg(42, DEFAULT_SCAN_RANGE.getStart(), DEFAULT_SCAN_RANGE.getEnd(), active_zoneset);
 }
 
 std::vector<data_conversion_layer::monitoring_frame::Message>
