@@ -416,7 +416,26 @@ if(CATKIN_ENABLE_TESTING)
       ARGS config:=with_intensities.yaml)
     add_rostest(test/hw_tests/hwtest_scan_range.test
       ARGS config:=big_resolution.yaml)
+
+    add_rostest_gtest(hwtest_zoneset_switching
+      test/hw_tests/hwtest_zoneset_switching.test
+      test/hw_tests/hwtest_zoneset_switching.cpp
+      standalone/src/laserscan.cpp
+    )
+  else()
+
+    catkin_add_executable_with_gtest(hwtest_zoneset_switching
+                                     test/hw_tests/hwtest_zoneset_switching.cpp
+                                    EXCLUDE_FROM_ALL)
+    add_dependencies(tests hwtest_zoneset_switching)
   endif()
+
+  target_link_libraries(hwtest_zoneset_switching
+    ${catkin_LIBRARIES}
+    ${PROJECT_NAME}_standalone
+    ${rosbag_LIBRARIES}
+    fmt::fmt
+  )
 
   #########################################
   ##  Hardware-Tests in Test Environment ##
