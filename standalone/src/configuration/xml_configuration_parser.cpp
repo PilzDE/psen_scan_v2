@@ -24,7 +24,7 @@ namespace psen_scan_v2_standalone
 {
 namespace configuration
 {
-ZoneSetConfiguration XMLConfigurationParser::parse(const char* filename)
+ZoneSetConfiguration XMLConfigurationParser::parseFile(const char* filename)
 {
   tinyxml2::XMLDocument doc;
   auto parse_result = doc.LoadFile(filename);

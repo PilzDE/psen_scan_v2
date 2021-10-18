@@ -29,7 +29,7 @@ ConfigServerNode::ConfigServerNode(ros::NodeHandle& nh, const char* config_file_
   configuration::XMLConfigurationParser parser;
   try
   {
-    auto zoneconfig = parser.parse(config_file_path);
+    auto zoneconfig = parser.parseFile(config_file_path);
     zoneset_pub_ = nh_.advertise<::psen_scan_v2::ZoneSetConfiguration>(DEFAULT_ZONESET_TOPIC, 1, true);
 
     zoneset_pub_.publish(toMsg(zoneconfig));

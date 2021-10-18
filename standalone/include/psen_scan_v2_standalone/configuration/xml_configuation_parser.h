@@ -82,7 +82,7 @@ std::vector<unsigned long> ro_string_to_vec(const std::string& ro_string)
 class XMLConfigurationParser
 {
 public:
-  ZoneSetConfiguration parse(const char* filename);
+  ZoneSetConfiguration parseFile(const char* filename);
 };
 
 }  // namespace configuration

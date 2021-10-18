@@ -85,20 +85,20 @@ class XmlConfiguationParserTest : public testing::Test
 TEST_F(XmlConfiguationParserTest, throwIfFileDoesNotExist)
 {
   configuration::XMLConfigurationParser parser;
-  EXPECT_THROW(parser.parse("non-existing-file.xml"), configuration::XMLConfigurationParserException);
+  EXPECT_THROW(parser.parseFile("non-existing-file.xml"), configuration::XMLConfigurationParserException);
 }
 
 TEST_F(XmlConfiguationParserTest, dontThrowIfFileExists)
 {
   configuration::XMLConfigurationParser parser;
-  EXPECT_NO_THROW(parser.parse("testfiles/unittest_xml_configuration_parser-testfile-no-speedrange.xml"));
+  EXPECT_NO_THROW(parser.parseFile("testfiles/unittest_xml_configuration_parser-testfile-no-speedrange.xml"));
 }
 
 TEST_F(XmlConfiguationParserTest, zonesParseCorrect)
 {
   configuration::XMLConfigurationParser parser;
   configuration::ZoneSetConfiguration zoneset_config =
-      parser.parse("testfiles/unittest_xml_configuration_parser-testfile-no-speedrange.xml");
+      parser.parseFile("testfiles/unittest_xml_configuration_parser-testfile-no-speedrange.xml");
   ASSERT_EQ(zoneset_config.zonesets_.size(), 2);
   EXPECT_EQ(zoneset_config.zonesets_[0].ro_safety_.size(), 550);
 
@@ -126,7 +126,7 @@ TEST_F(XmlConfiguationParserTest, correctParsingOfSpeedRange)
 {
   configuration::XMLConfigurationParser parser;
   configuration::ZoneSetConfiguration zoneset_config =
-      parser.parse("testfiles/unittest_xml_configuration_parser-testfile-with-speedrange.xml");
+      parser.parseFile("testfiles/unittest_xml_configuration_parser-testfile-with-speedrange.xml");
 
   EXPECT_EQ(zoneset_config.zonesets_[0].speed_range_->min_, -10);
   EXPECT_EQ(zoneset_config.zonesets_[0].speed_range_->max_, 10);
