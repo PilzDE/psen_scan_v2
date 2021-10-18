@@ -17,6 +17,7 @@
 
 #include "psen_scan_v2_standalone/configuration/xml_configuation_parser.h"
 #include "psen_scan_v2_standalone/configuration/zoneset_configuration.h"
+#include "psen_scan_v2_standalone/util/expectations.h"
 
 template <typename T>
 T concat(const std::initializer_list<T>& lst)
@@ -132,6 +133,754 @@ TEST_F(XmlConfiguationParserTest, correctParsingOfSpeedRange)
   EXPECT_EQ(zoneset_config.zonesets_[0].speed_range_->max_, 10);
   EXPECT_EQ(zoneset_config.zonesets_[1].speed_range_->min_, 11);
   EXPECT_EQ(zoneset_config.zonesets_[1].speed_range_->max_, 50);
+}
+
+TEST_F(XmlConfiguationParserTest, missingChainToZoneSetInfo)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>true</encEnable>"
+                          "      <zoneSetSelCode>"
+                          "        <zoneSetSelector>"
+                          "          <zoneSetSpeedRange>"
+                          "            <minSpeed>-5</minSpeed>"
+                          "            <maxSpeed>5</maxSpeed>"
+                          "          </zoneSetSpeedRange>"
+                          "        </zoneSetSelector>"
+                          "      </zoneSetSelCode>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          // Missing <zoneSetInfo>
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  EXPECT_THROW_AND_WHAT(parser.parseString(xml.c_str()),
+                        configuration::XMLConfigurationParserException,
+                        "Could not parse. Chain MIB->scannerDescr->zoneSetDefinition->zoneSetInfo not complete.");
+}
+
+TEST_F(XmlConfiguationParserTest, missingChainZoneSetDetail)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>true</encEnable>"
+                          "      <zoneSetSelCode>"
+                          "        <zoneSetSelector>"
+                          "          <zoneSetSpeedRange>"
+                          "            <minSpeed>-5</minSpeed>"
+                          "            <maxSpeed>5</maxSpeed>"
+                          "          </zoneSetSpeedRange>"
+                          "        </zoneSetSelector>"
+                          "      </zoneSetSelCode>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"
+                          // Missing <zoneSetDetail>
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  EXPECT_THROW_AND_WHAT(
+      parser.parseString(xml.c_str()),
+      configuration::XMLConfigurationParserException,
+      "Could not parse. Chain MIB->scannerDescr->zoneSetDefinition->zoneSetInfo->zoneSetDetail not complete.");
+}
+
+TEST_F(XmlConfiguationParserTest, missingChainZoneSetType)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>true</encEnable>"
+                          "      <zoneSetSelCode>"
+                          "        <zoneSetSelector>"
+                          "          <zoneSetSpeedRange>"
+                          "            <minSpeed>-5</minSpeed>"
+                          "            <maxSpeed>5</maxSpeed>"
+                          "          </zoneSetSpeedRange>"
+                          "        </zoneSetSelector>"
+                          "      </zoneSetSelCode>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"
+                          "        <zoneSetDetail>"
+                          // <type> missing here
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "           <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  EXPECT_THROW_AND_WHAT(parser.parseString(xml.c_str()),
+                        configuration::XMLConfigurationParserException,
+                        "Could not parse. At least one <zoneSetDetail> is missing a <type>.");
+}
+
+TEST_F(XmlConfiguationParserTest, missingChainZoneSetRO)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>true</encEnable>"
+                          "      <zoneSetSelCode>"
+                          "        <zoneSetSelector>"
+                          "          <zoneSetSpeedRange>"
+                          "            <minSpeed>-5</minSpeed>"
+                          "            <maxSpeed>5</maxSpeed>"
+                          "          </zoneSetSpeedRange>"
+                          "        </zoneSetSelector>"
+                          "      </zoneSetSelCode>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"
+                          "        <zoneSetDetail>"
+                          // <ro> missing here
+                          "          <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  EXPECT_THROW_AND_WHAT(parser.parseString(xml.c_str()),
+                        configuration::XMLConfigurationParserException,
+                        "Could not parse. At least one <zoneSetDetail> is missing a <ro>.");
+}
+TEST_F(XmlConfiguationParserTest, emptyRO)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>true</encEnable>"
+                          "      <zoneSetSelCode>"
+                          "        <zoneSetSelector>"
+                          "          <zoneSetSpeedRange>"  //<-- Only one speed range
+                          "            <minSpeed>-5</minSpeed>"
+                          "            <maxSpeed>5</maxSpeed>"
+                          "          </zoneSetSpeedRange>"
+                          "        </zoneSetSelector>"
+                          "      </zoneSetSelCode>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "  <zoneSetDefinition>"
+                          "    <zoneSetInfo>"
+                          "      <zoneSetDetail>"
+                          "        <ro>00aa</ro>"
+                          "        <type>roOSSD1</type>"
+                          "      </zoneSetDetail>"
+                          "      <zoneSetDetail>"
+                          "        <ro></ro>"  // ro here empty
+                          "        <type>roOSSD1</type>"
+                          "      </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  EXPECT_THROW_AND_WHAT(parser.parseString(xml.c_str()),
+                        configuration::XMLConfigurationParserException,
+                        "Could not parse. <ro> element is empty.");
+}
+
+TEST_F(XmlConfiguationParserTest, wrongType)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>true</encEnable>"
+                          "      <zoneSetSelCode>"
+                          "        <zoneSetSelector>"
+                          "          <zoneSetSpeedRange>"  //<-- Only one speed range
+                          "            <minSpeed>-5</minSpeed>"
+                          "            <maxSpeed>5</maxSpeed>"
+                          "          </zoneSetSpeedRange>"
+                          "        </zoneSetSelector>"
+                          "      </zoneSetSelCode>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>WRONGTYPE</type>"  // Here wrong type
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  EXPECT_THROW_AND_WHAT(parser.parseString(xml.c_str()),
+                        configuration::XMLConfigurationParserException,
+                        "Could not parse. Invalid <type> must be \"roOSSD1\" or \"warn1\".");
+}
+
+TEST_F(XmlConfiguationParserTest, emptyType)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>true</encEnable>"
+                          "      <zoneSetSelCode>"
+                          "        <zoneSetSelector>"
+                          "          <zoneSetSpeedRange>"  //<-- Only one speed range
+                          "            <minSpeed>-5</minSpeed>"
+                          "            <maxSpeed>5</maxSpeed>"
+                          "          </zoneSetSpeedRange>"
+                          "        </zoneSetSelector>"
+                          "      </zoneSetSelCode>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type></type>"  // Here empty type
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  EXPECT_THROW_AND_WHAT(parser.parseString(xml.c_str()),
+                        configuration::XMLConfigurationParserException,
+                        "Could not parse. <type> element is empty.");
+}
+
+TEST_F(XmlConfiguationParserTest, missingEncEnable)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          // No <encEnable> enabled
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>warn1</type>"
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  EXPECT_THROW_AND_WHAT(parser.parseString(xml.c_str()),
+                        configuration::XMLConfigurationParserException,
+                        "Could not parse. Chain MIB->clusterDescr->zoneSetConfiguration->encEnabled is broken.");
+}
+
+TEST_F(XmlConfiguationParserTest, emptyEncEnable)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable></encEnable>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>warn1</type>"
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  EXPECT_THROW_AND_WHAT(parser.parseString(xml.c_str()),
+                        configuration::XMLConfigurationParserException,
+                        "Could not parse. Value inside <encEnable> could not be evaluated to true or false");
+}
+
+TEST_F(XmlConfiguationParserTest, invalidEncEnableValue)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>INVALIDVALUE</encEnable>"  // Invalid value
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>warn1</type>"
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  EXPECT_THROW_AND_WHAT(parser.parseString(xml.c_str()),
+                        configuration::XMLConfigurationParserException,
+                        "Could not parse. Value inside <encEnable> could not be evaluated to true or false");
+}
+
+TEST_F(XmlConfiguationParserTest, missingZoneSetSelector)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>true</encEnable>"
+                          "      <zoneSetSelCode>"
+                          // Missing <zoneSetSelector>
+                          "      </zoneSetSelCode>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>warn1</type>"
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  EXPECT_THROW_AND_WHAT(
+      parser.parseString(xml.c_str()),
+      configuration::XMLConfigurationParserException,
+      "Could not parse. Chain MIB->clusterDescr->zoneSetConfiguration->zoneSetSelCode->zoneSetSelector is broken.");
+}
+
+TEST_F(XmlConfiguationParserTest, missingZoneSetSpeedRange)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>true</encEnable>"
+                          "      <zoneSetSelCode>"
+                          "        <zoneSetSelector>"
+                          // missing <zoneSetSpeedRange>
+                          "        </zoneSetSelector>"
+                          "      </zoneSetSelCode>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>warn1</type>"
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  EXPECT_THROW_AND_WHAT(parser.parseString(xml.c_str()),
+                        configuration::XMLConfigurationParserException,
+                        "Could not parse. Missing <zoneSetSpeedRange> below <zoneSetSelector>");
+}
+
+TEST_F(XmlConfiguationParserTest, missingMinSpeed)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>true</encEnable>"
+                          "      <zoneSetSelCode>"
+                          "        <zoneSetSelector>"
+                          "          <zoneSetSpeedRange>"
+                          // Missing <minSpeed>
+                          "            <maxSpeed>10</maxSpeed>"
+                          "          </zoneSetSpeedRange>"
+                          "        </zoneSetSelector>"
+                          "      </zoneSetSelCode>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>warn1</type>"
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  EXPECT_THROW_AND_WHAT(parser.parseString(xml.c_str()),
+                        configuration::XMLConfigurationParserException,
+                        "Could not parse. Missing <minSpeed> below <zoneSetSpeedRange>");
+}
+
+TEST_F(XmlConfiguationParserTest, invalidMinSpeed)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>true</encEnable>"
+                          "      <zoneSetSelCode>"
+                          "        <zoneSetSelector>"
+                          "          <zoneSetSpeedRange>"
+                          "            <minSpeed>abc</minSpeed>"  // invalid min Speed
+                          "            <maxSpeed>10</maxSpeed>"
+                          "          </zoneSetSpeedRange>"
+                          "        </zoneSetSelector>"
+                          "      </zoneSetSelCode>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>warn1</type>"
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  EXPECT_THROW_AND_WHAT(parser.parseString(xml.c_str()),
+                        configuration::XMLConfigurationParserException,
+                        "Could not parse. Value <minSpeed> invalid.");
+}
+
+TEST_F(XmlConfiguationParserTest, invalidMinSpeedEmpty)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>true</encEnable>"
+                          "      <zoneSetSelCode>"
+                          "        <zoneSetSelector>"
+                          "          <zoneSetSpeedRange>"
+                          "            <minSpeed></minSpeed>"  // Empty minSpeed
+                          "            <maxSpeed>10</maxSpeed>"
+                          "          </zoneSetSpeedRange>"
+                          "        </zoneSetSelector>"
+                          "      </zoneSetSelCode>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>warn1</type>"
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  EXPECT_THROW_AND_WHAT(parser.parseString(xml.c_str()),
+                        configuration::XMLConfigurationParserException,
+                        "Could not parse. Value <minSpeed> invalid.");
+}
+
+TEST_F(XmlConfiguationParserTest, missingMaxSpeed)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>true</encEnable>"
+                          "      <zoneSetSelCode>"
+                          "        <zoneSetSelector>"
+                          "          <zoneSetSpeedRange>"
+                          "            <minSpeed>-10</minSpeed>"
+                          // Missing <maxSpeed>
+                          "          </zoneSetSpeedRange>"
+                          "        </zoneSetSelector>"
+                          "      </zoneSetSelCode>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>warn1</type>"
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  EXPECT_THROW_AND_WHAT(parser.parseString(xml.c_str()),
+                        configuration::XMLConfigurationParserException,
+                        "Could not parse. Missing <maxSpeed> below <zoneSetSpeedRange>");
+}
+
+TEST_F(XmlConfiguationParserTest, invalidMaxSpeed)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>true</encEnable>"
+                          "      <zoneSetSelCode>"
+                          "        <zoneSetSelector>"
+                          "          <zoneSetSpeedRange>"
+                          "            <minSpeed>-10</minSpeed>"
+                          "            <maxSpeed>abc</maxSpeed>"  // invalid maxSpeed
+                          "          </zoneSetSpeedRange>"
+                          "        </zoneSetSelector>"
+                          "      </zoneSetSelCode>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>warn1</type>"
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  EXPECT_THROW_AND_WHAT(parser.parseString(xml.c_str()),
+                        configuration::XMLConfigurationParserException,
+                        "Could not parse. Value <maxSpeed> invalid.");
+}
+
+TEST_F(XmlConfiguationParserTest, invalidMaxSpeedEmpty)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>true</encEnable>"
+                          "      <zoneSetSelCode>"
+                          "        <zoneSetSelector>"
+                          "          <zoneSetSpeedRange>"
+                          "            <minSpeed>-10</minSpeed>"
+                          "            <maxSpeed></maxSpeed>"  // empty maxSpeed
+                          "          </zoneSetSpeedRange>"
+                          "        </zoneSetSelector>"
+                          "      </zoneSetSelCode>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>warn1</type>"
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  EXPECT_THROW_AND_WHAT(parser.parseString(xml.c_str()),
+                        configuration::XMLConfigurationParserException,
+                        "Could not parse. Value <maxSpeed> invalid.");
+}
+
+TEST_F(XmlConfiguationParserTest, invalidSpeedRange)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>true</encEnable>"
+                          "      <zoneSetSelCode>"
+                          "        <zoneSetSelector>"
+                          "          <zoneSetSpeedRange>"
+                          "            <minSpeed>10</minSpeed>"  // min_speed > max_speed
+                          "            <maxSpeed>9</maxSpeed>"   //
+                          "          </zoneSetSpeedRange>"
+                          "        </zoneSetSelector>"
+                          "      </zoneSetSelCode>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>warn1</type>"
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  EXPECT_THROW_AND_WHAT(parser.parseString(xml.c_str()),
+                        configuration::ZoneSetSpeedRangeException,
+                        "Invalid speedrange min: 10 > max: 9");
+}
+
+TEST_F(XmlConfiguationParserTest, moreSpeedRangesThanZoneSets)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>true</encEnable>"
+                          "      <zoneSetSelCode>"
+                          "        <zoneSetSelector>"
+                          "          <zoneSetSpeedRange>"  // <-- SpeedRange #1
+                          "            <minSpeed>-5</minSpeed>"
+                          "            <maxSpeed>5</maxSpeed>"
+                          "          </zoneSetSpeedRange>"
+                          "        </zoneSetSelector>"
+                          "        <zoneSetSelector>"  // <-- SpeedRange #2
+                          "          <zoneSetSpeedRange>"
+                          "            <minSpeed>6</minSpeed>"
+                          "            <maxSpeed>15</maxSpeed>"
+                          "          </zoneSetSpeedRange>"
+                          "        </zoneSetSelector>"
+                          "      </zoneSetSelCode>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"  //<-- Only one zoneset!
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>warn1</type>"
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+
+  EXPECT_THROW_AND_WHAT(parser.parseString(xml.c_str()),
+                        configuration::XMLConfigurationParserException,
+                        "Parsing failed. SpeedRanges are enabled by <encEnable>true</Enable> but there are more "
+                        "speedRanges than defined zones.");
+}
+
+TEST_F(XmlConfiguationParserTest, lessSpeedRangesThanZoneSets)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>true</encEnable>"
+                          "      <zoneSetSelCode>"
+                          "        <zoneSetSelector>"
+                          "          <zoneSetSpeedRange>"  //<-- Only one speed range
+                          "            <minSpeed>-5</minSpeed>"
+                          "            <maxSpeed>5</maxSpeed>"
+                          "          </zoneSetSpeedRange>"
+                          "        </zoneSetSelector>"
+                          "      </zoneSetSelCode>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"  //<-- Zoneset #1
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>warn1</type>"
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00aa</ro>"
+                          "          <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "      <zoneSetInfo>"  //<-- Zoneset #2
+                          "        <zoneSetDetail>"
+                          "          <ro>00bb</ro>"
+                          "          <type>warn1</type>"
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>00bb</ro>"
+                          "          <type>roOSSD1</type>"
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+
+  EXPECT_THROW_AND_WHAT(parser.parseString(xml.c_str()),
+                        configuration::XMLConfigurationParserException,
+                        "Parsing failed. SpeedRanges are enabled by <encEnable>true</Enable> but there are more "
+                        "speedRanges than defined zones.");
 }
 
 }  // namespace psen_scan_v2_standalone_test

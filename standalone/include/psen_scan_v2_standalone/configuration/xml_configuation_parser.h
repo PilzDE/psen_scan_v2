@@ -16,6 +16,8 @@
 #include <string>
 #include <stdexcept>
 
+#include <tinyxml2.h>
+
 #include "psen_scan_v2_standalone/configuration/zoneset_configuration.h"
 
 #ifndef PSEN_SCAN_V2_XML_CONFIGURATION_PARSER_H
@@ -83,6 +85,10 @@ class XMLConfigurationParser
 {
 public:
   ZoneSetConfiguration parseFile(const char* filename);
+  ZoneSetConfiguration parseString(const char* xml);
+
+private:
+  ZoneSetConfiguration parse(const tinyxml2::XMLDocument& doc);
 };
 
 }  // namespace configuration

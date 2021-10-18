@@ -18,16 +18,31 @@
 
 #include <vector>
 
+#include <fmt/format.h>
+
 #include <boost/optional.hpp>
 
 namespace psen_scan_v2_standalone
 {
 namespace configuration
 {
+class ZoneSetSpeedRangeException : public std::runtime_error
+{
+public:
+  ZoneSetSpeedRangeException(const std::string& msg) : std::runtime_error(msg)
+  {
+  }
+};
 class ZoneSetSpeedRange
 {
 public:
-  ZoneSetSpeedRange(short min, short max) : min_(min), max_(max){};
+  ZoneSetSpeedRange(short min, short max) : min_(min), max_(max)
+  {
+    if (min > max)
+    {
+      throw ZoneSetSpeedRangeException(fmt::format("Invalid speedrange min: {} > max: {}", min, max));
+    }
+  };
   short min_{ 0 };
   short max_{ 0 };
 };
