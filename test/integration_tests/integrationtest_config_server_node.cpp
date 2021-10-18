@@ -40,7 +40,7 @@ class SubscriberMock
 public:
   SubscriberMock()
   {
-    subscriber_ = nh_.subscribe("/config_server_node/zonesets", 10, &SubscriberMock::callback, this);
+    subscriber_ = nh_.subscribe("/test_ns_laser_1/zonesets", 10, &SubscriberMock::callback, this);
   }
 
   MOCK_METHOD1(callback, void(const ZoneSetConfiguration& msg));
@@ -56,7 +56,8 @@ class ConfigServerNodeTest : public testing::Test
 
 TEST_F(ConfigServerNodeTest, topicIsAvailable)
 {
-  EXPECT_TRUE(TopicExists("/config_server_node/zonesets"));
+  // Set param on server
+  EXPECT_TRUE(TopicExists("/test_ns_laser_1/zonesets"));
 }
 
 TEST_F(ConfigServerNodeTest, messageIsReceived)

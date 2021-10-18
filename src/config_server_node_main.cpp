@@ -20,12 +20,13 @@
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "config_server_node");
-  ros::NodeHandle pnh("~");
+  ros::NodeHandle nh;
+  ros::NodeHandle pnh{ "~" };
 
   std::string config_file;
   if (pnh.getParam("config_file", config_file))
   {
-    psen_scan_v2::ConfigServerNode config_server_node(pnh, config_file.c_str());
+    psen_scan_v2::ConfigServerNode config_server_node(nh, config_file.c_str());
 
     ros::spin();
   }
