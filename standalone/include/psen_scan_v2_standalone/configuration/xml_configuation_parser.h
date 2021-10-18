@@ -44,9 +44,9 @@ unsigned long ro_value_to_uint(const std::string& ro_value)
 }
 
 /**
- * @brief Convert string from a <ro> element to values.
+ * @brief Convert string from a \<ro\> element to values.
  *
- * The value in a <ro> element is a string with length 4*N where N is the number of distnace values.
+ * The value in a \<ro\> element is a string with length 4*N where N is the number of distance values.
  * 4 succedding values form a set that can be transformed into the lenth in mm.
  * The conversion of 4 characters follows the rule "abcd" -> 0xcdab
  * Examples:
