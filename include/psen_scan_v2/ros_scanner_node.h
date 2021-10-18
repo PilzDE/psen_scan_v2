@@ -88,6 +88,7 @@ private:
   FRIEND_TEST(RosScannerNodeTests, shouldPublishScansWhenLaserScanCallbackIsInvoked);
   FRIEND_TEST(RosScannerNodeTests, shouldPublishActiveZonesetWhenLaserScanCallbackIsInvoked);
   FRIEND_TEST(RosScannerNodeTests, shouldWaitWhenStopRequestResponseIsMissing);
+  FRIEND_TEST(RosScannerNodeTests, shouldReceiveLatchedActiveZonesetMsg);
 };
 
 typedef ROSScannerNodeT<> ROSScannerNode;

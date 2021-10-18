@@ -15,8 +15,6 @@
 
 #include <ros/ros.h>
 #include <gtest/gtest.h>
-
-#include <functional>
 #include <future>
 
 #include <string>
@@ -72,6 +70,7 @@ TEST_F(ScanComparisonTests, simpleCompare)
   auto received_active_zone_one = received_active_zone_one_promise.get_future();
   std::promise<void> received_active_zone_two_promise;
   auto received_active_zone_two = received_active_zone_two_promise.get_future();
+
   boost::function<void(const std_msgs::UInt8&)> callback = [&](const std_msgs::UInt8& msg) {
     if (msg.data == 0 && received_active_zone_one.wait_for(NOT_SET_TIMEOUT) == std::future_status::timeout)
     {

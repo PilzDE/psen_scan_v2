@@ -360,7 +360,7 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
   REMOVE_LOG_MOCK
 }
 
-TEST_F(ScannerAPITests, shouldShowInfoWithNewActiveZonesetWhenOnlyOnWhenItChanges)
+TEST_F(ScannerAPITests, shouldShowInfoWithNewActiveZonesetOnlyWhenItChanges)
 {
   INJECT_LOG_MOCK
   EXPECT_ANY_LOG().Times(AnyNumber());
