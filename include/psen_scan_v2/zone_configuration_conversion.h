@@ -20,6 +20,9 @@
 #include "psen_scan_v2/ZoneSetConfiguration.h"
 #include "psen_scan_v2_standalone/configuration/zoneset_configuration.h"
 
+using ZoneSetStandalone = psen_scan_v2_standalone::configuration::ZoneSet;
+using ZoneSetConfigurationStandalone = psen_scan_v2_standalone::configuration::ZoneSetConfiguration;
+
 static inline double deg_to_rad(double deg)
 {
   return deg * M_PI / 180.0;
@@ -45,7 +48,7 @@ geometry_msgs::Polygon fromPolar(const std::vector<unsigned long>& radii_vec_mm,
   return polygon;
 }
 
-psen_scan_v2::ZoneSet toMsg(const psen_scan_v2_standalone::configuration::ZoneSet& zoneset)
+psen_scan_v2::ZoneSet toMsg(const ZoneSetStandalone& zoneset)
 {
   psen_scan_v2::ZoneSet zoneset_msg;
 
@@ -61,8 +64,7 @@ psen_scan_v2::ZoneSet toMsg(const psen_scan_v2_standalone::configuration::ZoneSe
   return zoneset_msg;
 }
 
-psen_scan_v2::ZoneSetConfiguration
-toMsg(const psen_scan_v2_standalone::configuration::ZoneSetConfiguration& zoneset_configuration)
+psen_scan_v2::ZoneSetConfiguration toMsg(const ZoneSetConfigurationStandalone& zoneset_configuration)
 {
   psen_scan_v2::ZoneSetConfiguration zoneset_config_msg;
   for (const auto& z : zoneset_configuration.zonesets_)
