@@ -39,6 +39,7 @@
 #include "psen_scan_v2/ros_scanner_node.h"
 
 #include "psen_scan_v2/scanner_mock.h"
+#include "psen_scan_v2/ros_integrationtest_helper.h"
 
 using namespace psen_scan_v2;
 using namespace psen_scan_v2_standalone;
@@ -80,36 +81,26 @@ MATCHER_P(IsRosScanEqual, expected_ros_scan, "")
   // clang-format on
 }
 
-class ScanSubscriberMock
+class SubscriberMock
 {
 public:
-  ScanSubscriberMock(ros::NodeHandle& nh);
+  SubscriberMock(ros::NodeHandle& nh);
 
-  MOCK_METHOD1(callback, void(const sensor_msgs::LaserScan& msg));
-
-private:
-  ros::Subscriber subscriber_;
-};
-
-inline ScanSubscriberMock::ScanSubscriberMock(ros::NodeHandle& nh)
-{
-  subscriber_ = nh.subscribe("scan", QUEUE_SIZE, &ScanSubscriberMock::callback, this);
-}
-
-class ZoneSubscriberMock
-{
-public:
-  ZoneSubscriberMock(ros::NodeHandle& nh);
-
-  MOCK_METHOD1(callback, void(const std_msgs::UInt8& msg));
+  MOCK_METHOD1(scan_callback, void(const sensor_msgs::LaserScan& msg));
+  MOCK_METHOD1(zone_callback, void(const std_msgs::UInt8& msg));
+  MOCK_METHOD1(zone_latched_callback, void(const ros::MessageEvent<std_msgs::UInt8 const>& event));
 
 private:
-  ros::Subscriber subscriber_;
+  ros::Subscriber scan_subscriber_;
+  ros::Subscriber zone_subscriber_;
+  ros::Subscriber latched_zone_subscriber_;
 };
 
-inline ZoneSubscriberMock::ZoneSubscriberMock(ros::NodeHandle& nh)
+inline SubscriberMock::SubscriberMock(ros::NodeHandle& nh)
 {
-  subscriber_ = nh.subscribe("active_zoneset", QUEUE_SIZE, &ZoneSubscriberMock::callback, this);
+  scan_subscriber_ = nh.subscribe("scan", QUEUE_SIZE, &SubscriberMock::scan_callback, this);
+  zone_subscriber_ = nh.subscribe("active_zoneset", QUEUE_SIZE, &SubscriberMock::zone_callback, this);
+  latched_zone_subscriber_ = nh.subscribe("active_zoneset", QUEUE_SIZE, &SubscriberMock::zone_latched_callback, this);
 }
 
 static const std::string HOST_IP{ "127.0.0.1" };
@@ -191,8 +182,8 @@ TEST_F(RosScannerNodeTests, shouldPublishScansWhenLaserScanCallbackIsInvoked)
       nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
   util::Barrier scan_topic_barrier;
-  ScanSubscriberMock subscriber(nh_priv_);
-  EXPECT_CALL(subscriber, callback(::testing::_))
+  SubscriberMock subscriber(nh_priv_);
+  EXPECT_CALL(subscriber, scan_callback(::testing::_))
       .WillOnce(testing::Return())
       .WillOnce(OpenBarrier(&scan_topic_barrier));
 
@@ -220,9 +211,9 @@ TEST_F(RosScannerNodeTests, shouldPublishActiveZonesetWhenLaserScanCallbackIsInv
       nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
   util::Barrier scan_topic_barrier;
-  ZoneSubscriberMock subscriber(nh_priv_);
-  EXPECT_CALL(subscriber, callback(createActiveZonesetMsg(2)));
-  EXPECT_CALL(subscriber, callback(createActiveZonesetMsg(4))).WillOnce(OpenBarrier(&scan_topic_barrier));
+  SubscriberMock subscriber(nh_priv_);
+  EXPECT_CALL(subscriber, zone_callback(createActiveZonesetMsg(2)));
+  EXPECT_CALL(subscriber, zone_callback(createActiveZonesetMsg(4))).WillOnce(OpenBarrier(&scan_topic_barrier));
 
   util::Barrier start_barrier;
   util::Barrier stop_barrier;
@@ -251,14 +242,15 @@ TEST_F(RosScannerNodeTests, shouldReceiveLatchedActiveZonesetMsg)
   EXPECT_SUCCESSFULL_START_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &start_barrier);
   EXPECT_SUCCESSFULL_STOP_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &stop_barrier);
 
+  util::Barrier scan_topic_barrier;
+  SubscriberMock subscriber(nh_priv_);
+  EXPECT_CALL(subscriber, zone_latched_callback(AllOf(isLatched(), messageEQ(createActiveZonesetMsg(2)))))
+      .WillOnce(OpenBarrier(&scan_topic_barrier));
+
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
   EXPECT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
 
   ros_scanner_node.scanner_.invokeLaserScanCallback(createValidLaserScan(2));
-
-  util::Barrier scan_topic_barrier;
-  ZoneSubscriberMock subscriber(nh_priv_);
-  EXPECT_CALL(subscriber, callback(createActiveZonesetMsg(2))).WillOnce(OpenBarrier(&scan_topic_barrier));
 
   EXPECT_BARRIER_OPENS(scan_topic_barrier, DEFAULT_TIMEOUT) << "Scan message was not sended";
   ros_scanner_node.terminate();
