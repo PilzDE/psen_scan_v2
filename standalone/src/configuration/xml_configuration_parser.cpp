@@ -75,6 +75,7 @@ ZoneSetConfiguration XMLConfigurationParser::parse(const tinyxml2::XMLDocument& 
       }
 
       const char* xml_set_detail_type_element_str = xml_set_detail_type_element->GetText();
+
       if (xml_set_detail_type_element_str == nullptr || strlen(xml_set_detail_type_element_str) == 0)
       {
         throw XMLConfigurationParserException("Could not parse. <type> element is empty.");
@@ -82,11 +83,31 @@ ZoneSetConfiguration XMLConfigurationParser::parse(const tinyxml2::XMLDocument& 
 
       if (strcmp(xml_set_detail_type_element_str, "roOSSD1") == 0)
       {
-        set.ro_safety_ = ro_string_to_vec(xml_set_detail_ro_element_str);
+        set.safety1_ = ro_string_to_vec(xml_set_detail_ro_element_str);
+      }
+      else if (strcmp(xml_set_detail_type_element_str, "roOSSD2") == 0)
+      {
+        set.safety2_ = ro_string_to_vec(xml_set_detail_ro_element_str);
+      }
+      else if (strcmp(xml_set_detail_type_element_str, "roOSSD3") == 0)
+      {
+        set.safety3_ = ro_string_to_vec(xml_set_detail_ro_element_str);
       }
       else if (strcmp(xml_set_detail_type_element_str, "warn1") == 0)
       {
-        set.ro_warn_ = ro_string_to_vec(xml_set_detail_ro_element_str);
+        set.warn1_ = ro_string_to_vec(xml_set_detail_ro_element_str);
+      }
+      else if (strcmp(xml_set_detail_type_element_str, "warn2") == 0)
+      {
+        set.warn2_ = ro_string_to_vec(xml_set_detail_ro_element_str);
+      }
+      else if (strcmp(xml_set_detail_type_element_str, "muting1") == 0)
+      {
+        set.muting1_ = ro_string_to_vec(xml_set_detail_ro_element_str);
+      }
+      else if (strcmp(xml_set_detail_type_element_str, "muting2") == 0)
+      {
+        set.muting2_ = ro_string_to_vec(xml_set_detail_ro_element_str);
       }
       else
       {

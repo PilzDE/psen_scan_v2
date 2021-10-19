@@ -101,22 +101,22 @@ TEST_F(XmlConfiguationParserTest, zonesParseCorrect)
   configuration::ZoneSetConfiguration zoneset_config =
       parser.parseFile("testfiles/unittest_xml_configuration_parser-testfile-no-speedrange.xml");
   ASSERT_EQ(zoneset_config.zonesets_.size(), 2);
-  EXPECT_EQ(zoneset_config.zonesets_[0].ro_safety_.size(), 550);
+  EXPECT_EQ(zoneset_config.zonesets_[0].safety1_.size(), 550);
 
   // This represents an arc
-  EXPECT_TRUE(AllElementsAreEqual(zoneset_config.zonesets_[0].ro_safety_,
+  EXPECT_TRUE(AllElementsAreEqual(zoneset_config.zonesets_[0].safety1_,
                                   concat({ std::vector<unsigned long>(34, 0),
                                            std::vector<unsigned long>(486, 0x00DD),
                                            std::vector<unsigned long>(30, 0) })));
   // This represents an arc
-  EXPECT_TRUE(AllElementsAreEqual(zoneset_config.zonesets_[0].ro_warn_,
+  EXPECT_TRUE(AllElementsAreEqual(zoneset_config.zonesets_[0].warn1_,
                                   concat({ std::vector<unsigned long>(20, 0),
                                            std::vector<unsigned long>(520, 0x00BD),
                                            std::vector<unsigned long>(10, 0) })));
 
   // The next zonesets are circles
-  EXPECT_TRUE(AllElementsAreEqual(zoneset_config.zonesets_[1].ro_safety_, std::vector<unsigned long>(550, 0x0298)));
-  EXPECT_TRUE(AllElementsAreEqual(zoneset_config.zonesets_[1].ro_warn_, std::vector<unsigned long>(550, 0x02F0)));
+  EXPECT_TRUE(AllElementsAreEqual(zoneset_config.zonesets_[1].safety1_, std::vector<unsigned long>(550, 0x0298)));
+  EXPECT_TRUE(AllElementsAreEqual(zoneset_config.zonesets_[1].warn1_, std::vector<unsigned long>(550, 0x02F0)));
 
   // No speed range defined
   EXPECT_FALSE(zoneset_config.zonesets_[0].speed_range_);
@@ -133,6 +133,79 @@ TEST_F(XmlConfiguationParserTest, correctParsingOfSpeedRange)
   EXPECT_EQ(zoneset_config.zonesets_[0].speed_range_->max_, 10);
   EXPECT_EQ(zoneset_config.zonesets_[1].speed_range_->min_, 11);
   EXPECT_EQ(zoneset_config.zonesets_[1].speed_range_->max_, 50);
+}
+
+TEST_F(XmlConfiguationParserTest, correctParseAllFieldTypes)
+{
+  configuration::XMLConfigurationParser parser;
+  const std::string xml = "<MIB>"
+                          "  <clusterDescr>"
+                          "    <zoneSetConfiguration>"
+                          "      <encEnable>true</encEnable>"
+                          "      <zoneSetSelCode>"
+                          "        <zoneSetSelector>"
+                          "          <zoneSetSpeedRange>"
+                          "            <minSpeed>-5</minSpeed>"
+                          "            <maxSpeed>-4</maxSpeed>"
+                          "          </zoneSetSpeedRange>"
+                          "        </zoneSetSelector>"
+                          "      </zoneSetSelCode>"
+                          "    </zoneSetConfiguration>"
+                          "  </clusterDescr>"
+                          "  <scannerDescr>"
+                          "    <zoneSetDefinition>"
+                          "      <zoneSetInfo>"
+                          "        <zoneSetDetail>"
+                          "          <ro>0100</ro>"
+                          "          <type>roOSSD1</type>"  // Type roOSSD1 -> safety1
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>0200</ro>"
+                          "          <type>roOSSD2</type>"  // Type roOSSD2 -> safety2
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>0300</ro>"
+                          "          <type>roOSSD3</type>"  // Type roOSSD3 -> safety3
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>0400</ro>"
+                          "          <type>warn1</type>"  // Type warn1
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>0500</ro>"
+                          "          <type>warn2</type>"  // Type warn2
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>0600</ro>"
+                          "          <type>muting1</type>"  // Type muting1
+                          "        </zoneSetDetail>"
+                          "        <zoneSetDetail>"
+                          "          <ro>0700</ro>"
+                          "          <type>muting2</type>"  // Type muting2
+                          "        </zoneSetDetail>"
+                          "      </zoneSetInfo>"
+                          "    </zoneSetDefinition>"
+                          "  </scannerDescr>"
+                          "</MIB>";
+  configuration::ZoneSetConfiguration zoneset_config = parser.parseString(xml.c_str());
+  ASSERT_EQ(zoneset_config.zonesets_.size(), 1);
+  EXPECT_EQ(zoneset_config.zonesets_[0].safety1_.size(), 1);
+  EXPECT_EQ(zoneset_config.zonesets_[0].safety2_.size(), 1);
+  EXPECT_EQ(zoneset_config.zonesets_[0].safety3_.size(), 1);
+  EXPECT_EQ(zoneset_config.zonesets_[0].warn1_.size(), 1);
+  EXPECT_EQ(zoneset_config.zonesets_[0].warn2_.size(), 1);
+  EXPECT_EQ(zoneset_config.zonesets_[0].muting1_.size(), 1);
+  EXPECT_EQ(zoneset_config.zonesets_[0].muting2_.size(), 1);
+
+  EXPECT_EQ(zoneset_config.zonesets_[0].safety1_[0], 0x0001);  // Reverse defined in <ro>
+  EXPECT_EQ(zoneset_config.zonesets_[0].safety2_[0], 0x0002);  //  ''
+  EXPECT_EQ(zoneset_config.zonesets_[0].safety3_[0], 0x0003);  //  ''
+  EXPECT_EQ(zoneset_config.zonesets_[0].warn1_[0], 0x0004);    //  ''
+  EXPECT_EQ(zoneset_config.zonesets_[0].warn2_[0], 0x0005);    //  ''
+  EXPECT_EQ(zoneset_config.zonesets_[0].muting1_[0], 0x0006);  //  ''
+  EXPECT_EQ(zoneset_config.zonesets_[0].muting2_[0], 0x0007);  //  ''
+
+  EXPECT_EQ(zoneset_config.zonesets_[0].speed_range_, configuration::ZoneSetSpeedRange(-5, -4));
 }
 
 TEST_F(XmlConfiguationParserTest, missingChainToZoneSetInfo)

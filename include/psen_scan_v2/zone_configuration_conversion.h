@@ -52,8 +52,13 @@ psen_scan_v2::ZoneSet toMsg(const ZoneSetStandalone& zoneset)
 {
   psen_scan_v2::ZoneSet zoneset_msg;
 
-  zoneset_msg.warn = fromPolar(zoneset.ro_warn_, deg_to_rad(0.5));
-  zoneset_msg.safety = fromPolar(zoneset.ro_safety_, deg_to_rad(0.5));
+  zoneset_msg.safety1 = fromPolar(zoneset.safety1_, deg_to_rad(0.5));
+  zoneset_msg.safety2 = fromPolar(zoneset.safety2_, deg_to_rad(0.5));
+  zoneset_msg.safety3 = fromPolar(zoneset.safety3_, deg_to_rad(0.5));
+  zoneset_msg.warn1 = fromPolar(zoneset.warn1_, deg_to_rad(0.5));
+  zoneset_msg.warn2 = fromPolar(zoneset.warn2_, deg_to_rad(0.5));
+  zoneset_msg.muting1 = fromPolar(zoneset.muting1_, deg_to_rad(0.5));
+  zoneset_msg.muting2 = fromPolar(zoneset.muting2_, deg_to_rad(0.5));
 
   if (zoneset.speed_range_)
   {

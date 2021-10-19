@@ -45,13 +45,28 @@ public:
   };
   short min_{ 0 };
   short max_{ 0 };
+
+  bool operator==(const ZoneSetSpeedRange& rhs) const
+  {
+    return (min_ == rhs.min_) && (max_ == rhs.max_);
+  }
+  bool operator!=(const ZoneSetSpeedRange& rhs) const
+  {
+    return !operator==(rhs);
+  }
 };
 
 class ZoneSet
 {
 public:
-  std::vector<unsigned long> ro_warn_;
-  std::vector<unsigned long> ro_safety_;
+  // TODO replace with proper polar coordinates
+  std::vector<unsigned long> safety1_;
+  std::vector<unsigned long> safety2_;
+  std::vector<unsigned long> safety3_;
+  std::vector<unsigned long> warn1_;
+  std::vector<unsigned long> warn2_;
+  std::vector<unsigned long> muting1_;
+  std::vector<unsigned long> muting2_;
 
   boost::optional<ZoneSetSpeedRange> speed_range_;
 };

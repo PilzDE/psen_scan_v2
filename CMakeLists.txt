@@ -402,6 +402,8 @@ if(CATKIN_ENABLE_TESTING)
     ${console_bridge_LIBRARIES}
     fmt::fmt
   )
+  add_dependencies(unittest_xml_configuration_parser ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
   file(COPY standalone/test/unit_tests/configuration/unittest_xml_configuration_parser-testfile-no-speedrange.xml DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/testfiles)
   file(COPY standalone/test/unit_tests/configuration/unittest_xml_configuration_parser-testfile-with-speedrange.xml DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/testfiles)
 
@@ -458,6 +460,7 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES}
     ${PROJECT_NAME}_standalone_xml_configuration_import
   )
+  add_dependencies(integrationtest_config_server_node ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
   add_rostest_gmock(unittest_ros_parameter_handler
       test/unit_tests/unittest_ros_parameter_handler.test
