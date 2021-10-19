@@ -135,6 +135,13 @@ TEST_F(XmlConfiguationParserTest, correctParsingOfSpeedRange)
   EXPECT_EQ(zoneset_config.zonesets_[1].speed_range_->max_, 50);
 }
 
+TEST_F(XmlConfiguationParserTest, throwOnInvalidXML)
+{
+  configuration::XMLConfigurationParser parser;
+  EXPECT_THROW_AND_WHAT(
+      parser.parseString("NON XML STRING"), configuration::XMLConfigurationParserException, "Could not parse content.");
+}
+
 TEST_F(XmlConfiguationParserTest, correctParseAllFieldTypes)
 {
   configuration::XMLConfigurationParser parser;

@@ -34,8 +34,10 @@ ConfigServerNode::ConfigServerNode(ros::NodeHandle& nh, const char* config_file_
 
     zoneset_pub_.publish(toMsg(zoneconfig));
   }
+  // LCOV_EXCL_START
   catch (const configuration::XMLConfigurationParserException& e)
   {
-    std::cerr << e.what() << '\n';
+    ROS_ERROR_STREAM_NAMED("ConfigServerNode", e.what());
   }
+  // LCOV_EXCL_STOP
 }

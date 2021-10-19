@@ -30,8 +30,10 @@ int main(int argc, char** argv)
 
     ros::spin();
   }
+  // LCOV_EXCL_START
   else
   {
     ROS_ERROR("PARAMETER config_file not set.");
   }
+  // LCOV_EXCL_STOP
 }
