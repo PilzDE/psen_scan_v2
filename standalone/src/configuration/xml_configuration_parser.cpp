@@ -28,8 +28,8 @@ ZoneSetConfiguration XMLConfigurationParser::parse(const tinyxml2::XMLDocument& 
 {
   ZoneSetConfiguration zoneset_config;
 
-  tinyxml2::XMLConstHandle docHandle(&doc);
-  tinyxml2::XMLConstHandle xml_set_info_handle = docHandle.FirstChildElement("MIB")
+  tinyxml2::XMLConstHandle doc_handle(&doc);
+  tinyxml2::XMLConstHandle xml_set_info_handle = doc_handle.FirstChildElement("MIB")
                                                      .FirstChildElement("scannerDescr")
                                                      .FirstChildElement("zoneSetDefinition")
                                                      .FirstChildElement("zoneSetInfo");
@@ -123,7 +123,7 @@ ZoneSetConfiguration XMLConfigurationParser::parse(const tinyxml2::XMLDocument& 
   }
 
   // Parse speedrange if enc is enabled
-  const tinyxml2::XMLElement* enc_enabled_element = docHandle.FirstChildElement("MIB")
+  const tinyxml2::XMLElement* enc_enabled_element = doc_handle.FirstChildElement("MIB")
                                                         .FirstChildElement("clusterDescr")
                                                         .FirstChildElement("zoneSetConfiguration")
                                                         .FirstChildElement("encEnable")
@@ -143,7 +143,7 @@ ZoneSetConfiguration XMLConfigurationParser::parse(const tinyxml2::XMLDocument& 
     }
     if (enc_enabled)
     {
-      const tinyxml2::XMLElement* xml_zone_set_select_element = docHandle.FirstChildElement("MIB")
+      const tinyxml2::XMLElement* xml_zone_set_select_element = doc_handle.FirstChildElement("MIB")
                                                                     .FirstChildElement("clusterDescr")
                                                                     .FirstChildElement("zoneSetConfiguration")
                                                                     .FirstChildElement("zoneSetSelCode")
