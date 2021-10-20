@@ -20,10 +20,10 @@ def joy_callback(data):
     global speed_scale
     speed_scale = max([abs(data.axes[1]), abs(data.axes[2]), 0.3])
 
-def get_marker(ns, points, id, color, scale=1.0, z_offset=0):
+def get_marker(ns, points, id, color, frame_id, scale=1.0, z_offset=0):
     global speed_scale
     marker = Marker()
-    marker.header.frame_id = "scan"
+    marker.header.frame_id = frame_id
     marker.ns = ns
     marker.id = id
     marker.type = marker.TRIANGLE_LIST
@@ -39,9 +39,13 @@ def get_marker(ns, points, id, color, scale=1.0, z_offset=0):
     marker.pose.position.y = 0
     marker.pose.position.z = z_offset
     
-    #poly = [[0,-1],[2,-1],[2.2,-0.8], [2.2,0.8], [2,1], [0,1]]
+    #points = [[0,-1],[2,-1],[2.2,-0.8], [2.2,0.8], [2,1], [0,1]]
+    #points = points[0:10]
+    print(points)
     for p1,p2 in zip(points, points[1:]):
         marker.points.append(Point(0,0,0))
+        #marker.points.append(Point(p1[0],p1[1],0))
+        #marker.points.append(Point(p2[0],p2[1],0))
         marker.points.append(Point(p1.x,p1.y,0))
         marker.points.append(Point(p2.x,p2.y,0))
         marker.colors.append(color)
@@ -60,13 +64,25 @@ def talker():
     
                 #poly.polygon.points.append(Point32(1,1,0))
                 range_info = 'min:{:+} max:{:+}'.format(zoneset.speed_lower, zoneset.speed_upper)
-                pub.publish(get_marker('zoneset[' + str(idx) + "] safety " + range_info, zoneset.safety.points, 0, color=ColorRGBA(1,0,0,1)))
-                pub.publish(get_marker('zoneset[' + str(idx) + "] warn " + range_info, zoneset.warn.points, 1, ColorRGBA(1,1,0,1),z_offset=-0.01))
+                if len(zoneset.safety1.points):
+                    pub.publish(get_marker('zoneset[' + str(idx) + "] safety1 " + range_info, zoneset.safety1.points, 0, ColorRGBA(1,0,0,1), zoneset.header.frame_id))
+                if len(zoneset.safety2.points):
+                    pub.publish(get_marker('zoneset[' + str(idx) + "] safety2 " + range_info, zoneset.safety2.points, 0, ColorRGBA(1,0,0,1),zoneset.header.frame_id))
+                if len(zoneset.safety3.points):
+                    pub.publish(get_marker('zoneset[' + str(idx) + "] safety3 " + range_info, zoneset.safety3.points, 0, ColorRGBA(1,0,0,1),zoneset.header.frame_id))
+                if len(zoneset.warn1.points):
+                    pub.publish(get_marker('zoneset[' + str(idx) + "] warn1 " + range_info, zoneset.warn1.points, 1, ColorRGBA(1,1,0,1),zoneset.header.frame_id, z_offset=-0.01))
+                if len(zoneset.warn2.points):
+                    pub.publish(get_marker('zoneset[' + str(idx) + "] warn2 " + range_info, zoneset.warn2.points, 1, ColorRGBA(1,1,0,1),zoneset.header.frame_id, z_offset=-0.01))
+                if len(zoneset.muting1.points):
+                    pub.publish(get_marker('zoneset[' + str(idx) + "] muting1 " + range_info, zoneset.muting1.points, 1, ColorRGBA(0,0,1,1),zoneset.header.frame_id, z_offset=-0.02))
+                if len(zoneset.muting2.points):
+                    pub.publish(get_marker('zoneset[' + str(idx) + "] muting2 " + range_info, zoneset.muting2.points, 1, ColorRGBA(0,0,1,1),zoneset.header.frame_id, z_offset=-0.02))
                 rate.sleep()
 
 if __name__ == '__main__':
     try:
-        rospy.Subscriber("/config_server_node/zonesets", ZoneSetConfiguration, zoneset_configuration_callback)
+        rospy.Subscriber("/zonesets", ZoneSetConfiguration, zoneset_configuration_callback)
         talker()
     except rospy.ROSInterruptException:
         pass
