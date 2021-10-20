@@ -100,8 +100,8 @@ TEST_F(XmlConfiguationParserTest, zonesParseCorrect)
   configuration::XMLConfigurationParser parser;
   configuration::ZoneSetConfiguration zoneset_config =
       parser.parseFile("testfiles/unittest_xml_configuration_parser-testfile-no-speedrange.xml");
-  ASSERT_EQ(zoneset_config.zonesets_.size(), 2);
-  EXPECT_EQ(zoneset_config.zonesets_[0].safety1_.size(), 550);
+  ASSERT_EQ(zoneset_config.zonesets_.size(), 2ul);
+  EXPECT_EQ(zoneset_config.zonesets_[0].safety1_.size(), 550ul);
 
   // This represents an arc
   EXPECT_TRUE(AllElementsAreEqual(zoneset_config.zonesets_[0].safety1_,
