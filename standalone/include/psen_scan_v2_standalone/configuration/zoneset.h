@@ -22,6 +22,9 @@
 
 #include <boost/optional.hpp>
 
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
+#include "psen_scan_v2_standalone/configuration/default_parameters.h"
+
 namespace psen_scan_v2_standalone
 {
 namespace configuration
@@ -59,7 +62,6 @@ public:
 class ZoneSet
 {
 public:
-  // TODO replace with proper polar coordinates
   std::vector<unsigned long> safety1_;
   std::vector<unsigned long> safety2_;
   std::vector<unsigned long> safety3_;
@@ -67,6 +69,10 @@ public:
   std::vector<unsigned long> warn2_;
   std::vector<unsigned long> muting1_;
   std::vector<unsigned long> muting2_;
+
+  //! Distance of angle between the distance values given in safety1_, safety2_, safety3_, warn1_, warn2_, muting1_,
+  //! muting2_.
+  util::TenthOfDegree resolution_;
 
   boost::optional<ZoneSetSpeedRange> speed_range_;
 };

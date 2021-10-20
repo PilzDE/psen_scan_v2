@@ -118,6 +118,9 @@ ZoneSetConfiguration XMLConfigurationParser::parse(const tinyxml2::XMLDocument& 
       xml_set_detail_element = xml_set_detail_element->NextSiblingElement("zoneSetDetail");
     }
 
+    // Set default resolution for now this is only know implicitly
+    set.resolution_ = DEFAULT_ZONESET_ANGLE_STEP;
+
     zoneset_config.zonesets_.push_back(set);
     xml_set_element = xml_set_element->NextSiblingElement("zoneSetInfo");
   }

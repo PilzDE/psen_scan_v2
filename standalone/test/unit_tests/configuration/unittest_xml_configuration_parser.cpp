@@ -16,6 +16,7 @@
 #include <gmock/gmock.h>
 
 #include "psen_scan_v2_standalone/configuration/xml_configuation_parser.h"
+#include "psen_scan_v2_standalone/configuration/default_parameters.h"
 #include "psen_scan_v2_standalone/configuration/zoneset_configuration.h"
 #include "psen_scan_v2_standalone/util/expectations.h"
 
@@ -133,6 +134,19 @@ TEST_F(XmlConfiguationParserTest, correctParsingOfSpeedRange)
   EXPECT_EQ(zoneset_config.zonesets_[0].speed_range_->max_, 10);
   EXPECT_EQ(zoneset_config.zonesets_[1].speed_range_->min_, 11);
   EXPECT_EQ(zoneset_config.zonesets_[1].speed_range_->max_, 50);
+}
+
+TEST_F(XmlConfiguationParserTest, settingDefaultResolution)
+{
+  // Unfortunatly this is only known implicitly
+  configuration::XMLConfigurationParser parser;
+  configuration::ZoneSetConfiguration zoneset_config =
+      parser.parseFile("testfiles/unittest_xml_configuration_parser-testfile-with-speedrange.xml");
+
+  EXPECT_EQ(zoneset_config.zonesets_[0].resolution_,
+            psen_scan_v2_standalone::configuration::DEFAULT_ZONESET_ANGLE_STEP);
+  EXPECT_EQ(zoneset_config.zonesets_[1].resolution_,
+            psen_scan_v2_standalone::configuration::DEFAULT_ZONESET_ANGLE_STEP);
 }
 
 TEST_F(XmlConfiguationParserTest, throwOnInvalidXML)
