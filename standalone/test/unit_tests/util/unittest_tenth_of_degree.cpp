@@ -22,6 +22,12 @@ using namespace psen_scan_v2_standalone;
 
 namespace psen_scan_v2_standalone_test
 {
+TEST(TenthOfDegreeTest, dTor)
+{
+  util::TenthOfDegree tenth_of_degree;
+  EXPECT_EQ(tenth_of_degree, util::TenthOfDegree(0));
+}
+
 TEST(TenthOfDegreeTest, fromRad)
 {
   const double angle_in_rad{ 0.1 };
@@ -93,6 +99,16 @@ TEST(TenthOfDegreeTest, Addition)
   util::TenthOfDegree tenth_of_degree_2{ 3 };
 
   EXPECT_EQ((tenth_of_degree_1 + tenth_of_degree_2).value(), 5);
+}
+
+TEST(TenthOfDegreeTest, AdditionEqual)
+{
+  util::TenthOfDegree tenth_of_degree_1{ 2 };
+  util::TenthOfDegree tenth_of_degree_2{ 3 };
+
+  tenth_of_degree_1 += tenth_of_degree_2;
+
+  EXPECT_EQ((tenth_of_degree_1).value(), 5);
 }
 
 TEST(TenthOfDegreeTest, Subtraction)
