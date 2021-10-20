@@ -98,8 +98,8 @@ TEST_F(ScanComparisonTests, simpleCompare)
   util::Barrier zone_one_barrier;
 
   SubscriberMock sm{ nh_ };
-  ON_CALL(sm, callback(createActiveZonesetMsg(0))).WillByDefault(OpenBarrier(&zone_zero_barrier));
-  ON_CALL(sm, callback(createActiveZonesetMsg(1))).WillByDefault(OpenBarrier(&zone_one_barrier));
+  EXPECT_CALL(sm, callback(createActiveZonesetMsg(0))).Times(AnyNumber()).WillOnce(OpenBarrier(&zone_zero_barrier));
+  EXPECT_CALL(sm, callback(createActiveZonesetMsg(1))).Times(AnyNumber()).WillOnce(OpenBarrier(&zone_one_barrier));
 
   setScannerZoneSet(ZONE_ZERO_CMD);
   EXPECT_BARRIER_OPENS(zone_zero_barrier, DEFAULT_TIMEOUT);
