@@ -57,7 +57,7 @@ private:
 
 inline SubscriberMock::SubscriberMock(ros::NodeHandle& nh)
 {
-  subscriber_ = nh.subscribe("active_zoneset", 1, &SubscriberMock::callback, this);
+  subscriber_ = nh.subscribe("/laser_1/active_zoneset", 1, &SubscriberMock::callback, this);
 }
 
 class ScanComparisonTests : public ::testing::Test
