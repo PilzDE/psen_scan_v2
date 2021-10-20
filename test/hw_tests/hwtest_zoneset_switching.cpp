@@ -15,20 +15,50 @@
 
 #include <ros/ros.h>
 #include <gtest/gtest.h>
-#include <future>
+#include <gmock/gmock.h>
 
 #include <string>
+#include <functional>
 
 #include <std_msgs/Byte.h>
 #include <std_msgs/UInt8.h>
 
 #include "psen_scan_v2_standalone/util/expectations.h"
+#include "psen_scan_v2_standalone/util/matchers_and_actions.h"
+#include "psen_scan_v2_standalone/util/async_barrier.h"
 
 namespace psen_scan_v2_test
 {
+namespace util = psen_scan_v2_standalone::util;
+using psen_scan_v2_standalone_test::OpenBarrier;
+using std::placeholders::_1;
+
 static constexpr int32_t WAIT_FOR_MESSAGE_TIMEOUT_S{ 5 };
 static constexpr uint8_t ZONE_ZERO_CMD{ 4 };
 static constexpr uint8_t ZONE_ONE_CMD{ 12 };
+
+std_msgs::UInt8 createActiveZonesetMsg(const uint8_t active_zoneset)
+{
+  std_msgs::UInt8 zone;
+  zone.data = active_zoneset;
+  return zone;
+}
+
+class SubscriberMock
+{
+public:
+  SubscriberMock(ros::NodeHandle& nh);
+
+  MOCK_METHOD1(callback, void(const std_msgs::UInt8& msg));
+
+private:
+  ros::Subscriber subscriber_;
+};
+
+inline SubscriberMock::SubscriberMock(ros::NodeHandle& nh)
+{
+  subscriber_ = nh.subscribe("active_zoneset", 1, &SubscriberMock::callback, this);
+}
 
 class ScanComparisonTests : public ::testing::Test
 {
@@ -36,8 +66,7 @@ public:
   void SetUp() override  // Omit using SetUpTestSuite() for googletest below v1.11.0, see
                          // https://github.com/google/googletest/issues/247
   {
-    ros::NodeHandle pnh{ "~" };
-    pub_relay_cmd_ = pnh.advertise<std_msgs::Byte>("/relay_cmd", 1);
+    pub_relay_cmd_ = nh_.advertise<std_msgs::Byte>("/relay_cmd", 1);
   }
 
   void TearDown() override
@@ -50,6 +79,7 @@ protected:
 
 protected:
   ros::Publisher pub_relay_cmd_;
+  ros::NodeHandle nh_;
 };
 
 inline void ScanComparisonTests::setScannerZoneSet(uint8_t cmd)
@@ -61,32 +91,20 @@ inline void ScanComparisonTests::setScannerZoneSet(uint8_t cmd)
 }
 
 static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 3 };
-static constexpr std::chrono::milliseconds NOT_SET_TIMEOUT{ 5 };
 
 TEST_F(ScanComparisonTests, simpleCompare)
 {
-  ros::NodeHandle nh;
-  std::promise<void> received_active_zone_one_promise;
-  auto received_active_zone_one = received_active_zone_one_promise.get_future();
-  std::promise<void> received_active_zone_two_promise;
-  auto received_active_zone_two = received_active_zone_two_promise.get_future();
+  util::Barrier zone_zero_barrier;
+  util::Barrier zone_one_barrier;
 
-  boost::function<void(const std_msgs::UInt8&)> callback = [&](const std_msgs::UInt8& msg) {
-    if (msg.data == 0 && received_active_zone_one.wait_for(NOT_SET_TIMEOUT) == std::future_status::timeout)
-    {
-      received_active_zone_one_promise.set_value();
-    }
-    else if (msg.data == 1 && received_active_zone_two.wait_for(NOT_SET_TIMEOUT) == std::future_status::timeout)
-    {
-      received_active_zone_two_promise.set_value();
-    }
-  };
-  auto zone_subscriber = nh.subscribe<std_msgs::UInt8>("/laser_1/active_zoneset", 10, callback);
+  SubscriberMock sm{ nh_ };
+  ON_CALL(sm, callback(createActiveZonesetMsg(0))).WillByDefault(OpenBarrier(&zone_zero_barrier));
+  ON_CALL(sm, callback(createActiveZonesetMsg(1))).WillByDefault(OpenBarrier(&zone_one_barrier));
 
   setScannerZoneSet(ZONE_ZERO_CMD);
-  EXPECT_FUTURE_IS_READY(received_active_zone_one, DEFAULT_TIMEOUT);
+  EXPECT_BARRIER_OPENS(zone_zero_barrier, DEFAULT_TIMEOUT);
   setScannerZoneSet(ZONE_ONE_CMD);
-  EXPECT_FUTURE_IS_READY(received_active_zone_two, DEFAULT_TIMEOUT);
+  EXPECT_BARRIER_OPENS(zone_one_barrier, DEFAULT_TIMEOUT);
 }
 
 }  // namespace psen_scan_v2_test
@@ -95,6 +113,7 @@ int main(int argc, char** argv)
 {
   testing::InitGoogleTest(&argc, argv);
   ros::init(argc, argv, "active_zoneset_test");
+  ros::NodeHandle pn;
 
   // Needed since we use a subscriber
   ros::AsyncSpinner spinner{ 1 };
