@@ -27,8 +27,8 @@
 namespace psen_scan_v2_test
 {
 static constexpr int32_t WAIT_FOR_MESSAGE_TIMEOUT_S{ 5 };
-static constexpr uint8_t SCANNER_POWER_BIT{ 4 };
-static constexpr uint8_t ZONE_SWITCH_BIT{ 8 };
+static constexpr uint8_t ZONE_ZERO_CMD{ 4 };
+static constexpr uint8_t ZONE_ONE_CMD{ 12 };
 
 class ScanComparisonTests : public ::testing::Test
 {
@@ -42,17 +42,17 @@ public:
 
   void TearDown() override
   {
-    sendRelayCmd(SCANNER_POWER_BIT);
+    setScannerZoneSet(ZONE_ZERO_CMD);
   }
 
 protected:
-  void sendRelayCmd(uint8_t cmd);
+  void setScannerZoneSet(uint8_t cmd);
 
 protected:
   ros::Publisher pub_relay_cmd_;
 };
 
-inline void ScanComparisonTests::sendRelayCmd(uint8_t cmd)
+inline void ScanComparisonTests::setScannerZoneSet(uint8_t cmd)
 {
   std_msgs::Byte command;
   command.data = cmd;
@@ -83,9 +83,9 @@ TEST_F(ScanComparisonTests, simpleCompare)
   };
   auto zone_subscriber = nh.subscribe<std_msgs::UInt8>("/laser_1/active_zoneset", 10, callback);
 
-  sendRelayCmd(SCANNER_POWER_BIT);
+  setScannerZoneSet(ZONE_ZERO_CMD);
   EXPECT_FUTURE_IS_READY(received_active_zone_one, DEFAULT_TIMEOUT);
-  sendRelayCmd(SCANNER_POWER_BIT + ZONE_SWITCH_BIT);
+  setScannerZoneSet(ZONE_ONE_CMD);
   EXPECT_FUTURE_IS_READY(received_active_zone_two, DEFAULT_TIMEOUT);
 }
 
