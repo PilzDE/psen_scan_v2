@@ -209,22 +209,22 @@ TEST_F(XmlConfiguationParserTest, correctParseAllFieldTypes)
                           "  </scannerDescr>"
                           "</MIB>";
   configuration::ZoneSetConfiguration zoneset_config = parser.parseString(xml.c_str());
-  ASSERT_EQ(zoneset_config.zonesets_.size(), 1);
-  EXPECT_EQ(zoneset_config.zonesets_[0].safety1_.size(), 1);
-  EXPECT_EQ(zoneset_config.zonesets_[0].safety2_.size(), 1);
-  EXPECT_EQ(zoneset_config.zonesets_[0].safety3_.size(), 1);
-  EXPECT_EQ(zoneset_config.zonesets_[0].warn1_.size(), 1);
-  EXPECT_EQ(zoneset_config.zonesets_[0].warn2_.size(), 1);
-  EXPECT_EQ(zoneset_config.zonesets_[0].muting1_.size(), 1);
-  EXPECT_EQ(zoneset_config.zonesets_[0].muting2_.size(), 1);
+  ASSERT_EQ(zoneset_config.zonesets_.size(), 1ul);
+  EXPECT_EQ(zoneset_config.zonesets_[0].safety1_.size(), 1ul);
+  EXPECT_EQ(zoneset_config.zonesets_[0].safety2_.size(), 1ul);
+  EXPECT_EQ(zoneset_config.zonesets_[0].safety3_.size(), 1ul);
+  EXPECT_EQ(zoneset_config.zonesets_[0].warn1_.size(), 1ul);
+  EXPECT_EQ(zoneset_config.zonesets_[0].warn2_.size(), 1ul);
+  EXPECT_EQ(zoneset_config.zonesets_[0].muting1_.size(), 1ul);
+  EXPECT_EQ(zoneset_config.zonesets_[0].muting2_.size(), 1ul);
 
-  EXPECT_EQ(zoneset_config.zonesets_[0].safety1_[0], 0x0001);  // Reverse defined in <ro>
-  EXPECT_EQ(zoneset_config.zonesets_[0].safety2_[0], 0x0002);  //  ''
-  EXPECT_EQ(zoneset_config.zonesets_[0].safety3_[0], 0x0003);  //  ''
-  EXPECT_EQ(zoneset_config.zonesets_[0].warn1_[0], 0x0004);    //  ''
-  EXPECT_EQ(zoneset_config.zonesets_[0].warn2_[0], 0x0005);    //  ''
-  EXPECT_EQ(zoneset_config.zonesets_[0].muting1_[0], 0x0006);  //  ''
-  EXPECT_EQ(zoneset_config.zonesets_[0].muting2_[0], 0x0007);  //  ''
+  EXPECT_EQ(zoneset_config.zonesets_[0].safety1_[0], 0x0001ul);  // Reverse defined in <ro>
+  EXPECT_EQ(zoneset_config.zonesets_[0].safety2_[0], 0x0002ul);  //  ''
+  EXPECT_EQ(zoneset_config.zonesets_[0].safety3_[0], 0x0003ul);  //  ''
+  EXPECT_EQ(zoneset_config.zonesets_[0].warn1_[0], 0x0004ul);    //  ''
+  EXPECT_EQ(zoneset_config.zonesets_[0].warn2_[0], 0x0005ul);    //  ''
+  EXPECT_EQ(zoneset_config.zonesets_[0].muting1_[0], 0x0006ul);  //  ''
+  EXPECT_EQ(zoneset_config.zonesets_[0].muting2_[0], 0x0007ul);  //  ''
 
   EXPECT_EQ(zoneset_config.zonesets_[0].speed_range_, configuration::ZoneSetSpeedRange(-5, -4));
 }
