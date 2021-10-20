@@ -7,6 +7,7 @@ Forthcoming
 * Remove dependency on pilz_testutils
 * Always build hardware tests
 * Internal refactorings
+* Importing the config xml-file and publishing the zonesets
 
 0.3.2 (2021-09-16)
 ------------------
