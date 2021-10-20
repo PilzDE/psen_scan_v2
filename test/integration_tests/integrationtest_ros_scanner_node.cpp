@@ -45,7 +45,6 @@ using namespace psen_scan_v2_standalone;
 using namespace psen_scan_v2_test;
 
 using namespace ::testing;
-using namespace psen_scan_v2_standalone::configuration;
 using namespace psen_scan_v2_standalone_test;
 
 namespace psen_scan_v2
@@ -116,8 +115,7 @@ protected:
 
 TEST_F(RosScannerNodeTests, testScannerInvocation)
 {
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(
-      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
 
   std::promise<void> start_stop_barrier;
   start_stop_barrier.set_value();
@@ -150,8 +148,7 @@ TEST_F(RosScannerNodeTests, testScanTopicReceived)
       .WillOnce(testing::Return())
       .WillOnce(OpenBarrier(&scan_topic_barrier));
 
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(
-      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
 
   std::promise<void> start_stop_barrier;
   start_stop_barrier.set_value();
@@ -174,8 +171,7 @@ TEST_F(RosScannerNodeTests, testScanTopicReceived)
 
 TEST_F(RosScannerNodeTests, testMissingStopReply)
 {
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(
-      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
 
   std::promise<void> start_barrier;
   start_barrier.set_value();

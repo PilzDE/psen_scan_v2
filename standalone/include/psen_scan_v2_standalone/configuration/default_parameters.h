@@ -45,8 +45,6 @@ static constexpr double TIME_PER_SCAN_IN_S{ 0.03 };
 
 static constexpr double RANGE_MIN_IN_M{ 0.05 };
 static constexpr double RANGE_MAX_IN_M{ 40. };
-
-static constexpr double DEFAULT_X_AXIS_ROTATION(data_conversion_layer::degreeToRadian(137.5));
 }  // namespace configuration
 
 }  // namespace psen_scan_v2_standalone

@@ -34,7 +34,6 @@ REGISTER_ROSCONSOLE_BRIDGE;
 
 using namespace psen_scan_v2;
 using namespace psen_scan_v2_standalone;
-using namespace psen_scan_v2_standalone::configuration;
 
 std::function<void()> NODE_TERMINATE_CALLBACK;
 
@@ -49,6 +48,9 @@ const std::string PARAM_X_AXIS_ROTATION{ "x_axis_rotation" };
 const std::string PARAM_FRAGMENTED_SCANS{ "fragmented_scans" };
 const std::string PARAM_INTENSITIES{ "intensities" };
 const std::string PARAM_RESOLUTION{ "resolution" };
+
+//! @brief The 2D scan will be rotated around the z-axis.
+static const double DEFAULT_X_AXIS_ROTATION = data_conversion_layer::degreeToRadian(137.5);
 
 static const std::string DEFAULT_TF_PREFIX = "laser_1";
 
@@ -74,10 +76,10 @@ int main(int argc, char** argv)
 
   try
   {
-    ScanRange scan_range{ util::TenthOfDegree::fromRad(configuration::DEFAULT_X_AXIS_ROTATION +
+    ScanRange scan_range{ util::TenthOfDegree::fromRad(DEFAULT_X_AXIS_ROTATION +
                                                        getOptionalParamFromServer<double>(
                                                            pnh, PARAM_ANGLE_START, configuration::DEFAULT_ANGLE_START)),
-                          util::TenthOfDegree::fromRad(configuration::DEFAULT_X_AXIS_ROTATION +
+                          util::TenthOfDegree::fromRad(DEFAULT_X_AXIS_ROTATION +
                                                        getOptionalParamFromServer<double>(
                                                            pnh, PARAM_ANGLE_END, configuration::DEFAULT_ANGLE_END)) };
 
@@ -109,7 +111,7 @@ int main(int argc, char** argv)
     ROSScannerNode ros_scanner_node(pnh,
                                     DEFAULT_PUBLISH_TOPIC,
                                     getOptionalParamFromServer<std::string>(pnh, PARAM_TF_PREFIX, DEFAULT_TF_PREFIX),
-                                    configuration::DEFAULT_X_AXIS_ROTATION,
+                                    DEFAULT_X_AXIS_ROTATION,
                                     scanner_configuration);
 
     NODE_TERMINATE_CALLBACK = std::bind(&ROSScannerNode::terminate, &ros_scanner_node);

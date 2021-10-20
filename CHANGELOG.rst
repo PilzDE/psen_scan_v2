@@ -4,9 +4,11 @@ Changelog for package psen_scan_v2
 
 Forthcoming
 -----------
+* Remove unrelated parameter DEFAULT_X_AXIS_ROTATION from standalone
 * Remove dependency on pilz_testutils
 * Always build hardware tests
 * Internal refactorings
+* Contributors: Pilz GmbH and Co. KG
 
 0.3.2 (2021-09-16)
 ------------------
