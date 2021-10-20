@@ -1,0 +1,106 @@
+// Copyright (c) 2021 Pilz GmbH & Co. KG
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+#ifndef PSEN_SCAN_V2_ZONE_CONFIGURATION_CONVERSION_H
+#define PSEN_SCAN_V2_ZONE_CONFIGURATION_CONVERSION_H
+
+#include <ros/console.h>
+
+#include <geometry_msgs/Polygon.h>
+
+#include "psen_scan_v2/ZoneSet.h"
+#include "psen_scan_v2/ZoneSetConfiguration.h"
+#include "psen_scan_v2_standalone/configuration/zoneset_configuration.h"
+#include "psen_scan_v2_standalone/configuration/default_parameters.h"
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
+
+using ZoneSetStandalone = psen_scan_v2_standalone::configuration::ZoneSet;
+using ZoneSetConfigurationStandalone = psen_scan_v2_standalone::configuration::ZoneSetConfiguration;
+using TenthOfDegree = psen_scan_v2_standalone::util::TenthOfDegree;
+
+static inline double deg_to_rad(double deg)
+{
+  return deg * M_PI / 180.0;
+}
+
+geometry_msgs::Polygon fromPolar(const std::vector<unsigned long>& radii_vec_mm,
+                                 const TenthOfDegree& phi_step,
+                                 const double& x_axis_rotation)
+{
+  geometry_msgs::Polygon polygon;
+  size_t i = 0;
+  for (const auto& r : radii_vec_mm)
+  {
+    geometry_msgs::Point32 point;
+
+    const auto angle = phi_step.toRad() * i - x_axis_rotation;
+    point.x = (r / 1000.) * std::cos(angle);
+    point.y = (r / 1000.) * std::sin(angle);
+    point.z = 0;
+
+    polygon.points.push_back(point);
+
+    ++i;
+  }
+
+  return polygon;
+}
+
+psen_scan_v2::ZoneSet toMsg(const ZoneSetStandalone& zoneset,
+                            const std::string& frame_id,
+                            const ros::Time& stamp = ros::Time::now())
+{
+  psen_scan_v2::ZoneSet zoneset_msg;
+  zoneset_msg.header.stamp = stamp;
+  zoneset_msg.header.frame_id = frame_id;
+
+  zoneset_msg.safety1 =
+      fromPolar(zoneset.safety1_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION);
+  zoneset_msg.safety2 =
+      fromPolar(zoneset.safety2_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION);
+  zoneset_msg.safety3 =
+      fromPolar(zoneset.safety3_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION);
+  zoneset_msg.warn1 =
+      fromPolar(zoneset.warn1_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION);
+  zoneset_msg.warn2 =
+      fromPolar(zoneset.warn2_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION);
+  zoneset_msg.muting1 =
+      fromPolar(zoneset.muting1_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION);
+  zoneset_msg.muting2 =
+      fromPolar(zoneset.muting2_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION);
+
+  if (zoneset.speed_range_)
+  {
+    zoneset_msg.speed_lower = zoneset.speed_range_->min_;
+    zoneset_msg.speed_upper = zoneset.speed_range_->max_;
+  }
+
+  return zoneset_msg;
+}
+
+psen_scan_v2::ZoneSetConfiguration toMsg(const ZoneSetConfigurationStandalone& zoneset_configuration,
+                                         const std::string& frame_id,
+                                         const ros::Time& stamp = ros::Time::now())
+{
+  psen_scan_v2::ZoneSetConfiguration zoneset_config_msg;
+
+  for (const auto& z : zoneset_configuration.zonesets_)
+  {
+    zoneset_config_msg.zonesets.push_back(toMsg(z, frame_id, stamp));
+  }
+  return zoneset_config_msg;
+}
+
+#endif  // PSEN_SCAN_V2_ZONE_CONFIGURATION_CONVERSION_H

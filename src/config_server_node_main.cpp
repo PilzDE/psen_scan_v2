@@ -16,6 +16,12 @@
 #include <ros/ros.h>
 
 #include "psen_scan_v2/config_server_node.h"
+#include "psen_scan_v2/ros_parameter_handler.h"
+
+const std::string CONFIG_FILE{ "config_file" };
+const std::string FRAME_ID{ "frame_id" };
+
+using namespace psen_scan_v2;
 
 int main(int argc, char** argv)
 {
@@ -23,17 +29,20 @@ int main(int argc, char** argv)
   ros::NodeHandle nh;
   ros::NodeHandle pnh{ "~" };
 
-  std::string config_file;
-  if (pnh.getParam("config_file", config_file))
+  try
   {
-    psen_scan_v2::ConfigServerNode config_server_node(nh, config_file.c_str());
+    psen_scan_v2::ConfigServerNode config_server_node(nh,
+                                                      getRequiredParamFromServer<std::string>(pnh, CONFIG_FILE).c_str(),
+                                                      getRequiredParamFromServer<std::string>(pnh, FRAME_ID));
 
     ros::spin();
   }
   // LCOV_EXCL_START
-  else
+  catch (std::exception& e)
   {
-    ROS_ERROR("PARAMETER config_file not set.");
+    ROS_ERROR_STREAM(e.what());
   }
   // LCOV_EXCL_STOP
+
+  return 0;
 }

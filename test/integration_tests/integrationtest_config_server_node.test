@@ -1,5 +1,5 @@
 <!--
-Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+Copyright (c) 2021 Pilz GmbH & Co. KG
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -17,6 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 <launch>
   <node ns="test_ns_laser_1" name="config_server_node" pkg="psen_scan_v2" type="config_server_node">
     <param name="config_file" value="$(find psen_scan_v2)/standalone/test/unit_tests/configuration/unittest_xml_configuration_parser-testfile-with-speedrange.xml" />
+    <param name="frame_id" value="laser_1"/>
   </node>
 
   <test test-name="integrationtest_config_server_node" pkg="psen_scan_v2" type="integrationtest_config_server_node"/>

@@ -41,7 +41,7 @@ static const std::string DEFAULT_ZONESET_TOPIC = "zonesets";
 class ConfigServerNode
 {
 public:
-  ConfigServerNode(ros::NodeHandle& nh, const char* config_file_path);
+  ConfigServerNode(ros::NodeHandle& nh, const char* config_file_path, const std::string& frame_id);
 
 private:
   ros::NodeHandle nh_;

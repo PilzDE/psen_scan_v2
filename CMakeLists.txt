@@ -407,6 +407,15 @@ if(CATKIN_ENABLE_TESTING)
   file(COPY standalone/test/unit_tests/configuration/unittest_xml_configuration_parser-testfile-no-speedrange.xml DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/testfiles)
   file(COPY standalone/test/unit_tests/configuration/unittest_xml_configuration_parser-testfile-with-speedrange.xml DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/testfiles)
 
+
+  catkin_add_gmock(unittest_zone_configuration_ros_conversion
+    test/unit_tests/unittest_zone_configuration_ros_conversion.cpp
+  )
+  target_link_libraries(unittest_zone_configuration_ros_conversion
+    ${catkin_LIBRARIES}
+    fmt::fmt
+  )
+  add_dependencies(unittest_zone_configuration_ros_conversion ${${PROJECT_NAME}_EXPORTED_TARGETS})
   #########################
   ##  Integration-Tests  ##
   #########################
