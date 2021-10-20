@@ -32,8 +32,8 @@ namespace psen_scan_v2_standalone
  *
  * - Distance measures in mm.
  * - Normalized intensities of the signals.
- * - Resolution of the scan in radians.
- * - Min and Max angle in radians.
+ * - Resolution of the scan.
+ * - Min and Max angle.
  * - Counter of scan round.
  * - Time of the first scan ray.
  *
@@ -72,11 +72,11 @@ private:
   MeasurementData measurements_;
   //! Stores the received normalized signal intensities.
   IntensityData intensities_;
-  //! Distance of angle between the measurements (in radian).
+  //! Distance of angle between the measurements.
   const util::TenthOfDegree resolution_;
-  //! Lowest angle the scanner is scanning (in radian).
+  //! Lowest angle the scanner is scanning.
   const util::TenthOfDegree min_scan_angle_;
-  //! Highest angle the scanner is scanning (in radian).
+  //! Highest angle the scanner is scanning.
   const util::TenthOfDegree max_scan_angle_;
   //! Number of the scan round this data belongs to.
   const uint32_t scan_counter_;
