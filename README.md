@@ -112,6 +112,12 @@ Start a preconfigured rviz visualizing the scan data.
 
 `Hint 2: Frequency of the laser scan messages is about 33hz for the combined and 200hz for the fragmented scans.`
 
+/\<name\>/active_zoneset ([std_msgs/UInt8][])<br/>
+
+* This topic contains the id of the curretly active zoneset of the PSENscan safety laser scanner.
+
+`Hint 1: If no zonesets are configured the driver will publish "0" as default.`
+
 ### TF Frames
 The location of the TF frames is shown in the image below.
 These names are defined by the aforementioned launchfile parameter `name`.
@@ -188,4 +194,5 @@ supply in buildings.
 
 
 [sensor_msgs/LaserScan]: http://docs.ros.org/noetic/api/sensor_msgs/html/msg/LaserScan.html
+[std_msgs/UInt8]: https://docs.ros.org/en/api/std_msgs/html/msg/UInt8.html
 [gmapping]: http://wiki.ros.org/gmapping
