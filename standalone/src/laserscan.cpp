@@ -114,12 +114,13 @@ void LaserScan::setIntensities(const IntensityData& intensities)
 std::ostream& operator<<(std::ostream& os, const LaserScan& scan)
 {
   os << fmt::format("LaserScan(timestamp = {} nsec, scanCounter = {}, minScanAngle = {} deg, maxScanAngle = {} deg, "
-                    "resolution = {} deg, measurements = {}, intensities = {})",
+                    "resolution = {} deg, active_zoneset = {}, measurements = {}, intensities = {})",
                     scan.getTimestamp(),
                     scan.getScanCounter(),
                     scan.getMinScanAngle().value() / 10.,
                     scan.getMaxScanAngle().value() / 10.,
                     scan.getScanResolution().value() / 10.,
+                    scan.getActiveZoneset(),
                     util::formatRange(scan.getMeasurements()),
                     util::formatRange(scan.getIntensities()));
   return os;
