@@ -35,6 +35,7 @@ namespace psen_scan_v2_standalone
  * - Resolution of the scan in radians.
  * - Min and Max angle in radians.
  * - Counter of scan round.
+ * - ID of the currently active zoneset.
  * - Time of the first scan ray.
  *
  * The measures use the target frame defined as \<tf_prefix\>.

@@ -170,6 +170,16 @@ public:
   ScanCounterUnexpectedSize(const std::string& msg);
 };
 
+/**
+ * @brief Exception thrown on problems with the additional field: active_zoneset
+ *
+ * The length specified in the Header of the additional field "active_zoneset"
+ * must be exactly as defined in NUMBER_OF_BYTES_ZONE_SET for it to be converted.
+ *
+ * @see data_conversion_layer::monitoring_frame::AdditionalFieldHeader
+ * @see data_conversion_layer::monitoring_frame::AdditionalFieldHeaderID
+ * @see data_conversion_layer::monitoring_frame::NUMBER_OF_BYTES_ZONE_SET
+ */
 class ZoneSetUnexpectedSize : public DecodingFailure
 {
 public:

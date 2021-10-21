@@ -66,7 +66,7 @@ public:
                   const double& x_axis_rotation,
                   const ScannerConfiguration& scanner_config);
 
-  //! @brief Continuously fetches data from the scanner and publishes the data as ROS scanner message.
+  //! @brief Continuously fetches data from the scanner and publishes the data into the ROS network.
   void run();
   //! @brief Terminates the fetching and publishing of scanner data.
   void terminate();
