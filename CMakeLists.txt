@@ -416,18 +416,28 @@ if(CATKIN_ENABLE_TESTING)
       ARGS config:=with_intensities.yaml)
     add_rostest(test/hw_tests/hwtest_scan_range.test
       ARGS config:=big_resolution.yaml)
+  endif()
+
+  ###########################################
+  ##  Hardware-Tests with saintsmart_relay ##
+  ###########################################
+
+  if(ENABLE_HARDWARE_TESTING_WITH_RELAY)
 
     add_rostest_gmock(hwtest_zoneset_switching
       test/hw_tests/hwtest_zoneset_switching.test
       test/hw_tests/hwtest_zoneset_switching.cpp
     )
+
   else()
 
     catkin_add_executable_with_gmock(hwtest_zoneset_switching
-                                     test/hw_tests/hwtest_zoneset_switching.cpp
-                                     EXCLUDE_FROM_ALL)
+                                    test/hw_tests/hwtest_zoneset_switching.cpp
+                                    EXCLUDE_FROM_ALL)
     add_dependencies(tests hwtest_zoneset_switching)
+
   endif()
+
 
   target_link_libraries(hwtest_zoneset_switching
     ${catkin_LIBRARIES}
