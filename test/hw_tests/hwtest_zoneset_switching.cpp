@@ -31,7 +31,7 @@ namespace psen_scan_v2_test
 {
 namespace util = psen_scan_v2_standalone::util;
 using psen_scan_v2_standalone_test::OpenBarrier;
-using std::placeholders::_1;
+using ::testing::AnyNumber;
 
 static constexpr int32_t WAIT_FOR_MESSAGE_TIMEOUT_S{ 5 };
 static constexpr uint8_t ZONE_ZERO_CMD{ 4 };
