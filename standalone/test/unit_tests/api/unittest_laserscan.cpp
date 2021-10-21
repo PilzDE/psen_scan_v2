@@ -162,11 +162,11 @@ TEST(LaserScanTest, testPrintMessageSuccess)
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
   EXPECT_EQ(fmt::format("{}", *laser_scan),
             "LaserScan(timestamp = 1 nsec, scanCounter = 1, minScanAngle = 0.1 deg, maxScanAngle = 0.2 deg, resolution "
-            "= 0.1 deg, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {})");
+            "= 0.1 deg, active_zoneset = 0, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {})");
 #else
   EXPECT_EQ(fmt::format("{}", *laser_scan),
             "LaserScan(timestamp = 1 nsec, scanCounter = 1, minScanAngle = 0.1 deg, maxScanAngle = 0.2 deg, resolution "
-            "= 0.1 deg, measurements = {45, 44, 43, 42}, intensities = {})");
+            "= 0.1 deg, active_zoneset = 0, measurements = {45, 44, 43, 42}, intensities = {})");
 #endif
 }
 
