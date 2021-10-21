@@ -176,6 +176,44 @@ TEST_F(RosScannerNodeTests, shouldStartAndStopSuccessfullyIfScannerRespondsToReq
   EXPECT_FUTURE_IS_READY(loop, LOOP_END_TIMEOUT);
 }
 
+TEST_F(RosScannerNodeTests, shouldProvideScanTopic)
+{
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(
+      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+
+  util::Barrier start_barrier;
+  util::Barrier stop_barrier;
+  EXPECT_SUCCESSFULL_START_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &start_barrier);
+  EXPECT_SUCCESSFULL_STOP_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &stop_barrier);
+
+  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
+
+  EXPECT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
+  EXPECT_TRUE(TopicExists("/integrationtest_ros_scanner_node/scan"));
+  ros_scanner_node.terminate();
+  EXPECT_BARRIER_OPENS(stop_barrier, DEFAULT_TIMEOUT) << "Scanner stop was not called";
+  EXPECT_FUTURE_IS_READY(loop, LOOP_END_TIMEOUT);
+}
+
+TEST_F(RosScannerNodeTests, shouldProvideActiveZonesetTopic)
+{
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(
+      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+
+  util::Barrier start_barrier;
+  util::Barrier stop_barrier;
+  EXPECT_SUCCESSFULL_START_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &start_barrier);
+  EXPECT_SUCCESSFULL_STOP_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &stop_barrier);
+
+  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
+
+  EXPECT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
+  EXPECT_TRUE(TopicExists("/integrationtest_ros_scanner_node/active_zoneset"));
+  ros_scanner_node.terminate();
+  EXPECT_BARRIER_OPENS(stop_barrier, DEFAULT_TIMEOUT) << "Scanner stop was not called";
+  EXPECT_FUTURE_IS_READY(loop, LOOP_END_TIMEOUT);
+}
+
 TEST_F(RosScannerNodeTests, shouldPublishScansWhenLaserScanCallbackIsInvoked)
 {
   ROSScannerNodeT<ScannerMock> ros_scanner_node(
