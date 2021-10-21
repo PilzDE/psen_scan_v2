@@ -16,10 +16,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
 <launch>
-  <arg name="test_duration" default="10"/>
-
   <node pkg="sainsmart_relay_usb" type="relay_node" name="sainsmart_relay_node" />
 
+  <!-- Ensure active zoneset is set to 0 before starting the scanner -->
   <node pkg="rostopic" type="rostopic" name="relay_cmd_exec"
         args="pub /relay_cmd std_msgs/Byte 'data: 4'" />
 
@@ -28,9 +27,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <arg name="angle_end" value="1.2" />
     <arg name="sensor_ip" value="$(optenv SENSOR_IP 192.168.0.10)" />
     <arg name="host_ip" value="$(optenv HOST_IP auto)" />
-    <arg name="host_udp_port_data" value="55005" />
+    <arg name="host_udp_port_data" value="55008" />
   </include>
 
-  <test test-name="zoneset_switching" pkg="psen_scan_v2" type="hwtest_zoneset_switching" time-limit="$(eval test_duration + 10)" />
+  <test test-name="zoneset_switching" pkg="psen_scan_v2" type="hwtest_zoneset_switching" time-limit="$(eval 10)" />
 
 </launch>
