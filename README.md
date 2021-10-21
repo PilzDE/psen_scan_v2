@@ -36,6 +36,7 @@ If you are interested in using the PSENscan safety laser scanner without ROS, pl
    + [Published Topics](#published-topics)
    + [TF Frames](#tf-frames)
    + [Defining the scan range](#defining-the-scan-range)
+   + [Timestamp details](#timestamp-details)
 3. [Developer Information](#developer-information)
    + [Build Status](#build-status)
    + [Branching model](#branching-model)
@@ -130,7 +131,7 @@ Both limits are defined within the _laser_1_ frame as shown in the image below.
 <img src="img/angle_limits.png" width="800px" alt="Limit visualization" title="Limit visualization">
 </p>
 
-### Additional Information
+### Timestamp details
 The timestamps of the scan data published are computed to be close to reality and processing speed of incoming data was optimized to reduce the time for the scan data to be published. This should suffice for localization and slam algorithms. If you application benefits from getting the scan data any sooner there are two possibilities:
 
 * Use fragmented scans. This will publish the individual frames received by the PsenScan hardware immediately instead of waiting for a scan round to be completed and combined to a single laser scan message.
