@@ -67,6 +67,18 @@ createStampedMsgs(const std::size_t num_elements)
   return msgs;
 }
 
+static void addStampedMsgWithActiveZone(std::vector<data_conversion_layer::monitoring_frame::MessageStamped>& msgs,
+                                        uint8_t active_zone)
+{
+  msgs.push_back(createStampedMsg(DEFAULT_TIMESTAMP * msgs.size(),
+                                  msgs[0].msg_.fromTheta() + msgs[0].msg_.resolution() *
+                                                                 static_cast<int>(msgs[0].msg_.measurements().size()) *
+                                                                 msgs.size(),
+                                  msgs[0].msg_.resolution(),
+                                  msgs[0].msg_.scanCounter(),
+                                  active_zone));
+}
+
 static data_conversion_layer::monitoring_frame::MessageStamped
 copyStampedMsgWithNewTimestamp(const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg,
                                const int64_t new_timestamp)
@@ -268,6 +280,18 @@ TEST(LaserScanConversionsTest, laserScanShouldContainActiveZoneset)
   ASSERT_NO_THROW(
       scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
   EXPECT_EQ(0, scan_ptr->getActiveZoneset());
+}
+
+TEST(LaserScanConversionsTest, laserScanShouldContainActiveZonesetOfLastMsg)
+{
+  auto stamped_msgs = createStampedMsgs(1);
+  addStampedMsgWithActiveZone(stamped_msgs, 3);
+  addStampedMsgWithActiveZone(stamped_msgs, 4);
+
+  std::unique_ptr<LaserScan> scan_ptr;
+  ASSERT_NO_THROW(
+      scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
+  EXPECT_EQ(4, scan_ptr->getActiveZoneset());
 }
 
 using Message = data_conversion_layer::monitoring_frame::Message;
