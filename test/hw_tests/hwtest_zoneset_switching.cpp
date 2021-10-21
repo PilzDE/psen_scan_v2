@@ -60,7 +60,7 @@ inline SubscriberMock::SubscriberMock(ros::NodeHandle& nh)
   subscriber_ = nh.subscribe("/laser_1/active_zoneset", 1, &SubscriberMock::callback, this);
 }
 
-class ScanComparisonTests : public ::testing::Test
+class ActiveZonesetSwitchTests : public ::testing::Test
 {
 public:
   void SetUp() override  // Omit using SetUpTestSuite() for googletest below v1.11.0, see
@@ -82,7 +82,7 @@ protected:
   ros::NodeHandle nh_;
 };
 
-inline void ScanComparisonTests::setScannerZoneSet(uint8_t cmd)
+inline void ActiveZonesetSwitchTests::setScannerZoneSet(uint8_t cmd)
 {
   std_msgs::Byte command;
   command.data = cmd;
@@ -92,7 +92,7 @@ inline void ScanComparisonTests::setScannerZoneSet(uint8_t cmd)
 
 static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 3 };
 
-TEST_F(ScanComparisonTests, simpleCompare)
+TEST_F(ActiveZonesetSwitchTests, shouldPublishChangedZonesetIfIOChanges)
 {
   util::Barrier zone_zero_barrier;
   util::Barrier zone_one_barrier;
