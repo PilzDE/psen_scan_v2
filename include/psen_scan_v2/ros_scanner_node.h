@@ -91,6 +91,7 @@ private:
   FRIEND_TEST(RosScannerNodeTests, shouldReceiveLatchedActiveZonesetMsg);
   FRIEND_TEST(RosScannerNodeTests, shouldProvideScanTopic);
   FRIEND_TEST(RosScannerNodeTests, shouldProvideActiveZonesetTopic);
+  FRIEND_TEST(RosScannerNodeTests, shouldPublishScanEqualToConversionOfSuppliedLaserScan);
 };
 
 typedef ROSScannerNodeT<> ROSScannerNode;
