@@ -245,13 +245,13 @@ TEST_F(RosScannerNodeTests, shouldPublishActiveZonesetWhenLaserScanCallbackIsInv
   ROSScannerNodeT<ScannerMock> ros_scanner_node(
       nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
-  const uint8_t FIRST_ZONE{ 2 };
-  const uint8_t SECOND_ZONE{ 4 };
+  const uint8_t first_zone{ 2 };
+  const uint8_t second_zone{ 4 };
 
   util::Barrier scan_topic_barrier;
   SubscriberMock subscriber(nh_priv_);
-  EXPECT_CALL(subscriber, zone_callback(messageEQ(createActiveZonesetMsg(FIRST_ZONE))));
-  EXPECT_CALL(subscriber, zone_callback(messageEQ(createActiveZonesetMsg(SECOND_ZONE))))
+  EXPECT_CALL(subscriber, zone_callback(messageEQ(createActiveZonesetMsg(first_zone))));
+  EXPECT_CALL(subscriber, zone_callback(messageEQ(createActiveZonesetMsg(second_zone))))
       .WillOnce(OpenBarrier(&scan_topic_barrier));
 
   util::Barrier start_barrier;
@@ -263,8 +263,8 @@ TEST_F(RosScannerNodeTests, shouldPublishActiveZonesetWhenLaserScanCallbackIsInv
 
   EXPECT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
 
-  ros_scanner_node.scanner_.invokeLaserScanCallback(createValidLaserScan(FIRST_ZONE));
-  ros_scanner_node.scanner_.invokeLaserScanCallback(createValidLaserScan(SECOND_ZONE));
+  ros_scanner_node.scanner_.invokeLaserScanCallback(createValidLaserScan(first_zone));
+  ros_scanner_node.scanner_.invokeLaserScanCallback(createValidLaserScan(second_zone));
 
   EXPECT_BARRIER_OPENS(scan_topic_barrier, DEFAULT_TIMEOUT) << "Scan message was not sended";
   ros_scanner_node.terminate();
@@ -281,17 +281,17 @@ TEST_F(RosScannerNodeTests, shouldReceiveLatchedActiveZonesetMsg)
   EXPECT_SUCCESSFULL_START_AND_OPEN_BARRIER_ON_CALL(ros_scanner_node.scanner_, &start_barrier);
   EXPECT_SUCCESSFULL_STOP_AND_OPEN_BARRIER_ON_CALL(ros_scanner_node.scanner_, &stop_barrier);
 
-  const uint8_t FIRST_ZONE{ 2 };
+  const uint8_t first_zone{ 2 };
 
   util::Barrier scan_topic_barrier;
   SubscriberMock subscriber(nh_priv_);
-  EXPECT_CALL(subscriber, zone_callback(AllOf(isLatched(), messageEQ(createActiveZonesetMsg(FIRST_ZONE)))))
+  EXPECT_CALL(subscriber, zone_callback(AllOf(isLatched(), messageEQ(createActiveZonesetMsg(first_zone)))))
       .WillOnce(OpenBarrier(&scan_topic_barrier));
 
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
   EXPECT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
 
-  ros_scanner_node.scanner_.invokeLaserScanCallback(createValidLaserScan(FIRST_ZONE));
+  ros_scanner_node.scanner_.invokeLaserScanCallback(createValidLaserScan(first_zone));
 
   EXPECT_BARRIER_OPENS(scan_topic_barrier, DEFAULT_TIMEOUT) << "Scan message was not sended";
   ros_scanner_node.terminate();
