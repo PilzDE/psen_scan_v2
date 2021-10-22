@@ -53,12 +53,12 @@ namespace psen_scan_v2
 {
 #define Return_Future(promise_obj) ::testing::InvokeWithoutArgs([&promise_obj]() { return promise_obj.get_future(); })
 
-#define EXPECT_SUCCESSFULL_START_WILL_OPEN_BARRIER(mock, barrier)                                                      \
+#define EXPECT_SUCCESSFULL_START_AND_OPEN_BARRIER_ON_CALL(mock, barrier)                                               \
   std::promise<void> start_promise_object;                                                                             \
   start_promise_object.set_value();                                                                                    \
   EXPECT_CALL(mock, start()).WillOnce(DoAll(OpenBarrier(barrier), Return_Future(start_promise_object)));
 
-#define EXPECT_SUCCESSFULL_STOP_WILL_OPEN_BARRIER(mock, barrier)                                                       \
+#define EXPECT_SUCCESSFULL_STOP_AND_OPEN_BARRIER_ON_CALL(mock, barrier)                                                \
   std::promise<void> stop_promise_object;                                                                              \
   stop_promise_object.set_value();                                                                                     \
   EXPECT_CALL(mock, stop()).WillOnce(DoAll(OpenBarrier(barrier), Return_Future(stop_promise_object)));
@@ -180,8 +180,8 @@ TEST_F(RosScannerNodeTests, shouldProvideScanTopic)
 
   util::Barrier start_barrier;
   util::Barrier stop_barrier;
-  EXPECT_SUCCESSFULL_START_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &start_barrier);
-  EXPECT_SUCCESSFULL_STOP_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &stop_barrier);
+  EXPECT_SUCCESSFULL_START_AND_OPEN_BARRIER_ON_CALL(ros_scanner_node.scanner_, &start_barrier);
+  EXPECT_SUCCESSFULL_STOP_AND_OPEN_BARRIER_ON_CALL(ros_scanner_node.scanner_, &stop_barrier);
 
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
 
@@ -199,8 +199,8 @@ TEST_F(RosScannerNodeTests, shouldProvideActiveZonesetTopic)
 
   util::Barrier start_barrier;
   util::Barrier stop_barrier;
-  EXPECT_SUCCESSFULL_START_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &start_barrier);
-  EXPECT_SUCCESSFULL_STOP_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &stop_barrier);
+  EXPECT_SUCCESSFULL_START_AND_OPEN_BARRIER_ON_CALL(ros_scanner_node.scanner_, &start_barrier);
+  EXPECT_SUCCESSFULL_STOP_AND_OPEN_BARRIER_ON_CALL(ros_scanner_node.scanner_, &stop_barrier);
 
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
 
@@ -224,8 +224,8 @@ TEST_F(RosScannerNodeTests, shouldPublishScansWhenLaserScanCallbackIsInvoked)
 
   util::Barrier start_barrier;
   util::Barrier stop_barrier;
-  EXPECT_SUCCESSFULL_START_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &start_barrier);
-  EXPECT_SUCCESSFULL_STOP_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &stop_barrier);
+  EXPECT_SUCCESSFULL_START_AND_OPEN_BARRIER_ON_CALL(ros_scanner_node.scanner_, &start_barrier);
+  EXPECT_SUCCESSFULL_STOP_AND_OPEN_BARRIER_ON_CALL(ros_scanner_node.scanner_, &stop_barrier);
 
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
 
@@ -245,22 +245,26 @@ TEST_F(RosScannerNodeTests, shouldPublishActiveZonesetWhenLaserScanCallbackIsInv
   ROSScannerNodeT<ScannerMock> ros_scanner_node(
       nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
+  uint8_t FIRST_ZONE{ 2 };
+  uint8_t SECOND_ZONE{ 4 };
+
   util::Barrier scan_topic_barrier;
   SubscriberMock subscriber(nh_priv_);
-  EXPECT_CALL(subscriber, zone_callback(messageEQ(createActiveZonesetMsg(2))));
-  EXPECT_CALL(subscriber, zone_callback(messageEQ(createActiveZonesetMsg(4)))).WillOnce(OpenBarrier(&scan_topic_barrier));
+  EXPECT_CALL(subscriber, zone_callback(messageEQ(createActiveZonesetMsg(FIRST_ZONE))));
+  EXPECT_CALL(subscriber, zone_callback(messageEQ(createActiveZonesetMsg(SECOND_ZONE))))
+      .WillOnce(OpenBarrier(&scan_topic_barrier));
 
   util::Barrier start_barrier;
   util::Barrier stop_barrier;
-  EXPECT_SUCCESSFULL_START_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &start_barrier);
-  EXPECT_SUCCESSFULL_STOP_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &stop_barrier);
+  EXPECT_SUCCESSFULL_START_AND_OPEN_BARRIER_ON_CALL(ros_scanner_node.scanner_, &start_barrier);
+  EXPECT_SUCCESSFULL_STOP_AND_OPEN_BARRIER_ON_CALL(ros_scanner_node.scanner_, &stop_barrier);
 
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
 
   EXPECT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
 
-  ros_scanner_node.scanner_.invokeLaserScanCallback(createValidLaserScan(2));
-  ros_scanner_node.scanner_.invokeLaserScanCallback(createValidLaserScan(4));
+  ros_scanner_node.scanner_.invokeLaserScanCallback(createValidLaserScan(FIRST_ZONE));
+  ros_scanner_node.scanner_.invokeLaserScanCallback(createValidLaserScan(SECOND_ZONE));
 
   EXPECT_BARRIER_OPENS(scan_topic_barrier, DEFAULT_TIMEOUT) << "Scan message was not sended";
   ros_scanner_node.terminate();
@@ -274,18 +278,20 @@ TEST_F(RosScannerNodeTests, shouldReceiveLatchedActiveZonesetMsg)
       nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
   util::Barrier start_barrier;
   util::Barrier stop_barrier;
-  EXPECT_SUCCESSFULL_START_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &start_barrier);
-  EXPECT_SUCCESSFULL_STOP_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &stop_barrier);
+  EXPECT_SUCCESSFULL_START_AND_OPEN_BARRIER_ON_CALL(ros_scanner_node.scanner_, &start_barrier);
+  EXPECT_SUCCESSFULL_STOP_AND_OPEN_BARRIER_ON_CALL(ros_scanner_node.scanner_, &stop_barrier);
+
+  uint8_t FIRST_ZONE{ 2 };
 
   util::Barrier scan_topic_barrier;
   SubscriberMock subscriber(nh_priv_);
-  EXPECT_CALL(subscriber, zone_callback(AllOf(isLatched(), messageEQ(createActiveZonesetMsg(2)))))
+  EXPECT_CALL(subscriber, zone_callback(AllOf(isLatched(), messageEQ(createActiveZonesetMsg(FIRST_ZONE)))))
       .WillOnce(OpenBarrier(&scan_topic_barrier));
 
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
   EXPECT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
 
-  ros_scanner_node.scanner_.invokeLaserScanCallback(createValidLaserScan(2));
+  ros_scanner_node.scanner_.invokeLaserScanCallback(createValidLaserScan(FIRST_ZONE));
 
   EXPECT_BARRIER_OPENS(scan_topic_barrier, DEFAULT_TIMEOUT) << "Scan message was not sended";
   ros_scanner_node.terminate();
@@ -299,7 +305,7 @@ TEST_F(RosScannerNodeTests, shouldWaitWhenStopRequestResponseIsMissing)
       nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
   util::Barrier start_barrier;
-  EXPECT_SUCCESSFULL_START_WILL_OPEN_BARRIER(ros_scanner_node.scanner_, &start_barrier);
+  EXPECT_SUCCESSFULL_START_AND_OPEN_BARRIER_ON_CALL(ros_scanner_node.scanner_, &start_barrier);
 
   std::promise<void> unset_promise;
   EXPECT_CALL(ros_scanner_node.scanner_, stop()).WillOnce(Return_Future(unset_promise));
