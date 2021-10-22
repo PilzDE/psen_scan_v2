@@ -114,7 +114,7 @@ Start a preconfigured rviz visualizing the scan data.
 
 /\<name\>/active_zoneset ([std_msgs/UInt8][])<br/>
 
-* This topic contains the id of the curretly active zoneset of the PSENscan safety laser scanner.
+* This topic contains the id of the currently active zoneset of the PSENscan safety laser scanner.
 
 `Hint 1: If no zonesets are configured the driver will publish "0" as default.`
 
