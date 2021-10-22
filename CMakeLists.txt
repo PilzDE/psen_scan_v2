@@ -471,7 +471,12 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES}
     ${PROJECT_NAME}_standalone_xml_configuration_import
   )
-  add_dependencies(integrationtest_config_server_node ${${PROJECT_NAME}_EXPORTED_TARGETS})
+  add_dependencies(integrationtest_config_server_node 
+    ${PROJECT_NAME}_standalone
+    config_server_node
+    ${PROJECT_NAME}_standalone_xml_configuration_import
+    ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  )
 
   add_rostest_gmock(unittest_ros_parameter_handler
       test/unit_tests/unittest_ros_parameter_handler.test
