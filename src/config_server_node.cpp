@@ -31,7 +31,7 @@ ConfigServerNode::ConfigServerNode(ros::NodeHandle& nh, const char* config_file_
   try
   {
     auto zoneconfig = parser.parseFile(config_file_path);
-    zoneset_pub_ = nh_.advertise<::psen_scan_v2::ZoneSetConfiguration>(DEFAULT_ZONESET_TOPIC, 1, true);
+    zoneset_pub_ = nh_.advertise<::psen_scan_v2::ZoneSetConfiguration>(DEFAULT_ZONESET_TOPIC, 1, true /*latched*/);
 
     zoneset_pub_.publish(toMsg(zoneconfig, frame_id));
   }
