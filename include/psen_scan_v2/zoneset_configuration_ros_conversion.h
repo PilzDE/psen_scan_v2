@@ -58,9 +58,9 @@ geometry_msgs::Polygon fromPolar(const std::vector<unsigned long>& radii_vec_mm,
   return polygon;
 }
 
-psen_scan_v2::ZoneSet toMsg(const ZoneSetStandalone& zoneset,
-                            const std::string& frame_id,
-                            const ros::Time& stamp = ros::Time::now())
+psen_scan_v2::ZoneSet toRosMsg(const ZoneSetStandalone& zoneset,
+                               const std::string& frame_id,
+                               const ros::Time& stamp = ros::Time::now())
 {
   psen_scan_v2::ZoneSet zoneset_msg;
   zoneset_msg.header.stamp = stamp;
@@ -90,15 +90,15 @@ psen_scan_v2::ZoneSet toMsg(const ZoneSetStandalone& zoneset,
   return zoneset_msg;
 }
 
-psen_scan_v2::ZoneSetConfiguration toMsg(const ZoneSetConfigurationStandalone& zoneset_configuration,
-                                         const std::string& frame_id,
-                                         const ros::Time& stamp = ros::Time::now())
+psen_scan_v2::ZoneSetConfiguration toRosMsg(const ZoneSetConfigurationStandalone& zoneset_configuration,
+                                            const std::string& frame_id,
+                                            const ros::Time& stamp = ros::Time::now())
 {
   psen_scan_v2::ZoneSetConfiguration zoneset_config_msg;
 
   for (const auto& z : zoneset_configuration.zonesets_)
   {
-    zoneset_config_msg.zonesets.push_back(toMsg(z, frame_id, stamp));
+    zoneset_config_msg.zonesets.push_back(toRosMsg(z, frame_id, stamp));
   }
   return zoneset_config_msg;
 }

@@ -82,7 +82,7 @@ TEST(ZoneSetROSConversionsTest, ZoneSetToRosMsgCorrectPointConversion)
 
   zoneset.resolution_ = DEFAULT_ZONESET_ANGLE_STEP;
 
-  psen_scan_v2::ZoneSet zoneset_msg = toMsg(zoneset, "test_frame_id");
+  psen_scan_v2::ZoneSet zoneset_msg = toRosMsg(zoneset, "test_frame_id");
 
   // Use EXPECT_FLOAT_EQ since the msg has float internally
   EXPECT_FLOAT_EQ(zoneset_msg.safety1.points.at(0).x,
@@ -174,7 +174,7 @@ TEST(ZoneSetROSConversionsTest, ZoneSetToRosMsgCorrectSpeedRangeConversion)
   ZoneSetStandalone zoneset;
   zoneset.speed_range_ = ZoneSetSpeedRange(-5, 10);
 
-  psen_scan_v2::ZoneSet zoneset_msg = toMsg(zoneset, "test_frame_id");
+  psen_scan_v2::ZoneSet zoneset_msg = toRosMsg(zoneset, "test_frame_id");
   EXPECT_FLOAT_EQ(zoneset_msg.speed_lower, -5.0);
   EXPECT_FLOAT_EQ(zoneset_msg.speed_upper, 10.0);
 }
@@ -184,7 +184,7 @@ TEST(ZoneSetROSConversionsTest, ZoneSetToRosMsgCorrectHeader)
   ZoneSetStandalone zoneset;
   zoneset.speed_range_ = ZoneSetSpeedRange(-5, 10);
 
-  psen_scan_v2::ZoneSet zoneset_msg = toMsg(zoneset, "test_frame_id", ros::Time(1));
+  psen_scan_v2::ZoneSet zoneset_msg = toRosMsg(zoneset, "test_frame_id", ros::Time(1));
   EXPECT_EQ(zoneset_msg.header.frame_id, "test_frame_id");
   EXPECT_EQ(zoneset_msg.header.stamp, ros::Time(1));
 }

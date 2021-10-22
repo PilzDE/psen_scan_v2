@@ -33,7 +33,7 @@ ConfigServerNode::ConfigServerNode(ros::NodeHandle& nh, const char* config_file_
     auto zoneconfig = parser.parseFile(config_file_path);
     zoneset_pub_ = nh_.advertise<::psen_scan_v2::ZoneSetConfiguration>(DEFAULT_ZONESET_TOPIC, 1, true /*latched*/);
 
-    zoneset_pub_.publish(toMsg(zoneconfig, frame_id));
+    zoneset_pub_.publish(toRosMsg(zoneconfig, frame_id));
   }
   // LCOV_EXCL_START
   catch (const configuration::XMLConfigurationParserException& e)
