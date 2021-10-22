@@ -35,6 +35,19 @@ public:
   }
 };
 
+/**
+ * @brief Converts a quadrupel \<ro\> value into the respective length in mm
+ *
+ * The conversion of 4 characters follows the rule "abcd" -> 0xcdab
+ * Examples:
+ * "D307" -> 0x07D3 -> 2003mm
+ * "ED03" -> 0x03ED -> 1005mm
+ * "2B01" -> 0x012B -> 299mm
+ * "8913" -> 0x1389 -> 5001mm
+ *
+ * @param ro_value string containing a quadrupel of hex values
+ * @return unsigned long length in mm
+ */
 unsigned long ro_value_to_uint(const std::string& ro_value)
 {
   auto string_cpy = ro_value;
@@ -48,12 +61,6 @@ unsigned long ro_value_to_uint(const std::string& ro_value)
  *
  * The value in a \<ro\> element is a string with length 4*N where N is the number of distance values.
  * 4 succedding values form a set that can be transformed into the lenth in mm.
- * The conversion of 4 characters follows the rule "abcd" -> 0xcdab
- * Examples:
- * "D307" -> 0x07D3 -> 2003mm
- * "ED03" -> 0x03ED -> 1005mm
- * "2B01" -> 0x012B -> 299mm
- * "8913" -> 0x1389 -> 5001mm
  *
  * @param ro_string
  * @return std::vector<unsigned int>
