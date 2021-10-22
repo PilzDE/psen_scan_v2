@@ -63,8 +63,7 @@ inline SubscriberMock::SubscriberMock(ros::NodeHandle& nh)
 class ActiveZonesetSwitchTests : public ::testing::Test
 {
 public:
-  void SetUp() override  // Omit using SetUpTestSuite() for googletest below v1.11.0, see
-                         // https://github.com/google/googletest/issues/247
+  void SetUp() override
   {
     pub_relay_cmd_ = nh_.advertise<std_msgs::Byte>("/relay_cmd", 1);
   }
