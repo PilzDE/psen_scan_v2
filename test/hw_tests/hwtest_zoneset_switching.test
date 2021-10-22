@@ -18,10 +18,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 <launch>
   <node pkg="sainsmart_relay_usb" type="relay_node" name="sainsmart_relay_node" />
 
-  <!-- Ensure active zoneset is set to 0 before starting the scanner -->
-  <node pkg="rostopic" type="rostopic" name="relay_cmd_exec"
-        args="pub /relay_cmd std_msgs/Byte 'data: 4'" />
-
   <include file="$(find psen_scan_v2)/launch/bringup.launch">
     <arg name="angle_start" value="-1.2" />
     <arg name="angle_end" value="1.2" />
