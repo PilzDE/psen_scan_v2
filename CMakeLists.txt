@@ -206,7 +206,7 @@ install(TARGETS
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-catkin_install_python(PROGRAMS scripts/zone_switching_visualization.py
+catkin_install_python(PROGRAMS scripts/zonesets_visualization.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 ############
