@@ -245,8 +245,8 @@ TEST_F(RosScannerNodeTests, shouldPublishActiveZonesetWhenLaserScanCallbackIsInv
   ROSScannerNodeT<ScannerMock> ros_scanner_node(
       nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
-  uint8_t FIRST_ZONE{ 2 };
-  uint8_t SECOND_ZONE{ 4 };
+  const uint8_t FIRST_ZONE{ 2 };
+  const uint8_t SECOND_ZONE{ 4 };
 
   util::Barrier scan_topic_barrier;
   SubscriberMock subscriber(nh_priv_);
@@ -281,7 +281,7 @@ TEST_F(RosScannerNodeTests, shouldReceiveLatchedActiveZonesetMsg)
   EXPECT_SUCCESSFULL_START_AND_OPEN_BARRIER_ON_CALL(ros_scanner_node.scanner_, &start_barrier);
   EXPECT_SUCCESSFULL_STOP_AND_OPEN_BARRIER_ON_CALL(ros_scanner_node.scanner_, &stop_barrier);
 
-  uint8_t FIRST_ZONE{ 2 };
+  const uint8_t FIRST_ZONE{ 2 };
 
   util::Barrier scan_topic_barrier;
   SubscriberMock subscriber(nh_priv_);
