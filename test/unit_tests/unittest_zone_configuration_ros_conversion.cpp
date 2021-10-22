@@ -31,7 +31,7 @@ using namespace psen_scan_v2_standalone::configuration;
 
 namespace psen_scan_v2_test
 {
-TEST(ZoneSetROSConversionsTest, fromPolar)
+TEST(ZoneSetROSConversionsTest, shouldCorrectlyConvertPolarCoordinates)
 {
   geometry_msgs::Polygon poly1 = fromPolar({ 1000 }, util::TenthOfDegree(0) /*irrelevant here*/, 0 /*x_axis_rotation*/);
   EXPECT_DOUBLE_EQ(poly1.points.at(0).x, 1.0 /*m*/);

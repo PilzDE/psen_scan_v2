@@ -58,7 +58,7 @@ using namespace psen_scan_v2_standalone::configuration::xml_config_parsing;
 
 namespace psen_scan_v2_standalone_test
 {
-TEST(XMLRoStringParsing, parseROStringProperParsing)
+TEST(XMLRoStringParsing, shouldParseValidStrings)
 {
   EXPECT_THAT(ro_string_to_vec(""), testing::ElementsAre());
   EXPECT_THAT(ro_string_to_vec("D307D307D307"), testing::ElementsAre(2003, 2003, 2003));
@@ -66,17 +66,18 @@ TEST(XMLRoStringParsing, parseROStringProperParsing)
   EXPECT_THAT(ro_string_to_vec("2B018913"), testing::ElementsAre(299, 5001));
 }
 
-TEST(XMLRoStringParsing, stringToShort)
+TEST(XMLRoStringParsing, shouldReturnEmptyOnTooShortStrings)
 {
   EXPECT_THAT(ro_string_to_vec("D30"), testing::ElementsAre());
 }
 
-TEST(XMLRoStringParsing, extraCharacters)
+TEST(XMLRoStringParsing, shouldIgnoreExtraCharacters)
 {
   EXPECT_THAT(ro_string_to_vec("D307D307D307AAA"), testing::ElementsAre(2003, 2003, 2003));
+  //                                        ^^^ extra characters
 }
 
-TEST(XMLRoStringParsing, NONHEX)
+TEST(XMLRoStringParsing, shouldThrowOnNonHexInput)
 {
   EXPECT_THROW(ro_string_to_vec("YYYY"), XMLConfigurationParserException);
 }
@@ -85,17 +86,17 @@ class XmlConfiguationParserTest : public testing::Test
 {
 };
 
-TEST_F(XmlConfiguationParserTest, throwIfFileDoesNotExist)
+TEST_F(XmlConfiguationParserTest, shouldThrowIfFileDoesNotExist)
 {
   EXPECT_THROW(parseFile("non-existing-file.xml"), XMLConfigurationParserException);
 }
 
-TEST_F(XmlConfiguationParserTest, dontThrowIfFileExists)
+TEST_F(XmlConfiguationParserTest, shouldNotThrowIfFileExists)
 {
   EXPECT_NO_THROW(parseFile("testfiles/unittest_xml_configuration_parser-testfile-no-speedrange.xml"));
 }
 
-TEST_F(XmlConfiguationParserTest, zonesParseCorrect)
+TEST_F(XmlConfiguationParserTest, shouldParseAValidFile)
 {
   configuration::ZoneSetConfiguration zoneset_config =
       parseFile("testfiles/unittest_xml_configuration_parser-testfile-no-speedrange.xml");
@@ -122,7 +123,7 @@ TEST_F(XmlConfiguationParserTest, zonesParseCorrect)
   EXPECT_FALSE(zoneset_config.zonesets_[1].speed_range_);
 }
 
-TEST_F(XmlConfiguationParserTest, correctParsingOfSpeedRange)
+TEST_F(XmlConfiguationParserTest, shouldParseAValidFileContainingSpeedRanges)
 {
   configuration::ZoneSetConfiguration zoneset_config =
       parseFile("testfiles/unittest_xml_configuration_parser-testfile-with-speedrange.xml");
@@ -133,7 +134,7 @@ TEST_F(XmlConfiguationParserTest, correctParsingOfSpeedRange)
   EXPECT_EQ(zoneset_config.zonesets_[1].speed_range_->max_, 50);
 }
 
-TEST_F(XmlConfiguationParserTest, settingDefaultResolution)
+TEST_F(XmlConfiguationParserTest, shouldSetTheDefaultResolutionOfTheZoneSetConfiguration)
 {
   // Unfortunatly this is only known implicitly
 
@@ -146,12 +147,12 @@ TEST_F(XmlConfiguationParserTest, settingDefaultResolution)
             psen_scan_v2_standalone::configuration::DEFAULT_ZONESET_ANGLE_STEP);
 }
 
-TEST_F(XmlConfiguationParserTest, throwOnInvalidXML)
+TEST_F(XmlConfiguationParserTest, shouldThrowOnNonXMLInput)
 {
   EXPECT_THROW_AND_WHAT(parseString("NON XML STRING"), XMLConfigurationParserException, "Could not parse content.");
 }
 
-TEST_F(XmlConfiguationParserTest, correctParseAllFieldTypes)
+TEST_F(XmlConfiguationParserTest, shouldParseAllFieldTypes)
 {
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"
@@ -223,7 +224,7 @@ TEST_F(XmlConfiguationParserTest, correctParseAllFieldTypes)
   EXPECT_EQ(zoneset_config.zonesets_[0].speed_range_, configuration::ZoneSetSpeedRange(-5, -4));
 }
 
-TEST_F(XmlConfiguationParserTest, missingChainToZoneSetInfo)
+TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingChainToZoneSetInfo)
 {
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"
@@ -250,7 +251,7 @@ TEST_F(XmlConfiguationParserTest, missingChainToZoneSetInfo)
                         "Could not parse. Chain MIB->scannerDescr->zoneSetDefinition->zoneSetInfo not complete.");
 }
 
-TEST_F(XmlConfiguationParserTest, missingChainZoneSetDetail)
+TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingChainZoneSetDetail)
 {
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"
@@ -280,7 +281,7 @@ TEST_F(XmlConfiguationParserTest, missingChainZoneSetDetail)
       "Could not parse. Chain MIB->scannerDescr->zoneSetDefinition->zoneSetInfo->zoneSetDetail not complete.");
 }
 
-TEST_F(XmlConfiguationParserTest, missingChainZoneSetType)
+TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingChainZoneSetType)
 {
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"
@@ -314,7 +315,7 @@ TEST_F(XmlConfiguationParserTest, missingChainZoneSetType)
                         "Could not parse. At least one <zoneSetDetail> is missing a <type>.");
 }
 
-TEST_F(XmlConfiguationParserTest, missingChainZoneSetRO)
+TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingChainZoneSetRO)
 {
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"
@@ -455,7 +456,7 @@ TEST_F(XmlConfiguationParserTest, emptyType)
       parseString(xml.c_str()), XMLConfigurationParserException, "Could not parse. <type> element is empty.");
 }
 
-TEST_F(XmlConfiguationParserTest, missingEncEnable)
+TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingEncEnable)
 {
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"
@@ -483,7 +484,7 @@ TEST_F(XmlConfiguationParserTest, missingEncEnable)
                         "Could not parse. Chain MIB->clusterDescr->zoneSetConfiguration->encEnabled is broken.");
 }
 
-TEST_F(XmlConfiguationParserTest, emptyEncEnable)
+TEST_F(XmlConfiguationParserTest, shouldThrowIfEncEnableIsEmpty)
 {
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"
@@ -511,7 +512,7 @@ TEST_F(XmlConfiguationParserTest, emptyEncEnable)
                         "Could not parse. Value inside <encEnable> could not be evaluated to true or false");
 }
 
-TEST_F(XmlConfiguationParserTest, invalidEncEnableValue)
+TEST_F(XmlConfiguationParserTest, shouldThrowIfEncEnableIsNotBool)
 {
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"
@@ -539,7 +540,7 @@ TEST_F(XmlConfiguationParserTest, invalidEncEnableValue)
                         "Could not parse. Value inside <encEnable> could not be evaluated to true or false");
 }
 
-TEST_F(XmlConfiguationParserTest, missingZoneSetSelector)
+TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingZoneSetSelector)
 {
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"
@@ -571,7 +572,7 @@ TEST_F(XmlConfiguationParserTest, missingZoneSetSelector)
       "Could not parse. Chain MIB->clusterDescr->zoneSetConfiguration->zoneSetSelCode->zoneSetSelector is broken.");
 }
 
-TEST_F(XmlConfiguationParserTest, missingZoneSetSpeedRange)
+TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingZoneSetSpeedRange)
 {
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"
@@ -604,7 +605,7 @@ TEST_F(XmlConfiguationParserTest, missingZoneSetSpeedRange)
                         "Could not parse. Missing <zoneSetSpeedRange> below <zoneSetSelector>");
 }
 
-TEST_F(XmlConfiguationParserTest, missingMinSpeed)
+TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingMinSpeed)
 {
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"
@@ -640,7 +641,7 @@ TEST_F(XmlConfiguationParserTest, missingMinSpeed)
                         "Could not parse. Missing <minSpeed> below <zoneSetSpeedRange>");
 }
 
-TEST_F(XmlConfiguationParserTest, invalidMinSpeed)
+TEST_F(XmlConfiguationParserTest, shouldThrowOnInvalidMinSpeed)
 {
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"
@@ -675,7 +676,7 @@ TEST_F(XmlConfiguationParserTest, invalidMinSpeed)
       parseString(xml.c_str()), XMLConfigurationParserException, "Could not parse. Value <minSpeed> invalid.");
 }
 
-TEST_F(XmlConfiguationParserTest, invalidMinSpeedEmpty)
+TEST_F(XmlConfiguationParserTest, shouldThrowIfMinSpeedIsEmpty)
 {
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"
@@ -710,7 +711,7 @@ TEST_F(XmlConfiguationParserTest, invalidMinSpeedEmpty)
       parseString(xml.c_str()), XMLConfigurationParserException, "Could not parse. Value <minSpeed> invalid.");
 }
 
-TEST_F(XmlConfiguationParserTest, missingMaxSpeed)
+TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingMaxSpeed)
 {
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"
@@ -746,7 +747,7 @@ TEST_F(XmlConfiguationParserTest, missingMaxSpeed)
                         "Could not parse. Missing <maxSpeed> below <zoneSetSpeedRange>");
 }
 
-TEST_F(XmlConfiguationParserTest, invalidMaxSpeed)
+TEST_F(XmlConfiguationParserTest, shouldThrowOnInvalidMaxSpeed)
 {
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"
@@ -781,7 +782,7 @@ TEST_F(XmlConfiguationParserTest, invalidMaxSpeed)
       parseString(xml.c_str()), XMLConfigurationParserException, "Could not parse. Value <maxSpeed> invalid.");
 }
 
-TEST_F(XmlConfiguationParserTest, invalidMaxSpeedEmpty)
+TEST_F(XmlConfiguationParserTest, shouldThrowOnEmptyMaxSpeed)
 {
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"
@@ -816,7 +817,7 @@ TEST_F(XmlConfiguationParserTest, invalidMaxSpeedEmpty)
       parseString(xml.c_str()), XMLConfigurationParserException, "Could not parse. Value <maxSpeed> invalid.");
 }
 
-TEST_F(XmlConfiguationParserTest, invalidSpeedRange)
+TEST_F(XmlConfiguationParserTest, shouldThrowOnInvalidSpeedRange)
 {
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"
@@ -851,7 +852,7 @@ TEST_F(XmlConfiguationParserTest, invalidSpeedRange)
       parseString(xml.c_str()), configuration::ZoneSetSpeedRangeException, "Invalid speedrange min: 10 > max: 9");
 }
 
-TEST_F(XmlConfiguationParserTest, moreSpeedRangesThanZoneSets)
+TEST_F(XmlConfiguationParserTest, shouldThrowIfMoreSpeedRangesThanZonesets)
 {
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"
@@ -895,7 +896,7 @@ TEST_F(XmlConfiguationParserTest, moreSpeedRangesThanZoneSets)
                         "speedRanges than defined zones.");
 }
 
-TEST_F(XmlConfiguationParserTest, lessSpeedRangesThanZoneSets)
+TEST_F(XmlConfiguationParserTest, shouldThrowIfLessSpeedRangesThanZoneset)
 {
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"

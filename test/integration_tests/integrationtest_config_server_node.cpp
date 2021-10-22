@@ -54,13 +54,13 @@ class ConfigServerNodeTest : public testing::Test
 {
 };
 
-TEST_F(ConfigServerNodeTest, topicIsAvailable)
+TEST_F(ConfigServerNodeTest, shouldAdvertiseZonesetTopic)
 {
   // Set param on server
   EXPECT_TRUE(TopicExists("/test_ns_laser_1/zonesets"));
 }
 
-TEST_F(ConfigServerNodeTest, messageIsReceived)
+TEST_F(ConfigServerNodeTest, shouldPublishOnZonesetTopic)
 {
   SubscriberMock subscriber_mock;
 
