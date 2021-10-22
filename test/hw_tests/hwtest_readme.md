@@ -58,8 +58,10 @@ To do this it uses a saintsmart relay to trigger this IO change from ROS context
 
 ### Build the test
 Same as above however **additionally** `-DENABLE_HARDWARE_TESTING_WITH_RELAY=ON` needs to be defined at compile time.
-At runetime it needs the ros-<distro>-sainsmart-relay-usb package.
-It expects the scanner power to be on relay 3 and the zone IO on relay 4
+
+### Run the test
+At runtime the test needs the ros-<distro>-sainsmart-relay-usb package.
+It is expected that the scanner power is on relay 3 and the zone IO on relay 4 and that the scanner is turned on beforehand.
 
 ## Hardware Test `hwtest_scan_compare`
 The `hwtest_scan_compare` compares scanner data to a set of prerecorded data in order to detect unwanted changes in the data itself (shifts, flips, ...).
