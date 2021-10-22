@@ -14,11 +14,10 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <tinyxml2.h>
+#include <fmt/format.h>
 
 #include "psen_scan_v2_standalone/configuration/xml_configuation_parser.h"
 #include "psen_scan_v2_standalone/configuration/zoneset_configuration.h"
-
-#include <iostream>
 
 namespace psen_scan_v2_standalone
 {
@@ -231,7 +230,7 @@ ZoneSetConfiguration XMLConfigurationParser::parseFile(const char* filename)
   auto parse_result = doc.LoadFile(filename);
   if (parse_result != tinyxml2::XML_SUCCESS)
   {
-    throw XMLConfigurationParserException("Could not parse file.");
+    throw XMLConfigurationParserException(fmt::format("Could not parse {}.", filename));
   }
 
   return parse(doc);
