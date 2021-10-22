@@ -33,7 +33,5 @@
   <test_depend>roslaunch</test_depend>
   <test_depend>rosbag</test_depend>
 
-
-
   <build_export_depend>tinyxml2</build_export_depend>
 </package>
