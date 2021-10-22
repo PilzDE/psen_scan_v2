@@ -33,7 +33,6 @@ namespace util = psen_scan_v2_standalone::util;
 using psen_scan_v2_standalone_test::OpenBarrier;
 using ::testing::AnyNumber;
 
-static constexpr int32_t WAIT_FOR_MESSAGE_TIMEOUT_S{ 5 };
 static constexpr uint8_t ZONE_ZERO_CMD{ 4 };
 static constexpr uint8_t ZONE_ONE_CMD{ 12 };
 
@@ -86,10 +85,9 @@ inline void ActiveZonesetSwitchTests::setScannerZoneSet(uint8_t cmd)
   std_msgs::Byte command;
   command.data = cmd;
   pub_relay_cmd_.publish(command);
-  ros::topic::waitForMessage<std_msgs::Byte>("/relay_cmd", ros::Duration(WAIT_FOR_MESSAGE_TIMEOUT_S, 0));
 }
 
-static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 3 };
+static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 5 };
 
 TEST_F(ActiveZonesetSwitchTests, shouldPublishChangedZonesetIfIOChanges)
 {
