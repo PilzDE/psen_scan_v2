@@ -35,13 +35,13 @@ static inline double deg_to_rad(double deg)
   return deg * M_PI / 180.0;
 }
 
-geometry_msgs::Polygon fromPolar(const std::vector<unsigned long>& radii_vec_mm,
+geometry_msgs::Polygon fromPolar(const std::vector<unsigned long>& radii_in_mm,
                                  const TenthOfDegree& phi_step,
                                  const double& x_axis_rotation)
 {
   geometry_msgs::Polygon polygon;
   size_t i = 0;
-  for (const auto& r : radii_vec_mm)
+  for (const auto& r : radii_in_mm)
   {
     geometry_msgs::Point32 point;
 
