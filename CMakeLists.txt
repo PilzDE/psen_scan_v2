@@ -146,7 +146,7 @@ target_include_directories(${PROJECT_NAME}_standalone PUBLIC "${CMAKE_CURRENT_SO
 
 add_library(
   ${PROJECT_NAME}_standalone_xml_configuration_import
-  standalone/src/configuration/xml_configuration_parser.cpp
+  standalone/src/configuration/xml_configuration_parsing.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}_standalone_xml_configuration_import

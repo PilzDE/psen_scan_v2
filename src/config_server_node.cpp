@@ -18,7 +18,7 @@
 #include "psen_scan_v2/config_server_node.h"
 #include "psen_scan_v2/ZoneSetConfiguration.h"
 #include "psen_scan_v2/zoneset_configuration_ros_conversion.h"
-#include "psen_scan_v2_standalone/configuration/xml_configuation_parser.h"
+#include "psen_scan_v2_standalone/configuration/xml_configuration_parsing.h"
 #include "psen_scan_v2_standalone/configuration/zoneset_configuration.h"
 
 using namespace psen_scan_v2;
@@ -27,10 +27,9 @@ using namespace psen_scan_v2_standalone;
 ConfigServerNode::ConfigServerNode(ros::NodeHandle& nh, const char* config_file_path, const std::string& frame_id)
   : nh_(nh)
 {
-  configuration::XMLConfigurationParser parser;
   try
   {
-    auto zoneconfig = parser.parseFile(config_file_path);
+    auto zoneconfig = configuration::xml_config_parsing::parseFile(config_file_path);
     zoneset_pub_ = nh_.advertise<::psen_scan_v2::ZoneSetConfiguration>(DEFAULT_ZONESET_TOPIC, 1, true /*latched*/);
 
     zoneset_pub_.publish(toRosMsg(zoneconfig, frame_id));

@@ -16,14 +16,16 @@
 #include <tinyxml2.h>
 #include <fmt/format.h>
 
-#include "psen_scan_v2_standalone/configuration/xml_configuation_parser.h"
+#include "psen_scan_v2_standalone/configuration/xml_configuration_parsing.h"
 #include "psen_scan_v2_standalone/configuration/zoneset_configuration.h"
 
 namespace psen_scan_v2_standalone
 {
 namespace configuration
 {
-ZoneSetConfiguration XMLConfigurationParser::parse(const tinyxml2::XMLDocument& doc)
+namespace xml_config_parsing
+{
+ZoneSetConfiguration parseTinyXML(const tinyxml2::XMLDocument& doc)
 {
   ZoneSetConfiguration zoneset_config;
 
@@ -224,7 +226,7 @@ ZoneSetConfiguration XMLConfigurationParser::parse(const tinyxml2::XMLDocument& 
   return zoneset_config;
 }
 
-ZoneSetConfiguration XMLConfigurationParser::parseFile(const char* filename)
+ZoneSetConfiguration parseFile(const char* filename)
 {
   tinyxml2::XMLDocument doc;
   auto parse_result = doc.LoadFile(filename);
@@ -233,10 +235,10 @@ ZoneSetConfiguration XMLConfigurationParser::parseFile(const char* filename)
     throw XMLConfigurationParserException(fmt::format("Could not parse {}.", filename));
   }
 
-  return parse(doc);
+  return parseTinyXML(doc);
 }
 
-ZoneSetConfiguration XMLConfigurationParser::parseString(const char* xml)
+ZoneSetConfiguration parseString(const char* xml)
 {
   tinyxml2::XMLDocument doc;
   auto parse_result = doc.Parse(xml);
@@ -245,8 +247,9 @@ ZoneSetConfiguration XMLConfigurationParser::parseString(const char* xml)
     throw XMLConfigurationParserException("Could not parse content.");
   }
 
-  return parse(doc);
+  return parseTinyXML(doc);
 }
 
+}  // namespace xml_config_parsing
 }  // namespace configuration
 }  // namespace psen_scan_v2_standalone

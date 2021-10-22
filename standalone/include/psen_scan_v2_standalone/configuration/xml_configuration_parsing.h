@@ -88,16 +88,13 @@ std::vector<unsigned long> ro_string_to_vec(const std::string& ro_string)
   return vec;
 }
 
-class XMLConfigurationParser
+namespace xml_config_parsing
 {
-public:
-  ZoneSetConfiguration parseFile(const char* filename);
-  ZoneSetConfiguration parseString(const char* xml);
+ZoneSetConfiguration parseFile(const char* filename);
+ZoneSetConfiguration parseString(const char* xml);
+ZoneSetConfiguration parseTinyXML(const tinyxml2::XMLDocument& doc);
 
-private:
-  ZoneSetConfiguration parse(const tinyxml2::XMLDocument& doc);
-};
-
+}  // namespace xml_config_parsing
 }  // namespace configuration
 }  // namespace psen_scan_v2_standalone
 
