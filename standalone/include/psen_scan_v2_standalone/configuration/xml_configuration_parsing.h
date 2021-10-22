@@ -27,6 +27,8 @@ namespace psen_scan_v2_standalone
 {
 namespace configuration
 {
+namespace xml_config_parsing
+{
 class XMLConfigurationParserException : public std::runtime_error
 {
 public:
@@ -88,8 +90,6 @@ std::vector<unsigned long> ro_string_to_vec(const std::string& ro_string)
   return vec;
 }
 
-namespace xml_config_parsing
-{
 ZoneSetConfiguration parseFile(const char* filename);
 ZoneSetConfiguration parseString(const char* xml);
 ZoneSetConfiguration parseTinyXML(const tinyxml2::XMLDocument& doc);

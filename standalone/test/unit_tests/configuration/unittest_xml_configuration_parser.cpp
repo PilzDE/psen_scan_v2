@@ -60,25 +60,25 @@ namespace psen_scan_v2_standalone_test
 {
 TEST(XMLRoStringParsing, parseROStringProperParsing)
 {
-  EXPECT_THAT(configuration::ro_string_to_vec(""), testing::ElementsAre());
-  EXPECT_THAT(configuration::ro_string_to_vec("D307D307D307"), testing::ElementsAre(2003, 2003, 2003));
-  EXPECT_THAT(configuration::ro_string_to_vec("ED03"), testing::ElementsAre(1005));
-  EXPECT_THAT(configuration::ro_string_to_vec("2B018913"), testing::ElementsAre(299, 5001));
+  EXPECT_THAT(ro_string_to_vec(""), testing::ElementsAre());
+  EXPECT_THAT(ro_string_to_vec("D307D307D307"), testing::ElementsAre(2003, 2003, 2003));
+  EXPECT_THAT(ro_string_to_vec("ED03"), testing::ElementsAre(1005));
+  EXPECT_THAT(ro_string_to_vec("2B018913"), testing::ElementsAre(299, 5001));
 }
 
 TEST(XMLRoStringParsing, stringToShort)
 {
-  EXPECT_THAT(configuration::ro_string_to_vec("D30"), testing::ElementsAre());
+  EXPECT_THAT(ro_string_to_vec("D30"), testing::ElementsAre());
 }
 
 TEST(XMLRoStringParsing, extraCharacters)
 {
-  EXPECT_THAT(configuration::ro_string_to_vec("D307D307D307AAA"), testing::ElementsAre(2003, 2003, 2003));
+  EXPECT_THAT(ro_string_to_vec("D307D307D307AAA"), testing::ElementsAre(2003, 2003, 2003));
 }
 
 TEST(XMLRoStringParsing, NONHEX)
 {
-  EXPECT_THROW(configuration::ro_string_to_vec("YYYY"), configuration::XMLConfigurationParserException);
+  EXPECT_THROW(ro_string_to_vec("YYYY"), XMLConfigurationParserException);
 }
 
 class XmlConfiguationParserTest : public testing::Test
@@ -87,7 +87,7 @@ class XmlConfiguationParserTest : public testing::Test
 
 TEST_F(XmlConfiguationParserTest, throwIfFileDoesNotExist)
 {
-  EXPECT_THROW(parseFile("non-existing-file.xml"), configuration::XMLConfigurationParserException);
+  EXPECT_THROW(parseFile("non-existing-file.xml"), XMLConfigurationParserException);
 }
 
 TEST_F(XmlConfiguationParserTest, dontThrowIfFileExists)
@@ -148,8 +148,7 @@ TEST_F(XmlConfiguationParserTest, settingDefaultResolution)
 
 TEST_F(XmlConfiguationParserTest, throwOnInvalidXML)
 {
-  EXPECT_THROW_AND_WHAT(
-      parseString("NON XML STRING"), configuration::XMLConfigurationParserException, "Could not parse content.");
+  EXPECT_THROW_AND_WHAT(parseString("NON XML STRING"), XMLConfigurationParserException, "Could not parse content.");
 }
 
 TEST_F(XmlConfiguationParserTest, correctParseAllFieldTypes)
@@ -247,7 +246,7 @@ TEST_F(XmlConfiguationParserTest, missingChainToZoneSetInfo)
                           "  </scannerDescr>"
                           "</MIB>";
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
-                        configuration::XMLConfigurationParserException,
+                        XMLConfigurationParserException,
                         "Could not parse. Chain MIB->scannerDescr->zoneSetDefinition->zoneSetInfo not complete.");
 }
 
@@ -277,7 +276,7 @@ TEST_F(XmlConfiguationParserTest, missingChainZoneSetDetail)
                           "</MIB>";
   EXPECT_THROW_AND_WHAT(
       parseString(xml.c_str()),
-      configuration::XMLConfigurationParserException,
+      XMLConfigurationParserException,
       "Could not parse. Chain MIB->scannerDescr->zoneSetDefinition->zoneSetInfo->zoneSetDetail not complete.");
 }
 
@@ -311,7 +310,7 @@ TEST_F(XmlConfiguationParserTest, missingChainZoneSetType)
                           "  </scannerDescr>"
                           "</MIB>";
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
-                        configuration::XMLConfigurationParserException,
+                        XMLConfigurationParserException,
                         "Could not parse. At least one <zoneSetDetail> is missing a <type>.");
 }
 
@@ -347,7 +346,7 @@ TEST_F(XmlConfiguationParserTest, missingChainZoneSetRO)
                           "  </scannerDescr>"
                           "</MIB>";
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
-                        configuration::XMLConfigurationParserException,
+                        XMLConfigurationParserException,
                         "Could not parse. At least one <zoneSetDetail> is missing a <ro>.");
 }
 TEST_F(XmlConfiguationParserTest, emptyRO)
@@ -381,9 +380,8 @@ TEST_F(XmlConfiguationParserTest, emptyRO)
                           "    </zoneSetDefinition>"
                           "  </scannerDescr>"
                           "</MIB>";
-  EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
-                        configuration::XMLConfigurationParserException,
-                        "Could not parse. <ro> element is empty.");
+  EXPECT_THROW_AND_WHAT(
+      parseString(xml.c_str()), XMLConfigurationParserException, "Could not parse. <ro> element is empty.");
 }
 
 TEST_F(XmlConfiguationParserTest, wrongType)
@@ -418,7 +416,7 @@ TEST_F(XmlConfiguationParserTest, wrongType)
                           "  </scannerDescr>"
                           "</MIB>";
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
-                        configuration::XMLConfigurationParserException,
+                        XMLConfigurationParserException,
                         "Could not parse. Invalid <type> must be \"roOSSD1\" or \"warn1\".");
 }
 
@@ -453,9 +451,8 @@ TEST_F(XmlConfiguationParserTest, emptyType)
                           "    </zoneSetDefinition>"
                           "  </scannerDescr>"
                           "</MIB>";
-  EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
-                        configuration::XMLConfigurationParserException,
-                        "Could not parse. <type> element is empty.");
+  EXPECT_THROW_AND_WHAT(
+      parseString(xml.c_str()), XMLConfigurationParserException, "Could not parse. <type> element is empty.");
 }
 
 TEST_F(XmlConfiguationParserTest, missingEncEnable)
@@ -482,7 +479,7 @@ TEST_F(XmlConfiguationParserTest, missingEncEnable)
                           "  </scannerDescr>"
                           "</MIB>";
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
-                        configuration::XMLConfigurationParserException,
+                        XMLConfigurationParserException,
                         "Could not parse. Chain MIB->clusterDescr->zoneSetConfiguration->encEnabled is broken.");
 }
 
@@ -510,7 +507,7 @@ TEST_F(XmlConfiguationParserTest, emptyEncEnable)
                           "  </scannerDescr>"
                           "</MIB>";
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
-                        configuration::XMLConfigurationParserException,
+                        XMLConfigurationParserException,
                         "Could not parse. Value inside <encEnable> could not be evaluated to true or false");
 }
 
@@ -538,7 +535,7 @@ TEST_F(XmlConfiguationParserTest, invalidEncEnableValue)
                           "  </scannerDescr>"
                           "</MIB>";
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
-                        configuration::XMLConfigurationParserException,
+                        XMLConfigurationParserException,
                         "Could not parse. Value inside <encEnable> could not be evaluated to true or false");
 }
 
@@ -570,7 +567,7 @@ TEST_F(XmlConfiguationParserTest, missingZoneSetSelector)
                           "</MIB>";
   EXPECT_THROW_AND_WHAT(
       parseString(xml.c_str()),
-      configuration::XMLConfigurationParserException,
+      XMLConfigurationParserException,
       "Could not parse. Chain MIB->clusterDescr->zoneSetConfiguration->zoneSetSelCode->zoneSetSelector is broken.");
 }
 
@@ -603,7 +600,7 @@ TEST_F(XmlConfiguationParserTest, missingZoneSetSpeedRange)
                           "  </scannerDescr>"
                           "</MIB>";
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
-                        configuration::XMLConfigurationParserException,
+                        XMLConfigurationParserException,
                         "Could not parse. Missing <zoneSetSpeedRange> below <zoneSetSelector>");
 }
 
@@ -639,7 +636,7 @@ TEST_F(XmlConfiguationParserTest, missingMinSpeed)
                           "  </scannerDescr>"
                           "</MIB>";
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
-                        configuration::XMLConfigurationParserException,
+                        XMLConfigurationParserException,
                         "Could not parse. Missing <minSpeed> below <zoneSetSpeedRange>");
 }
 
@@ -674,9 +671,8 @@ TEST_F(XmlConfiguationParserTest, invalidMinSpeed)
                           "    </zoneSetDefinition>"
                           "  </scannerDescr>"
                           "</MIB>";
-  EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
-                        configuration::XMLConfigurationParserException,
-                        "Could not parse. Value <minSpeed> invalid.");
+  EXPECT_THROW_AND_WHAT(
+      parseString(xml.c_str()), XMLConfigurationParserException, "Could not parse. Value <minSpeed> invalid.");
 }
 
 TEST_F(XmlConfiguationParserTest, invalidMinSpeedEmpty)
@@ -710,9 +706,8 @@ TEST_F(XmlConfiguationParserTest, invalidMinSpeedEmpty)
                           "    </zoneSetDefinition>"
                           "  </scannerDescr>"
                           "</MIB>";
-  EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
-                        configuration::XMLConfigurationParserException,
-                        "Could not parse. Value <minSpeed> invalid.");
+  EXPECT_THROW_AND_WHAT(
+      parseString(xml.c_str()), XMLConfigurationParserException, "Could not parse. Value <minSpeed> invalid.");
 }
 
 TEST_F(XmlConfiguationParserTest, missingMaxSpeed)
@@ -747,7 +742,7 @@ TEST_F(XmlConfiguationParserTest, missingMaxSpeed)
                           "  </scannerDescr>"
                           "</MIB>";
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
-                        configuration::XMLConfigurationParserException,
+                        XMLConfigurationParserException,
                         "Could not parse. Missing <maxSpeed> below <zoneSetSpeedRange>");
 }
 
@@ -782,9 +777,8 @@ TEST_F(XmlConfiguationParserTest, invalidMaxSpeed)
                           "    </zoneSetDefinition>"
                           "  </scannerDescr>"
                           "</MIB>";
-  EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
-                        configuration::XMLConfigurationParserException,
-                        "Could not parse. Value <maxSpeed> invalid.");
+  EXPECT_THROW_AND_WHAT(
+      parseString(xml.c_str()), XMLConfigurationParserException, "Could not parse. Value <maxSpeed> invalid.");
 }
 
 TEST_F(XmlConfiguationParserTest, invalidMaxSpeedEmpty)
@@ -818,9 +812,8 @@ TEST_F(XmlConfiguationParserTest, invalidMaxSpeedEmpty)
                           "    </zoneSetDefinition>"
                           "  </scannerDescr>"
                           "</MIB>";
-  EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
-                        configuration::XMLConfigurationParserException,
-                        "Could not parse. Value <maxSpeed> invalid.");
+  EXPECT_THROW_AND_WHAT(
+      parseString(xml.c_str()), XMLConfigurationParserException, "Could not parse. Value <maxSpeed> invalid.");
 }
 
 TEST_F(XmlConfiguationParserTest, invalidSpeedRange)
@@ -897,7 +890,7 @@ TEST_F(XmlConfiguationParserTest, moreSpeedRangesThanZoneSets)
                           "</MIB>";
 
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
-                        configuration::XMLConfigurationParserException,
+                        XMLConfigurationParserException,
                         "Parsing failed. SpeedRanges are enabled by <encEnable>true</Enable> but there are more "
                         "speedRanges than defined zones.");
 }
@@ -945,7 +938,7 @@ TEST_F(XmlConfiguationParserTest, lessSpeedRangesThanZoneSets)
                           "</MIB>";
 
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
-                        configuration::XMLConfigurationParserException,
+                        XMLConfigurationParserException,
                         "Parsing failed. SpeedRanges are enabled by <encEnable>true</Enable> but there are more "
                         "speedRanges than defined zones.");
 }
