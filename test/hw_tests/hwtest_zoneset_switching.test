@@ -30,6 +30,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <arg name="host_udp_port_data" value="55008" />
   </include>
 
-  <test test-name="zoneset_switching" pkg="psen_scan_v2" type="hwtest_zoneset_switching" time-limit="$(eval 10)" />
+  <test test-name="zoneset_switching" pkg="psen_scan_v2" type="hwtest_zoneset_switching" />
 
 </launch>
