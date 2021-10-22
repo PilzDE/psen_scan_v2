@@ -61,9 +61,7 @@ TEST(ZoneSetROSConversionsTest, fromPolarWithSteps)
 TEST(ZoneSetROSConversionsTest, fromPolarWithActualOffset)
 {
   geometry_msgs::Polygon poly2 =
-      fromPolar({ 1000, 500 },
-                util::TenthOfDegree(1375),
-                psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION /*x_axis_rotation*/);
+      fromPolar({ 1000, 500 }, util::TenthOfDegree(1375), DEFAULT_X_AXIS_ROTATION /*x_axis_rotation*/);
   EXPECT_DOUBLE_EQ(poly2.points.at(1).x /*m*/, 0.5);
   EXPECT_NEAR(poly2.points.at(1).y, 0.0, 1e-16);
 }
@@ -85,88 +83,58 @@ TEST(ZoneSetROSConversionsTest, ZoneSetToRosMsgCorrectPointConversion)
   psen_scan_v2::ZoneSet zoneset_msg = toRosMsg(zoneset, "test_frame_id");
 
   // Use EXPECT_FLOAT_EQ since the msg has float internally
-  EXPECT_FLOAT_EQ(zoneset_msg.safety1.points.at(0).x,
-                  1.0 * std::cos(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION));
-  EXPECT_FLOAT_EQ(zoneset_msg.safety1.points.at(0).y,
-                  1.0 * std::sin(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION));
+  EXPECT_FLOAT_EQ(zoneset_msg.safety1.points.at(0).x, 1.0 * std::cos(-DEFAULT_X_AXIS_ROTATION));
+  EXPECT_FLOAT_EQ(zoneset_msg.safety1.points.at(0).y, 1.0 * std::sin(-DEFAULT_X_AXIS_ROTATION));
   EXPECT_FLOAT_EQ(zoneset_msg.safety1.points.at(1).x,
-                  2.0 * std::cos(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION +
-                                 DEFAULT_ZONESET_ANGLE_STEP.toRad()));
+                  2.0 * std::cos(-DEFAULT_X_AXIS_ROTATION + DEFAULT_ZONESET_ANGLE_STEP.toRad()));
   EXPECT_FLOAT_EQ(zoneset_msg.safety1.points.at(1).y,
-                  2.0 * std::sin(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION +
-                                 DEFAULT_ZONESET_ANGLE_STEP.toRad()));
+                  2.0 * std::sin(-DEFAULT_X_AXIS_ROTATION + DEFAULT_ZONESET_ANGLE_STEP.toRad()));
   EXPECT_FLOAT_EQ(zoneset_msg.safety1.points.at(2).x,
-                  2.5 * std::cos(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION +
-                                 DEFAULT_ZONESET_ANGLE_STEP.toRad() * 2));
+                  2.5 * std::cos(-DEFAULT_X_AXIS_ROTATION + DEFAULT_ZONESET_ANGLE_STEP.toRad() * 2));
   EXPECT_FLOAT_EQ(zoneset_msg.safety1.points.at(2).y,
-                  2.5 * std::sin(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION +
-                                 DEFAULT_ZONESET_ANGLE_STEP.toRad() * 2));
+                  2.5 * std::sin(-DEFAULT_X_AXIS_ROTATION + DEFAULT_ZONESET_ANGLE_STEP.toRad() * 2));
 
-  EXPECT_FLOAT_EQ(zoneset_msg.safety2.points.at(0).x,
-                  3.0 * std::cos(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION));
-  EXPECT_FLOAT_EQ(zoneset_msg.safety2.points.at(0).y,
-                  3.0 * std::sin(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION));
+  EXPECT_FLOAT_EQ(zoneset_msg.safety2.points.at(0).x, 3.0 * std::cos(-DEFAULT_X_AXIS_ROTATION));
+  EXPECT_FLOAT_EQ(zoneset_msg.safety2.points.at(0).y, 3.0 * std::sin(-DEFAULT_X_AXIS_ROTATION));
   EXPECT_FLOAT_EQ(zoneset_msg.safety2.points.at(1).x,
-                  4.0 * std::cos(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION +
-                                 DEFAULT_ZONESET_ANGLE_STEP.toRad()));
+                  4.0 * std::cos(-DEFAULT_X_AXIS_ROTATION + DEFAULT_ZONESET_ANGLE_STEP.toRad()));
   EXPECT_FLOAT_EQ(zoneset_msg.safety2.points.at(1).y,
-                  4.0 * std::sin(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION +
-                                 DEFAULT_ZONESET_ANGLE_STEP.toRad()));
+                  4.0 * std::sin(-DEFAULT_X_AXIS_ROTATION + DEFAULT_ZONESET_ANGLE_STEP.toRad()));
 
-  EXPECT_FLOAT_EQ(zoneset_msg.safety3.points.at(0).x,
-                  5.0 * std::cos(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION));
-  EXPECT_FLOAT_EQ(zoneset_msg.safety3.points.at(0).y,
-                  5.0 * std::sin(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION));
+  EXPECT_FLOAT_EQ(zoneset_msg.safety3.points.at(0).x, 5.0 * std::cos(-DEFAULT_X_AXIS_ROTATION));
+  EXPECT_FLOAT_EQ(zoneset_msg.safety3.points.at(0).y, 5.0 * std::sin(-DEFAULT_X_AXIS_ROTATION));
   EXPECT_FLOAT_EQ(zoneset_msg.safety3.points.at(1).x,
-                  6.0 * std::cos(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION +
-                                 DEFAULT_ZONESET_ANGLE_STEP.toRad()));
+                  6.0 * std::cos(-DEFAULT_X_AXIS_ROTATION + DEFAULT_ZONESET_ANGLE_STEP.toRad()));
   EXPECT_FLOAT_EQ(zoneset_msg.safety3.points.at(1).y,
-                  6.0 * std::sin(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION +
-                                 DEFAULT_ZONESET_ANGLE_STEP.toRad()));
+                  6.0 * std::sin(-DEFAULT_X_AXIS_ROTATION + DEFAULT_ZONESET_ANGLE_STEP.toRad()));
 
-  EXPECT_FLOAT_EQ(zoneset_msg.warn1.points.at(0).x,
-                  7.0 * std::cos(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION));
-  EXPECT_FLOAT_EQ(zoneset_msg.warn1.points.at(0).y,
-                  7.0 * std::sin(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION));
+  EXPECT_FLOAT_EQ(zoneset_msg.warn1.points.at(0).x, 7.0 * std::cos(-DEFAULT_X_AXIS_ROTATION));
+  EXPECT_FLOAT_EQ(zoneset_msg.warn1.points.at(0).y, 7.0 * std::sin(-DEFAULT_X_AXIS_ROTATION));
   EXPECT_FLOAT_EQ(zoneset_msg.warn1.points.at(1).x,
-                  8.0 * std::cos(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION +
-                                 DEFAULT_ZONESET_ANGLE_STEP.toRad()));
+                  8.0 * std::cos(-DEFAULT_X_AXIS_ROTATION + DEFAULT_ZONESET_ANGLE_STEP.toRad()));
   EXPECT_FLOAT_EQ(zoneset_msg.warn1.points.at(1).y,
-                  8.0 * std::sin(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION +
-                                 DEFAULT_ZONESET_ANGLE_STEP.toRad()));
+                  8.0 * std::sin(-DEFAULT_X_AXIS_ROTATION + DEFAULT_ZONESET_ANGLE_STEP.toRad()));
 
-  EXPECT_FLOAT_EQ(zoneset_msg.warn2.points.at(0).x,
-                  9.0 * std::cos(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION));
-  EXPECT_FLOAT_EQ(zoneset_msg.warn2.points.at(0).y,
-                  9.0 * std::sin(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION));
+  EXPECT_FLOAT_EQ(zoneset_msg.warn2.points.at(0).x, 9.0 * std::cos(-DEFAULT_X_AXIS_ROTATION));
+  EXPECT_FLOAT_EQ(zoneset_msg.warn2.points.at(0).y, 9.0 * std::sin(-DEFAULT_X_AXIS_ROTATION));
   EXPECT_FLOAT_EQ(zoneset_msg.warn2.points.at(1).x,
-                  10.0 * std::cos(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION +
-                                  DEFAULT_ZONESET_ANGLE_STEP.toRad()));
+                  10.0 * std::cos(-DEFAULT_X_AXIS_ROTATION + DEFAULT_ZONESET_ANGLE_STEP.toRad()));
   EXPECT_FLOAT_EQ(zoneset_msg.warn2.points.at(1).y,
-                  10.0 * std::sin(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION +
-                                  DEFAULT_ZONESET_ANGLE_STEP.toRad()));
+                  10.0 * std::sin(-DEFAULT_X_AXIS_ROTATION + DEFAULT_ZONESET_ANGLE_STEP.toRad()));
 
-  EXPECT_FLOAT_EQ(zoneset_msg.muting1.points.at(0).x,
-                  11.0 * std::cos(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION));
-  EXPECT_FLOAT_EQ(zoneset_msg.muting1.points.at(0).y,
-                  11.0 * std::sin(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION));
+  EXPECT_FLOAT_EQ(zoneset_msg.muting1.points.at(0).x, 11.0 * std::cos(-DEFAULT_X_AXIS_ROTATION));
+  EXPECT_FLOAT_EQ(zoneset_msg.muting1.points.at(0).y, 11.0 * std::sin(-DEFAULT_X_AXIS_ROTATION));
   EXPECT_FLOAT_EQ(zoneset_msg.muting1.points.at(1).x,
-                  12.0 * std::cos(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION +
-                                  DEFAULT_ZONESET_ANGLE_STEP.toRad()));
+                  12.0 * std::cos(-DEFAULT_X_AXIS_ROTATION + DEFAULT_ZONESET_ANGLE_STEP.toRad()));
   EXPECT_FLOAT_EQ(zoneset_msg.muting1.points.at(1).y,
-                  12.0 * std::sin(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION +
-                                  DEFAULT_ZONESET_ANGLE_STEP.toRad()));
+                  12.0 * std::sin(-DEFAULT_X_AXIS_ROTATION + DEFAULT_ZONESET_ANGLE_STEP.toRad()));
 
-  EXPECT_FLOAT_EQ(zoneset_msg.muting2.points.at(0).x,
-                  13.0 * std::cos(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION));
-  EXPECT_FLOAT_EQ(zoneset_msg.muting2.points.at(0).y,
-                  13.0 * std::sin(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION));
+  EXPECT_FLOAT_EQ(zoneset_msg.muting2.points.at(0).x, 13.0 * std::cos(-DEFAULT_X_AXIS_ROTATION));
+  EXPECT_FLOAT_EQ(zoneset_msg.muting2.points.at(0).y, 13.0 * std::sin(-DEFAULT_X_AXIS_ROTATION));
   EXPECT_FLOAT_EQ(zoneset_msg.muting2.points.at(1).x,
-                  14.0 * std::cos(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION +
-                                  DEFAULT_ZONESET_ANGLE_STEP.toRad()));
+                  14.0 * std::cos(-DEFAULT_X_AXIS_ROTATION + DEFAULT_ZONESET_ANGLE_STEP.toRad()));
   EXPECT_FLOAT_EQ(zoneset_msg.muting2.points.at(1).y,
-                  14.0 * std::sin(-psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION +
-                                  DEFAULT_ZONESET_ANGLE_STEP.toRad()));
+                  14.0 * std::sin(-DEFAULT_X_AXIS_ROTATION + DEFAULT_ZONESET_ANGLE_STEP.toRad()));
 }
 
 TEST(ZoneSetROSConversionsTest, ZoneSetToRosMsgCorrectSpeedRangeConversion)
