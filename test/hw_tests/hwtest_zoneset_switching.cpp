@@ -33,6 +33,7 @@ namespace util = psen_scan_v2_standalone::util;
 using psen_scan_v2_standalone_test::OpenBarrier;
 using ::testing::AnyNumber;
 
+static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 5 };
 static constexpr uint8_t ZONE_ZERO_CMD{ 4 };
 static constexpr uint8_t ZONE_ONE_CMD{ 12 };
 
@@ -65,6 +66,11 @@ public:
   void SetUp() override
   {
     pub_relay_cmd_ = nh_.advertise<std_msgs::Byte>("/relay_cmd", 1);
+    setScannerZoneSet(ZONE_ZERO_CMD);
+    util::Barrier zone_zero_barrier;
+    SubscriberMock sm{ nh_ };
+    EXPECT_CALL(sm, callback(createActiveZonesetMsg(0))).Times(AnyNumber()).WillOnce(OpenBarrier(&zone_zero_barrier));
+    zone_zero_barrier.waitTillRelease(DEFAULT_TIMEOUT);
   }
 
   void TearDown() override
@@ -87,16 +93,17 @@ inline void ActiveZonesetSwitchTests::setScannerZoneSet(uint8_t cmd)
   pub_relay_cmd_.publish(command);
 }
 
-static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 5 };
-
 TEST_F(ActiveZonesetSwitchTests, shouldPublishChangedZonesetIfIOChanges)
 {
   util::Barrier zone_zero_barrier;
   util::Barrier zone_one_barrier;
 
   SubscriberMock sm{ nh_ };
-  EXPECT_CALL(sm, callback(createActiveZonesetMsg(0))).Times(AnyNumber()).WillOnce(OpenBarrier(&zone_zero_barrier));
-  EXPECT_CALL(sm, callback(createActiveZonesetMsg(1))).Times(AnyNumber()).WillOnce(OpenBarrier(&zone_one_barrier));
+  {
+    ::testing::InSequence s;
+    EXPECT_CALL(sm, callback(createActiveZonesetMsg(0))).Times(AnyNumber()).WillOnce(OpenBarrier(&zone_zero_barrier));
+    EXPECT_CALL(sm, callback(createActiveZonesetMsg(1))).Times(AnyNumber()).WillOnce(OpenBarrier(&zone_one_barrier));
+  }
 
   setScannerZoneSet(ZONE_ZERO_CMD);
   EXPECT_BARRIER_OPENS(zone_zero_barrier, DEFAULT_TIMEOUT);
