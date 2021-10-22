@@ -87,20 +87,17 @@ public:
   SubscriberMock(ros::NodeHandle& nh);
 
   MOCK_METHOD1(scan_callback, void(const sensor_msgs::LaserScan& msg));
-  MOCK_METHOD1(zone_callback, void(const std_msgs::UInt8& msg));
-  MOCK_METHOD1(zone_latched_callback, void(const ros::MessageEvent<std_msgs::UInt8 const>& event));
+  MOCK_METHOD1(zone_callback, void(const ros::MessageEvent<std_msgs::UInt8 const>& event));
 
 private:
   ros::Subscriber scan_subscriber_;
   ros::Subscriber zone_subscriber_;
-  ros::Subscriber latched_zone_subscriber_;
 };
 
 inline SubscriberMock::SubscriberMock(ros::NodeHandle& nh)
 {
   scan_subscriber_ = nh.subscribe("scan", QUEUE_SIZE, &SubscriberMock::scan_callback, this);
   zone_subscriber_ = nh.subscribe("active_zoneset", QUEUE_SIZE, &SubscriberMock::zone_callback, this);
-  latched_zone_subscriber_ = nh.subscribe("active_zoneset", QUEUE_SIZE, &SubscriberMock::zone_latched_callback, this);
 }
 
 static const std::string HOST_IP{ "127.0.0.1" };
@@ -250,8 +247,8 @@ TEST_F(RosScannerNodeTests, shouldPublishActiveZonesetWhenLaserScanCallbackIsInv
 
   util::Barrier scan_topic_barrier;
   SubscriberMock subscriber(nh_priv_);
-  EXPECT_CALL(subscriber, zone_callback(createActiveZonesetMsg(2)));
-  EXPECT_CALL(subscriber, zone_callback(createActiveZonesetMsg(4))).WillOnce(OpenBarrier(&scan_topic_barrier));
+  EXPECT_CALL(subscriber, zone_callback(messageEQ(createActiveZonesetMsg(2))));
+  EXPECT_CALL(subscriber, zone_callback(messageEQ(createActiveZonesetMsg(4)))).WillOnce(OpenBarrier(&scan_topic_barrier));
 
   util::Barrier start_barrier;
   util::Barrier stop_barrier;
@@ -282,7 +279,7 @@ TEST_F(RosScannerNodeTests, shouldReceiveLatchedActiveZonesetMsg)
 
   util::Barrier scan_topic_barrier;
   SubscriberMock subscriber(nh_priv_);
-  EXPECT_CALL(subscriber, zone_latched_callback(AllOf(isLatched(), messageEQ(createActiveZonesetMsg(2)))))
+  EXPECT_CALL(subscriber, zone_callback(AllOf(isLatched(), messageEQ(createActiveZonesetMsg(2)))))
       .WillOnce(OpenBarrier(&scan_topic_barrier));
 
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
