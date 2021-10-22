@@ -16,7 +16,11 @@
 #define PSEN_SCAN_V2_ROS_INTEGRATIONTEST_HELPER_H
 
 #include <chrono>
-#include <iostream>  // TODO remove
+#include <string>
+#include <sstream>
+#include <thread>
+
+#include <gtest/gtest.h>
 
 #include <ros/master.h>
 
@@ -25,13 +29,18 @@ using namespace std::chrono_literals;
 namespace psen_scan_v2_test
 {
 ::testing::AssertionResult TopicExists(const std::string& topic,
-                                       const std::chrono::milliseconds& timeout = 500ms,
+                                       const std::chrono::milliseconds& sleep_after_fail = 500ms,
                                        size_t retries = 10)
 {
   std::string topic_names;  // For verbose information on failure
 
   for (size_t i = 0; i < retries; i++)
   {
+    if (i > 0)
+    {
+      std::this_thread::sleep_for(sleep_after_fail);
+    }
+
     std::stringstream ss_topic_names;
 
     ros::master::V_TopicInfo available_topics;
@@ -47,11 +56,22 @@ namespace psen_scan_v2_test
       ss_topic_names << "\"" << info.name << "\" ";
     }
     topic_names = ss_topic_names.str();
-
-    std::this_thread::sleep_for(timeout);
   }
 
   return ::testing::AssertionFailure() << "Topic \"" << topic << "\" not found. Available topics: " << topic_names;
+}
+
+MATCHER(isLatched, "")
+{
+  auto connection_header = arg.getConnectionHeader();
+  auto search = connection_header.find("latching");
+  return (search != connection_header.end() && search->second == "1");
+}
+
+MATCHER_P(messageEQ, expected_msg, "")
+{
+  auto actual_msg = arg.getMessage();
+  return expected_msg == *actual_msg;
 }
 
 }  // namespace psen_scan_v2_test

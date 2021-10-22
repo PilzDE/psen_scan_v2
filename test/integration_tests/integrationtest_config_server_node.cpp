@@ -43,7 +43,8 @@ public:
     subscriber_ = nh_.subscribe("/test_ns_laser_1/zonesets", 10, &SubscriberMock::callback, this);
   }
 
-  MOCK_METHOD1(callback, void(const ZoneSetConfiguration& msg));
+  // MOCK_METHOD1(callback, void(const ZoneSetConfiguration& msg));
+  MOCK_METHOD1(callback, void(const ros::MessageEvent<ZoneSetConfiguration const>& event));
 
 private:
   ros::NodeHandle nh_;
@@ -60,7 +61,7 @@ TEST_F(ConfigServerNodeTest, shouldAdvertiseZonesetTopic)
   EXPECT_TRUE(TopicExists("/test_ns_laser_1/zonesets"));
 }
 
-TEST_F(ConfigServerNodeTest, shouldPublishOnZonesetTopic)
+TEST_F(ConfigServerNodeTest, shouldPublishLatchedOnZonesetTopic)
 {
   SubscriberMock subscriber_mock;
 
@@ -74,7 +75,7 @@ TEST_F(ConfigServerNodeTest, shouldPublishOnZonesetTopic)
   zoneset1.speed_upper = 50;
   zoneset_config.zonesets.push_back(zoneset0);
   zoneset_config.zonesets.push_back(zoneset1);
-  EXPECT_CALL(subscriber_mock, callback(::testing::_)).WillOnce(OpenBarrier(&topic_received_barrier));
+  EXPECT_CALL(subscriber_mock, callback(isLatched())).WillOnce(OpenBarrier(&topic_received_barrier));
   // EXPECT_CALL(subscriber_mock, callback(zoneset_config)).WillOnce(OpenBarrier(&topic_received_barrier));
 
   topic_received_barrier.waitTillRelease(3s);
