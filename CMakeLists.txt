@@ -32,6 +32,8 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   cmake_modules # Needed for find_package(TinyXML2 REQUIRED)
   message_generation
+  geometry_msgs
+  std_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -53,7 +55,8 @@ add_message_files(
 
 generate_messages(
   DEPENDENCIES
-  sensor_msgs
+  geometry_msgs
+  std_msgs
 )
 
 catkin_package(
@@ -151,8 +154,8 @@ add_library(
 
 target_link_libraries(${PROJECT_NAME}_standalone_xml_configuration_import
   ${console_bridge_LIBRARIES}
-  ${TinyXML_LIBRARIES} 
-  ${TinyXML2_LIBRARIES} 
+  ${TinyXML_LIBRARIES}
+  ${TinyXML2_LIBRARIES}
   fmt::fmt
 )
 target_include_directories(${PROJECT_NAME}_standalone_xml_configuration_import PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
