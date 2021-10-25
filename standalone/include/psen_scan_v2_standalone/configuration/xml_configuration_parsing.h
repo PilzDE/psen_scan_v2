@@ -92,7 +92,6 @@ std::vector<unsigned long> ro_string_to_vec(const std::string& ro_string)
 
 ZoneSetConfiguration parseFile(const char* filename);
 ZoneSetConfiguration parseString(const char* xml);
-ZoneSetConfiguration parseTinyXML(const tinyxml2::XMLDocument& doc);
 
 }  // namespace xml_config_parsing
 }  // namespace configuration

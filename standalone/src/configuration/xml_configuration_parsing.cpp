@@ -25,108 +25,116 @@ namespace configuration
 {
 namespace xml_config_parsing
 {
-ZoneSetConfiguration parseTinyXML(const tinyxml2::XMLDocument& doc)
+inline const tinyxml2::XMLElement* getFirstChildElement(const tinyxml2::XMLElement* parent, const char* name)
 {
-  ZoneSetConfiguration zoneset_config;
-
-  tinyxml2::XMLConstHandle doc_handle(&doc);
-  tinyxml2::XMLConstHandle xml_set_info_handle = doc_handle.FirstChildElement("MIB")
-                                                     .FirstChildElement("scannerDescr")
-                                                     .FirstChildElement("zoneSetDefinition")
-                                                     .FirstChildElement("zoneSetInfo");
-
-  // Loop over all <zoneSetInfo>
-  const tinyxml2::XMLElement* xml_set_element = xml_set_info_handle.ToElement();
-
-  if (!xml_set_element)
+  const tinyxml2::XMLElement* child = parent->FirstChildElement(name);
+  if (!child)
   {
     throw XMLConfigurationParserException(
-        "Could not parse. Chain MIB->scannerDescr->zoneSetDefinition->zoneSetInfo not complete.");
+        fmt::format("Could not parse. Element <{}> is missing a child <{}>.", parent->Name(), name));
   }
 
-  while (xml_set_element)
+  return child;
+}
+
+const char* getText(const tinyxml2::XMLElement* element)
+{
+  const char* element_str = element->GetText();
+  if (element_str == nullptr || strlen(element_str) == 0)
   {
-    // Loop over <zoneSetDetail> to generate a ZoneSet
-    ZoneSet set;
-    const tinyxml2::XMLElement* xml_set_detail_element = xml_set_element->FirstChildElement("zoneSetDetail");
-
-    if (!xml_set_detail_element)
-    {
-      throw XMLConfigurationParserException(
-          "Could not parse. Chain MIB->scannerDescr->zoneSetDefinition->zoneSetInfo->zoneSetDetail not complete.");
-    }
-
-    while (xml_set_detail_element)  // TODO do-while?
-    {
-      const tinyxml2::XMLElement* xml_set_detail_type_element = xml_set_detail_element->FirstChildElement("type");
-      if (!xml_set_detail_type_element)
-      {
-        throw XMLConfigurationParserException("Could not parse. At least one <zoneSetDetail> is missing a <type>.");
-      }
-      const tinyxml2::XMLElement* xml_set_detail_ro_element = xml_set_detail_element->FirstChildElement("ro");
-      if (!xml_set_detail_ro_element)
-      {
-        throw XMLConfigurationParserException("Could not parse. At least one <zoneSetDetail> is missing a <ro>.");
-      }
-
-      const char* xml_set_detail_ro_element_str = xml_set_detail_ro_element->GetText();
-      if (xml_set_detail_ro_element_str == nullptr || strlen(xml_set_detail_ro_element_str) == 0)
-      {
-        throw XMLConfigurationParserException("Could not parse. <ro> element is empty.");
-      }
-
-      const char* xml_set_detail_type_element_str = xml_set_detail_type_element->GetText();
-
-      if (xml_set_detail_type_element_str == nullptr || strlen(xml_set_detail_type_element_str) == 0)
-      {
-        throw XMLConfigurationParserException("Could not parse. <type> element is empty.");
-      }
-
-      if (strcmp(xml_set_detail_type_element_str, "roOSSD1") == 0)
-      {
-        set.safety1_ = ro_string_to_vec(xml_set_detail_ro_element_str);
-      }
-      else if (strcmp(xml_set_detail_type_element_str, "roOSSD2") == 0)
-      {
-        set.safety2_ = ro_string_to_vec(xml_set_detail_ro_element_str);
-      }
-      else if (strcmp(xml_set_detail_type_element_str, "roOSSD3") == 0)
-      {
-        set.safety3_ = ro_string_to_vec(xml_set_detail_ro_element_str);
-      }
-      else if (strcmp(xml_set_detail_type_element_str, "warn1") == 0)
-      {
-        set.warn1_ = ro_string_to_vec(xml_set_detail_ro_element_str);
-      }
-      else if (strcmp(xml_set_detail_type_element_str, "warn2") == 0)
-      {
-        set.warn2_ = ro_string_to_vec(xml_set_detail_ro_element_str);
-      }
-      else if (strcmp(xml_set_detail_type_element_str, "muting1") == 0)
-      {
-        set.muting1_ = ro_string_to_vec(xml_set_detail_ro_element_str);
-      }
-      else if (strcmp(xml_set_detail_type_element_str, "muting2") == 0)
-      {
-        set.muting2_ = ro_string_to_vec(xml_set_detail_ro_element_str);
-      }
-      else
-      {
-        throw XMLConfigurationParserException("Could not parse. Invalid <type> must be \"roOSSD1\" or \"warn1\".");
-      }
-
-      // Move to next <zoneSetDetail>
-      xml_set_detail_element = xml_set_detail_element->NextSiblingElement("zoneSetDetail");
-    }
-
-    // Set default resolution for now this is only know implicitly
-    set.resolution_ = DEFAULT_ZONESET_ANGLE_STEP;
-
-    zoneset_config.zonesets_.push_back(set);
-    xml_set_element = xml_set_element->NextSiblingElement("zoneSetInfo");
+    throw XMLConfigurationParserException(fmt::format("Could not parse. <{}> element is empty.", element->Name()));
   }
 
-  // Parse speedrange if enc is enabled
+  return element_str;
+}
+
+inline bool textIsEqual(const tinyxml2::XMLElement* element, const char* str)
+{
+  return strcmp(getText(element), str) == 0;
+}
+
+ZoneSet parseZoneSet(const tinyxml2::XMLElement* xml_set_element)
+{
+  ZoneSet set;
+
+  const tinyxml2::XMLElement* xml_set_detail_element = getFirstChildElement(xml_set_element, "zoneSetDetail");
+
+  while (xml_set_detail_element)  // TODO do-while?
+  {
+    const tinyxml2::XMLElement* xml_set_detail_type_element = getFirstChildElement(xml_set_detail_element, "type");
+    const tinyxml2::XMLElement* xml_set_detail_ro_element = getFirstChildElement(xml_set_detail_element, "ro");
+
+    if (textIsEqual(xml_set_detail_type_element, "roOSSD1"))
+    {
+      set.safety1_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+    }
+    else if (textIsEqual(xml_set_detail_type_element, "roOSSD2"))
+    {
+      set.safety2_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+    }
+    else if (textIsEqual(xml_set_detail_type_element, "roOSSD3"))
+    {
+      set.safety3_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+    }
+    else if (textIsEqual(xml_set_detail_type_element, "warn1"))
+    {
+      set.warn1_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+    }
+    else if (textIsEqual(xml_set_detail_type_element, "warn2"))
+    {
+      set.warn2_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+    }
+    else if (textIsEqual(xml_set_detail_type_element, "muting1"))
+    {
+      set.muting1_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+    }
+    else if (textIsEqual(xml_set_detail_type_element, "muting2"))
+    {
+      set.muting2_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+    }
+    else
+    {
+      throw XMLConfigurationParserException("Could not parse. Invalid <type> must be \"roOSSD1\", \"roOSSD2\", "
+                                            "\"roOSSD3\", \"warn1\", \"warn2\", \"muting1\" or \"muting2\".");
+    }
+
+    // Move to next <zoneSetDetail>
+    xml_set_detail_element = xml_set_detail_element->NextSiblingElement("zoneSetDetail");
+  }
+
+  // Set default resolution for now this is only know implicitly
+  set.resolution_ = DEFAULT_ZONESET_ANGLE_STEP;
+
+  return set;
+}
+
+ZoneSetSpeedRange parseZoneSetSpeedRange(const tinyxml2::XMLElement* xml_zone_set_select_element)
+{
+  const tinyxml2::XMLElement* xml_zone_set_speed_range_element =
+      getFirstChildElement(xml_zone_set_select_element, "zoneSetSpeedRange");
+
+  const tinyxml2::XMLElement* xml_zone_set_select_element_min =
+      getFirstChildElement(xml_zone_set_speed_range_element, "minSpeed");
+
+  const tinyxml2::XMLElement* xml_zone_set_select_element_max =
+      getFirstChildElement(xml_zone_set_speed_range_element, "maxSpeed");
+
+  unsigned int min_speed, max_speed;
+  if (xml_zone_set_select_element_min->QueryUnsignedText(&min_speed) != tinyxml2::XML_SUCCESS)
+  {
+    throw XMLConfigurationParserException("Could not parse. Value <minSpeed> invalid.");
+  }
+
+  if (xml_zone_set_select_element_max->QueryUnsignedText(&max_speed) != tinyxml2::XML_SUCCESS)
+  {
+    throw XMLConfigurationParserException("Could not parse. Value <maxSpeed> invalid.");
+  }
+
+  return ZoneSetSpeedRange(min_speed, max_speed);
+}
+
+bool isEncoderEnabled(const tinyxml2::XMLConstHandle& doc_handle)
+{
   const tinyxml2::XMLElement* enc_enabled_element = doc_handle.FirstChildElement("MIB")
                                                         .FirstChildElement("clusterDescr")
                                                         .FirstChildElement("zoneSetConfiguration")
@@ -137,91 +145,104 @@ ZoneSetConfiguration parseTinyXML(const tinyxml2::XMLDocument& doc)
     throw XMLConfigurationParserException(
         "Could not parse. Chain MIB->clusterDescr->zoneSetConfiguration->encEnabled is broken.");
   }
-  else
+
+  bool enc_enabled;
+  if (enc_enabled_element->QueryBoolText(&enc_enabled) != tinyxml2::XML_SUCCESS)
   {
-    bool enc_enabled;
-    if (enc_enabled_element->QueryBoolText(&enc_enabled) != tinyxml2::XML_SUCCESS)
+    throw XMLConfigurationParserException(
+        "Could not parse. Value inside <encEnable> could not be evaluated to true or false");
+  }
+
+  return enc_enabled;
+}
+
+std::vector<ZoneSet> parseZoneSets(const tinyxml2::XMLConstHandle& doc_handle)
+{
+  tinyxml2::XMLConstHandle xml_set_info_handle = doc_handle.FirstChildElement("MIB")
+                                                     .FirstChildElement("scannerDescr")
+                                                     .FirstChildElement("zoneSetDefinition")
+                                                     .FirstChildElement("zoneSetInfo");
+
+  const tinyxml2::XMLElement* xml_set_element = xml_set_info_handle.ToElement();
+
+  if (!xml_set_element)
+  {
+    throw XMLConfigurationParserException(
+        "Could not parse. Chain MIB->scannerDescr->zoneSetDefinition->zoneSetInfo not complete.");
+  }
+
+  std::vector<ZoneSet> zonesets;
+
+  while (xml_set_element)
+  {
+    ZoneSet set = parseZoneSet(xml_set_element);
+
+    zonesets.push_back(set);
+    xml_set_element = xml_set_element->NextSiblingElement("zoneSetInfo");
+  }
+
+  return zonesets;
+}
+
+std::vector<ZoneSetSpeedRange> parseSpeedRanges(const tinyxml2::XMLConstHandle& doc_handle)
+{
+  const tinyxml2::XMLElement* xml_zone_set_select_element = doc_handle.FirstChildElement("MIB")
+                                                                .FirstChildElement("clusterDescr")
+                                                                .FirstChildElement("zoneSetConfiguration")
+                                                                .FirstChildElement("zoneSetSelCode")
+                                                                .FirstChildElement("zoneSetSelector")
+                                                                .ToElement();
+
+  if (!xml_zone_set_select_element)
+  {
+    throw XMLConfigurationParserException(
+        "Could not parse. Chain MIB->clusterDescr->zoneSetConfiguration->zoneSetSelCode->zoneSetSelector is "
+        "broken.");
+  }
+
+  std::vector<ZoneSetSpeedRange> speed_ranges;
+
+  while (xml_zone_set_select_element)
+  {
+    ZoneSetSpeedRange speed_range = parseZoneSetSpeedRange(xml_zone_set_select_element);
+    speed_ranges.push_back(speed_range);
+
+    xml_zone_set_select_element = xml_zone_set_select_element->NextSiblingElement("zoneSetSelector");
+  }
+
+  return speed_ranges;
+}
+
+ZoneSetConfiguration parseTinyXML(const tinyxml2::XMLDocument& doc)
+{
+  tinyxml2::XMLConstHandle doc_handle(&doc);
+
+  std::vector<ZoneSet> zonesets = parseZoneSets(doc_handle);
+
+  if (isEncoderEnabled(doc_handle))
+  {
+    std::vector<ZoneSetSpeedRange> speed_ranges = parseSpeedRanges(doc_handle);
+
+    if (zonesets.size() == speed_ranges.size())
+    {
+      for (size_t i = 0; i < zonesets.size() && i < speed_ranges.size(); i++)
+      {
+        zonesets.at(i).speed_range_ = speed_ranges.at(i);
+      }
+    }
+    else
     {
       throw XMLConfigurationParserException(
-          "Could not parse. Value inside <encEnable> could not be evaluated to true or false");
-    }
-    if (enc_enabled)
-    {
-      const tinyxml2::XMLElement* xml_zone_set_select_element = doc_handle.FirstChildElement("MIB")
-                                                                    .FirstChildElement("clusterDescr")
-                                                                    .FirstChildElement("zoneSetConfiguration")
-                                                                    .FirstChildElement("zoneSetSelCode")
-                                                                    .FirstChildElement("zoneSetSelector")
-                                                                    .ToElement();
-
-      if (!xml_zone_set_select_element)
-      {
-        throw XMLConfigurationParserException(
-            "Could not parse. Chain MIB->clusterDescr->zoneSetConfiguration->zoneSetSelCode->zoneSetSelector is "
-            "broken.");
-      }
-      size_t zoneset_id_counter = 0;
-      while (xml_zone_set_select_element)
-      {
-        const tinyxml2::XMLElement* xml_zone_set_speed_range_element =
-            xml_zone_set_select_element->FirstChildElement("zoneSetSpeedRange");
-
-        if (!xml_zone_set_speed_range_element)
-        {
-          throw XMLConfigurationParserException("Could not parse. Missing <zoneSetSpeedRange> below <zoneSetSelector>");
-        }
-
-        const tinyxml2::XMLElement* xml_zone_set_select_element_min =
-            xml_zone_set_speed_range_element->FirstChildElement("minSpeed");
-        if (!xml_zone_set_select_element_min)
-        {
-          throw XMLConfigurationParserException("Could not parse. Missing <minSpeed> below <zoneSetSpeedRange>");
-        }
-
-        const tinyxml2::XMLElement* xml_zone_set_select_element_max =
-            xml_zone_set_speed_range_element->FirstChildElement("maxSpeed");
-        if (!xml_zone_set_select_element_max)
-        {
-          throw XMLConfigurationParserException("Could not parse. Missing <maxSpeed> below <zoneSetSpeedRange>");
-        }
-
-        unsigned int min_speed, max_speed;
-        if (xml_zone_set_select_element_min->QueryUnsignedText(&min_speed) != tinyxml2::XML_SUCCESS)
-        {
-          throw XMLConfigurationParserException("Could not parse. Value <minSpeed> invalid.");
-        }
-
-        if (xml_zone_set_select_element_max->QueryUnsignedText(&max_speed) != tinyxml2::XML_SUCCESS)
-        {
-          throw XMLConfigurationParserException("Could not parse. Value <maxSpeed> invalid.");
-        }
-
-        ZoneSetSpeedRange speed_range(min_speed, max_speed);
-        try
-        {
-          zoneset_config.zonesets_.at(zoneset_id_counter).speed_range_ = speed_range;
-        }
-        catch (const std::out_of_range& e)
-        {
-          throw XMLConfigurationParserException("Parsing failed. SpeedRanges are enabled by <encEnable>true</Enable> "
-                                                "but there are more speedRanges than defined zones.");
-        }
-
-        xml_zone_set_select_element = xml_zone_set_select_element->NextSiblingElement("zoneSetSelector");
-        zoneset_id_counter++;
-      }
-
-      // If speed_ranges are defined they should be for every zoneset
-      for (const auto& zoneset : zoneset_config.zonesets_)
-      {
-        if (!zoneset.speed_range_)
-        {
-          throw XMLConfigurationParserException("Parsing failed. SpeedRanges are enabled by <encEnable>true</Enable> "
-                                                "but there are more speedRanges than defined zones.");
-        }
-      }
+          fmt::format("Parsing failed. SpeedRanges are enabled by <encEnable>true</Enable>"
+                      "but there are {} speedRanges and {} defined zones.",
+                      speed_ranges.size(),
+                      zonesets.size()));
     }
   }
+
+  ZoneSetConfiguration zoneset_config;
+
+  zoneset_config.zonesets_ = zonesets;
 
   return zoneset_config;
 }

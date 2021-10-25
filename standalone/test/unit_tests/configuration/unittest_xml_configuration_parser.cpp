@@ -275,10 +275,9 @@ TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingChainZoneSetDetail)
                           "    </zoneSetDefinition>"
                           "  </scannerDescr>"
                           "</MIB>";
-  EXPECT_THROW_AND_WHAT(
-      parseString(xml.c_str()),
-      XMLConfigurationParserException,
-      "Could not parse. Chain MIB->scannerDescr->zoneSetDefinition->zoneSetInfo->zoneSetDetail not complete.");
+  EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
+                        XMLConfigurationParserException,
+                        "Could not parse. Element <zoneSetInfo> is missing a child <zoneSetDetail>.");
 }
 
 TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingChainZoneSetType)
@@ -312,7 +311,7 @@ TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingChainZoneSetType)
                           "</MIB>";
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
                         XMLConfigurationParserException,
-                        "Could not parse. At least one <zoneSetDetail> is missing a <type>.");
+                        "Could not parse. Element <zoneSetDetail> is missing a child <type>.");
 }
 
 TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingChainZoneSetRO)
@@ -348,7 +347,7 @@ TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingChainZoneSetRO)
                           "</MIB>";
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
                         XMLConfigurationParserException,
-                        "Could not parse. At least one <zoneSetDetail> is missing a <ro>.");
+                        "Could not parse. Element <zoneSetDetail> is missing a child <ro>.");
 }
 TEST_F(XmlConfiguationParserTest, emptyRO)
 {
@@ -418,7 +417,8 @@ TEST_F(XmlConfiguationParserTest, wrongType)
                           "</MIB>";
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
                         XMLConfigurationParserException,
-                        "Could not parse. Invalid <type> must be \"roOSSD1\" or \"warn1\".");
+                        "Could not parse. Invalid <type> must be \"roOSSD1\", \"roOSSD2\", "
+                        "\"roOSSD3\", \"warn1\", \"warn2\", \"muting1\" or \"muting2\".");
 }
 
 TEST_F(XmlConfiguationParserTest, emptyType)
@@ -602,7 +602,7 @@ TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingZoneSetSpeedRange)
                           "</MIB>";
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
                         XMLConfigurationParserException,
-                        "Could not parse. Missing <zoneSetSpeedRange> below <zoneSetSelector>");
+                        "Could not parse. Element <zoneSetSelector> is missing a child <zoneSetSpeedRange>.");
 }
 
 TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingMinSpeed)
@@ -638,7 +638,7 @@ TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingMinSpeed)
                           "</MIB>";
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
                         XMLConfigurationParserException,
-                        "Could not parse. Missing <minSpeed> below <zoneSetSpeedRange>");
+                        "Could not parse. Element <zoneSetSpeedRange> is missing a child <minSpeed>.");
 }
 
 TEST_F(XmlConfiguationParserTest, shouldThrowOnInvalidMinSpeed)
@@ -744,7 +744,7 @@ TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingMaxSpeed)
                           "</MIB>";
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
                         XMLConfigurationParserException,
-                        "Could not parse. Missing <maxSpeed> below <zoneSetSpeedRange>");
+                        "Could not parse. Element <zoneSetSpeedRange> is missing a child <maxSpeed>.");
 }
 
 TEST_F(XmlConfiguationParserTest, shouldThrowOnInvalidMaxSpeed)
@@ -892,8 +892,8 @@ TEST_F(XmlConfiguationParserTest, shouldThrowIfMoreSpeedRangesThanZonesets)
 
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
                         XMLConfigurationParserException,
-                        "Parsing failed. SpeedRanges are enabled by <encEnable>true</Enable> but there are more "
-                        "speedRanges than defined zones.");
+                        "Parsing failed. SpeedRanges are enabled by <encEnable>true</Enable>"
+                        "but there are 2 speedRanges and 1 defined zones.");
 }
 
 TEST_F(XmlConfiguationParserTest, shouldThrowIfLessSpeedRangesThanZoneset)
@@ -940,8 +940,8 @@ TEST_F(XmlConfiguationParserTest, shouldThrowIfLessSpeedRangesThanZoneset)
 
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
                         XMLConfigurationParserException,
-                        "Parsing failed. SpeedRanges are enabled by <encEnable>true</Enable> but there are more "
-                        "speedRanges than defined zones.");
+                        "Parsing failed. SpeedRanges are enabled by <encEnable>true</Enable>"
+                        "but there are 1 speedRanges and 2 defined zones.");
 }
 
 }  // namespace psen_scan_v2_standalone_test
