@@ -52,6 +52,17 @@ DOCKER_RUN_OPTS="--env HOST_IP=192.168.0.122 --env SENSOR_IP=192.168.0.100 \
 APT_PROXY=http://172.20.20.104:3142
 ```
 
+## Hardware Test `hwtest_zoneset_switching`
+This test checks if the published active zoneset switches from zero to one if the corresponding IO on the scanner change.
+To do this it uses a saintsmart relay to trigger this IO change from ROS context and thus needs additional HW and dependencies.
+
+### Build the test
+Same as above however **additionally** `-DENABLE_HARDWARE_TESTING_WITH_RELAY=ON` needs to be defined at compile time.
+
+### Run the test
+At runtime the test needs the ros-<distro>-sainsmart-relay-usb package.
+It is expected that the scanner power is on relay 3 and the zone IO on relay 4 and that the scanner is turned on beforehand.
+
 ## Hardware Test `hwtest_scan_compare`
 The `hwtest_scan_compare` compares scanner data to a set of prerecorded data in order to detect unwanted changes in the data itself (shifts, flips, ...).
 

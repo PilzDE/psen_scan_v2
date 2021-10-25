@@ -37,9 +37,10 @@ static LaserScan createScan(int64_t stamp = 1)
   const util::TenthOfDegree angle_max_raw{ 20 };
   const util::TenthOfDegree angle_increment{ 1 };
   const uint32_t scan_counter{ 1 };
+  const uint8_t active_zoneset{ 0 };
   const int64_t timestamp{ stamp };
 
-  LaserScan laserscan(angle_increment, angle_min_raw, angle_max_raw, scan_counter, timestamp);
+  LaserScan laserscan(angle_increment, angle_min_raw, angle_max_raw, scan_counter, active_zoneset, timestamp);
   const LaserScan::MeasurementData measurements{ 1., 2., 3. };
   laserscan.setMeasurements(measurements);
 

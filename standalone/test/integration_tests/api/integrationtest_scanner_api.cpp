@@ -360,6 +360,33 @@ TEST_F(ScannerAPITests, LaserScanShouldContainAllInfosTransferedByMonitoringFram
   REMOVE_LOG_MOCK
 }
 
+TEST_F(ScannerAPITests, shouldShowInfoWithNewActiveZonesetOnlyWhenItChanges)
+{
+  INJECT_LOG_MOCK
+  EXPECT_ANY_LOG().Times(AnyNumber());
+  setUpScannerConfig();
+  setUpScannerV2Driver();
+  setUpScannerHwMock();
+  EXPECT_SCANNER_TO_START_SUCCESSFULLY(hw_mock_, driver_, config_);
+
+  const auto msg1{ createValidMonitoringFrameMsgWithZoneset(2) };
+  const auto msg2{ createValidMonitoringFrameMsgWithZoneset(4) };
+  util::Barrier diagnostic_barrier;
+
+  EXPECT_LOG_SHORT(INFO, "Scanner: The scanner switched to active zoneset 2").Times(1);
+  EXPECT_LOG_SHORT(INFO, "Scanner: The scanner switched to active zoneset 4")
+      .WillOnce(OpenBarrier(&diagnostic_barrier));
+
+  hw_mock_->sendMonitoringFrame(msg1);
+  hw_mock_->sendMonitoringFrame(msg1);
+  hw_mock_->sendMonitoringFrame(msg2);
+
+  EXPECT_BARRIER_OPENS(diagnostic_barrier, DEFAULT_TIMEOUT) << "Diagnostic message not received";
+
+  EXPECT_SCANNER_TO_STOP_SUCCESSFULLY(hw_mock_, driver_);
+  REMOVE_LOG_MOCK
+}
+
 TEST_F(ScannerAPITests, shouldCallLaserScanCallbackOnlyOneTimeWithAllInformationWhenUnfragmentedScanIsEnabled)
 {
   setUpScannerConfig(HOST_IP_ADDRESS, UNFRAGMENTED_SCAN);

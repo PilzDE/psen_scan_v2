@@ -22,6 +22,7 @@
 #include <chrono>
 #include <stdexcept>
 #include <vector>
+#include <boost/optional.hpp>
 
 #define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 10  // see https://www.boost.org/doc/libs/1_66_0/libs/msm/doc/HTML/ch03s05.html
 
@@ -225,6 +226,7 @@ private:
   void checkForInternalErrors(const data_conversion_layer::scanner_reply::Message& msg);
 
   void checkForDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& msg);
+  void checkForChangedActiveZoneset(const data_conversion_layer::monitoring_frame::Message& msg);
   void informUserAboutTheScanData(const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg);
   void
   sendMessageWithMeasurements(const std::vector<data_conversion_layer::monitoring_frame::MessageStamped>& stamped_msg);
@@ -238,6 +240,7 @@ private:
 
   std::unique_ptr<util::Watchdog> monitoring_frame_watchdog_{};
   ScanBuffer scan_buffer_{ DEFAULT_NUM_MSG_PER_ROUND };
+  boost::optional<data_conversion_layer::monitoring_frame::Message> zoneset_reference_msg_;
 
   // Udp Clients
   communication_layer::UdpClientImpl control_client_;

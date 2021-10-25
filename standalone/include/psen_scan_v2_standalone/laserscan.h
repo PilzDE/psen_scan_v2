@@ -35,6 +35,7 @@ namespace psen_scan_v2_standalone
  * - Resolution of the scan.
  * - Min and Max angle.
  * - Counter of scan round.
+ * - ID of the currently active zoneset.
  * - Time of the first scan ray.
  *
  * The measures use the target frame defined as \<tf_prefix\>.
@@ -51,6 +52,7 @@ public:
             const util::TenthOfDegree& min_scan_angle,
             const util::TenthOfDegree& max_scan_angle,
             const uint32_t scan_counter,
+            const uint8_t active_zoneset,
             const int64_t timestamp);
 
 public:
@@ -58,6 +60,7 @@ public:
   const util::TenthOfDegree& getMinScanAngle() const;
   const util::TenthOfDegree& getMaxScanAngle() const;
   uint32_t getScanCounter() const;
+  uint8_t getActiveZoneset() const;
   int64_t getTimestamp() const;
 
   const MeasurementData& getMeasurements() const;
@@ -80,6 +83,8 @@ private:
   const util::TenthOfDegree max_scan_angle_;
   //! Number of the scan round this data belongs to.
   const uint32_t scan_counter_;
+  //! The currently active zoneset of the scanner.
+  const uint8_t active_zoneset_;
   //! Time of the first ray in this scan round (or fragment if fragmented_scans is enabled).
   const int64_t timestamp_;
 };

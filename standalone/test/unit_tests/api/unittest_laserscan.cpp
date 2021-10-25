@@ -32,13 +32,14 @@ static const util::TenthOfDegree DEFAULT_START_ANGLE{ 1 };
 static const util::TenthOfDegree DEFAULT_END_ANGLE{ 2 };
 static const int64_t DEFAULT_TIMESTAMP{ 1 };
 static const uint32_t DEFAULT_SCAN_COUNTER{ 1 };
+static const uint8_t DEFAULT_ACTIVE_ZONESET{ 2 };
 
 class LaserScanBuilder
 {
 public:
   LaserScan build()
   {
-    return LaserScan(resolution_, start_angle_, end_angle_, scan_counter_, timestamp_);
+    return LaserScan(resolution_, start_angle_, end_angle_, scan_counter_, active_zoneset_, timestamp_);
   }
 
   LaserScanBuilder& resolution(const util::TenthOfDegree& resolution)
@@ -76,6 +77,7 @@ private:
   util::TenthOfDegree start_angle_{ DEFAULT_START_ANGLE };
   util::TenthOfDegree end_angle_{ DEFAULT_END_ANGLE };
   uint32_t scan_counter_{ DEFAULT_SCAN_COUNTER };
+  uint8_t active_zoneset_{ DEFAULT_ACTIVE_ZONESET };
   int64_t timestamp_{ DEFAULT_TIMESTAMP };
 };
 
@@ -147,6 +149,14 @@ TEST(LaserScanTest, testGetTimestamp)
   EXPECT_EQ(DEFAULT_TIMESTAMP, laser_scan->getTimestamp());
 }
 
+TEST(LaserScanTest, testGetActiveZoneset)
+{
+  LaserScanBuilder laser_scan_builder;
+  std::unique_ptr<LaserScan> laser_scan;
+  ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
+  EXPECT_EQ(DEFAULT_ACTIVE_ZONESET, laser_scan->getActiveZoneset());
+}
+
 TEST(LaserScanTest, testPrintMessageSuccess)
 {
   LaserScanBuilder laser_scan_builder;
@@ -160,11 +170,11 @@ TEST(LaserScanTest, testPrintMessageSuccess)
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
   EXPECT_EQ(fmt::format("{}", *laser_scan),
             "LaserScan(timestamp = 1 nsec, scanCounter = 1, minScanAngle = 0.1 deg, maxScanAngle = 0.2 deg, resolution "
-            "= 0.1 deg, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {})");
+            "= 0.1 deg, active_zoneset = 2, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {})");
 #else
   EXPECT_EQ(fmt::format("{}", *laser_scan),
             "LaserScan(timestamp = 1 nsec, scanCounter = 1, minScanAngle = 0.1 deg, maxScanAngle = 0.2 deg, resolution "
-            "= 0.1 deg, measurements = {45, 44, 43, 42}, intensities = {})");
+            "= 0.1 deg, active_zoneset = 2, measurements = {45, 44, 43, 42}, intensities = {})");
 #endif
 }
 
