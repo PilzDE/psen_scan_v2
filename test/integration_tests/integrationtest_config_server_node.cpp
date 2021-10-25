@@ -22,6 +22,9 @@
 #include <geometry_msgs/Point32.h>
 #include <geometry_msgs/Polygon.h>
 
+#include <rosbag/bag.h>
+#include <rosbag/view.h>
+
 #include "psen_scan_v2/config_server_node.h"
 
 #include "psen_scan_v2/ZoneSet.h"
@@ -39,9 +42,23 @@ using namespace psen_scan_v2_standalone_test;
 using namespace std::chrono_literals;
 
 static const std::string FRAME_ID_PARAM_NAME{ "frame_id" };
+static const std::string BAG_TESTFILE_PARAM_NAME{ "bag_testfile" };
 
 namespace psen_scan_v2_test
 {
+ZoneSetConfiguration readSingleMsgFromBagFile(const std::string& filepath, const std::string& zone_sets_topic)
+{
+  rosbag::Bag bag;
+  bag.open(filepath, rosbag::bagmode::Read);
+
+  rosbag::View view(bag, rosbag::TopicQuery(zone_sets_topic));
+
+  const auto msg = view.begin()->instantiate<ZoneSetConfiguration>();
+
+  bag.close();
+  return *msg;
+}
+
 class SubscriberMock
 {
 public:
@@ -50,7 +67,6 @@ public:
     subscriber_ = nh_.subscribe("/test_ns_laser_1/zonesets", 10, &SubscriberMock::callback, this);
   }
 
-  // MOCK_METHOD1(callback, void(const ZoneSetConfiguration& msg));
   MOCK_METHOD1(callback, void(const ros::MessageEvent<ZoneSetConfiguration const>& event));
 
 private:
@@ -66,37 +82,34 @@ public:
     ros::NodeHandle nh{ "~" };
     ASSERT_TRUE(nh.getParam(FRAME_ID_PARAM_NAME, frame_id_))
         << "Parameter " << FRAME_ID_PARAM_NAME << " does not exist.";
+
+    std::string bag_testfile;
+    ASSERT_TRUE(nh.getParam(BAG_TESTFILE_PARAM_NAME, bag_testfile))
+        << "Parameter " << BAG_TESTFILE_PARAM_NAME << " does not exist.";
+
+    try
+    {
+      zoneset_config_ = readSingleMsgFromBagFile(bag_testfile, "/laser_1/zonesets");
+    }
+    catch (const rosbag::BagIOException& e)
+    {
+      FAIL() << "File " << bag_testfile
+             << " could not be opened. Make sure the file exists and that you have sufficient rights to open it.";
+    }
+    catch (const rosbag::BagException& e)
+    {
+      FAIL() << "There was an error opening " << bag_testfile;
+    }
   }
 
   ZoneSetConfiguration expectedZoneSetConfig() const
   {
-    const std::vector<geometry_msgs::Point32> default_points_vector(550);
-    geometry_msgs::Polygon default_polygon;
-    default_polygon.points = default_points_vector;
-
-    ZoneSetMsgBuilder zoneset0_msg_builder;
-    zoneset0_msg_builder.headerFrameId(frame_id_)
-        .speedLower(-10)
-        .speedUpper(10)
-        .safety1(default_polygon)
-        .warn1(default_polygon);
-
-    ZoneSetMsgBuilder zoneset1_msg_builder;
-    zoneset1_msg_builder.headerFrameId(frame_id_)
-        .speedLower(11)
-        .speedUpper(50)
-        .safety1(default_polygon)
-        .warn1(default_polygon);
-
-    ZoneSetConfiguration zoneset_config;
-    zoneset_config.zonesets.push_back(zoneset0_msg_builder.build());
-    zoneset_config.zonesets.push_back(zoneset1_msg_builder.build());
-
-    return zoneset_config;
+    return zoneset_config_;
   }
 
 private:
   std::string frame_id_;
+  ZoneSetConfiguration zoneset_config_;
 };
 
 TEST_F(ConfigServerNodeTest, shouldAdvertiseZonesetTopic)
@@ -115,7 +128,7 @@ TEST_F(ConfigServerNodeTest, shouldPublishLatchedOnZonesetTopic)
   topic_received_barrier.waitTillRelease(3s);
 }
 
-TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedZoneSetCount)
+TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedZoneSetsCount)
 {
   SubscriberMock subscriber_mock;
   util::Barrier msg_received_barrier;
@@ -157,6 +170,12 @@ TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedPolygonPointCou
       .WillOnce(OpenBarrier(&msg_received_barrier));
 
   msg_received_barrier.waitTillRelease(3s);
+}
+
+TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedPolygonPoints)
+{
+  // ToDo
+  SUCCEED();
 }
 
 }  // namespace psen_scan_v2_test

@@ -221,6 +221,7 @@ if(CATKIN_ENABLE_TESTING)
 
   find_package(rostest REQUIRED)
   find_package(roslaunch REQUIRED)
+  find_package(rosbag REQUIRED)
 
   if(ENABLE_COVERAGE_TESTING)
     find_package(code_coverage REQUIRED)
@@ -475,8 +476,9 @@ if(CATKIN_ENABLE_TESTING)
   target_link_libraries(integrationtest_config_server_node
     ${catkin_LIBRARIES}
     ${PROJECT_NAME}_standalone_xml_configuration_import
+    ${rosbag_LIBRARIES}
   )
-  add_dependencies(integrationtest_config_server_node 
+  add_dependencies(integrationtest_config_server_node
     ${PROJECT_NAME}_standalone
     config_server_node
     ${PROJECT_NAME}_standalone_xml_configuration_import
@@ -548,7 +550,6 @@ if(CATKIN_ENABLE_TESTING)
 
   # This test is intended to be run on in a dedicated environment with a prerecorded reference scan
   # and thus needs to be enabled seperately.
-  find_package(rosbag REQUIRED)
   if(ENABLE_HARDWARE_TESTING_WITH_REFERENCE_SCAN)
 
     catkin_add_gtest(hwtest_scan_compare_standalone

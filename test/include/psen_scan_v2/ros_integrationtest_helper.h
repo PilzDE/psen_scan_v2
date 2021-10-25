@@ -75,33 +75,38 @@ MATCHER_P(messageEQ, expected_msg, "")
 }
 
 using ::testing::Eq;
+using ::testing::ExplainMatchResult;
 using ::testing::Matches;
 using ::testing::SizeIs;
 
 MATCHER_P(messageZoneSetCountEQ, expected_msg, "")
 {
   auto actual_msg = arg.getMessage();
-  return Matches(SizeIs(expected_msg.zonesets.size()))(actual_msg->zonesets);
+  return ExplainMatchResult(SizeIs(expected_msg.zonesets.size()), actual_msg->zonesets, result_listener);
 }
 
 MATCHER_P(zonesetSpeedLimitsEQ, expected_zoneset, "")
 {
+  *result_listener << "where arg.speed_lower is " << arg.speed_lower << " and arg.speed_upper is " << arg.speed_upper;
   return Matches(Eq(expected_zoneset.speed_lower))(arg.speed_lower) &&
          Matches(Eq(expected_zoneset.speed_upper))(arg.speed_upper);
 }
 
 MATCHER_P(zonesetVecSpeedLimitsEQ, expected_zonesets, "")
 {
-  return std::equal(
-      expected_zonesets.begin(), expected_zonesets.end(), arg.begin(), arg.end(), [](const auto& a, const auto& b) {
-        return Matches(zonesetSpeedLimitsEQ(a))(b);
-      });
+  return std::equal(expected_zonesets.begin(),
+                    expected_zonesets.end(),
+                    arg.begin(),
+                    arg.end(),
+                    [result_listener](const auto& a, const auto& b) {
+                      return ExplainMatchResult(zonesetSpeedLimitsEQ(a), b, result_listener);
+                    });
 }
 
 MATCHER_P(messageZoneSetsSpeedLimitsEQ, expected_msg, "")
 {
   auto actual_msg = arg.getMessage();
-  return Matches(zonesetVecSpeedLimitsEQ(expected_msg.zonesets))(actual_msg->zonesets);
+  return ExplainMatchResult(zonesetVecSpeedLimitsEQ(expected_msg.zonesets), actual_msg->zonesets, result_listener);
 }
 
 MATCHER_P(zonesetVecFrameIdsEQ, expected_zonesets, "")

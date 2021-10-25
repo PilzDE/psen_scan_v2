@@ -22,7 +22,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <param name="frame_id" value="$(arg frame_id)"/>
   </node>
 
+  <!-- For this test a bag-file was recorded with
+  roslaunch psen_scan_v2 psen_scan_v2.launch config_file:=<path-to>/unittest_xml_configuration_parser-testfile-with-speedrange.xml
+  rosbag record -O integrationtest_config_server_node-testfile.bag -l 1 /laser_1/zonesets
+  -->
   <test test-name="integrationtest_config_server_node" pkg="psen_scan_v2" type="integrationtest_config_server_node">
+    <param name="bag_testfile" value="$(find psen_scan_v2)/test/bag/integrationtest_config_server_node-testfile.bag" />
     <param name="frame_id" value="$(arg frame_id)"/>
   </test>
 
