@@ -64,6 +64,8 @@ catkin_package(
     roscpp
     sensor_msgs
     message_runtime
+    geometry_msgs
+    std_msgs
   DEPENDS TinyXML2
 )
 
