@@ -37,6 +37,7 @@ If you are interested in using the PSENscan safety laser scanner without ROS, pl
    + [TF Frames](#tf-frames)
    + [Defining the scan range](#defining-the-scan-range)
    + [Timestamp details](#timestamp-details)
+   + [Importing the zoneset configuration](#importing-the-zoneset-configuration)
 3. [Developer Information](#developer-information)
    + [Build Status](#build-status)
    + [Branching model](#branching-model)
