@@ -18,10 +18,15 @@
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+
+#include <geometry_msgs/Point32.h>
+#include <geometry_msgs/Polygon.h>
+
 #include "psen_scan_v2/config_server_node.h"
 
 #include "psen_scan_v2/ZoneSet.h"
 #include "psen_scan_v2/ZoneSetConfiguration.h"
+#include "psen_scan_v2/zoneset_msg_builder.h"
 
 #include "psen_scan_v2/ros_integrationtest_helper.h"
 
@@ -65,21 +70,27 @@ public:
 
   ZoneSetConfiguration expectedZoneSetConfig() const
   {
+    const std::vector<geometry_msgs::Point32> default_points_vector(550);
+    geometry_msgs::Polygon default_polygon;
+    default_polygon.points = default_points_vector;
+
+    ZoneSetMsgBuilder zoneset0_msg_builder;
+    zoneset0_msg_builder.headerFrameId(frame_id_)
+        .speedLower(-10)
+        .speedUpper(10)
+        .safety1(default_polygon)
+        .warn1(default_polygon);
+
+    ZoneSetMsgBuilder zoneset1_msg_builder;
+    zoneset1_msg_builder.headerFrameId(frame_id_)
+        .speedLower(11)
+        .speedUpper(50)
+        .safety1(default_polygon)
+        .warn1(default_polygon);
+
     ZoneSetConfiguration zoneset_config;
-    ZoneSet zoneset0;
-    zoneset0.header.frame_id = frame_id_;
-    zoneset0.speed_lower = -10;
-    zoneset0.speed_upper = 10;
-    zoneset0.safety1.points.resize(550);
-    zoneset0.warn1.points.resize(550);
-    ZoneSet zoneset1;
-    zoneset1.header.frame_id = frame_id_;
-    zoneset1.speed_lower = 11;
-    zoneset1.speed_upper = 50;
-    zoneset1.safety1.points.resize(550);
-    zoneset1.warn1.points.resize(550);
-    zoneset_config.zonesets.push_back(zoneset0);
-    zoneset_config.zonesets.push_back(zoneset1);
+    zoneset_config.zonesets.push_back(zoneset0_msg_builder.build());
+    zoneset_config.zonesets.push_back(zoneset1_msg_builder.build());
 
     return zoneset_config;
   }

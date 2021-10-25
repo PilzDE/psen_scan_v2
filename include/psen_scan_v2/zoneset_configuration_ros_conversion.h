@@ -22,6 +22,7 @@
 
 #include "psen_scan_v2/ZoneSet.h"
 #include "psen_scan_v2/ZoneSetConfiguration.h"
+#include "psen_scan_v2/zoneset_msg_builder.h"
 #include "psen_scan_v2_standalone/configuration/zoneset_configuration.h"
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
@@ -62,32 +63,30 @@ psen_scan_v2::ZoneSet toRosMsg(const ZoneSetStandalone& zoneset,
                                const std::string& frame_id,
                                const ros::Time& stamp = ros::Time::now())
 {
-  psen_scan_v2::ZoneSet zoneset_msg;
-  zoneset_msg.header.stamp = stamp;
-  zoneset_msg.header.frame_id = frame_id;
-
-  zoneset_msg.safety1 =
-      fromPolar(zoneset.safety1_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION);
-  zoneset_msg.safety2 =
-      fromPolar(zoneset.safety2_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION);
-  zoneset_msg.safety3 =
-      fromPolar(zoneset.safety3_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION);
-  zoneset_msg.warn1 =
-      fromPolar(zoneset.warn1_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION);
-  zoneset_msg.warn2 =
-      fromPolar(zoneset.warn2_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION);
-  zoneset_msg.muting1 =
-      fromPolar(zoneset.muting1_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION);
-  zoneset_msg.muting2 =
-      fromPolar(zoneset.muting2_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION);
+  psen_scan_v2::ZoneSetMsgBuilder zoneset_msg_builder;
+  zoneset_msg_builder.headerStamp(stamp)
+      .headerFrameId(frame_id)
+      .safety1(fromPolar(
+          zoneset.safety1_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION))
+      .safety2(fromPolar(
+          zoneset.safety2_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION))
+      .safety3(fromPolar(
+          zoneset.safety3_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION))
+      .warn1(fromPolar(
+          zoneset.warn1_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION))
+      .warn2(fromPolar(
+          zoneset.warn2_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION))
+      .muting1(fromPolar(
+          zoneset.muting1_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION))
+      .muting2(fromPolar(
+          zoneset.muting2_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION));
 
   if (zoneset.speed_range_)
   {
-    zoneset_msg.speed_lower = zoneset.speed_range_->min_;
-    zoneset_msg.speed_upper = zoneset.speed_range_->max_;
+    zoneset_msg_builder.speedLower(zoneset.speed_range_->min_).speedUpper(zoneset.speed_range_->max_);
   }
 
-  return zoneset_msg;
+  return zoneset_msg_builder.build();
 }
 
 psen_scan_v2::ZoneSetConfiguration toRosMsg(const ZoneSetConfigurationStandalone& zoneset_configuration,
