@@ -84,6 +84,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
       util::TenthOfDegree(25),
       util::TenthOfDegree(1),
       456,
+      2,
       { 10, 20, std::numeric_limits<double>::infinity(), 40 },
       { 15, 25, 35, 45 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(configuration::ScannerId::master,
@@ -102,7 +103,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
 TEST(MonitoringFrameSerializationTest, shouldFailOnSerializeAndDeserializeFrameWithIntensityChannelBits)
 {
   data_conversion_layer::monitoring_frame::Message msg(
-      util::TenthOfDegree(25), util::TenthOfDegree(1), 1, { 0 }, { 70045 }, {});
+      util::TenthOfDegree(25), util::TenthOfDegree(1), 1, 0, { 0 }, { 70045 }, {});
 
   auto raw = serialize(msg);
   auto deserialized_msg = data_conversion_layer::monitoring_frame::deserialize(convertToRawData(raw), raw.size());
@@ -239,6 +240,17 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
   data_conversion_layer::monitoring_frame::Message msg;
   EXPECT_THROW(msg = data_conversion_layer::monitoring_frame::deserialize(raw_frame_data, num_bytes);
                , data_conversion_layer::monitoring_frame::ScanCounterUnexpectedSize);
+}
+
+TEST_F(MonitoringFrameDeserializationTest, shouldThrowZoneSetUnexpectedSizeErrorOnTooLargeZoneSetLength)
+{
+  scanner_udp_datagram_hexdumps::WithTooLargeActiveZoneSetLength with_too_large_active_zone_set_length;
+  const auto raw_frame_data = convertToRawData(with_too_large_active_zone_set_length.hex_dump);
+  const auto num_bytes = 2 * with_too_large_active_zone_set_length.hex_dump.size();
+
+  data_conversion_layer::monitoring_frame::Message msg;
+  EXPECT_THROW(msg = data_conversion_layer::monitoring_frame::deserialize(raw_frame_data, num_bytes);
+               , data_conversion_layer::monitoring_frame::ZoneSetUnexpectedSize);
 }
 
 }  // namespace psen_scan_v2_standalone_test

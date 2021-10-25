@@ -15,12 +15,13 @@ PSENscan firmware >= 3.1.0 is supported on the following models:
 | Type | Features | Order number |
 |------|----------|--------------|
 | |	Common features:<ul><li>compliant and approved in accordance with: EN/IEC 61496-1: Type 3, EN ISO 13849-1: PL d, IEC 61508: SIL 2</li><li>opening angle: 275°</li><li>operating range: 3.0 or 5.5 m safety zone, 40 m warning zone</li><li>reaction time: 62 ms</li><li>Protection type: IP65</li><li>Dimensions (H x W x D) in mm: 152 x 102 x 112.5</li></ul> | |
-| |Light versions	Additional features: Muting, EDM, Override | |
-| PSEN sc L 3.0 08-12	3.0 m | safety zone, 8 or 12-pin exchangeable memory module |	6D000012 |
-| PSEN sc L 5.5 08-12	5.5 m | safety zone, 8 or 12-pin exchangeable memory module	| 6D000013 |
-| | Master versions	Additional features: Muting, EDM, Override, restart in accordance with EN ISO 61496-3, vertical applications| |
-| PSEN sc M 3.0 08-12	3.0 m | safety zone, 8 or 12-pin exchangeable memory module	| 6D000016 |
-| PSEN sc M 5.5 08-12	5.5 m | safety zone, 8 or 12-pin exchangeable memory module	| 6D000017 |
+| | *Light versions*	Additional features: Muting, EDM, Override | |
+| PSEN sc L 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin exchangeable memory module |	6D000012 |
+| PSEN sc L 5.5 08-12	| 5.5 m safety zone, 8 or 12-pin exchangeable memory module	| 6D000013 |
+| | *Master versions*	Additional features: Muting, EDM, Override, restart in accordance with EN ISO 61496-3, vertical applications| |
+| PSEN sc M 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin exchangeable memory module	| 6D000016 |
+| PSEN sc M 5.5 08-12	| 5.5 m safety zone, 8 or 12-pin exchangeable memory module	| 6D000017 |
+| PSEN sc ME 5.5 08-17  | Master Encoder, 5.5 m safety zone, 8/17-pin exchangeable memory | 6D000019 |
 
 ## C++ standalone library
 If you are interested in using the PSENscan safety laser scanner without ROS, please take a look at our C++ standalone library. You can read more about it [in the `standalone` folder](https://github.com/PilzDE/psen_scan_v2/blob/main/standalone/README.md)
@@ -35,6 +36,7 @@ If you are interested in using the PSENscan safety laser scanner without ROS, pl
    + [Published Topics](#published-topics)
    + [TF Frames](#tf-frames)
    + [Defining the scan range](#defining-the-scan-range)
+   + [Timestamp details](#timestamp-details)
 3. [Developer Information](#developer-information)
    + [Build Status](#build-status)
    + [Branching model](#branching-model)
@@ -59,7 +61,7 @@ If you wish to set parameters from the command line, add them to the end of the 
 ```bash
 roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10
 ```
-This example configures the safety laser scanner at 192.168.0.10 to send it´s frames to 192.168.0.20:3050.
+This example configures the safety laser scanner at 192.168.0.10 to send it´s frames to the ROS node at localhost.
 
 In order to create an application with your own launch file, you can include the `bringup.launch`, where you can easily adjust the configuration parameters. A more detailed explanation can be found in the [tutorials](http://wiki.ros.org/psen_scan_v2/Tutorials/).
 
@@ -116,6 +118,13 @@ Start a preconfigured rviz visualizing the scan data.
 `Hint 2: Frequency of the laser scan messages is about 33hz for the combined and 200hz for the fragmented scans.`
 
 /\<name\>/zonesets ([psen_scan_v2/ZoneSetConfiguration](http://docs.ros.org/en/noetic/api/psen_scan_v2/html/msg/ZoneSetConfiguration.html))<br/>
+
+/\<name\>/active_zoneset ([std_msgs/UInt8][])<br/>
+
+* This topic contains the id of the currently active zoneset of the PSENscan safety laser scanner.
+
+`Hint 1: If no zonesets are configured the driver will publish "0" as default.`
+
 ### TF Frames
 The location of the TF frames is shown in the image below.
 These names are defined by the aforementioned launchfile parameter `name`.
@@ -133,7 +142,7 @@ Both limits are defined within the _laser_1_ frame as shown in the image below.
 <img src="img/angle_limits.png" width="800px" alt="Limit visualization" title="Limit visualization">
 </p>
 
-### Additional Information
+### Timestamp details
 The timestamps of the scan data published are computed to be close to reality and processing speed of incoming data was optimized to reduce the time for the scan data to be published. This should suffice for localization and slam algorithms. If you application benefits from getting the scan data any sooner there are two possibilities:
 
 * Use fragmented scans. This will publish the individual frames received by the PsenScan hardware immediately instead of waiting for a scan round to be completed and combined to a single laser scan message.
@@ -217,4 +226,5 @@ supply in buildings.
 
 
 [sensor_msgs/LaserScan]: http://docs.ros.org/noetic/api/sensor_msgs/html/msg/LaserScan.html
+[std_msgs/UInt8]: https://docs.ros.org/en/api/std_msgs/html/msg/UInt8.html
 [gmapping]: http://wiki.ros.org/gmapping

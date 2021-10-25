@@ -49,6 +49,7 @@ static constexpr uint32_t OP_CODE_MONITORING_FRAME{ 0xCA };
 static constexpr uint32_t ONLINE_WORKING_MODE{ 0x00 };
 static constexpr uint32_t GUI_MONITORING_TRANSACTION{ 0x05 };
 static constexpr uint16_t NUMBER_OF_BYTES_SCAN_COUNTER{ 4 };
+static constexpr uint16_t NUMBER_OF_BYTES_ZONE_SET{ 1 };
 static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_MEASUREMENT{ 2 };
 static constexpr uint16_t NO_SIGNAL_ARRIVED{ 59956 };
 static constexpr uint16_t SIGNAL_TOO_LATE{ 59958 };
@@ -128,6 +129,7 @@ private:
 enum class AdditionalFieldHeaderID : AdditionalFieldHeader::Id
 {
   scan_counter = 0x02,
+  zone_set = 0x03,
   diagnostics = 0x04,
   measurements = 0x05,
   intensities = 0x06,
@@ -168,11 +170,31 @@ public:
   ScanCounterUnexpectedSize(const std::string& msg);
 };
 
+/**
+ * @brief Exception thrown on problems with the additional field: active_zoneset
+ *
+ * The length specified in the Header of the additional field "active_zoneset"
+ * must be exactly as defined in NUMBER_OF_BYTES_ZONE_SET for it to be converted.
+ *
+ * @see data_conversion_layer::monitoring_frame::AdditionalFieldHeader
+ * @see data_conversion_layer::monitoring_frame::AdditionalFieldHeaderID
+ * @see data_conversion_layer::monitoring_frame::NUMBER_OF_BYTES_ZONE_SET
+ */
+class ZoneSetUnexpectedSize : public DecodingFailure
+{
+public:
+  ZoneSetUnexpectedSize(const std::string& msg);
+};
+
 inline DecodingFailure::DecodingFailure(const std::string& msg) : std::runtime_error(msg)
 {
 }
 
 inline ScanCounterUnexpectedSize::ScanCounterUnexpectedSize(const std::string& msg) : DecodingFailure(msg)
+{
+}
+
+inline ZoneSetUnexpectedSize::ZoneSetUnexpectedSize(const std::string& msg) : DecodingFailure(msg)
 {
 }
 

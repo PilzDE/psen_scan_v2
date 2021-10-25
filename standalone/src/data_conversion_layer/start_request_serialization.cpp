@@ -82,7 +82,7 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
   const uint8_t intensity_enabled{ static_cast<uint8_t>(
       msg.master_device_settings_.intensitiesEnabled() ? 0b00001000 : 0b00000000) };
   const uint8_t point_in_safety_enabled{ 0 };
-  const uint8_t active_zone_set_enabled{ 0 };
+  const uint8_t active_zone_set_enabled{ 0b00001000 };
   const uint8_t io_pin_enabled{ 0 };
   const uint8_t scan_counter_enabled{ 0b00001000 };
   const uint8_t speed_encoder_enabled{ 0 }; /**< 0000000bin disabled, 00001111bin enabled.*/

@@ -58,6 +58,11 @@ uint32_t data_conversion_layer::monitoring_frame::Message::scanCounter() const
   }
 }
 
+uint8_t data_conversion_layer::monitoring_frame::Message::activeZoneset() const
+{
+  return active_zoneset_;
+}
+
 const std::vector<double>& data_conversion_layer::monitoring_frame::Message::measurements() const
 {
   return measurements_;
@@ -78,8 +83,8 @@ bool data_conversion_layer::monitoring_frame::Message::operator==(
     const data_conversion_layer::monitoring_frame::Message& rhs) const
 {
   return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
-          measurements() == rhs.measurements() && intensities() == rhs.intensities() &&
-          diagnosticMessages() == rhs.diagnosticMessages());
+          activeZoneset() == rhs.activeZoneset() && measurements() == rhs.measurements() &&
+          intensities() == rhs.intensities() && diagnosticMessages() == rhs.diagnosticMessages());
 }
 
 namespace monitoring_frame
@@ -88,10 +93,11 @@ std::ostream& operator<<(std::ostream& os,
                          const psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message& msg)
 {
   os << fmt::format("monitoring_frame::Message(fromTheta = {} deg, resolution = {} deg, scanCounter = "
-                    "{}, measurements = {}, intensities = {}, diagnostics = {})",
+                    "{}, active_zoneset = {}, measurements = {}, intensities = {}, diagnostics = {})",
                     msg.fromTheta().value() / 10.,
                     msg.resolution().value() / 10.,
                     msg.scanCounter(),
+                    msg.activeZoneset(),
                     util::formatRange(msg.measurements()),
                     util::formatRange(msg.intensities()),
                     util::formatRange(msg.diagnosticMessages()));

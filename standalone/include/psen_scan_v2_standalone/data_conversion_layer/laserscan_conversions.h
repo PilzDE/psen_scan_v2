@@ -107,8 +107,12 @@ inline LaserScan LaserScanConverter::toLaserScan(
                        stamped_msgs[index].msg_.intensities().end());
   }
 
-  LaserScan scan(
-      stamped_msgs[0].msg_.resolution(), min_angle, max_angle, stamped_msgs[0].msg_.scanCounter(), timestamp);
+  LaserScan scan(stamped_msgs[0].msg_.resolution(),
+                 min_angle,
+                 max_angle,
+                 stamped_msgs[0].msg_.scanCounter(),
+                 stamped_msgs[sorted_stamped_msgs_indices.back()].msg_.activeZoneset(),
+                 timestamp);
   scan.setMeasurements(measurements);
   scan.setIntensities(intensities);
 
