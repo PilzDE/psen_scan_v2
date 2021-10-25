@@ -36,7 +36,7 @@ const util::TenthOfDegree ANGLE_END{ data_conversion_layer::degreeToTenthDegree(
 void laserScanCallback(const LaserScan& scan)
 {
   // Available scan information is listed on
-  // http://docs.ros.org/en/melodic/api/psen_scan_v2/html/classpsen__scan__v2__standalone_1_1LaserScan.html.html
+  // https://docs.ros.org/en/melodic/api/psen_scan_v2/html/classpsen__scan__v2__standalone_1_1LaserScan.html
   PSENSCAN_INFO_THROTTLE(1 /* sec */, "laserScanCallback()", "Ranges {}", util::formatRange(scan.getMeasurements()));
 }
 
