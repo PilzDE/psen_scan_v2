@@ -66,8 +66,10 @@ psen_scan_v2::ZoneSet toRosMsg(const ZoneSetStandalone& zoneset,
   psen_scan_v2::ZoneSetMsgBuilder zoneset_msg_builder;
   zoneset_msg_builder.headerStamp(stamp)
       .headerFrameId(frame_id)
-      .safety1(fromPolar(
-          zoneset.safety1_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION))
+      .safety1(fromPolar(  // LCOV_EXCL_LINE gcov bug?
+          zoneset.safety1_,
+          zoneset.resolution_,
+          psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION))
       .safety2(fromPolar(
           zoneset.safety2_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION))
       .safety3(fromPolar(
