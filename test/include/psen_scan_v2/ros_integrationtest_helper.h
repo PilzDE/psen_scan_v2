@@ -74,6 +74,75 @@ MATCHER_P(messageEQ, expected_msg, "")
   return expected_msg == *actual_msg;
 }
 
+using ::testing::Eq;
+using ::testing::Matches;
+using ::testing::SizeIs;
+
+MATCHER_P(messageZoneSetCountEQ, expected_msg, "")
+{
+  auto actual_msg = arg.getMessage();
+  return Matches(SizeIs(expected_msg.zonesets.size()))(actual_msg->zonesets);
+}
+
+MATCHER_P(zonesetSpeedLimitsEQ, expected_zoneset, "")
+{
+  return Matches(Eq(expected_zoneset.speed_lower))(arg.speed_lower) &&
+         Matches(Eq(expected_zoneset.speed_upper))(arg.speed_upper);
+}
+
+MATCHER_P(zonesetVecSpeedLimitsEQ, expected_zonesets, "")
+{
+  return std::equal(
+      expected_zonesets.begin(), expected_zonesets.end(), arg.begin(), arg.end(), [](const auto& a, const auto& b) {
+        return Matches(zonesetSpeedLimitsEQ(a))(b);
+      });
+}
+
+MATCHER_P(messageZoneSetsSpeedLimitsEQ, expected_msg, "")
+{
+  auto actual_msg = arg.getMessage();
+  return Matches(zonesetVecSpeedLimitsEQ(expected_msg.zonesets))(actual_msg->zonesets);
+}
+
+MATCHER_P(zonesetVecFrameIdsEQ, expected_zonesets, "")
+{
+  return std::equal(
+      expected_zonesets.begin(), expected_zonesets.end(), arg.begin(), arg.end(), [](const auto& a, const auto& b) {
+        return Matches(Eq(a.header.frame_id))(b.header.frame_id);
+      });
+}
+
+MATCHER_P(messageZoneSetsFrameIdEQ, expected_msg, "")
+{
+  auto actual_msg = arg.getMessage();
+  return Matches(zonesetVecFrameIdsEQ(expected_msg.zonesets))(actual_msg->zonesets);
+}
+
+MATCHER_P(zonesetPolygonPointCountsEQ, expected_zoneset, "")
+{
+  return Matches(SizeIs(expected_zoneset.safety1.points.size()))(arg.safety1.points) &&
+         Matches(SizeIs(expected_zoneset.safety2.points.size()))(arg.safety2.points) &&
+         Matches(SizeIs(expected_zoneset.safety3.points.size()))(arg.safety3.points) &&
+         Matches(SizeIs(expected_zoneset.warn1.points.size()))(arg.warn1.points) &&
+         Matches(SizeIs(expected_zoneset.warn2.points.size()))(arg.warn2.points) &&
+         Matches(SizeIs(expected_zoneset.muting1.points.size()))(arg.muting1.points) &&
+         Matches(SizeIs(expected_zoneset.muting2.points.size()))(arg.muting2.points);
+}
+
+MATCHER_P(zonesetVecPolygonPointCountsEQ, expected_zonesets, "")
+{
+  return std::equal(
+      expected_zonesets.begin(), expected_zonesets.end(), arg.begin(), arg.end(), [](const auto& a, const auto& b) {
+        return Matches(zonesetPolygonPointCountsEQ(a))(b);
+      });
+}
+
+MATCHER_P(messageZoneSetsPolygonPointCountsEQ, expected_msg, "")
+{
+  auto actual_msg = arg.getMessage();
+  return Matches(zonesetVecPolygonPointCountsEQ(expected_msg.zonesets))(actual_msg->zonesets);
+}
+
 }  // namespace psen_scan_v2_test
 
 #endif  // PSEN_SCAN_V2_ROS_INTEGRATIONTEST_HELPER_H

@@ -33,6 +33,8 @@ using namespace psen_scan_v2_standalone;
 using namespace psen_scan_v2_standalone_test;
 using namespace std::chrono_literals;
 
+static const std::string FRAME_ID_PARAM_NAME{ "frame_id" };
+
 namespace psen_scan_v2_test
 {
 class SubscriberMock
@@ -53,6 +55,37 @@ private:
 
 class ConfigServerNodeTest : public testing::Test
 {
+public:
+  void SetUp() override
+  {
+    ros::NodeHandle nh{ "~" };
+    ASSERT_TRUE(nh.getParam(FRAME_ID_PARAM_NAME, frame_id_))
+        << "Parameter " << FRAME_ID_PARAM_NAME << " does not exist.";
+  }
+
+  ZoneSetConfiguration expectedZoneSetConfig() const
+  {
+    ZoneSetConfiguration zoneset_config;
+    ZoneSet zoneset0;
+    zoneset0.header.frame_id = frame_id_;
+    zoneset0.speed_lower = -10;
+    zoneset0.speed_upper = 10;
+    zoneset0.safety1.points.resize(550);
+    zoneset0.warn1.points.resize(550);
+    ZoneSet zoneset1;
+    zoneset1.header.frame_id = frame_id_;
+    zoneset1.speed_lower = 11;
+    zoneset1.speed_upper = 50;
+    zoneset1.safety1.points.resize(550);
+    zoneset1.warn1.points.resize(550);
+    zoneset_config.zonesets.push_back(zoneset0);
+    zoneset_config.zonesets.push_back(zoneset1);
+
+    return zoneset_config;
+  }
+
+private:
+  std::string frame_id_;
 };
 
 TEST_F(ConfigServerNodeTest, shouldAdvertiseZonesetTopic)
@@ -64,21 +97,55 @@ TEST_F(ConfigServerNodeTest, shouldAdvertiseZonesetTopic)
 TEST_F(ConfigServerNodeTest, shouldPublishLatchedOnZonesetTopic)
 {
   SubscriberMock subscriber_mock;
-
   util::Barrier topic_received_barrier;
-  ZoneSetConfiguration zoneset_config;
-  ZoneSet zoneset0;
-  zoneset0.speed_lower = -10;
-  zoneset0.speed_upper = 10;
-  ZoneSet zoneset1;
-  zoneset1.speed_lower = 11;
-  zoneset1.speed_upper = 50;
-  zoneset_config.zonesets.push_back(zoneset0);
-  zoneset_config.zonesets.push_back(zoneset1);
+
   EXPECT_CALL(subscriber_mock, callback(isLatched())).WillOnce(OpenBarrier(&topic_received_barrier));
-  // EXPECT_CALL(subscriber_mock, callback(zoneset_config)).WillOnce(OpenBarrier(&topic_received_barrier));
 
   topic_received_barrier.waitTillRelease(3s);
+}
+
+TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedZoneSetCount)
+{
+  SubscriberMock subscriber_mock;
+  util::Barrier msg_received_barrier;
+
+  EXPECT_CALL(subscriber_mock, callback(messageZoneSetCountEQ(expectedZoneSetConfig())))
+      .WillOnce(OpenBarrier(&msg_received_barrier));
+
+  msg_received_barrier.waitTillRelease(3s);
+}
+
+TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedZoneSetsSpeedLimits)
+{
+  SubscriberMock subscriber_mock;
+  util::Barrier msg_received_barrier;
+
+  EXPECT_CALL(subscriber_mock, callback(messageZoneSetsSpeedLimitsEQ(expectedZoneSetConfig())))
+      .WillOnce(OpenBarrier(&msg_received_barrier));
+
+  msg_received_barrier.waitTillRelease(3s);
+}
+
+TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedZoneSetsFrameId)
+{
+  SubscriberMock subscriber_mock;
+  util::Barrier msg_received_barrier;
+
+  EXPECT_CALL(subscriber_mock, callback(messageZoneSetsFrameIdEQ(expectedZoneSetConfig())))
+      .WillOnce(OpenBarrier(&msg_received_barrier));
+
+  msg_received_barrier.waitTillRelease(3s);
+}
+
+TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedPolygonPointCounts)
+{
+  SubscriberMock subscriber_mock;
+  util::Barrier msg_received_barrier;
+
+  EXPECT_CALL(subscriber_mock, callback(messageZoneSetsPolygonPointCountsEQ(expectedZoneSetConfig())))
+      .WillOnce(OpenBarrier(&msg_received_barrier));
+
+  msg_received_barrier.waitTillRelease(3s);
 }
 
 }  // namespace psen_scan_v2_test
