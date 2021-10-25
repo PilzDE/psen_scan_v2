@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef PSEN_SCAN_V2_ZONE_CONFIGURATION_CONVERSION_H
-#define PSEN_SCAN_V2_ZONE_CONFIGURATION_CONVERSION_H
+#ifndef PSEN_SCAN_V2_ZONESET_CONFIGURATION_ROS_CONVERSION_H
+#define PSEN_SCAN_V2_ZONESET_CONFIGURATION_ROS_CONVERSION_H
 
 #include <ros/console.h>
 
@@ -103,4 +103,4 @@ psen_scan_v2::ZoneSetConfiguration toRosMsg(const ZoneSetConfigurationStandalone
   return zoneset_config_msg;
 }
 
-#endif  // PSEN_SCAN_V2_ZONE_CONFIGURATION_CONVERSION_H
+#endif  // PSEN_SCAN_V2_ZONESET_CONFIGURATION_ROS_CONVERSION_H
