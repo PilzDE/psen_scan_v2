@@ -47,62 +47,51 @@ static const std::string BAG_TESTFILE_PARAM_NAME{ "bag_testfile" };
 namespace psen_scan_v2_test
 {
 using ::testing::ExplainMatchResult;
-using ::testing::Field;
 using ::testing::SizeIs;
 
-MATCHER_P(lessVerboseContainerEQ, expected, "")
+MATCHER_P2(namedEQ, value, name, "")
 {
-  *result_listener << "whose elements " << (expected == arg ? "do" : "don't") << " match";
-  return expected == arg;
+  *result_listener << name << " " << arg << " " << (value == arg ? "does" : "doesn't") << " match";
+  return value == arg;
 }
 
-MATCHER_P(zoneSetPolygonEQ, expected_polygon, "")
+MATCHER_P2(namedLessVerboseEQ, value, name, "")
 {
-  *result_listener << "with points vector, ";
-  return ExplainMatchResult(SizeIs(expected_polygon.points.size()), arg.points, result_listener) &&
-         ExplainMatchResult(
-             lessVerboseContainerEQ(expected_polygon.points), arg.points, &(*result_listener << " and "));
+  *result_listener << name << " " << (value == arg ? "does" : "doesn't") << " match";
+  return value == arg;
 }
 
-MATCHER_P(zoneSetEQ, expected_zoneset, "")
+MATCHER_P2(namedZoneSetPolygonEQ, polygon, name, "")
 {
-  return ExplainMatchResult(Field("header.frame_id", &std_msgs::Header::frame_id, expected_zoneset.header.frame_id),
-                            arg.header,
-                            &(*result_listener << "\t")) &&
-         ExplainMatchResult(Field("speed_lower", &ZoneSet::speed_lower, expected_zoneset.speed_lower),
-                            arg,
-                            &(*result_listener << "\n\t")) &&
-         ExplainMatchResult(Field("speed_upper", &ZoneSet::speed_upper, expected_zoneset.speed_upper),
-                            arg,
-                            &(*result_listener << "\n\t")) &&
-         ExplainMatchResult(
-             zoneSetPolygonEQ(expected_zoneset.safety1), arg.safety1, &(*result_listener << "\n\tfield safety1 ")) &&
-         ExplainMatchResult(
-             zoneSetPolygonEQ(expected_zoneset.safety2), arg.safety2, &(*result_listener << "\n\tfield safety2 ")) &&
-         ExplainMatchResult(
-             zoneSetPolygonEQ(expected_zoneset.safety3), arg.safety3, &(*result_listener << "\n\tfield safety3 ")) &&
-         ExplainMatchResult(
-             zoneSetPolygonEQ(expected_zoneset.warn1), arg.warn1, &(*result_listener << "\n\tfield warn1 ")) &&
-         ExplainMatchResult(
-             zoneSetPolygonEQ(expected_zoneset.warn2), arg.warn2, &(*result_listener << "\n\tfield warn2 ")) &&
-         ExplainMatchResult(
-             zoneSetPolygonEQ(expected_zoneset.muting1), arg.muting1, &(*result_listener << "\n\tfield muting1 ")) &&
-         ExplainMatchResult(
-             zoneSetPolygonEQ(expected_zoneset.muting2), arg.muting2, &(*result_listener << "\n\tfield muting2 "));
+  *result_listener << name << " with points vector, ";
+  return ExplainMatchResult(SizeIs(polygon.points.size()), arg.points, result_listener) &&
+         ExplainMatchResult(namedLessVerboseEQ(polygon.points, ", whose data"), arg.points, result_listener);
 }
 
-MATCHER_P(zoneSetVecEQ, expected_zonesets, "")
+MATCHER_P(zoneSetEQ, zoneset, "")
+{
+  *result_listener << "whose fields";
+  return ExplainMatchResult(namedEQ(zoneset.header.frame_id, "\n\tframe_id"), arg.header.frame_id, result_listener) &&
+         ExplainMatchResult(namedEQ(zoneset.speed_lower, "\n\tspeed_lower"), arg.speed_lower, result_listener) &&
+         ExplainMatchResult(namedEQ(zoneset.speed_upper, "\n\tspeed_upper"), arg.speed_upper, result_listener) &&
+         ExplainMatchResult(namedZoneSetPolygonEQ(zoneset.safety1, "\n\tsafety1"), arg.safety1, result_listener) &&
+         ExplainMatchResult(namedZoneSetPolygonEQ(zoneset.safety2, "\n\tsafety2"), arg.safety2, result_listener) &&
+         ExplainMatchResult(namedZoneSetPolygonEQ(zoneset.safety3, "\n\tsafety3"), arg.safety3, result_listener) &&
+         ExplainMatchResult(namedZoneSetPolygonEQ(zoneset.warn1, "\n\twarn1"), arg.warn1, result_listener) &&
+         ExplainMatchResult(namedZoneSetPolygonEQ(zoneset.warn2, "\n\twarn2"), arg.warn2, result_listener) &&
+         ExplainMatchResult(namedZoneSetPolygonEQ(zoneset.muting1, "\n\tmuting1"), arg.muting1, result_listener) &&
+         ExplainMatchResult(namedZoneSetPolygonEQ(zoneset.muting2, "\n\tmuting2"), arg.muting2, result_listener);
+}
+
+MATCHER_P(zoneSetVecEQ, zoneset_vec, "")
 {
   unsigned int i = 0;
-  return ExplainMatchResult(SizeIs(expected_zonesets.size()), arg, result_listener) &&
-         std::equal(expected_zonesets.begin(),
-                    expected_zonesets.end(),
-                    arg.begin(),
-                    arg.end(),
-                    [&](const auto& zs1, const auto& zs2) {
-                      *result_listener << "\nwith zoneset" << i++ << "\n";
-                      return ExplainMatchResult(zoneSetEQ(zs1), zs2, result_listener);
-                    });
+  return ExplainMatchResult(SizeIs(zoneset_vec.size()), arg, result_listener) &&
+         std::equal(
+             zoneset_vec.begin(), zoneset_vec.end(), arg.begin(), arg.end(), [&](const auto& zs1, const auto& zs2) {
+               *result_listener << "\nwith zoneset" << i++ << " ";
+               return ExplainMatchResult(zoneSetEQ(zs1), zs2, result_listener);
+             });
 }
 
 MATCHER_P(msgZoneSetConfigEQ, expected_msg, "")
