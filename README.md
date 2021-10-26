@@ -37,6 +37,7 @@ If you are interested in using the PSENscan safety laser scanner without ROS, pl
    + [TF Frames](#tf-frames)
    + [Defining the scan range](#defining-the-scan-range)
    + [Timestamp details](#timestamp-details)
+   + [Importing the zoneset configuration](#importing-the-zoneset-configuration)
 3. [Developer Information](#developer-information)
    + [Build Status](#build-status)
    + [Branching model](#branching-model)
@@ -87,6 +88,9 @@ Publish intensities. If this is enabled, the resolution needs to be increased (a
 _resolution_ (_double_, default: 0.0017 (= 0.1 deg))<br/>
 Scan angle resolution. (Radian) The value is rounded to a multiple of 0.1 deg and has to be in the range [0.1, 10] degrees.
 
+_config_file_ (_string_, default: "")
+Full path to a scanner config file. If a file is provided the configured zonesets are published, see [here](#importing-the-zoneset-configuration) for more information.
+
 ### Expert Parameters (optional)
 
 _host_ip_ (_string_, default: "auto")<br/>
@@ -113,6 +117,8 @@ Start a preconfigured rviz visualizing the scan data.
 `Hint 1: Scan rounds and fragments that contain no measurement data are not published. This can happen with smaller scan ranges.`
 
 `Hint 2: Frequency of the laser scan messages is about 33hz for the combined and 200hz for the fragmented scans.`
+
+/\<name\>/zoneconfiguration ([psen_scan_v2/ZoneSetConfiguration](http://docs.ros.org/en/noetic/api/psen_scan_v2/html/msg/ZoneSetConfiguration.html))<br/>
 
 /\<name\>/active_zoneset ([std_msgs/UInt8][])<br/>
 
@@ -143,6 +149,31 @@ The timestamps of the scan data published are computed to be close to reality an
 * Use fragmented scans. This will publish the individual frames received by the PsenScan hardware immediately instead of waiting for a scan round to be completed and combined to a single laser scan message.
 * Use the tcp_nodelay flag in your ROS subscriber. This will disable the nagle's algorithm, which is a TCP optimization. This algorithm can produce a jitter of about 20ms in the ros topic.
    * The cpp API of ROS does not support disabling this on the publisher side. If you don't have control over the subscriber e.g. due to using a third party package you can create a python node which acts as a repeater for the scan topic. rospy subscriber and publisher both allow setting this flag and thus can disable it for this driver and the third party package.
+
+
+### Importing the zoneset configuration
+Once you setup the scanner and created a configuration according to our [tutorial](http://wiki.ros.org/psen_scan_v2/Tutorials/SettingUpPSENscanHW#Create_a_new_configuration) you can use a exported xml configuration file within ROS.
+The configured zonesets will be published 
+
+The zonesets you created in the Pilz configurator:
+![configurator_screenshot](doc/zones_screenshot_configurator.png)
+
+will be exactly the same in ROS:
+![configurator_screenshot](doc/zones_screenshot_rviz.png)
+
+You can try this out with:
+```
+roslaunch psen_scan_v2 psen_scan_v2.lauch config_file:='full_path_to/example_config.xml'
+```
+
+If you want to use the configuration node in your launchfile add a section such as:
+
+```
+<node ns="$(arg laser_ns)" name="config_server_node_$(arg laser_ns)" type="config_server_node" pkg="psen_scan_v2">
+  <param name="config_file" value="$(arg config_file)" />
+  <param name="frame_id" value="$(arg frame_id)" />
+</node>
+```
 
 ## Developer Information
 ### Build Status

@@ -1,0 +1,34 @@
+<!--
+Copyright (c) 2021 Pilz GmbH & Co. KG
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<launch>
+  <arg name="frame_id" default="laser_1" />
+
+  <node ns="test_ns_laser_1" name="config_server_node" pkg="psen_scan_v2" type="config_server_node">
+    <param name="config_file" value="$(find psen_scan_v2)/standalone/test/unit_tests/configuration/unittest_xml_configuration_parser-testfile-with-speedrange.xml" />
+    <param name="frame_id" value="$(arg frame_id)"/>
+  </node>
+
+  <!-- For this test a bag-file was recorded with
+  roslaunch psen_scan_v2 psen_scan_v2.launch config_file:=<path-to>/unittest_xml_configuration_parser-testfile-with-speedrange.xml
+  rosbag record -O integrationtest_config_server_node-testfile.bag -l 1 /laser_1/zoneconfiguration
+  -->
+  <test test-name="integrationtest_config_server_node" pkg="psen_scan_v2" type="integrationtest_config_server_node">
+    <param name="bag_testfile" value="$(find psen_scan_v2)/test/bag/integrationtest_config_server_node-testfile.bag" />
+    <param name="frame_id" value="$(arg frame_id)"/>
+  </test>
+
+</launch>

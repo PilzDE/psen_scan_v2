@@ -17,6 +17,7 @@
 #define PSEN_SCAN_V2_STANDALONE_DEFAULT_PARAMETERS_H
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -47,6 +48,8 @@ static constexpr double RANGE_MIN_IN_M{ 0.05 };
 static constexpr double RANGE_MAX_IN_M{ 40. };
 
 static constexpr double DEFAULT_X_AXIS_ROTATION(data_conversion_layer::degreeToRadian(137.5));
+
+static const util::TenthOfDegree DEFAULT_ZONESET_ANGLE_STEP(5);
 }  // namespace configuration
 
 }  // namespace psen_scan_v2_standalone

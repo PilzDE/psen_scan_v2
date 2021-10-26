@@ -33,4 +33,19 @@ namespace psen_scan_v2_standalone_test
   } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
 }  // namespace psen_scan_v2_standalone_test
 
+#define EXPECT_THROW_AND_WHAT(statement, expected_exception, expected_message)                                         \
+  EXPECT_THROW(                                                                                                        \
+      {                                                                                                                \
+        try                                                                                                            \
+        {                                                                                                              \
+          statement;                                                                                                   \
+        }                                                                                                              \
+        catch (const expected_exception& e)                                                                            \
+        {                                                                                                              \
+          EXPECT_STREQ(expected_message, e.what());                                                                    \
+          throw;                                                                                                       \
+        }                                                                                                              \
+      },                                                                                                               \
+      expected_exception);
+
 #endif  // PSEN_SCAN_V2_STANDALONE_TEST_EXPECTATIONS_H
