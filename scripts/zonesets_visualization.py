@@ -44,7 +44,9 @@ def publish_zoneconfiguration_visualizations(pub):
     if(active_zoneset_config):
         for idx, zoneset in enumerate(active_zoneset_config.zonesets):
 
-            range_info = 'min:{:+} max:{:+}'.format(zoneset.speed_lower, zoneset.speed_upper)
+            range_info = ""
+            if zoneset.speed_lower != 0 or zoneset.speed_upper != 0:
+                range_info = 'min:{:+} max:{:+}'.format(zoneset.speed_lower, zoneset.speed_upper)
             if len(zoneset.safety1.points):
                 pub.publish(get_marker('zoneset[' + str(idx) + "] safety1 " + range_info, zoneset.safety1.points, 0, ColorRGBA(1,0,0,1), zoneset.header.frame_id))
             if len(zoneset.safety2.points):
