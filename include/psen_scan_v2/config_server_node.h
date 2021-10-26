@@ -32,7 +32,7 @@ using namespace std;
  */
 namespace psen_scan_v2
 {
-static const std::string DEFAULT_ZONESET_TOPIC = "zonesets";
+static const std::string DEFAULT_ZONESET_TOPIC = "zoneconfiguration";
 
 /**
  * @brief ROS Node that publishes a latched topic containing the configured zonesets.

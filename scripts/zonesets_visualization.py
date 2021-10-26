@@ -38,7 +38,7 @@ def get_marker(ns, points, id, color, frame_id, z_offset=0):
         marker.colors.append(color)
     return marker
 
-def publish_zoneset_visualizations(pub):
+def publish_zoneconfiguration_visualizations(pub):
     global active_zoneset_config
 
     if(active_zoneset_config):
@@ -63,13 +63,13 @@ def publish_zoneset_visualizations(pub):
 
 if __name__ == '__main__':
     try:
-        rospy.init_node('zonesets_visualization_node', anonymous=True)
-        rospy.Subscriber(rospy.get_namespace() + "zonesets", ZoneSetConfiguration, zoneset_configuration_callback)
-        pub = rospy.Publisher('zoneset_visualisation', Marker, queue_size=10)
+        rospy.init_node('zoneconfiguration_visualization_node', anonymous=True)
+        rospy.Subscriber(rospy.get_namespace() + "zoneconfiguration", ZoneSetConfiguration, zoneset_configuration_callback)
+        pub = rospy.Publisher('zoneconfiguration_visualisation', Marker, queue_size=10)
         rate = rospy.Rate(10)
 
         while not rospy.is_shutdown():
-            publish_zoneset_visualizations(pub)
+            publish_zoneconfiguration_visualizations(pub)
             rate.sleep()
     except rospy.ROSInterruptException:
         pass

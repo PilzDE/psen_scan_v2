@@ -118,7 +118,7 @@ Start a preconfigured rviz visualizing the scan data.
 
 `Hint 2: Frequency of the laser scan messages is about 33hz for the combined and 200hz for the fragmented scans.`
 
-/\<name\>/zonesets ([psen_scan_v2/ZoneSetConfiguration](http://docs.ros.org/en/noetic/api/psen_scan_v2/html/msg/ZoneSetConfiguration.html))<br/>
+/\<name\>/zoneconfiguration ([psen_scan_v2/ZoneSetConfiguration](http://docs.ros.org/en/noetic/api/psen_scan_v2/html/msg/ZoneSetConfiguration.html))<br/>
 
 /\<name\>/active_zoneset ([std_msgs/UInt8][])<br/>
 

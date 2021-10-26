@@ -138,7 +138,7 @@ class SubscriberMock
 public:
   SubscriberMock()
   {
-    subscriber_ = nh_.subscribe("/test_ns_laser_1/zonesets", 10, &SubscriberMock::callback, this);
+    subscriber_ = nh_.subscribe("/test_ns_laser_1/zoneconfiguration", 10, &SubscriberMock::callback, this);
   }
 
   MOCK_METHOD1(callback, void(const ros::MessageEvent<ZoneSetConfiguration const>& event));
@@ -163,7 +163,7 @@ public:
 
     try
     {
-      zoneset_config_ = readSingleMsgFromBagFile(bag_testfile, "/laser_1/zonesets");
+      zoneset_config_ = readSingleMsgFromBagFile(bag_testfile, "/laser_1/zoneconfiguration");
     }
     catch (const rosbag::BagIOException& e)
     {
@@ -189,7 +189,7 @@ private:
 TEST_F(ConfigServerNodeTest, shouldAdvertiseZonesetTopic)
 {
   // Set param on server
-  EXPECT_TRUE(TopicExists("/test_ns_laser_1/zonesets"));
+  EXPECT_TRUE(TopicExists("/test_ns_laser_1/zoneconfiguration"));
 }
 
 TEST_F(ConfigServerNodeTest, shouldPublishLatchedOnZonesetTopic)
