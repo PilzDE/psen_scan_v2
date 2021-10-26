@@ -184,6 +184,9 @@ target_link_libraries(config_server_node
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_standalone_xml_configuration_import
 )
+add_dependencies(config_server_node
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+)
 
 #############
 ## Install ##
