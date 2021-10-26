@@ -37,6 +37,10 @@ public:
   }
 };
 
+/**
+ * @brief The speedrange at which a ZoneSet is active.
+ *
+ */
 class ZoneSetSpeedRange
 {
 public:
@@ -60,6 +64,10 @@ public:
   }
 };
 
+/**
+ * @brief A set of simultanously active zones.
+ *
+ */
 class ZoneSet
 {
 public:

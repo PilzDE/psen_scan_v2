@@ -27,6 +27,10 @@ namespace psen_scan_v2_standalone
 {
 namespace configuration
 {
+/**
+ * @brief Namespace for parsing xml configuration files exported from the psenScan Configurator.
+ *
+ */
 namespace xml_config_parsing
 {
 class XMLConfigurationParserException : public std::runtime_error
