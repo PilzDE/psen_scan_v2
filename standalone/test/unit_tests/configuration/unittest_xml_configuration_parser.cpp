@@ -489,7 +489,7 @@ TEST_F(XmlConfiguationParserTest, shouldThrowIfEncEnableIsEmpty)
   const std::string xml = "<MIB>"
                           "  <clusterDescr>"
                           "    <zoneSetConfiguration>"
-                          "      <encEnable></encEnable>"
+                          "      <encEnable></encEnable>"  // <encEnable> empty
                           "    </zoneSetConfiguration>"
                           "  </clusterDescr>"
                           "  <scannerDescr>"
