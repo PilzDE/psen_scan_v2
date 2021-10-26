@@ -120,6 +120,31 @@ MATCHER_P(messageZoneSetsPolygonPointCountsEQ, expected_msg, "")
   return Matches(zonesetVecPolygonPointCountsEQ(expected_msg.zonesets))(actual_msg->zonesets);
 }
 
+MATCHER_P(zonesetPolygonPointsEQ, expected_zoneset, "")
+{
+  return Matches(ContainerEq(expected_zoneset.safety1.points))(arg.safety1.points) &&
+         Matches(ContainerEq(expected_zoneset.safety2.points))(arg.safety2.points) &&
+         Matches(ContainerEq(expected_zoneset.safety3.points))(arg.safety3.points) &&
+         Matches(ContainerEq(expected_zoneset.warn1.points))(arg.warn1.points) &&
+         Matches(ContainerEq(expected_zoneset.warn2.points))(arg.warn2.points) &&
+         Matches(ContainerEq(expected_zoneset.muting1.points))(arg.muting1.points) &&
+         Matches(ContainerEq(expected_zoneset.muting2.points))(arg.muting2.points);
+}
+
+MATCHER_P(zonesetVecPolygonPointsEQ, expected_zonesets, "")
+{
+  return std::equal(
+      expected_zonesets.begin(), expected_zonesets.end(), arg.begin(), arg.end(), [](const auto& a, const auto& b) {
+        return Matches(zonesetPolygonPointsEQ(a))(b);
+      });
+}
+
+MATCHER_P(messageZoneSetsPolygonPointsEQ, expected_msg, "")
+{
+  auto actual_msg = arg.getMessage();
+  return Matches(zonesetVecPolygonPointsEQ(expected_msg.zonesets))(actual_msg->zonesets);
+}
+
 ZoneSetConfiguration readSingleMsgFromBagFile(const std::string& filepath, const std::string& zone_sets_topic)
 {
   rosbag::Bag bag;
@@ -202,7 +227,7 @@ TEST_F(ConfigServerNodeTest, shouldPublishLatchedOnZonesetTopic)
   topic_received_barrier.waitTillRelease(3s);
 }
 
-TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedZoneSetsCount)
+TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedZoneSetCount)
 {
   SubscriberMock subscriber_mock;
   util::Barrier msg_received_barrier;
@@ -241,6 +266,17 @@ TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedPolygonPointCou
   util::Barrier msg_received_barrier;
 
   EXPECT_CALL(subscriber_mock, callback(messageZoneSetsPolygonPointCountsEQ(expectedZoneSetConfig())))
+      .WillOnce(OpenBarrier(&msg_received_barrier));
+
+  msg_received_barrier.waitTillRelease(3s);
+}
+
+TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedPolygonPoints)
+{
+  SubscriberMock subscriber_mock;
+  util::Barrier msg_received_barrier;
+
+  EXPECT_CALL(subscriber_mock, callback(messageZoneSetsPolygonPointsEQ(expectedZoneSetConfig())))
       .WillOnce(OpenBarrier(&msg_received_barrier));
 
   msg_received_barrier.waitTillRelease(3s);
