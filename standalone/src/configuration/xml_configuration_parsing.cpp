@@ -102,7 +102,7 @@ ZoneSet parseZoneSet(const tinyxml2::XMLElement* xml_set_element)
     xml_set_detail_element = xml_set_detail_element->NextSiblingElement("zoneSetDetail");
   }
 
-  // Set default resolution for now this is only know implicitly
+  // Set default resolution for now this is only known implicitly
   set.resolution_ = DEFAULT_ZONESET_ANGLE_STEP;
 
   return set;
@@ -225,7 +225,7 @@ ZoneSetConfiguration parseTinyXML(const tinyxml2::XMLDocument& doc)
 
     if (zonesets.size() == speed_ranges.size())
     {
-      for (size_t i = 0; i < zonesets.size() && i < speed_ranges.size(); i++)
+      for (size_t i = 0; i < zonesets.size(); i++)
       {
         zonesets.at(i).speed_range_ = speed_ranges.at(i);
       }
