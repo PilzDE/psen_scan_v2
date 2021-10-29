@@ -15,11 +15,24 @@
 
 #include <ros/ros.h>
 
+#include "psen_scan_v2/active_zoneset_node.h"
+
+
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "active_zoneset_node");
   ros::NodeHandle nh;
-  ros::NodeHandle pnh{ "~" };
+
+  try
+  {
+    psen_scan_v2::ActiveZonesetNode active_zoneset_node{nh};
+    ros::spin();
+  }
+  // LCOV_EXCL_START
+  catch (std::exception& e)
+  {
+    ROS_ERROR_STREAM(e.what());
+  }
 
   return 0;
 }
