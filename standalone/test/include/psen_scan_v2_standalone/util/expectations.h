@@ -16,6 +16,14 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_TEST_EXPECTATIONS_H
 #define PSEN_SCAN_V2_STANDALONE_TEST_EXPECTATIONS_H
 
+#include <chrono>
+#include <future>
+
+#include <gtest/gtest.h>
+
+#include "psen_scan_v2_standalone/util/async_barrier.h"
+#include "psen_scan_v2_standalone/util/matchers_and_actions.h"
+
 namespace psen_scan_v2_standalone_test
 {
 #define EXPECT_FUTURE_IS_READY(future, wait_timeout) EXPECT_EQ(future.wait_for(wait_timeout), std::future_status::ready)
@@ -35,7 +43,7 @@ namespace psen_scan_v2_standalone_test
 #define EXPECT_ASYNC_CALL(mock, call, timeout)                                                                         \
   do                                                                                                                   \
   {                                                                                                                    \
-    util::Barrier msg_received_barrier;                                                                                \
+    psen_scan_v2_standalone::util::Barrier msg_received_barrier;                                                       \
     EXPECT_CALL(mock, call).WillOnce(OpenBarrier(&msg_received_barrier));                                              \
     msg_received_barrier.waitTillRelease(timeout);                                                                     \
   } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
