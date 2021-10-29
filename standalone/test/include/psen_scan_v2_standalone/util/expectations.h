@@ -25,11 +25,13 @@ namespace psen_scan_v2_standalone_test
 
 #define EXPECT_BARRIER_OPENS(barrier, wait_timeout) EXPECT_TRUE(barrier.waitTillRelease(wait_timeout))
 
-#define EXPECT_DOES_NOT_BLOCK(statement)                                                                               \
+#define EXPECT_DOES_NOT_BLOCK_NOR_THROW(statement)                                                                     \
   do                                                                                                                   \
   {                                                                                                                    \
-    const auto future = std::async(std::launch::async, [&]() { statement });                                           \
+    auto future = std::async(std::launch::async, [&]() { statement });                                                 \
+    EXPECT_TRUE(future.valid());                                                                                       \
     EXPECT_FUTURE_IS_READY(future, std::chrono::seconds{ 1 }) << #statement << " does not return.";                    \
+    EXPECT_NO_THROW(future.get();) << #statement << " does throw an exception.";                                       \
   } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
 }  // namespace psen_scan_v2_standalone_test
 
