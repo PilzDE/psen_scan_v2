@@ -65,22 +65,6 @@ namespace psen_scan_v2
 
 static constexpr int QUEUE_SIZE{ 10 };
 
-MATCHER_P(IsRosScanEqual, expected_ros_scan, "")
-{
-  const sensor_msgs::LaserScan actual_scan = arg;
-
-  // clang-format off
-  return (actual_scan.angle_min       == expected_ros_scan.angle_min) &&
-         (actual_scan.angle_max       == expected_ros_scan.angle_max) &&
-         (actual_scan.angle_increment == expected_ros_scan.angle_increment) &&
-         (actual_scan.time_increment  == expected_ros_scan.time_increment) &&
-         (actual_scan.scan_time       == expected_ros_scan.scan_time) &&
-         (actual_scan.range_min       == expected_ros_scan.range_min) &&
-         (actual_scan.ranges          == expected_ros_scan.ranges) &&
-         (actual_scan.intensities     == expected_ros_scan.intensities);
-  // clang-format on
-}
-
 class SubscriberMock
 {
 public:
@@ -308,7 +292,7 @@ TEST_F(RosScannerNodeTests, shouldPublishScanEqualToConversionOfSuppliedLaserSca
   util::Barrier scan_topic_barrier;
   SubscriberMock subscriber(nh_priv_);
   const auto scan = createValidLaserScan();
-  EXPECT_CALL(subscriber, scan_callback(IsRosScanEqual(toLaserScanMsg(scan, prefix, x_axis_rotation))))
+  EXPECT_CALL(subscriber, scan_callback(toLaserScanMsg(scan, prefix, x_axis_rotation)))
       .WillOnce(OpenBarrier(&scan_topic_barrier));
 
   util::Barrier start_barrier;
