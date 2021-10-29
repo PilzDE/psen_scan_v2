@@ -32,26 +32,6 @@ using namespace std::chrono_literals;
 using namespace psen_scan_v2_standalone;
 using namespace psen_scan_v2_standalone_test;
 
-inline visualization_msgs::Marker createValidMarker() {
-  visualization_msgs::Marker marker;
-  marker.header.frame_id = "laser_1";
-  marker.ns = "test_ns_laser_1";
-  marker.id = 0;
-  marker.type = visualization_msgs::Marker::TRIANGLE_LIST;
-  marker.action = visualization_msgs::Marker::ADD;
-  marker.scale.x = 1.0;
-  marker.scale.y = 1.0;
-  marker.scale.z = 1.0;
-  marker.color.a = 0.4;
-  marker.pose.orientation.z = 0;
-  marker.pose.orientation.w = 1;
-  marker.pose.position.x = 0;
-  marker.pose.position.y = 0;
-  marker.pose.position.z = 0;
-
-  return marker;
-}
-
 class SubscriberMock
 {
 public:
@@ -80,10 +60,10 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithCorrectType)
 {
   SubscriberMock subscriber_mock;
 
-  auto expected_marker = createValidMarker();
-  expected_marker.type = visualization_msgs::Marker::TRIANGLE_LIST;
-
-  EXPECT_ASYNC_CALL(subscriber_mock, callback(expected_marker), 3s);
+  EXPECT_ASYNC_CALL(
+      subscriber_mock,
+      callback(::testing::Field("type", &visualization_msgs::Marker::type, visualization_msgs::Marker::TRIANGLE_LIST)),
+      3s);
 }
 
 }  // namespace psen_scan_v2_test
