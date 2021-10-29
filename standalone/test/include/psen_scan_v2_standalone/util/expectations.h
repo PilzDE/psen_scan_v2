@@ -16,6 +16,8 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_TEST_EXPECTATIONS_H
 #define PSEN_SCAN_V2_STANDALONE_TEST_EXPECTATIONS_H
 
+#include <gtest/gtest.h>
+
 namespace psen_scan_v2_standalone_test
 {
 #define EXPECT_FUTURE_IS_READY(future, wait_timeout) EXPECT_EQ(future.wait_for(wait_timeout), std::future_status::ready)

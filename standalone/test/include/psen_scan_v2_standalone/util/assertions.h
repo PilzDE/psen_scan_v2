@@ -16,6 +16,8 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_TEST_ASSERTIONS_H
 #define PSEN_SCAN_V2_STANDALONE_TEST_ASSERTIONS_H
 
+#include <gtest/gtest.h>
+
 #define ASSERT_BARRIER_OPENS(barrier, wait_timeout) ASSERT_TRUE(barrier.waitTillRelease(wait_timeout))
 
 #endif  // PSEN_SCAN_V2_STANDALONE_TEST_ASSERTIONS_H
