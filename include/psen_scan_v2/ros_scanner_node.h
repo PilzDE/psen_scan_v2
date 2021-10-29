@@ -33,8 +33,6 @@
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 
-using namespace std;
-
 /**
  * @brief Root namespace for the ROS part
  */

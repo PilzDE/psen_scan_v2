@@ -25,8 +25,6 @@
 #include "psen_scan_v2/ZoneSet.h"
 #include "psen_scan_v2/ZoneSetConfiguration.h"
 
-using namespace std;
-
 /**
  * @brief Root namespace for the ROS part
  */
