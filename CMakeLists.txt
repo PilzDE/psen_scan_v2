@@ -197,6 +197,7 @@ add_executable(active_zoneset_node
 )
 target_link_libraries(active_zoneset_node
   ${catkin_LIBRARIES}
+  fmt::fmt
 )
 add_dependencies(active_zoneset_node
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
@@ -448,6 +449,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   target_link_libraries(unittest_zoneset_to_marker_conversion
     ${catkin_LIBRARIES}
+    fmt::fmt
   )
   add_dependencies(unittest_zoneset_to_marker_conversion
     ${${PROJECT_NAME}_EXPORTED_TARGETS}
