@@ -192,7 +192,9 @@ add_dependencies(config_server_node
 
 
 add_executable(active_zoneset_node
-  src/active_zoneset_node_main.cpp)
+  src/active_zoneset_node_main.cpp
+  src/active_zoneset_node.cpp
+)
 target_link_libraries(active_zoneset_node
   ${catkin_LIBRARIES}
 )
@@ -440,6 +442,16 @@ if(CATKIN_ENABLE_TESTING)
     fmt::fmt
   )
   add_dependencies(unittest_zone_configuration_ros_conversion ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+  catkin_add_gtest(unittest_zoneset_to_marker_conversion
+    test/unit_tests/unittest_zoneset_to_marker_conversion.cpp
+  )
+  target_link_libraries(unittest_zoneset_to_marker_conversion
+    ${catkin_LIBRARIES}
+  )
+  add_dependencies(unittest_zoneset_to_marker_conversion
+    ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  )
   #########################
   ##  Integration-Tests  ##
   #########################

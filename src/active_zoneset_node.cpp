@@ -13,45 +13,32 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef PSEN_SCAN_V2_ACTIVE_ZONESET_H
-#define PSEN_SCAN_V2_ACTIVE_ZONESET_H
+#include <vector>
 
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
 
+#include "psen_scan_v2/active_zoneset_node.h"
+#include "psen_scan_v2/config_server_node.h"
 #include "psen_scan_v2/ZoneSetConfiguration.h"
+#include "psen_scan_v2/zoneset_to_marker_conversion.h"
 
 namespace psen_scan_v2
 {
-static const std::string DEFAULT_ZONESET_MARKER_TOPIC = "active_zoneset_marker";
-
-/**
- * @brief ROS Node that continuously publishes a marker for the active_zoneset.
- *
- * subscribes to: ns/active_zoneset
- * subscribes to: ns/zonsesetconfiguration
- *
- * advertizes: ns/active_zoneset_marker
- */
-class ActiveZonesetNode
+ActiveZonesetNode::ActiveZonesetNode(ros::NodeHandle& nh) : nh_(nh)
 {
-public:
-  /**
-   * @brief Constructor.
-   *
-   * @param nh Node handle for the ROS node on which the scanner topic is advertised.
-   */
-  ActiveZonesetNode(ros::NodeHandle& nh);
+  zoneset_subscriber_ = nh_.subscribe(DEFAULT_ZONESET_TOPIC, 1, &ActiveZonesetNode::zonesetCallback, this);
+  zoneset_marker_ = nh_.advertise<visualization_msgs::Marker>(DEFAULT_ZONESET_MARKER_TOPIC, 1);
+}
 
-public:
-  void zonesetCallback(const ZoneSetConfiguration& zoneset_config);
-
-private:
-  ros::NodeHandle nh_;
-  ros::Subscriber zoneset_subscriber_;
-  ros::Publisher zoneset_marker_;
+void ActiveZonesetNode::zonesetCallback(const ZoneSetConfiguration& zoneset_config)
+{
+  std::size_t active_zoneset_id = 0;
+  const auto markers = toMarkers(zoneset_config.zonesets.at(active_zoneset_id));
+  for (const auto& marker : markers)
+  {
+    zoneset_marker_.publish(marker);
+  }
 };
 
 }  // namespace psen_scan_v2
-
-#endif  // PSEN_SCAN_V2_ACTIVE_ZONESET_H
