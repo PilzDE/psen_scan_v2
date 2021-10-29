@@ -17,7 +17,6 @@
 
 #include "psen_scan_v2/active_zoneset_node.h"
 
-
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "active_zoneset_node");
@@ -25,7 +24,7 @@ int main(int argc, char** argv)
 
   try
   {
-    psen_scan_v2::ActiveZonesetNode active_zoneset_node{nh};
+    psen_scan_v2::ActiveZonesetNode active_zoneset_node{ nh };
     ros::spin();
   }
   // LCOV_EXCL_START

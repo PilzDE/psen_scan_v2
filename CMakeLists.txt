@@ -33,6 +33,7 @@ find_package(catkin REQUIRED COMPONENTS
   cmake_modules # Needed for find_package(TinyXML2 REQUIRED)
   message_generation
   geometry_msgs
+  visualization_msgs
   std_msgs
 )
 
@@ -56,6 +57,7 @@ add_message_files(
 generate_messages(
   DEPENDENCIES
   geometry_msgs
+  visualization_msgs
   std_msgs
 )
 

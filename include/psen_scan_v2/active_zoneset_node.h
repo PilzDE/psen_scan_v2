@@ -46,8 +46,7 @@ private:
   ros::Publisher zoneset_marker_;
 };
 
-ActiveZonesetNode::ActiveZonesetNode(ros::NodeHandle& nh)
-  : nh_(nh)
+ActiveZonesetNode::ActiveZonesetNode(ros::NodeHandle& nh) : nh_(nh)
 {
   zoneset_marker_ = nh_.advertise<visualization_msgs::Marker>(DEFAULT_ZONESET_MARKER_TOPIC, 1);
 }
