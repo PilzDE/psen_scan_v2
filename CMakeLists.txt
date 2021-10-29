@@ -188,6 +188,16 @@ add_dependencies(config_server_node
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
 )
 
+
+add_executable(active_zoneset_node
+  src/active_zoneset_node_main.cpp)
+target_link_libraries(active_zoneset_node
+  ${catkin_LIBRARIES}
+)
+add_dependencies(active_zoneset_node
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+)
+
 #############
 ## Install ##
 #############
@@ -208,6 +218,7 @@ install(TARGETS
   ${PROJECT_NAME}_node
   ${PROJECT_NAME}_standalone
   config_server_node
+  active_zoneset_node
   ${PROJECT_NAME}_standalone_xml_configuration_import
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -484,6 +495,21 @@ if(CATKIN_ENABLE_TESTING)
   add_dependencies(integrationtest_config_server_node
     ${PROJECT_NAME}_standalone
     config_server_node
+    ${PROJECT_NAME}_standalone_xml_configuration_import
+    ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  )
+
+  add_rostest_gmock(integrationtest_active_zoneset_node
+    test/integration_tests/integrationtest_active_zoneset_node.test
+    test/integration_tests/integrationtest_active_zoneset_node.cpp
+  )
+  target_link_libraries(integrationtest_active_zoneset_node
+    ${catkin_LIBRARIES}
+    ${rosbag_LIBRARIES}
+  )
+  add_dependencies(integrationtest_active_zoneset_node
+    ${PROJECT_NAME}_standalone
+    active_zoneset_node
     ${PROJECT_NAME}_standalone_xml_configuration_import
     ${${PROJECT_NAME}_EXPORTED_TARGETS}
   )

@@ -19,6 +19,8 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include <ros/ros.h>
+
 #include <geometry_msgs/Point32.h>
 #include <geometry_msgs/Polygon.h>
 
