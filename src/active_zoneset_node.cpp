@@ -17,6 +17,7 @@
 
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
+#include <std_msgs/UInt8.h>
 
 #include "psen_scan_v2/active_zoneset_node.h"
 #include "psen_scan_v2/config_server_node.h"
@@ -28,16 +29,25 @@ namespace psen_scan_v2
 ActiveZonesetNode::ActiveZonesetNode(ros::NodeHandle& nh) : nh_(nh)
 {
   zoneset_subscriber_ = nh_.subscribe(DEFAULT_ZONESET_TOPIC, 1, &ActiveZonesetNode::zonesetCallback, this);
+  active_zoneset_subscriber_ =
+      nh_.subscribe("active_zoneset", 1, &ActiveZonesetNode::activeZonesetCallback, this);
   zoneset_marker_ = nh_.advertise<visualization_msgs::Marker>(DEFAULT_ZONESET_MARKER_TOPIC, 1);
 }
 
 void ActiveZonesetNode::zonesetCallback(const ZoneSetConfiguration& zoneset_config)
 {
-  std::size_t active_zoneset_id = 0;
-  const auto markers = toMarkers(zoneset_config.zonesets.at(active_zoneset_id));
-  for (const auto& marker : markers)
+  zoneset_config_ = zoneset_config;
+}
+
+void ActiveZonesetNode::activeZonesetCallback(const std_msgs::UInt8& active_zoneset)
+{
+  if (zoneset_config_.is_initialized())
   {
-    zoneset_marker_.publish(marker);
+    const auto markers = toMarkers(zoneset_config_.get().zonesets.at(active_zoneset.data));
+    for (const auto& marker : markers)
+    {
+      zoneset_marker_.publish(marker);
+    }
   }
 };
 

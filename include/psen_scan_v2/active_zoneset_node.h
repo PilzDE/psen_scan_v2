@@ -17,7 +17,9 @@
 #define PSEN_SCAN_V2_ACTIVE_ZONESET_H
 
 #include <ros/ros.h>
+#include <boost/optional.hpp>
 #include <visualization_msgs/Marker.h>
+#include <std_msgs/UInt8.h>
 
 #include "psen_scan_v2/ZoneSetConfiguration.h"
 
@@ -45,11 +47,15 @@ public:
 
 public:
   void zonesetCallback(const ZoneSetConfiguration& zoneset_config);
+  void activeZonesetCallback(const std_msgs::UInt8& zoneset_config);
 
 private:
   ros::NodeHandle nh_;
   ros::Subscriber zoneset_subscriber_;
+  ros::Subscriber active_zoneset_subscriber_;
   ros::Publisher zoneset_marker_;
+
+  boost::optional<ZoneSetConfiguration> zoneset_config_;
 };
 
 }  // namespace psen_scan_v2
