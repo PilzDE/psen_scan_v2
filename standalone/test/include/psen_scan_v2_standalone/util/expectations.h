@@ -40,11 +40,19 @@ namespace psen_scan_v2_standalone_test
     EXPECT_FUTURE_IS_READY(future, std::chrono::seconds{ 1 }) << #statement << " does not return.";                    \
   } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
 
-#define EXPECT_ASYNC_CALL(mock, call, timeout)                                                                         \
+#define EXPECT_CALL_AND_WAIT(mock, call, timeout)                                                                      \
   do                                                                                                                   \
   {                                                                                                                    \
     psen_scan_v2_standalone::util::Barrier msg_received_barrier;                                                       \
     EXPECT_CALL(mock, call).WillOnce(OpenBarrier(&msg_received_barrier));                                              \
+    msg_received_barrier.waitTillRelease(timeout);                                                                     \
+  } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
+
+#define EXPECT_CALLS_AND_WAIT(mock, call, timeout)                                                                     \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    psen_scan_v2_standalone::util::Barrier msg_received_barrier;                                                       \
+    EXPECT_CALL(mock, call).WillOnce(OpenBarrier(&msg_received_barrier)).WillRepeatedly(Return());                     \
     msg_received_barrier.waitTillRelease(timeout);                                                                     \
   } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
 }  // namespace psen_scan_v2_standalone_test

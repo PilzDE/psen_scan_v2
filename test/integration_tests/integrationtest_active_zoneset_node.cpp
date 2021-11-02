@@ -60,7 +60,7 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithCorrectType)
 {
   SubscriberMock subscriber_mock;
 
-  EXPECT_ASYNC_CALL(
+  EXPECT_CALLS_AND_WAIT(
       subscriber_mock,
       callback(::testing::Field("type", &visualization_msgs::Marker::type, visualization_msgs::Marker::TRIANGLE_LIST)),
       3s);
