@@ -59,7 +59,7 @@ ZoneSet parseZoneSet(const tinyxml2::XMLElement* xml_set_element)
 
   const tinyxml2::XMLElement* xml_set_detail_element = getFirstChildElement(xml_set_element, "zoneSetDetail");
 
-  while (xml_set_detail_element)  // TODO do-while?
+  while (xml_set_detail_element)
   {
     const tinyxml2::XMLElement* xml_set_detail_type_element = getFirstChildElement(xml_set_detail_element, "type");
     const tinyxml2::XMLElement* xml_set_detail_ro_element = getFirstChildElement(xml_set_detail_element, "ro");
