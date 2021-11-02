@@ -36,18 +36,25 @@ ActiveZonesetNode::ActiveZonesetNode(ros::NodeHandle& nh) : nh_(nh)
 void ActiveZonesetNode::zonesetCallback(const ZoneSetConfiguration& zoneset_config)
 {
   zoneset_config_ = zoneset_config;
+  sendMarkersWhenAllInformationIsAvailable();
 }
 
 void ActiveZonesetNode::activeZonesetCallback(const std_msgs::UInt8& active_zoneset)
 {
-  if (zoneset_config_.is_initialized())
+  active_zoneset_ = active_zoneset;
+  sendMarkersWhenAllInformationIsAvailable();
+};
+
+void ActiveZonesetNode::sendMarkersWhenAllInformationIsAvailable()
+{
+  if (active_zoneset_.is_initialized() && zoneset_config_.is_initialized())
   {
-    const auto markers = toMarkers(zoneset_config_.get().zonesets.at(active_zoneset.data));
+    const auto markers = toMarkers(zoneset_config_.get().zonesets.at(active_zoneset_.get().data));
     for (const auto& marker : markers)
     {
       zoneset_marker_.publish(marker);
     }
   }
-};
+}
 
 }  // namespace psen_scan_v2

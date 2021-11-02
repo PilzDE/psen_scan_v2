@@ -50,12 +50,16 @@ public:
   void activeZonesetCallback(const std_msgs::UInt8& zoneset_config);
 
 private:
+  void sendMarkersWhenAllInformationIsAvailable();
+
+private:
   ros::NodeHandle nh_;
   ros::Subscriber zoneset_subscriber_;
   ros::Subscriber active_zoneset_subscriber_;
   ros::Publisher zoneset_marker_;
 
   boost::optional<ZoneSetConfiguration> zoneset_config_;
+  boost::optional<std_msgs::UInt8> active_zoneset_;
 };
 
 }  // namespace psen_scan_v2
