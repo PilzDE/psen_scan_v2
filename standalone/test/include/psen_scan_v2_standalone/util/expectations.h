@@ -56,14 +56,36 @@ namespace psen_scan_v2_standalone_test
     msg_received_barrier.waitTillRelease(timeout);                                                                     \
   } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
 
-#define EXPECT_CALLS_ON_STATEMENT_AND_WAIT(mock, call, statement, timeout)                                             \
+#define EXPECT_CALL_X_TIMES_RUN_STATEMENT_AND_WAIT(mock, call, times, statement, timeout)                              \
   do                                                                                                                   \
   {                                                                                                                    \
     psen_scan_v2_standalone::util::Barrier msg_received_barrier;                                                       \
-    EXPECT_CALL(mock, call).WillOnce(OpenBarrier(&msg_received_barrier)).WillRepeatedly(Return());                     \
+    EXPECT_CALL(mock, call).WillOnce(OpenBarrier(&msg_received_barrier));                                              \
+    EXPECT_CALL(mock, call).Times(times - 1).RetiresOnSaturation();                                                    \
     statement;                                                                                                         \
     msg_received_barrier.waitTillRelease(timeout);                                                                     \
   } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
+
+#define EXPECT_CALL_WITH_BARRIER(barrier_name, mock, call)                                                             \
+  psen_scan_v2_standalone::util::Barrier barrier_name;                                                                 \
+  EXPECT_CALL(mock, call).WillOnce(OpenBarrier(&barrier_name));
+
+#define EXPECT_CALLS_ON_ASYNC_STATEMENT_AND_WAIT(mock, statement, timeout, ...)                                        \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    std::vector<psen_scan_v2_standalone::util::Barrier> barriers;                                                      \
+    FOR_EACH()(auto call : calls)                                                                                      \
+    {                                                                                                                  \
+      barriers.push_back(psen_scan_v2_standalone::util::Barrier);                                                      \
+      EXPECT_CALL(mock, call).WillOnce(OpenBarrier(&barriers.back()));                                                 \
+    }                                                                                                                  \
+    statement;                                                                                                         \
+    for (auto barrier : barriers)                                                                                      \
+    {                                                                                                                  \
+      barrier.waitTillRelease(timeout);                                                                                \
+    }                                                                                                                  \
+  } while (false)
+
 }  // namespace psen_scan_v2_standalone_test
 
 #define EXPECT_THROW_AND_WHAT(statement, expected_exception, expected_message)                                         \

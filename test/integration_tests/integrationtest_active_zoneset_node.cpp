@@ -14,6 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <chrono>
+#include <vector>
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -35,17 +36,20 @@ using namespace psen_scan_v2_standalone_test;
 
 MATCHER(hasPoints, "")
 {
-  return !arg.points.empty();
+  *result_listener << "arg.points length is: " << arg->points.size();
+  return !arg->points.empty();
 }
 
-MATCHER(IsTriangleList, "")
+MATCHER(isTriangleList, "")
 {
-  return arg.type == visualization_msgs::Marker::TRIANGLE_LIST;
+  *result_listener << "arg.type is: " << arg->type << "but should be: " << visualization_msgs::Marker::TRIANGLE_LIST;
+  return arg->type == visualization_msgs::Marker::TRIANGLE_LIST;
 }
 
 MATCHER_P(matchesName, expectedName, "")
 {
-  return arg.ns == expectedName;
+  *result_listener << "arg.ns is: " << arg->ns << " but should be: " << expectedName;
+  return arg->ns == expectedName;
 }
 
 class SubscriberMock
@@ -56,7 +60,7 @@ public:
     subscriber_ = nh_.subscribe("/test_ns_laser_1/active_zoneset_marker", 10, &SubscriberMock::callback, this);
   }
 
-  MOCK_METHOD1(callback, void(const visualization_msgs::Marker& event));
+  MOCK_METHOD1(callback, void(const visualization_msgs::MarkerConstPtr& event));
 
 private:
   ros::NodeHandle nh_;
@@ -92,31 +96,41 @@ TEST_F(ActiveZonesetNodeTest, shouldAdvertiseZonesetMarkerTopic)
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithCorrectType)
 {
   SubscriberMock subscriber_mock;
-  EXPECT_CALLS_ON_STATEMENT_AND_WAIT(subscriber_mock, callback(IsTriangleList()), sendActiveZone(0), 3s);
+  EXPECT_CALL_X_TIMES_RUN_STATEMENT_AND_WAIT(subscriber_mock, callback(isTriangleList()), 2, sendActiveZone(0);, 3s);
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithPoints)
 {
   SubscriberMock subscriber_mock;
-  EXPECT_CALLS_ON_STATEMENT_AND_WAIT(subscriber_mock, callback(hasPoints()), sendActiveZone(0), 3s);
+  EXPECT_CALL_X_TIMES_RUN_STATEMENT_AND_WAIT(subscriber_mock, callback(hasPoints()), 2, sendActiveZone(0);, 3s);
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForAllDefinedZoneTypes)
 {
   SubscriberMock subscriber_mock;
 
-  psen_scan_v2_standalone::util::Barrier safety_msg_received_barrier;
-  psen_scan_v2_standalone::util::Barrier warn_msg_received_barrier;
+  // psen_scan_v2_standalone::util::Barrier safety_msg_received_barrier;
+  // psen_scan_v2_standalone::util::Barrier warn_msg_received_barrier;
 
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")))
-      .WillOnce(OpenBarrier(&safety_msg_received_barrier));
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")))
-      .WillOnce(OpenBarrier(&warn_msg_received_barrier));
+  // EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")))
+  //    .WillOnce(OpenBarrier(&safety_msg_received_barrier));
+  // EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")))
+  //    .WillOnce(OpenBarrier(&warn_msg_received_barrier));
+  EXPECT_CALL_WITH_BARRIER(safety_msg_received_barrier,
+                           subscriber_mock,
+                           callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")));
+  EXPECT_CALL_WITH_BARRIER(
+      warn_msg_received_barrier, subscriber_mock, callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")))
 
   sendActiveZone(0);
 
   safety_msg_received_barrier.waitTillRelease(3s);
   warn_msg_received_barrier.waitTillRelease(3s);
+  // EXPECT_CALLS_ON_ASYNC_STATEMENT_AND_WAIT(subscriber_mock,
+  //                                         sendActiveZone(0),
+  //                                         3s,
+  //                                         callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")),
+  //                                         callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")));
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForNewActiveZoneWhenActiveZoneSwitches)
