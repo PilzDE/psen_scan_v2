@@ -108,7 +108,6 @@ void ScannerProtocolDef::WaitForMonitoringFrame::on_entry(Event const&, FSM& fsm
   // Start watchdog...
   fsm.monitoring_frame_watchdog_ =
       fsm.watchdog_factory_.create(WATCHDOG_TIMEOUT, fsm.monitoring_frame_timeout_callback_);
-  fsm.scanner_started_callback_();
 }
 
 template <class Event, class FSM>
@@ -123,7 +122,6 @@ template <class Event, class FSM>
 void ScannerProtocolDef::Stopped::on_entry(Event const&, FSM& fsm)
 {
   PSENSCAN_DEBUG("StateMachine", "Entering state: Stopped");
-  fsm.scanner_stopped_callback_();
 }
 
 DEFAULT_ON_EXIT_IMPL(Stopped)
@@ -183,6 +181,16 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
     PSENSCAN_ERROR("StateMachine", e.what());
   }
   // LCOV_EXCL_STOP
+}
+
+void ScannerProtocolDef::notifyUserAboutStart(scanner_events::RawReplyReceived const& reply_event)
+{
+  scanner_started_callback_();
+}
+
+void ScannerProtocolDef::notifyUserAboutStop(scanner_events::RawReplyReceived const& reply_event)
+{
+  scanner_stopped_callback_();
 }
 
 inline void ScannerProtocolDef::checkForDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& msg)
