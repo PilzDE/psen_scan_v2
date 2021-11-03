@@ -202,7 +202,8 @@ inline void ScannerProtocolDef::notifyUserAboutUnknownStartReply(scanner_events:
 {
   const data_conversion_layer::scanner_reply::Message msg{ data_conversion_layer::scanner_reply::deserialize(
       *(reply_event.data_)) };
-  start_error_callback_(fmt::format("Unknown result code {:#04x} in start reply.", msg.result()));
+  start_error_callback_(
+      fmt::format("Unknown result code {:#04x} in start reply.", static_cast<uint32_t>(msg.result())));
 }
 
 inline void ScannerProtocolDef::notifyUserAboutRefusedStartReply(scanner_events::RawReplyReceived const& reply_event)
