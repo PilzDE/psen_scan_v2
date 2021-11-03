@@ -70,7 +70,7 @@ namespace psen_scan_v2_standalone_test
   psen_scan_v2_standalone::util::Barrier barrier_name;                                                                 \
   EXPECT_CALL(mock, call).WillOnce(OpenBarrier(&barrier_name));
 
-#define EXPECT_CALLS_ON_ASYNC_STATEMENT_AND_WAIT(mock, statement, timeout, ...)                                        \
+#define EXPECT_CALLS_RUN_STATEMENT_AND_WAIT(mock, statement, timeout, ...)                                             \
   do                                                                                                                   \
   {                                                                                                                    \
     std::vector<psen_scan_v2_standalone::util::Barrier> barriers;                                                      \
