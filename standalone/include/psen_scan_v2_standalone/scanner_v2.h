@@ -76,6 +76,7 @@ private:
 
   void scannerStartedCallback();
   void scannerStoppedCallback();
+  void scannerStartErrorCallback(const std::string& error_msg);
 
 private:
   using OptionalPromise = boost::optional<std::promise<void>>;

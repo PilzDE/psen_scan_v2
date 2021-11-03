@@ -23,6 +23,7 @@ namespace protocol_layer
 inline ScannerProtocolDef::ScannerProtocolDef(const ScannerConfiguration config,
                                               const communication_layer::NewMessageCallback& control_msg_callback,
                                               const communication_layer::ErrorCallback& control_error_callback,
+                                              const communication_layer::ErrorCallback& start_error_callback,
                                               const communication_layer::NewMessageCallback& data_msg_callback,
                                               const communication_layer::ErrorCallback& data_error_callback,
                                               const ScannerStartedCallback& scanner_started_callback,
@@ -43,6 +44,7 @@ inline ScannerProtocolDef::ScannerProtocolDef(const ScannerConfiguration config,
                  config_.scannerDataPort())
   , scanner_started_callback_(scanner_started_callback)
   , scanner_stopped_callback_(scanner_stopped_callback)
+  , start_error_callback_(start_error_callback)
   , inform_user_about_laser_scan_callback_(laser_scan_callback)
   , start_timeout_callback_(start_timeout_callback)
   , monitoring_frame_timeout_callback_(monitoring_frame_timeout_callback)
@@ -126,6 +128,9 @@ void ScannerProtocolDef::Stopped::on_entry(Event const&, FSM& fsm)
 
 DEFAULT_ON_EXIT_IMPL(Stopped)
 
+DEFAULT_ON_ENTRY_IMPL(Error)
+DEFAULT_ON_EXIT_IMPL(Error)
+
 // \endcond
 //+++++++++++++++++++++++++++++++++ Actions +++++++++++++++++++++++++++++++++++
 
@@ -183,14 +188,26 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
   // LCOV_EXCL_STOP
 }
 
-void ScannerProtocolDef::notifyUserAboutStart(scanner_events::RawReplyReceived const& reply_event)
+inline void ScannerProtocolDef::notifyUserAboutStart(scanner_events::RawReplyReceived const& reply_event)
 {
   scanner_started_callback_();
 }
 
-void ScannerProtocolDef::notifyUserAboutStop(scanner_events::RawReplyReceived const& reply_event)
+inline void ScannerProtocolDef::notifyUserAboutStop(scanner_events::RawReplyReceived const& reply_event)
 {
   scanner_stopped_callback_();
+}
+
+inline void ScannerProtocolDef::notifyUserAboutUnknownStartReply(scanner_events::RawReplyReceived const& reply_event)
+{
+  const data_conversion_layer::scanner_reply::Message msg{ data_conversion_layer::scanner_reply::deserialize(
+      *(reply_event.data_)) };
+  start_error_callback_(fmt::format("Unknown result code {:#04x} in start reply.", msg.result()));
+}
+
+inline void ScannerProtocolDef::notifyUserAboutRefusedStartReply(scanner_events::RawReplyReceived const& reply_event)
+{
+  start_error_callback_("Request refused by device.");
 }
 
 inline void ScannerProtocolDef::checkForDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& msg)
@@ -304,11 +321,44 @@ inline void ScannerProtocolDef::checkForInternalErrors(const data_conversion_lay
   // LCOV_EXCL_STOP
 }
 
-inline bool ScannerProtocolDef::isStartReply(scanner_events::RawReplyReceived const& reply_event)
+inline bool ScannerProtocolDef::isAcceptedStartReply(scanner_events::RawReplyReceived const& reply_event)
 {
   const data_conversion_layer::scanner_reply::Message msg{ data_conversion_layer::scanner_reply::deserialize(
       *(reply_event.data_)) };
-  checkForInternalErrors(msg);
+  return isStartReply(msg) && isAcceptedReply(msg);
+}
+
+inline bool ScannerProtocolDef::isUnknownStartReply(scanner_events::RawReplyReceived const& reply_event)
+{
+  const data_conversion_layer::scanner_reply::Message msg{ data_conversion_layer::scanner_reply::deserialize(
+      *(reply_event.data_)) };
+  return isStartReply(msg) && isUnknownReply(msg);
+}
+
+inline bool ScannerProtocolDef::isRefusedStartReply(scanner_events::RawReplyReceived const& reply_event)
+{
+  const data_conversion_layer::scanner_reply::Message msg{ data_conversion_layer::scanner_reply::deserialize(
+      *(reply_event.data_)) };
+  return isStartReply(msg) && isRefusedReply(msg);
+}
+
+inline bool ScannerProtocolDef::isAcceptedReply(data_conversion_layer::scanner_reply::Message const& msg)
+{
+  return msg.result() == data_conversion_layer::scanner_reply::Message::OperationResult::accepted;
+}
+
+inline bool ScannerProtocolDef::isUnknownReply(data_conversion_layer::scanner_reply::Message const& msg)
+{
+  return msg.result() == data_conversion_layer::scanner_reply::Message::OperationResult::unknown;
+}
+
+inline bool ScannerProtocolDef::isRefusedReply(data_conversion_layer::scanner_reply::Message const& msg)
+{
+  return msg.result() == data_conversion_layer::scanner_reply::Message::OperationResult::refused;
+}
+
+inline bool ScannerProtocolDef::isStartReply(data_conversion_layer::scanner_reply::Message const& msg)
+{
   return msg.type() == data_conversion_layer::scanner_reply::Message::Type::start;
 }
 

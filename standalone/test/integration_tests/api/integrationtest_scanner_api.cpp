@@ -240,7 +240,7 @@ TEST_F(ScannerAPITests, startShouldReturnFutureWithExceptionIfStartRequestRefuse
   setUpScannerHwMock();
 
   util::Barrier start_req_received_barrier;
-  ON_START_REQUEST_CALL(*hw_mock_, *config_).WillByDefault(OpenBarrier(&start_req_received_barrier));
+  EXPECT_START_REQUEST_CALL(*hw_mock_, *config_).WillOnce(OpenBarrier(&start_req_received_barrier));
 
   std::future<void> start_future = driver_->start();
   start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT);
@@ -257,14 +257,18 @@ TEST_F(ScannerAPITests, startShouldReturnFutureWithExceptionIfUnknownResultSent)
   setUpScannerHwMock();
 
   util::Barrier start_req_received_barrier;
-  ON_START_REQUEST_CALL(*hw_mock_, *config_).WillByDefault(OpenBarrier(&start_req_received_barrier));
+  EXPECT_START_REQUEST_CALL(*hw_mock_, *config_).WillOnce(OpenBarrier(&start_req_received_barrier));
 
   std::future<void> start_future = driver_->start();
   start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT);
 
   hw_mock_->sendStartReply(data_conversion_layer::scanner_reply::Message::OperationResult::unknown);
   EXPECT_FUTURE_IS_READY(start_future, DEFAULT_TIMEOUT);
-  EXPECT_THROW_AND_WHAT(start_future.get(), std::runtime_error, "Unknown operation result code.");
+  EXPECT_THROW_AND_WHAT(start_future.get(),
+                        std::runtime_error,
+                        fmt::format("Unknown result code {:#04x} in start reply.",
+                                    data_conversion_layer::scanner_reply::Message::OperationResult::unknown)
+                            .c_str());
 }
 
 TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
