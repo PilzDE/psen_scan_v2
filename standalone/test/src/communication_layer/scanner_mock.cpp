@@ -93,17 +93,17 @@ void ScannerMock::startContinuousListeningForControlMsg()
   control_server_.asyncReceive(MockUDPServer::ReceiveMode::continuous);
 }
 
-void ScannerMock::sendReply(const data_conversion_layer::scanner_reply::Message::Type& reply_type)
+void ScannerMock::sendReply(const data_conversion_layer::scanner_reply::Message::Type& reply_type,
+                            const data_conversion_layer::scanner_reply::Message::OperationResult& result)
 {
-  const data_conversion_layer::scanner_reply::Message msg(
-      reply_type, data_conversion_layer::scanner_reply::Message::OperationResult::accepted);
+  const data_conversion_layer::scanner_reply::Message msg(reply_type, result);
   control_server_.asyncSend(control_msg_receiver_, data_conversion_layer::scanner_reply::serialize(msg));
 }
 
-void ScannerMock::sendStartReply()
+void ScannerMock::sendStartReply(const data_conversion_layer::scanner_reply::Message::OperationResult& result)
 {
   std::cout << "ScannerMock: Send start reply..." << std::endl;
-  sendReply(data_conversion_layer::scanner_reply::Message::Type::start);
+  sendReply(data_conversion_layer::scanner_reply::Message::Type::start, result);
 }
 
 void ScannerMock::sendStopReply()

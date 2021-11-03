@@ -76,7 +76,8 @@ public:
                void(const udp::endpoint&, const psen_scan_v2_standalone::data_conversion_layer::RawData&));
 
 public:
-  void sendStartReply();
+  void sendStartReply(const data_conversion_layer::scanner_reply::Message::OperationResult& result =
+                          data_conversion_layer::scanner_reply::Message::OperationResult::accepted);
   void sendStopReply();
   void sendMonitoringFrame(const data_conversion_layer::monitoring_frame::Message& msg);
   void sendEmptyMonitoringFrame();
@@ -84,7 +85,9 @@ public:
 
 private:
   void startContinuousListeningForControlMsg();
-  void sendReply(const data_conversion_layer::scanner_reply::Message::Type& reply_type);
+  void sendReply(const data_conversion_layer::scanner_reply::Message::Type& reply_type,
+                 const data_conversion_layer::scanner_reply::Message::OperationResult& result =
+                     data_conversion_layer::scanner_reply::Message::OperationResult::accepted);
 
 private:
   const udp::endpoint control_msg_receiver_;
