@@ -77,6 +77,8 @@ public:
   {
     ros::NodeHandle nh;
     pub_active_ = nh.advertise<std_msgs::UInt8>("/test_ns_laser_1/active_zoneset", 1, true);
+    ASSERT_TRUE(NodeExists("/test_ns_laser_1/config_server_node"));
+    ASSERT_TRUE(NodeExists("/test_ns_laser_1/active_zoneset_node"));
   }
   void sendActiveZone(uint8_t zone);
 
