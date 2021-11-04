@@ -49,7 +49,7 @@ void ActiveZonesetNode::sendMarkersWhenAllInformationIsAvailable()
 {
   if (active_zoneset_.is_initialized() && zoneset_config_.is_initialized())
   {
-    const auto markers = toMarkers(zoneset_config_.get().zonesets.at(active_zoneset_.get().data));
+    const auto markers = toMarkers(zoneset_config_->zonesets.at(active_zoneset_->data));
     for (const auto& marker : markers)
     {
       zoneset_marker_.publish(marker);
