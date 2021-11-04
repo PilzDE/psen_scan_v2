@@ -115,15 +115,15 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForAllDefinedZoneTypes)
 // For compatibility with different ubuntu versions (resp. fmt), we need to take account of changes in
 // the default formatting of floating point numbers
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:-10 max:+10")))
-      .WillOnce(OpenBarrier(&safety_msg_barrier));
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:-10 max:+10")))
-      .WillOnce(OpenBarrier(&warn_msg_barrier));
-#else
   EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")))
-      .WillOnce(OpenBarrier(&safety_msg_barrier));
+      .WillOnce(OpenBarrier(&safety_msg_received_barrier));
   EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")))
-      .WillOnce(OpenBarrier(&warn_msg_barrier));
+      .WillOnce(OpenBarrier(&warn_msg_received_barrier));
+#else
+  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:-10 max:+10")))
+      .WillOnce(OpenBarrier(&safety_msg_received_barrier));
+  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:-10 max:+10")))
+      .WillOnce(OpenBarrier(&warn_msg_received_barrier));
 #endif
 
   // EXPECT_CALL_WITH_BARRIER(
@@ -150,15 +150,15 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForNewActiveZoneWhenActiveZone
   psen_scan_v2_standalone::util::Barrier warn_msg_received_barrier1;
 
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:-10 max:+10")))
-      .WillOnce(OpenBarrier(&safety_msg_received_barrier1));
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:-10 max:+10")))
-      .WillOnce(OpenBarrier(&warn_msg_received_barrier1));
-#else
   EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")))
-      .WillOnce(OpenBarrier(&safety_msg_received_barrier1));
+      .WillOnce(OpenBarrier(&safety_msg_received_barrier));
   EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")))
-      .WillOnce(OpenBarrier(&warn_msg_received_barrier1));
+      .WillOnce(OpenBarrier(&warn_msg_received_barrier));
+#else
+  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:-10 max:+10")))
+      .WillOnce(OpenBarrier(&safety_msg_received_barrier));
+  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:-10 max:+10")))
+      .WillOnce(OpenBarrier(&warn_msg_received_barrier));
 #endif
 
   sendActiveZone(0);
@@ -170,14 +170,14 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForNewActiveZoneWhenActiveZone
   psen_scan_v2_standalone::util::Barrier warn_msg_received_barrier2;
 
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:+11 max:+50")))
-      .WillOnce(OpenBarrier(&safety_msg_received_barrier2));
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:+11 max:+50")))
-      .WillOnce(OpenBarrier(&warn_msg_received_barrier2));
-#else
   EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:+11.0 max:+50.0")))
       .WillOnce(OpenBarrier(&safety_msg_received_barrier2));
   EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:+11.0 max:+50.0")))
+      .WillOnce(OpenBarrier(&warn_msg_received_barrier2));
+#else
+  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:+11 max:+50")))
+      .WillOnce(OpenBarrier(&safety_msg_received_barrier2));
+  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:+11 max:+50")))
       .WillOnce(OpenBarrier(&warn_msg_received_barrier2));
 #endif
 
