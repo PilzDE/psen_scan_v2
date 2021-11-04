@@ -28,7 +28,7 @@ fontsize=10
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>328</x>
+      <x>312</x>
       <y>1136</y>
       <w>600</w>
       <h>48</h>
@@ -43,7 +43,7 @@ Scanner device</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>696</x>
+      <x>680</x>
       <y>1056</y>
       <w>72</w>
       <h>96</h>
@@ -55,7 +55,7 @@ UDP package</panel_attributes>
   <element>
     <id>UMLActor</id>
     <coordinates>
-      <x>584</x>
+      <x>568</x>
       <y>0</y>
       <w>80</w>
       <h>96</h>
@@ -68,7 +68,7 @@ UDP package</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>328</x>
+      <x>312</x>
       <y>984</y>
       <w>600</w>
       <h>80</h>
@@ -86,7 +86,7 @@ The software components of this abstraction level delivere data as simple byte v
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>696</x>
+      <x>680</x>
       <y>896</y>
       <w>120</w>
       <h>104</h>
@@ -99,7 +99,7 @@ byte vector
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>328</x>
+      <x>312</x>
       <y>144</y>
       <w>608</w>
       <h>136</h>
@@ -124,7 +124,7 @@ It enables users to configurate, start and stop a single scanner by providing a 
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>616</x>
+      <x>600</x>
       <y>80</y>
       <w>24</w>
       <h>80</h>
@@ -136,7 +136,7 @@ It enables users to configurate, start and stop a single scanner by providing a 
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>1016</x>
+      <x>1000</x>
       <y>472</y>
       <w>200</w>
       <h>168</h>
@@ -154,7 +154,7 @@ This abstraction layer consists of all software components transforming primitiv
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>920</x>
+      <x>904</x>
       <y>560</y>
       <w>112</w>
       <h>32</h>
@@ -166,7 +166,7 @@ This abstraction layer consists of all software components transforming primitiv
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>1016</x>
+      <x>1000</x>
       <y>144</y>
       <w>200</w>
       <h>152</h>
@@ -183,7 +183,7 @@ like scanner IP &amp; port, scan range, scan resolution, etc.</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>504</x>
+      <x>488</x>
       <y>896</y>
       <w>120</w>
       <h>104</h>
@@ -196,7 +196,7 @@ byte vector
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>496</x>
+      <x>480</x>
       <y>1056</y>
       <w>72</w>
       <h>96</h>
@@ -208,7 +208,7 @@ UDP package</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>328</x>
+      <x>312</x>
       <y>328</y>
       <w>600</w>
       <h>576</h>
@@ -226,7 +226,7 @@ This abstraction layer implements the scanner protocol. In other words, this lay
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>632</x>
+      <x>616</x>
       <y>272</y>
       <w>48</w>
       <h>72</h>
@@ -238,7 +238,7 @@ This abstraction layer implements the scanner protocol. In other words, this lay
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>488</x>
+      <x>472</x>
       <y>504</y>
       <w>144</w>
       <h>32</h>
@@ -251,7 +251,7 @@ Idle</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>488</x>
+      <x>472</x>
       <y>576</y>
       <w>144</w>
       <h>32</h>
@@ -264,7 +264,7 @@ WaitForStartReply</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>552</x>
+      <x>536</x>
       <y>528</y>
       <w>72</w>
       <h>64</h>
@@ -276,7 +276,7 @@ StartRequest</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>488</x>
+      <x>472</x>
       <y>648</y>
       <w>144</w>
       <h>32</h>
@@ -289,7 +289,7 @@ WaitForMonitoringFrame</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>552</x>
+      <x>536</x>
       <y>600</y>
       <w>200</w>
       <h>64</h>
@@ -301,7 +301,7 @@ RawReplyReceived [isAcceptedStartReply()]</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>552</x>
+      <x>536</x>
       <y>672</y>
       <w>72</w>
       <h>88</h>
@@ -313,7 +313,7 @@ StopRequest</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>488</x>
+      <x>472</x>
       <y>744</y>
       <w>144</w>
       <h>32</h>
@@ -326,7 +326,7 @@ WaitForStopReply</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>624</x>
+      <x>608</x>
       <y>648</y>
       <w>160</w>
       <h>40</h>
@@ -338,7 +338,7 @@ RawMonitoringFrameReceived</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>368</x>
+      <x>352</x>
       <y>408</y>
       <w>504</w>
       <h>464</h>
@@ -359,43 +359,44 @@ This component represents the scanner protocol/ state machine (indirectly) descr
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>416</x>
-      <y>520</y>
+      <x>400</x>
+      <y>512</y>
       <w>88</w>
-      <h>256</h>
+      <h>264</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 m2=StopRequest</panel_attributes>
-    <additional_attributes>90.0;10.0;20.0;60.0;20.0;300.0;90.0;300.0</additional_attributes>
+    <additional_attributes>90.0;10.0;20.0;60.0;20.0;310.0;90.0;310.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>424</x>
-      <y>568</y>
+      <x>408</x>
+      <y>576</y>
       <w>80</w>
       <h>32</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;
+    <panel_attributes>lt=-
 </panel_attributes>
     <additional_attributes>80.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>368</x>
-      <y>648</y>
-      <w>136</w>
+      <x>432</x>
+      <y>672</y>
+      <w>120</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-m2=MonitoringFrameTimeout</panel_attributes>
-    <additional_attributes>150.0;10.0;120.0;10.0;120.0;30.0;150.0;30.0</additional_attributes>
+
+MonitoringFrameTimeout</panel_attributes>
+    <additional_attributes>80.0;10.0;80.0;30.0;60.0;30.0;60.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>488</x>
+      <x>472</x>
       <y>816</y>
       <w>144</w>
       <h>32</h>
@@ -408,7 +409,7 @@ Stopped</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>552</x>
+      <x>536</x>
       <y>768</y>
       <w>160</w>
       <h>64</h>
@@ -420,19 +421,20 @@ m1=RawReplyReceived [isStopReply()]</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>480</x>
+      <x>456</x>
       <y>600</y>
       <w>72</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
+
 StartTimeout</panel_attributes>
     <additional_attributes>50.0;10.0;50.0;30.0;30.0;30.0;30.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>928</x>
+      <x>912</x>
       <y>216</y>
       <w>104</w>
       <h>32</h>
@@ -444,7 +446,7 @@ StartTimeout</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>624</x>
+      <x>608</x>
       <y>744</y>
       <w>160</w>
       <h>40</h>
@@ -456,7 +458,7 @@ RawMonitoringFrameReceived</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>624</x>
+      <x>608</x>
       <y>816</y>
       <w>160</w>
       <h>40</h>
@@ -469,8 +471,8 @@ RawMonitoringFrameReceived</panel_attributes>
     <id>UMLState</id>
     <coordinates>
       <x>768</x>
-      <y>504</y>
-      <w>96</w>
+      <y>512</y>
+      <w>80</w>
       <h>32</h>
     </coordinates>
     <panel_attributes>halign=center
@@ -482,16 +484,16 @@ Error</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>624</x>
-      <y>528</y>
-      <w>208</w>
-      <h>88</h>
+      <x>608</x>
+      <y>536</y>
+      <w>224</w>
+      <h>80</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 fg=red
 
- RawReplyReceived
- [isUnknownStartReply()|isRefusedStartReply()]</panel_attributes>
-    <additional_attributes>10.0;80.0;240.0;80.0;240.0;10.0</additional_attributes>
+RawReplyReceived
+[isUnknownStartReply()|isRefusedStartReply()]</panel_attributes>
+    <additional_attributes>10.0;70.0;260.0;70.0;260.0;10.0</additional_attributes>
   </element>
 </diagram>
