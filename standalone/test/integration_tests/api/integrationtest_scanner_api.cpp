@@ -75,12 +75,6 @@ public:
       receiveControlMsg(                                                                                               \
           _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config))))
 
-#define ON_START_REQUEST_CALL(hw_mock, config)                                                                         \
-  ON_CALL(                                                                                                             \
-      hw_mock,                                                                                                         \
-      receiveControlMsg(                                                                                               \
-          _, data_conversion_layer::start_request::serialize(data_conversion_layer::start_request::Message(config))))
-
 #define EXPECT_CALLBACK_WILL_OPEN_BARRIER(cb, msgs, barrier)                                                           \
   do                                                                                                                   \
   {                                                                                                                    \
@@ -264,11 +258,12 @@ TEST_F(ScannerAPITests, startShouldReturnFutureWithExceptionIfUnknownResultSent)
 
   hw_mock_->sendStartReply(data_conversion_layer::scanner_reply::Message::OperationResult::unknown);
   EXPECT_FUTURE_IS_READY(start_future, DEFAULT_TIMEOUT);
-  EXPECT_THROW_AND_WHAT(start_future.get(),
-                        std::runtime_error,
-                        fmt::format("Unknown result code {:#04x} in start reply.",
-                                    data_conversion_layer::scanner_reply::Message::OperationResult::unknown)
-                            .c_str());
+  EXPECT_THROW_AND_WHAT(
+      start_future.get(),
+      std::runtime_error,
+      fmt::format("Unknown result code {:#04x} in start reply.",
+                  static_cast<uint32_t>(data_conversion_layer::scanner_reply::Message::OperationResult::unknown))
+          .c_str());
 }
 
 TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
