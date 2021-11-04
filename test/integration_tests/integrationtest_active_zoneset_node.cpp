@@ -20,6 +20,7 @@
 #include <gmock/gmock.h>
 
 #include <ros/ros.h>
+#include <fmt/core.h>
 
 #include <visualization_msgs/Marker.h>
 #include <std_msgs/UInt8.h>
@@ -116,14 +117,14 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForAllDefinedZoneTypes)
 // the default formatting of floating point numbers
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
   EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")))
-      .WillOnce(OpenBarrier(&safety_msg_received_barrier));
+      .WillOnce(OpenBarrier(&safety_msg_barrier));
   EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")))
-      .WillOnce(OpenBarrier(&warn_msg_received_barrier));
+      .WillOnce(OpenBarrier(&warn_msg_barrier));
 #else
   EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:-10 max:+10")))
-      .WillOnce(OpenBarrier(&safety_msg_received_barrier));
+      .WillOnce(OpenBarrier(&safety_msg_barrier));
   EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:-10 max:+10")))
-      .WillOnce(OpenBarrier(&warn_msg_received_barrier));
+      .WillOnce(OpenBarrier(&warn_msg_barrier));
 #endif
 
   // EXPECT_CALL_WITH_BARRIER(
@@ -151,14 +152,14 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForNewActiveZoneWhenActiveZone
 
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
   EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")))
-      .WillOnce(OpenBarrier(&safety_msg_received_barrier));
+      .WillOnce(OpenBarrier(&safety_msg_received_barrier1));
   EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")))
-      .WillOnce(OpenBarrier(&warn_msg_received_barrier));
+      .WillOnce(OpenBarrier(&warn_msg_received_barrier1));
 #else
   EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:-10 max:+10")))
-      .WillOnce(OpenBarrier(&safety_msg_received_barrier));
+      .WillOnce(OpenBarrier(&safety_msg_received_barrier1));
   EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:-10 max:+10")))
-      .WillOnce(OpenBarrier(&warn_msg_received_barrier));
+      .WillOnce(OpenBarrier(&warn_msg_received_barrier1));
 #endif
 
   sendActiveZone(0);
