@@ -55,12 +55,30 @@ MATCHER_P(matchesName, expectedName, "")
   return arg->ns == expectedName;
 }
 
-class SubscriberMock
+class MarkerSubscriberMock
 {
 public:
-  SubscriberMock()
+  MarkerSubscriberMock()
   {
-    subscriber_ = nh_.subscribe("/test_ns_laser_1/active_zoneset_marker", 10, &SubscriberMock::callback, this);
+    subscriber_ = nh_.subscribe("/test_ns_laser_1/active_zoneset_marker", 10, &MarkerSubscriberMock::callback, this);
+  }
+
+  bool isConnected(const ros::Duration& timeout = ros::Duration(10.0)) const
+  {
+    const auto start_time = ros::Time::now();
+    while (ros::ok())
+    {
+      if (subscriber_.getNumPublishers() == 1)
+      {
+        return true;
+      }
+      if ((ros::Time::now() - start_time) > timeout)
+      {
+        return false;
+      }
+      ros::Duration(0.1).sleep();
+    }
+    return false;
   }
 
   MOCK_METHOD1(callback, void(const visualization_msgs::MarkerConstPtr& event));
@@ -77,12 +95,12 @@ public:
   {
     ros::NodeHandle nh;
     pub_active_ = nh.advertise<std_msgs::UInt8>("/test_ns_laser_1/active_zoneset", 1, true);
-    ASSERT_TRUE(NodeExists("/test_ns_laser_1/config_server_node"));
-    ASSERT_TRUE(NodeExists("/test_ns_laser_1/active_zoneset_node"));
+    ASSERT_TRUE(marker_sub_mock_.isConnected());
   }
   void sendActiveZone(uint8_t zone);
 
 public:
+  MarkerSubscriberMock marker_sub_mock_;
   ros::Publisher pub_active_;
 };
 
@@ -100,34 +118,30 @@ TEST_F(ActiveZonesetNodeTest, shouldAdvertiseZonesetMarkerTopic)
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithCorrectType)
 {
-  SubscriberMock subscriber_mock;
-  EXPECT_CALL_X_TIMES_RUN_STATEMENT_AND_WAIT(subscriber_mock, callback(isTriangleList()), 2, sendActiveZone(0);, 3s);
+  EXPECT_CALL_X_TIMES_RUN_STATEMENT_AND_WAIT(marker_sub_mock_, callback(isTriangleList()), 2, sendActiveZone(0);, 3s);
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithPoints)
 {
-  SubscriberMock subscriber_mock;
-  EXPECT_CALL_X_TIMES_RUN_STATEMENT_AND_WAIT(subscriber_mock, callback(hasPoints()), 2, sendActiveZone(0);, 3s);
+  EXPECT_CALL_X_TIMES_RUN_STATEMENT_AND_WAIT(marker_sub_mock_, callback(hasPoints()), 2, sendActiveZone(0);, 3s);
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForAllDefinedZoneTypes)
 {
-  SubscriberMock subscriber_mock;
-
   psen_scan_v2_standalone::util::Barrier safety_msg_barrier;
   psen_scan_v2_standalone::util::Barrier warn_msg_barrier;
 
 // For compatibility with different ubuntu versions (resp. fmt), we need to take account of changes in
 // the default formatting of floating point numbers
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")))
+  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")))
       .WillOnce(OpenBarrier(&safety_msg_barrier));
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")))
+  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")))
       .WillOnce(OpenBarrier(&warn_msg_barrier));
 #else
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:-10 max:+10")))
+  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset safety1 min:-10 max:+10")))
       .WillOnce(OpenBarrier(&safety_msg_barrier));
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:-10 max:+10")))
+  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset warn1 min:-10 max:+10")))
       .WillOnce(OpenBarrier(&warn_msg_barrier));
 #endif
 
@@ -149,20 +163,18 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForAllDefinedZoneTypes)
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForNewActiveZoneWhenActiveZoneSwitches)
 {
-  SubscriberMock subscriber_mock;
-
   psen_scan_v2_standalone::util::Barrier safety_msg_received_barrier1;
   psen_scan_v2_standalone::util::Barrier warn_msg_received_barrier1;
 
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")))
+  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")))
       .WillOnce(OpenBarrier(&safety_msg_received_barrier1));
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")))
+  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")))
       .WillOnce(OpenBarrier(&warn_msg_received_barrier1));
 #else
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:-10 max:+10")))
+  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset safety1 min:-10 max:+10")))
       .WillOnce(OpenBarrier(&safety_msg_received_barrier1));
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:-10 max:+10")))
+  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset warn1 min:-10 max:+10")))
       .WillOnce(OpenBarrier(&warn_msg_received_barrier1));
 #endif
 
@@ -175,14 +187,14 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForNewActiveZoneWhenActiveZone
   psen_scan_v2_standalone::util::Barrier warn_msg_received_barrier2;
 
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:+11.0 max:+50.0")))
+  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset safety1 min:+11.0 max:+50.0")))
       .WillOnce(OpenBarrier(&safety_msg_received_barrier2));
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:+11.0 max:+50.0")))
+  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset warn1 min:+11.0 max:+50.0")))
       .WillOnce(OpenBarrier(&warn_msg_received_barrier2));
 #else
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset safety1 min:+11 max:+50")))
+  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset safety1 min:+11 max:+50")))
       .WillOnce(OpenBarrier(&safety_msg_received_barrier2));
-  EXPECT_CALL(subscriber_mock, callback(matchesName("active zoneset warn1 min:+11 max:+50")))
+  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset warn1 min:+11 max:+50")))
       .WillOnce(OpenBarrier(&warn_msg_received_barrier2));
 #endif
 
