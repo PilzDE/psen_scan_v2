@@ -20,7 +20,7 @@
 #include <gmock/gmock.h>
 
 #include <ros/ros.h>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <visualization_msgs/Marker.h>
 #include <std_msgs/UInt8.h>
