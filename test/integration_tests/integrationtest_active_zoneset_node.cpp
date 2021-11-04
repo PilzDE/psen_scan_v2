@@ -20,6 +20,8 @@
 #include <gmock/gmock.h>
 
 #include <ros/ros.h>
+
+// Needed only for FMT_VERSION define but version 4.0.0 used on Ubuntu 18 (melodic) does not yet use a core.h
 #include <fmt/format.h>
 
 #include <visualization_msgs/Marker.h>
