@@ -522,6 +522,7 @@ if(CATKIN_ENABLE_TESTING)
   target_link_libraries(integrationtest_active_zoneset_node
     ${catkin_LIBRARIES}
     ${rosbag_LIBRARIES}
+    fmt::fmt
   )
   add_dependencies(integrationtest_active_zoneset_node
     ${PROJECT_NAME}_standalone
