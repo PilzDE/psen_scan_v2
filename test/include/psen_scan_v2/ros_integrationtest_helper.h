@@ -68,7 +68,7 @@ namespace psen_scan_v2_test
  */
 inline ::testing::AssertionResult NodeExists(const std::string node_name,
                                              const double loop_frequency = 10.0,
-                                             const ros::Duration timeout = ros::Duration(10.0))
+                                             const ros::Duration timeout = ros::Duration(3.0))
 {
   ROS_INFO_STREAM("Waiting for Node " << node_name);
   std::vector<std::string> node_names;
