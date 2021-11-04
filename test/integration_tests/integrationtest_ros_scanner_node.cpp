@@ -173,6 +173,40 @@ TEST_F(RosScannerNodeTests, shouldStartAndStopSuccessfullyIfScannerRespondsToReq
   EXPECT_FUTURE_IS_READY(loop, LOOP_END_TIMEOUT);
 }
 
+TEST_F(RosScannerNodeTests, shouldThrowExceptionSetInScannerStartFuture)
+{
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(
+      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+
+  std::promise<void> hw_finished_request;
+  const std::string error_msg = "error msg for testing";
+  hw_finished_request.set_exception(std::make_exception_ptr(std::runtime_error(error_msg)));
+
+  ON_CALL(ros_scanner_node.scanner_, start()).WillByDefault(Return_Future(hw_finished_request));
+  EXPECT_THROW_AND_WHAT(ros_scanner_node.run(), std::runtime_error, error_msg.c_str());
+}
+
+TEST_F(RosScannerNodeTests, shouldThrowDelayedExceptionSetInScannerStartFuture)
+{
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(
+      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+
+  util::Barrier start_barrier;
+  std::promise<void> hw_finished_request;
+  ON_CALL(ros_scanner_node.scanner_, start())
+      .WillByDefault(DoAll(OpenBarrier(&start_barrier), Return_Future(hw_finished_request)));
+
+  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
+  start_barrier.waitTillRelease(DEFAULT_TIMEOUT);
+  std::this_thread::sleep_for(1s);
+
+  const std::string error_msg = "error msg for testing";
+  hw_finished_request.set_exception(std::make_exception_ptr(std::runtime_error(error_msg)));
+
+  EXPECT_FUTURE_IS_READY(loop, LOOP_END_TIMEOUT);
+  EXPECT_THROW_AND_WHAT(loop.get(), std::runtime_error, error_msg.c_str());
+}
+
 TEST_F(RosScannerNodeTests, shouldProvideScanTopic)
 {
   ROSScannerNodeT<ScannerMock> ros_scanner_node(
