@@ -30,14 +30,14 @@
 
 #define TO_MARKER(zoneset_obj, polygon_type, polygon_index)                                                            \
   createMarker(fmt::format("active zoneset {}{} {}", #polygon_type, #polygon_index, getRangeInfo(zoneset_obj)),        \
-               strcmp(#polygon_type, "safety") == 0,                                                                   \
-               createRGBA(strcmp(#polygon_type, "muting") == 0,                                                        \
+               strcmp(#polygon_type, "safety") != 0,                                                                   \
+               createRGBA(strcmp(#polygon_type, "muting") != 0,                                                        \
                           strcmp(#polygon_type, "warn") == 0,                                                          \
                           strcmp(#polygon_type, "muting") == 0,                                                        \
                           1),                                                                                          \
                zoneset_obj.header.frame_id,                                                                            \
                zoneset_obj.polygon_type##polygon_index.points,                                                         \
-               0.01 * ((strcmp(#polygon_type, "warn") == 0) + (strcmp(#polygon_type, "muting") == 0)))
+               0.01 * (strcmp(#polygon_type, "warn") == 0) + 0.02 * (strcmp(#polygon_type, "muting") == 0))
 
 namespace psen_scan_v2
 {
@@ -73,11 +73,18 @@ visualization_msgs::Marker createMarker(const std::string& ns,
   marker.id = id;
   marker.type = marker.TRIANGLE_LIST;
   marker.action = marker.ADD;
+
   marker.scale.x = 1.0;
   marker.scale.y = 1.0;
   marker.scale.z = 1.0;
+
+  marker.color.r = 0.0;
+  marker.color.g = 0.0;
+  marker.color.b = 0.0;
   marker.color.a = 0.4;
 
+  marker.pose.orientation.x = 0.0;
+  marker.pose.orientation.y = 0.0;
   marker.pose.orientation.z = 0.0;
   marker.pose.orientation.w = 1.0;
   marker.pose.position.x = 0.0;

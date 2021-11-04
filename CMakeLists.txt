@@ -445,7 +445,7 @@ if(CATKIN_ENABLE_TESTING)
   )
   add_dependencies(unittest_zone_configuration_ros_conversion ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
-  catkin_add_gtest(unittest_zoneset_to_marker_conversion
+  catkin_add_gmock(unittest_zoneset_to_marker_conversion
     test/unit_tests/unittest_zoneset_to_marker_conversion.cpp
   )
   target_link_libraries(unittest_zoneset_to_marker_conversion
