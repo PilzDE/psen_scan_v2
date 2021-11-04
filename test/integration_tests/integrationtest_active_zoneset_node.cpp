@@ -101,13 +101,13 @@ TEST_F(ActiveZonesetNodeTest, shouldAdvertiseZonesetMarkerTopic)
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithCorrectType)
 {
   SubscriberMock subscriber_mock;
-  EXPECT_CALL_X_TIMES_RUN_STATEMENT_AND_WAIT(subscriber_mock, callback(isTriangleList()), 2, sendActiveZone(0);, 10s);
+  EXPECT_CALL_X_TIMES_RUN_STATEMENT_AND_WAIT(subscriber_mock, callback(isTriangleList()), 2, sendActiveZone(0);, 3s);
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithPoints)
 {
   SubscriberMock subscriber_mock;
-  EXPECT_CALL_X_TIMES_RUN_STATEMENT_AND_WAIT(subscriber_mock, callback(hasPoints()), 2, sendActiveZone(0);, 10s);
+  EXPECT_CALL_X_TIMES_RUN_STATEMENT_AND_WAIT(subscriber_mock, callback(hasPoints()), 2, sendActiveZone(0);, 3s);
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForAllDefinedZoneTypes)
@@ -138,8 +138,8 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForAllDefinedZoneTypes)
 
   sendActiveZone(0);
 
-  safety_msg_barrier.waitTillRelease(10s);
-  warn_msg_barrier.waitTillRelease(10s);
+  safety_msg_barrier.waitTillRelease(3s);
+  warn_msg_barrier.waitTillRelease(3s);
   // EXPECT_CALLS_RUN_STATEMENT_AND_WAIT(subscriber_mock, sendActiveZone(0);
   //                                     ,
   //                                     3s,
@@ -168,8 +168,8 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForNewActiveZoneWhenActiveZone
 
   sendActiveZone(0);
 
-  safety_msg_received_barrier1.waitTillRelease(10s);
-  warn_msg_received_barrier1.waitTillRelease(10s);
+  safety_msg_received_barrier1.waitTillRelease(3s);
+  warn_msg_received_barrier1.waitTillRelease(3s);
 
   psen_scan_v2_standalone::util::Barrier safety_msg_received_barrier2;
   psen_scan_v2_standalone::util::Barrier warn_msg_received_barrier2;
@@ -188,8 +188,8 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForNewActiveZoneWhenActiveZone
 
   sendActiveZone(1);
 
-  safety_msg_received_barrier2.waitTillRelease(10s);
-  warn_msg_received_barrier2.waitTillRelease(10s);
+  safety_msg_received_barrier2.waitTillRelease(3s);
+  warn_msg_received_barrier2.waitTillRelease(3s);
 }
 
 }  // namespace psen_scan_v2_test
