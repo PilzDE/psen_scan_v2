@@ -68,6 +68,7 @@ catkin_package(
     message_runtime
     geometry_msgs
     std_msgs
+    visualization_msgs
   DEPENDS TinyXML2
 )
 
