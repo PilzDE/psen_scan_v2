@@ -89,7 +89,7 @@ _resolution_ (_double_, default: 0.0017 (= 0.1 deg))<br/>
 Scan angle resolution. (Radian) The value is rounded to a multiple of 0.1 deg and has to be in the range [0.1, 10] degrees.
 
 _config_file_ (_string_, default: "")
-Full path to a scanner config file. If a file is provided the configured zonesets are published, see [here](#importing-the-zoneset-configuration) for more information.
+Full path to a scanner config file. If a file is provided the configured zonesets and active zone marker are published, see [here](#importing-the-zoneset-configuration) for more information.
 
 ### Expert Parameters (optional)
 
@@ -120,11 +120,21 @@ Start a preconfigured rviz visualizing the scan data.
 
 /\<name\>/zoneconfiguration ([psen_scan_v2/ZoneSetConfiguration](http://docs.ros.org/en/noetic/api/psen_scan_v2/html/msg/ZoneSetConfiguration.html))<br/>
 
+`Hint 1: Will not be advertised if no config_file is provided.`
+
 /\<name\>/active_zoneset ([std_msgs/UInt8][])<br/>
 
 * This topic contains the id of the currently active zoneset of the PSENscan safety laser scanner.
 
 `Hint 1: If no zonesets are configured the driver will publish "0" as default.`
+
+/\<name\>/active_zoneset_marker ([visualization_msgs/Marker][]) <br/>
+
+* The markers published represent the currently active zoneset as triangle lists. They can be viewed e.g. in rviz.
+
+`Hint 1: Uses the topics /<name>/zoneconfiguration and /<name>/active_zoneset to calculate the vizualization and updates in the same frequency as those topics.`
+
+`Hint 2: Will not be advertised if no config_file is provided.`
 
 ### TF Frames
 The location of the TF frames is shown in the image below.
@@ -228,4 +238,5 @@ supply in buildings.
 
 [sensor_msgs/LaserScan]: http://docs.ros.org/noetic/api/sensor_msgs/html/msg/LaserScan.html
 [std_msgs/UInt8]: https://docs.ros.org/en/api/std_msgs/html/msg/UInt8.html
+[visualization_msgs/Marker]: https://docs.ros.org/en/noetic/api/visualization_msgs/html/msg/Marker.html
 [gmapping]: http://wiki.ros.org/gmapping
