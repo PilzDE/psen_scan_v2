@@ -30,7 +30,6 @@
 
 #define TO_MARKER(zoneset_obj, polygon_type, polygon_index)                                                            \
   createMarker(fmt::format("active zoneset {}{} {}", #polygon_type, #polygon_index, getRangeInfo(zoneset_obj)),        \
-               strcmp(#polygon_type, "safety") != 0,                                                                   \
                createRGBA(strcmp(#polygon_type, "muting") != 0,                                                        \
                           strcmp(#polygon_type, "warn") == 0,                                                          \
                           strcmp(#polygon_type, "muting") == 0,                                                        \
@@ -61,7 +60,6 @@ std_msgs::ColorRGBA createRGBA(const float& r, const float& g, const float& b, c
 }
 
 visualization_msgs::Marker createMarker(const std::string& ns,
-                                        int32_t id,
                                         const std_msgs::ColorRGBA& color,
                                         const std::string& frame_id,
                                         const std::vector<geometry_msgs::Point32>& points,
@@ -70,7 +68,7 @@ visualization_msgs::Marker createMarker(const std::string& ns,
   auto marker = visualization_msgs::Marker();
   marker.header.frame_id = frame_id;
   marker.ns = ns;
-  marker.id = id;
+  marker.id = 0;
   marker.type = marker.TRIANGLE_LIST;
   marker.action = marker.ADD;
 

@@ -218,14 +218,7 @@ TEST(ZonesetToMarkerConversionTest, shouldReturnMarkersWithCorrectId)
 
   for (const auto& marker : markers)
   {
-    if (isPolygonTypeMarker(marker, "safety"))
-    {
-      EXPECT_EQ(0, marker.id);
-    }
-    else
-    {
-      EXPECT_EQ(1, marker.id);
-    }
+    EXPECT_EQ(0, marker.id);
   }
 }
 

@@ -14,6 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <vector>
+#include <memory>
 
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
@@ -49,12 +50,61 @@ void ActiveZonesetNode::sendMarkersWhenAllInformationIsAvailable()
 {
   if (active_zoneset_.is_initialized() && zoneset_config_.is_initialized())
   {
-    const auto markers = toMarkers(zoneset_config_->zonesets.at(active_zoneset_->data));
-    for (const auto& marker : markers)
+    try
     {
-      zoneset_marker_.publish(marker);
+      auto new_markers = toMarkers(zoneset_config_->zonesets.at(active_zoneset_->data));
+      sendNewMarkersAndDeleteOldOnes(std::move(new_markers));
+    }
+    catch (std::out_of_range const& e)
+    {
+      ROS_ERROR_STREAM_THROTTLE(1,
+                                "Active zone " << active_zoneset_->data
+                                               << " of your scanner does not exist in the provided configuration!");
+      deleteMarkers();
     }
   }
+}
+
+void ActiveZonesetNode::sendNewMarkersAndDeleteOldOnes(std::vector<visualization_msgs::Marker> new_markers)
+{
+  if (!markersMatchLastMarkers(new_markers))
+  {
+    deleteMarkers();
+  }
+  for (const auto& marker : new_markers)
+  {
+    zoneset_marker_.publish(marker);
+  }
+  last_markers_ = std::move(new_markers);
+}
+
+void ActiveZonesetNode::deleteMarkers()
+{
+  for (auto lm : last_markers_)
+  {
+    auto marker = visualization_msgs::Marker();
+    marker.action = visualization_msgs::Marker::DELETE;
+    marker.ns = lm.ns;
+    marker.id = 0;
+    zoneset_marker_.publish(marker);
+  }
+  last_markers_.clear();
+}
+
+bool ActiveZonesetNode::markersMatchLastMarkers(const std::vector<visualization_msgs::Marker>& new_markers)
+{
+  if (last_markers_.size() == new_markers.size())
+  {
+    for (size_t i = 0; i < last_markers_.size(); i++)
+    {
+      if (last_markers_.at(i).ns != new_markers.at(i).ns)
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+  return false;
 }
 
 }  // namespace psen_scan_v2

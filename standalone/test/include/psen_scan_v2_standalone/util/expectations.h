@@ -78,6 +78,24 @@ namespace psen_scan_v2_standalone_test
     b2.waitTillRelease(timeout);                                                                                       \
   } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
 
+#define EXPECT_4_CALLS_RUN_STATEMENT_AND_WAIT(mock, call1, call2, call3, call4, statement, timeout)                    \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    psen_scan_v2_standalone::util::Barrier b1;                                                                         \
+    psen_scan_v2_standalone::util::Barrier b2;                                                                         \
+    psen_scan_v2_standalone::util::Barrier b3;                                                                         \
+    psen_scan_v2_standalone::util::Barrier b4;                                                                         \
+    EXPECT_CALL(mock, call1).WillOnce(OpenBarrier(&b1));                                                               \
+    EXPECT_CALL(mock, call2).WillOnce(OpenBarrier(&b2));                                                               \
+    EXPECT_CALL(mock, call3).WillOnce(OpenBarrier(&b1));                                                               \
+    EXPECT_CALL(mock, call4).WillOnce(OpenBarrier(&b2));                                                               \
+    statement;                                                                                                         \
+    b1.waitTillRelease(timeout);                                                                                       \
+    b2.waitTillRelease(timeout);                                                                                       \
+    b3.waitTillRelease(timeout);                                                                                       \
+    b4.waitTillRelease(timeout);                                                                                       \
+  } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
+
 }  // namespace psen_scan_v2_standalone_test
 
 #define EXPECT_THROW_AND_WHAT(statement, expected_exception, expected_message)                                         \

@@ -28,8 +28,9 @@
 #include <std_msgs/UInt8.h>
 
 #include "psen_scan_v2/ros_integrationtest_helper.h"
-
 #include "psen_scan_v2_standalone/util/expectations.h"
+
+#include "psen_scan_v2/active_zoneset_node.h"
 
 namespace psen_scan_v2_test
 {
@@ -53,6 +54,18 @@ MATCHER_P(matchesName, expectedName, "")
 {
   *result_listener << "arg.ns is: " << arg->ns << " but should be: " << expectedName;
   return arg->ns == expectedName;
+}
+
+MATCHER(hasDeleteAction, "")
+{
+  *result_listener << "arg.action is: " << arg->action << " but should be: " << visualization_msgs::Marker::DELETE;
+  return arg->action == visualization_msgs::Marker::DELETE;
+}
+
+MATCHER(hasAddAction, "")
+{
+  *result_listener << "arg.action is: " << arg->action << " but should be: " << visualization_msgs::Marker::ADD;
+  return arg->action == visualization_msgs::Marker::ADD;
 }
 
 class MarkerSubscriberMock
@@ -129,44 +142,116 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithPoints)
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForAllDefinedZoneTypes)
 {
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
-  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(marker_sub_mock_,
-                                        callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")),
-                                        callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")),
-                                        sendActiveZone(0);
-                                        , 3s);
+  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
+      marker_sub_mock_,
+      callback(AllOf(matchesName("active zoneset safety1 min:-10.0 max:+10.0"), hasAddAction())),
+      callback(AllOf(matchesName("active zoneset warn1 min:-10.0 max:+10.0"), hasAddAction())),
+      sendActiveZone(0);
+      , 3s);
 #else
-  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(marker_sub_mock_,
-                                        callback(matchesName("active zoneset safety1 min:-10 max:+10")),
-                                        callback(matchesName("active zoneset warn1 min:-10 max:+10")),
-                                        sendActiveZone(0);
-                                        , 3s);
+  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
+      marker_sub_mock_,
+      callback(AllOf(matchesName("active zoneset safety1 min:-10 max:+10"), hasAddAction())),
+      callback(AllOf(matchesName("active zoneset warn1 min:-10 max:+10"), hasAddAction())),
+      sendActiveZone(0);
+      , 3s);
 #endif
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForNewActiveZoneWhenActiveZoneSwitches)
 {
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
-  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(marker_sub_mock_,
-                                        callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")),
-                                        callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")),
-                                        sendActiveZone(0);
-                                        , 3s);
-  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(marker_sub_mock_,
-                                        callback(matchesName("active zoneset safety1 min:+11.0 max:+50.0")),
-                                        callback(matchesName("active zoneset warn1 min:+11.0 max:+50.0")),
-                                        sendActiveZone(1);
-                                        , 3s);
+  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
+      marker_sub_mock_,
+      callback(AllOf(matchesName("active zoneset safety1 min:-10.0 max:+10.0"), hasAddAction())),
+      callback(AllOf(matchesName("active zoneset warn1 min:-10.0 max:+10.0"), hasAddAction())),
+      sendActiveZone(0);
+      , 3s);
+  EXPECT_4_CALLS_RUN_STATEMENT_AND_WAIT(
+      marker_sub_mock_,
+      callback(AllOf(matchesName("active zoneset safety1 min:-10.0 max:+10.0"), hasDeleteAction())),
+      callback(AllOf(matchesName("active zoneset warn1 min:-10.0 max:+10.0"), hasDeleteAction())),
+      callback(AllOf(matchesName("active zoneset safety1 min:+11.0 max:+50.0"), hasAddAction())),
+      callback(AllOf(matchesName("active zoneset warn1 min:+11.0 max:+50.0"), hasAddAction())),
+      sendActiveZone(1);
+      , 3s);
 #else
-  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(marker_sub_mock_,
-                                        callback(matchesName("active zoneset safety1 min:-10 max:+10")),
-                                        callback(matchesName("active zoneset warn1 min:-10 max:+10")),
-                                        sendActiveZone(0);
-                                        , 3s);
-  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(marker_sub_mock_,
-                                        callback(matchesName("active zoneset safety1 min:+11 max:+50")),
-                                        callback(matchesName("active zoneset warn1 min:+11 max:+50")),
-                                        sendActiveZone(1);
-                                        , 3s);
+  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
+      marker_sub_mock_,
+      callback(AllOf(matchesName("active zoneset safety1 min:-10 max:+10"), hasAddAction())),
+      callback(AllOf(matchesName("active zoneset warn1 min:-10 max:+10"), hasAddAction())),
+      sendActiveZone(0);
+      , 3s);
+  EXPECT_4_CALLS_RUN_STATEMENT_AND_WAIT(
+      marker_sub_mock_,
+      callback(AllOf(matchesName("active zoneset safety1 min:-10 max:+10"), hasDeleteAction())),
+      callback(AllOf(matchesName("active zoneset warn1 min:-10 max:+10"), hasDeleteAction())),
+      callback(AllOf(matchesName("active zoneset safety1 min:+11 max:+50"), hasAddAction())),
+      callback(AllOf(matchesName("active zoneset warn1 min:+11 max:+50"), hasAddAction())),
+      sendActiveZone(1);
+      , 3s);
+#endif
+}
+
+TEST_F(ActiveZonesetNodeTest, shouldNotPublishDeleteMarkersForSameActiveZone)
+{
+#if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
+  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
+      marker_sub_mock_,
+      callback(AllOf(matchesName("active zoneset safety1 min:-10.0 max:+10.0"), hasAddAction())),
+      callback(AllOf(matchesName("active zoneset warn1 min:-10.0 max:+10.0"), hasAddAction())),
+      sendActiveZone(0);
+      , 3s);
+  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
+      marker_sub_mock_,
+      callback(AllOf(matchesName("active zoneset safety1 min:-10.0 max:+10.0"), hasAddAction())),
+      callback(AllOf(matchesName("active zoneset warn1 min:-10.0 max:+10.0"), hasAddAction())),
+      sendActiveZone(0);
+      , 3s);
+#else
+  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
+      marker_sub_mock_,
+      callback(AllOf(matchesName("active zoneset safety1 min:-10 max:+10"), hasAddAction())),
+      callback(AllOf(matchesName("active zoneset warn1 min:-10 max:+10"), hasAddAction())),
+      sendActiveZone(0);
+      , 3s);
+  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
+      marker_sub_mock_,
+      callback(AllOf(matchesName("active zoneset safety1 min:-10 max:+10"), hasAddAction())),
+      callback(AllOf(matchesName("active zoneset warn1 min:-10 max:+10"), hasAddAction())),
+      sendActiveZone(0);
+      , 3s);
+#endif
+}
+
+TEST_F(ActiveZonesetNodeTest, shouldPublishDeleteMarkersOnInvalidActiveZone)
+{
+#if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
+  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
+      marker_sub_mock_,
+      callback(AllOf(matchesName("active zoneset safety1 min:-10.0 max:+10.0"), hasAddAction())),
+      callback(AllOf(matchesName("active zoneset warn1 min:-10.0 max:+10.0"), hasAddAction())),
+      sendActiveZone(0);
+      , 3s);
+  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
+      marker_sub_mock_,
+      callback(AllOf(matchesName("active zoneset safety1 min:-10.0 max:+10.0"), hasDeleteAction())),
+      callback(AllOf(matchesName("active zoneset warn1 min:-10.0 max:+10.0"), hasDeleteAction())),
+      sendActiveZone(5);
+      , 3s);
+#else
+  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
+      marker_sub_mock_,
+      callback(AllOf(matchesName("active zoneset safety1 min:-10 max:+10"), hasAddAction())),
+      callback(AllOf(matchesName("active zoneset warn1 min:-10 max:+10"), hasAddAction())),
+      sendActiveZone(0);
+      , 3s);
+  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
+      marker_sub_mock_,
+      callback(AllOf(matchesName("active zoneset safety1 min:-10 max:+10"), hasDeleteAction())),
+      callback(AllOf(matchesName("active zoneset warn1 min:-10 max:+10"), hasDeleteAction())),
+      sendActiveZone(5);
+      , 3s);
 #endif
 }
 
