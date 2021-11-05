@@ -128,80 +128,46 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithPoints)
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForAllDefinedZoneTypes)
 {
-  psen_scan_v2_standalone::util::Barrier safety_msg_barrier;
-  psen_scan_v2_standalone::util::Barrier warn_msg_barrier;
-
-// For compatibility with different ubuntu versions (resp. fmt), we need to take account of changes in
-// the default formatting of floating point numbers
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
-  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")))
-      .WillOnce(OpenBarrier(&safety_msg_barrier));
-  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")))
-      .WillOnce(OpenBarrier(&warn_msg_barrier));
+  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(marker_sub_mock_,
+                                        callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")),
+                                        callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")),
+                                        sendActiveZone(0);
+                                        , 3s);
 #else
-  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset safety1 min:-10 max:+10")))
-      .WillOnce(OpenBarrier(&safety_msg_barrier));
-  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset warn1 min:-10 max:+10")))
-      .WillOnce(OpenBarrier(&warn_msg_barrier));
+  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(marker_sub_mock_,
+                                        callback(matchesName("active zoneset safety1 min:-10 max:+10")),
+                                        callback(matchesName("active zoneset warn1 min:-10 max:+10")),
+                                        sendActiveZone(0);
+                                        , 3s);
 #endif
-
-  // EXPECT_CALL_WITH_BARRIER(
-  //     safety_msg_barrier, subscriber_mock, callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")));
-  // EXPECT_CALL_WITH_BARRIER(
-  //     warn_msg_barrier, subscriber_mock, callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")))
-
-  sendActiveZone(0);
-
-  safety_msg_barrier.waitTillRelease(3s);
-  warn_msg_barrier.waitTillRelease(3s);
-  // EXPECT_CALLS_RUN_STATEMENT_AND_WAIT(subscriber_mock, sendActiveZone(0);
-  //                                     ,
-  //                                     3s,
-  //                                     callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")),
-  //                                     callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")));
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForNewActiveZoneWhenActiveZoneSwitches)
 {
-  psen_scan_v2_standalone::util::Barrier safety_msg_received_barrier1;
-  psen_scan_v2_standalone::util::Barrier warn_msg_received_barrier1;
-
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
-  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")))
-      .WillOnce(OpenBarrier(&safety_msg_received_barrier1));
-  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")))
-      .WillOnce(OpenBarrier(&warn_msg_received_barrier1));
+  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(marker_sub_mock_,
+                                        callback(matchesName("active zoneset safety1 min:-10.0 max:+10.0")),
+                                        callback(matchesName("active zoneset warn1 min:-10.0 max:+10.0")),
+                                        sendActiveZone(0);
+                                        , 3s);
+  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(marker_sub_mock_,
+                                        callback(matchesName("active zoneset safety1 min:+11.0 max:+50.0")),
+                                        callback(matchesName("active zoneset warn1 min:+11.0 max:+50.0")),
+                                        sendActiveZone(1);
+                                        , 3s);
 #else
-  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset safety1 min:-10 max:+10")))
-      .WillOnce(OpenBarrier(&safety_msg_received_barrier1));
-  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset warn1 min:-10 max:+10")))
-      .WillOnce(OpenBarrier(&warn_msg_received_barrier1));
+  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(marker_sub_mock_,
+                                        callback(matchesName("active zoneset safety1 min:-10 max:+10")),
+                                        callback(matchesName("active zoneset warn1 min:-10 max:+10")),
+                                        sendActiveZone(0);
+                                        , 3s);
+  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(marker_sub_mock_,
+                                        callback(matchesName("active zoneset safety1 min:+11 max:+50")),
+                                        callback(matchesName("active zoneset warn1 min:+11 max:+50")),
+                                        sendActiveZone(1);
+                                        , 3s);
 #endif
-
-  sendActiveZone(0);
-
-  safety_msg_received_barrier1.waitTillRelease(3s);
-  warn_msg_received_barrier1.waitTillRelease(3s);
-
-  psen_scan_v2_standalone::util::Barrier safety_msg_received_barrier2;
-  psen_scan_v2_standalone::util::Barrier warn_msg_received_barrier2;
-
-#if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
-  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset safety1 min:+11.0 max:+50.0")))
-      .WillOnce(OpenBarrier(&safety_msg_received_barrier2));
-  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset warn1 min:+11.0 max:+50.0")))
-      .WillOnce(OpenBarrier(&warn_msg_received_barrier2));
-#else
-  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset safety1 min:+11 max:+50")))
-      .WillOnce(OpenBarrier(&safety_msg_received_barrier2));
-  EXPECT_CALL(marker_sub_mock_, callback(matchesName("active zoneset warn1 min:+11 max:+50")))
-      .WillOnce(OpenBarrier(&warn_msg_received_barrier2));
-#endif
-
-  sendActiveZone(1);
-
-  safety_msg_received_barrier2.waitTillRelease(3s);
-  warn_msg_received_barrier2.waitTillRelease(3s);
 }
 
 }  // namespace psen_scan_v2_test
