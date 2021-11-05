@@ -6,4 +6,12 @@
   <xacro:include filename="$(find psen_scan_v2)/urdf/psen_scan.urdf.xacro" />
 
   <xacro:psen_scan prefix="$(arg prefix)" />
+
+  <xacro:include filename="$(find neo_mp_400)/robot_model/mp_400/mp_400.urdf.xacro" />
+
+  <joint name="$(arg prefix)_mount_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="$(arg prefix)_mount_link" />
+    <origin rpy="0 0 0" xyz="0.25 0 0.1"/>
+  </joint>
 </robot>
