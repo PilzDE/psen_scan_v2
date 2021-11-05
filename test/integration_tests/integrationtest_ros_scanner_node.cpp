@@ -15,7 +15,6 @@
 
 #include <memory>
 #include <chrono>
-#include <thread>
 #include <future>
 
 #include <gtest/gtest.h>
@@ -198,7 +197,7 @@ TEST_F(RosScannerNodeTests, shouldThrowDelayedExceptionSetInScannerStartFuture)
 
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
   start_barrier.waitTillRelease(DEFAULT_TIMEOUT);
-  std::this_thread::sleep_for(1s);
+  ros::Duration(1.0).sleep();
 
   const std::string error_msg = "error msg for testing";
   hw_finished_request.set_exception(std::make_exception_ptr(std::runtime_error(error_msg)));
