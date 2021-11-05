@@ -64,7 +64,10 @@ public:
                   const double& x_axis_rotation,
                   const ScannerConfiguration& scanner_config);
 
-  //! @brief Continuously fetches data from the scanner and publishes the data into the ROS network.
+  /**
+   * @brief Continuously fetches data from the scanner and publishes the data into the ROS network.
+   * @throw std::runtime_error if starting the scanner was not successful.
+   */
   void run();
   //! @brief Terminates the fetching and publishing of scanner data.
   void terminate();
