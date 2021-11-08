@@ -162,8 +162,8 @@ The timestamps of the scan data published are computed to be close to reality an
 
 
 ### Importing the zoneset configuration
-Once you setup the scanner and created a configuration according to our [tutorial](http://wiki.ros.org/psen_scan_v2/Tutorials/SettingUpPSENscanHW#Create_a_new_configuration) you can use a exported xml configuration file within ROS.
-The configured zonesets will be published 
+Once you setup the scanner and created a configuration according to our [tutorial](http://wiki.ros.org/psen_scan_v2/Tutorials/SettingUpPSENscanHW#Create_a_new_configuration) you can use an exported xml configuration file within ROS.
+The configured zonesets will be published.
 
 The zonesets you created in the Pilz configurator:
 ![configurator_screenshot](doc/zones_screenshot_configurator.png)
@@ -184,6 +184,9 @@ If you want to use the configuration node in your launchfile add a section such 
   <param name="frame_id" value="$(arg frame_id)" />
 </node>
 ```
+
+### Visualizing the active zoneset
+For visualizing the active zoneset in RViz you can run the `active_zoneset_node`. It will publish markers on the `/<name>/active_zoneset_marker` topic like shown in the RViz screenshot above.
 
 ## Developer Information
 ### Build Status
