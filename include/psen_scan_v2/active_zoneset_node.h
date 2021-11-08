@@ -16,6 +16,7 @@
 #ifndef PSEN_SCAN_V2_ACTIVE_ZONESET_H
 #define PSEN_SCAN_V2_ACTIVE_ZONESET_H
 
+#include <string>
 #include <vector>
 #include <boost/optional.hpp>
 
@@ -54,9 +55,9 @@ public:
 
 private:
   void sendMarkersWhenAllInformationIsAvailable();
-  void sendNewMarkersAndDeleteOldOnes(std::vector<visualization_msgs::Marker> new_markers);
-  void deleteMarkers();
-  bool markersMatchLastMarkers(const std::vector<visualization_msgs::Marker>& new_markers);
+  void deleteLastMarkers();
+  void addMarkers(const std::vector<visualization_msgs::Marker>& new_markers);
+  bool mismatchLastMarkers(const std::vector<visualization_msgs::Marker>& new_markers);
 
 private:
   ros::NodeHandle nh_;

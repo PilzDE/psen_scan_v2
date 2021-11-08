@@ -13,8 +13,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <algorithm>
+#include <stdexcept>
 #include <vector>
-#include <memory>
+
+#include <boost/optional.hpp>
 
 #include <ros/ros.h>
 #include <visualization_msgs/Marker.h>
@@ -54,32 +57,32 @@ void ActiveZonesetNode::sendMarkersWhenAllInformationIsAvailable()
     try
     {
       auto new_markers = toMarkers(zoneset_config_->zonesets.at(active_zoneset_->data));
-      sendNewMarkersAndDeleteOldOnes(std::move(new_markers));
+      if (mismatchLastMarkers(new_markers))
+      {
+        deleteLastMarkers();
+      }
+      addMarkers(new_markers);
     }
     catch (std::out_of_range const& e)
     {
       ROS_ERROR_STREAM_THROTTLE(1,
                                 "Active zone " << active_zoneset_->data
                                                << " of your scanner does not exist in the provided configuration!");
-      deleteMarkers();
+      deleteLastMarkers();
     }
   }
 }
 
-void ActiveZonesetNode::sendNewMarkersAndDeleteOldOnes(std::vector<visualization_msgs::Marker> new_markers)
+void ActiveZonesetNode::addMarkers(const std::vector<visualization_msgs::Marker>& new_markers)
 {
-  if (!markersMatchLastMarkers(new_markers))
-  {
-    deleteMarkers();
-  }
   for (const auto& marker : new_markers)
   {
     zoneset_marker_.publish(marker);
   }
-  last_markers_ = std::move(new_markers);
+  last_markers_ = new_markers;
 }
 
-void ActiveZonesetNode::deleteMarkers()
+void ActiveZonesetNode::deleteLastMarkers()
 {
   for (const auto& lm : last_markers_)
   {
@@ -92,20 +95,21 @@ void ActiveZonesetNode::deleteMarkers()
   last_markers_.clear();
 }
 
-bool ActiveZonesetNode::markersMatchLastMarkers(const std::vector<visualization_msgs::Marker>& new_markers)
+bool ActiveZonesetNode::mismatchLastMarkers(const std::vector<visualization_msgs::Marker>& new_markers)
 {
-  if (last_markers_.size() == new_markers.size())
+  if (last_markers_.empty())
   {
-    for (size_t i = 0; i < last_markers_.size(); i++)
-    {
-      if (last_markers_.at(i).ns != new_markers.at(i).ns)
-      {
-        return false;
-      }
-    }
+    return false;
+  }
+  if (last_markers_.size() != new_markers.size())
+  {
     return true;
   }
-  return false;
+  return std::mismatch(last_markers_.begin(),
+                       last_markers_.end(),
+                       new_markers.begin(),
+                       [](const auto& m1, const auto& m2) { return m1.ns == m2.ns; })
+             .first != last_markers_.end();
 }
 
 }  // namespace psen_scan_v2
