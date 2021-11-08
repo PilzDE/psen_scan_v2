@@ -133,7 +133,10 @@ TEST_F(ActiveZonesetNodeTest, shouldAdvertiseZonesetMarkerTopic)
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithCorrectType)
 {
-  EXPECT_CALL_X_TIMES_RUN_STATEMENT_AND_WAIT(marker_sub_mock_, callback(isTriangleList()), 2, sendActiveZone(0);, 3s);
+  auto barrier = EXPECT_N_ASYNC_CALLS(marker_sub_mock_, callback(isTriangleList()), 2);
+  sendActiveZone(0);
+  barrier->waitTillRelease(3s);
+  //EXPECT_CALL_X_TIMES_RUN_STATEMENT_AND_WAIT(marker_sub_mock_, callback(isTriangleList()), 2, sendActiveZone(0);, 3s);
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithPoints)

@@ -96,6 +96,16 @@ namespace psen_scan_v2_standalone_test
     b4.waitTillRelease(timeout);                                                                                       \
   } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
 
+#define EXPECT_N_ASYNC_CALLS(mock, call, times)                                                                        \
+  [&]() {                                                                                                              \
+    std::unique_ptr<psen_scan_v2_standalone::util::Barrier> b1{ new psen_scan_v2_standalone::util::Barrier{} };        \
+    EXPECT_CALL(mock, call).WillOnce(OpenBarrier(b1.get()));                                                           \
+    EXPECT_CALL(mock, call).Times(times - 1).RetiresOnSaturation();                                                    \
+    return b1;                                                                                                         \
+  }();
+
+#define EXPECT_ASYNC_CALL(mock, call) EXPECT_N_ASYNC_CALLS(mock, call, 1)
+
 }  // namespace psen_scan_v2_standalone_test
 
 #define EXPECT_THROW_AND_WHAT(statement, expected_exception, expected_message)                                         \
