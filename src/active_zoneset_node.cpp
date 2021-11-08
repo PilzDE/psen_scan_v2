@@ -80,7 +80,7 @@ void ActiveZonesetNode::sendNewMarkersAndDeleteOldOnes(std::vector<visualization
 
 void ActiveZonesetNode::deleteMarkers()
 {
-  for (auto lm : last_markers_)
+  for (const auto& lm : last_markers_)
   {
     auto marker = visualization_msgs::Marker();
     marker.action = visualization_msgs::Marker::DELETE;
