@@ -50,7 +50,7 @@ MATCHER(isTriangleList, "")
   return arg->type == visualization_msgs::Marker::TRIANGLE_LIST;
 }
 
-MATCHER_P(matchesName, expectedName, "")
+MATCHER_P(hasNS, expectedName, "")
 {
   *result_listener << "arg.ns is: " << arg->ns << " but should be: " << expectedName;
   return arg->ns == expectedName;
@@ -101,13 +101,25 @@ private:
   ros::Subscriber subscriber_;
 };
 
+#if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
+static const std::string SAFETY_NS_ZONE_1{ "active zoneset safety1 min:-10.0 max:+10.0" };
+static const std::string WARN_NS_ZONE_1{ "active zoneset warn1 min:-10.0 max:+10.0" };
+static const std::string SAFETY_NS_ZONE_2{ "active zoneset safety1 min:+11.0 max:+50.0" };
+static const std::string WARN_NS_ZONE_2 = { "active zoneset warn1 min:+11.0 max:+50.0" };
+#else
+static const std::string SAFETY_NS_ZONE_1{ "active zoneset safety1 min:-10 max:+10" };
+static const std::string WARN_NS_ZONE_1{ "active zoneset warn1 min:-10 max:+10" };
+static const std::string SAFETY_NS_ZONE_2{ "active zoneset safety1 min:+11 max:+50" };
+static const std::string WARN_NS_ZONE_2{ "active zoneset warn1 min:+11 max:+50" };
+#endif
+
 class ActiveZonesetNodeTest : public testing::Test
 {
 public:
   void SetUp() override
   {
     activeZoneNode_.reset(new psen_scan_v2::ActiveZonesetNode(nh_));
-    pub_active_ = nh_.advertise<std_msgs::UInt8>("active_zoneset", 1, true);
+    pub_active_ = nh_.advertise<std_msgs::UInt8>("active_zoneset", 10, true);
     ASSERT_TRUE(marker_sub_mock_.isConnected());
   }
   void sendActiveZone(uint8_t zone);
@@ -136,129 +148,65 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithCorrectType)
   auto barrier = EXPECT_N_ASYNC_CALLS(marker_sub_mock_, callback(isTriangleList()), 2);
   sendActiveZone(0);
   barrier->waitTillRelease(3s);
-  // EXPECT_CALL_X_TIMES_RUN_STATEMENT_AND_WAIT(marker_sub_mock_, callback(isTriangleList()), 2, sendActiveZone(0);,
-  // 3s);
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithPoints)
 {
-  EXPECT_CALL_X_TIMES_RUN_STATEMENT_AND_WAIT(marker_sub_mock_, callback(hasPoints()), 2, sendActiveZone(0);, 3s);
+  auto barrier = EXPECT_N_ASYNC_CALLS(marker_sub_mock_, callback(hasPoints()), 2);
+  sendActiveZone(0);
+  barrier->waitTillRelease(3s);
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForAllDefinedZoneTypes)
 {
-#if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
-  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
-      marker_sub_mock_,
-      callback(AllOf(matchesName("active zoneset safety1 min:-10.0 max:+10.0"), hasAddAction())),
-      callback(AllOf(matchesName("active zoneset warn1 min:-10.0 max:+10.0"), hasAddAction())),
-      sendActiveZone(0);
-      , 3s);
-#else
-  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
-      marker_sub_mock_,
-      callback(AllOf(matchesName("active zoneset safety1 min:-10 max:+10"), hasAddAction())),
-      callback(AllOf(matchesName("active zoneset warn1 min:-10 max:+10"), hasAddAction())),
-      sendActiveZone(0);
-      , 3s);
-#endif
+  auto s_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasAddAction())));
+  auto w_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasAddAction())));
+  sendActiveZone(0);
+  s_barrier->waitTillRelease(3s);
+  w_barrier->waitTillRelease(3s);
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForNewActiveZoneWhenActiveZoneSwitches)
 {
-#if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
-  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
-      marker_sub_mock_,
-      callback(AllOf(matchesName("active zoneset safety1 min:-10.0 max:+10.0"), hasAddAction())),
-      callback(AllOf(matchesName("active zoneset warn1 min:-10.0 max:+10.0"), hasAddAction())),
-      sendActiveZone(0);
-      , 3s);
-  EXPECT_4_CALLS_RUN_STATEMENT_AND_WAIT(
-      marker_sub_mock_,
-      callback(AllOf(matchesName("active zoneset safety1 min:-10.0 max:+10.0"), hasDeleteAction())),
-      callback(AllOf(matchesName("active zoneset warn1 min:-10.0 max:+10.0"), hasDeleteAction())),
-      callback(AllOf(matchesName("active zoneset safety1 min:+11.0 max:+50.0"), hasAddAction())),
-      callback(AllOf(matchesName("active zoneset warn1 min:+11.0 max:+50.0"), hasAddAction())),
-      sendActiveZone(1);
-      , 3s);
-#else
-  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
-      marker_sub_mock_,
-      callback(AllOf(matchesName("active zoneset safety1 min:-10 max:+10"), hasAddAction())),
-      callback(AllOf(matchesName("active zoneset warn1 min:-10 max:+10"), hasAddAction())),
-      sendActiveZone(0);
-      , 3s);
-  EXPECT_4_CALLS_RUN_STATEMENT_AND_WAIT(
-      marker_sub_mock_,
-      callback(AllOf(matchesName("active zoneset safety1 min:-10 max:+10"), hasDeleteAction())),
-      callback(AllOf(matchesName("active zoneset warn1 min:-10 max:+10"), hasDeleteAction())),
-      callback(AllOf(matchesName("active zoneset safety1 min:+11 max:+50"), hasAddAction())),
-      callback(AllOf(matchesName("active zoneset warn1 min:+11 max:+50"), hasAddAction())),
-      sendActiveZone(1);
-      , 3s);
-#endif
+  auto s1_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasAddAction())));
+  auto w1_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasAddAction())));
+  sendActiveZone(0);
+  s1_barrier->waitTillRelease(3s);
+  w1_barrier->waitTillRelease(3s);
+
+  auto d_barrier = EXPECT_N_ASYNC_CALLS(marker_sub_mock_, callback(hasDeleteAction()), 2);
+  auto s2_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_2), hasAddAction())));
+  auto w2_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_2), hasAddAction())));
+  sendActiveZone(1);
+  d_barrier->waitTillRelease(3s);
+  s2_barrier->waitTillRelease(3s);
+  w2_barrier->waitTillRelease(3s);
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldNotPublishDeleteMarkersForSameActiveZone)
 {
-#if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
-  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
-      marker_sub_mock_,
-      callback(AllOf(matchesName("active zoneset safety1 min:-10.0 max:+10.0"), hasAddAction())),
-      callback(AllOf(matchesName("active zoneset warn1 min:-10.0 max:+10.0"), hasAddAction())),
-      sendActiveZone(0);
-      , 3s);
-  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
-      marker_sub_mock_,
-      callback(AllOf(matchesName("active zoneset safety1 min:-10.0 max:+10.0"), hasAddAction())),
-      callback(AllOf(matchesName("active zoneset warn1 min:-10.0 max:+10.0"), hasAddAction())),
-      sendActiveZone(0);
-      , 3s);
-#else
-  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
-      marker_sub_mock_,
-      callback(AllOf(matchesName("active zoneset safety1 min:-10 max:+10"), hasAddAction())),
-      callback(AllOf(matchesName("active zoneset warn1 min:-10 max:+10"), hasAddAction())),
-      sendActiveZone(0);
-      , 3s);
-  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
-      marker_sub_mock_,
-      callback(AllOf(matchesName("active zoneset safety1 min:-10 max:+10"), hasAddAction())),
-      callback(AllOf(matchesName("active zoneset warn1 min:-10 max:+10"), hasAddAction())),
-      sendActiveZone(0);
-      , 3s);
-#endif
+  auto s_barrier = EXPECT_N_ASYNC_CALLS(marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasAddAction())), 2);
+  auto w_barrier = EXPECT_N_ASYNC_CALLS(marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasAddAction())), 2);
+  sendActiveZone(0);
+  ros::Duration(0.5).sleep();
+  sendActiveZone(0);
+  s_barrier->waitTillRelease(3s);
+  w_barrier->waitTillRelease(3s);
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishDeleteMarkersOnInvalidActiveZone)
 {
-#if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
-  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
-      marker_sub_mock_,
-      callback(AllOf(matchesName("active zoneset safety1 min:-10.0 max:+10.0"), hasAddAction())),
-      callback(AllOf(matchesName("active zoneset warn1 min:-10.0 max:+10.0"), hasAddAction())),
-      sendActiveZone(0);
-      , 3s);
-  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
-      marker_sub_mock_,
-      callback(AllOf(matchesName("active zoneset safety1 min:-10.0 max:+10.0"), hasDeleteAction())),
-      callback(AllOf(matchesName("active zoneset warn1 min:-10.0 max:+10.0"), hasDeleteAction())),
-      sendActiveZone(5);
-      , 3s);
-#else
-  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
-      marker_sub_mock_,
-      callback(AllOf(matchesName("active zoneset safety1 min:-10 max:+10"), hasAddAction())),
-      callback(AllOf(matchesName("active zoneset warn1 min:-10 max:+10"), hasAddAction())),
-      sendActiveZone(0);
-      , 3s);
-  EXPECT_2_CALLS_RUN_STATEMENT_AND_WAIT(
-      marker_sub_mock_,
-      callback(AllOf(matchesName("active zoneset safety1 min:-10 max:+10"), hasDeleteAction())),
-      callback(AllOf(matchesName("active zoneset warn1 min:-10 max:+10"), hasDeleteAction())),
-      sendActiveZone(5);
-      , 3s);
-#endif
+  auto s1_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasAddAction())));
+  auto w1_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasAddAction())));
+  sendActiveZone(0);
+  s1_barrier->waitTillRelease(3s);
+  w1_barrier->waitTillRelease(3s);
+
+  auto s1d_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasDeleteAction())));
+  auto w1d_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasDeleteAction())));
+  sendActiveZone(5);
+  s1d_barrier->waitTillRelease(3s);
+  w1d_barrier->waitTillRelease(3s);
 }
 
 }  // namespace psen_scan_v2_test

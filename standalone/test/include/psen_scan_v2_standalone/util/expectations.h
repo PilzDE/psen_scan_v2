@@ -99,8 +99,11 @@ namespace psen_scan_v2_standalone_test
 #define EXPECT_N_ASYNC_CALLS(mock, call, times)                                                                        \
   [&]() {                                                                                                              \
     std::unique_ptr<psen_scan_v2_standalone::util::Barrier> b1{ new psen_scan_v2_standalone::util::Barrier{} };        \
-    EXPECT_CALL(mock, call).WillOnce(OpenBarrier(b1.get()));                                                           \
-    EXPECT_CALL(mock, call).Times(times - 1).RetiresOnSaturation();                                                    \
+    {                                                                                                                  \
+      ::testing::InSequence s;                                                                                         \
+      EXPECT_CALL(mock, call).Times(times - 1);                                                                        \
+      EXPECT_CALL(mock, call).WillOnce(OpenBarrier(b1.get()));                                                         \
+    }                                                                                                                  \
     return b1;                                                                                                         \
   }();
 
