@@ -23,7 +23,7 @@
 #include <stdexcept>
 #include <vector>
 
-#define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 10  // see https://www.boost.org/doc/libs/1_66_0/libs/msm/doc/HTML/ch03s05.html
+#define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 11  // see https://www.boost.org/doc/libs/1_66_0/libs/msm/doc/HTML/ch03s05.html
 
 // back-end
 #include <boost/msm/back/state_machine.hpp>
@@ -83,6 +83,7 @@ static constexpr uint32_t DEFAULT_NUM_MSG_PER_ROUND{ 6 };
 
 using ScannerStartedCallback = std::function<void()>;
 using ScannerStoppedCallback = std::function<void()>;
+using StartErrorCallback = std::function<void(const std::string&)>;
 using TimeoutCallback = std::function<void()>;
 using InformUserAboutLaserScanCallback = std::function<void(const LaserScan&)>;
 
@@ -145,6 +146,7 @@ public:
   ScannerProtocolDef(const ScannerConfiguration config,
                      const communication_layer::NewMessageCallback& control_msg_callback,
                      const communication_layer::ErrorCallback& control_error_callback,
+                     const communication_layer::ErrorCallback& start_error_callback,
                      const communication_layer::NewMessageCallback& data_msg_callback,
                      const communication_layer::ErrorCallback& data_error_callback,
                      const ScannerStartedCallback& scanner_started_callback,
@@ -159,6 +161,7 @@ public:  // States
   STATE(WaitForMonitoringFrame);
   STATE(WaitForStopReply);
   STATE(Stopped);
+  STATE(Error);
 
 public:  // Action methods
   template <class T>
@@ -168,10 +171,16 @@ public:  // Action methods
   void sendStopRequest(const T& event);
   void handleMonitoringFrame(const scanner_events::RawMonitoringFrameReceived& event);
   void handleMonitoringFrameTimeout(const scanner_events::MonitoringFrameTimeout& event);
+  void notifyUserAboutStart(scanner_events::RawReplyReceived const& reply_event);
+  void notifyUserAboutUnknownStartReply(scanner_events::RawReplyReceived const& reply_event);
+  void notifyUserAboutRefusedStartReply(scanner_events::RawReplyReceived const& reply_event);
+  void notifyUserAboutStop(scanner_events::RawReplyReceived const& reply_event);
 
 public:  // Guards
-  bool isStartReply(scanner_events::RawReplyReceived const& reply_event);
   bool isStopReply(scanner_events::RawReplyReceived const& reply_event);
+  bool isAcceptedStartReply(scanner_events::RawReplyReceived const& reply_event);
+  bool isUnknownStartReply(scanner_events::RawReplyReceived const& reply_event);
+  bool isRefusedStartReply(scanner_events::RawReplyReceived const& reply_event);
 
 public:  // Replaces the default exception/no-transition responses
   template <class FSM, class Event>
@@ -193,19 +202,21 @@ public:  // Definition of state machine via table
    */
   struct transition_table : mpl::vector<
       //    Start                         Event                         Next                        Action                        Guard
-      //  +------------------------------+----------------------------+---------------------------+------------------------------+-----------------------------+
-      a_row  < Idle,                      e::StartRequest,              WaitForStartReply,          &m::sendStartRequest                                      >,
-      a_row  < Idle,                      e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                       >,
-      g_row  < WaitForStartReply,         e::RawReplyReceived,          WaitForMonitoringFrame,                                   &m::isStartReply            >,
-      a_irow < WaitForStartReply,         e::StartTimeout,                                          &m::handleStartRequestTimeout                             >,
-      a_irow < WaitForMonitoringFrame,    e::RawMonitoringFrameReceived,                            &m::handleMonitoringFrame                                 >,
-      a_irow < WaitForMonitoringFrame,    e::MonitoringFrameTimeout,                                &m::handleMonitoringFrameTimeout                          >,
-      a_row  < WaitForStartReply,         e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                       >,
-      a_row  < WaitForMonitoringFrame,    e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                       >,
-      _irow  < WaitForStopReply,          e::RawMonitoringFrameReceived                                                                                       >,
-      g_row  < WaitForStopReply,          e::RawReplyReceived,          Stopped,                                                  &m::isStopReply             >,
-      _irow  < Stopped,                   e::RawMonitoringFrameReceived                                                                                       >
-      //  +------------------------------+----------------------------+--------------------------+--------------------------------+-----------------------------+
+      //  +------------------------------+----------------------------+---------------------------+--------------------------------------+-------------------------+
+      a_row  < Idle,                      e::StartRequest,              WaitForStartReply,          &m::sendStartRequest                                           >,
+      a_row  < Idle,                      e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                            >,
+      row    < WaitForStartReply,         e::RawReplyReceived,          WaitForMonitoringFrame,     &m::notifyUserAboutStart,             &m::isAcceptedStartReply >,
+      row    < WaitForStartReply,         e::RawReplyReceived,          Error,                      &m::notifyUserAboutRefusedStartReply, &m::isRefusedStartReply  >,
+      row    < WaitForStartReply,         e::RawReplyReceived,          Error,                      &m::notifyUserAboutUnknownStartReply, &m::isUnknownStartReply  >,
+      a_irow < WaitForStartReply,         e::StartTimeout,                                          &m::handleStartRequestTimeout                                  >,
+      a_irow < WaitForMonitoringFrame,    e::RawMonitoringFrameReceived,                            &m::handleMonitoringFrame                                      >,
+      a_irow < WaitForMonitoringFrame,    e::MonitoringFrameTimeout,                                &m::handleMonitoringFrameTimeout                               >,
+      a_row  < WaitForStartReply,         e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                            >,
+      a_row  < WaitForMonitoringFrame,    e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                            >,
+      _irow  < WaitForStopReply,          e::RawMonitoringFrameReceived                                                                                            >,
+      row    < WaitForStopReply,          e::RawReplyReceived,          Stopped,                    &m::notifyUserAboutStop,              &m::isStopReply          >,
+      _irow  < Stopped,                   e::RawMonitoringFrameReceived                                                                                            >
+      //  +------------------------------+----------------------------+--------------------------+---------------------------------------+-------------------------+
       > {};
   // clang-format on
 
@@ -222,8 +233,12 @@ private:
     InternalScannerReplyError(const std::string& error_msg);
   };
   // LCOV_EXCL_STOP
-  void checkForInternalErrors(const data_conversion_layer::scanner_reply::Message& msg);
+  bool isStartReply(data_conversion_layer::scanner_reply::Message const& msg);
+  bool isAcceptedReply(data_conversion_layer::scanner_reply::Message const& msg);
+  bool isUnknownReply(data_conversion_layer::scanner_reply::Message const& msg);
+  bool isRefusedReply(data_conversion_layer::scanner_reply::Message const& msg);
 
+  void checkForInternalErrors(const data_conversion_layer::scanner_reply::Message& msg);
   void checkForDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& msg);
   void informUserAboutTheScanData(const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg);
   void
@@ -246,6 +261,7 @@ private:
   // Callbacks
   const ScannerStartedCallback scanner_started_callback_;
   const ScannerStoppedCallback scanner_stopped_callback_;
+  const StartErrorCallback start_error_callback_;
   const InformUserAboutLaserScanCallback inform_user_about_laser_scan_callback_;
 
   // Timeout Handler

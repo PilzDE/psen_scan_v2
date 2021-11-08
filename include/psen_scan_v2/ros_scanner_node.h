@@ -64,7 +64,10 @@ public:
                   const double& x_axis_rotation,
                   const ScannerConfiguration& scanner_config);
 
-  //! @brief Continuously fetches data from the scanner and publishes the data as ROS scanner message.
+  /**
+   * @brief Continuously fetches data from the scanner and publishes the data into the ROS network.
+   * @throw std::runtime_error if starting the scanner was not successful.
+   */
   void run();
   //! @brief Terminates the fetching and publishing of scanner data.
   void terminate();
@@ -137,7 +140,13 @@ template <typename S>
 void ROSScannerNodeT<S>::run()
 {
   ros::Rate r(10);
-  scanner_.start();
+  auto start_future = scanner_.start();
+  const auto start_status = start_future.wait_for(3s);
+  if (start_status == std::future_status::ready)
+  {
+    start_future.get();  // Throws std::runtime_error if start not successful
+  }
+
   while (ros::ok() && !terminate_)
   {
     r.sleep();  // LCOV_EXCL_LINE can not be reached deterministically

@@ -4,6 +4,7 @@ Changelog for package psen_scan_v2
 
 Forthcoming
 -----------
+* Introduce error state and set exception in start-future
 * Remove dependency on pilz_testutils
 * Always build hardware tests
 * Internal refactorings

@@ -64,6 +64,7 @@ public:
   ~ScannerV2();
 
 public:
+  //! @brief An exception is set in the returned future if the scanner start was not successful.
   std::future<void> start() override;
   std::future<void> stop() override;
 
@@ -76,6 +77,7 @@ private:
 
   void scannerStartedCallback();
   void scannerStoppedCallback();
+  void scannerStartErrorCallback(const std::string& error_msg);
 
 private:
   using OptionalPromise = boost::optional<std::promise<void>>;

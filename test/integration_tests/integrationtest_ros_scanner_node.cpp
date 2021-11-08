@@ -15,7 +15,6 @@
 
 #include <memory>
 #include <chrono>
-#include <thread>
 #include <future>
 
 #include <gtest/gtest.h>
