@@ -28,7 +28,7 @@ fontsize=10
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>240</x>
+      <x>312</x>
       <y>1136</y>
       <w>600</w>
       <h>48</h>
@@ -43,7 +43,7 @@ Scanner device</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>608</x>
+      <x>680</x>
       <y>1056</y>
       <w>72</w>
       <h>96</h>
@@ -55,7 +55,7 @@ UDP package</panel_attributes>
   <element>
     <id>UMLActor</id>
     <coordinates>
-      <x>496</x>
+      <x>568</x>
       <y>0</y>
       <w>80</w>
       <h>96</h>
@@ -68,7 +68,7 @@ UDP package</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>240</x>
+      <x>312</x>
       <y>984</y>
       <w>600</w>
       <h>80</h>
@@ -86,7 +86,7 @@ The software components of this abstraction level delivere data as simple byte v
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>608</x>
+      <x>680</x>
       <y>896</y>
       <w>120</w>
       <h>104</h>
@@ -99,7 +99,7 @@ byte vector
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>240</x>
+      <x>312</x>
       <y>144</y>
       <w>608</w>
       <h>136</h>
@@ -124,7 +124,7 @@ It enables users to configurate, start and stop a single scanner by providing a 
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>528</x>
+      <x>600</x>
       <y>80</y>
       <w>24</w>
       <h>80</h>
@@ -136,7 +136,7 @@ It enables users to configurate, start and stop a single scanner by providing a 
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>928</x>
+      <x>1000</x>
       <y>472</y>
       <w>200</w>
       <h>168</h>
@@ -154,7 +154,7 @@ This abstraction layer consists of all software components transforming primitiv
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>832</x>
+      <x>904</x>
       <y>560</y>
       <w>112</w>
       <h>32</h>
@@ -166,7 +166,7 @@ This abstraction layer consists of all software components transforming primitiv
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>928</x>
+      <x>1000</x>
       <y>144</y>
       <w>200</w>
       <h>152</h>
@@ -183,7 +183,7 @@ like scanner IP &amp; port, scan range, scan resolution, etc.</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>416</x>
+      <x>488</x>
       <y>896</y>
       <w>120</w>
       <h>104</h>
@@ -196,7 +196,7 @@ byte vector
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>408</x>
+      <x>480</x>
       <y>1056</y>
       <w>72</w>
       <h>96</h>
@@ -208,7 +208,7 @@ UDP package</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>240</x>
+      <x>312</x>
       <y>328</y>
       <w>600</w>
       <h>576</h>
@@ -226,7 +226,7 @@ This abstraction layer implements the scanner protocol. In other words, this lay
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>544</x>
+      <x>616</x>
       <y>272</y>
       <w>48</w>
       <h>72</h>
@@ -238,115 +238,107 @@ This abstraction layer implements the scanner protocol. In other words, this lay
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>440</x>
-      <y>512</y>
+      <x>472</x>
+      <y>504</y>
       <w>144</w>
       <h>32</h>
     </coordinates>
     <panel_attributes>halign=center
 valign=center
-Idle
-group=1</panel_attributes>
+Idle</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>440</x>
-      <y>584</y>
+      <x>472</x>
+      <y>576</y>
       <w>144</w>
       <h>32</h>
     </coordinates>
     <panel_attributes>halign=center
 valign=center
-WaitForStartReply
-group=1</panel_attributes>
+WaitForStartReply</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>504</x>
-      <y>536</y>
+      <x>536</x>
+      <y>528</y>
       <w>72</w>
       <h>64</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-StartRequest
-group=1</panel_attributes>
+StartRequest</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
   </element>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>440</x>
-      <y>656</y>
+      <x>472</x>
+      <y>648</y>
       <w>144</w>
       <h>32</h>
     </coordinates>
     <panel_attributes>halign=center
 valign=center
-WaitForMonitoringFrame
-group=1</panel_attributes>
+WaitForMonitoringFrame</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>504</x>
-      <y>608</y>
-      <w>160</w>
+      <x>536</x>
+      <y>600</y>
+      <w>200</w>
       <h>64</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-RawReplyReceived [isStartReply()]
-group=1</panel_attributes>
+RawReplyReceived [isAcceptedStartReply()]</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>504</x>
-      <y>680</y>
+      <x>536</x>
+      <y>672</y>
       <w>72</w>
       <h>88</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-StopRequest
-group=1</panel_attributes>
+StopRequest</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
   </element>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>440</x>
-      <y>752</y>
+      <x>472</x>
+      <y>744</y>
       <w>144</w>
       <h>32</h>
     </coordinates>
     <panel_attributes>halign=center
 valign=center
-WaitForStopReply
-group=1</panel_attributes>
+WaitForStopReply</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>576</x>
-      <y>656</y>
+      <x>608</x>
+      <y>648</y>
       <w>160</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-RawMonitoringFrameReceived
-group=1</panel_attributes>
+RawMonitoringFrameReceived</panel_attributes>
     <additional_attributes>10.0;10.0;30.0;10.0;30.0;30.0;10.0;30.0</additional_attributes>
   </element>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>280</x>
+      <x>352</x>
       <y>408</y>
       <w>504</w>
       <h>464</h>
@@ -361,93 +353,88 @@ This component represents the scanner protocol/ state machine (indirectly) descr
 --
 
 
-
-group=1</panel_attributes>
+</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>368</x>
-      <y>528</y>
+      <x>400</x>
+      <y>512</y>
       <w>88</w>
-      <h>256</h>
+      <h>264</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-m2=StopRequest
-group=1</panel_attributes>
-    <additional_attributes>90.0;10.0;20.0;60.0;20.0;300.0;90.0;300.0</additional_attributes>
+m2=StopRequest</panel_attributes>
+    <additional_attributes>90.0;10.0;20.0;60.0;20.0;310.0;90.0;310.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>376</x>
-      <y>584</y>
+      <x>408</x>
+      <y>576</y>
       <w>80</w>
       <h>32</h>
     </coordinates>
-    <panel_attributes>lt=-&gt;
-
-group=1</panel_attributes>
+    <panel_attributes>lt=-
+</panel_attributes>
     <additional_attributes>80.0;20.0;10.0;20.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>320</x>
-      <y>656</y>
-      <w>136</w>
+      <x>432</x>
+      <y>672</y>
+      <w>120</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-m2=MonitoringFrameTimeout
-group=1</panel_attributes>
-    <additional_attributes>150.0;10.0;120.0;10.0;120.0;30.0;150.0;30.0</additional_attributes>
+
+MonitoringFrameTimeout</panel_attributes>
+    <additional_attributes>80.0;10.0;80.0;30.0;60.0;30.0;60.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>440</x>
-      <y>824</y>
+      <x>472</x>
+      <y>816</y>
       <w>144</w>
       <h>32</h>
     </coordinates>
     <panel_attributes>halign=center
 valign=center
-Stopped
-group=1</panel_attributes>
+Stopped</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>504</x>
-      <y>776</y>
+      <x>536</x>
+      <y>768</y>
       <w>160</w>
       <h>64</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-m1=RawReplyReceived [isStopReply()]
-group=1</panel_attributes>
+m1=RawReplyReceived [isStopReply()]</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;60.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>576</x>
-      <y>584</y>
-      <w>88</w>
+      <x>456</x>
+      <y>600</y>
+      <w>72</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
-StartTimeout
-group=1</panel_attributes>
-    <additional_attributes>10.0;10.0;30.0;10.0;30.0;30.0;10.0;30.0</additional_attributes>
+
+StartTimeout</panel_attributes>
+    <additional_attributes>50.0;10.0;50.0;30.0;30.0;30.0;30.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>840</x>
+      <x>912</x>
       <y>216</y>
       <w>104</w>
       <h>32</h>
@@ -459,27 +446,54 @@ group=1</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>576</x>
-      <y>752</y>
+      <x>608</x>
+      <y>744</y>
       <w>160</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
-RawMonitoringFrameReceived
-group=1</panel_attributes>
+RawMonitoringFrameReceived</panel_attributes>
     <additional_attributes>10.0;30.0;30.0;30.0;30.0;10.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>576</x>
-      <y>824</y>
+      <x>608</x>
+      <y>816</y>
       <w>160</w>
       <h>40</h>
     </coordinates>
     <panel_attributes>lt=&lt;-
-RawMonitoringFrameReceived
-group=1</panel_attributes>
+RawMonitoringFrameReceived</panel_attributes>
     <additional_attributes>10.0;30.0;30.0;30.0;30.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>768</x>
+      <y>512</y>
+      <w>80</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>halign=center
+valign=center
+fg=red
+Error</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>608</x>
+      <y>536</y>
+      <w>224</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+fg=red
+
+RawReplyReceived
+[isUnknownStartReply()|isRefusedStartReply()]</panel_attributes>
+    <additional_attributes>10.0;70.0;260.0;70.0;260.0;10.0</additional_attributes>
   </element>
 </diagram>

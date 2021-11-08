@@ -227,6 +227,45 @@ TEST_F(ScannerAPITests, shouldReturnInvalidFutureWhenStartIsCalledSecondTime)
   EXPECT_SCANNER_TO_STOP_SUCCESSFULLY(hw_mock_, driver_);
 }
 
+TEST_F(ScannerAPITests, startShouldReturnFutureWithExceptionIfStartRequestRefused)
+{
+  setUpScannerConfig();
+  setUpScannerV2Driver();
+  setUpScannerHwMock();
+
+  util::Barrier start_req_received_barrier;
+  EXPECT_START_REQUEST_CALL(*hw_mock_, *config_).WillOnce(OpenBarrier(&start_req_received_barrier));
+
+  std::future<void> start_future = driver_->start();
+  start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT);
+
+  hw_mock_->sendStartReply(data_conversion_layer::scanner_reply::Message::OperationResult::refused);
+  EXPECT_FUTURE_IS_READY(start_future, DEFAULT_TIMEOUT);
+  EXPECT_THROW_AND_WHAT(start_future.get(), std::runtime_error, "Request refused by device.");
+}
+
+TEST_F(ScannerAPITests, startShouldReturnFutureWithExceptionIfUnknownResultSent)
+{
+  setUpScannerConfig();
+  setUpScannerV2Driver();
+  setUpScannerHwMock();
+
+  util::Barrier start_req_received_barrier;
+  EXPECT_START_REQUEST_CALL(*hw_mock_, *config_).WillOnce(OpenBarrier(&start_req_received_barrier));
+
+  std::future<void> start_future = driver_->start();
+  start_req_received_barrier.waitTillRelease(DEFAULT_TIMEOUT);
+
+  hw_mock_->sendStartReply(data_conversion_layer::scanner_reply::Message::OperationResult::unknown);
+  EXPECT_FUTURE_IS_READY(start_future, DEFAULT_TIMEOUT);
+  EXPECT_THROW_AND_WHAT(
+      start_future.get(),
+      std::runtime_error,
+      fmt::format("Unknown result code {:#04x} in start reply.",
+                  static_cast<uint32_t>(data_conversion_layer::scanner_reply::Message::OperationResult::unknown))
+          .c_str());
+}
+
 TEST_F(ScannerAPITests, startShouldSucceedDespiteUnexpectedMonitoringFrame)
 {
   setUpScannerConfig();
