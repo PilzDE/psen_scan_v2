@@ -519,6 +519,7 @@ if(CATKIN_ENABLE_TESTING)
   add_rostest_gmock(integrationtest_active_zoneset_node
     test/integration_tests/integrationtest_active_zoneset_node.test
     test/integration_tests/integrationtest_active_zoneset_node.cpp
+    src/active_zoneset_node.cpp
   )
   target_link_libraries(integrationtest_active_zoneset_node
     ${catkin_LIBRARIES}

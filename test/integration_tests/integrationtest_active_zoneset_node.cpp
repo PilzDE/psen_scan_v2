@@ -76,7 +76,7 @@ public:
     subscriber_ = nh_.subscribe("/test_ns_laser_1/active_zoneset_marker", 10, &MarkerSubscriberMock::callback, this);
   }
 
-  bool isConnected(const ros::Duration& timeout = ros::Duration(10.0)) const
+  bool isConnected(const ros::Duration& timeout = ros::Duration(3.0)) const
   {
     const auto start_time = ros::Time::now();
     while (ros::ok())
@@ -106,8 +106,8 @@ class ActiveZonesetNodeTest : public testing::Test
 public:
   void SetUp() override
   {
-    ros::NodeHandle nh;
-    pub_active_ = nh.advertise<std_msgs::UInt8>("/test_ns_laser_1/active_zoneset", 1, true);
+    activeZoneNode_.reset(new psen_scan_v2::ActiveZonesetNode(nh_));
+    pub_active_ = nh_.advertise<std_msgs::UInt8>("active_zoneset", 1, true);
     ASSERT_TRUE(marker_sub_mock_.isConnected());
   }
   void sendActiveZone(uint8_t zone);
@@ -115,6 +115,8 @@ public:
 public:
   MarkerSubscriberMock marker_sub_mock_;
   ros::Publisher pub_active_;
+  ros::NodeHandle nh_{"test_ns_laser_1"};
+  std::unique_ptr<psen_scan_v2::ActiveZonesetNode> activeZoneNode_;
 };
 
 void ActiveZonesetNodeTest::sendActiveZone(uint8_t zone)

@@ -27,6 +27,7 @@
 
 namespace psen_scan_v2
 {
+static const std::string DEFAULT_ACTIVE_ZONESET_TOPIC = "active_zoneset";
 static const std::string DEFAULT_ZONESET_MARKER_TOPIC = "active_zoneset_marker";
 
 /**
