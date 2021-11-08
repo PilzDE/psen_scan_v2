@@ -115,7 +115,7 @@ public:
 public:
   MarkerSubscriberMock marker_sub_mock_;
   ros::Publisher pub_active_;
-  ros::NodeHandle nh_{"test_ns_laser_1"};
+  ros::NodeHandle nh_{ "test_ns_laser_1" };
   std::unique_ptr<psen_scan_v2::ActiveZonesetNode> activeZoneNode_;
 };
 
@@ -136,7 +136,8 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithCorrectType)
   auto barrier = EXPECT_N_ASYNC_CALLS(marker_sub_mock_, callback(isTriangleList()), 2);
   sendActiveZone(0);
   barrier->waitTillRelease(3s);
-  //EXPECT_CALL_X_TIMES_RUN_STATEMENT_AND_WAIT(marker_sub_mock_, callback(isTriangleList()), 2, sendActiveZone(0);, 3s);
+  // EXPECT_CALL_X_TIMES_RUN_STATEMENT_AND_WAIT(marker_sub_mock_, callback(isTriangleList()), 2, sendActiveZone(0);,
+  // 3s);
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithPoints)
