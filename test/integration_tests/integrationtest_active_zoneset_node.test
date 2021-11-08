@@ -22,6 +22,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <param name="frame_id" value="$(arg frame_id)"/>
   </node>
 
+  <node ns="test_ns_laser_1" name="active_zoneset_node" pkg="psen_scan_v2" type="active_zoneset_node" />
+
   <test test-name="integrationtest_active_zoneset_node" pkg="psen_scan_v2" type="integrationtest_active_zoneset_node" />
 
 </launch>

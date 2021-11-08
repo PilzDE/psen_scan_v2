@@ -30,8 +30,6 @@
 #include "psen_scan_v2/ros_integrationtest_helper.h"
 #include "psen_scan_v2_standalone/util/expectations.h"
 
-#include "psen_scan_v2/active_zoneset_node.h"
-
 namespace psen_scan_v2_test
 {
 using namespace std::chrono_literals;
@@ -118,8 +116,8 @@ class ActiveZonesetNodeTest : public testing::Test
 public:
   void SetUp() override
   {
-    activeZoneNode_.reset(new psen_scan_v2::ActiveZonesetNode(nh_));
-    pub_active_ = nh_.advertise<std_msgs::UInt8>("active_zoneset", 10, true);
+    ros::NodeHandle nh;
+    pub_active_ = nh.advertise<std_msgs::UInt8>("/test_ns_laser_1/active_zoneset", 1, true);
     ASSERT_TRUE(marker_sub_mock_.isConnected());
   }
   void sendActiveZone(uint8_t zone);
@@ -127,8 +125,6 @@ public:
 public:
   MarkerSubscriberMock marker_sub_mock_;
   ros::Publisher pub_active_;
-  ros::NodeHandle nh_{ "test_ns_laser_1" };
-  std::unique_ptr<psen_scan_v2::ActiveZonesetNode> activeZoneNode_;
 };
 
 void ActiveZonesetNodeTest::sendActiveZone(uint8_t zone)

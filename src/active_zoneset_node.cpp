@@ -29,9 +29,9 @@ namespace psen_scan_v2
 {
 ActiveZonesetNode::ActiveZonesetNode(ros::NodeHandle& nh) : nh_(nh)
 {
-  zoneset_subscriber_ = nh_.subscribe(DEFAULT_ZONESET_TOPIC, 4, &ActiveZonesetNode::zonesetCallback, this);
+  zoneset_subscriber_ = nh_.subscribe(DEFAULT_ZONESET_TOPIC, 2, &ActiveZonesetNode::zonesetCallback, this);
   active_zoneset_subscriber_ =
-      nh_.subscribe(DEFAULT_ACTIVE_ZONESET_TOPIC, 4, &ActiveZonesetNode::activeZonesetCallback, this);
+      nh_.subscribe(DEFAULT_ACTIVE_ZONESET_TOPIC, 10, &ActiveZonesetNode::activeZonesetCallback, this);
   zoneset_marker_ = nh_.advertise<visualization_msgs::Marker>(DEFAULT_ZONESET_MARKER_TOPIC, 10);
 }
 
