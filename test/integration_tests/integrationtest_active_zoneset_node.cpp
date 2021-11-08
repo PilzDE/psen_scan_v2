@@ -14,6 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <chrono>
+#include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -28,6 +29,7 @@
 #include <std_msgs/UInt8.h>
 
 #include "psen_scan_v2/ros_integrationtest_helper.h"
+#include "psen_scan_v2_standalone/util/async_barrier.h"
 #include "psen_scan_v2_standalone/util/expectations.h"
 
 namespace psen_scan_v2_test
@@ -44,7 +46,7 @@ MATCHER(hasPoints, "")
 
 MATCHER(isTriangleList, "")
 {
-  *result_listener << "arg.type is: " << arg->type << "but should be: " << visualization_msgs::Marker::TRIANGLE_LIST;
+  *result_listener << "arg.type is: " << arg->type << " but should be: " << visualization_msgs::Marker::TRIANGLE_LIST;
   return arg->type == visualization_msgs::Marker::TRIANGLE_LIST;
 }
 
@@ -111,19 +113,29 @@ static const std::string SAFETY_NS_ZONE_2{ "active zoneset safety1 min:+11 max:+
 static const std::string WARN_NS_ZONE_2{ "active zoneset warn1 min:+11 max:+50" };
 #endif
 
+TEST(ActiveZonesetNodeTopicTest, shouldAdvertiseZonesetMarkerTopic)
+{
+  EXPECT_TRUE(TopicExists("/test_ns_laser_1/active_zoneset_marker"));
+}
+
 class ActiveZonesetNodeTest : public testing::Test
 {
 public:
   void SetUp() override
   {
-    ros::NodeHandle nh;
-    pub_active_ = nh.advertise<std_msgs::UInt8>("/test_ns_laser_1/active_zoneset", 1, true);
-    ASSERT_TRUE(marker_sub_mock_.isConnected());
+    pub_active_ = nh_.advertise<std_msgs::UInt8>("/test_ns_laser_1/active_zoneset", 10, true);
+
+    // reset active zone to create clear testing conditions
+    EXPECT_CALL(marker_sub_mock_, callback(hasDeleteAction())).Times(::testing::AtMost(2));
+    auto init_barrier = EXPECT_N_ASYNC_CALLS(marker_sub_mock_, callback(hasAddAction()), 2);
+    sendActiveZone(0);
+    init_barrier->waitTillRelease(3s);
   }
   void sendActiveZone(uint8_t zone);
 
 public:
   MarkerSubscriberMock marker_sub_mock_;
+  ros::NodeHandle nh_;
   ros::Publisher pub_active_;
 };
 
@@ -132,11 +144,6 @@ void ActiveZonesetNodeTest::sendActiveZone(uint8_t zone)
   std_msgs::UInt8 active_zone_msg;
   active_zone_msg.data = zone;
   pub_active_.publish(active_zone_msg);
-}
-
-TEST_F(ActiveZonesetNodeTest, shouldAdvertiseZonesetMarkerTopic)
-{
-  EXPECT_TRUE(TopicExists("/test_ns_laser_1/active_zoneset_marker"));
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithCorrectType)
@@ -164,27 +171,21 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForAllDefinedZoneTypes)
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForNewActiveZoneWhenActiveZoneSwitches)
 {
-  auto s1_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasAddAction())));
-  auto w1_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasAddAction())));
-  sendActiveZone(0);
-  s1_barrier->waitTillRelease(3s);
-  w1_barrier->waitTillRelease(3s);
-
-  auto d_barrier = EXPECT_N_ASYNC_CALLS(marker_sub_mock_, callback(hasDeleteAction()), 2);
+  auto d1_barrier = EXPECT_N_ASYNC_CALLS(marker_sub_mock_, callback(hasDeleteAction()), 2);
   auto s2_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_2), hasAddAction())));
   auto w2_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_2), hasAddAction())));
   sendActiveZone(1);
-  d_barrier->waitTillRelease(3s);
+  d1_barrier->waitTillRelease(3s);
   s2_barrier->waitTillRelease(3s);
   w2_barrier->waitTillRelease(3s);
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldNotPublishDeleteMarkersForSameActiveZone)
 {
-  auto s_barrier = EXPECT_N_ASYNC_CALLS(marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasAddAction())), 2);
-  auto w_barrier = EXPECT_N_ASYNC_CALLS(marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasAddAction())), 2);
-  sendActiveZone(0);
-  ros::Duration(0.5).sleep();
+  EXPECT_CALL(marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasDeleteAction()))).Times(0);
+  EXPECT_CALL(marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasDeleteAction()))).Times(0);
+  auto s_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasAddAction())));
+  auto w_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasAddAction())));
   sendActiveZone(0);
   s_barrier->waitTillRelease(3s);
   w_barrier->waitTillRelease(3s);
@@ -192,12 +193,6 @@ TEST_F(ActiveZonesetNodeTest, shouldNotPublishDeleteMarkersForSameActiveZone)
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishDeleteMarkersOnInvalidActiveZone)
 {
-  auto s1_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasAddAction())));
-  auto w1_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasAddAction())));
-  sendActiveZone(0);
-  s1_barrier->waitTillRelease(3s);
-  w1_barrier->waitTillRelease(3s);
-
   auto s1d_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasDeleteAction())));
   auto w1d_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasDeleteAction())));
   sendActiveZone(5);
