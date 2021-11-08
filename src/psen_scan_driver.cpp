@@ -120,6 +120,7 @@ int main(int argc, char** argv)
   catch (std::exception& e)
   {
     ROS_ERROR_STREAM(e.what());
+    return 1;
   }
 
   return 0;
