@@ -106,12 +106,10 @@ private:
 static const std::string SAFETY_NS_ZONE_1{ "active zoneset safety1 min:-10.0 max:+10.0" };
 static const std::string WARN_NS_ZONE_1{ "active zoneset warn1 min:-10.0 max:+10.0" };
 static const std::string SAFETY_NS_ZONE_2{ "active zoneset safety1 min:+11.0 max:+50.0" };
-static const std::string WARN_NS_ZONE_2 = { "active zoneset warn1 min:+11.0 max:+50.0" };
 #else
 static const std::string SAFETY_NS_ZONE_1{ "active zoneset safety1 min:-10 max:+10" };
 static const std::string WARN_NS_ZONE_1{ "active zoneset warn1 min:-10 max:+10" };
 static const std::string SAFETY_NS_ZONE_2{ "active zoneset safety1 min:+11 max:+50" };
-static const std::string WARN_NS_ZONE_2{ "active zoneset warn1 min:+11 max:+50" };
 #endif
 
 TEST(ActiveZonesetNodeTopicTest, shouldAdvertiseZonesetMarkerTopic)
@@ -202,11 +200,9 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForNewActiveZoneWhenActiveZone
 {
   auto d1_barrier = EXPECT_N_ASYNC_CALLS(*marker_sub_mock_, callback(hasDeleteAction()), 2);
   auto s2_barrier = EXPECT_ASYNC_CALL(*marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_2), hasAddAction())));
-  auto w2_barrier = EXPECT_ASYNC_CALL(*marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_2), hasAddAction())));
   sendActiveZone(1);
   d1_barrier->waitTillRelease(3s);
   s2_barrier->waitTillRelease(3s);
-  w2_barrier->waitTillRelease(3s);
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldNotPublishDeleteMarkersForSameActiveZone)
