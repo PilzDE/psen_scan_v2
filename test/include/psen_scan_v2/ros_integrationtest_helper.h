@@ -61,40 +61,6 @@ namespace psen_scan_v2_test
   return ::testing::AssertionFailure() << "Topic \"" << topic << "\" not found. Available topics: " << topic_names;
 }
 
-/**
- * @brief Blocks until a node defined by node_name comes up.
- * @param node_name The name of the node to wait for.
- * @param loop_frequency Frequency at which the system is checked for the node.
- */
-inline ::testing::AssertionResult NodeExists(const std::string node_name,
-                                             const double loop_frequency = 10.0,
-                                             const ros::Duration timeout = ros::Duration(3.0))
-{
-  std::vector<std::string> node_names;
-  std::stringstream ss_node_names;
-  const auto timeout_time = ros::Time::now() + timeout;
-  if (ros::master::getNodes(node_names))
-  {
-    for (auto node : node_names)
-    {
-      ss_node_names << "\"" << node << "\" ";
-    }
-  }
-
-  while (ros::master::getNodes(node_names) &&
-         std::find(node_names.begin(), node_names.end(), node_name) == node_names.end())
-  {
-    if (ros::Time::now() > timeout_time)
-    {
-      return ::testing::AssertionFailure() << "Timeout while waiting for node: \"" << node_name << "\""
-                                           << "\". Available nodes: " << ss_node_names.str();
-    }
-    ros::Rate(loop_frequency).sleep();
-  }
-
-  return ::testing::AssertionSuccess() << "Found node \"" << node_name;
-}
-
 MATCHER(isLatched, "")
 {
   auto connection_header = arg.getConnectionHeader();

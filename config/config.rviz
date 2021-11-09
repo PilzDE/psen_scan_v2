@@ -143,9 +143,6 @@ Visualization Manager:
       Enabled: true
       Marker Topic: /laser_1/active_zoneset_marker
       Name: Marker
-      Namespaces:
-        active zoneset safety1 min:-10.0 max:+10.0: true
-        active zoneset warn1 min:-10.0 max:+10.0: true
       Queue Size: 100
       Value: true
   Enabled: true
