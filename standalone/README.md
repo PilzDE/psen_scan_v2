@@ -152,6 +152,6 @@ For more Documentation please take a look at the generated Doxygen [Code API][].
 
 
 
-[Code API]: http://docs.ros.org/en/noetic/psen_scan_v2/html/
-[LaserScan]: http://docs.ros.org/en/noetic/psen_scan_v2/html/classpsen__scan__v2__standalone_1_1LaserScan.html
-[ScannerV2]: http://docs.ros.org/en/noetic/psen_scan_v2/html/classpsen__scan__v2__standalone_1_1ScannerV2.html
+[Code API]: http://docs.ros.org/en/noetic/api/psen_scan_v2/html/
+[LaserScan]: http://docs.ros.org/en/noetic/api/psen_scan_v2/html/classpsen__scan__v2__standalone_1_1LaserScan.html
+[ScannerV2]: http://docs.ros.org/en/noetic/api/psen_scan_v2/html/classpsen__scan__v2__standalone_1_1ScannerV2.html
