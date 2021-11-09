@@ -57,7 +57,7 @@ void ActiveZonesetNode::sendMarkersWhenAllInformationIsAvailable()
     try
     {
       auto new_markers = toMarkers(zoneset_config_->zonesets.at(active_zoneset_->data));
-      if (mismatchLastMarkers(new_markers))
+      if (!containLastMarkers(new_markers))
       {
         deleteLastMarkers();
       }
@@ -95,21 +95,17 @@ void ActiveZonesetNode::deleteLastMarkers()
   last_markers_.clear();
 }
 
-bool ActiveZonesetNode::mismatchLastMarkers(const std::vector<visualization_msgs::Marker>& new_markers)
+bool ActiveZonesetNode::containLastMarkers(const std::vector<visualization_msgs::Marker>& new_markers)
 {
-  if (last_markers_.empty())
+  if (new_markers.size() < last_markers_.size())
   {
     return false;
-  }
-  if (last_markers_.size() != new_markers.size())
-  {
-    return true;
   }
   return std::mismatch(last_markers_.begin(),
                        last_markers_.end(),
                        new_markers.begin(),
                        [](const auto& m1, const auto& m2) { return m1.ns == m2.ns; })
-             .first != last_markers_.end();
+             .first == last_markers_.end();
 }
 
 }  // namespace psen_scan_v2

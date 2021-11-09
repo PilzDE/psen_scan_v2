@@ -57,7 +57,7 @@ private:
   void sendMarkersWhenAllInformationIsAvailable();
   void deleteLastMarkers();
   void addMarkers(const std::vector<visualization_msgs::Marker>& new_markers);
-  bool mismatchLastMarkers(const std::vector<visualization_msgs::Marker>& new_markers);
+  bool containLastMarkers(const std::vector<visualization_msgs::Marker>& new_markers);
 
 private:
   ros::NodeHandle nh_;
