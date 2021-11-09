@@ -14,6 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <chrono>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -121,23 +122,27 @@ TEST(ActiveZonesetNodeTopicTest, shouldAdvertiseZonesetMarkerTopic)
 class ActiveZonesetNodeTest : public testing::Test
 {
 public:
-  void SetUp() override
-  {
-    pub_active_ = nh_.advertise<std_msgs::UInt8>("/test_ns_laser_1/active_zoneset", 10, true);
-
-    // reset active zone to create clear testing conditions
-    EXPECT_CALL(marker_sub_mock_, callback(hasDeleteAction())).Times(::testing::AtMost(2));
-    auto init_barrier = EXPECT_N_ASYNC_CALLS(marker_sub_mock_, callback(hasAddAction()), 2);
-    sendActiveZone(0);
-    init_barrier->waitTillRelease(3s);
-  }
+  void SetUp() override;
   void sendActiveZone(uint8_t zone);
+  ::testing::AssertionResult resetActiveZoneNode();
 
 public:
-  MarkerSubscriberMock marker_sub_mock_;
+  std::unique_ptr<MarkerSubscriberMock> marker_sub_mock_;
   ros::NodeHandle nh_;
   ros::Publisher pub_active_;
 };
+
+void ActiveZonesetNodeTest::SetUp()
+{
+  pub_active_ = nh_.advertise<std_msgs::UInt8>("/test_ns_laser_1/active_zoneset", 10, true);
+
+  // reset active zone to create clear testing conditions
+  ASSERT_TRUE(resetActiveZoneNode());
+
+  // initialize here to avoid traffic of above reset
+  marker_sub_mock_.reset(new MarkerSubscriberMock{});
+  ASSERT_TRUE(marker_sub_mock_->isConnected());
+}
 
 void ActiveZonesetNodeTest::sendActiveZone(uint8_t zone)
 {
@@ -146,24 +151,48 @@ void ActiveZonesetNodeTest::sendActiveZone(uint8_t zone)
   pub_active_.publish(active_zone_msg);
 }
 
+::testing::AssertionResult ActiveZonesetNodeTest::resetActiveZoneNode()
+{
+  MarkerSubscriberMock reset_marker_mock;
+  if (!reset_marker_mock.isConnected())
+  {
+    return ::testing::AssertionFailure() << "Could not connect with subscriber on marker topic.";
+  }
+
+  util::Barrier reset_marker_barrier;
+  unsigned count = 0;
+  ON_CALL(reset_marker_mock, callback(hasAddAction())).WillByDefault(OpenBarrierCond(&reset_marker_barrier, [&count]() {
+    return ++count == 2;
+  }));
+
+  sendActiveZone(0);
+  if (!reset_marker_barrier.waitTillRelease(3s))
+  {
+    return ::testing::AssertionFailure() << "Failure receiving 2 markers to add for active zone 0.";
+  }
+  return ::testing::AssertionSuccess();
+}
+
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithCorrectType)
 {
-  auto barrier = EXPECT_N_ASYNC_CALLS(marker_sub_mock_, callback(isTriangleList()), 2);
+  auto barrier = EXPECT_N_ASYNC_CALLS(*marker_sub_mock_, callback(isTriangleList()), 2);
   sendActiveZone(0);
   barrier->waitTillRelease(3s);
 }
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithPoints)
 {
-  auto barrier = EXPECT_N_ASYNC_CALLS(marker_sub_mock_, callback(hasPoints()), 2);
+  auto barrier = EXPECT_N_ASYNC_CALLS(*marker_sub_mock_, callback(hasPoints()), 2);
   sendActiveZone(0);
   barrier->waitTillRelease(3s);
 }
 
+using ::testing::AllOf;
+
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForAllDefinedZoneTypes)
 {
-  auto s_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasAddAction())));
-  auto w_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasAddAction())));
+  auto s_barrier = EXPECT_ASYNC_CALL(*marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasAddAction())));
+  auto w_barrier = EXPECT_ASYNC_CALL(*marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasAddAction())));
   sendActiveZone(0);
   s_barrier->waitTillRelease(3s);
   w_barrier->waitTillRelease(3s);
@@ -171,9 +200,9 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForAllDefinedZoneTypes)
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForNewActiveZoneWhenActiveZoneSwitches)
 {
-  auto d1_barrier = EXPECT_N_ASYNC_CALLS(marker_sub_mock_, callback(hasDeleteAction()), 2);
-  auto s2_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_2), hasAddAction())));
-  auto w2_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_2), hasAddAction())));
+  auto d1_barrier = EXPECT_N_ASYNC_CALLS(*marker_sub_mock_, callback(hasDeleteAction()), 2);
+  auto s2_barrier = EXPECT_ASYNC_CALL(*marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_2), hasAddAction())));
+  auto w2_barrier = EXPECT_ASYNC_CALL(*marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_2), hasAddAction())));
   sendActiveZone(1);
   d1_barrier->waitTillRelease(3s);
   s2_barrier->waitTillRelease(3s);
@@ -182,10 +211,10 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForNewActiveZoneWhenActiveZone
 
 TEST_F(ActiveZonesetNodeTest, shouldNotPublishDeleteMarkersForSameActiveZone)
 {
-  EXPECT_CALL(marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasDeleteAction()))).Times(0);
-  EXPECT_CALL(marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasDeleteAction()))).Times(0);
-  auto s_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasAddAction())));
-  auto w_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasAddAction())));
+  EXPECT_CALL(*marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasDeleteAction()))).Times(0);
+  EXPECT_CALL(*marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasDeleteAction()))).Times(0);
+  auto s_barrier = EXPECT_ASYNC_CALL(*marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasAddAction())));
+  auto w_barrier = EXPECT_ASYNC_CALL(*marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasAddAction())));
   sendActiveZone(0);
   s_barrier->waitTillRelease(3s);
   w_barrier->waitTillRelease(3s);
@@ -193,8 +222,8 @@ TEST_F(ActiveZonesetNodeTest, shouldNotPublishDeleteMarkersForSameActiveZone)
 
 TEST_F(ActiveZonesetNodeTest, shouldPublishDeleteMarkersOnInvalidActiveZone)
 {
-  auto s1d_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasDeleteAction())));
-  auto w1d_barrier = EXPECT_ASYNC_CALL(marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasDeleteAction())));
+  auto s1d_barrier = EXPECT_ASYNC_CALL(*marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasDeleteAction())));
+  auto w1d_barrier = EXPECT_ASYNC_CALL(*marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasDeleteAction())));
   sendActiveZone(5);
   s1d_barrier->waitTillRelease(3s);
   w1d_barrier->waitTillRelease(3s);
