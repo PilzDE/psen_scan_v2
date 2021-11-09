@@ -66,7 +66,7 @@ void ActiveZonesetNode::sendMarkersWhenAllInformationIsAvailable()
     catch (std::out_of_range const& e)
     {
       ROS_ERROR_STREAM_THROTTLE(1,
-                                "Active zone " << active_zoneset_->data
+                                "Active zone " << static_cast<unsigned>(active_zoneset_->data)
                                                << " of your scanner does not exist in the provided configuration!");
       deleteLastMarkers();
     }
