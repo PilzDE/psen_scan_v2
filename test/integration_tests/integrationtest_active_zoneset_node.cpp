@@ -123,6 +123,7 @@ public:
   void SetUp() override;
   void sendActiveZone(uint8_t zone);
   ::testing::AssertionResult resetActiveZoneNode();
+  ::testing::AssertionResult switchToInvalidActiveZoneAfterSetup();
 
 public:
   std::unique_ptr<MarkerSubscriberMock> marker_sub_mock_;
@@ -140,6 +141,27 @@ void ActiveZonesetNodeTest::SetUp()
   // initialize here to avoid traffic of above reset
   marker_sub_mock_.reset(new MarkerSubscriberMock{});
   ASSERT_TRUE(marker_sub_mock_->isConnected());
+}
+
+::testing::AssertionResult ActiveZonesetNodeTest::switchToInvalidActiveZoneAfterSetup()
+{
+  MarkerSubscriberMock invalid_marker_mock;
+  if (!invalid_marker_mock.isConnected())
+  {
+    return ::testing::AssertionFailure() << "Could not connect with subscriber on marker topic.";
+  }
+
+  util::Barrier invalid_marker_barrier;
+  unsigned count = 0;
+  ON_CALL(invalid_marker_mock, callback(hasDeleteAction()))
+      .WillByDefault(OpenBarrierCond(&invalid_marker_barrier, [&count]() { return ++count == 2; }));
+
+  sendActiveZone(5);
+  if (!invalid_marker_barrier.waitTillRelease(3s))
+  {
+    return ::testing::AssertionFailure() << "Failure receiving 2 markers for deletion.";
+  }
+  return ::testing::AssertionSuccess();
 }
 
 void ActiveZonesetNodeTest::sendActiveZone(uint8_t zone)
@@ -223,6 +245,17 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishDeleteMarkersOnInvalidActiveZone)
   sendActiveZone(5);
   s1d_barrier->waitTillRelease(3s);
   w1d_barrier->waitTillRelease(3s);
+}
+
+TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForNewActiveZoneAfterSwitchFromInvalidActiveZone)
+{
+  ASSERT_TRUE(switchToInvalidActiveZoneAfterSetup());
+
+  auto s_barrier = EXPECT_ASYNC_CALL(*marker_sub_mock_, callback(AllOf(hasNS(SAFETY_NS_ZONE_1), hasAddAction())));
+  auto w_barrier = EXPECT_ASYNC_CALL(*marker_sub_mock_, callback(AllOf(hasNS(WARN_NS_ZONE_1), hasAddAction())));
+  sendActiveZone(0);
+  s_barrier->waitTillRelease(3s);
+  w_barrier->waitTillRelease(3s);
 }
 
 }  // namespace psen_scan_v2_test
