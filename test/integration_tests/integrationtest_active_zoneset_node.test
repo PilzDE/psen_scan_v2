@@ -15,11 +15,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <launch>
-  <arg name="frame_id" default="laser_1" />
-
   <node ns="test_ns_laser_1" name="config_server_node" pkg="psen_scan_v2" type="config_server_node">
     <param name="config_file" value="$(find psen_scan_v2)/test/integration_tests/integrationtest_active_zoneset_node-testfile.xml" />
-    <param name="frame_id" value="$(arg frame_id)"/>
+    <param name="frame_id" value="laser_1"/>
   </node>
 
   <node ns="test_ns_laser_1" name="active_zoneset_node" pkg="psen_scan_v2" type="active_zoneset_node" />
