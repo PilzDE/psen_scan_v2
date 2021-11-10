@@ -24,7 +24,6 @@
 #include <std_msgs/UInt8.h>
 
 #include "psen_scan_v2/active_zoneset_node.h"
-#include "psen_scan_v2/config_server_node.h"
 #include "psen_scan_v2/ZoneSetConfiguration.h"
 #include "psen_scan_v2/zoneset_to_marker_conversion.h"
 
@@ -32,7 +31,7 @@ namespace psen_scan_v2
 {
 ActiveZonesetNode::ActiveZonesetNode(ros::NodeHandle& nh) : nh_(nh)
 {
-  zoneset_subscriber_ = nh_.subscribe(DEFAULT_ZONESET_TOPIC, 2, &ActiveZonesetNode::zonesetCallback, this);
+  zoneset_subscriber_ = nh_.subscribe(DEFAULT_ZONECONFIGURATION_TOPIC, 2, &ActiveZonesetNode::zonesetCallback, this);
   active_zoneset_subscriber_ =
       nh_.subscribe(DEFAULT_ACTIVE_ZONESET_TOPIC, 10, &ActiveZonesetNode::activeZonesetCallback, this);
   zoneset_marker_ = nh_.advertise<visualization_msgs::Marker>(DEFAULT_ZONESET_MARKER_TOPIC, 10);
@@ -41,22 +40,22 @@ ActiveZonesetNode::ActiveZonesetNode(ros::NodeHandle& nh) : nh_(nh)
 void ActiveZonesetNode::zonesetCallback(const ZoneSetConfiguration& zoneset_config)
 {
   zoneset_config_ = zoneset_config;
-  sendMarkersWhenAllInformationIsAvailable();
+  updateMarkers();
 }
 
-void ActiveZonesetNode::activeZonesetCallback(const std_msgs::UInt8& active_zoneset)
+void ActiveZonesetNode::activeZonesetCallback(const std_msgs::UInt8& active_zoneset_id)
 {
-  active_zoneset_ = active_zoneset;
-  sendMarkersWhenAllInformationIsAvailable();
+  active_zoneset_id_ = active_zoneset_id;
+  updateMarkers();
 };
 
-void ActiveZonesetNode::sendMarkersWhenAllInformationIsAvailable()
+void ActiveZonesetNode::updateMarkers()
 {
-  if (active_zoneset_.is_initialized() && zoneset_config_.is_initialized())
+  if (isAllInformationAvailable())
   {
     try
     {
-      auto new_markers = toMarkers(zoneset_config_->zonesets.at(active_zoneset_->data));
+      auto new_markers = toMarkers(getActiveZoneset());
       if (!containLastMarkers(new_markers))
       {
         deleteLastMarkers();
@@ -66,20 +65,30 @@ void ActiveZonesetNode::sendMarkersWhenAllInformationIsAvailable()
     catch (std::out_of_range const& e)
     {
       ROS_ERROR_STREAM_THROTTLE(1,
-                                "Active zone " << static_cast<unsigned>(active_zoneset_->data)
+                                "Active zone " << static_cast<unsigned>(active_zoneset_id_->data)
                                                << " of your scanner does not exist in the provided configuration!");
       deleteLastMarkers();
     }
   }
 }
 
-void ActiveZonesetNode::addMarkers(const std::vector<visualization_msgs::Marker>& new_markers)
+bool ActiveZonesetNode::isAllInformationAvailable() const
+{
+  return active_zoneset_id_.is_initialized() && zoneset_config_.is_initialized();
+}
+
+ZoneSet ActiveZonesetNode::getActiveZoneset() const
+{
+  return zoneset_config_->zonesets.at(active_zoneset_id_->data);
+}
+
+void ActiveZonesetNode::addMarkers(std::vector<visualization_msgs::Marker>& new_markers)
 {
   for (const auto& marker : new_markers)
   {
     zoneset_marker_.publish(marker);
   }
-  last_markers_ = new_markers;
+  last_markers_ = std::move(new_markers);
 }
 
 void ActiveZonesetNode::deleteLastMarkers()

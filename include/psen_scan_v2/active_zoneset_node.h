@@ -29,6 +29,7 @@
 namespace psen_scan_v2
 {
 static const std::string DEFAULT_ACTIVE_ZONESET_TOPIC = "active_zoneset";
+static const std::string DEFAULT_ZONECONFIGURATION_TOPIC = "zoneconfiguration";
 static const std::string DEFAULT_ZONESET_MARKER_TOPIC = "active_zoneset_marker";
 
 /**
@@ -54,9 +55,11 @@ public:
   void activeZonesetCallback(const std_msgs::UInt8& zoneset_config);
 
 private:
-  void sendMarkersWhenAllInformationIsAvailable();
+  void updateMarkers();
+  bool isAllInformationAvailable() const;
+  ZoneSet getActiveZoneset() const;
   void deleteLastMarkers();
-  void addMarkers(const std::vector<visualization_msgs::Marker>& new_markers);
+  void addMarkers(std::vector<visualization_msgs::Marker>& new_markers);
   bool containLastMarkers(const std::vector<visualization_msgs::Marker>& new_markers);
 
 private:
@@ -66,7 +69,7 @@ private:
   ros::Publisher zoneset_marker_;
 
   boost::optional<ZoneSetConfiguration> zoneset_config_;
-  boost::optional<std_msgs::UInt8> active_zoneset_;
+  boost::optional<std_msgs::UInt8> active_zoneset_id_;
   std::vector<visualization_msgs::Marker> last_markers_;
 };
 
