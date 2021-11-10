@@ -35,9 +35,9 @@ static const std::string DEFAULT_ZONESET_MARKER_TOPIC = "active_zoneset_marker";
  * @brief ROS Node that continuously publishes a marker for the active_zoneset.
  *
  * subscribes to: ns/active_zoneset
- * subscribes to: ns/zonsesetconfiguration
+ * subscribes to: ns/zoneconfiguration
  *
- * advertizes: ns/active_zoneset_marker
+ * advertises: ns/active_zoneset_marker
  */
 class ActiveZonesetNode
 {
