@@ -27,11 +27,13 @@ int main(int argc, char** argv)
     psen_scan_v2::ActiveZonesetNode active_zoneset_node{ nh };
     ros::spin();
   }
+  // LCOV_EXCL_START
   catch (std::exception& e)
   {
     ROS_ERROR_STREAM(e.what());
     return 1;
   }
+  // LCOV_EXCL_STOP
 
   return 0;
 }

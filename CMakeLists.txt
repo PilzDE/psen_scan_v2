@@ -689,7 +689,6 @@ if(CATKIN_ENABLE_TESTING)
     set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/standalone/test*"
                           "*/${PROJECT_NAME}/test*"
                           "*/${PROJECT_NAME}/src/psen_scan_driver.cpp"
-                          "*/${PROJECT_NAME}/src/active_zoneset_node_main.cpp"
                           "*/ZoneSet.h" # generated message
                           "*/ZoneSetConfiguration.h" # generated message
         )
