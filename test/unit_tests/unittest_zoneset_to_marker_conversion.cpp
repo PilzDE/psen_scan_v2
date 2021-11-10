@@ -80,6 +80,7 @@ MATCHER_P(IsTriangleListOfArcSegment, points, "")
       *result_listener << "Third triangle point " << *triangle_points_it << " doesn't match " << *arc_points_it << ".";
       return false;
     }
+    // Move to next triangle but reuse the second point as first one of next triangle.
     triangle_points_it++;
   }
   if (triangle_points_it != arg.end() || arc_points_it + 1 != points.end())
