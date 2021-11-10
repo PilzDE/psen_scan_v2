@@ -16,7 +16,6 @@
 #include <chrono>
 #include <memory>
 #include <string>
-#include <vector>
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -41,7 +40,6 @@ using namespace psen_scan_v2_standalone_test;
 
 MATCHER(hasPoints, "")
 {
-  *result_listener << "arg.points length is: " << arg->points.size();
   return !arg->points.empty();
 }
 
@@ -51,10 +49,10 @@ MATCHER(isTriangleList, "")
   return arg->type == visualization_msgs::Marker::TRIANGLE_LIST;
 }
 
-MATCHER_P(hasNS, expectedName, "")
+MATCHER_P(hasNS, expectedNS, "")
 {
-  *result_listener << "arg.ns is: " << arg->ns << " but should be: " << expectedName;
-  return arg->ns == expectedName;
+  *result_listener << "arg.ns is: " << arg->ns << " but should be: " << expectedNS;
+  return arg->ns == expectedNS;
 }
 
 MATCHER(hasDeleteAction, "")
@@ -82,7 +80,7 @@ public:
     const auto start_time = ros::Time::now();
     while (ros::ok())
     {
-      if (subscriber_.getNumPublishers() == 1)
+      if (subscriber_.getNumPublishers() > 0)
       {
         return true;
       }
@@ -95,7 +93,7 @@ public:
     return false;
   }
 
-  MOCK_METHOD1(callback, void(const visualization_msgs::MarkerConstPtr& event));
+  MOCK_METHOD1(callback, void(const visualization_msgs::MarkerConstPtr& msg));
 
 private:
   ros::NodeHandle nh_;
@@ -159,7 +157,7 @@ void ActiveZonesetNodeTest::SetUp()
   sendActiveZone(5);
   if (!invalid_marker_barrier.waitTillRelease(3s))
   {
-    return ::testing::AssertionFailure() << "Failure receiving 2 markers for deletion.";
+    return ::testing::AssertionFailure() << "Failed to receive 2 markers for deletion.";
   }
   return ::testing::AssertionSuccess();
 }
@@ -188,19 +186,19 @@ void ActiveZonesetNodeTest::sendActiveZone(uint8_t zone)
   sendActiveZone(0);
   if (!reset_marker_barrier.waitTillRelease(3s))
   {
-    return ::testing::AssertionFailure() << "Failure receiving 2 markers to add for active zone 0.";
+    return ::testing::AssertionFailure() << "Failed to receive 2 markers to add for active zone 0.";
   }
   return ::testing::AssertionSuccess();
 }
 
-TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithCorrectType)
+TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersWithCorrectType)
 {
   auto barrier = EXPECT_N_ASYNC_CALLS(*marker_sub_mock_, callback(isTriangleList()), 2);
   sendActiveZone(0);
   barrier->waitTillRelease(3s);
 }
 
-TEST_F(ActiveZonesetNodeTest, shouldPublishMarkerWithPoints)
+TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersWithPoints)
 {
   auto barrier = EXPECT_N_ASYNC_CALLS(*marker_sub_mock_, callback(hasPoints()), 2);
   sendActiveZone(0);
