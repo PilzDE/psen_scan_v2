@@ -12,6 +12,7 @@ Forthcoming
 * Add active zoneset to LaserScan
 * Publish active zoneset id to ~/active_zoneset
 * Add active zoneset visualization in rviz
+* Contributors: Pilz GmbH and Co. KG
 
 0.3.2 (2021-09-16)
 ------------------
