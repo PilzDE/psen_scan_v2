@@ -65,7 +65,7 @@ visualization_msgs::Marker createMarker(const std::string& ns,
                                         const std::vector<geometry_msgs::Point32>& points,
                                         const double& z_offset = 0)
 {
-  auto marker = visualization_msgs::Marker();
+  visualization_msgs::Marker marker;
   marker.header.frame_id = frame_id;
   marker.ns = ns;
   marker.id = 0;
@@ -150,4 +150,4 @@ std::vector<visualization_msgs::Marker> toMarkers(const ZoneSet& zoneset)
 
 }  // namespace psen_scan_v2
 
-#endif
+#endif  // PSEN_SCAN_V2_ZONESET_TO_MARKER_CONVERSION_H
