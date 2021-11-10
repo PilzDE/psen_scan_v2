@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef PSEN_SCAN_V2_ACTIVE_ZONESET_H
-#define PSEN_SCAN_V2_ACTIVE_ZONESET_H
+#ifndef PSEN_SCAN_V2_ACTIVE_ZONESET_NODE_H
+#define PSEN_SCAN_V2_ACTIVE_ZONESET_NODE_H
 
 #include <string>
 #include <vector>
@@ -72,4 +72,4 @@ private:
 
 }  // namespace psen_scan_v2
 
-#endif  // PSEN_SCAN_V2_ACTIVE_ZONESET_H
+#endif  // PSEN_SCAN_V2_ACTIVE_ZONESET_NODE_H
