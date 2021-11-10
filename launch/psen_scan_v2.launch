@@ -75,7 +75,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
   <!-- Publish the defined zonesets from the xml configuration -->
   <group if="$(eval config_file != '')">
-    <node ns="$(arg tf_prefix)" name="config_server_node_$(arg tf_prefix)" type="config_server_node" pkg="psen_scan_v2">
+    <node ns="$(arg tf_prefix)" name="config_server_node" type="config_server_node" pkg="psen_scan_v2">
       <param name="config_file" value="$(arg config_file)" />
       <param name="frame_id" value="$(arg tf_prefix)" />
     </node>
@@ -87,7 +87,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
     <!-- Visualize active zoneset -->
     <group if="$(eval config_file != '')">
-      <node ns="$(arg tf_prefix)" name="active_zoneset_node_$(arg tf_prefix)" type="active_zoneset_node" pkg="psen_scan_v2" />
+      <node ns="$(arg tf_prefix)" name="active_zoneset_node" type="active_zoneset_node" pkg="psen_scan_v2" />
     </group>
   </group>
 </launch>
