@@ -114,28 +114,26 @@ Start a preconfigured rviz visualizing the scan data.
 
 * If _fragmented_scans_ is set to false (default) the driver will publish complete scan rounds from the PSENscan safety laser scanner as a single message.
 * If _fragmented_scans_ is enabled the driver will send the measurement data as soon as they arrive, instead of waiting for the scan round to be completed. This way the scan data is received sooner but is split into several sensor messages.
-
-`Hint 1: Scan rounds and fragments that contain no measurement data are not published. This can happen with smaller scan ranges.`
-
-`Hint 2: Frequency of the laser scan messages is about 33hz for the combined and 200hz for the fragmented scans.`
+* `Hint 1: Scan rounds and fragments that contain no measurement data are not published. This can happen with smaller scan ranges.`
+* `Hint 2: Frequency of the laser scan messages is about 33hz for the combined and 200hz for the fragmented scans.`
 
 /\<name\>/zoneconfiguration ([psen_scan_v2/ZoneSetConfiguration](http://docs.ros.org/en/noetic/api/psen_scan_v2/html/msg/ZoneSetConfiguration.html))<br/>
 
-`Hint 1: Will not be advertised if no config_file is provided.`
+* `Hint 1: Will not be advertised if no config_file is provided.`
 
 /\<name\>/active_zoneset ([std_msgs/UInt8][])<br/>
 
 * This topic contains the id of the currently active zoneset of the PSENscan safety laser scanner.
 
-`Hint 1: If no zonesets are configured the driver will publish "0" as default.`
+* `Hint 1: If no zonesets are configured the driver will publish "0" as default.`
 
 /\<name\>/active_zoneset_marker ([visualization_msgs/Marker][]) <br/>
 
 * The markers published represent the currently active zoneset as triangle lists. They can be viewed e.g. in rviz.
 
-`Hint 1: Uses the topics /<name>/zoneconfiguration and /<name>/active_zoneset to calculate the vizualization and updates in the same frequency as those topics.`
+* `Hint 1: Uses the topics /<name>/zoneconfiguration and /<name>/active_zoneset to calculate the vizualization and updates in the same frequency as those topics.`
 
-`Hint 2: Will not be advertised if no config_file is provided.`
+* `Hint 2: Will not be advertised if no config_file is provided.`
 
 ### TF Frames
 The location of the TF frames is shown in the image below.
