@@ -28,6 +28,14 @@ ACTION_P(OpenBarrier, barrier)
   barrier->release();
 }
 
+ACTION_P2(OpenBarrierCond, barrier, predicate)
+{
+  if (predicate())
+  {
+    barrier->release();
+  }
+}
+
 MATCHER_P(PointwiseDoubleEq, vec, "")
 {
   return std::equal(vec.begin(), vec.end(), arg.begin(), arg.end(), [](const double& a, const double& b) {
