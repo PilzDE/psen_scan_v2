@@ -26,6 +26,7 @@
 #include "psen_scan_v2_standalone/scanner_config_builder.h"
 #include "psen_scan_v2_standalone/scan_range.h"
 
+#include "psen_scan_v2/default_ros_parameters.h"
 #include "psen_scan_v2/ros_parameter_handler.h"
 #include "psen_scan_v2/ros_scanner_node.h"
 
@@ -48,9 +49,6 @@ const std::string PARAM_X_AXIS_ROTATION{ "x_axis_rotation" };
 const std::string PARAM_FRAGMENTED_SCANS{ "fragmented_scans" };
 const std::string PARAM_INTENSITIES{ "intensities" };
 const std::string PARAM_RESOLUTION{ "resolution" };
-
-//! @brief The 2D scan will be rotated around the z-axis.
-static const double DEFAULT_X_AXIS_ROTATION = data_conversion_layer::degreeToRadian(137.5);
 
 static const std::string DEFAULT_TF_PREFIX = "laser_1";
 
