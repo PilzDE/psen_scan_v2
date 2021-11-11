@@ -13,38 +13,15 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef PSEN_SCAN_V2_CONFIG_SERVER_NODE_H
-#define PSEN_SCAN_V2_CONFIG_SERVER_NODE_H
+#ifndef PSEN_SCAN_V2_DEFAULT_ROS_PARAMETERS_H
+#define PSEN_SCAN_V2_DEFAULT_ROS_PARAMETERS_H
 
-#include <string>
+#include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 
-#include <gtest/gtest_prod.h>
-
-#include <ros/ros.h>
-
-#include "psen_scan_v2/ZoneSet.h"
-#include "psen_scan_v2/ZoneSetConfiguration.h"
-
-/**
- * @brief Root namespace for the ROS part
- */
 namespace psen_scan_v2
 {
-static const std::string DEFAULT_ZONESET_TOPIC = "zoneconfiguration";
-
-/**
- * @brief ROS Node that publishes a latched topic containing the configured zonesets.
- *
- */
-class ConfigServerNode
-{
-public:
-  ConfigServerNode(ros::NodeHandle& nh, const char* config_file_path, const std::string& frame_id);
-
-private:
-  ros::NodeHandle nh_;
-  ros::Publisher zoneset_pub_;
-};
+//! @brief The 2D scan will be rotated around the z-axis.
+static constexpr double DEFAULT_X_AXIS_ROTATION = psen_scan_v2_standalone::data_conversion_layer::degreeToRadian(137.5);
 }  // namespace psen_scan_v2
 
-#endif  // PSEN_SCAN_V2_CONFIG_SERVER_NODE_H
+#endif

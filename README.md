@@ -38,6 +38,7 @@ If you are interested in using the PSENscan safety laser scanner without ROS, pl
    + [Defining the scan range](#defining-the-scan-range)
    + [Timestamp details](#timestamp-details)
    + [Importing the zoneset configuration](#importing-the-zoneset-configuration)
+   + [Visualizing the active zoneset](#visualizing-the-active-zoneset)
 3. [Developer Information](#developer-information)
    + [Build Status](#build-status)
    + [Branching model](#branching-model)
@@ -89,7 +90,7 @@ _resolution_ (_double_, default: 0.0017 (= 0.1 deg))<br/>
 Scan angle resolution. (Radian) The value is rounded to a multiple of 0.1 deg and has to be in the range [0.1, 10] degrees.
 
 _config_file_ (_string_, default: "")
-Full path to a scanner config file. If a file is provided the configured zonesets are published, see [here](#importing-the-zoneset-configuration) for more information.
+Full path to a scanner config file. If a file is provided the configured zonesets and active zone marker are published, see [here](#importing-the-zoneset-configuration) for more information.
 
 ### Expert Parameters (optional)
 
@@ -113,18 +114,26 @@ Start a preconfigured rviz visualizing the scan data.
 
 * If _fragmented_scans_ is set to false (default) the driver will publish complete scan rounds from the PSENscan safety laser scanner as a single message.
 * If _fragmented_scans_ is enabled the driver will send the measurement data as soon as they arrive, instead of waiting for the scan round to be completed. This way the scan data is received sooner but is split into several sensor messages.
-
-`Hint 1: Scan rounds and fragments that contain no measurement data are not published. This can happen with smaller scan ranges.`
-
-`Hint 2: Frequency of the laser scan messages is about 33hz for the combined and 200hz for the fragmented scans.`
+* `Hint 1: Scan rounds and fragments that contain no measurement data are not published. This can happen with smaller scan ranges.`
+* `Hint 2: Frequency of the laser scan messages is about 33hz for the combined and 200hz for the fragmented scans.`
 
 /\<name\>/zoneconfiguration ([psen_scan_v2/ZoneSetConfiguration](http://docs.ros.org/en/noetic/api/psen_scan_v2/html/msg/ZoneSetConfiguration.html))<br/>
+
+* `Hint 1: Will not be advertised if no config_file is provided.`
 
 /\<name\>/active_zoneset ([std_msgs/UInt8][])<br/>
 
 * This topic contains the id of the currently active zoneset of the PSENscan safety laser scanner.
 
-`Hint 1: If no zonesets are configured the driver will publish "0" as default.`
+* `Hint 1: If no zonesets are configured the driver will publish "0" as default.`
+
+/\<name\>/active_zoneset_marker ([visualization_msgs/Marker][]) <br/>
+
+* The markers published represent the currently active zoneset as triangle lists. They can be viewed e.g. in rviz.
+
+* `Hint 1: Uses the topics /<name>/zoneconfiguration and /<name>/active_zoneset to calculate the vizualization and updates in the same frequency as those topics.`
+
+* `Hint 2: Will not be advertised if no config_file is provided.`
 
 ### TF Frames
 The location of the TF frames is shown in the image below.
@@ -152,8 +161,8 @@ The timestamps of the scan data published are computed to be close to reality an
 
 
 ### Importing the zoneset configuration
-Once you setup the scanner and created a configuration according to our [tutorial](http://wiki.ros.org/psen_scan_v2/Tutorials/SettingUpPSENscanHW#Create_a_new_configuration) you can use a exported xml configuration file within ROS.
-The configured zonesets will be published 
+Once you setup the scanner and created a configuration according to our [tutorial](http://wiki.ros.org/psen_scan_v2/Tutorials/SettingUpPSENscanHW#Create_a_new_configuration) you can use an exported xml configuration file within ROS.
+The configured zonesets will be published.
 
 The zonesets you created in the Pilz configurator:
 ![configurator_screenshot](doc/zones_screenshot_configurator.png)
@@ -174,6 +183,9 @@ If you want to use the configuration node in your launchfile add a section such 
   <param name="frame_id" value="$(arg frame_id)" />
 </node>
 ```
+
+### Visualizing the active zoneset
+For visualizing the active zoneset in RViz you can run the `active_zoneset_node`. It will publish markers on the `/<name>/active_zoneset_marker` topic like shown in the RViz screenshot above.
 
 ## Developer Information
 ### Build Status
@@ -228,4 +240,5 @@ supply in buildings.
 
 [sensor_msgs/LaserScan]: http://docs.ros.org/noetic/api/sensor_msgs/html/msg/LaserScan.html
 [std_msgs/UInt8]: https://docs.ros.org/en/api/std_msgs/html/msg/UInt8.html
+[visualization_msgs/Marker]: https://docs.ros.org/en/noetic/api/visualization_msgs/html/msg/Marker.html
 [gmapping]: http://wiki.ros.org/gmapping

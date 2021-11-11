@@ -4,12 +4,20 @@ Changelog for package psen_scan_v2
 
 Forthcoming
 -----------
+* Remove unrelated parameter DEFAULT_X_AXIS_ROTATION from standalone
+* Contributors: Pilz GmbH and Co. KG
+
+0.3.3 (2021-11-10)
+------------------
+* Introduce error state and set exception in start-future
 * Remove dependency on pilz_testutils
 * Always build hardware tests
 * Internal refactorings
 * Importing the config xml-file and publishing the zoneconfiguration
 * Add active zoneset to LaserScan
 * Publish active zoneset id to ~/active_zoneset
+* Add active zoneset visualization in rviz
+* Contributors: Pilz GmbH and Co. KG
 
 0.3.2 (2021-09-16)
 ------------------

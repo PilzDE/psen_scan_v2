@@ -13,38 +13,27 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef PSEN_SCAN_V2_CONFIG_SERVER_NODE_H
-#define PSEN_SCAN_V2_CONFIG_SERVER_NODE_H
-
-#include <string>
-
-#include <gtest/gtest_prod.h>
-
 #include <ros/ros.h>
 
-#include "psen_scan_v2/ZoneSet.h"
-#include "psen_scan_v2/ZoneSetConfiguration.h"
+#include "psen_scan_v2/active_zoneset_node.h"
 
-/**
- * @brief Root namespace for the ROS part
- */
-namespace psen_scan_v2
+int main(int argc, char** argv)
 {
-static const std::string DEFAULT_ZONESET_TOPIC = "zoneconfiguration";
+  ros::init(argc, argv, "active_zoneset_node");
+  ros::NodeHandle nh;
 
-/**
- * @brief ROS Node that publishes a latched topic containing the configured zonesets.
- *
- */
-class ConfigServerNode
-{
-public:
-  ConfigServerNode(ros::NodeHandle& nh, const char* config_file_path, const std::string& frame_id);
+  try
+  {
+    psen_scan_v2::ActiveZonesetNode active_zoneset_node{ nh };
+    ros::spin();
+  }
+  // LCOV_EXCL_START
+  catch (std::exception& e)
+  {
+    ROS_ERROR_STREAM(e.what());
+    return 1;
+  }
+  // LCOV_EXCL_STOP
 
-private:
-  ros::NodeHandle nh_;
-  ros::Publisher zoneset_pub_;
-};
-}  // namespace psen_scan_v2
-
-#endif  // PSEN_SCAN_V2_CONFIG_SERVER_NODE_H
+  return 0;
+}

@@ -61,30 +61,32 @@ struct PortHolder
 
 static PortHolder GLOBAL_PORT_HOLDER;
 
-using boost::asio::ip::udp;
 using namespace psen_scan_v2_standalone;
 
 class ScannerMock
 {
+  using udp = boost::asio::ip::udp;
+  using MonitoringFrameMsg = data_conversion_layer::monitoring_frame::Message;
+  using ReplyMsg = data_conversion_layer::scanner_reply::Message;
+
 public:
   ScannerMock(const std::string& host_ip, const PortHolder& port_holder);
 
 public:
-  MOCK_METHOD2(receiveControlMsg,
-               void(const udp::endpoint&, const psen_scan_v2_standalone::data_conversion_layer::RawData&));
-  MOCK_METHOD2(receiveDataMsg,
-               void(const udp::endpoint&, const psen_scan_v2_standalone::data_conversion_layer::RawData&));
+  MOCK_METHOD2(receiveControlMsg, void(const udp::endpoint&, const data_conversion_layer::RawData&));
+  MOCK_METHOD2(receiveDataMsg, void(const udp::endpoint&, const data_conversion_layer::RawData&));
 
 public:
-  void sendStartReply();
+  void sendStartReply(const ReplyMsg::OperationResult& result = ReplyMsg::OperationResult::accepted);
   void sendStopReply();
-  void sendMonitoringFrame(const data_conversion_layer::monitoring_frame::Message& msg);
+  void sendMonitoringFrame(const MonitoringFrameMsg& msg);
   void sendEmptyMonitoringFrame();
-  void sendMonitoringFrames(const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs);
+  void sendMonitoringFrames(const std::vector<MonitoringFrameMsg>& msgs);
 
 private:
   void startContinuousListeningForControlMsg();
-  void sendReply(const data_conversion_layer::scanner_reply::Message::Type& reply_type);
+  void sendReply(const ReplyMsg::Type& reply_type,
+                 const ReplyMsg::OperationResult& result = ReplyMsg::OperationResult::accepted);
 
 private:
   const udp::endpoint control_msg_receiver_;

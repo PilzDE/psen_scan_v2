@@ -33,6 +33,7 @@ find_package(catkin REQUIRED COMPONENTS
   cmake_modules # Needed for find_package(TinyXML2 REQUIRED)
   message_generation
   geometry_msgs
+  visualization_msgs
   std_msgs
 )
 
@@ -56,6 +57,7 @@ add_message_files(
 generate_messages(
   DEPENDENCIES
   geometry_msgs
+  visualization_msgs
   std_msgs
 )
 
@@ -66,6 +68,7 @@ catkin_package(
     message_runtime
     geometry_msgs
     std_msgs
+    visualization_msgs
   DEPENDS TinyXML2
 )
 
@@ -188,6 +191,19 @@ add_dependencies(config_server_node
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
 )
 
+
+add_executable(active_zoneset_node
+  src/active_zoneset_node_main.cpp
+  src/active_zoneset_node.cpp
+)
+target_link_libraries(active_zoneset_node
+  ${catkin_LIBRARIES}
+  fmt::fmt
+)
+add_dependencies(active_zoneset_node
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+)
+
 #############
 ## Install ##
 #############
@@ -208,6 +224,7 @@ install(TARGETS
   ${PROJECT_NAME}_node
   ${PROJECT_NAME}_standalone
   config_server_node
+  active_zoneset_node
   ${PROJECT_NAME}_standalone_xml_configuration_import
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -427,6 +444,17 @@ if(CATKIN_ENABLE_TESTING)
     fmt::fmt
   )
   add_dependencies(unittest_zone_configuration_ros_conversion ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+  catkin_add_gmock(unittest_zoneset_to_marker_conversion
+    test/unit_tests/unittest_zoneset_to_marker_conversion.cpp
+  )
+  target_link_libraries(unittest_zoneset_to_marker_conversion
+    ${catkin_LIBRARIES}
+    fmt::fmt
+  )
+  add_dependencies(unittest_zoneset_to_marker_conversion
+    ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  )
   #########################
   ##  Integration-Tests  ##
   #########################
@@ -484,6 +512,22 @@ if(CATKIN_ENABLE_TESTING)
   add_dependencies(integrationtest_config_server_node
     ${PROJECT_NAME}_standalone
     config_server_node
+    ${PROJECT_NAME}_standalone_xml_configuration_import
+    ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  )
+
+  add_rostest_gmock(integrationtest_active_zoneset_node
+    test/integration_tests/integrationtest_active_zoneset_node.test
+    test/integration_tests/integrationtest_active_zoneset_node.cpp
+  )
+  target_link_libraries(integrationtest_active_zoneset_node
+    ${catkin_LIBRARIES}
+    ${rosbag_LIBRARIES}
+    fmt::fmt
+  )
+  add_dependencies(integrationtest_active_zoneset_node
+    ${PROJECT_NAME}_standalone
+    active_zoneset_node
     ${PROJECT_NAME}_standalone_xml_configuration_import
     ${${PROJECT_NAME}_EXPORTED_TARGETS}
   )
