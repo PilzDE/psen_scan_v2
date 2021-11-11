@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>psen_scan_v2</name>
-  <version>0.3.2</version>
+  <version>0.3.3</version>
   <description>ROS support for the Pilz laser scanner</description>
 
   <maintainer email="a.gutenkunst@pilz.de">Alexander Gutenkunst</maintainer>
@@ -19,6 +19,7 @@
   <depend>rosconsole_bridge</depend>
   <depend>geometry_msgs</depend>
   <depend>std_msgs</depend>
+  <depend>visualization_msgs</depend>
   <build_depend>tinyxml2</build_depend>
   <build_depend>message_generation</build_depend>
   <build_depend>cmake_modules</build_depend>
