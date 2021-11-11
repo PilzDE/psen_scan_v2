@@ -31,11 +31,12 @@
                          name,                                                                                         \
                          fmt::format(__VA_ARGS__).c_str())
 #else
-#include <iostream>
-// ToDo Either use console_bridge or extend own implementation, see
-// https://github.com/ros/console_bridge/blob/master/src/console.cpp#L109
+#include <console_bridge/console.h>
 #define PSENSCAN_LOG(name, file, line, level, ...)                                                                     \
-  std::cout << fmt::format("{}: {}: {}", #level, name, fmt::format(__VA_ARGS__)) << std::endl;
+  console_bridge::log(file,                                                                                            \
+                      line,                                                                                            \
+                      console_bridge::CONSOLE_BRIDGE_LOG_##level,                                                      \
+                      fmt::format("{}: {}", name, fmt::format(__VA_ARGS__)).c_str());
 #endif
 
 #define PSENSCAN_LOG_ONCE(name, file, line, level, ...)                                                                \

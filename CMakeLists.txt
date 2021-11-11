@@ -134,6 +134,7 @@ if(BUILD_TESTING)
 
   find_package(ament_cmake_gtest REQUIRED)
   find_package(ament_cmake_ros REQUIRED)
+  find_package(console_bridge REQUIRED)
   find_package(ros_testing REQUIRED)
 
   #roslaunch_add_file_check(launch DEPENDENCIES ${PROJECT_NAME}_node)
@@ -165,6 +166,7 @@ if(BUILD_TESTING)
     standalone/src/data_conversion_layer/start_request_serialization.cpp
   )
   target_link_libraries(unittest_start_request
+    ${console_bridge_LIBRARIES}
     fmt::fmt
   )
 
@@ -181,6 +183,7 @@ if(BUILD_TESTING)
     standalone/test/unit_tests/configuration/unittest_scanner_configuration.cpp
   )
   target_link_libraries(unittest_scanner_configuration
+    ${console_bridge_LIBRARIES}
     fmt::fmt
   )
 
@@ -192,6 +195,7 @@ if(BUILD_TESTING)
     standalone/test/unit_tests/communication_layer/unittest_udp_client.cpp
   )
   target_link_libraries(unittest_udp_client
+    ${console_bridge_LIBRARIES}
     fmt::fmt
   )
 
@@ -214,6 +218,7 @@ if(BUILD_TESTING)
     standalone/src/data_conversion_layer/diagnostics.cpp
   )
   target_link_libraries(unittest_laserscan_conversions
+    ${console_bridge_LIBRARIES}
     fmt::fmt
   )
 
@@ -228,10 +233,9 @@ if(BUILD_TESTING)
     sensor_msgs
   )
   target_link_libraries(unittest_laserscan_ros_conversions
+    ${console_bridge_LIBRARIES}
     fmt::fmt
   )
-
-  add_ros_test(test/integration_tests/integrationtest_ros_scanner_launch.py)
 
   ament_add_gtest(unittest_scanner_reply_msg
     standalone/test/unit_tests/data_conversion_layer/unittest_scanner_reply_msg.cpp
@@ -248,6 +252,7 @@ if(BUILD_TESTING)
     standalone/src/data_conversion_layer/monitoring_frame_deserialization.cpp
   )
   target_link_libraries(unittest_monitoring_frame_msg
+    ${console_bridge_LIBRARIES}
     fmt::fmt
   )
 
@@ -257,6 +262,7 @@ if(BUILD_TESTING)
     standalone/src/data_conversion_layer/diagnostics.cpp
   )
   target_link_libraries(unittest_monitoring_frame_msg_stamped
+    ${console_bridge_LIBRARIES}
     fmt::fmt
   )
 
@@ -268,17 +274,17 @@ if(BUILD_TESTING)
     standalone/test/src/data_conversion_layer/monitoring_frame_serialization.cpp
   )
   target_link_libraries(unittest_monitoring_frame_serialization_deserialization
+    ${console_bridge_LIBRARIES}
     fmt::fmt
   )
 
-  # uses console_bridge
-  #ament_add_gmock(unittest_logging
-  #  standalone/test/unit_tests/util/unittest_logging.cpp
-  #)
-  #target_link_libraries(unittest_logging
-  #  ${console_bridge_LIBRARIES}
-  #  fmt::fmt
-  #)
+  ament_add_gmock(unittest_logging
+    standalone/test/unit_tests/util/unittest_logging.cpp
+  )
+  target_link_libraries(unittest_logging
+    ${console_bridge_LIBRARIES}
+    fmt::fmt
+  )
 
   ament_add_gmock(unittest_monitoring_frame_diagnostic_message
     standalone/src/data_conversion_layer/diagnostics.cpp
@@ -296,28 +302,29 @@ if(BUILD_TESTING)
     standalone/test/src/communication_layer/mock_udp_server.cpp
   )
   target_link_libraries(integrationtest_udp_client
+    ${console_bridge_LIBRARIES}
     fmt::fmt
   )
 
-  # uses console_bridge
-  #ament_add_gmock(integrationtest_scanner_api
-  #  standalone/test/integration_tests/api/integrationtest_scanner_api.cpp
-  #  standalone/test/src/communication_layer/mock_udp_server.cpp
-  #  standalone/test/src/communication_layer/scanner_mock.cpp
-  #  standalone/test/src/data_conversion_layer/monitoring_frame_serialization.cpp
-  #  standalone/src/scanner_v2.cpp
-  #  standalone/src/laserscan.cpp
-  #  standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
-  #  standalone/src/data_conversion_layer/monitoring_frame_deserialization.cpp
-  #  standalone/src/data_conversion_layer/start_request.cpp
-  #  standalone/src/data_conversion_layer/stop_request_serialization.cpp
-  #  standalone/src/data_conversion_layer/diagnostics.cpp
-  #  standalone/src/data_conversion_layer/start_request_serialization.cpp
-  #  standalone/src/data_conversion_layer/scanner_reply_serialization_deserialization.cpp
-  #)
-  #target_link_libraries(integrationtest_scanner_api
-  #  fmt::fmt
-  #)
+  ament_add_gmock(integrationtest_scanner_api
+    standalone/test/integration_tests/api/integrationtest_scanner_api.cpp
+    standalone/test/src/communication_layer/mock_udp_server.cpp
+    standalone/test/src/communication_layer/scanner_mock.cpp
+    standalone/test/src/data_conversion_layer/monitoring_frame_serialization.cpp
+    standalone/src/scanner_v2.cpp
+    standalone/src/laserscan.cpp
+    standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
+    standalone/src/data_conversion_layer/monitoring_frame_deserialization.cpp
+    standalone/src/data_conversion_layer/start_request.cpp
+    standalone/src/data_conversion_layer/stop_request_serialization.cpp
+    standalone/src/data_conversion_layer/diagnostics.cpp
+    standalone/src/data_conversion_layer/start_request_serialization.cpp
+    standalone/src/data_conversion_layer/scanner_reply_serialization_deserialization.cpp
+  )
+  target_link_libraries(integrationtest_scanner_api
+    ${console_bridge_LIBRARIES}
+    fmt::fmt
+  )
 
   # needs update for ros2 api
   #ament_add_ros_isolated_gmock(integrationtest_ros_scanner_node
@@ -337,6 +344,8 @@ if(BUILD_TESTING)
   ament_target_dependencies(unittest_ros_parameter_handler
     rclcpp
   )
+
+  add_ros_test(test/integration_tests/integrationtest_ros_scanner_launch.py)
 endif()
 
 ament_package()
