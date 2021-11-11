@@ -25,7 +25,7 @@ namespace psen_scan_v2_standalone_test
 
 #define EXPECT_BARRIER_OPENS(barrier, wait_timeout) EXPECT_TRUE(barrier.waitTillRelease(wait_timeout))
 
-#define EXPECT_DOES_NOT_BLOCK_NOR_THROW(statement)                                                                     \
+#define EXPECT_NO_BLOCK_NO_THROW(statement)                                                                     \
   do                                                                                                                   \
   {                                                                                                                    \
     auto future = std::async(std::launch::async, [&]() { statement });                                                 \
