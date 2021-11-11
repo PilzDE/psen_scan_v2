@@ -48,103 +48,59 @@ static const std::string BAG_TESTFILE_PARAM_NAME{ "bag_testfile" };
 
 namespace psen_scan_v2_test
 {
-using ::testing::Eq;
 using ::testing::ExplainMatchResult;
-using ::testing::Matches;
 using ::testing::SizeIs;
 
-MATCHER_P(messageZoneSetCountEQ, expected_msg, "")
+MATCHER_P2(namedEQ, value, name, "")
+{
+  *result_listener << name << " " << arg << " " << (value == arg ? "does" : "doesn't") << " match";
+  return value == arg;
+}
+
+MATCHER_P2(namedLessVerboseEQ, value, name, "")
+{
+  *result_listener << name << " " << (value == arg ? "does" : "doesn't") << " match";
+  return value == arg;
+}
+
+MATCHER_P2(namedZoneSetPolygonEQ, polygon, name, "")
+{
+  *result_listener << name << " with points vector, ";
+  return ExplainMatchResult(SizeIs(polygon.points.size()), arg.points, result_listener) &&
+         ExplainMatchResult(namedLessVerboseEQ(polygon.points, ", whose data"), arg.points, result_listener);
+}
+
+MATCHER_P(zoneSetEQ, zoneset, "")
+{
+  *result_listener << "whose fields";
+  return ExplainMatchResult(namedEQ(zoneset.header.frame_id, "\n\tframe_id"), arg.header.frame_id, result_listener) &&
+         ExplainMatchResult(namedEQ(zoneset.speed_lower, "\n\tspeed_lower"), arg.speed_lower, result_listener) &&
+         ExplainMatchResult(namedEQ(zoneset.speed_upper, "\n\tspeed_upper"), arg.speed_upper, result_listener) &&
+         ExplainMatchResult(namedZoneSetPolygonEQ(zoneset.safety1, "\n\tsafety1"), arg.safety1, result_listener) &&
+         ExplainMatchResult(namedZoneSetPolygonEQ(zoneset.safety2, "\n\tsafety2"), arg.safety2, result_listener) &&
+         ExplainMatchResult(namedZoneSetPolygonEQ(zoneset.safety3, "\n\tsafety3"), arg.safety3, result_listener) &&
+         ExplainMatchResult(namedZoneSetPolygonEQ(zoneset.warn1, "\n\twarn1"), arg.warn1, result_listener) &&
+         ExplainMatchResult(namedZoneSetPolygonEQ(zoneset.warn2, "\n\twarn2"), arg.warn2, result_listener) &&
+         ExplainMatchResult(namedZoneSetPolygonEQ(zoneset.muting1, "\n\tmuting1"), arg.muting1, result_listener) &&
+         ExplainMatchResult(namedZoneSetPolygonEQ(zoneset.muting2, "\n\tmuting2"), arg.muting2, result_listener);
+}
+
+MATCHER_P(zoneSetVecEQ, zoneset_vec, "")
+{
+  unsigned int i = 0;
+  return ExplainMatchResult(SizeIs(zoneset_vec.size()), arg, result_listener) &&
+         std::equal(
+             zoneset_vec.begin(), zoneset_vec.end(), arg.begin(), arg.end(), [&](const auto& zs1, const auto& zs2) {
+               *result_listener << "\nwith zoneset" << i++ << " ";
+               return ExplainMatchResult(zoneSetEQ(zs1), zs2, result_listener);
+             });
+}
+
+MATCHER_P(msgZoneSetConfigEQ, expected_msg, "")
 {
   auto actual_msg = arg.getMessage();
-  return ExplainMatchResult(SizeIs(expected_msg.zonesets.size()), actual_msg->zonesets, result_listener);
-}
-
-MATCHER_P(zonesetSpeedLimitsEQ, expected_zoneset, "")
-{
-  *result_listener << "where arg.speed_lower is " << arg.speed_lower << " and arg.speed_upper is " << arg.speed_upper;
-  return Matches(Eq(expected_zoneset.speed_lower))(arg.speed_lower) &&
-         Matches(Eq(expected_zoneset.speed_upper))(arg.speed_upper);
-}
-
-MATCHER_P(zonesetVecSpeedLimitsEQ, expected_zonesets, "")
-{
-  return std::equal(expected_zonesets.begin(),
-                    expected_zonesets.end(),
-                    arg.begin(),
-                    arg.end(),
-                    [result_listener](const auto& a, const auto& b) {
-                      return ExplainMatchResult(zonesetSpeedLimitsEQ(a), b, result_listener);
-                    });
-}
-
-MATCHER_P(messageZoneSetsSpeedLimitsEQ, expected_msg, "")
-{
-  auto actual_msg = arg.getMessage();
-  return ExplainMatchResult(zonesetVecSpeedLimitsEQ(expected_msg.zonesets), actual_msg->zonesets, result_listener);
-}
-
-MATCHER_P(zonesetVecFrameIdsEQ, expected_zonesets, "")
-{
-  return std::equal(
-      expected_zonesets.begin(), expected_zonesets.end(), arg.begin(), arg.end(), [](const auto& a, const auto& b) {
-        return Matches(Eq(a.header.frame_id))(b.header.frame_id);
-      });
-}
-
-MATCHER_P(messageZoneSetsFrameIdEQ, expected_msg, "")
-{
-  auto actual_msg = arg.getMessage();
-  return Matches(zonesetVecFrameIdsEQ(expected_msg.zonesets))(actual_msg->zonesets);
-}
-
-MATCHER_P(zonesetPolygonPointCountsEQ, expected_zoneset, "")
-{
-  return Matches(SizeIs(expected_zoneset.safety1.points.size()))(arg.safety1.points) &&
-         Matches(SizeIs(expected_zoneset.safety2.points.size()))(arg.safety2.points) &&
-         Matches(SizeIs(expected_zoneset.safety3.points.size()))(arg.safety3.points) &&
-         Matches(SizeIs(expected_zoneset.warn1.points.size()))(arg.warn1.points) &&
-         Matches(SizeIs(expected_zoneset.warn2.points.size()))(arg.warn2.points) &&
-         Matches(SizeIs(expected_zoneset.muting1.points.size()))(arg.muting1.points) &&
-         Matches(SizeIs(expected_zoneset.muting2.points.size()))(arg.muting2.points);
-}
-
-MATCHER_P(zonesetVecPolygonPointCountsEQ, expected_zonesets, "")
-{
-  return std::equal(
-      expected_zonesets.begin(), expected_zonesets.end(), arg.begin(), arg.end(), [](const auto& a, const auto& b) {
-        return Matches(zonesetPolygonPointCountsEQ(a))(b);
-      });
-}
-
-MATCHER_P(messageZoneSetsPolygonPointCountsEQ, expected_msg, "")
-{
-  auto actual_msg = arg.getMessage();
-  return Matches(zonesetVecPolygonPointCountsEQ(expected_msg.zonesets))(actual_msg->zonesets);
-}
-
-MATCHER_P(zonesetPolygonPointsEQ, expected_zoneset, "")
-{
-  return Matches(ContainerEq(expected_zoneset.safety1.points))(arg.safety1.points) &&
-         Matches(ContainerEq(expected_zoneset.safety2.points))(arg.safety2.points) &&
-         Matches(ContainerEq(expected_zoneset.safety3.points))(arg.safety3.points) &&
-         Matches(ContainerEq(expected_zoneset.warn1.points))(arg.warn1.points) &&
-         Matches(ContainerEq(expected_zoneset.warn2.points))(arg.warn2.points) &&
-         Matches(ContainerEq(expected_zoneset.muting1.points))(arg.muting1.points) &&
-         Matches(ContainerEq(expected_zoneset.muting2.points))(arg.muting2.points);
-}
-
-MATCHER_P(zonesetVecPolygonPointsEQ, expected_zonesets, "")
-{
-  return std::equal(
-      expected_zonesets.begin(), expected_zonesets.end(), arg.begin(), arg.end(), [](const auto& a, const auto& b) {
-        return Matches(zonesetPolygonPointsEQ(a))(b);
-      });
-}
-
-MATCHER_P(messageZoneSetsPolygonPointsEQ, expected_msg, "")
-{
-  auto actual_msg = arg.getMessage();
-  return Matches(zonesetVecPolygonPointsEQ(expected_msg.zonesets))(actual_msg->zonesets);
+  *result_listener << "with zonesets vector, ";
+  return ExplainMatchResult(zoneSetVecEQ(expected_msg.zonesets), actual_msg->zonesets, result_listener);
 }
 
 ZoneSetConfiguration readSingleMsgFromBagFile(const std::string& filepath, const std::string& zone_sets_topic)
@@ -229,56 +185,12 @@ TEST_F(ConfigServerNodeTest, shouldPublishLatchedOnZonesetTopic)
   topic_received_barrier.waitTillRelease(3s);
 }
 
-TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedZoneSetCount)
+TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedZoneSetConfig)
 {
   SubscriberMock subscriber_mock;
   util::Barrier msg_received_barrier;
 
-  EXPECT_CALL(subscriber_mock, callback(messageZoneSetCountEQ(expectedZoneSetConfig())))
-      .WillOnce(OpenBarrier(&msg_received_barrier));
-
-  msg_received_barrier.waitTillRelease(3s);
-}
-
-TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedZoneSetsSpeedLimits)
-{
-  SubscriberMock subscriber_mock;
-  util::Barrier msg_received_barrier;
-
-  EXPECT_CALL(subscriber_mock, callback(messageZoneSetsSpeedLimitsEQ(expectedZoneSetConfig())))
-      .WillOnce(OpenBarrier(&msg_received_barrier));
-
-  msg_received_barrier.waitTillRelease(3s);
-}
-
-TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedZoneSetsFrameId)
-{
-  SubscriberMock subscriber_mock;
-  util::Barrier msg_received_barrier;
-
-  EXPECT_CALL(subscriber_mock, callback(messageZoneSetsFrameIdEQ(expectedZoneSetConfig())))
-      .WillOnce(OpenBarrier(&msg_received_barrier));
-
-  msg_received_barrier.waitTillRelease(3s);
-}
-
-TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedPolygonPointCounts)
-{
-  SubscriberMock subscriber_mock;
-  util::Barrier msg_received_barrier;
-
-  EXPECT_CALL(subscriber_mock, callback(messageZoneSetsPolygonPointCountsEQ(expectedZoneSetConfig())))
-      .WillOnce(OpenBarrier(&msg_received_barrier));
-
-  msg_received_barrier.waitTillRelease(3s);
-}
-
-TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedPolygonPoints)
-{
-  SubscriberMock subscriber_mock;
-  util::Barrier msg_received_barrier;
-
-  EXPECT_CALL(subscriber_mock, callback(messageZoneSetsPolygonPointsEQ(expectedZoneSetConfig())))
+  EXPECT_CALL(subscriber_mock, callback(msgZoneSetConfigEQ(expectedZoneSetConfig())))
       .WillOnce(OpenBarrier(&msg_received_barrier));
 
   msg_received_barrier.waitTillRelease(3s);
