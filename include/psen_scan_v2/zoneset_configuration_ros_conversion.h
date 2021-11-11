@@ -20,6 +20,7 @@
 
 #include <geometry_msgs/Polygon.h>
 
+#include "psen_scan_v2/default_ros_parameters.h"
 #include "psen_scan_v2/ZoneSet.h"
 #include "psen_scan_v2/ZoneSetConfiguration.h"
 #include "psen_scan_v2/zoneset_msg_builder.h"
@@ -69,19 +70,13 @@ psen_scan_v2::ZoneSet toRosMsg(const ZoneSetStandalone& zoneset,
       .safety1(fromPolar(  // LCOV_EXCL_LINE gcov bug?
           zoneset.safety1_,
           zoneset.resolution_,
-          psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION))
-      .safety2(fromPolar(
-          zoneset.safety2_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION))
-      .safety3(fromPolar(
-          zoneset.safety3_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION))
-      .warn1(fromPolar(
-          zoneset.warn1_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION))
-      .warn2(fromPolar(
-          zoneset.warn2_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION))
-      .muting1(fromPolar(
-          zoneset.muting1_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION))
-      .muting2(fromPolar(
-          zoneset.muting2_, zoneset.resolution_, psen_scan_v2_standalone::configuration::DEFAULT_X_AXIS_ROTATION));
+          psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
+      .safety2(fromPolar(zoneset.safety2_, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
+      .safety3(fromPolar(zoneset.safety3_, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
+      .warn1(fromPolar(zoneset.warn1_, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
+      .warn2(fromPolar(zoneset.warn2_, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
+      .muting1(fromPolar(zoneset.muting1_, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
+      .muting2(fromPolar(zoneset.muting2_, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION));
 
   if (zoneset.speed_range_)
   {

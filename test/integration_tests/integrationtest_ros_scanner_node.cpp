@@ -45,7 +45,6 @@ using namespace psen_scan_v2_standalone;
 using namespace psen_scan_v2_test;
 
 using namespace ::testing;
-using namespace psen_scan_v2_standalone::configuration;
 using namespace psen_scan_v2_standalone_test;
 
 namespace psen_scan_v2
@@ -149,8 +148,7 @@ protected:
 
 TEST_F(RosScannerNodeTests, shouldStartAndStopSuccessfullyIfScannerRespondsToRequests)
 {
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(
-      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
 
   std::promise<void> hw_finished_request;
   hw_finished_request.set_value();
@@ -174,8 +172,7 @@ TEST_F(RosScannerNodeTests, shouldStartAndStopSuccessfullyIfScannerRespondsToReq
 
 TEST_F(RosScannerNodeTests, shouldThrowExceptionSetInScannerStartFuture)
 {
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(
-      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
 
   std::promise<void> hw_finished_request;
   const std::string error_msg = "error msg for testing";
@@ -187,8 +184,7 @@ TEST_F(RosScannerNodeTests, shouldThrowExceptionSetInScannerStartFuture)
 
 TEST_F(RosScannerNodeTests, shouldThrowDelayedExceptionSetInScannerStartFuture)
 {
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(
-      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
 
   util::Barrier start_barrier;
   std::promise<void> hw_finished_request;
@@ -208,8 +204,7 @@ TEST_F(RosScannerNodeTests, shouldThrowDelayedExceptionSetInScannerStartFuture)
 
 TEST_F(RosScannerNodeTests, shouldProvideScanTopic)
 {
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(
-      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
 
   util::Barrier start_barrier;
   util::Barrier stop_barrier;
@@ -227,8 +222,7 @@ TEST_F(RosScannerNodeTests, shouldProvideScanTopic)
 
 TEST_F(RosScannerNodeTests, shouldProvideActiveZonesetTopic)
 {
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(
-      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
 
   util::Barrier start_barrier;
   util::Barrier stop_barrier;
@@ -246,8 +240,7 @@ TEST_F(RosScannerNodeTests, shouldProvideActiveZonesetTopic)
 
 TEST_F(RosScannerNodeTests, shouldPublishScansWhenLaserScanCallbackIsInvoked)
 {
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(
-      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
 
   util::Barrier scan_topic_barrier;
   SubscriberMock subscriber(nh_priv_);
@@ -275,8 +268,7 @@ TEST_F(RosScannerNodeTests, shouldPublishScansWhenLaserScanCallbackIsInvoked)
 
 TEST_F(RosScannerNodeTests, shouldPublishActiveZonesetWhenLaserScanCallbackIsInvoked)
 {
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(
-      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
 
   const uint8_t first_zone{ 2 };
   const uint8_t second_zone{ 4 };
@@ -307,8 +299,7 @@ TEST_F(RosScannerNodeTests, shouldPublishActiveZonesetWhenLaserScanCallbackIsInv
 
 TEST_F(RosScannerNodeTests, shouldReceiveLatchedActiveZonesetMsg)
 {
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(
-      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
   util::Barrier start_barrier;
   util::Barrier stop_barrier;
   EXPECT_SUCCESSFULL_START_AND_OPEN_BARRIER_ON_CALL(ros_scanner_node.scanner_, &start_barrier);
@@ -334,8 +325,7 @@ TEST_F(RosScannerNodeTests, shouldReceiveLatchedActiveZonesetMsg)
 
 TEST_F(RosScannerNodeTests, shouldWaitWhenStopRequestResponseIsMissing)
 {
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(
-      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
 
   util::Barrier start_barrier;
   EXPECT_SUCCESSFULL_START_AND_OPEN_BARRIER_ON_CALL(ros_scanner_node.scanner_, &start_barrier);
