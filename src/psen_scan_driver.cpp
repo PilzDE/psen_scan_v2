@@ -114,8 +114,7 @@ int main(int argc, char** argv)
 
     NODE_TERMINATE_CALLBACK = std::bind(&ROSScannerNode::terminate, &ros_scanner_node);
 
-    auto f = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
-    f.get();
+    ros_scanner_node.run();
   }
   catch (std::exception& e)
   {
