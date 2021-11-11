@@ -9,6 +9,7 @@ Panels:
         - /LaserScan1
         - /TF1
         - /RobotModel1
+        - /Marker1
       Splitter Ratio: 0.5
     Tree Height: 451
   - Class: rviz/Selection
@@ -92,10 +93,11 @@ Visualization Manager:
         All Enabled: true
         laser_1:
           Value: true
-        laser_1_mount_link:
-          Value: true
         laser_1_body_link:
           Value: true
+        laser_1_mount_link:
+          Value: true
+      Marker Alpha: 1
       Marker Scale: 0.5
       Name: TF
       Show Arrows: true
@@ -118,6 +120,10 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        laser_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         laser_1_body_link:
           Alpha: 1
           Show Axes: false
@@ -127,16 +133,18 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        laser_1:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
       Name: RobotModel
       Robot Description: robot_description
       TF Prefix: ""
       Update Interval: 0
       Value: true
       Visual Enabled: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /laser_1/active_zoneset_marker
+      Name: Marker
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -171,6 +179,7 @@ Visualization Manager:
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
+      Field of View: 0.7853981852531433
       Focal Point:
         X: 0.1902836561203003
         Y: -0.0010642623528838158
@@ -182,7 +191,6 @@ Visualization Manager:
       Near Clip Distance: 0.009999999776482582
       Pitch: 0.7547971606254578
       Target Frame: <Fixed Frame>
-      Value: Orbit (rviz)
       Yaw: 0.6699999570846558
     Saved: ~
 Window Geometry:
@@ -201,5 +209,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1440
-  X: 63
-  Y: 100
+  X: 273
+  Y: 70

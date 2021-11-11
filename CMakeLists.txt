@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.7)
 project(psen_scan_v2)
 
 add_compile_options(-std=c++14)
@@ -30,6 +30,11 @@ find_package(catkin REQUIRED COMPONENTS
   rosconsole_bridge
   roscpp
   sensor_msgs
+  cmake_modules # Needed for find_package(TinyXML2 REQUIRED)
+  message_generation
+  geometry_msgs
+  visualization_msgs
+  std_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -41,10 +46,30 @@ endif()
 find_package(console_bridge REQUIRED)
 find_package(fmt REQUIRED)
 
+find_package(TinyXML2 REQUIRED)
+
+add_message_files(
+  FILES
+  ZoneSet.msg
+  ZoneSetConfiguration.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  geometry_msgs
+  visualization_msgs
+  std_msgs
+)
+
 catkin_package(
   CATKIN_DEPENDS
     roscpp
     sensor_msgs
+    message_runtime
+    geometry_msgs
+    std_msgs
+    visualization_msgs
+  DEPENDS TinyXML2
 )
 
 
@@ -89,6 +114,7 @@ if(CATKIN_ENABLE_CLANG_TIDY)
     set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
   endif()
 endif()
+
 ######################
 ## Build Standalone ##
 ######################
@@ -99,6 +125,7 @@ include_directories(
   ${console_bridge_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
+  ${TinyXML2_INCLUDE_DIRS}
 )
 
 set(${PROJECT_NAME}_standalone_sources
@@ -125,6 +152,19 @@ target_link_libraries(${PROJECT_NAME}_standalone
 )
 target_include_directories(${PROJECT_NAME}_standalone PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
+add_library(
+  ${PROJECT_NAME}_standalone_xml_configuration_import
+  standalone/src/configuration/xml_configuration_parsing.cpp
+)
+
+target_link_libraries(${PROJECT_NAME}_standalone_xml_configuration_import
+  ${console_bridge_LIBRARIES}
+  ${TinyXML_LIBRARIES}
+  ${TinyXML2_LIBRARIES}
+  fmt::fmt
+)
+target_include_directories(${PROJECT_NAME}_standalone_xml_configuration_import PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
 ###########
 ## Build ##
 ###########
@@ -137,6 +177,31 @@ add_executable(${PROJECT_NAME}_node ${${PROJECT_NAME}_node_sources})
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_standalone
+)
+
+
+add_executable(config_server_node
+  src/config_server_node_main.cpp
+  src/config_server_node.cpp)
+target_link_libraries(config_server_node
+  ${catkin_LIBRARIES}
+  ${PROJECT_NAME}_standalone_xml_configuration_import
+)
+add_dependencies(config_server_node
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+)
+
+
+add_executable(active_zoneset_node
+  src/active_zoneset_node_main.cpp
+  src/active_zoneset_node.cpp
+)
+target_link_libraries(active_zoneset_node
+  ${catkin_LIBRARIES}
+  fmt::fmt
+)
+add_dependencies(active_zoneset_node
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
 )
 
 #############
@@ -158,10 +223,16 @@ install(DIRECTORY urdf/
 install(TARGETS
   ${PROJECT_NAME}_node
   ${PROJECT_NAME}_standalone
+  config_server_node
+  active_zoneset_node
+  ${PROJECT_NAME}_standalone_xml_configuration_import
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+
+catkin_install_python(PROGRAMS scripts/zonesets_visualization.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 ############
 ##  Test  ##
@@ -170,6 +241,7 @@ if(CATKIN_ENABLE_TESTING)
 
   find_package(rostest REQUIRED)
   find_package(roslaunch REQUIRED)
+  find_package(rosbag REQUIRED)
 
   if(ENABLE_COVERAGE_TESTING)
     find_package(code_coverage REQUIRED)
@@ -347,6 +419,42 @@ if(CATKIN_ENABLE_TESTING)
     fmt::fmt
   )
 
+  catkin_add_gmock(unittest_xml_configuration_parser
+    standalone/test/unit_tests/configuration/unittest_xml_configuration_parser.cpp
+  )
+  target_link_libraries(unittest_xml_configuration_parser
+    ${catkin_LIBRARIES}
+    ${PROJECT_NAME}_standalone_xml_configuration_import
+    ${console_bridge_LIBRARIES}
+    fmt::fmt
+  )
+  add_dependencies(unittest_xml_configuration_parser ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+  file(COPY standalone/test/unit_tests/configuration/unittest_xml_configuration_parser-testfile-no-speedrange.xml
+       DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/testfiles)
+  file(COPY standalone/test/unit_tests/configuration/unittest_xml_configuration_parser-testfile-with-speedrange.xml
+       DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/testfiles)
+
+
+  catkin_add_gmock(unittest_zone_configuration_ros_conversion
+    test/unit_tests/unittest_zone_configuration_ros_conversion.cpp
+  )
+  target_link_libraries(unittest_zone_configuration_ros_conversion
+    ${catkin_LIBRARIES}
+    fmt::fmt
+  )
+  add_dependencies(unittest_zone_configuration_ros_conversion ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+  catkin_add_gmock(unittest_zoneset_to_marker_conversion
+    test/unit_tests/unittest_zoneset_to_marker_conversion.cpp
+  )
+  target_link_libraries(unittest_zoneset_to_marker_conversion
+    ${catkin_LIBRARIES}
+    fmt::fmt
+  )
+  add_dependencies(unittest_zoneset_to_marker_conversion
+    ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  )
   #########################
   ##  Integration-Tests  ##
   #########################
@@ -391,6 +499,39 @@ if(CATKIN_ENABLE_TESTING)
     fmt::fmt
   )
 
+  add_rostest_gmock(integrationtest_config_server_node
+    test/integration_tests/integrationtest_config_server_node.test
+    test/integration_tests/integrationtest_config_server_node.cpp
+    src/config_server_node.cpp
+  )
+  target_link_libraries(integrationtest_config_server_node
+    ${catkin_LIBRARIES}
+    ${PROJECT_NAME}_standalone_xml_configuration_import
+    ${rosbag_LIBRARIES}
+  )
+  add_dependencies(integrationtest_config_server_node
+    ${PROJECT_NAME}_standalone
+    config_server_node
+    ${PROJECT_NAME}_standalone_xml_configuration_import
+    ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  )
+
+  add_rostest_gmock(integrationtest_active_zoneset_node
+    test/integration_tests/integrationtest_active_zoneset_node.test
+    test/integration_tests/integrationtest_active_zoneset_node.cpp
+  )
+  target_link_libraries(integrationtest_active_zoneset_node
+    ${catkin_LIBRARIES}
+    ${rosbag_LIBRARIES}
+    fmt::fmt
+  )
+  add_dependencies(integrationtest_active_zoneset_node
+    ${PROJECT_NAME}_standalone
+    active_zoneset_node
+    ${PROJECT_NAME}_standalone_xml_configuration_import
+    ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  )
+
   add_rostest_gmock(unittest_ros_parameter_handler
       test/unit_tests/unittest_ros_parameter_handler.test
       test/unit_tests/unittest_ros_parameter_handler.cpp
@@ -418,6 +559,34 @@ if(CATKIN_ENABLE_TESTING)
       ARGS config:=big_resolution.yaml)
   endif()
 
+  ###########################################
+  ##  Hardware-Tests with saintsmart_relay ##
+  ###########################################
+
+  if(ENABLE_HARDWARE_TESTING_WITH_RELAY)
+
+    add_rostest_gmock(hwtest_zoneset_switching
+      test/hw_tests/hwtest_zoneset_switching.test
+      test/hw_tests/hwtest_zoneset_switching.cpp
+    )
+
+  else()
+
+    catkin_add_executable_with_gmock(hwtest_zoneset_switching
+                                    test/hw_tests/hwtest_zoneset_switching.cpp
+                                    EXCLUDE_FROM_ALL)
+    add_dependencies(tests hwtest_zoneset_switching)
+
+  endif()
+
+
+  target_link_libraries(hwtest_zoneset_switching
+    ${catkin_LIBRARIES}
+    ${PROJECT_NAME}_standalone
+    ${rosbag_LIBRARIES}
+    fmt::fmt
+  )
+
   #########################################
   ##  Hardware-Tests in Test Environment ##
   #########################################
@@ -428,7 +597,6 @@ if(CATKIN_ENABLE_TESTING)
 
   # This test is intended to be run on in a dedicated environment with a prerecorded reference scan
   # and thus needs to be enabled seperately.
-  find_package(rosbag REQUIRED)
   if(ENABLE_HARDWARE_TESTING_WITH_REFERENCE_SCAN)
 
     catkin_add_gtest(hwtest_scan_compare_standalone
@@ -516,11 +684,14 @@ if(CATKIN_ENABLE_TESTING)
   # generate coverage report using CATKIN:
   # catkin config --cmake-args -DENABLE_COVERAGE_TESTING=ON -DCMAKE_BUILD_TYPE=Debug
   # catkin build
-  # catkin build psen_scan_v2 -v --no-deps --catkin-make-args psen_scan_v2_coverage
+  # catkin build psen_scan_v2 -j1 -v --no-deps --catkin-make-args psen_scan_v2_coverage
   if(ENABLE_COVERAGE_TESTING)
     set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/standalone/test*"
                           "*/${PROJECT_NAME}/test*"
-                          "*/${PROJECT_NAME}/src/psen_scan_driver.cpp")
+                          "*/${PROJECT_NAME}/src/psen_scan_driver.cpp"
+                          "*/ZoneSet.h" # generated message
+                          "*/ZoneSetConfiguration.h" # generated message
+        )
     add_code_coverage(
       NAME ${PROJECT_NAME}_coverage
       DEPENDS tests

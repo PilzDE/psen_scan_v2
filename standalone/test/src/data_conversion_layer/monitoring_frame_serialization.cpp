@@ -76,6 +76,12 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
         os, msg.intensities_, [](double elem) { return (static_cast<uint16_t>(std::round(elem))); });
   }
 
+  AdditionalFieldHeader zoneset_header(static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::zone_set),
+                                       sizeof(msg.active_zoneset_));
+  write(os, zoneset_header);
+  uint8_t zoneset_header_payload = msg.active_zoneset_;
+  raw_processing::write(os, zoneset_header_payload);
+
   AdditionalFieldHeader::Id end_of_frame_header_id =
       static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::end_of_frame);
   data_conversion_layer::raw_processing::write(os, end_of_frame_header_id);

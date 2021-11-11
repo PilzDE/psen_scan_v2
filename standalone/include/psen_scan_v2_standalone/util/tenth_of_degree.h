@@ -40,6 +40,8 @@ public:
   }
 
 public:
+  explicit constexpr TenthOfDegree() = default;
+
   explicit constexpr TenthOfDegree(const int16_t& tenth_of_degree) : tenth_of_degree_(tenth_of_degree)
   {
   }
@@ -104,6 +106,12 @@ public:
   }
 
   constexpr TenthOfDegree& operator+(const TenthOfDegree& rhs)
+  {
+    tenth_of_degree_ = value() + rhs.value();
+    return *this;
+  }
+
+  constexpr TenthOfDegree& operator+=(const TenthOfDegree& rhs)
   {
     tenth_of_degree_ = value() + rhs.value();
     return *this;

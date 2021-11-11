@@ -50,7 +50,8 @@ jobs:
           ROS_REPO: testing
           ADDITIONAL_DEBS: git
           CATKIN_LINT: false
-          NOT_TEST_BUILD: true
           PARALLEL_TESTS: false
+          BUILDER: colcon
+          CMAKE_ARGS: '-DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="--coverage"'
+          DOCKER_RUN_OPTS: '-e COVERAGE_EXCLUDES="*/psen_scan_v2/src/psen_scan_driver.cpp"'
           AFTER_SCRIPT: 'git clone --depth=1 --branch master https://github.com/PilzDE/industrial_ci_addons.git /industrial_ci_addons && source /industrial_ci_addons/check_coverage.sh && check_coverage psen_scan_v2'
-          CMAKE_ARGS: '-DENABLE_COVERAGE_TESTING=ON -DCMAKE_BUILD_TYPE=Debug'

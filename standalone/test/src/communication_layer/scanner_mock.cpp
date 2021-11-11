@@ -93,26 +93,25 @@ void ScannerMock::startContinuousListeningForControlMsg()
   control_server_.asyncReceive(MockUDPServer::ReceiveMode::continuous);
 }
 
-void ScannerMock::sendReply(const data_conversion_layer::scanner_reply::Message::Type& reply_type)
+void ScannerMock::sendReply(const ReplyMsg::Type& reply_type, const ReplyMsg::OperationResult& result)
 {
-  const data_conversion_layer::scanner_reply::Message msg(
-      reply_type, data_conversion_layer::scanner_reply::Message::OperationResult::accepted);
+  const ReplyMsg msg(reply_type, result);
   control_server_.asyncSend(control_msg_receiver_, data_conversion_layer::scanner_reply::serialize(msg));
 }
 
-void ScannerMock::sendStartReply()
+void ScannerMock::sendStartReply(const ReplyMsg::OperationResult& result)
 {
   std::cout << "ScannerMock: Send start reply..." << std::endl;
-  sendReply(data_conversion_layer::scanner_reply::Message::Type::start);
+  sendReply(ReplyMsg::Type::start, result);
 }
 
 void ScannerMock::sendStopReply()
 {
   std::cout << "ScannerMock: Send stop reply..." << std::endl;
-  sendReply(data_conversion_layer::scanner_reply::Message::Type::stop);
+  sendReply(ReplyMsg::Type::stop);
 }
 
-void ScannerMock::sendMonitoringFrame(const data_conversion_layer::monitoring_frame::Message& msg)
+void ScannerMock::sendMonitoringFrame(const MonitoringFrameMsg& msg)
 {
   std::cout << "ScannerMock: Send monitoring frame..." << std::endl;
   data_server_.asyncSend(monitoring_frame_receiver_, data_conversion_layer::monitoring_frame::serialize(msg));
@@ -125,7 +124,7 @@ void ScannerMock::sendEmptyMonitoringFrame()
   data_server_.asyncSend(monitoring_frame_receiver_, data);
 }
 
-void ScannerMock::sendMonitoringFrames(const std::vector<data_conversion_layer::monitoring_frame::Message>& msgs)
+void ScannerMock::sendMonitoringFrames(const std::vector<MonitoringFrameMsg>& msgs)
 {
   for (const auto& msg : msgs)
   {

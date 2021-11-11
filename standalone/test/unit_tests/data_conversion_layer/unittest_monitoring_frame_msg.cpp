@@ -66,9 +66,9 @@ protected:
 TEST(MonitoringFrameMsgEqualityTest, testCompareEqualSucces)
 {
   const data_conversion_layer::monitoring_frame::Message msg0(
-      util::TenthOfDegree(100), util::TenthOfDegree(10), 42, { 1, 2, 3 });
+      util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 1, { 1, 2, 3 });
   const data_conversion_layer::monitoring_frame::Message msg1(
-      util::TenthOfDegree(100), util::TenthOfDegree(10), 42, { 1, 2, 3 });
+      util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 1, { 1, 2, 3 });
   EXPECT_EQ(msg0, msg1);
 }
 
@@ -78,6 +78,7 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareEqualIntensitiesSucces)
       util::TenthOfDegree(100),
       util::TenthOfDegree(10),
       42,
+      0,
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
@@ -87,6 +88,7 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareEqualIntensitiesSucces)
       util::TenthOfDegree(100),
       util::TenthOfDegree(10),
       42,
+      0,
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
@@ -98,18 +100,18 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareEqualIntensitiesSucces)
 TEST(MonitoringFrameMsgEqualityTest, testCompareEqualEmptySuccess)
 {
   const data_conversion_layer::monitoring_frame::Message msg0(
-      util::TenthOfDegree(100), util::TenthOfDegree(10), 42, {});
+      util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, {});
   const data_conversion_layer::monitoring_frame::Message msg1(
-      util::TenthOfDegree(100), util::TenthOfDegree(10), 42, {});
+      util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, {});
   EXPECT_EQ(msg0, msg1);
 }
 
 TEST(MonitoringFrameMsgEqualityTest, testCompareEqualIntensitiesEmptySucces)
 {
   const data_conversion_layer::monitoring_frame::Message msg0(
-      util::TenthOfDegree(100), util::TenthOfDegree(10), 42, {}, {}, {});
+      util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, {}, {}, {});
   const data_conversion_layer::monitoring_frame::Message msg1(
-      util::TenthOfDegree(100), util::TenthOfDegree(10), 42, {}, {}, {});
+      util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, {}, {}, {});
   EXPECT_EQ(msg0, msg1);
 }
 
@@ -119,6 +121,7 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareMeasurementsNotEqual)
       util::TenthOfDegree(100),
       util::TenthOfDegree(10),
       42,
+      0,
       { 1, 42, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
@@ -128,6 +131,7 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareMeasurementsNotEqual)
       util::TenthOfDegree(100),
       util::TenthOfDegree(10),
       42,
+      0,
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
@@ -143,6 +147,7 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareIntensitiesNotEqual)
       util::TenthOfDegree(100),
       util::TenthOfDegree(10),
       42,
+      0,
       { 1, 2, 3 },
       { 10, 42, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
@@ -152,6 +157,7 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareIntensitiesNotEqual)
       util::TenthOfDegree(100),
       util::TenthOfDegree(10),
       42,
+      0,
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
@@ -167,6 +173,7 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareFromThetaNotEqual)
       util::TenthOfDegree(42),
       util::TenthOfDegree(10),
       42,
+      0,
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
@@ -176,6 +183,7 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareFromThetaNotEqual)
       util::TenthOfDegree(100),
       util::TenthOfDegree(10),
       42,
+      0,
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
@@ -191,6 +199,7 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareResolutionNotEqual)
       util::TenthOfDegree(100),
       util::TenthOfDegree(42),
       42,
+      0,
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
@@ -200,6 +209,7 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareResolutionNotEqual)
       util::TenthOfDegree(100),
       util::TenthOfDegree(10),
       42,
+      0,
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
@@ -215,6 +225,7 @@ TEST(MonitoringFrameMsgEqualityTest, shouldCompareToFalseOnMessagesWithDifferent
       util::TenthOfDegree(100),
       util::TenthOfDegree(10),
       42,
+      0,
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
@@ -224,6 +235,33 @@ TEST(MonitoringFrameMsgEqualityTest, shouldCompareToFalseOnMessagesWithDifferent
       util::TenthOfDegree(100),
       util::TenthOfDegree(10),
       1,
+      0,
+      { 1, 2, 3 },
+      { 10, 20, 30 },
+      { data_conversion_layer::monitoring_frame::diagnostic::Message(
+          configuration::ScannerId::master,
+          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+  EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
+                             << "\nexpected to be false but was true";
+}
+
+TEST(MonitoringFrameMsgEqualityTest, shouldCompareToFalseOnMessagesWithDifferentActiveZoneset)
+{
+  const data_conversion_layer::monitoring_frame::Message msg0(
+      util::TenthOfDegree(100),
+      util::TenthOfDegree(10),
+      42,
+      0,
+      { 1, 2, 3 },
+      { 10, 20, 30 },
+      { data_conversion_layer::monitoring_frame::diagnostic::Message(
+          configuration::ScannerId::master,
+          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
+  const data_conversion_layer::monitoring_frame::Message msg1(
+      util::TenthOfDegree(100),
+      util::TenthOfDegree(10),
+      42,
+      42,
       { 1, 2, 3 },
       { 10, 20, 30 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(
@@ -242,9 +280,9 @@ TEST(MonitoringFrameMsgTest, shouldThrowMissingScanCounterErrorWhenScanCounterWa
 TEST(MonitoringFrameMsgEqualityTest, testCompareNotEqualEmpty)
 {
   const data_conversion_layer::monitoring_frame::Message msg0(
-      util::TenthOfDegree(100), util::TenthOfDegree(42), 42, {}, {}, {});
+      util::TenthOfDegree(100), util::TenthOfDegree(42), 42, 0, {}, {}, {});
   const data_conversion_layer::monitoring_frame::Message msg1(
-      util::TenthOfDegree(100), util::TenthOfDegree(42), 0, {}, {}, {});
+      util::TenthOfDegree(100), util::TenthOfDegree(42), 0, 0, {}, {}, {});
   EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
                              << "\nexpected to be false but was true";
 }
@@ -252,18 +290,18 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareNotEqualEmpty)
 TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)
 {
   data_conversion_layer::monitoring_frame::Message msg(
-      util::TenthOfDegree(1234), util::TenthOfDegree(56), 78, { 45, 44, 43, 42 });
+      util::TenthOfDegree(1234), util::TenthOfDegree(56), 78, 2, { 45, 44, 43, 42 });
 
 // For compatibility with different ubuntu versions (resp. fmt), we need to take account of changes in
 // the default formatting of floating point numbers
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
   EXPECT_EQ(fmt::format("{}", msg),
             "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-            "measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {}, diagnostics = {})");
+            "active_zoneset = 2, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {}, diagnostics = {})");
 #else
   EXPECT_EQ(fmt::format("{}", msg),
             "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-            "measurements = {45, 44, 43, 42}, intensities = {}, diagnostics = {})");
+            "active_zoneset = 2, measurements = {45, 44, 43, 42}, intensities = {}, diagnostics = {})");
 #endif
 }
 

@@ -31,11 +31,13 @@ LaserScan::LaserScan(const util::TenthOfDegree& resolution,
                      const util::TenthOfDegree& min_scan_angle,
                      const util::TenthOfDegree& max_scan_angle,
                      const uint32_t scan_counter,
+                     const uint8_t active_zoneset,
                      const int64_t timestamp)
   : resolution_(resolution)
   , min_scan_angle_(min_scan_angle)
   , max_scan_angle_(max_scan_angle)
   , scan_counter_(scan_counter)
+  , active_zoneset_(active_zoneset)
   , timestamp_(timestamp)
 {
   if (getScanResolution() == util::TenthOfDegree(0))
@@ -79,6 +81,11 @@ uint32_t LaserScan::getScanCounter() const
   return scan_counter_;
 }
 
+uint8_t LaserScan::getActiveZoneset() const
+{
+  return active_zoneset_;
+}
+
 int64_t LaserScan::getTimestamp() const
 {
   return timestamp_;
@@ -107,12 +114,13 @@ void LaserScan::setIntensities(const IntensityData& intensities)
 std::ostream& operator<<(std::ostream& os, const LaserScan& scan)
 {
   os << fmt::format("LaserScan(timestamp = {} nsec, scanCounter = {}, minScanAngle = {} deg, maxScanAngle = {} deg, "
-                    "resolution = {} deg, measurements = {}, intensities = {})",
+                    "resolution = {} deg, active_zoneset = {}, measurements = {}, intensities = {})",
                     scan.getTimestamp(),
                     scan.getScanCounter(),
                     scan.getMinScanAngle().value() / 10.,
                     scan.getMaxScanAngle().value() / 10.,
                     scan.getScanResolution().value() / 10.,
+                    scan.getActiveZoneset(),
                     util::formatRange(scan.getMeasurements()),
                     util::formatRange(scan.getIntensities()));
   return os;

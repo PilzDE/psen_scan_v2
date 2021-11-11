@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>psen_scan_v2</name>
-  <version>0.3.2</version>
+  <version>0.3.3</version>
   <description>ROS support for the Pilz laser scanner</description>
 
   <maintainer email="a.gutenkunst@pilz.de">Alexander Gutenkunst</maintainer>
@@ -17,10 +17,18 @@
   <depend>roscpp</depend>
   <depend>sensor_msgs</depend>
   <depend>rosconsole_bridge</depend>
+  <depend>geometry_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>visualization_msgs</depend>
+  <build_depend>tinyxml2</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>cmake_modules</build_depend>
   <exec_depend>robot_state_publisher</exec_depend>
   <exec_depend>roslaunch</exec_depend>
   <exec_depend>rviz</exec_depend>
   <exec_depend>xacro</exec_depend>
+  <exec_depend>tinyxml2</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
 
   <test_depend>code_coverage</test_depend>
   <test_depend>rostest</test_depend>
@@ -28,4 +36,5 @@
   <test_depend>roslaunch</test_depend>
   <test_depend>rosbag</test_depend>
 
+  <build_export_depend>tinyxml2</build_export_depend>
 </package>

@@ -48,6 +48,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- Set the following to true in order to publish scan data as soon as a UDP packet is ready, instead of waiting for a full scan -->
   <arg name="fragmented_scans" default="false" />
 
+  <!-- Load scanner config file to publish zonesets -->
+  <arg name="config_file" default="" />
+
   <!-- Start rviz -->
   <arg name="rviz" default="true" />
 
@@ -70,8 +73,21 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     '$(find psen_scan_v2)/urdf/example.urdf.xacro' prefix:=$(arg tf_prefix)" />
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
+  <!-- Publish the defined zonesets from the xml configuration -->
+  <group if="$(eval config_file != '')">
+    <node ns="$(arg tf_prefix)" name="config_server_node" type="config_server_node" pkg="psen_scan_v2">
+      <param name="config_file" value="$(arg config_file)" />
+      <param name="frame_id" value="$(arg tf_prefix)" />
+    </node>
+  </group>
+
   <!-- Start rviz -->
   <group if="$(arg rviz)">
     <node name="rviz" type="rviz" pkg="rviz" args="-d $(find psen_scan_v2)/config/config.rviz" />
+
+    <!-- Visualize active zoneset -->
+    <group if="$(eval config_file != '')">
+      <node ns="$(arg tf_prefix)" name="active_zoneset_node" type="active_zoneset_node" pkg="psen_scan_v2" />
+    </group>
   </group>
 </launch>

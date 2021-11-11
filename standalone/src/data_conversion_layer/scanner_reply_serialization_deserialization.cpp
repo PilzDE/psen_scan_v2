@@ -46,7 +46,6 @@ RawData data_conversion_layer::scanner_reply::serialize(const uint32_t op_code, 
   raw_processing::write(os, op_code);
   raw_processing::write(os, res_code);
 
-  // TODO check limits
   const std::string data_str(os.str());
   assert(data_str.length() == data_conversion_layer::scanner_reply::Message::SIZE &&
          "Message data of start reply has not the expected size");
