@@ -140,18 +140,16 @@ void ScannerAPITests::setUpScannerConfig(const std::string& host_ip, bool fragme
 
 ScannerConfiguration ScannerAPITests::generateScannerConfig(const std::string& host_ip, bool fragmented)
 {
-  auto config_builder = ScannerConfigurationBuilder()
-                            .hostIP(host_ip)
-                            .hostDataPort(port_holder_.data_port_host)
-                            .hostControlPort(port_holder_.control_port_host)
-                            .scannerIp(SCANNER_IP_ADDRESS)
-                            .scannerDataPort(port_holder_.data_port_scanner)
-                            .scannerControlPort(port_holder_.control_port_scanner)
-                            .scanRange(DEFAULT_SCAN_RANGE)
-                            .scanResolution(DEFAULT_SCAN_RESOLUTION)
-                            .enableIntensities()
-                            .enableFragmentedScans(fragmented);
-  return config_builder.build();
+  return ScannerConfigurationBuilder(SCANNER_IP_ADDRESS)
+      .hostIP(host_ip)
+      .hostDataPort(port_holder_.data_port_host)
+      .hostControlPort(port_holder_.control_port_host)
+      .scannerDataPort(port_holder_.data_port_scanner)
+      .scannerControlPort(port_holder_.control_port_scanner)
+      .scanRange(DEFAULT_SCAN_RANGE)
+      .scanResolution(DEFAULT_SCAN_RESOLUTION)
+      .enableIntensities()
+      .enableFragmentedScans(fragmented);
 }
 
 void ScannerAPITests::setUpScannerV2Driver()
