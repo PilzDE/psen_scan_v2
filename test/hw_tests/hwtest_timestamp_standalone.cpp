@@ -83,7 +83,7 @@ protected:
 private:
   void buildScannerConfig()
   {
-    ScannerConfigurationBuilder config_builder { SCANNER_IP };
+    ScannerConfigurationBuilder config_builder{ SCANNER_IP };
     config_builder.hostDataPort(HOST_UDP_DATA_PORT).scanRange(ScanRange{ ANGLE_START, ANGLE_END });
 
     if (const char* host_ip{ std::getenv("HOST_IP") })

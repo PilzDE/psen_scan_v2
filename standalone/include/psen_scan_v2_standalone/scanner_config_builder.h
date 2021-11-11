@@ -34,7 +34,7 @@ namespace psen_scan_v2_standalone
 class ScannerConfigurationBuilder
 {
 public:
-  ScannerConfigurationBuilder(const std::string& scanner_ip); // IP is mandatory
+  ScannerConfigurationBuilder(const std::string& scanner_ip);  // IP is mandatory
   ScannerConfiguration build() const;
 
 public:
@@ -49,7 +49,7 @@ public:
   ScannerConfigurationBuilder& enableDiagnostics(const bool&);
   ScannerConfigurationBuilder& enableIntensities(const bool&);
   ScannerConfigurationBuilder& enableFragmentedScans(const bool&);
-  operator ScannerConfiguration() {return build();}
+  operator ScannerConfiguration();
 
 private:
   static uint16_t convertPort(const int& port);
@@ -150,6 +150,12 @@ inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableFragmente
   config_.fragmented_scans_ = enable;
   return *this;
 }
+
+ScannerConfigurationBuilder::operator ScannerConfiguration()
+{
+  return build();
+}
+
 }  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_SCANNER_CONFIG_BUILDER_H

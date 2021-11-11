@@ -90,7 +90,7 @@ public:
     util::Barrier start_req_barrier;                                                                                   \
     std::future<void> start_future;                                                                                    \
     EXPECT_START_REQUEST_CALL(*hw_mock, *config).WillOnce(OpenBarrier(&start_req_barrier));                            \
-    EXPECT_NO_BLOCK_NO_THROW(start_future = driver->start(););                                                  \
+    EXPECT_NO_BLOCK_NO_THROW(start_future = driver->start(););                                                         \
     EXPECT_TRUE(start_future.valid());                                                                                 \
     EXPECT_BARRIER_OPENS(start_req_barrier, DEFAULT_TIMEOUT) << "Start request not received";                          \
     hw_mock->sendStartReply();                                                                                         \
@@ -103,7 +103,7 @@ public:
     util::Barrier stop_req_barrier;                                                                                    \
     std::future<void> stop_future;                                                                                     \
     EXPECT_STOP_REQUEST_CALL(*hw_mock).WillOnce(OpenBarrier(&stop_req_barrier));                                       \
-    EXPECT_NO_BLOCK_NO_THROW(stop_future = driver->stop(););                                                    \
+    EXPECT_NO_BLOCK_NO_THROW(stop_future = driver->stop(););                                                           \
     EXPECT_TRUE(stop_future.valid());                                                                                  \
     EXPECT_BARRIER_OPENS(stop_req_barrier, DEFAULT_TIMEOUT) << "Stop request not received";                            \
     hw_mock->sendStopReply();                                                                                          \

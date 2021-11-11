@@ -93,7 +93,7 @@ TEST_F(ScanComparisonTests, simpleCompare)
 
   ScanRange scan_range{ ANGLE_START, ANGLE_END };
 
-  ScannerConfigurationBuilder config_builder { scanner_ip_};
+  ScannerConfigurationBuilder config_builder{ scanner_ip_ };
   config_builder.hostIP(host_ip_).hostDataPort(HOST_UDP_PORT_DATA).scanRange(scan_range);
 
   ScannerV2 scanner(config_builder, [&laser_scan_validator, &window_size](const ScanType& scan) {

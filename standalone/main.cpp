@@ -46,8 +46,8 @@ int main(int argc, char** argv)
 
   // Available configuration options are listed on
   // http://docs.ros.org/en/melodic/api/psen_scan_v2/html/classpsen__scan__v2__standalone_1_1ScannerConfigurationBuilder.html
-  auto config = ScannerConfigurationBuilder(SCANNER_IP).scanRange(ScanRange{ ANGLE_START, ANGLE_END });
-  ScannerV2 scanner(config, laserScanCallback);
+  ScannerV2 scanner(ScannerConfigurationBuilder(SCANNER_IP).scanRange(ScanRange{ ANGLE_START, ANGLE_END }),
+                    laserScanCallback);
 
   scanner.start();
   std::this_thread::sleep_for(std::chrono::seconds(10));
