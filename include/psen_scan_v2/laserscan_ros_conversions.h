@@ -28,8 +28,8 @@ namespace psen_scan_v2
 using namespace psen_scan_v2_standalone;
 
 sensor_msgs::msg::LaserScan toLaserScanMsg(const LaserScan& laserscan,
-                                      const std::string& frame_id,
-                                      const double x_axis_rotation)
+                                           const std::string& frame_id,
+                                           const double x_axis_rotation)
 {
   sensor_msgs::msg::LaserScan ros_message;
   if (laserscan.getTimestamp() < 0)
