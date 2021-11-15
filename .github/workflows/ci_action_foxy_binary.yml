@@ -41,7 +41,7 @@ jobs:
           path: cached_binary.deb
 
       - name: Install debian
-        run: apt-get update && apt-get install ./cached_binary.deb -y
+        run: apt-get update && apt-get install -y ros-foxy-ros-testing ./cached_binary.deb
 
       - uses: actions/checkout@v1
 
