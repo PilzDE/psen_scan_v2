@@ -350,17 +350,24 @@ if(BUILD_TESTING)
     fmt::fmt
   )
 
-  # needs update for ros2 api
-  #ament_add_ros_isolated_gmock(integrationtest_ros_scanner_node
-  #  test/integration_tests/integrationtest_ros_scanner_node.test
-  #  test/integration_tests/integrationtest_ros_scanner_node.cpp
-  #  standalone/src/laserscan.cpp
-  #  standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
-  #  standalone/src/data_conversion_layer/diagnostics.cpp
-  #)
-  #target_link_libraries(integrationtest_ros_scanner_node
-  #  fmt::fmt
-  #)
+  ament_add_ros_isolated_gmock(integrationtest_ros_scanner_node
+    test/integration_tests/integrationtest_ros_scanner_node.test
+    test/integration_tests/integrationtest_ros_scanner_node.cpp
+    standalone/src/laserscan.cpp
+    standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
+    standalone/src/data_conversion_layer/diagnostics.cpp
+  )
+  target_compile_definitions(integrationtest_ros_scanner_node
+    PUBLIC
+    _ROS_BUILD_
+  )
+  target_link_libraries(integrationtest_ros_scanner_node
+    fmt::fmt
+  )
+  ament_target_dependencies(integrationtest_ros_scanner_node
+    rclcpp
+    sensor_msgs
+  )
 
   ament_add_ros_isolated_gmock(unittest_ros_parameter_handler
       test/unit_tests/unittest_ros_parameter_handler.cpp

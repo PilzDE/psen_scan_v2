@@ -35,7 +35,9 @@ public:
 
 private:
   std::promise<void> barrier_;
-  const std::future<void> future_{ barrier_.get_future() };
+
+protected:
+  const std::shared_future<void> future_{ barrier_.get_future() };
 };
 
 inline void util::Barrier::release()
