@@ -485,22 +485,4 @@ if(TODO______________)
     ${catkin_LIBRARIES}
     ${PROJECT_NAME}_standalone
   )
-
-
-  # generate coverage report using CATKIN_MAKE:
-  # catkin_make -DENABLE_COVERAGE_TESTING=ON -DCMAKE_BUILD_TYPE=Debug psen_scan_v2_coverage (adding -j1 recommended)
-  #
-  # generate coverage report using CATKIN:
-  # catkin config --cmake-args -DENABLE_COVERAGE_TESTING=ON -DCMAKE_BUILD_TYPE=Debug
-  # catkin build
-  # catkin build psen_scan_v2 -v --no-deps --catkin-make-args psen_scan_v2_coverage
-  if(ENABLE_COVERAGE_TESTING)
-    set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/standalone/test*"
-                          "*/${PROJECT_NAME}/test*"
-                          "*/${PROJECT_NAME}/src/psen_scan_driver.cpp")
-    add_code_coverage(
-      NAME ${PROJECT_NAME}_coverage
-      DEPENDS tests
-    )
-  endif()
 endif()
