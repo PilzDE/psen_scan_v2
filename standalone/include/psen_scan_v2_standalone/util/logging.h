@@ -29,6 +29,7 @@
                          RCUTILS_LOG_CONDITION_EMPTY,                                                                  \
                          RCUTILS_LOG_CONDITION_EMPTY,                                                                  \
                          name,                                                                                         \
+                         "%s",                                                                                         \
                          fmt::format(__VA_ARGS__).c_str())
 #else
 #include <console_bridge/console.h>
