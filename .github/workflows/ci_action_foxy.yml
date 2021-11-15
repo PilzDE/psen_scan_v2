@@ -36,16 +36,16 @@ jobs:
           CLANG_TIDY: true
           NOT_TEST_BUILD: true
 
- coverage:
-   name: "Run coverage check with Testing Repo of foxy (http://packages.ros.org/ros2-testing/ubuntu)"
-   runs-on: ubuntu-20.04
-   steps:
-     - uses: actions/checkout@v1
-     - uses: 'ros-industrial/industrial_ci@master'
-       env:
-         ROS_REPO: testing
-         ADDITIONAL_DEBS: git
-         NOT_TEST_BUILD: true
-         PARALLEL_TESTS: false
-         CMAKE_ARGS: '-DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGWS="--coverage"'
-         AFTER_SCRIPT: 'git clone --depth=1 --branch master https://github.com/PilzDE/industrial_ci_addons.git /industrial_ci_addons && source /industrial_ci_addons/check_coverage.sh && check_coverage psen_scan_v2'
+  coverage:
+    name: "Run coverage check with Testing Repo of foxy (http://packages.ros.org/ros2-testing/ubuntu)"
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v1
+      - uses: 'ros-industrial/industrial_ci@master'
+        env:
+          ROS_REPO: testing
+          ADDITIONAL_DEBS: git
+          NOT_TEST_BUILD: true
+          PARALLEL_TESTS: false
+          CMAKE_ARGS: '-DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGWS="--coverage"'
+          AFTER_SCRIPT: 'git clone --depth=1 --branch master https://github.com/PilzDE/industrial_ci_addons.git /industrial_ci_addons && source /industrial_ci_addons/check_coverage.sh && check_coverage psen_scan_v2'
