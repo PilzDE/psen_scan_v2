@@ -48,4 +48,5 @@ jobs:
           ADDITIONAL_DEBS: git lcov
           PARALLEL_TESTS: false
           CMAKE_ARGS: '-DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="--coverage"'
+          DOCKER_RUN_OPTS: '-e COVERAGE_EXCLUDES="*/psen_scan_v2/src/psen_scan_driver.cpp"'
           AFTER_SCRIPT: 'git clone --depth=1 --branch master https://github.com/PilzDE/industrial_ci_addons.git /industrial_ci_addons && source /industrial_ci_addons/check_coverage.sh && check_coverage psen_scan_v2'
