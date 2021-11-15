@@ -40,7 +40,7 @@ void laserScanCallback(const LaserScan& scan)
 
 int main(int argc, char** argv)
 {
-  setLogLevel(CONSOLE_BRIDGE_LOG_INFO);
+  console_bridge::setLogLevel(console_bridge::CONSOLE_BRIDGE_LOG_INFO);
 
   // Available configuration options are listed on
   // http://docs.ros.org/en/melodic/api/psen_scan_v2/html/classpsen__scan__v2__standalone_1_1ScannerConfigurationBuilder.html
