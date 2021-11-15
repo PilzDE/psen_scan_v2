@@ -53,14 +53,9 @@ static const std::string DEFAULT_TF_PREFIX = "laser_1";
 //! @brief Topic on which the LaserScan data are published.
 static const std::string DEFAULT_PUBLISH_TOPIC = "scan";
 
-void delayed_shutdown_sig_handler(int sig)
+void shutdown_sig_handler(int sig)
 {
   NODE_TERMINATE_CALLBACK();
-
-  // Delay the shutdown() to get full debug output. Workaround for https://github.com/ros/ros_comm/issues/688
-  rclcpp::sleep_for(std::chrono::duration_cast<std::chrono::nanoseconds>(0.2s));  // TODO check if we can get rid of
-                                                                                  // this
-
   rclcpp::shutdown();
 }
 
@@ -71,7 +66,7 @@ int main(int argc, char** argv)
   node_options.automatically_declare_parameters_from_overrides(true);
   rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("psen_scan_v2_node", node_options);
 
-  std::signal(SIGINT, delayed_shutdown_sig_handler);
+  std::signal(SIGINT, shutdown_sig_handler);
 
   try
   {
