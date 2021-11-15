@@ -351,7 +351,6 @@ if(BUILD_TESTING)
   )
 
   ament_add_ros_isolated_gmock(integrationtest_ros_scanner_node
-    test/integration_tests/integrationtest_ros_scanner_node.test
     test/integration_tests/integrationtest_ros_scanner_node.cpp
     standalone/src/laserscan.cpp
     standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
