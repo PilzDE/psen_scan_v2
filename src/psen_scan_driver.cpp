@@ -82,13 +82,12 @@ int main(int argc, char** argv)
                                                            pnh, PARAM_ANGLE_END, configuration::DEFAULT_ANGLE_END)) };
 
     ScannerConfiguration scanner_configuration{
-      ScannerConfigurationBuilder()
+      ScannerConfigurationBuilder(getRequiredParamFromServer<std::string>(pnh, PARAM_SCANNER_IP))
           .hostIP(getOptionalParamFromServer<std::string>(pnh, PARAM_HOST_IP, configuration::DEFAULT_HOST_IP_STRING))
           .hostDataPort(
               getOptionalParamFromServer<int>(pnh, PARAM_HOST_DATA_PORT, configuration::DATA_PORT_OF_HOST_DEVICE))
           .hostControlPort(
               getOptionalParamFromServer<int>(pnh, PARAM_HOST_CONTROL_PORT, configuration::CONTROL_PORT_OF_HOST_DEVICE))
-          .scannerIp(getRequiredParamFromServer<std::string>(pnh, PARAM_SCANNER_IP))
           .scannerDataPort(configuration::DATA_PORT_OF_SCANNER_DEVICE)
           .scannerControlPort(configuration::CONTROL_PORT_OF_SCANNER_DEVICE)
           .scanRange(scan_range)

@@ -100,15 +100,13 @@ static void setDefaultActions(ScannerMock& mock, util::Barrier& start_barrier)
 
 static ScannerConfiguration createValidConfig()
 {
-  return ScannerConfigurationBuilder()
+  return ScannerConfigurationBuilder(DEVICE_IP)
       .hostIP(HOST_IP)
       .hostDataPort(HOST_UDP_PORT_DATA)
       .hostControlPort(HOST_UDP_PORT_CONTROL)
-      .scannerIp(DEVICE_IP)
       .scannerDataPort(configuration::DATA_PORT_OF_SCANNER_DEVICE)
       .scannerControlPort(configuration::CONTROL_PORT_OF_SCANNER_DEVICE)
-      .scanRange(SCAN_RANGE)
-      .build();
+      .scanRange(SCAN_RANGE);
 }
 
 static LaserScan createValidLaserScan(const uint8_t active_zoneset = 1)

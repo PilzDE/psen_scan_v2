@@ -74,11 +74,10 @@ TEST_F(StartRequestTest, constructorTest)
   const ScanRange scan_range{ util::TenthOfDegree(1), util::TenthOfDegree::fromRad(4.71) };
 
   uint32_t sequence_number{ 123 };
-  data_conversion_layer::start_request::Message sr(ScannerConfigurationBuilder()
+  data_conversion_layer::start_request::Message sr(ScannerConfigurationBuilder("192.168.0.50")
                                                        .hostIP(host_ip)
                                                        .hostDataPort(host_udp_port_data)
                                                        .hostControlPort(1 /* irrelevant */)
-                                                       .scannerIp("192.168.0.50")
                                                        .scannerDataPort(77)
                                                        .scannerControlPort(78)
                                                        .scanRange(scan_range)
@@ -142,10 +141,10 @@ TEST_F(StartRequestTest, endAngleIncreasedWhenMatchingDataPoint)
   const ScanRange scan_range{ util::TenthOfDegree(1u), util::TenthOfDegree(2749u) };
   const util::TenthOfDegree resolution{ 2u };
 
-  ScannerConfigurationBuilder builder;
-  builder.hostIP("192.168.0.50").scannerIp("192.168.0.10").scanResolution(resolution).scanRange(scan_range);
-
-  const ScannerConfiguration config = builder.build();
+  const ScannerConfiguration config = ScannerConfigurationBuilder("192.168.0.10")
+                                          .hostIP("192.168.0.50")
+                                          .scanResolution(resolution)
+                                          .scanRange(scan_range);
 
   const auto raw_start_request{ data_conversion_layer::start_request::serialize(
       data_conversion_layer::start_request::Message(config)) };
@@ -160,15 +159,12 @@ TEST_F(StartRequestTest, endAngleIncreasedWhenMatchingDataPoint)
 
 TEST_F(StartRequestTest, crcWithIntensities)
 {
-  ScannerConfigurationBuilder builder;
-  builder.hostIP("192.168.0.50")
-      .scannerIp("192.168.0.10")
-      .scanResolution(util::TenthOfDegree(2u))
-      .enableIntensities()
-      .scanRange(ScanRange(util::TenthOfDegree(1), util::TenthOfDegree(2749)))
-      .enableDiagnostics();
-
-  const ScannerConfiguration config = builder.build();
+  const ScannerConfiguration config = ScannerConfigurationBuilder("192.168.0.10")
+                                          .hostIP("192.168.0.50")
+                                          .scanResolution(util::TenthOfDegree(2u))
+                                          .enableIntensities()
+                                          .scanRange(ScanRange(util::TenthOfDegree(1), util::TenthOfDegree(2749)))
+                                          .enableDiagnostics();
 
   const auto raw_start_request{ data_conversion_layer::start_request::serialize(
       data_conversion_layer::start_request::Message(config)) };
