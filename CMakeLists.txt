@@ -46,6 +46,26 @@ if(NOT Boost_FOUND)
 endif()
 find_package(fmt REQUIRED)
 
+################
+## Clang tidy ##
+################
+# alternative to ament_cmake_clang_tidy which is very time consuming
+# to run: catkin_make -DAMENT_ENABLE_CLANG_TIDY=true
+# build and install folders have to be deleted before run
+if(AMENT_ENABLE_CLANG_TIDY)
+  find_program(
+    CLANG_TIDY_EXE
+    NAMES "clang-tidy"
+    DOC "Path to clang-tidy executable"
+    )
+  if(NOT CLANG_TIDY_EXE)
+    message(FATAL_ERROR "clang-tidy not found.")
+  else()
+    message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
+    set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
+  endif()
+endif()
+
 ######################
 ## Build Standalone ##
 ######################
@@ -129,15 +149,13 @@ install(TARGETS
 ############
 if(BUILD_TESTING)
 
-  find_package(ament_lint_auto REQUIRED)
-  #ament_lint_auto_find_test_dependencies()
+  find_package(ament_cmake_clang_format REQUIRED)
+  find_package(ament_cmake_xmllint REQUIRED)
 
   find_package(ament_cmake_gtest REQUIRED)
   find_package(ament_cmake_ros REQUIRED)
   find_package(console_bridge REQUIRED)
   find_package(ros_testing REQUIRED)
-
-  #roslaunch_add_file_check(launch DEPENDENCIES ${PROJECT_NAME}_node)
 
   include_directories(
     include
@@ -145,6 +163,12 @@ if(BUILD_TESTING)
     standalone/test/include
     test/include
   )
+
+  ####################
+  ##  Linter-Tests  ##
+  ####################
+  ament_clang_format(CONFIG_FILE ".clang-format")
+  ament_xmllint()
 
   ##################
   ##  Unit-Tests  ##
