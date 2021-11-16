@@ -29,55 +29,56 @@ import pytest
 
 import rclpy
 
+
 @pytest.mark.launch_test
 def generate_test_description():
-	psen_scan_v2_launch_descr = XMLLaunchDescriptionSource(
-		PathJoinSubstitution([
-			get_package_share_directory('psen_scan_v2'),
-			'launch',
-			'psen_scan_v2.launch.xml'
-		])
-	)
+    psen_scan_v2_launch_descr = XMLLaunchDescriptionSource(
+        PathJoinSubstitution([
+            get_package_share_directory('psen_scan_v2'),
+            'launch',
+            'psen_scan_v2.launch.xml'
+        ])
+    )
 
-	psen_scan_v2_launch_args = {'sensor_ip': '127.0.0.1', 'rviz': 'false'}
+    psen_scan_v2_launch_args = {'sensor_ip': '127.0.0.1', 'rviz': 'false'}
 
-	return launch.LaunchDescription([
-		IncludeLaunchDescription(
-			psen_scan_v2_launch_descr,
-			launch_arguments=psen_scan_v2_launch_args.items()
-		),
-		launch_testing.util.KeepAliveProc(),
-		launch_testing.actions.ReadyToTest(),
-	])
+    return launch.LaunchDescription([
+        IncludeLaunchDescription(
+            psen_scan_v2_launch_descr,
+            launch_arguments=psen_scan_v2_launch_args.items()
+        ),
+        launch_testing.util.KeepAliveProc(),
+        launch_testing.actions.ReadyToTest(),
+    ])
 
 
 class TestNodeAvailable(unittest.TestCase):
 
-	def setUp(self):
-		rclpy.init()
-		self.node = rclpy.create_node('TestNodeAvailable')
+    def setUp(self):
+        rclpy.init()
+        self.node = rclpy.create_node('TestNodeAvailable')
 
-	def tearDown(self):
-		self.node.destroy_node()
-		rclpy.shutdown()
+    def tearDown(self):
+        self.node.destroy_node()
+        rclpy.shutdown()
 
-	def test_psen_scan_v2_node_available(self):
-		node_found = False
-		end_time = time.time() + 10
-		while time.time() < end_time:
-			if 'laser_1' in self.node.get_node_names():
-				node_found = True
-				break
-		self.assertTrue(node_found)
+    def test_psen_scan_v2_node_available(self):
+        node_found = False
+        end_time = time.time() + 10
+        while time.time() < end_time:
+            if 'laser_1' in self.node.get_node_names():
+                node_found = True
+                break
+        self.assertTrue(node_found)
 
-	def test_robot_state_publisher_node_available(self):
-		node_found = False
-		end_time = time.time() + 10
-		while time.time() < end_time:
-			if 'robot_state_publisher' in self.node.get_node_names():
-				node_found = True
-				break
-		self.assertTrue(node_found)
+    def test_robot_state_publisher_node_available(self):
+        node_found = False
+        end_time = time.time() + 10
+        while time.time() < end_time:
+            if 'robot_state_publisher' in self.node.get_node_names():
+                node_found = True
+                break
+        self.assertTrue(node_found)
 
 
 @launch_testing.post_shutdown_test()
