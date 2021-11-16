@@ -376,11 +376,6 @@ if(BUILD_TESTING)
   )
 
   add_ros_test(test/integration_tests/integrationtest_ros_scanner_launch.py)
-endif()
-
-ament_package()
-
-if(TODO______________)
 
   ######################
   ##  Hardware-Tests  ##
@@ -389,8 +384,13 @@ if(TODO______________)
   # See ./hwtest_readme.md for details on the hardware tests.
   if(ENABLE_HARDWARE_TESTING)
 
-    add_rostest(test/hw_tests/hwtest_publish.test)
+    add_ros_test(test/hw_tests/hwtest_publish.py)
 
+  endif()
+endif()
+
+if(__________________TODO_________________)
+  if(ENABLE_HARDWARE_TESTING)
     add_rostest(test/hw_tests/hwtest_scan_range.test
       ARGS config:=default.yaml)
     add_rostest(test/hw_tests/hwtest_scan_range.test
@@ -492,3 +492,5 @@ if(TODO______________)
     ${PROJECT_NAME}_standalone
   )
 endif()
+
+ament_package()
