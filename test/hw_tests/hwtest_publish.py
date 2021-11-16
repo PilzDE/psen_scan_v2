@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import asyncio
+import os
 import unittest
 
 import launch
@@ -33,6 +34,10 @@ from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
 
 
+def get_optional_env(name, default_value):
+    return os.environ[name] if name in os.environ else default_value
+
+
 @pytest.mark.launch_test
 def generate_test_description():
     bringup_launch_descr = XMLLaunchDescriptionSource(
@@ -43,8 +48,10 @@ def generate_test_description():
         ])
     )
 
+    sensor_ip = get_optional_env('SENSOR_IP', '192.168.0.10')
+    host_ip = get_optional_env('HOST_IP', 'auto')
     bringup_launch_args = {'angle_start': '-1.2', 'angle_end': '1.2',
-                           'sensor_ip': '192.168.0.10', 'host_ip': 'auto', 'host_udp_port_data': '55000'}
+                           'sensor_ip': sensor_ip, 'host_ip': host_ip, 'host_udp_port_data': '55000'}
 
     return launch.LaunchDescription([
         IncludeLaunchDescription(
