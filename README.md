@@ -44,26 +44,19 @@ If you are interested in using the PSENscan safety laser scanner without ROS, pl
 4. [Migration](#migration)
 
 ## Installation
-Needed Equipment:
-- PSENscan safety laser scanner
-- ROS Machine
-
-To use the package, you can install prebuilt packages with
-```
-sudo apt install ros-$ROS_DISTRO-psen-scan-v2
-```
+The ros2 branch is **experimental**. There are no ros2 releases, so you have to build this package from source.
 
 ## Usage
-To start reading data from the safety laser scanner and publishing scans execute `roslaunch psen_scan_v2 psen_scan_v2.launch` in a command line. This will launch the ROS Node with the default configuration.
+To start reading data from the safety laser scanner and publishing scans execute `ros2 launch psen_scan_v2 psen_scan_v2.launch.xml` in a command line. This will launch the ROS Node with the default configuration.
 
 If you wish to set parameters from the command line, add them to the end of the command as `parameter:=value`, separated by spaces.
 
 ```bash
-roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10
+ros2 launch psen_scan_v2 psen_scan_v2.launch.xml sensor_ip:=192.168.0.10
 ```
 This example configures the safety laser scanner at 192.168.0.10 to send it´s frames to the ROS node at localhost.
 
-In order to create an application with your own launch file, you can include the `bringup.launch`, where you can easily adjust the configuration parameters. A more detailed explanation can be found in the [tutorials](http://wiki.ros.org/psen_scan_v2/Tutorials/).
+In order to create an application with your own launch file, you can include the `bringup.launch.xml`, where you can easily adjust the configuration parameters. A more detailed explanation can be found in the [tutorials](http://wiki.ros.org/psen_scan_v2/Tutorials/).
 
 ### Parameters
 
