@@ -42,7 +42,7 @@ find_package(rcutils REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(Boost 1.69)
 if(NOT Boost_FOUND)
-  find_package(Boost REQUIRED COMPONENTS system)
+  find_package(Boost REQUIRED COMPONENTS system filesystem)
 endif()
 find_package(fmt REQUIRED)
 
@@ -386,19 +386,15 @@ if(BUILD_TESTING)
 
     add_ros_test(test/hw_tests/hwtest_publish.py)
 
-  endif()
-endif()
-
-if(__________________TODO_________________)
-  if(ENABLE_HARDWARE_TESTING)
-    add_rostest(test/hw_tests/hwtest_scan_range.test
-      ARGS config:=default.yaml)
-    add_rostest(test/hw_tests/hwtest_scan_range.test
-      ARGS config:=subrange.yaml)
-    add_rostest(test/hw_tests/hwtest_scan_range.test
-      ARGS config:=with_intensities.yaml)
-    add_rostest(test/hw_tests/hwtest_scan_range.test
-      ARGS config:=big_resolution.yaml)
+    # TODO
+    # add_rostest(test/hw_tests/hwtest_scan_range.test
+    #   ARGS config:=default.yaml)
+    # add_rostest(test/hw_tests/hwtest_scan_range.test
+    #   ARGS config:=subrange.yaml)
+    # add_rostest(test/hw_tests/hwtest_scan_range.test
+    #   ARGS config:=with_intensities.yaml)
+    # add_rostest(test/hw_tests/hwtest_scan_range.test
+    #   ARGS config:=big_resolution.yaml)
   endif()
 
   #########################################
@@ -411,31 +407,36 @@ if(__________________TODO_________________)
 
   # This test is intended to be run on in a dedicated environment with a prerecorded reference scan
   # and thus needs to be enabled seperately.
-  find_package(rosbag REQUIRED)
+  find_package(rosbag2_cpp REQUIRED)
   if(ENABLE_HARDWARE_TESTING_WITH_REFERENCE_SCAN)
 
-    catkin_add_gtest(hwtest_scan_compare_standalone
+    ament_add_gtest(hwtest_scan_compare_standalone
       test/hw_tests/hwtest_scan_compare_standalone.cpp
       standalone/src/laserscan.cpp
     )
-
   else()
-    # always at least build the test to avoid build breaking changes
-    catkin_add_executable_with_gtest(hwtest_scan_compare_standalone
-                                            test/hw_tests/hwtest_scan_compare_standalone.cpp
-                                            standalone/src/laserscan.cpp
-                                            EXCLUDE_FROM_ALL)
-    add_dependencies(tests hwtest_scan_compare_standalone)
 
+    # always at least build the test to avoid build breaking changes
+    ament_add_gtest(hwtest_scan_compare_standalone
+      test/hw_tests/hwtest_scan_compare_standalone.cpp
+      standalone/src/laserscan.cpp
+      SKIP_TEST
+    )
   endif()
 
   target_link_libraries(hwtest_scan_compare_standalone
-    ${catkin_LIBRARIES}
     ${PROJECT_NAME}_standalone
-    ${rosbag_LIBRARIES}
+    ${console_bridge_LIBRARIES}
     fmt::fmt
   )
+  ament_target_dependencies(hwtest_scan_compare_standalone
+    rosbag2_cpp
+    rclcpp
+    sensor_msgs
+  )
 
+endif()
+if(__________________TODO_________________)
 
   #----------------------
   ### hwtest_scan_compare

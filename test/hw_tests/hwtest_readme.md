@@ -56,26 +56,26 @@ APT_PROXY=http://172.20.20.104:3142
 The `hwtest_scan_compare` compares scanner data to a set of prerecorded data in order to detect unwanted changes in the data itself (shifts, flips, ...).
 
 ### Build the test
-Same as above however **additionally** `-DENABLE_HARDWARE_TESTING_WITH_REFERENCE_SCAN=ON` needs to be defined at compile time. At runtime the reference file needs to be set within the environment variable `HW_TEST_SCAN_COMPARE_TESTFILE`, for details see the instructions below.
+Same as above however **additionally** `-DENABLE_HARDWARE_TESTING_WITH_REFERENCE_SCAN=ON` needs to be defined at compile time. At runtime the reference scan needs to be set within the environment variable `HW_TEST_SCAN_COMPARE_TESTDIR`, for details see the instructions below.
 ### Setup the reference scan
 This step is only needed if the setup of the scanner or something within its environment changed.
 
 First startup the scanner
 ```
-roslaunch psen_scan_v2 psen_scan_v2.launch angle_start:=-1.2 angle_end:=1.2
+ros2 launch psen_scan_v2 psen_scan_v2.launch.xml angle_start:=-1.2 angle_end:=1.2
 ```
 
-After this record the bag file
+After this record the bag file (at least 10 seconds)
 
 ```
-export HW_TEST_SCAN_COMPARE_TESTFILE=<your/desired/path/file.bag>
-rosbag record -a -O $HW_TEST_SCAN_COMPARE_TESTFILE --duration 10
+export HW_TEST_SCAN_COMPARE_TESTDIR=<your/desired/path>
+ros2 bag record -a -o $HW_TEST_SCAN_COMPARE_TESTDIR
 ```
 
 ### Run standalone test
 Execute
 ```
-export HW_TEST_SCAN_COMPARE_TESTFILE=<path/to/reference/file.bag>
+export HW_TEST_SCAN_COMPARE_TESTDIR=<path/to/reference/scan>
 ./devel/lib/psen_scan_v2/hwtest_scan_compare_standalone
 ```
 
