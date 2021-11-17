@@ -462,33 +462,29 @@ if(BUILD_TESTING)
   endif()
 
 
-endif()
-if(__________________TODO_________________)
-
-
   #------------------------------
   ### hwtest_timestamp_standalone
   #------------------------------
 
   # This test is intended to be run with a parallel wireshark process and thus needs to be enabled separately.
   if(ENABLE_HARDWARE_TESTING_WITH_WIRESHARK)
-    catkin_add_gtest(hwtest_timestamp_standalone
+    ament_add_gtest(hwtest_timestamp_standalone
       test/hw_tests/hwtest_timestamp_standalone.cpp
       test/src/test_data.cpp
     )
   else()
     # always at least build the test to avoid build breaking changes
-    catkin_add_executable_with_gtest(hwtest_timestamp_standalone
+    ament_add_gtest(hwtest_timestamp_standalone
       test/hw_tests/hwtest_timestamp_standalone.cpp
       test/src/test_data.cpp
-      EXCLUDE_FROM_ALL
+      SKIP_TEST
     )
-    add_dependencies(tests hwtest_timestamp_standalone)
   endif()
 
   target_link_libraries(hwtest_timestamp_standalone
-    ${catkin_LIBRARIES}
     ${PROJECT_NAME}_standalone
+    ${console_bridge_LIBRARIES}
+    fmt::fmt
   )
 endif()
 

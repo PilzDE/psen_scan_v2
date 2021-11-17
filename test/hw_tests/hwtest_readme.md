@@ -74,21 +74,21 @@ ros2 bag record -a -o $HW_TEST_SCAN_COMPARE_TESTDIR
 ### Run standalone test
 Execute
 ```
-export HW_TEST_SCAN_COMPARE_TESTDIR=<path/to/reference/scan/dir>
+export HW_TEST_SCAN_COMPARE_TESTDIR=<path/to/reference/scan/bag_dir>
 ./build/psen_scan_v2/hwtest_scan_compare_standalone
 ```
 
-### Run `rostest`
+### Run ROS 2 test
 Execute
 ```
-export HW_TEST_SCAN_COMPARE_TESTDIR=<path/to/reference/scan/dir>
+export HW_TEST_SCAN_COMPARE_TESTDIR=<path/to/reference/scan/bag_dir>
 colcon test --ctest-args -R ".*hwtest_scan_compare.py"
 ```
 
 ### Build and run using `industrial_ci`
 In addition to the arguments displayed above, you need to make the reference scan available to the docker container. Firstly, create a folder containing the bag-file with the reference scan. Then add the following to the `DOCKER_RUN_OPTS`:
 ```
--v <path/to/reference/scan/dir>:/testfiles --env HW_TEST_SCAN_COMPARE_TESTDIR=/testfiles
+-v <path/to/parent/folder>:/testfiles --env HW_TEST_SCAN_COMPARE_TESTDIR=/testfiles/bag_dir
 ```
 and the following to the `CMAKE_ARGS` option:
 ```
@@ -112,13 +112,13 @@ Firstly start recording udp packets in parallel to the tests execution:
 Then execute
 ```
 export UDP_DATA_FILENAME=<path/to/udp/data/file.txt>
-./devel/lib/psen_scan_v2/hwtest_timestamp_standalone
+./build/psen_scan_v2/hwtest_timestamp_standalone
 ```
 
 ### Build and run using `industrial_ci`
 In addition to the arguments displayed above, you need to make the udp data file available to the docker container. Firstly, create a folder to contain the udp data file. Remember to start recording the udp packets before running `industrial_ci`. Then add the following to the `DOCKER_RUN_OPTS`:
 ```
--v <your/desired/path/to/folder>:/testfiles --env UDP_DATA_FILENAME=/testfiles/<file.txt>
+-v <path/to/parent/folder>:/testfiles --env UDP_DATA_FILENAME=/testfiles/<file.txt>
 ```
 and the following to the `CMAKE_ARGS` option:
 ```
