@@ -48,5 +48,5 @@ jobs:
       - name: Launch test
         run: |
           source /opt/ros/foxy/setup.bash
-          ros2 test test/integration_tests/integrationtest_ros_scanner_launch.py
+          ros2 test test/integration_tests/integrationtest_ros_scanner_launch.launch.py
         shell: bash

@@ -375,7 +375,7 @@ if(BUILD_TESTING)
     rclcpp
   )
 
-  add_ros_test(test/integration_tests/integrationtest_ros_scanner_launch.py)
+  add_ros_test(test/integration_tests/integrationtest_ros_scanner_launch.launch.py)
 
   ######################
   ##  Hardware-Tests  ##
@@ -384,7 +384,7 @@ if(BUILD_TESTING)
   # See ./hwtest_readme.md for details on the hardware tests.
   if(ENABLE_HARDWARE_TESTING)
 
-    add_ros_test(test/hw_tests/hwtest_publish.py)
+    add_ros_test(test/hw_tests/hwtest_publish.launch.py)
 
     # TODO
     # add_rostest(test/hw_tests/hwtest_scan_range.test
@@ -456,7 +456,7 @@ if(BUILD_TESTING)
 
   if(ENABLE_HARDWARE_TESTING_WITH_REFERENCE_SCAN)
 
-    add_ros_test(test/hw_tests/hwtest_scan_compare.py
+    add_ros_test(test/hw_tests/hwtest_scan_compare.launch.py
       ARGS "test_binary_dir:=${CMAKE_CURRENT_BINARY_DIR}" "test_duration:=10"
     )
   endif()
