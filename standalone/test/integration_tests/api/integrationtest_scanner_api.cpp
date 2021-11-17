@@ -175,6 +175,18 @@ class ScannerAPITestsFragmented : public ScannerAPITests
   }
 };
 
+class ScannerAPITestsUnfragmented : public ScannerAPITests
+{
+  void SetUp() override
+  {
+    port_holder_.printPorts();
+    setLogLevel(CONSOLE_BRIDGE_LOG_DEBUG);
+    setUpScannerConfig(HOST_IP_ADDRESS, UNFRAGMENTED_SCAN);
+    setUpScannerV2Driver();
+    setUpScannerHwMock();
+  }
+};
+
 TEST_F(ScannerAPITestsFragmented, shouldSendStartRequestAndReturnValidFutureWhenLaunchingWithValidConfig)
 {
   util::Barrier start_req_received_barrier;
@@ -404,11 +416,9 @@ TEST_F(ScannerAPITestsFragmented, shouldShowInfoWithNewActiveZonesetOnlyWhenItCh
   REMOVE_LOG_MOCK
 }
 
-TEST_F(ScannerAPITests, shouldCallLaserScanCallbackOnlyOneTimeWithAllInformationWhenUnfragmentedScanIsEnabled)
+TEST_F(ScannerAPITestsUnfragmented,
+       shouldCallLaserScanCallbackOnlyOneTimeWithAllInformationWhenUnfragmentedScanIsEnabled)
 {
-  setUpScannerConfig(HOST_IP_ADDRESS, UNFRAGMENTED_SCAN);
-  setUpScannerV2Driver();
-  setUpScannerHwMock();
   EXPECT_SCANNER_TO_START_SUCCESSFULLY(hw_mock_, driver_, config_);
 
   const auto msgs{ createMonitoringFrameMsgsForScanRound(2, 6) };
@@ -422,13 +432,10 @@ TEST_F(ScannerAPITests, shouldCallLaserScanCallbackOnlyOneTimeWithAllInformation
   EXPECT_SCANNER_TO_STOP_SUCCESSFULLY(hw_mock_, driver_);
 }
 
-TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
+TEST_F(ScannerAPITestsUnfragmented, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
 {
   INJECT_LOG_MOCK
   EXPECT_ANY_LOG().Times(AnyNumber());
-  setUpScannerConfig(HOST_IP_ADDRESS, UNFRAGMENTED_SCAN);
-  setUpScannerV2Driver();
-  setUpScannerHwMock();
   EXPECT_SCANNER_TO_START_SUCCESSFULLY(hw_mock_, driver_, config_);
 
   std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> ignored_short_first_round =
@@ -460,13 +467,10 @@ TEST_F(ScannerAPITests, shouldShowOneUserMsgIfFirstTwoScanRoundsStartEarly)
   REMOVE_LOG_MOCK
 }
 
-TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
+TEST_F(ScannerAPITestsUnfragmented, shouldIgnoreMonitoringFrameOfFormerScanRound)
 {
   INJECT_LOG_MOCK
   EXPECT_ANY_LOG().Times(AnyNumber());
-  setUpScannerConfig(HOST_IP_ADDRESS, UNFRAGMENTED_SCAN);
-  setUpScannerV2Driver();
-  setUpScannerHwMock();
   EXPECT_SCANNER_TO_START_SUCCESSFULLY(hw_mock_, driver_, config_);
 
   auto msg_round2 = createValidMonitoringFrameMsg(2);
