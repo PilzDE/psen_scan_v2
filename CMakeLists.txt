@@ -435,37 +435,35 @@ if(BUILD_TESTING)
     sensor_msgs
   )
 
-endif()
-if(__________________TODO_________________)
-
   #----------------------
   ### hwtest_scan_compare
   #----------------------
 
-  if(ENABLE_HARDWARE_TESTING_WITH_REFERENCE_SCAN)
-
-    add_rostest_gtest(hwtest_scan_compare
-      test/hw_tests/hwtest_scan_compare.test
-      test/hw_tests/hwtest_scan_compare.cpp
-      standalone/src/laserscan.cpp
-    )
-
-  else()
-    # always at least build the test to avoid build breaking changes
-    catkin_add_executable_with_gtest(hwtest_scan_compare
+  ament_add_gtest_executable(hwtest_scan_compare
     test/hw_tests/hwtest_scan_compare.cpp
     standalone/src/laserscan.cpp
-    EXCLUDE_FROM_ALL
+  )
+  target_link_libraries(hwtest_scan_compare
+    ${PROJECT_NAME}_standalone
+    ${console_bridge_LIBRARIES}
+    fmt::fmt
+  )
+  ament_target_dependencies(hwtest_scan_compare
+    rosbag2_cpp
+    rclcpp
+    sensor_msgs
+  )
+
+  if(ENABLE_HARDWARE_TESTING_WITH_REFERENCE_SCAN)
+
+    add_ros_test(test/hw_tests/hwtest_scan_compare.py
+      ARGS "test_binary_dir:=${CMAKE_CURRENT_BINARY_DIR}" "test_duration:=10"
     )
-    add_dependencies(tests hwtest_scan_compare)
   endif()
 
 
-  target_link_libraries(hwtest_scan_compare
-    ${catkin_LIBRARIES}
-    ${rosbag_LIBRARIES}
-    fmt::fmt
-  )
+endif()
+if(__________________TODO_________________)
 
 
   #------------------------------

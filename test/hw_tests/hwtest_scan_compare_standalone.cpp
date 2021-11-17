@@ -16,6 +16,7 @@
 #include <map>
 #include <memory>
 #include <sstream>
+#include <stdexcept>
 #include <stdlib.h>
 #include <string>
 

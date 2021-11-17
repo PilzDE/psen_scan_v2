@@ -62,7 +62,7 @@ class ScanSubscriberMock : public rclcpp::Node
 {
 public:
   ScanSubscriberMock();
-  MOCK_CONST_METHOD1(callback, void(const sensor_msgs::msg::LaserScan::SharedPtr msg));
+  MOCK_CONST_METHOD1(callback, void(sensor_msgs::msg::LaserScan::ConstSharedPtr msg));
 
 private:
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr subscription_;

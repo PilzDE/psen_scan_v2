@@ -17,24 +17,23 @@ limitations under the License.
 
 # Hardware Tests with psen_scan_v2
 
-## Build and run using `catkin_make`
+## Build and run using `colcon`
 To build the hardware tests execute
 ```
-catkin_make
-catkin_make tests -DENABLE_HARDWARE_TESTING=ON
+colcon build --cmake-args '-DENABLE_HARDWARE_TESTING=ON'
 ```
 in your catkin workspace.
 
-## Build and run using `catkin`
-To build and run the hardware tests using `catkin` run something like
+## Run using `colcon`
+To run the hardware tests using `colcon` run something like
 ```
-SENSOR_IP=192.168.0.100 catkin run_tests --cmake-args -DENABLE_HARDWARE_TESTING=ON && catkin_test_results
+SENSOR_IP=192.168.0.100 colcon test
 ```
 ## Build and run using `industrial_ci`
 Setup `industrial_ci` to run locally using [this instructions](https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#simplest-way-to-run-locally).
 Then run
 ```
-rosrun industrial_ci run_ci ROS_DISTRO=noetic ROS_REPO=main \
+rosrun industrial_ci run_ci ROS_DISTRO=foxy ROS_REPO=main \
 CMAKE_ARGS="-DENABLE_HARDWARE_TESTING=ON" DOCKER_RUN_OPTS="--env \
 HOST_IP=192.168.0.122 --env SENSOR_IP=192.168.0.100 -p 55000-55020:55000-55020/udp"
 ```
@@ -44,7 +43,7 @@ in order to receive the data inside the docker container used by industrial_ci.
 ### With a custom ROOT_CA and apt proxy
 If you need to use a custom ROOT_CA and have a apt-proxy the command for running `industrial_ci` locally extends to
 ```
-rosrun industrial_ci run_ci ROS_DISTRO=noetic ROS_REPO=main \
+rosrun industrial_ci run_ci ROS_DISTRO=foxy ROS_REPO=main \
 CMAKE_ARGS="-DENABLE_HARDWARE_TESTING=ON" \
 DOCKER_RUN_OPTS="--env HOST_IP=192.168.0.122 --env SENSOR_IP=192.168.0.100 \
 -p 55000-55020:55000-55020/udp \
@@ -75,21 +74,21 @@ ros2 bag record -a -o $HW_TEST_SCAN_COMPARE_TESTDIR
 ### Run standalone test
 Execute
 ```
-export HW_TEST_SCAN_COMPARE_TESTDIR=<path/to/reference/scan>
-./devel/lib/psen_scan_v2/hwtest_scan_compare_standalone
+export HW_TEST_SCAN_COMPARE_TESTDIR=<path/to/reference/scan/dir>
+./build/psen_scan_v2/hwtest_scan_compare_standalone
 ```
 
 ### Run `rostest`
 Execute
 ```
-export HW_TEST_SCAN_COMPARE_TESTFILE=<path/to/reference/file.bag>
-rostest psen_scan_v2 hwtest_scan_compare.test
+export HW_TEST_SCAN_COMPARE_TESTDIR=<path/to/reference/scan/dir>
+colcon test --ctest-args -R ".*hwtest_scan_compare.py"
 ```
 
 ### Build and run using `industrial_ci`
 In addition to the arguments displayed above, you need to make the reference scan available to the docker container. Firstly, create a folder containing the bag-file with the reference scan. Then add the following to the `DOCKER_RUN_OPTS`:
 ```
--v <your/desired/path/to/folder>:/testfiles --env HW_TEST_SCAN_COMPARE_TESTFILE=/testfiles/<file.bag>
+-v <path/to/reference/scan/dir>:/testfiles --env HW_TEST_SCAN_COMPARE_TESTDIR=/testfiles
 ```
 and the following to the `CMAKE_ARGS` option:
 ```

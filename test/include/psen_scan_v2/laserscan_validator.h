@@ -141,7 +141,7 @@ public:
 
   typedef std::shared_ptr<ScanType const> ScanConstPtr;
 
-  void scanCb(const ScanConstPtr scan, size_t n_msgs, const int16_t angle_offset = 0)
+  void scanCb(ScanConstPtr scan, size_t n_msgs, const int16_t angle_offset = 0)
   {
     PSENSCAN_INFO_THROTTLE(5, "LaserScanValidator", "Checking messages for validity. So far looking good.");
 
