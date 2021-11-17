@@ -498,14 +498,13 @@ TEST_F(ScannerAPITests, shouldIgnoreMonitoringFrameOfFormerScanRound)
 
 TEST_F(ScannerAPITestsFragmented, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFrame)
 {
-  INJECT_NICE_LOG_MOCK;
+  INJECT_LOG_MOCK;
+  EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_SCANNER_TO_START_SUCCESSFULLY(hw_mock_, driver_, config_);
 
   EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times(0);
 
   util::Barrier empty_msg_received;
-  // Needed to allow all other log messages which might be received
-  EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(WARN,
                    "StateMachine: No transition in state \"WaitForMonitoringFrame\" for event "
                    "\"MonitoringFrameReceivedError\".")
@@ -520,14 +519,13 @@ TEST_F(ScannerAPITestsFragmented, shouldNotCallLaserscanCallbackInCaseOfEmptyMon
 
 TEST_F(ScannerAPITestsFragmented, shouldNotCallLaserscanCallbackInCaseOfMissingMeassurements)
 {
-  INJECT_NICE_LOG_MOCK;
+  INJECT_LOG_MOCK;
+  EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_SCANNER_TO_START_SUCCESSFULLY(hw_mock_, driver_, config_);
 
   EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).Times(0);
 
   util::Barrier log_msgs_barrier;
-  // Needed to allow all other log messages which might be received
-  EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_LOG_SHORT(DEBUG,
                    "StateMachine: No measurement data in current monitoring frame(s), skipping laser scan "
                    "callback.")
