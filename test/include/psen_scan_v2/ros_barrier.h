@@ -24,6 +24,33 @@
 
 namespace psen_scan_v2_test
 {
+/**
+ * @brief Extension of psen_scan_v2_standalone::util::Barrier for tests involving ROS 2 nodes.
+ *
+ * This class allows to block execution of a thread until a callback of a rclcpp::Node triggers a release. The following
+ * code example shows how to use this class for testing a method that should publish on a specific topic.
+ *
+ * \code
+ * ACTION_P(OpenBarrier, barrier)
+ * {
+ *   barrier->release();
+ * }
+ *
+ * TEST(MyNodeTests, methodUnderTestShouldPublishOnMyTopic)
+ * {
+ *   MyNode my_node;
+ *   MyTopicSubscriberMock my_topic_sub; // child class of rclcpp::Node
+ *
+ *   RosBarrier barrier;
+ *   EXPECT_CALL(my_topic_sub, callback()).WillOnce(OpenBarrier(&barrier));
+ *
+ *   my_node.methodUnderTest();
+ *
+ *   const std::chrono::seconds timeout{ 3 };
+ *   barrier.spinUntilRelease(my_topic_sub, timeout)) << "methodUnderTest did not publish on my topic.";
+ * }
+ * \code
+ */
 class RosBarrier : public psen_scan_v2_standalone::util::Barrier
 {
 public:

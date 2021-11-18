@@ -68,7 +68,8 @@ def generate_test_description():
 class TestScanCompareGTest(unittest.TestCase):
 
     def test_gtest_terminates(self, proc_info, scan_compare_gtest, test_args):
-        # Found no other way of passing test_duration, this only works if it has no default value
+        # Found no other way of passing test_duration,
+        # this only works if it is set explicitly via command-line/cmake
         test_duration = int(test_args['test_duration'])
         proc_info.assertWaitForShutdown(process=scan_compare_gtest, timeout=test_duration + 5)
 
