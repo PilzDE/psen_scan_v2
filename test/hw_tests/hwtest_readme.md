@@ -82,7 +82,7 @@ export HW_TEST_SCAN_COMPARE_TESTDIR=<path/to/reference/scan/bag_dir>
 Execute
 ```
 export HW_TEST_SCAN_COMPARE_TESTDIR=<path/to/reference/scan/bag_dir>
-colcon test --ctest-args -R ".*hwtest_scan_compare.py"
+colcon test --ctest-args -R ".*hwtest_scan_compare.launch.py"
 ```
 
 ### Build and run using `industrial_ci`

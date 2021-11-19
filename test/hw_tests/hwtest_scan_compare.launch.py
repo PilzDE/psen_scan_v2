@@ -14,6 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
+import pytest
 import unittest
 
 import launch
@@ -21,11 +22,9 @@ import launch_ros
 import launch_testing
 
 from ament_index_python.packages import get_package_share_directory
-from launch.actions import IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_xml.launch_description_sources import XMLLaunchDescriptionSource
-
-import pytest
 
 
 def get_optional_env(name, default_value):
@@ -44,17 +43,27 @@ def generate_test_description():
 
     sensor_ip = get_optional_env('SENSOR_IP', '192.168.0.10')
     host_ip = get_optional_env('HOST_IP', 'auto')
-    bringup_launch_args = {'angle_start': '-1.2', 'angle_end': '1.2',
-                           'sensor_ip': sensor_ip, 'host_ip': host_ip, 'host_udp_port_data': '55005'}
+    bringup_launch_args = {
+        'sensor_ip': sensor_ip,
+        'host_ip': host_ip,
+        'angle_start': '-1.2',
+        'angle_end': '1.2',
+        'host_udp_port_data': '55005'
+    }
 
-    test_node = launch_ros.actions.Node(executable=PathJoinSubstitution([LaunchConfiguration(
-        'test_binary_dir'), 'hwtest_scan_compare']), name='scan_compare_gtest', parameters=[{'test_duration': LaunchConfiguration('test_duration')}], output='screen')
+    test_node = launch_ros.actions.Node(
+        executable=PathJoinSubstitution(
+            [LaunchConfiguration('test_binary_dir'), 'hwtest_scan_compare']),
+        parameters=[{'test_duration': LaunchConfiguration('test_duration')}],
+        output='screen'
+    )
 
     return launch.LaunchDescription([
-        launch.actions.DeclareLaunchArgument(
-            name='test_binary_dir', description='Binary directory of package containing test executables'),
-        launch.actions.DeclareLaunchArgument(
-            name='test_duration', description='Duration of test'),
+        DeclareLaunchArgument(name='test_binary_dir',
+                              description='Binary directory of package containing test executables'),
+        DeclareLaunchArgument(name='test_duration',
+                              description='Duration of test',
+                              default_value='10'),
         IncludeLaunchDescription(
             bringup_launch_descr,
             launch_arguments=bringup_launch_args.items()
@@ -67,10 +76,12 @@ def generate_test_description():
 
 class TestScanCompareGTest(unittest.TestCase):
 
-    def test_gtest_terminates(self, proc_info, scan_compare_gtest, test_args):
-        # Found no other way of passing test_duration,
-        # this only works if it is set explicitly via command-line/cmake
-        test_duration = int(test_args['test_duration'])
+    # This prevents the launch-test to shutdown too early
+    def test_gtest_terminates(self, launch_service, proc_info, scan_compare_gtest):
+        try:
+            test_duration = int(launch_service.context.launch_configurations['test_duration'])
+        except KeyError:
+            self.fail("Failure reading parameters from launch context")
         proc_info.assertWaitForShutdown(process=scan_compare_gtest, timeout=test_duration + 5)
 
 

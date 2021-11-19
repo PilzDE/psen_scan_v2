@@ -15,6 +15,7 @@
 
 import asyncio
 import os
+import pytest
 import unittest
 
 import launch
@@ -26,10 +27,7 @@ from launch.actions import IncludeLaunchDescription
 from launch.substitutions import PathJoinSubstitution
 from launch_xml.launch_description_sources import XMLLaunchDescriptionSource
 
-import pytest
-
 import rclpy
-
 from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
 
@@ -50,10 +48,15 @@ def generate_test_description():
 
     sensor_ip = get_optional_env('SENSOR_IP', '192.168.0.10')
     host_ip = get_optional_env('HOST_IP', 'auto')
-    bringup_launch_args = {'angle_start': '-1.2', 'angle_end': '1.2',
-                           'sensor_ip': sensor_ip, 'host_ip': host_ip, 'host_udp_port_data': '55000'}
+    bringup_launch_args = {
+        'sensor_ip': sensor_ip,
+        'host_ip': host_ip,
+        'angle_start': '-1.2',
+        'angle_end': '1.2',
+        'host_udp_port_data': LaunchConfiguration('host_udp_port_data')}
 
     return launch.LaunchDescription([
+        DeclareLaunchArgument(name='host_udp_port_data'),
         IncludeLaunchDescription(
             bringup_launch_descr,
             launch_arguments=bringup_launch_args.items()

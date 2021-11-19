@@ -384,17 +384,26 @@ if(BUILD_TESTING)
   # See ./hwtest_readme.md for details on the hardware tests.
   if(ENABLE_HARDWARE_TESTING)
 
-    add_ros_test(test/hw_tests/hwtest_publish.launch.py)
+    add_ros_test(test/hw_tests/hwtest_publish.launch.py
+      ARGS host_udp_port_data:=55000
+    )
 
-    # TODO
-    # add_rostest(test/hw_tests/hwtest_scan_range.test
-    #   ARGS config:=default.yaml)
-    # add_rostest(test/hw_tests/hwtest_scan_range.test
-    #   ARGS config:=subrange.yaml)
-    # add_rostest(test/hw_tests/hwtest_scan_range.test
-    #   ARGS config:=with_intensities.yaml)
-    # add_rostest(test/hw_tests/hwtest_scan_range.test
-    #   ARGS config:=big_resolution.yaml)
+    add_ros_test(test/hw_tests/hwtest_scan_range.launch.py
+      ARGS host_udp_port_data:=55001
+      TARGET hwtest_scan_range
+    )
+    add_ros_test(test/hw_tests/hwtest_scan_range.launch.py
+      ARGS angle_start:=0.0 angle_end:=1.2 host_udp_port_data:=55002
+      TARGET hwtest_scan_range_subrange
+    )
+    add_ros_test(test/hw_tests/hwtest_scan_range.launch.py
+      ARGS intensities:=true resolution:=0.0035 host_udp_port_data:=55003
+      TARGET hwtest_scan_range_with_intensities
+    )
+    add_ros_test(test/hw_tests/hwtest_scan_range.launch.py
+      ARGS resolution:=0.17 host_udp_port_data:=55004
+      TARGET hwtest_scan_range_big_resolution
+    )
   endif()
 
   #########################################
@@ -457,7 +466,7 @@ if(BUILD_TESTING)
   if(ENABLE_HARDWARE_TESTING_WITH_REFERENCE_SCAN)
 
     add_ros_test(test/hw_tests/hwtest_scan_compare.launch.py
-      ARGS "test_binary_dir:=${CMAKE_CURRENT_BINARY_DIR}" "test_duration:=10"
+      ARGS test_binary_dir:=${CMAKE_CURRENT_BINARY_DIR}
     )
   endif()
 
