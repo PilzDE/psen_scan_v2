@@ -50,6 +50,8 @@ find_package(TinyXML2 REQUIRED)
 
 add_message_files(
   FILES
+  PinState.msg
+  IOState.msg
   ZoneSet.msg
   ZoneSetConfiguration.msg
 )
@@ -691,6 +693,8 @@ if(CATKIN_ENABLE_TESTING)
                           "*/${PROJECT_NAME}/src/psen_scan_driver.cpp"
                           "*/ZoneSet.h" # generated message
                           "*/ZoneSetConfiguration.h" # generated message
+                          "*/PinState.h" # generated message
+                          "*/IOState.h" # generated message
         )
     add_code_coverage(
       NAME ${PROJECT_NAME}_coverage
