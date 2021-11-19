@@ -495,6 +495,14 @@ if(BUILD_TESTING)
     ${console_bridge_LIBRARIES}
     fmt::fmt
   )
+
+  #################################
+  ##  Code Coverage Instructions ##
+  #################################
+
+  # Add the cmake args -DCMAKE_BUILD_TYPE=Debug and -DCMAKE_CXX_FLAGS="--coverage" to your colcon build command;
+  # the resulting coverage data can be captured by lcov,
+  # see e.g. https://github.com/PilzDE/industrial_ci_addons/blob/master/colcon.sh
 endif()
 
 ament_package()
