@@ -32,7 +32,6 @@
 
 using namespace psen_scan_v2;
 using namespace psen_scan_v2_standalone::configuration;
-using namespace std::chrono_literals;
 
 std::function<void()> NODE_TERMINATE_CALLBACK;
 
