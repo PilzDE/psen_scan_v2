@@ -166,8 +166,7 @@ class ScannerAPITestsFragmented : public ScannerAPITests
 {
   void SetUp() override
   {
-    port_holder_.printPorts();
-    setLogLevel(CONSOLE_BRIDGE_LOG_DEBUG);
+    ScannerAPITests::SetUp();
     setUpScannerConfig();
     setUpScannerV2Driver();
     setUpScannerHwMock();
@@ -178,8 +177,7 @@ class ScannerAPITestsUnfragmented : public ScannerAPITests
 {
   void SetUp() override
   {
-    port_holder_.printPorts();
-    setLogLevel(CONSOLE_BRIDGE_LOG_DEBUG);
+    ScannerAPITests::SetUp();
     setUpScannerConfig(HOST_IP_ADDRESS, UNFRAGMENTED_SCAN);
     setUpScannerV2Driver();
     setUpScannerHwMock();
