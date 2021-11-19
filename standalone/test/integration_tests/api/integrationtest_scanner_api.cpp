@@ -435,12 +435,9 @@ TEST_F(ScannerAPITestsUnfragmented, shouldShowOneUserMsgIfFirstTwoScanRoundsStar
   EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_SCANNER_TO_START_SUCCESSFULLY(hw_mock_, driver_, config_);
 
-  std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> ignored_short_first_round =
-      createMonitoringFrameMsgsForScanRound(2, 1);
-  std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> accounted_short_round =
-      createMonitoringFrameMsgsForScanRound(3, 5);
-  std::vector<psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message> valid_round =
-      createMonitoringFrameMsgsForScanRound(4, 6);
+  auto ignored_short_first_round = createMonitoringFrameMsgsForScanRound(2, 1);
+  auto accounted_short_round = createMonitoringFrameMsgsForScanRound(3, 5);
+  auto valid_round = createMonitoringFrameMsgsForScanRound(4, 6);
 
   util::Barrier monitoring_frame_barrier;
   EXPECT_CALLBACK_WILL_OPEN_BARRIER(user_callbacks_, valid_round, monitoring_frame_barrier);
