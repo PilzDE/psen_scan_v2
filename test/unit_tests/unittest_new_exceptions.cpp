@@ -20,10 +20,10 @@ using namespace psen_scan_v2;
 
 namespace psen_scan_v2_test
 {
-TEST(GetROSParameterExceptionTest, new_param_missing_on_server_exception)
+TEST(ParameterNotSetTests, whatShouldReturnExpectedString)
 {
   std::string except_str = "GetROSParameterException";
-  std::unique_ptr<ParamMissingOnServer> e(new ParamMissingOnServer(except_str));
+  std::unique_ptr<ParameterNotSet> e(new ParameterNotSet(except_str));  // keep new to increase function coverage
   EXPECT_EQ(except_str, e->what());
 }
 

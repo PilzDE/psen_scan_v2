@@ -41,7 +41,7 @@ T getOptionalParam(const rclcpp::Node& node, const std::string& key, const T& de
 }
 
 /**
- * @throws ParamMissingOnServer if the parameter was not set.
+ * @throws ParameterNotSet if the parameter was not set.
  * @throws rclcpp::exceptions::InvalidParameterTypeException if the requested type does not match the stored parameter.
  */
 template <class T>
@@ -50,7 +50,7 @@ T getRequiredParam(const rclcpp::Node& node, const std::string& key)
   T ret_val{};
   if (!node.get_parameter(key, ret_val))
   {
-    throw ParamMissingOnServer("Parameter " + key + " doesn't exist for node " + node.get_name() + ".");
+    throw ParameterNotSet("Parameter " + key + " doesn't exist for node " + node.get_name() + ".");
   }
   return ret_val;
 }

@@ -130,7 +130,7 @@ TYPED_TEST(ParamTestSuite, testParamNotOnServer)
   TypeParam test_item;
   rclcpp::Node::SharedPtr node = std::make_shared<rclcpp::Node>("testParamNotOnServer_node");
   const std::string param_name{ "MissingParam" };
-  ASSERT_THROW(test_item.callRequiredGetter(node, param_name), ParamMissingOnServer);
+  ASSERT_THROW(test_item.callRequiredGetter(node, param_name), ParameterNotSet);
   ASSERT_EQ(test_item.getDefaultValue(), test_item.callOptionalGetter(node, param_name)) << "Default value incorrect ";
 }
 
