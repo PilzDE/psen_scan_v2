@@ -393,7 +393,7 @@ if(BUILD_TESTING)
       TARGET hwtest_scan_range
     )
     add_ros_test(test/hw_tests/hwtest_scan_range.launch.py
-      ARGS angle_start:=0.0 angle_end:=1.2 host_udp_port_data:=55002
+      ARGS angle_start:=-1.2 angle_end:=1.2 host_udp_port_data:=55002
       TARGET hwtest_scan_range_subrange
     )
     add_ros_test(test/hw_tests/hwtest_scan_range.launch.py
@@ -401,7 +401,7 @@ if(BUILD_TESTING)
       TARGET hwtest_scan_range_with_intensities
     )
     add_ros_test(test/hw_tests/hwtest_scan_range.launch.py
-      ARGS resolution:=0.17 host_udp_port_data:=55004
+      ARGS resolution:=0.1 host_udp_port_data:=55004
       TARGET hwtest_scan_range_big_resolution
     )
   endif()

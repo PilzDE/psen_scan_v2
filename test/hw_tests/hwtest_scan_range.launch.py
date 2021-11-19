@@ -137,9 +137,9 @@ class HwtestScanRange(unittest.IsolatedAsyncioTestCase):
         expected_max_angle = angle_end_rounded - \
             ((angle_end_rounded - angle_start_rounded) % resolution_rounded)
 
-        self.assertAlmostEqual(self.angle_start, message.angle_min, DECIMAL_PLACE_ACCURACY,
+        self.assertAlmostEqual(angle_start_rounded, message.angle_min, DECIMAL_PLACE_ACCURACY,
                                "angle_min of the laserscan message is " + str(message.angle_min) +
-                               " but should be " + str(self.angle_start) + ".")
+                               " but should be " + str(angle_start_rounded) + ".")
         self.assertAlmostEqual(expected_max_angle, message.angle_max, DECIMAL_PLACE_ACCURACY,
                                "angle_max of the laserscan message is " + str(message.angle_max) +
                                " but should be " + str(expected_max_angle) + ".")
