@@ -111,7 +111,7 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
   , scanner_(scanner_config, std::bind(&ROSScannerNodeT<S>::laserScanCallback, this, std::placeholders::_1))
 {
   pub_scan_ = nh_.advertise<sensor_msgs::LaserScan>(topic, 1);
-  pub_zone_ = nh_.advertise<std_msgs::UInt8>("active_zoneset", 1, true);
+  pub_zone_ = nh_.advertise<std_msgs::UInt8>("active_zoneset", 1);
 }
 
 template <typename S>

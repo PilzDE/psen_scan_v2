@@ -283,7 +283,7 @@ TEST_F(RosScannerNodeTests, shouldReceiveLatchedActiveZonesetMsg)
 
   util::Barrier zoneset_topic_barrier;
   SubscriberMock subscriber(nh_priv_);
-  EXPECT_CALL(subscriber, zone_callback(AllOf(isLatched(), messageEQ(createActiveZonesetMsg(first_zone)))))
+  EXPECT_CALL(subscriber, zone_callback(messageEQ(createActiveZonesetMsg(first_zone))))
       .WillOnce(OpenBarrier(&zoneset_topic_barrier));
 
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
