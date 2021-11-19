@@ -62,23 +62,18 @@ class TestNodeAvailable(unittest.TestCase):
         self.node.destroy_node()
         rclpy.shutdown()
 
+    def isNodeAvailable(self, node_name: str, timeout: float) -> bool:
+        start_time = time.time()
+        while time.time() < (start_time + timeout):
+            if node_name in self.node.get_node_names():
+                return True
+        return False
+
     def test_psen_scan_v2_node_available(self):
-        node_found = False
-        end_time = time.time() + 10
-        while time.time() < end_time:
-            if 'laser_1' in self.node.get_node_names():
-                node_found = True
-                break
-        self.assertTrue(node_found)
+        self.assertTrue(self.isNodeAvailable('laser_1', 10.0))
 
     def test_robot_state_publisher_node_available(self):
-        node_found = False
-        end_time = time.time() + 10
-        while time.time() < end_time:
-            if 'robot_state_publisher' in self.node.get_node_names():
-                node_found = True
-                break
-        self.assertTrue(node_found)
+        self.assertTrue(self.isNodeAvailable('robot_state_publisher', 10.0))
 
 
 @launch_testing.post_shutdown_test()
