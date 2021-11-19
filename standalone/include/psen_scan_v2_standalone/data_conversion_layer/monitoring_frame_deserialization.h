@@ -128,6 +128,7 @@ private:
 
 enum class AdditionalFieldHeaderID : AdditionalFieldHeader::Id
 {
+  io_pins = 0x01,
   scan_counter = 0x02,
   zone_set = 0x03,
   diagnostics = 0x04,

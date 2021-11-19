@@ -124,6 +124,9 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
         msg.active_zoneset_ = zone_set_read_buffer;
         break;
 
+      case AdditionalFieldHeaderID::io_pins:
+        break;
+
       case AdditionalFieldHeaderID::diagnostics:
         msg.diagnostic_messages_ = diagnostic::deserializeMessages(ss);
         msg.diagnostic_data_enabled_ = true;

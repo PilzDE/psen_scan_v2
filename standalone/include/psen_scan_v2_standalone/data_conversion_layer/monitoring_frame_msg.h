@@ -29,6 +29,7 @@
 
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/io_status.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 
@@ -120,6 +121,7 @@ private:
   std::vector<double> intensities_;
   std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnostic_messages_;
   bool diagnostic_data_enabled_{ false };
+  psen_scan_v2_standalone::io::IOState io_state;
 
 public:
   friend data_conversion_layer::RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg);
