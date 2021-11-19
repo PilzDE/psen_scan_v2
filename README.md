@@ -147,14 +147,10 @@ The timestamps of the scan data published are computed to be close to reality an
 ![psen_scan_test_concept](doc/test_architecture.svg)
 
 ## Migration
-To update your ROS environment from the former `psen_scan` package (which supported firmware versions up to 3.0), please execute the following steps:
-1. Update scanner firmware using PSENscan Configurator (unless the device has firmware 3.1 already)
-2. Install the new ROS package ```sudo apt install ros-$ROS_DISTRO-psen-scan-v2```
-3. Replace the launch file arguments:
-   * `password` and `x_axis_rotation` are obsolete and should be dropped
-   * `angle_start` and `angle_end` are now in radians, in direction of the x axis of the scanner tf frame
-   * `prefix` is replaced by `tf_prefix`
-4. In your application launch file / roslaunch command: replace all occurrences of `psen_scan` with `psen_scan_v2`
+If you update your application from a ROS 1 distribution, there are very little changes with respect to `psen_scan_v2`.
+The given launch files were renamed from `bringup.launch` to `bringup.launch.xml` and `psen_scan_v2.launch` to `psen_scan_v2.launch.xml`. The invocation of our launch-files with the ROS 2 command-line interface is shown above.
+
+Other than that,  we refer to the general [tutorials](https://docs.ros.org/en/foxy/Tutorials.html) for more information about ROS 2. A detailed migration guide for developers can be found [here](https://docs.ros.org/en/foxy/Contributing/Migration-Guide.html).
 
 ## You need further information?
 Our international hotline staff will support you individually about our ROS packages at
