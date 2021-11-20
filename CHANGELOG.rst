@@ -4,6 +4,7 @@ Changelog for package psen_scan_v2
 
 Forthcoming
 -----------
+* Apply clang-tidy fixes to header-files. Fix #277
 * Remove latched flag from active zoneset topic
 * Remove unrelated parameter DEFAULT_X_AXIS_ROTATION from standalone
 * Contributors: Pilz GmbH and Co. KG

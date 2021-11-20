@@ -144,7 +144,7 @@ public:
 class ScannerProtocolDef : public msm::front::state_machine_def<ScannerProtocolDef>
 {
 public:
-  ScannerProtocolDef(const ScannerConfiguration config,
+  ScannerProtocolDef(const ScannerConfiguration& config,
                      const communication_layer::NewMessageCallback& control_msg_callback,
                      const communication_layer::ErrorCallback& control_error_callback,
                      const communication_layer::ErrorCallback& start_error_callback,
@@ -188,10 +188,10 @@ public:  // Replaces the default exception/no-transition responses
   void exception_caught(Event const& event, FSM& fsm, std::exception& exception);
 
   template <class FSM, class Event>
-  void no_transition(Event const& event, FSM&, int state);
+  void no_transition(Event const& event, FSM& /*unused*/, int state);
 
   template <class FSM>
-  void no_transition(const scanner_events::RawMonitoringFrameReceived&, FSM&, int state);
+  void no_transition(const scanner_events::RawMonitoringFrameReceived& /*unused*/, FSM& /*unused*/, int state);
 
 public:  // Definition of state machine via table
   typedef Idle initial_state;
@@ -201,7 +201,7 @@ public:  // Definition of state machine via table
   /**
    * @brief Table describing the state machine which is specified in the scanner protocol.
    */
-  struct transition_table : mpl::vector<
+  struct transition_table : mpl::vector<  // NOLINT
       //    Start                         Event                         Next                        Action                        Guard
       //  +------------------------------+----------------------------+---------------------------+--------------------------------------+-------------------------+
       a_row  < Idle,                      e::StartRequest,              WaitForStartReply,          &m::sendStartRequest                                           >,

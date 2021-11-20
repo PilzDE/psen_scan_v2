@@ -46,9 +46,8 @@ namespace psen_scan_v2_test
     ros::master::V_TopicInfo available_topics;
     ros::master::getTopics(available_topics);
 
-    for (ros::master::V_TopicInfo::iterator it = available_topics.begin(); it != available_topics.end(); it++)
+    for (const auto& info : available_topics)
     {
-      const ros::master::TopicInfo& info = *it;
       if (info.name == topic)
       {
         return ::testing::AssertionSuccess();

@@ -85,7 +85,7 @@ enum class ErrorType
 using Et = ErrorType;
 using ErrorMessage = std::string;
 
-static const std::map<ErrorType, ErrorMessage> error_code_to_string
+static const std::map<ErrorType, ErrorMessage> ERROR_CODE_TO_STRING
 {
   { Et::ossd1_oc, "OSSD1 Overcurrent / Short circuit." },
   { Et::ossd_shrt_c, "Short circuit between at least two OSSDs." },
@@ -120,7 +120,7 @@ static const std::map<ErrorType, ErrorMessage> error_code_to_string
 // clang-format off
   #define REV(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) arg8, arg7, arg6, arg5, arg4, arg3, arg2, arg1
 
-  static constexpr std::array<std::array<ErrorType, 8>, 9> error_bits{{
+  static constexpr std::array<std::array<ErrorType, 8>, 9> ERROR_BITS{{
   //Bit7                 Bit6              Bit5              Bit4              Bit3              Bit2                  Bit1                   Bit0
   { REV(Et::ossd1_oc,    Et::ossd_shrt_c,  Et::ossd_integr,  Et::intern,       Et::intern,       Et::intern,           Et::intern,              Et::intern) },
   { REV(Et::win_cln_al,  Et::power_supply, Et::netw_prb,     Et::dust_crc_fl,  Et::intern,       Et::intern,           Et::unused,              Et::ossd2_overcur) },
@@ -196,7 +196,7 @@ public:
 
   constexpr ErrorType getDiagnosticCode() const
   {
-    return error_bits.at(error_location_.getByte()).at(error_location_.getBit());
+    return ERROR_BITS.at(error_location_.getByte()).at(error_location_.getBit());
   }
 
 private:
@@ -216,11 +216,11 @@ constexpr inline bool Message::operator==(const Message& rhs) const
 }
 
 // Store ambiguous errors for additional output
-static const std::set<Et> ambiguous_diagnostic_codes = { Et::unused, Et::intern };
+static const std::set<Et> AMBIGUOUS_DIAGNOSTIC_CODES = { Et::unused, Et::intern };
 
 inline bool isAmbiguous(const ErrorType& code)
 {
-  return ambiguous_diagnostic_codes.find(code) != ambiguous_diagnostic_codes.end();
+  return AMBIGUOUS_DIAGNOSTIC_CODES.find(code) != AMBIGUOUS_DIAGNOSTIC_CODES.end();
 }
 
 std::ostream& operator<<(std::ostream& os, const diagnostic::Message& msg);

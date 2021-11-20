@@ -61,7 +61,7 @@ class ScannerV2 : public IScanner
 {
 public:
   ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback);
-  ~ScannerV2();
+  ~ScannerV2() override;
 
 public:
   //! @brief An exception is set in the returned future if the scanner start was not successful.

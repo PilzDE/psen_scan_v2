@@ -51,14 +51,14 @@ public:
     return stdev;
   }
 
-  size_t N() const
+  size_t n() const
   {
     return values_.size();
   }
 
-  std::string to_string()
+  std::string toString()
   {
-    return fmt::format("NormalDist(mean: {:+.3f}, stdev: {:+.3f} N: {})", mean(), stdev(), N());
+    return fmt::format("NormalDist(mean: {:+.3f}, stdev: {:+.3f} N: {})", mean(), stdev(), n());
   }
 
 private:

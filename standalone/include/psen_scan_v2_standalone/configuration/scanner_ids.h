@@ -37,7 +37,7 @@ static constexpr std::array<ScannerId, 4> VALID_SCANNER_IDS{ ScannerId::master,
                                                              ScannerId::slave1,
                                                              ScannerId::slave2 };
 
-static const std::map<ScannerId, std::string> scanner_id_to_string{ { ScannerId::master, "Master" },
+static const std::map<ScannerId, std::string> SCANNER_ID_TO_STRING{ { ScannerId::master, "Master" },
                                                                     { ScannerId::slave0, "Slave0" },
                                                                     { ScannerId::slave1, "Slave1" },
                                                                     { ScannerId::slave2, "Slave2" } };
