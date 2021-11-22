@@ -146,6 +146,11 @@ namespace diagnostic
 std::vector<diagnostic::Message> deserializeMessages(std::istream& is);
 }
 
+namespace io
+{
+IOState deserializePins(std::istream& is);
+}
+
 /**
  * @brief Exception thrown on problems during the extraction of the measurement data.
  */

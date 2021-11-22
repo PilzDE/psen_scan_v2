@@ -22,9 +22,6 @@
 
 namespace psen_scan_v2_standalone
 {
-/**
- * @brief Contains the data serialization and deserialization layer.
- */
 namespace data_conversion_layer
 {
 namespace monitoring_frame
@@ -225,90 +222,6 @@ static const std::map<Ot, IoName> output_bit_to_name
   { REV(Ot::warn2,        Ot::warn1,        Ot::ossd3_lock,   Ot::ossd3,        Ot::ossd2_lock,   Ot::ossd2,        Ot::ossd1_lock,   Ot::ossd1) },
   }};  // TODO: Verify byte order
 // clang-format on
-
-/**
- * @brief Defines a byte and bit position of a bit in the IO chunk.
- *
- * The IO chunk provided by the scanner is a set of bits stored in consecutive bytes.
- *
- * This class helps defining the positions of those bits and their functions.
- *
- * @see data_conversion_layer::monitoring_frame::io::physical_input_bits
- * @see data_conversion_layer::monitoring_frame::io::output_bits
- */
-class IoLocation
-{
-public:
-  using ByteLocation = size_t;
-  using BitLocation = size_t;
-  constexpr IoLocation(const ByteLocation& byte, const BitLocation& bit) : byte_(byte), bit_(bit){};
-  inline constexpr ByteLocation getByte() const
-  {
-    return byte_;
-  };
-  inline constexpr BitLocation getBit() const
-  {
-    return bit_;
-  };
-
-private:
-  ByteLocation byte_;
-  BitLocation bit_;
-};
-
-/**
- * Every single raw IOState is defined as a boolean value
- */
-using RawIoState = bool;
-
-/**
- * @brief Defines an IO message by defining the IoLocation
- *
- * With the provided information a message can be generated when this IO changes.
- * The SingleIoState object then can be used in an std::ostream to print the changed IO state with their
- * name defined in the `physical_input_bit_to_name` or `output_bit_to_name` array.
- *
- * @see data_conversion_layer::monitoring_frame::io::IoLocation
- * @see data_conversion_layer::monitoring_frame::io::physical_input_bit_to_name
- * @see data_conversion_layer::monitoring_frame::io::output_bit_to_name
- * @see data_conversion_layer::monitoring_frame::io::physical_input_bits
- * @see data_conversion_layer::monitoring_frame::io::output_bits
- */
-class SingleIoState
-{
-public:
-  constexpr SingleIoState(const io::IoLocation& location, const io::RawIoState& state);
-  constexpr bool operator==(const io::SingleIoState& rhs) const;
-
-  friend RawChunk serialize(const std::vector<io::SingleIoState>& SingleIoStates);
-
-  constexpr IoLocation getIoLocation() const
-  {
-    return error_location_;
-  }
-
-  constexpr RawIoState getRawIoState() const
-  {
-    return raw_io_state_;
-  }
-
-private:
-  IoLocation error_location_;
-  RawIoState raw_io_state_;
-};
-
-constexpr inline SingleIoState::SingleIoState(const io::IoLocation& location, const io::RawIoState& state)
-  : error_location_(location), raw_io_state_(state)
-{
-}
-
-constexpr inline bool SingleIoState::operator==(const SingleIoState& rhs) const
-{
-  return (error_location_.getBit() == rhs.error_location_.getBit() &&
-          error_location_.getByte() == rhs.error_location_.getByte() && raw_io_state_ == rhs.raw_io_state_);
-}
-
-std::ostream& operator<<(std::ostream& os, const io::SingleIoState& msg);
 
 }  // namespace io
 }  // namespace monitoring_frame

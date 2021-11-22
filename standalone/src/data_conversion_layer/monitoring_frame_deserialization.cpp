@@ -25,6 +25,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/io.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
+#include "psen_scan_v2_standalone/io_state.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -126,7 +127,7 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
         break;
 
       case AdditionalFieldHeaderID::io_pins:
-        msg.io_states_ = io::deserializeSingleIoStates(ss);
+        msg.io_state_ = io::deserializePins(ss);
         break;
 
       case AdditionalFieldHeaderID::diagnostics:
@@ -168,9 +169,11 @@ AdditionalFieldHeader readAdditionalField(std::istream& is, const std::size_t& m
 
 namespace io
 {
-std::vector<io::SingleIoState> deserializeSingleIoStates(std::istream& is)
+IOState deserializePins(std::istream& is)
 {
-  std::vector<io::SingleIoState> io_states;
+  std::vector<PinState> input;
+  std::vector<PinState> logical;
+  std::vector<PinState> output;
 
   // Read physical inputs
   raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
@@ -182,7 +185,9 @@ std::vector<io::SingleIoState> deserializeSingleIoStates(std::istream& is)
     {
       if (io::PhysicalInputType::unused != io::physical_input_bits[byte_n][bit_n])
       {
-        io_states.push_back(io::SingleIoState(io::IoLocation(byte_n, bit_n), raw_bits[bit_n]));
+        auto pin_id = byte_n * 8 + bit_n;
+        input.push_back(
+            PinState(pin_id, physical_input_bit_to_name.at(physical_input_bits.at(byte_n).at(bit_n)), raw_bits[bit_n]));
       }
     }
   }
@@ -195,7 +200,8 @@ std::vector<io::SingleIoState> deserializeSingleIoStates(std::istream& is)
     const std::bitset<8> raw_bits(raw_byte);
     for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
     {
-      io_states.push_back(io::SingleIoState(io::IoLocation(byte_n, bit_n), raw_bits[bit_n]));
+      auto pin_id = byte_n * 8 + bit_n;
+      logical.push_back(PinState(pin_id, "", raw_bits[bit_n]));
     }
   }
 
@@ -209,12 +215,13 @@ std::vector<io::SingleIoState> deserializeSingleIoStates(std::istream& is)
     {
       if (io::OutputType::unused != io::output_bits[byte_n][bit_n])
       {
-        io_states.push_back(io::SingleIoState(io::IoLocation(byte_n, bit_n), raw_bits[bit_n]));
+        auto pin_id = byte_n * 8 + bit_n;
+        output.push_back(PinState(pin_id, output_bit_to_name.at(output_bits.at(byte_n).at(bit_n)), raw_bits[bit_n]));
       }
     }
   }
 
-  return io_states;
+  return IOState(input, logical, output);
 }
 }  // namespace io
 

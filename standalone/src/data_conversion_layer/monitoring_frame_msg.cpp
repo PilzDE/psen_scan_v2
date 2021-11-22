@@ -79,10 +79,9 @@ data_conversion_layer::monitoring_frame::Message::diagnosticMessages() const
   return diagnostic_messages_;
 }
 
-std::vector<data_conversion_layer::monitoring_frame::io::SingleIoState>
-data_conversion_layer::monitoring_frame::Message::ioStates() const
+IOState data_conversion_layer::monitoring_frame::Message::ioState() const
 {
-  return io_states_;
+  return io_state_;
 }
 
 bool data_conversion_layer::monitoring_frame::Message::operator==(
