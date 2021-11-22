@@ -126,6 +126,7 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
         break;
 
       case AdditionalFieldHeaderID::io_pins:
+        msg.io_states_ = io::deserializeSingleIoStates(ss);
         break;
 
       case AdditionalFieldHeaderID::diagnostics:

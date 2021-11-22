@@ -79,6 +79,12 @@ data_conversion_layer::monitoring_frame::Message::diagnosticMessages() const
   return diagnostic_messages_;
 }
 
+std::vector<data_conversion_layer::monitoring_frame::io::SingleIoState>
+data_conversion_layer::monitoring_frame::Message::ioStates() const
+{
+  return io_states_;
+}
+
 bool data_conversion_layer::monitoring_frame::Message::operator==(
     const data_conversion_layer::monitoring_frame::Message& rhs) const
 {

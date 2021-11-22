@@ -29,6 +29,7 @@
 
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io.h"
 #include "psen_scan_v2_standalone/io_status.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
@@ -89,6 +90,7 @@ public:
           const uint8_t active_zoneset,
           const std::vector<double>& measurements,
           const std::vector<double>& intensities,
+          const std::vector<data_conversion_layer::monitoring_frame::io::SingleIoState>& io_states,
           const std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message>& diagnostic_messages)
     : from_theta_(from_theta)
     , resolution_(resolution)
@@ -96,6 +98,7 @@ public:
     , active_zoneset_(active_zoneset)
     , measurements_(measurements)
     , intensities_(intensities)
+    , io_states_(io_states)
     , diagnostic_messages_(diagnostic_messages)
     , diagnostic_data_enabled_(true){
 
@@ -109,6 +112,7 @@ public:
   const std::vector<double>& measurements() const;
   const std::vector<double>& intensities() const;
   std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnosticMessages() const;
+  std::vector<data_conversion_layer::monitoring_frame::io::SingleIoState> ioStates() const;
   bool operator==(const data_conversion_layer::monitoring_frame::Message& rhs) const;
 
 private:
@@ -119,6 +123,7 @@ private:
   uint8_t active_zoneset_{ 0 };
   std::vector<double> measurements_;
   std::vector<double> intensities_;
+  std::vector<data_conversion_layer::monitoring_frame::io::SingleIoState> io_states_;
   std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnostic_messages_;
   bool diagnostic_data_enabled_{ false };
   psen_scan_v2_standalone::io::IOState io_state;
