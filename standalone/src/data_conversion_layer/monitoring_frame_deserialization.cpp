@@ -169,6 +169,21 @@ AdditionalFieldHeader readAdditionalField(std::istream& is, const std::size_t& m
 
 namespace io
 {
+typedef std::function<void(size_t, size_t, bool)> AddPinStateFunction;
+
+void deserializePinField(std::istream& is, std::size_t length_in_bytes, const AddPinStateFunction& add_func)
+{
+  for (size_t byte_n = 0; byte_n < length_in_bytes; byte_n++)
+  {
+    const auto raw_byte = raw_processing::read<uint8_t>(is);
+    const std::bitset<8> raw_bits(raw_byte);
+    for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
+    {
+      add_func(byte_n, bit_n, raw_bits[bit_n]);
+    }
+  }
+}
+
 IOState deserializePins(std::istream& is)
 {
   std::vector<PinState> input;
@@ -177,50 +192,30 @@ IOState deserializePins(std::istream& is)
 
   // Read physical inputs
   raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  for (size_t byte_n = 0; byte_n < io::RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES; byte_n++)
-  {
-    const auto raw_byte = raw_processing::read<uint8_t>(is);
-    const std::bitset<8> raw_bits(raw_byte);
-    for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
+  deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, [&input](size_t byte_n, size_t bit_n, bool value) {
+    auto input_bit = physical_input_bits.at(byte_n).at(bit_n);
+    if (io::PhysicalInputType::unused != input_bit)
     {
-      auto input_bit = physical_input_bits.at(byte_n).at(bit_n);
-      if (io::PhysicalInputType::unused != input_bit)
-      {
-        auto pin_id = byte_n * 8 + bit_n;
-        input.push_back(PinState(pin_id, physical_input_bit_to_name.at(input_bit), raw_bits[bit_n]));
-      }
+      input.push_back(PinState(byte_n * 8 + bit_n, physical_input_bit_to_name.at(input_bit), value));
     }
-  }
+  });
 
   // Read logical inputs
   raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  for (size_t byte_n = 0; byte_n < io::RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES; byte_n++)
-  {
-    const auto raw_byte = raw_processing::read<uint8_t>(is);
-    const std::bitset<8> raw_bits(raw_byte);
-    for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
-    {
-      auto pin_id = byte_n * 8 + bit_n;
-      logical.push_back(PinState(pin_id, "", raw_bits[bit_n]));
-    }
-  }
+  deserializePinField(
+      is, RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES, [&logical](size_t byte_n, size_t bit_n, bool value) {
+        logical.push_back(PinState(byte_n * 8 + bit_n, "", value));
+      });
 
   // Read outputs
   raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  for (size_t byte_n = 0; byte_n < io::RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES; byte_n++)
-  {
-    const auto raw_byte = raw_processing::read<uint8_t>(is);
-    const std::bitset<8> raw_bits(raw_byte);
-    for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
+  deserializePinField(is, RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES, [&output](size_t byte_n, size_t bit_n, bool value) {
+    auto output_bit = output_bits.at(byte_n).at(bit_n);
+    if (io::OutputType::unused != output_bit)
     {
-      auto output_bit = output_bits.at(byte_n).at(bit_n);
-      if (io::OutputType::unused != output_bit)
-      {
-        auto pin_id = byte_n * 8 + bit_n;
-        output.push_back(PinState(pin_id, output_bit_to_name.at(output_bit), raw_bits[bit_n]));
-      }
+      output.push_back(PinState(byte_n * 8 + bit_n, output_bit_to_name.at(output_bit), value));
     }
-  }
+  });
 
   return IOState(input, logical, output);
 }
