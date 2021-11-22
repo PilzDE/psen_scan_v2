@@ -23,6 +23,7 @@
 #include <fmt/format.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
 
 namespace psen_scan_v2_standalone
@@ -163,6 +164,58 @@ AdditionalFieldHeader readAdditionalField(std::istream& is, const std::size_t& m
   }
   return AdditionalFieldHeader(id, length);
 }
+
+namespace io
+{
+std::vector<io::SingleIoState> deserializeSingleIoStates(std::istream& is)
+{
+  std::vector<io::SingleIoState> io_states;
+
+  // Read physical inputs
+  raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
+  for (size_t byte_n = 0; byte_n < io::RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES; byte_n++)
+  {
+    const auto raw_byte = raw_processing::read<uint8_t>(is);
+    const std::bitset<8> raw_bits(raw_byte);
+    for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
+    {
+      if (io::PhysicalInputType::unused != io::physical_input_bits[byte_n][bit_n])
+      {
+        io_states.push_back(io::SingleIoState(io::IoLocation(byte_n, bit_n), raw_bits[bit_n]));
+      }
+    }
+  }
+
+  // Read logical inputs
+  raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
+  for (size_t byte_n = 0; byte_n < io::RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES; byte_n++)
+  {
+    const auto raw_byte = raw_processing::read<uint8_t>(is);
+    const std::bitset<8> raw_bits(raw_byte);
+    for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
+    {
+      io_states.push_back(io::SingleIoState(io::IoLocation(byte_n, bit_n), raw_bits[bit_n]));
+    }
+  }
+
+  // Read outputs
+  raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
+  for (size_t byte_n = 0; byte_n < io::RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES; byte_n++)
+  {
+    const auto raw_byte = raw_processing::read<uint8_t>(is);
+    const std::bitset<8> raw_bits(raw_byte);
+    for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
+    {
+      if (io::OutputType::unused != io::output_bits[byte_n][bit_n])
+      {
+        io_states.push_back(io::SingleIoState(io::IoLocation(byte_n, bit_n), raw_bits[bit_n]));
+      }
+    }
+  }
+
+  return io_states;
+}
+}  // namespace io
 
 namespace diagnostic
 {
