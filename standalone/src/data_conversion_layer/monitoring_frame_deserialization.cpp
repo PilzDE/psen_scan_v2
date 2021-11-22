@@ -183,11 +183,11 @@ IOState deserializePins(std::istream& is)
     const std::bitset<8> raw_bits(raw_byte);
     for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
     {
-      if (io::PhysicalInputType::unused != io::physical_input_bits[byte_n][bit_n])
+      auto input_bit = physical_input_bits.at(byte_n).at(bit_n);
+      if (io::PhysicalInputType::unused != input_bit)
       {
         auto pin_id = byte_n * 8 + bit_n;
-        input.push_back(
-            PinState(pin_id, physical_input_bit_to_name.at(physical_input_bits.at(byte_n).at(bit_n)), raw_bits[bit_n]));
+        input.push_back(PinState(pin_id, physical_input_bit_to_name.at(input_bit), raw_bits[bit_n]));
       }
     }
   }
@@ -213,10 +213,11 @@ IOState deserializePins(std::istream& is)
     const std::bitset<8> raw_bits(raw_byte);
     for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
     {
-      if (io::OutputType::unused != io::output_bits[byte_n][bit_n])
+      auto output_bit = output_bits.at(byte_n).at(bit_n);
+      if (io::OutputType::unused != output_bit)
       {
         auto pin_id = byte_n * 8 + bit_n;
-        output.push_back(PinState(pin_id, output_bit_to_name.at(output_bits.at(byte_n).at(bit_n)), raw_bits[bit_n]));
+        output.push_back(PinState(pin_id, output_bit_to_name.at(output_bit), raw_bits[bit_n]));
       }
     }
   }
