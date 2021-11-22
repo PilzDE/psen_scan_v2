@@ -17,6 +17,8 @@
 #define PSEN_SCAN_V2_STANDALONE_IO_H
 
 #include <array>
+#include <map>
+#include <vector>
 
 namespace psen_scan_v2_standalone
 {
@@ -39,13 +41,15 @@ namespace io
 static constexpr uint32_t RAW_CHUNK_LENGTH_RESERVED_IN_BYTES{ 4 };
 static constexpr uint32_t RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES{ 10 };
 static constexpr uint32_t RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES{ 8 };
-static constexpr uint32_t RAW_CHUNK_LENGTH_IN_BYTES{ RAW_CHUNK_LENGTH_RESERVED_IN_BYTES +
-                                                     RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES +
-                                                     RAW_CHUNK_LENGTH_RESERVED_IN_BYTES +
-                                                     RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES };
+static constexpr uint32_t RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES{ 4 };
+static constexpr uint32_t RAW_CHUNK_LENGTH_IN_BYTES{
+  RAW_CHUNK_LENGTH_RESERVED_IN_BYTES + RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES + RAW_CHUNK_LENGTH_RESERVED_IN_BYTES +
+  RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES + RAW_CHUNK_LENGTH_RESERVED_IN_BYTES + RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES
+};
 
 using RawChunk = std::array<uint8_t, io::RAW_CHUNK_LENGTH_IN_BYTES>;
 
+// clang-format off
 enum class PhysicalInputType
 {
   zone_sw_8,
@@ -56,6 +60,7 @@ enum class PhysicalInputType
   zone_sw_3,
   zone_sw_2,
   zone_sw_1,
+
   override_12,
   override_11,
   muting_12,
@@ -63,6 +68,7 @@ enum class PhysicalInputType
   muting_en_1,
   restart_1,
   reset,
+
   edm_2,
   override_22,
   override_21,
@@ -71,6 +77,7 @@ enum class PhysicalInputType
   muting_en_2,
   restart_2,
   edm_1,
+
   edm_3,
   override_32,
   override_31,
@@ -82,20 +89,226 @@ enum class PhysicalInputType
 };
 
 using Pit = PhysicalInputType;
+using IoName = std::string;
 
-// clang-format off
+static const std::map<Pit, IoName> physical_input_bit_to_name
+{
+  { Pit::zone_sw_8, "Zone Set Switching Input 8" },
+  { Pit::zone_sw_7, "Zone Set Switching Input 7" },
+  { Pit::zone_sw_6, "Zone Set Switching Input 6" },
+  { Pit::zone_sw_5, "Zone Set Switching Input 5" },
+  { Pit::zone_sw_4, "Zone Set Switching Input 4" },
+  { Pit::zone_sw_3, "Zone Set Switching Input 3" },
+  { Pit::zone_sw_2, "Zone Set Switching Input 2" },
+  { Pit::zone_sw_1, "Zone Set Switching Input 1" },
+
+  { Pit::override_12, "Override 12" },
+  { Pit::override_11, "Override 11" },
+  { Pit::muting_12, "Muting 12" },
+  { Pit::muting_11, "Muting 11" },
+  { Pit::muting_en_1, "Muting Enable 1" },
+  { Pit::restart_1, "Restart 1" },
+  { Pit::unused, "unused" },
+  { Pit::reset, "Reset" },
+
+  { Pit::edm_2, "EDM 2" },
+  { Pit::override_22, "Override 22" },
+  { Pit::override_21, "Override 21" },
+  { Pit::muting_22, "Muting 22" },
+  { Pit::muting_21, "Muting 21" },
+  { Pit::muting_en_2, "Muting Enable 2" },
+  { Pit::restart_2, "Restart 2" },
+  { Pit::edm_1, "EDM 1" },
+
+  { Pit::edm_3, "EDM 3" },
+  { Pit::override_32, "Override 32" },
+  { Pit::override_31, "Override 31" },
+  { Pit::muting_32, "Muting 32" },
+  { Pit::muting_31, "Muting 31" },
+  { Pit::muting_en_3, "Muting Enable 3" },
+  { Pit::restart_3, "Restart 3" },
+};
+
   #define REV(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) arg8, arg7, arg6, arg5, arg4, arg3, arg2, arg1
 
-  static constexpr std::array<std::array<Pit, 8>, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES> error_bits{{
+  static constexpr std::array<std::array<Pit, 8>, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES> physical_input_bits{{
   //    Bit7              Bit6              Bit5              Bit4              Bit3              Bit2              Bit1              Bit0
   { REV(Pit::zone_sw_8,   Pit::zone_sw_7,   Pit::zone_sw_6,   Pit::zone_sw_5,   Pit::zone_sw_4,   Pit::zone_sw_3,   Pit::zone_sw_2,   Pit::zone_sw_1) },
   { REV(Pit::override_12, Pit::override_11, Pit::muting_12,   Pit::muting_11,   Pit::muting_en_1, Pit::restart_1,   Pit::unused,      Pit::reset) },
   { REV(Pit::edm_2,       Pit::override_22, Pit::override_21, Pit::muting_22,   Pit::muting_21,   Pit::muting_en_2, Pit::restart_2,   Pit::edm_1) },
   { REV(Pit::unused,      Pit::edm_3,       Pit::override_32, Pit::override_31, Pit::muting_32,   Pit::muting_31,   Pit::muting_en_3, Pit::restart_3) },
   }};
-// clang-format on
 
 // TODO: LogicalInputType ...
+
+enum class OutputType
+{
+  unused,
+  ossd1_refpts,
+  warn2_slv3,
+  warn1_slv3,
+  ossd3_slv3,
+  ossd2_slv3,
+
+  ossd1_slv3,
+  warn2_slv2,
+  warn1_slv2,
+  ossd3_slv2,
+  ossd2_slv2,
+  ossd1_slv2,
+  warn2_slv1,
+  warn1_slv1,
+
+  ossd3_slv1,
+  ossd2_slv1,
+  ossd1_slv1,
+  warn2_m,
+  warn1_m,
+  ossd3_m,
+  ossd2_m,
+  ossd1_m,
+
+  warn2,
+  warn1,
+  ossd3_lock,
+  ossd3,
+  ossd2_lock,
+  ossd2,
+  ossd1_lock,
+  ossd1
+};
+
+using Ot = OutputType;
+
+static const std::map<Ot, IoName> output_bit_to_name
+{
+  { Ot::unused, "unused" },
+  { Ot::ossd1_refpts, "OSSD1_REFPTS" },
+  { Ot::warn2_slv3, "WARN2_SLV3" },
+  { Ot::warn1_slv3, "WARN1_SLV3" },
+  { Ot::ossd3_slv3, "OSSD3_SLV3" },
+  { Ot::ossd2_slv3, "OSSD2_SLV3" },
+  
+  { Ot::ossd1_slv3, "OSSD1_SLV3" },
+  { Ot::warn2_slv2, "WARN2_SLV2" },
+  { Ot::warn1_slv2, "WARN1_SLV2" },
+  { Ot::ossd3_slv2, "OSSD3_SLV2" },
+  { Ot::ossd2_slv2, "OSSD2_SLV2" },
+  { Ot::ossd1_slv2, "OSSD1_SLV2" },
+  { Ot::warn2_slv1, "WARN2_SLV1" },
+  { Ot::warn1_slv1, "WARN1_SLV1" },
+  
+  { Ot::ossd3_slv1, "OSSD3_SLV1" },
+  { Ot::ossd2_slv1, "OSSD2_SLV1" },
+  { Ot::ossd1_slv1, "OSSD1_SLV1" },
+  { Ot::warn2_m, "WARN2_M" },
+  { Ot::warn1_m, "WARN1_M" },
+  { Ot::ossd3_m, "OSSD3_M" },
+  { Ot::ossd2_m, "OSSD2_M" },
+  { Ot::ossd1_m, "OSSD1_M" },
+  
+  { Ot::warn2, "WARN2" },
+  { Ot::warn1, "WARN1" },
+  { Ot::ossd3_lock, "OSSD3_LOCK" },
+  { Ot::ossd3, "OSSD3" },
+  { Ot::ossd2_lock, "OSSD2_LOCK" },
+  { Ot::ossd2, "OSSD2" },
+  { Ot::ossd1_lock, "OSSD1_LOCK" },
+  { Ot::ossd1, "OSSD1" } 
+};
+
+  static constexpr std::array<std::array<Ot, 8>, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES> output_bits{{
+  //    Bit7              Bit6              Bit5              Bit4              Bit3              Bit2              Bit1              Bit0
+  { REV(Ot::unused,       Ot::unused,       Ot::unused,       Ot::ossd1_refpts, Ot::warn2_slv3,   Ot::warn1_slv3,   Ot::ossd3_slv3,   Ot::ossd2_slv3) },
+  { REV(Ot::ossd1_slv3,   Ot::warn2_slv2,   Ot::warn1_slv2,   Ot::ossd3_slv2,   Ot::ossd2_slv2,   Ot::ossd1_slv2,   Ot::warn2_slv1,   Ot::warn1_slv1) },
+  { REV(Ot::ossd3_slv1,   Ot::ossd2_slv1,   Ot::ossd1_slv1,   Ot::warn2_m,      Ot::warn1_m,      Ot::ossd3_m,      Ot::ossd2_m,      Ot::ossd1_m) },
+  { REV(Ot::warn2,        Ot::warn1,        Ot::ossd3_lock,   Ot::ossd3,        Ot::ossd2_lock,   Ot::ossd2,        Ot::ossd1_lock,   Ot::ossd1) },
+  }};  // TODO: Verify byte order
+// clang-format on
+
+/**
+ * @brief Defines a byte and bit position of a bit in the IO chunk.
+ *
+ * The IO chunk provided by the scanner is a set of bits stored in consecutive bytes.
+ *
+ * This class helps defining the positions of those bits and their functions.
+ *
+ * @see data_conversion_layer::monitoring_frame::io::physical_input_bits
+ * @see data_conversion_layer::monitoring_frame::io::output_bits
+ */
+class IoLocation
+{
+public:
+  using ByteLocation = size_t;
+  using BitLocation = size_t;
+  constexpr IoLocation(const ByteLocation& byte, const BitLocation& bit) : byte_(byte), bit_(bit){};
+  inline constexpr ByteLocation getByte() const
+  {
+    return byte_;
+  };
+  inline constexpr BitLocation getBit() const
+  {
+    return bit_;
+  };
+
+private:
+  ByteLocation byte_;
+  BitLocation bit_;
+};
+
+/**
+ * Every single raw IOState is defined as a boolean value
+ */
+using RawIoState = bool;
+
+/**
+ * @brief Defines an IO message by defining the IoLocation
+ *
+ * With the provided information a message can be generated when this IO changes.
+ * The SingleIoState object then can be used in an std::ostream to print the changed IO state with their
+ * name defined in the `physical_input_bit_to_name` or `output_bit_to_name` array.
+ *
+ * @see data_conversion_layer::monitoring_frame::io::IoLocation
+ * @see data_conversion_layer::monitoring_frame::io::physical_input_bit_to_name
+ * @see data_conversion_layer::monitoring_frame::io::output_bit_to_name
+ * @see data_conversion_layer::monitoring_frame::io::physical_input_bits
+ * @see data_conversion_layer::monitoring_frame::io::output_bits
+ */
+class SingleIoState
+{
+public:
+  constexpr SingleIoState(const io::IoLocation& location, const io::RawIoState& state);
+  constexpr bool operator==(const io::SingleIoState& rhs) const;
+
+  friend RawChunk serialize(const std::vector<io::SingleIoState>& SingleIoStates);
+
+  constexpr IoLocation getIoLocation() const
+  {
+    return error_location_;
+  }
+
+  constexpr RawIoState getRawIoState() const
+  {
+    return raw_io_state_;
+  }
+
+private:
+  IoLocation error_location_;
+  RawIoState raw_io_state_;
+};
+
+constexpr inline SingleIoState::SingleIoState(const io::IoLocation& location, const io::RawIoState& state)
+  : error_location_(location), raw_io_state_(state)
+{
+}
+
+constexpr inline bool SingleIoState::operator==(const SingleIoState& rhs) const
+{
+  return (error_location_.getBit() == rhs.error_location_.getBit() &&
+          error_location_.getByte() == rhs.error_location_.getByte() && raw_io_state_ == rhs.raw_io_state_);
+}
+
+std::ostream& operator<<(std::ostream& os, const io::SingleIoState& msg);
 
 }  // namespace io
 }  // namespace monitoring_frame
