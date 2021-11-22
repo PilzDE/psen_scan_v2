@@ -79,7 +79,7 @@ DEFAULT_ON_ENTRY_IMPL(Idle)
 
 // \cond Ignore "was not declared or defined" warnings from doxygen
 template <class Event, class FSM>
-void ScannerProtocolDef::Idle::on_exit(Event const& /*unused*/, FSM& fsm)
+void ScannerProtocolDef::Idle::on_exit(Event const& /*unused*/, FSM& fsm)  // NOLINT
 {
   PSENSCAN_DEBUG("StateMachine", "Exiting state: Idle");
   fsm.control_client_.startAsyncReceiving();
@@ -87,7 +87,7 @@ void ScannerProtocolDef::Idle::on_exit(Event const& /*unused*/, FSM& fsm)
 }
 
 template <class Event, class FSM>
-void ScannerProtocolDef::WaitForStartReply::on_entry(Event const& /*unused*/, FSM& fsm)
+void ScannerProtocolDef::WaitForStartReply::on_entry(Event const& /*unused*/, FSM& fsm)  // NOLINT
 {
   PSENSCAN_DEBUG("StateMachine", "Entering state: WaitForStartReply");
   // Start watchdog...
@@ -95,7 +95,7 @@ void ScannerProtocolDef::WaitForStartReply::on_entry(Event const& /*unused*/, FS
 }
 
 template <class Event, class FSM>
-void ScannerProtocolDef::WaitForStartReply::on_exit(Event const& /*unused*/, FSM& fsm)
+void ScannerProtocolDef::WaitForStartReply::on_exit(Event const& /*unused*/, FSM& fsm)  // NOLINT
 {
   PSENSCAN_DEBUG("StateMachine", "Exiting state: WaitForStartReply");
   // Stops the watchdog by resetting the pointer
@@ -103,7 +103,7 @@ void ScannerProtocolDef::WaitForStartReply::on_exit(Event const& /*unused*/, FSM
 }
 
 template <class Event, class FSM>
-void ScannerProtocolDef::WaitForMonitoringFrame::on_entry(Event const& /*unused*/, FSM& fsm)
+void ScannerProtocolDef::WaitForMonitoringFrame::on_entry(Event const& /*unused*/, FSM& fsm)  // NOLINT
 {
   PSENSCAN_DEBUG("StateMachine", "Entering state: WaitForMonitoringFrame");
   fsm.scan_buffer_.reset();
@@ -113,7 +113,7 @@ void ScannerProtocolDef::WaitForMonitoringFrame::on_entry(Event const& /*unused*
 }
 
 template <class Event, class FSM>
-void ScannerProtocolDef::WaitForMonitoringFrame::on_exit(Event const& /*unused*/, FSM& fsm)
+void ScannerProtocolDef::WaitForMonitoringFrame::on_exit(Event const& /*unused*/, FSM& fsm)  // NOLINT
 {
   PSENSCAN_DEBUG("StateMachine", "Exiting state: WaitForMonitoringFrame");
   // Stops the watchdog by resetting the pointer
@@ -121,7 +121,7 @@ void ScannerProtocolDef::WaitForMonitoringFrame::on_exit(Event const& /*unused*/
 }
 
 template <class Event, class FSM>
-void ScannerProtocolDef::Stopped::on_entry(Event const& /*unused*/, FSM& /*unused*/)
+void ScannerProtocolDef::Stopped::on_entry(Event const& /*unused*/, FSM& /*unused*/)  // NOLINT
 {
   PSENSCAN_DEBUG("StateMachine", "Entering state: Stopped");
 }
@@ -395,7 +395,7 @@ static std::string classNameShort(const T& t)
 
 // LCOV_EXCL_START
 template <class FSM, class Event>
-void ScannerProtocolDef::exception_caught(Event const& event, FSM& /*unused*/, std::exception& exception)
+void ScannerProtocolDef::exception_caught(Event const& event, FSM& /*unused*/, std::exception& exception)  // NOLINT
 {
   PSENSCAN_ERROR("StateMachine", "Received error \"{}\". Shutting down now.", exception.what());
   sendStopRequest(event);
@@ -404,7 +404,7 @@ void ScannerProtocolDef::exception_caught(Event const& event, FSM& /*unused*/, s
 // LCOV_EXCL_STOP
 
 template <class FSM, class Event>
-void ScannerProtocolDef::no_transition(Event const& event, FSM& /*unused*/, int state)
+void ScannerProtocolDef::no_transition(Event const& event, FSM& /*unused*/, int state)  // NOLINT
 {
   PSENSCAN_WARN("StateMachine",
                 "No transition in state \"{}\" for event \"{}\".",
@@ -413,7 +413,7 @@ void ScannerProtocolDef::no_transition(Event const& event, FSM& /*unused*/, int 
 }
 
 template <class FSM>
-void ScannerProtocolDef::no_transition(const scanner_events::RawMonitoringFrameReceived& /*unused*/,
+void ScannerProtocolDef::no_transition(const scanner_events::RawMonitoringFrameReceived& /*unused*/,  // NOLINT
                                        FSM& /*unused*/,
                                        int state)
 {

@@ -184,6 +184,7 @@ public:  // Guards
   bool isRefusedStartReply(scanner_events::RawReplyReceived const& reply_event);
 
 public:  // Replaces the default exception/no-transition responses
+  // NOLINTBEGIN
   template <class FSM, class Event>
   void exception_caught(Event const& event, FSM& fsm, std::exception& exception);
 
@@ -192,6 +193,7 @@ public:  // Replaces the default exception/no-transition responses
 
   template <class FSM>
   void no_transition(const scanner_events::RawMonitoringFrameReceived& /*unused*/, FSM& /*unused*/, int state);
+  // NOLINTEND
 
 public:  // Definition of state machine via table
   typedef Idle initial_state;
