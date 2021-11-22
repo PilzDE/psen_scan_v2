@@ -25,7 +25,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
   <rosparam ns="laser_1" command="load" file="$(find psen_scan_v2)/test/hw_tests/config/$(arg config)" />
 
-  <!-- The test-name attribute is used for recording the results (see see http://wiki.ros.org/roslaunch/XML/test).
+  <!-- The test-name attribute is used for recording the results (see http://wiki.ros.org/roslaunch/XML/test).
        The result will get overwritten if we don't choose a unique name -->
   <arg name="test_name_suffix" value="$(eval config.split('.')[0])" />
 
