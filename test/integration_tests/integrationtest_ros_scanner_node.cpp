@@ -16,14 +16,15 @@
 #include <memory>
 #include <chrono>
 #include <thread>
+#include <functional>
 #include <future>
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
 
-#include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/msg/laser_scan.hpp>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/laserscan.h"
@@ -38,6 +39,7 @@
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 #include "psen_scan_v2/ros_scanner_node.h"
 
+#include "psen_scan_v2/ros_barrier.h"
 #include "psen_scan_v2/scanner_mock.h"
 
 using namespace psen_scan_v2;
@@ -53,37 +55,23 @@ namespace psen_scan_v2
 #define Return_Future(promise_obj) ::testing::InvokeWithoutArgs([&promise_obj]() { return promise_obj.get_future(); })
 
 static constexpr int QUEUE_SIZE{ 10 };
+static const std::string SCANNER_PREFIX{ "scanner" };
+static const std::string SCAN_TOPIC_NAME{ "scan" };
 
-MATCHER_P(IsRosScanEqual, expected_ros_scan, "")
-{
-  const sensor_msgs::LaserScan actual_scan = arg;
-
-  // clang-format off
-  return (actual_scan.angle_min       == expected_ros_scan.angle_min) &&
-         (actual_scan.angle_max       == expected_ros_scan.angle_max) &&
-         (actual_scan.angle_increment == expected_ros_scan.angle_increment) &&
-         (actual_scan.time_increment  == expected_ros_scan.time_increment) &&
-         (actual_scan.scan_time       == expected_ros_scan.scan_time) &&
-         (actual_scan.range_min       == expected_ros_scan.range_min) &&
-         (actual_scan.ranges          == expected_ros_scan.ranges) &&
-         (actual_scan.intensities     == expected_ros_scan.intensities);
-  // clang-format on
-}
-
-class SubscriberMock
+class ScanSubscriberMock : public rclcpp::Node
 {
 public:
-  void initialize(ros::NodeHandle& nh);
-
-  MOCK_METHOD1(callback, void(const sensor_msgs::LaserScan& msg));
+  ScanSubscriberMock();
+  MOCK_CONST_METHOD1(callback, void(sensor_msgs::msg::LaserScan::ConstSharedPtr msg));
 
 private:
-  ros::Subscriber subscriber_;
+  rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr subscription_;
 };
 
-inline void SubscriberMock::initialize(ros::NodeHandle& nh)
+inline ScanSubscriberMock::ScanSubscriberMock() : rclcpp::Node("scan_subscriber", SCANNER_PREFIX)
 {
-  subscriber_ = nh.subscribe("scan", QUEUE_SIZE, &SubscriberMock::callback, this);
+  subscription_ = this->create_subscription<sensor_msgs::msg::LaserScan>(
+      SCAN_TOPIC_NAME, QUEUE_SIZE, std::bind(&ScanSubscriberMock::callback, this, std::placeholders::_1));
 }
 
 static const std::string HOST_IP{ "127.0.0.1" };
@@ -110,14 +98,14 @@ static ScannerConfiguration createValidConfig()
 class RosScannerNodeTests : public testing::Test
 {
 protected:
-  ros::NodeHandle nh_priv_{ "~" };
+  rclcpp::Node::SharedPtr node_ptr_{ std::make_shared<rclcpp::Node>("test_node") };
   ScannerConfiguration scanner_config_{ createValidConfig() };
 };
 
 TEST_F(RosScannerNodeTests, testScannerInvocation)
 {
   ROSScannerNodeT<ScannerMock> ros_scanner_node(
-      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+      node_ptr_, SCAN_TOPIC_NAME, SCANNER_PREFIX, configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
   std::promise<void> start_stop_barrier;
   start_stop_barrier.set_value();
@@ -144,14 +132,12 @@ TEST_F(RosScannerNodeTests, testScanTopicReceived)
   LaserScan laser_scan_fake(util::TenthOfDegree(1), util::TenthOfDegree(3), util::TenthOfDegree(5), 14, 1000000000);
   laser_scan_fake.getMeasurements().push_back(1);
 
-  util::Barrier scan_topic_barrier;
-  SubscriberMock subscriber;
-  EXPECT_CALL(subscriber, callback(::testing::_))
-      .WillOnce(testing::Return())
-      .WillOnce(OpenBarrier(&scan_topic_barrier));
+  RosBarrier scan_topic_barrier;
+  auto subscriber = std::make_shared<ScanSubscriberMock>();
+  EXPECT_CALL(*subscriber, callback(::testing::_)).WillOnce(OpenBarrier(&scan_topic_barrier));
 
   ROSScannerNodeT<ScannerMock> ros_scanner_node(
-      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+      node_ptr_, SCAN_TOPIC_NAME, SCANNER_PREFIX, configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
   std::promise<void> start_stop_barrier;
   start_stop_barrier.set_value();
@@ -159,15 +145,14 @@ TEST_F(RosScannerNodeTests, testScanTopicReceived)
   EXPECT_CALL(ros_scanner_node.scanner_, start())
       .WillOnce(DoAll(OpenBarrier(&start_barrier), Return_Future(start_stop_barrier)));
 
-  subscriber.initialize(nh_priv_);
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
 
   EXPECT_TRUE(start_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Scanner start was not called";
 
   ros_scanner_node.scanner_.invokeLaserScanCallback(laser_scan_fake);
-  ros_scanner_node.scanner_.invokeLaserScanCallback(laser_scan_fake);
 
-  EXPECT_TRUE(scan_topic_barrier.waitTillRelease(DEFAULT_TIMEOUT)) << "Scan message was not sended";
+  EXPECT_EQ(rclcpp::FutureReturnCode::SUCCESS, scan_topic_barrier.spinUntilRelease(subscriber, DEFAULT_TIMEOUT))
+      << "Scan message was not sended";
   ros_scanner_node.terminate();
   EXPECT_FUTURE_IS_READY(loop, LOOP_END_TIMEOUT);
 }
@@ -175,7 +160,7 @@ TEST_F(RosScannerNodeTests, testScanTopicReceived)
 TEST_F(RosScannerNodeTests, testMissingStopReply)
 {
   ROSScannerNodeT<ScannerMock> ros_scanner_node(
-      nh_priv_, "scan", "scanner", configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
+      node_ptr_, SCAN_TOPIC_NAME, SCANNER_PREFIX, configuration::DEFAULT_X_AXIS_ROTATION, scanner_config_);
 
   std::promise<void> start_barrier;
   start_barrier.set_value();
@@ -201,11 +186,7 @@ TEST_F(RosScannerNodeTests, testMissingStopReply)
 
 int main(int argc, char* argv[])
 {
-  ros::init(argc, argv, "integrationtest_ros_scanner_node");
-  ros::NodeHandle nh;
-
-  ros::AsyncSpinner spinner{ 1 };
-  spinner.start();
+  rclcpp::init(argc, argv);
 
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

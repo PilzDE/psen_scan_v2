@@ -22,6 +22,7 @@
 
 #include "psen_scan_v2_standalone/util/mock_console_bridge_output_handler.h"
 
+using namespace console_bridge;
 using namespace psen_scan_v2_standalone_test;
 
 TEST(LoggingTest, logInfo)

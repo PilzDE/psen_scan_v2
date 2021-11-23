@@ -14,14 +14,15 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <map>
+#include <memory>
 #include <sstream>
+#include <stdexcept>
 #include <stdlib.h>
 #include <string>
 
 #include <gtest/gtest.h>
 
-#include <boost/filesystem.hpp>
-#include <boost/shared_ptr.hpp>
+#include <console_bridge/console.h>
 
 #include "psen_scan_v2_standalone/core.h"
 
@@ -33,7 +34,7 @@ using namespace psen_scan_v2_test;
 
 namespace psen_scan_v2_standalone_test
 {
-static const char* TESTFILE_ENV_VAR{ "HW_TEST_SCAN_COMPARE_TESTFILE" };
+static const char* TESTDIR_ENV_VAR{ "HW_TEST_SCAN_COMPARE_TESTDIR" };
 static const char* HOST_IP_ENV_VAR{ "HOST_IP" };
 static const char* SENSOR_IP_ENV_VAR{ "SENSOR_IP" };
 static const util::TenthOfDegree ANGLE_START{ 687 };
@@ -47,7 +48,7 @@ public:
   void SetUp() override  // Omit using SetUpTestSuite() for googletest below v1.11.0, see
                          // https://github.com/google/googletest/issues/247
   {
-    setLogLevel(CONSOLE_BRIDGE_LOG_INFO);
+    console_bridge::setLogLevel(console_bridge::CONSOLE_BRIDGE_LOG_INFO);
     PSENSCAN_INFO("ScanComparisonTests", "Using test duration={}", TEST_DURATION_S);
 
     const char* host_ip{ std::getenv(HOST_IP_ENV_VAR) };
@@ -61,19 +62,23 @@ public:
       scanner_ip_ = scanner_ip;
     }
 
-    const char* filepath{ std::getenv(TESTFILE_ENV_VAR) };
-    if (!filepath)
+    const char* path{ std::getenv(TESTDIR_ENV_VAR) };
+    if (!path)
     {
-      PSENSCAN_ERROR("ScanComparisonTests", "Environment variable {} not set!", TESTFILE_ENV_VAR);
+      PSENSCAN_ERROR("ScanComparisonTests", "Environment variable {} not set!", TESTDIR_ENV_VAR);
       FAIL();
     }
-    PSENSCAN_INFO("ScanComparisonTests", "Using testfile {}", filepath);
-    if (!boost::filesystem::exists(filepath))
+    PSENSCAN_INFO("ScanComparisonTests", "Using test directory {}", path);
+
+    try
     {
-      PSENSCAN_ERROR("ScanComparisonTests", "File {} not found!", filepath);
-      FAIL();
+      bins_expected_ = binsFromRosbag(path);
     }
-    bins_expected_ = binsFromRosbag(filepath);
+    catch (const std::runtime_error& e)
+    {
+      FAIL() << "Bag record in " << path
+             << " could not be opened. Make sure the directory exists and the you have sufficient rights to open it.";
+    }
   }
 
 protected:
@@ -97,7 +102,7 @@ TEST_F(ScanComparisonTests, simpleCompare)
   config_builder.hostIP(host_ip_).scannerIp(scanner_ip_).hostDataPort(HOST_UDP_PORT_DATA).scanRange(scan_range);
 
   ScannerV2 scanner(config_builder.build(), [&laser_scan_validator, &window_size](const ScanType& scan) {
-    return laser_scan_validator.scanCb(boost::make_shared<ScanType const>(scan), window_size, -1375);
+    return laser_scan_validator.scanCb(std::make_shared<ScanType const>(scan), window_size, -1375);
   });
   scanner.start();
 

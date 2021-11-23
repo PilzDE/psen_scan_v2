@@ -21,23 +21,12 @@
 namespace psen_scan_v2
 {
 /**
- * @brief Exception thrown if a parameter of a certain type cannot be found on the ROS parameter server.
+ * @brief Exception thrown if a parameter of a certain type was not set.
  */
-class ParamMissingOnServer : public std::runtime_error
+class ParameterNotSet : public std::runtime_error
 {
 public:
-  ParamMissingOnServer(const std::string& msg) : std::runtime_error(msg)
-  {
-  }
-};
-
-/**
- * @brief Exception thrown if a parameter can be found on the ROS parameter server but with an unexpected type.
- */
-class WrongParameterType : public std::runtime_error
-{
-public:
-  WrongParameterType(const std::string& msg) : std::runtime_error(msg)
+  ParameterNotSet(const std::string& msg) : std::runtime_error(msg)
   {
   }
 };

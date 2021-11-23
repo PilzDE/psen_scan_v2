@@ -24,6 +24,8 @@
 
 #include <gtest/gtest.h>
 
+#include <console_bridge/console.h>
+
 #include "psen_scan_v2_standalone/core.h"
 
 #include "psen_scan_v2/test_data.h"
@@ -54,7 +56,7 @@ public:
     udp_data_filename_ = udp_data_filename;
 
     buildScannerConfig();
-    setLogLevel(CONSOLE_BRIDGE_LOG_INFO);
+    console_bridge::setLogLevel(console_bridge::CONSOLE_BRIDGE_LOG_INFO);
 
     assembleTestDataByRunningTheScanner();  // Only runs the scanner once for all test cases.
     ASSERT_GE(testSize(), MINIMUM_TEST_SIZE) << "Assembling test data failed.";

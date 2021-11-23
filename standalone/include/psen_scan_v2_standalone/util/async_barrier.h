@@ -35,7 +35,10 @@ public:
 
 private:
   std::promise<void> barrier_;
-  const std::future<void> future_{ barrier_.get_future() };
+
+protected:
+  // Child classes might implement their own waiting mechanisms. The shared_future allows for more flexibel usage.
+  const std::shared_future<void> future_{ barrier_.get_future() };
 };
 
 inline void util::Barrier::release()

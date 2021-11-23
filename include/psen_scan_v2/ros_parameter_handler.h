@@ -20,50 +20,39 @@
 
 #include <boost/optional.hpp>
 
-#include <ros/ros.h>
+#include <rclcpp/node.hpp>
 
 #include "psen_scan_v2/get_ros_parameter_exception.h"
 
 namespace psen_scan_v2
 {
+/**
+ * @throws rclcpp::exceptions::InvalidParameterTypeException if the requested type does not match the stored parameter.
+ */
 template <class T>
-boost::optional<T> getParam(const ros::NodeHandle& node_handle, const std::string& key)
+T getOptionalParam(const rclcpp::Node& node, const std::string& key, const T& default_value)
 {
-  if (!node_handle.hasParam(key))
+  T ret_val{};
+  if (!node.get_parameter_or(key, ret_val, default_value))
   {
-    ROS_WARN_STREAM("Parameter " + key + " doesn't exist on parameter server.");
-    return boost::none;
-  }
-
-  T default_val{};
-  boost::optional<T> ret_val(default_val);
-  if (!node_handle.getParam(key, ret_val.get()))
-  {
-    throw WrongParameterType("Parameter " + key + " has wrong datatype on parameter server.");
+    RCLCPP_WARN_STREAM(node.get_logger(), "Parameter " + key + " doesn't exist for node " + node.get_name() + ".");
   }
   return ret_val;
 }
 
+/**
+ * @throws ParameterNotSet if the parameter was not set.
+ * @throws rclcpp::exceptions::InvalidParameterTypeException if the requested type does not match the stored parameter.
+ */
 template <class T>
-T getOptionalParamFromServer(const ros::NodeHandle& node_handle, const std::string& key, const T& default_value)
+T getRequiredParam(const rclcpp::Node& node, const std::string& key)
 {
-  boost::optional<T> val{ getParam<T>(node_handle, key) };
-  if (!val)
+  T ret_val{};
+  if (!node.get_parameter(key, ret_val))
   {
-    return default_value;
+    throw ParameterNotSet("Parameter " + key + " doesn't exist for node " + node.get_name() + ".");
   }
-  return val.value();
-}
-
-template <class T>
-T getRequiredParamFromServer(const ros::NodeHandle& node_handle, const std::string& key)
-{
-  boost::optional<T> val{ getParam<T>(node_handle, key) };
-  if (!val)
-  {
-    throw ParamMissingOnServer("Parameter " + key + " doesn't exist on parameter server.");
-  }
-  return val.value();
+  return ret_val;
 }
 
 }  // namespace psen_scan_v2

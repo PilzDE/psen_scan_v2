@@ -128,7 +128,7 @@ protected:
 void ScannerAPITests::SetUp()
 {
   port_holder_.printPorts();
-  setLogLevel(CONSOLE_BRIDGE_LOG_DEBUG);
+  console_bridge::setLogLevel(console_bridge::CONSOLE_BRIDGE_LOG_DEBUG);
 }
 
 void ScannerAPITests::setUpScannerConfig(const std::string& host_ip, bool fragmented)

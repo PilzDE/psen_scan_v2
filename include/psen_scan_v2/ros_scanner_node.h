@@ -24,12 +24,14 @@
 
 #include <gtest/gtest_prod.h>
 
-#include <ros/ros.h>
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
 
 #include "psen_scan_v2_standalone/scanner_v2.h"
 
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
+#include "psen_scan_v2_standalone/scanner_configuration.h"
 
 using namespace std;
 
@@ -39,6 +41,7 @@ using namespace std;
 namespace psen_scan_v2
 {
 using namespace psen_scan_v2_standalone;
+using namespace psen_scan_v2_standalone::configuration;
 using namespace std::chrono_literals;
 
 /**
@@ -52,13 +55,13 @@ public:
   /**
    * @brief Constructor.
    *
-   * @param nh Node handle for the ROS node on which the scanner topic is advertised.
+   * @param node rclcpp::Node instance.
    * @param topic Name of the ROS topic under which the scanner data are published.
    * @param tf_prefix Prefix for the frame ids.
    * @param x_axis_rotation Rotation of 2D scan around the z-axis.
    * @param scanner_config Scanner configuration.
    */
-  ROSScannerNodeT(ros::NodeHandle& nh,
+  ROSScannerNodeT(const rclcpp::Node::SharedPtr& node,
                   const std::string& topic,
                   const std::string& tf_prefix,
                   const double& x_axis_rotation,
@@ -73,8 +76,8 @@ private:
   void laserScanCallback(const LaserScan& scan);
 
 private:
-  ros::NodeHandle nh_;
-  ros::Publisher pub_;
+  rclcpp::Node::SharedPtr node_;
+  rclcpp::Publisher<sensor_msgs::msg::LaserScan>::SharedPtr pub_;
   std::string tf_prefix_;
   double x_axis_rotation_;
   S scanner_;
@@ -91,17 +94,17 @@ private:
 typedef ROSScannerNodeT<> ROSScannerNode;
 
 template <typename S>
-ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
+ROSScannerNodeT<S>::ROSScannerNodeT(const rclcpp::Node::SharedPtr& node,
                                     const std::string& topic,
                                     const std::string& tf_prefix,
                                     const double& x_axis_rotation,
                                     const ScannerConfiguration& scanner_config)
-  : nh_(nh)
+  : node_(node)
   , tf_prefix_(tf_prefix)
   , x_axis_rotation_(x_axis_rotation)
   , scanner_(scanner_config, std::bind(&ROSScannerNodeT<S>::laserScanCallback, this, std::placeholders::_1))
 {
-  pub_ = nh_.advertise<sensor_msgs::LaserScan>(topic, 1);
+  pub_ = node->create_publisher<sensor_msgs::msg::LaserScan>(tf_prefix_ + "/" + topic, 1);
 }
 
 template <typename S>
@@ -117,12 +120,12 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
         data_conversion_layer::radianToDegree(laserScanMsg.angle_max),
         data_conversion_layer::radianToDegree(laserScanMsg.angle_increment),
         laserScanMsg.ranges.size());
-    pub_.publish(laserScanMsg);
+    pub_->publish(laserScanMsg);
   }
   // LCOV_EXCL_START
   catch (const std::invalid_argument& e)
   {
-    ROS_ERROR_STREAM(e.what());
+    RCLCPP_ERROR_STREAM(node_->get_logger(), e.what());
   }
   // LCOV_EXCL_STOP
 }
@@ -136,17 +139,18 @@ void ROSScannerNodeT<S>::terminate()
 template <typename S>
 void ROSScannerNodeT<S>::run()
 {
-  ros::Rate r(10);
+  rclcpp::Rate r(10);
   scanner_.start();
-  while (ros::ok() && !terminate_)
+  while (rclcpp::ok() && !terminate_)
   {
-    r.sleep();  // LCOV_EXCL_LINE can not be reached deterministically
+    rclcpp::spin_some(node_);
+    r.sleep();
   }
   const auto stop_future = scanner_.stop();
   const auto stop_status = stop_future.wait_for(3s);
   if (stop_status == std::future_status::timeout)
   {
-    ROS_ERROR("Scanner did not finish properly");
+    RCLCPP_ERROR(node_->get_logger(), "Scanner did not finish properly");
   }
 }
 

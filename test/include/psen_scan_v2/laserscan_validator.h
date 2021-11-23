@@ -20,11 +20,10 @@
 #include <chrono>
 #include <future>
 #include <map>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
-
-#include <boost/shared_ptr.hpp>
 
 #include <fmt/format.h>
 
@@ -32,11 +31,14 @@
 
 #include <math.h>
 
-#include <ros/ros.h>
+#include <rclcpp/serialization.hpp>
+#include <rclcpp/serialized_message.hpp>
 
-#include <rosbag/bag.h>
-#include <rosbag/view.h>
-#include <sensor_msgs/LaserScan.h>
+#include <rosbag2_cpp/readers/sequential_reader.hpp>
+#include <rosbag2_cpp/converter_options.hpp>
+#include <rosbag2_cpp/storage_options.hpp>
+#include <rosbag2_storage/storage_filter.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/laserscan.h"
@@ -64,7 +66,7 @@ void addScanToBin(const psen_scan_v2_standalone::LaserScan& scan,
   }
 }
 
-void addScanToBin(const sensor_msgs::LaserScan& scan,
+void addScanToBin(const sensor_msgs::msg::LaserScan& scan,
                   std::map<int16_t, NormalDist>& bin,
                   const int16_t angle_offset = 0)
 {
@@ -97,24 +99,36 @@ std::map<int16_t, NormalDist> binsFromScans(const std::vector<ScanConstPtr>& sca
   return bins;
 }
 
-std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
+std::map<int16_t, NormalDist> binsFromRosbag(std::string path)
 {
   std::map<int16_t, NormalDist> bins;
 
-  rosbag::Bag bag;
-  bag.open(filepath, rosbag::bagmode::Read);
+  // the following could be simplified if https://github.com/ros2/rosbag2/pull/452 would be released to foxy
+  rosbag2_cpp::StorageOptions storage_options;
+  storage_options.uri = path;
+  storage_options.storage_id = "sqlite3";
 
-  std::vector<std::string> topics;
-  topics.push_back(std::string("/laser_1/scan"));
+  rosbag2_cpp::ConverterOptions converter_options;
+  converter_options.input_serialization_format = "cdr";
+  converter_options.output_serialization_format = "cdr";
 
-  rosbag::View view(bag, rosbag::TopicQuery(topics));
+  rosbag2_storage::StorageFilter storage_filter;
+  storage_filter.topics.push_back("/laser_1/scan");
 
-  std::for_each(view.begin(), view.end(), [&bins](const rosbag::MessageInstance& msg) {
-    sensor_msgs::LaserScanConstPtr scan = msg.instantiate<sensor_msgs::LaserScan>();
-    addScanToBin(*scan, bins);
-  });
+  rosbag2_cpp::readers::SequentialReader reader;
+  reader.open(storage_options, converter_options);
 
-  bag.close();
+  reader.set_filter(storage_filter);
+
+  rclcpp::Serialization<sensor_msgs::msg::LaserScan> serialization;
+  while (reader.has_next())
+  {
+    auto bag_msg = reader.read_next();
+    rclcpp::SerializedMessage serialized_msg(*bag_msg->serialized_data);
+    sensor_msgs::msg::LaserScan scan_msg;
+    serialization.deserialize_message(&serialized_msg, &scan_msg);
+    addScanToBin(scan_msg, bins);
+  }
 
   return bins;
 }
@@ -125,9 +139,9 @@ class LaserScanValidator
 public:
   LaserScanValidator(std::map<int16_t, NormalDist> bins_expected) : bins_expected_(bins_expected){};
 
-  typedef boost::shared_ptr<ScanType const> ScanConstPtr;
+  typedef std::shared_ptr<ScanType const> ScanConstPtr;
 
-  void scanCb(const ScanConstPtr scan, size_t n_msgs, const int16_t angle_offset = 0)
+  void scanCb(ScanConstPtr scan, size_t n_msgs, const int16_t angle_offset = 0)
   {
     PSENSCAN_INFO_THROTTLE(5, "LaserScanValidator", "Checking messages for validity. So far looking good.");
 
