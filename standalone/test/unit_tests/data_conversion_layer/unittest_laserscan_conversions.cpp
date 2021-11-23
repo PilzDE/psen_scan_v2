@@ -20,13 +20,14 @@
 #include <gtest/gtest.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
+#include "psen_scan_v2_standalone/io_state.h"
 #include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/laserscan_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
-#include "psen_scan_v2_standalone/io_state.h"
+#include "psen_scan_v2_standalone/util/expectations.h"
 
 using namespace psen_scan_v2_standalone;
 
@@ -42,7 +43,12 @@ createStampedMsg(const int64_t timestamp = DEFAULT_TIMESTAMP,
                  const uint32_t scan_counter = uint32_t{ 42 },
                  const uint8_t active_zoneset = uint8_t{ 0 })
 {
-  const IOState io_state({}, {}, {});
+  const IOState io_state({ PinState(0, fmt::format("input_{}", scan_counter), true) },
+                         { PinState(0, fmt::format("output_{}", scan_counter), false),
+                           PinState(1, fmt::format("output2_{}", scan_counter), true) },
+                         { PinState(0, fmt::format("logical_{}", scan_counter), false) });  // encode scan counter in
+                                                                                            // name in order to get
+                                                                                            // unambiguous states
   const std::vector<double> measurements{ 1., 2., 3., 4.5, 5., 42. };
   const std::vector<double> intensities{ 0., 4., 3., 1007., 508., 14000. };
   const std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnostic_messages{};
@@ -182,6 +188,17 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectTimestampAfterConver
   EXPECT_EQ(EXPECTED_TIMESTAMP_AFTER_CONVERSION, scan_ptr->getTimestamp());
 }
 
+TEST(LaserScanConversionsTest, laserScanShouldContainCorrectIOStateAfterConversion)
+{
+  const auto stamped_msg{ createStampedMsg() };
+
+  std::unique_ptr<LaserScan> scan_ptr;
+  ASSERT_NO_THROW(
+      scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan({ stamped_msg }) }););
+
+  EXPECT_IO_STATE_EQ(stamped_msg.msg_.ioState(), scan_ptr->getIOState());
+}
+
 TEST(LaserScanConversionsTest, shouldThrowProtocolErrorOnMismatchingResolutions)
 {
   auto stamped_msgs = createStampedMsgs(6);
@@ -274,6 +291,29 @@ TEST(LaserScanConversionsTest, laserScanShouldContainMinimalTimestamp)
   ASSERT_NO_THROW(
       scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
   EXPECT_EQ(EXPECTED_TIMESTAMP_AFTER_CONVERSION, scan_ptr->getTimestamp());
+}
+
+TEST(LaserScanConversionsTest, laserScanShouldContainMostRecentIOStateWhenFramesAreOrdered)
+{
+  const auto stamped_msgs = createStampedMsgs(3);
+
+  std::unique_ptr<LaserScan> scan_ptr;
+  ASSERT_NO_THROW(
+      scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
+
+  EXPECT_IO_STATE_EQ(stamped_msgs.back().msg_.ioState(), scan_ptr->getIOState());
+}
+
+TEST(LaserScanConversionsTest, laserScanShouldContainMostRecentIOStateWhenFramesAreUnordered)
+{
+  auto stamped_msgs = createStampedMsgs(3);
+  std::swap(stamped_msgs.back(), stamped_msgs.front());
+
+  std::unique_ptr<LaserScan> scan_ptr;
+  ASSERT_NO_THROW(
+      scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
+
+  EXPECT_IO_STATE_EQ(stamped_msgs.front().msg_.ioState(), scan_ptr->getIOState());
 }
 
 TEST(LaserScanConversionsTest, laserScanShouldContainActiveZoneset)

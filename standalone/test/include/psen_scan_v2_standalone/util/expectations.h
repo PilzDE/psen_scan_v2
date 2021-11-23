@@ -74,4 +74,9 @@ using namespace std::chrono_literals;
       },                                                                                                               \
       expected_exception);
 
+#define EXPECT_IO_STATE_EQ(expected_io_state, io_state)                                                                \
+  EXPECT_EQ(expected_io_state.input(), io_state.input());                                                              \
+  EXPECT_EQ(expected_io_state.output(), io_state.output());                                                            \
+  EXPECT_EQ(expected_io_state.logical(), io_state.logical());
+
 #endif  // PSEN_SCAN_V2_STANDALONE_TEST_EXPECTATIONS_H
