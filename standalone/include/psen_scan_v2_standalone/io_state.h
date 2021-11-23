@@ -25,23 +25,23 @@ class PinState
 {
 public:
   PinState(uint32_t pin_id, const std::string& name, bool state);
-  uint32_t pinId() const;
+  uint32_t id() const;
   std::string name() const;
   bool state() const;
 
 private:
-  uint32_t pin_id_;
+  uint32_t id_;
   std::string name_;
   bool state_;
 };
 
-inline PinState::PinState(uint32_t pin_id, const std::string& name, bool state) : pin_id_(pin_id), name_(name), state_(state)
+inline PinState::PinState(uint32_t pin_id, const std::string& name, bool state) : id_(pin_id), name_(name), state_(state)
 {
 }
 
-inline uint32_t PinState::pinId() const
+inline uint32_t PinState::id() const
 {
-  return pin_id_;
+  return id_;
 }
 
 inline std::string PinState::name() const

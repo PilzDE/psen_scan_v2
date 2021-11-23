@@ -20,6 +20,8 @@
 #include <map>
 #include <vector>
 
+#include "psen_scan_v2_standalone/io_state.h"
+
 namespace psen_scan_v2_standalone
 {
 namespace data_conversion_layer
@@ -222,6 +224,33 @@ static const std::map<Ot, IoName> output_bit_to_name
   { REV(Ot::warn2,        Ot::warn1,        Ot::ossd3_lock,   Ot::ossd3,        Ot::ossd2_lock,   Ot::ossd2,        Ot::ossd1_lock,   Ot::ossd1) },
   }};  // TODO: Verify byte order
 // clang-format on
+
+static uint32_t createID(size_t byte_n, size_t bit_n)
+{
+  return byte_n * 8 + bit_n;
+}
+
+static PinState createInputPinState(size_t byte_n, size_t bit_n, bool value)
+{
+  auto id = createID(byte_n, bit_n);
+  auto input_bit = physical_input_bits.at(byte_n).at(bit_n);
+  auto name = physical_input_bit_to_name.at(input_bit);
+  return PinState(id, name, value);
+}
+
+static PinState createLogicalPinState(size_t byte_n, size_t bit_n, bool value)
+{
+  auto id = createID(byte_n, bit_n);
+  return PinState(id, "", value);
+}
+
+static PinState createOutputPinState(size_t byte_n, size_t bit_n, bool value)
+{
+  auto id = createID(byte_n, bit_n);
+  auto input_bit = output_bits.at(byte_n).at(bit_n);
+  auto name = output_bit_to_name.at(input_bit);
+  return PinState(id, name, value);
+}
 
 }  // namespace io
 }  // namespace monitoring_frame
