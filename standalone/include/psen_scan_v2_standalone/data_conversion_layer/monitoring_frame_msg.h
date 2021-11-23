@@ -73,11 +73,13 @@ public:
           const util::TenthOfDegree& resolution,
           const uint32_t scan_counter,
           const uint8_t active_zoneset,
+          const IOState& io_state,
           const std::vector<double>& measurements)
     : from_theta_(from_theta)
     , resolution_(resolution)
     , scan_counter_(scan_counter)
     , active_zoneset_(active_zoneset)
+    , io_state_(io_state)
     , measurements_(measurements)
     , diagnostic_data_enabled_(false){
 
@@ -87,6 +89,7 @@ public:
           const util::TenthOfDegree& resolution,
           const uint32_t scan_counter,
           const uint8_t active_zoneset,
+          const IOState& io_state,
           const std::vector<double>& measurements,
           const std::vector<double>& intensities,
           const std::vector<diagnostic::Message>& diagnostic_messages)
@@ -94,6 +97,7 @@ public:
     , resolution_(resolution)
     , scan_counter_(scan_counter)
     , active_zoneset_(active_zoneset)
+    , io_state_(io_state)
     , measurements_(measurements)
     , intensities_(intensities)
     , diagnostic_messages_(diagnostic_messages)
@@ -106,10 +110,10 @@ public:
   util::TenthOfDegree resolution() const;
   uint32_t scanCounter() const;
   uint8_t activeZoneset() const;
+  IOState ioState() const;
   const std::vector<double>& measurements() const;
   const std::vector<double>& intensities() const;
   std::vector<diagnostic::Message> diagnosticMessages() const;
-  IOState ioState() const;
   bool operator==(const monitoring_frame::Message& rhs) const;
   bool operator!=(const monitoring_frame::Message& rhs) const;
 
@@ -119,11 +123,11 @@ private:
   util::TenthOfDegree resolution_{ 0 };
   boost::optional<uint32_t> scan_counter_;
   uint8_t active_zoneset_{ 0 };
+  IOState io_state_;
   std::vector<double> measurements_;
   std::vector<double> intensities_;
   std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnostic_messages_;
   bool diagnostic_data_enabled_{ false };
-  IOState io_state_;
 
 public:
   friend data_conversion_layer::RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg);

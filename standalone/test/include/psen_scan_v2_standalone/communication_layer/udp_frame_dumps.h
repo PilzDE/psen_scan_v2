@@ -22,6 +22,7 @@
 #include <iostream>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
+#include "psen_scan_v2_standalone/io_state.h"
 
 using namespace psen_scan_v2_standalone;
 
@@ -85,6 +86,7 @@ public:
         util::TenthOfDegree(0x02),
         0x00008894,
         0x02,
+        IOState({}, {}, {}),
         readMeasurements(hex_dump, 74, 250),
         readIntensities(hex_dump, intensities_offset, 250),
         { data_conversion_layer::monitoring_frame::diagnostic::Message(
@@ -180,7 +182,7 @@ public:
   WithoutMeasurementsAndIntensities()
   {
     data_conversion_layer::monitoring_frame::Message msg(
-        util::TenthOfDegree(0x5dc), util::TenthOfDegree(0x0a), 0x0661fc, 0x02, {});
+        util::TenthOfDegree(0x5dc), util::TenthOfDegree(0x0a), 0x0661fc, 0x02, IOState({}, {}, {}), {});
     expected_msg_ = msg;
   }
 

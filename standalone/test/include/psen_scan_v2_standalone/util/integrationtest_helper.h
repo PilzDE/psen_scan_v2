@@ -76,6 +76,7 @@ createValidMonitoringFrameMsg(const uint32_t scan_counter = 42,
                               const uint8_t active_zoneset = 1)
 {
   const auto resolution{ util::TenthOfDegree(10) };
+  const IOState io_state({ PinState(1, "zone", true) }, { PinState(4, "OSST", false) }, { PinState(5, "", true) });
 
   const unsigned int num_elements = ((end_angle - start_angle) / resolution).value();
   const double lowest_measurement{ 0. };
@@ -91,7 +92,7 @@ createValidMonitoringFrameMsg(const uint32_t scan_counter = 42,
   };
 
   return data_conversion_layer::monitoring_frame::Message(
-      start_angle, resolution, scan_counter, active_zoneset, measurements, intensities, diagnostic_messages);
+      start_angle, resolution, scan_counter, active_zoneset, io_state, measurements, intensities, diagnostic_messages);
 }
 
 static data_conversion_layer::monitoring_frame::Message

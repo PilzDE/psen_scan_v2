@@ -30,6 +30,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/istring_stream_builder.h"
 #include "psen_scan_v2_standalone/communication_layer/udp_frame_dumps.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
+#include "psen_scan_v2_standalone/io_state.h"
 
 namespace psen_scan_v2_standalone_test
 {
@@ -40,6 +41,9 @@ const util::TenthOfDegree DEFAULT_FROM_THETA(100);
 const util::TenthOfDegree DEFAULT_RESOLUTION(10);
 const uint32_t DEFAULT_SCAN_COUNTER(42);
 const uint8_t DEFAULT_ACTIVE_ZONESET(0);
+const IOState DEFAULT_IO_STATE({ PinState(1, "zone", true) },
+                               { PinState(4, "OSST", false) },
+                               { PinState(5, "", true) });
 const std::vector<double> DEFAULT_MEASUREMENTS{ 1, 2, 3 };
 const std::vector<double> DEFAULT_INTENSITIES{ 10, 20, 30 };
 const std::vector<diagnostic::Message> DEFAULT_DIAGNOSTIC_MSGS{ diagnostic::Message(configuration::ScannerId::master,
@@ -50,11 +54,13 @@ createMonitoringFrameMsg(const util::TenthOfDegree& from_theta = DEFAULT_FROM_TH
                          const util::TenthOfDegree& resolution = DEFAULT_RESOLUTION,
                          const uint32_t scan_counter = DEFAULT_SCAN_COUNTER,
                          const uint8_t active_zoneset = DEFAULT_ACTIVE_ZONESET,
+                         const IOState& io_state = DEFAULT_IO_STATE,
                          const std::vector<double>& measurements = DEFAULT_MEASUREMENTS,
                          const std::vector<double>& intensities = DEFAULT_INTENSITIES,
                          const std::vector<diagnostic::Message>& diagnostic_messages = DEFAULT_DIAGNOSTIC_MSGS)
 {
-  return Message(from_theta, resolution, scan_counter, active_zoneset, measurements, intensities, diagnostic_messages);
+  return Message(
+      from_theta, resolution, scan_counter, active_zoneset, io_state, measurements, intensities, diagnostic_messages);
 }
 
 static Message createDefaultMsgAndSetIntensities(const std::vector<double>& intensities)
@@ -63,14 +69,19 @@ static Message createDefaultMsgAndSetIntensities(const std::vector<double>& inte
                                   DEFAULT_RESOLUTION,
                                   DEFAULT_SCAN_COUNTER,
                                   DEFAULT_ACTIVE_ZONESET,
+                                  DEFAULT_IO_STATE,
                                   DEFAULT_MEASUREMENTS,
                                   intensities);
 }
 
 static Message createDefaultMsgAndSetMeasurements(const std::vector<double>& measurements)
 {
-  return createMonitoringFrameMsg(
-      DEFAULT_FROM_THETA, DEFAULT_RESOLUTION, DEFAULT_SCAN_COUNTER, DEFAULT_ACTIVE_ZONESET, measurements);
+  return createMonitoringFrameMsg(DEFAULT_FROM_THETA,
+                                  DEFAULT_RESOLUTION,
+                                  DEFAULT_SCAN_COUNTER,
+                                  DEFAULT_ACTIVE_ZONESET,
+                                  DEFAULT_IO_STATE,
+                                  measurements);
 }
 
 static Message createDefaultMsgAndSetFromTheta(util::TenthOfDegree from_theta)
@@ -122,8 +133,8 @@ protected:
 
 TEST(MonitoringFrameMsgEqualityTest, testCompareEqualSucces)
 {
-  const Message msg0(util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 1, { 1, 2, 3 });
-  const Message msg1(util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 1, { 1, 2, 3 });
+  const Message msg0(util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 1, DEFAULT_IO_STATE, { 1, 2, 3 });
+  const Message msg1(util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 1, DEFAULT_IO_STATE, { 1, 2, 3 });
   EXPECT_EQ(msg0, msg1);
 }
 
@@ -136,15 +147,15 @@ TEST(MonitoringFrameMsgEqualityTest, testCompareEqualIntensitiesSucces)
 
 TEST(MonitoringFrameMsgEqualityTest, testCompareEqualEmptySuccess)
 {
-  const Message msg0(util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, {});
-  const Message msg1(util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, {});
+  const Message msg0(util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, DEFAULT_IO_STATE, {});
+  const Message msg1(util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, DEFAULT_IO_STATE, {});
   EXPECT_EQ(msg0, msg1);
 }
 
 TEST(MonitoringFrameMsgEqualityTest, testCompareEqualIntensitiesEmptySucces)
 {
-  const Message msg0(util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, {}, {}, {});
-  const Message msg1(util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, {}, {}, {});
+  const Message msg0(util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, DEFAULT_IO_STATE, {}, {}, {});
+  const Message msg1(util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, DEFAULT_IO_STATE, {}, {}, {});
   EXPECT_EQ(msg0, msg1);
 }
 
@@ -198,14 +209,14 @@ TEST(MonitoringFrameMsgTest, shouldThrowMissingScanCounterErrorWhenScanCounterWa
 
 TEST(MonitoringFrameMsgEqualityTest, testCompareNotEqualEmpty)
 {
-  const Message msg0(util::TenthOfDegree(100), util::TenthOfDegree(42), 42, 0, {}, {}, {});
-  const Message msg1(util::TenthOfDegree(100), util::TenthOfDegree(42), 0, 0, {}, {}, {});
+  const Message msg0(util::TenthOfDegree(100), util::TenthOfDegree(42), 42, 0, DEFAULT_IO_STATE, {}, {}, {});
+  const Message msg1(util::TenthOfDegree(100), util::TenthOfDegree(42), 0, 0, DEFAULT_IO_STATE, {}, {}, {});
   EXPECT_NE(msg0, msg1);
 }
 
 TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)
 {
-  Message msg(util::TenthOfDegree(1234), util::TenthOfDegree(56), 78, 2, { 45, 44, 43, 42 });
+  Message msg(util::TenthOfDegree(1234), util::TenthOfDegree(56), 78, 2, DEFAULT_IO_STATE, { 45, 44, 43, 42 });
 
 // For compatibility with different ubuntu versions (resp. fmt), we need to take account of changes in
 // the default formatting of floating point numbers

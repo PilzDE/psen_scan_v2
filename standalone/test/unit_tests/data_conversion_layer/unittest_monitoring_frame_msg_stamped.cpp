@@ -13,9 +13,13 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <vector>
+
 #include <gtest/gtest.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
+#include "psen_scan_v2_standalone/io_state.h"
 
 using namespace psen_scan_v2_standalone;
 
@@ -27,12 +31,13 @@ createMsg(const util::TenthOfDegree from_theta = util::TenthOfDegree{ 10 },
           const uint32_t scan_counter = uint32_t{ 42 },
           const uint8_t active_zoneset = uint8_t{ 1 })
 {
+  const IOState io_state({ PinState(1, "zone", true) }, { PinState(4, "OSST", false) }, { PinState(5, "", true) });
   const std::vector<double> measurements{ 1., 2., 3., 4.5, 5., 42. };
   const std::vector<double> intensities{ 0., 4., 3., 1007., 508., 14000. };
   const std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnostic_messages{};
 
   return data_conversion_layer::monitoring_frame::Message(
-      from_theta, resolution, scan_counter, active_zoneset, measurements, intensities, diagnostic_messages);
+      from_theta, resolution, scan_counter, active_zoneset, io_state, measurements, intensities, diagnostic_messages);
 }
 
 TEST(MonitoringFrameMsgStampedTest, testMsg)
