@@ -152,6 +152,16 @@ TARGET_LINK_LIBRARIES(unittest_pin_state
 ADD_TEST(NAME unittest_pin_state
          COMMAND unittest_pin_state)
 
+ADD_EXECUTABLE(unittest_io_state test/unit_tests/api/unittest_io_state.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_io_state
+    ${PROJECT_NAME}
+    gtest
+)
+
+ADD_TEST(NAME unittest_io_state
+         COMMAND unittest_io_state)
+
 ADD_EXECUTABLE(unittest_logging test/unit_tests/util/unittest_logging.cpp)
 
 TARGET_LINK_LIBRARIES(unittest_logging

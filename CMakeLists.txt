@@ -346,6 +346,14 @@ if(CATKIN_ENABLE_TESTING)
     fmt::fmt
   )
 
+  catkin_add_gtest(unittest_io_state
+    standalone/test/unit_tests/api/unittest_io_state.cpp
+  )
+  target_link_libraries(unittest_io_state
+    ${catkin_LIBRARIES}
+    fmt::fmt
+  )
+
   catkin_add_gtest(unittest_laserscan_conversions
     standalone/test/unit_tests/data_conversion_layer/unittest_laserscan_conversions.cpp
     standalone/src/laserscan.cpp

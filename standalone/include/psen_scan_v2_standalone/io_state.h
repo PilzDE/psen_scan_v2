@@ -25,6 +25,8 @@ class PinState
 {
 public:
   PinState(uint32_t pin_id, const std::string& name, bool state);
+  bool operator==(const PinState& ps) const;
+  bool operator!=(const PinState& ps) const;
   uint32_t id() const;
   std::string name() const;
   bool state() const;
@@ -38,6 +40,16 @@ private:
 inline PinState::PinState(uint32_t pin_id, const std::string& name, bool state)
   : id_(pin_id), name_(name), state_(state)
 {
+}
+
+inline bool PinState::operator==(const PinState& ps) const
+{
+  return id() == ps.id() && name() == ps.name() && state() == ps.state();
+}
+
+inline bool PinState::operator!=(const PinState& ps) const
+{
+  return !operator==(ps);
 }
 
 inline uint32_t PinState::id() const

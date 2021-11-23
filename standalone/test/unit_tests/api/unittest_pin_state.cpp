@@ -53,6 +53,34 @@ TEST(PinStateTests, shouldReturnSetState)
   EXPECT_EQ(pin1.state(), EXPECTED_STATE_1);
   EXPECT_EQ(pin2.state(), EXPECTED_STATE_2);
 }
+
+TEST(PinStateTests, shouldNotBeEqualWithDifferentId)
+{
+  PinState pin1(EXPECTED_ID_1, EXPECTED_NAME_1, EXPECTED_STATE_1);
+  PinState pin2(EXPECTED_ID_2, EXPECTED_NAME_1, EXPECTED_STATE_1);
+  EXPECT_NE(pin1, pin2);
+}
+
+TEST(PinStateTests, shouldNotBeEqualWithDifferentName)
+{
+  PinState pin1(EXPECTED_ID_1, EXPECTED_NAME_1, EXPECTED_STATE_1);
+  PinState pin2(EXPECTED_ID_1, EXPECTED_NAME_2, EXPECTED_STATE_1);
+  EXPECT_NE(pin1, pin2);
+}
+
+TEST(PinStateTests, shouldNotBeEqualWithDifferentState)
+{
+  PinState pin1(EXPECTED_ID_1, EXPECTED_NAME_1, EXPECTED_STATE_1);
+  PinState pin2(EXPECTED_ID_1, EXPECTED_NAME_1, EXPECTED_STATE_2);
+  EXPECT_NE(pin1, pin2);
+}
+
+TEST(PinStateTests, shouldBeEqual)
+{
+  PinState pin1(EXPECTED_ID_1, EXPECTED_NAME_1, EXPECTED_STATE_1);
+  PinState pin2(EXPECTED_ID_1, EXPECTED_NAME_1, EXPECTED_STATE_1);
+  EXPECT_EQ(pin1, pin2);
+}
 }  // namespace psen_scan_v2_standalone_test
 
 int main(int argc, char** argv)
