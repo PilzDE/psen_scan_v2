@@ -232,6 +232,10 @@ static uint32_t createID(size_t byte_n, size_t bit_n)
 
 static PinState createInputPinState(size_t byte_n, size_t bit_n, bool value)
 {
+  if (byte_n >= RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES)
+  {
+    throw std::out_of_range("");
+  }
   auto id = createID(byte_n, bit_n);
   auto input_bit = PHYSICAL_INPUT_BITS.at(byte_n).at(bit_n);
   const auto& name = PHYSICAL_INPUT_BIT_TO_NAME.at(input_bit);
@@ -246,6 +250,10 @@ static PinState createLogicalPinState(size_t byte_n, size_t bit_n, bool value)
 
 static PinState createOutputPinState(size_t byte_n, size_t bit_n, bool value)
 {
+  if (byte_n >= RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES)
+  {
+    throw std::out_of_range("");
+  }
   auto id = createID(byte_n, bit_n);
   auto input_bit = OUTPUT_BITS.at(byte_n).at(bit_n);
   const auto& name = OUTPUT_BIT_TO_NAME.at(input_bit);
