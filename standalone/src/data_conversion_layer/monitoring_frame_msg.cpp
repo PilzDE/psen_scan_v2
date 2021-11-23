@@ -36,17 +36,17 @@ namespace psen_scan_v2_standalone
 {
 namespace data_conversion_layer
 {
-util::TenthOfDegree data_conversion_layer::monitoring_frame::Message::fromTheta() const
+util::TenthOfDegree monitoring_frame::Message::fromTheta() const
 {
   return from_theta_;
 }
 
-util::TenthOfDegree data_conversion_layer::monitoring_frame::Message::resolution() const
+util::TenthOfDegree monitoring_frame::Message::resolution() const
 {
   return resolution_;
 }
 
-uint32_t data_conversion_layer::monitoring_frame::Message::scanCounter() const
+uint32_t monitoring_frame::Message::scanCounter() const
 {
   if (scan_counter_.is_initialized())
   {
@@ -54,48 +54,50 @@ uint32_t data_conversion_layer::monitoring_frame::Message::scanCounter() const
   }
   else
   {
-    throw data_conversion_layer::monitoring_frame::ScanCounterMissing();
+    throw monitoring_frame::ScanCounterMissing();
   }
 }
 
-uint8_t data_conversion_layer::monitoring_frame::Message::activeZoneset() const
+uint8_t monitoring_frame::Message::activeZoneset() const
 {
   return active_zoneset_;
 }
 
-const std::vector<double>& data_conversion_layer::monitoring_frame::Message::measurements() const
+const std::vector<double>& monitoring_frame::Message::measurements() const
 {
   return measurements_;
 }
 
-const std::vector<double>& data_conversion_layer::monitoring_frame::Message::intensities() const
+const std::vector<double>& monitoring_frame::Message::intensities() const
 {
   return intensities_;
 }
 
-std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message>
-data_conversion_layer::monitoring_frame::Message::diagnosticMessages() const
+std::vector<monitoring_frame::diagnostic::Message> monitoring_frame::Message::diagnosticMessages() const
 {
   return diagnostic_messages_;
 }
 
-IOState data_conversion_layer::monitoring_frame::Message::ioState() const
+IOState monitoring_frame::Message::ioState() const
 {
   return io_state_;
 }
 
-bool data_conversion_layer::monitoring_frame::Message::operator==(
-    const data_conversion_layer::monitoring_frame::Message& rhs) const
+bool monitoring_frame::Message::operator==(const monitoring_frame::Message& rhs) const
 {
   return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
           activeZoneset() == rhs.activeZoneset() && measurements() == rhs.measurements() &&
           intensities() == rhs.intensities() && diagnosticMessages() == rhs.diagnosticMessages());
 }
 
+bool monitoring_frame::Message::operator!=(const monitoring_frame::Message& rhs) const
+{
+  return !operator==(rhs);
+}
+
 namespace monitoring_frame
 {
-std::ostream& operator<<(std::ostream& os,
-                         const psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message& msg)
+std::ostream& operator<<(std::ostream& os, const monitoring_frame::Message& msg)
 {
   os << fmt::format("monitoring_frame::Message(fromTheta = {} deg, resolution = {} deg, scanCounter = "
                     "{}, active_zoneset = {}, measurements = {}, intensities = {}, diagnostics = {})",

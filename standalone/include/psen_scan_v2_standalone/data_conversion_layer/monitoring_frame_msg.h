@@ -89,7 +89,7 @@ public:
           const uint8_t active_zoneset,
           const std::vector<double>& measurements,
           const std::vector<double>& intensities,
-          const std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message>& diagnostic_messages)
+          const std::vector<diagnostic::Message>& diagnostic_messages)
     : from_theta_(from_theta)
     , resolution_(resolution)
     , scan_counter_(scan_counter)
@@ -108,9 +108,10 @@ public:
   uint8_t activeZoneset() const;
   const std::vector<double>& measurements() const;
   const std::vector<double>& intensities() const;
-  std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnosticMessages() const;
+  std::vector<diagnostic::Message> diagnosticMessages() const;
   IOState ioState() const;
-  bool operator==(const data_conversion_layer::monitoring_frame::Message& rhs) const;
+  bool operator==(const monitoring_frame::Message& rhs) const;
+  bool operator!=(const monitoring_frame::Message& rhs) const;
 
 private:
   configuration::ScannerId scanner_id_{ configuration::ScannerId::master };
