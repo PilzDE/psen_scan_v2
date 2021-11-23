@@ -14,12 +14,18 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import sys
 import unittest
-from math import floor
+from math import radians
 
 import rospy
 from sensor_msgs.msg import LaserScan
+
+
+def to_multiple_of_tenth_degree_in_radian(radian_angle: float) -> float:
+    reminder = radian_angle % radians(0.1)
+    if (reminder < 0.5 * radians(0.1)):
+        return radian_angle - reminder
+    return radian_angle + reminder
 
 
 DECIMAL_PLACE_ACCURACY = 6
@@ -48,13 +54,16 @@ class HwtestScanRange(unittest.TestCase):
         self.assertTrue(self.received_msgs)
         message: LaserScan = self.received_msgs[-1]
 
-        num_intervals = floor(
-            (self.angle_end - self.angle_start) / self.resolution)
-        expected_max_angle = self.angle_start + self.resolution * num_intervals
+        angle_start_rounded = to_multiple_of_tenth_degree_in_radian(self.angle_start)
+        angle_end_rounded = to_multiple_of_tenth_degree_in_radian(self.angle_end)
+        resolution_rounded = to_multiple_of_tenth_degree_in_radian(self.resolution)
 
-        self.assertAlmostEqual(self.angle_start, message.angle_min, DECIMAL_PLACE_ACCURACY,
+        expected_max_angle = angle_end_rounded - \
+            ((angle_end_rounded - angle_start_rounded) % resolution_rounded)
+
+        self.assertAlmostEqual(angle_start_rounded, message.angle_min, DECIMAL_PLACE_ACCURACY,
                                "angle_min of the laserscan message is " + str(message.angle_min) +
-                               " but should be " + str(self.angle_start) + ".")
+                               " but should be " + str(angle_start_rounded) + ".")
         self.assertAlmostEqual(expected_max_angle, message.angle_max, DECIMAL_PLACE_ACCURACY,
                                "angle_max of the laserscan message is " + str(message.angle_max) +
                                " but should be " + str(expected_max_angle) + ".")
