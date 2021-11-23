@@ -70,7 +70,7 @@ private:
 };
 
 inline IOState::IOState(std::vector<PinState> input_states, std::vector<PinState> output_states, std::vector<PinState> logical_states)
-  : input_(input_states), output_(output_states), logical_(logical_states)
+  : input_(std::move(input_states)), output_(std::move(output_states)), logical_(std::move(logical_states))
 {
 }
 

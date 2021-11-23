@@ -193,7 +193,7 @@ IOState deserializePins(std::istream& is)
   // Read physical inputs
   raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
   deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, [&input](size_t byte_n, size_t bit_n, bool value) {
-    if (physical_input_bits.at(byte_n).at(bit_n) != io::PhysicalInputType::unused)
+    if (PHYSICAL_INPUT_BITS.at(byte_n).at(bit_n) != io::PhysicalInputType::unused)
     {
       input.push_back(createInputPinState(byte_n, bit_n, value));
     }
@@ -209,7 +209,7 @@ IOState deserializePins(std::istream& is)
   // Read outputs
   raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
   deserializePinField(is, RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES, [&output](size_t byte_n, size_t bit_n, bool value) {
-    if (output_bits.at(byte_n).at(bit_n) != io::OutputType::unused)
+    if (OUTPUT_BITS.at(byte_n).at(bit_n) != io::OutputType::unused)
     {
       output.push_back(createOutputPinState(byte_n, bit_n, value));
     }
