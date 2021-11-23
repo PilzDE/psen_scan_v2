@@ -35,7 +35,8 @@ private:
   bool state_;
 };
 
-inline PinState::PinState(uint32_t pin_id, const std::string& name, bool state) : id_(pin_id), name_(name), state_(state)
+inline PinState::PinState(uint32_t pin_id, const std::string& name, bool state)
+  : id_(pin_id), name_(name), state_(state)
 {
 }
 
@@ -58,7 +59,9 @@ class IOState
 {
 public:
   IOState() = default;
-  IOState(std::vector<PinState> input_states, std::vector<PinState> output_states, std::vector<PinState> logical_states);
+  IOState(std::vector<PinState> input_states,
+          std::vector<PinState> output_states,
+          std::vector<PinState> logical_states);
   std::vector<PinState> input() const;
   std::vector<PinState> output() const;
   std::vector<PinState> logical() const;
@@ -69,7 +72,9 @@ private:
   std::vector<PinState> logical_;
 };
 
-inline IOState::IOState(std::vector<PinState> input_states, std::vector<PinState> output_states, std::vector<PinState> logical_states)
+inline IOState::IOState(std::vector<PinState> input_states,
+                        std::vector<PinState> output_states,
+                        std::vector<PinState> logical_states)
   : input_(std::move(input_states)), output_(std::move(output_states)), logical_(std::move(logical_states))
 {
 }

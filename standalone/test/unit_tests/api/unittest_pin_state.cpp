@@ -32,26 +32,26 @@ static const bool EXPECTED_STATE_2 = true;
 
 TEST(PinStateTests, shouldReturnSetId)
 {
-    PinState pin1(EXPECTED_ID_1, EXPECTED_NAME_1, EXPECTED_STATE_1);
-    PinState pin2(EXPECTED_ID_2, EXPECTED_NAME_1, EXPECTED_STATE_1);
-    EXPECT_EQ(pin1.id(), EXPECTED_ID_1);
-    EXPECT_EQ(pin2.id(), EXPECTED_ID_2);
+  PinState pin1(EXPECTED_ID_1, EXPECTED_NAME_1, EXPECTED_STATE_1);
+  PinState pin2(EXPECTED_ID_2, EXPECTED_NAME_1, EXPECTED_STATE_1);
+  EXPECT_EQ(pin1.id(), EXPECTED_ID_1);
+  EXPECT_EQ(pin2.id(), EXPECTED_ID_2);
 }
 
 TEST(PinStateTests, shouldReturnSetName)
 {
-    PinState pin1(EXPECTED_ID_1, EXPECTED_NAME_1, EXPECTED_STATE_1);
-    PinState pin2(EXPECTED_ID_1, EXPECTED_NAME_2, EXPECTED_STATE_1);
-    EXPECT_EQ(pin1.name(), EXPECTED_NAME_1);
-    EXPECT_EQ(pin2.name(), EXPECTED_NAME_2);
+  PinState pin1(EXPECTED_ID_1, EXPECTED_NAME_1, EXPECTED_STATE_1);
+  PinState pin2(EXPECTED_ID_1, EXPECTED_NAME_2, EXPECTED_STATE_1);
+  EXPECT_EQ(pin1.name(), EXPECTED_NAME_1);
+  EXPECT_EQ(pin2.name(), EXPECTED_NAME_2);
 }
 
 TEST(PinStateTests, shouldReturnSetState)
 {
-    PinState pin1(EXPECTED_ID_1, EXPECTED_NAME_1, EXPECTED_STATE_1);
-    PinState pin2(EXPECTED_ID_1, EXPECTED_NAME_1, EXPECTED_STATE_2);
-    EXPECT_EQ(pin1.state(), EXPECTED_STATE_1);
-    EXPECT_EQ(pin2.state(), EXPECTED_STATE_2);
+  PinState pin1(EXPECTED_ID_1, EXPECTED_NAME_1, EXPECTED_STATE_1);
+  PinState pin2(EXPECTED_ID_1, EXPECTED_NAME_1, EXPECTED_STATE_2);
+  EXPECT_EQ(pin1.state(), EXPECTED_STATE_1);
+  EXPECT_EQ(pin2.state(), EXPECTED_STATE_2);
 }
 }  // namespace psen_scan_v2_standalone_test
 
