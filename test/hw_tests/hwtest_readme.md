@@ -27,7 +27,7 @@ in your catkin workspace.
 ## Run using `colcon`
 To run the hardware tests using `colcon` run something like
 ```
-SENSOR_IP=192.168.0.100 colcon test; colcon test-result
+SENSOR_IP=192.168.0.100 colcon test && colcon test-result
 ```
 ## Build and run using `industrial_ci`
 Setup `industrial_ci` to run locally using [this instructions](https://github.com/ros-industrial/industrial_ci/blob/master/doc/index.rst#simplest-way-to-run-locally).
