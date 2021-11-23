@@ -18,8 +18,10 @@
 #include <stdexcept>
 
 #include <fmt/format.h>
+#include <fmt/ostream.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
+#include "psen_scan_v2_standalone/io_state.h"
 #include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/util/format_range.h"
 
@@ -111,10 +113,20 @@ void LaserScan::setIntensities(const IntensityData& intensities)
   intensities_ = intensities;
 }
 
+void LaserScan::setIOState(const IOState& io_state)
+{
+  io_state_ = io_state;
+}
+
+const IOState& LaserScan::getIOState() const
+{
+  return io_state_;
+}
+
 std::ostream& operator<<(std::ostream& os, const LaserScan& scan)
 {
   os << fmt::format("LaserScan(timestamp = {} nsec, scanCounter = {}, minScanAngle = {} deg, maxScanAngle = {} deg, "
-                    "resolution = {} deg, active_zoneset = {}, measurements = {}, intensities = {})",
+                    "resolution = {} deg, active_zoneset = {}, measurements = {}, intensities = {}, io_state = {})",
                     scan.getTimestamp(),
                     scan.getScanCounter(),
                     scan.getMinScanAngle().value() / 10.,
@@ -122,7 +134,8 @@ std::ostream& operator<<(std::ostream& os, const LaserScan& scan)
                     scan.getScanResolution().value() / 10.,
                     scan.getActiveZoneset(),
                     util::formatRange(scan.getMeasurements()),
-                    util::formatRange(scan.getIntensities()));
+                    util::formatRange(scan.getIntensities()),
+                    scan.getIOState());
   return os;
 }
 

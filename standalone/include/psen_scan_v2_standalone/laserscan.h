@@ -20,6 +20,7 @@
 #include <ostream>
 #include <vector>
 
+#include "psen_scan_v2_standalone/io_state.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
@@ -70,11 +71,16 @@ public:
   const IntensityData& getIntensities() const;
   void setIntensities(const IntensityData& intensities);
 
+  const IOState& getIOState() const;
+  void setIOState(const IOState& io_state);
+
 private:
   //! Measurement data of the laserscan (in Millimeters).
   MeasurementData measurements_;
   //! Stores the received normalized signal intensities.
   IntensityData intensities_;
+  //! State of the I/O pins.
+  IOState io_state_;
   //! Distance of angle between the measurements.
   const util::TenthOfDegree resolution_;
   //! Lowest angle the scanner is scanning.

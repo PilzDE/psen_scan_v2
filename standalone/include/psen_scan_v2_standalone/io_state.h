@@ -19,6 +19,11 @@
 #include <string>
 #include <vector>
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
+#include "psen_scan_v2_standalone/util/format_range.h"
+
 namespace psen_scan_v2_standalone
 {
 class PinState
@@ -67,6 +72,12 @@ inline bool PinState::state() const
   return state_;
 }
 
+inline std::ostream& operator<<(std::ostream& os, const PinState& pin_state)
+{
+  return os << fmt::format(
+             "PinState(id = {}, name = {}, state = {})", pin_state.id(), pin_state.name(), pin_state.state());
+}
+
 class IOState
 {
 public:
@@ -104,6 +115,14 @@ inline std::vector<PinState> IOState::output() const
 inline std::vector<PinState> IOState::logical() const
 {
   return logical_;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const IOState& io_state)
+{
+  return os << fmt::format("IOState(input = {}, output = {}, logical = {})",
+                           util::formatRange(io_state.input()),
+                           util::formatRange(io_state.output()),
+                           util::formatRange(io_state.logical()));
 }
 }  // namespace psen_scan_v2_standalone
 
