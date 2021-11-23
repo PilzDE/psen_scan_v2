@@ -78,12 +78,12 @@ public:
               Resolution resolution);
 
 public:
-  DeviceStatus device_status() const;
-  OpCode op_code() const;
-  WorkingMode working_mode() const;
-  TransactionType transaction_type() const;
-  configuration::ScannerId scanner_id() const;
-  FromTheta from_theta() const;
+  DeviceStatus deviceStatus() const;
+  OpCode opCode() const;
+  WorkingMode workingMode() const;
+  TransactionType transactionType() const;
+  configuration::ScannerId scannerId() const;
+  FromTheta fromTheta() const;
   Resolution resolution() const;
 
 private:
@@ -208,32 +208,32 @@ inline AdditionalFieldHeader::Length AdditionalFieldHeader::length() const
   return length_;
 }
 
-inline FixedFields::DeviceStatus FixedFields::device_status() const
+inline FixedFields::DeviceStatus FixedFields::deviceStatus() const
 {
   return device_status_;
 }
 
-inline FixedFields::OpCode FixedFields::op_code() const
+inline FixedFields::OpCode FixedFields::opCode() const
 {
   return op_code_;
 }
 
-inline FixedFields::WorkingMode FixedFields::working_mode() const
+inline FixedFields::WorkingMode FixedFields::workingMode() const
 {
   return working_mode_;
 }
 
-inline FixedFields::TransactionType FixedFields::transaction_type() const
+inline FixedFields::TransactionType FixedFields::transactionType() const
 {
   return transaction_type_;
 }
 
-inline configuration::ScannerId FixedFields::scanner_id() const
+inline configuration::ScannerId FixedFields::scannerId() const
 {
   return scanner_id_;
 }
 
-inline FixedFields::FromTheta FixedFields::from_theta() const
+inline FixedFields::FromTheta FixedFields::fromTheta() const
 {
   return from_theta_;
 }

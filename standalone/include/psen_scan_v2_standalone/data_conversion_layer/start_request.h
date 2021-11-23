@@ -44,8 +44,8 @@ class Message
 public:
   Message(const ScannerConfiguration& scanner_configuration);
 
-  friend data_conversion_layer::RawData serialize(const data_conversion_layer::start_request::Message&,
-                                                  const uint32_t&);
+  friend data_conversion_layer::RawData serialize(const data_conversion_layer::start_request::Message& msg,
+                                                  const uint32_t& seq_number);
 
 private:
   /**

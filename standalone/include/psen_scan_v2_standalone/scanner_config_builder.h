@@ -38,17 +38,17 @@ public:
   ScannerConfiguration build() const;
 
 public:
-  ScannerConfigurationBuilder& hostIP(const std::string&);
-  ScannerConfigurationBuilder& hostDataPort(const int&);
-  ScannerConfigurationBuilder& hostControlPort(const int&);
-  ScannerConfigurationBuilder& scannerIp(const std::string&);
-  ScannerConfigurationBuilder& scannerDataPort(const int&);
-  ScannerConfigurationBuilder& scannerControlPort(const int&);
-  ScannerConfigurationBuilder& scanRange(const ScanRange&);
-  ScannerConfigurationBuilder& scanResolution(const util::TenthOfDegree&);
-  ScannerConfigurationBuilder& enableDiagnostics(const bool&);
-  ScannerConfigurationBuilder& enableIntensities(const bool&);
-  ScannerConfigurationBuilder& enableFragmentedScans(const bool&);
+  ScannerConfigurationBuilder& hostIP(const std::string& host_ip);
+  ScannerConfigurationBuilder& hostDataPort(const int& host_data_port);
+  ScannerConfigurationBuilder& hostControlPort(const int& host_control_port);
+  ScannerConfigurationBuilder& scannerIp(const std::string& scanner_ip);
+  ScannerConfigurationBuilder& scannerDataPort(const int& scanner_data_port);
+  ScannerConfigurationBuilder& scannerControlPort(const int& scanner_control_port);
+  ScannerConfigurationBuilder& scanRange(const ScanRange& scan_range);
+  ScannerConfigurationBuilder& scanResolution(const util::TenthOfDegree& scan_resolution);
+  ScannerConfigurationBuilder& enableDiagnostics(const bool& enable);
+  ScannerConfigurationBuilder& enableIntensities(const bool& enable);
+  ScannerConfigurationBuilder& enableFragmentedScans(const bool& enable);
   operator ScannerConfiguration();
 
 private:
@@ -79,7 +79,7 @@ inline ScannerConfiguration ScannerConfigurationBuilder::build() const
 
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::hostIP(const std::string& ip)
 {
-  if (ip != "" && ip != "auto")
+  if (!ip.empty() && ip != "auto")
   {
     config_.host_ip_ = util::convertIP(ip);
   }

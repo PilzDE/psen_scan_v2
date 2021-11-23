@@ -58,7 +58,7 @@ private:
    * was not notified. For more info see:
    * https://en.cppreference.com/w/cpp/thread/condition_variable/wait_for
    */
-  std::cv_status wait_for(const Timeout& timeout);
+  std::cv_status waitFor(const Timeout& timeout);
 
 private:
   util::Barrier thread_startetd_barrier_;
@@ -73,7 +73,7 @@ inline Watchdog::Watchdog(const Timeout& timeout, const std::function<void()>& t
     thread_startetd_barrier_.release();
     while (!terminated_)
     {
-      if ((this->wait_for(timeout) == std::cv_status::timeout) && !terminated_)
+      if ((this->waitFor(timeout) == std::cv_status::timeout) && !terminated_)
       {
         timeout_callback();
       }
@@ -92,7 +92,7 @@ inline Watchdog::Watchdog(const Timeout& timeout, const std::function<void()>& t
   }
 }
 
-inline std::cv_status Watchdog::wait_for(const Timeout& timeout)
+inline std::cv_status Watchdog::waitFor(const Timeout& timeout)
 {
   std::unique_lock<std::mutex> lk(cv_m_);
   return cv_.wait_for(lk, timeout);

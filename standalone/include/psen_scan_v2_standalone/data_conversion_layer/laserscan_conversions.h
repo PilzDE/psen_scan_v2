@@ -214,16 +214,16 @@ inline bool LaserScanConverter::thetaAnglesFitTogether(
     const std::vector<data_conversion_layer::monitoring_frame::MessageStamped>& stamped_msgs,
     const std::vector<int>& sorted_filled_stamped_msgs_indices)
 {
-  util::TenthOfDegree lastEnd = stamped_msgs[sorted_filled_stamped_msgs_indices[0]].msg_.fromTheta();
+  util::TenthOfDegree last_end = stamped_msgs[sorted_filled_stamped_msgs_indices[0]].msg_.fromTheta();
   for (auto index : sorted_filled_stamped_msgs_indices)
   {
     const auto& stamped_msg = stamped_msgs[index];
-    if (lastEnd != stamped_msg.msg_.fromTheta())
+    if (last_end != stamped_msg.msg_.fromTheta())
     {
       return false;
     }
-    lastEnd = stamped_msg.msg_.fromTheta() +
-              stamped_msg.msg_.resolution() * static_cast<int>(stamped_msg.msg_.measurements().size());
+    last_end = stamped_msg.msg_.fromTheta() +
+               stamped_msg.msg_.resolution() * static_cast<int>(stamped_msg.msg_.measurements().size());
   }
   return true;
 }

@@ -65,10 +65,10 @@ public:
 
   const MeasurementData& getMeasurements() const;
   MeasurementData& getMeasurements();
-  void setMeasurements(const MeasurementData&);
+  void setMeasurements(const MeasurementData& measurements);
 
   const IntensityData& getIntensities() const;
-  void setIntensities(const IntensityData&);
+  void setIntensities(const IntensityData& intensities);
 
 private:
   //! Measurement data of the laserscan (in Millimeters).

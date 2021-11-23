@@ -97,7 +97,7 @@ std::map<int16_t, NormalDist> binsFromScans(const std::vector<ScanConstPtr>& sca
   return bins;
 }
 
-std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
+std::map<int16_t, NormalDist> binsFromRosbag(const std::string& filepath)
 {
   std::map<int16_t, NormalDist> bins;
 
@@ -123,7 +123,7 @@ template <typename ScanType>
 class LaserScanValidator
 {
 public:
-  LaserScanValidator(std::map<int16_t, NormalDist> bins_expected) : bins_expected_(bins_expected){};
+  LaserScanValidator(std::map<int16_t, NormalDist> bins_expected) : bins_expected_(std::move(bins_expected)){};
 
   typedef boost::shared_ptr<ScanType const> ScanConstPtr;
 
@@ -168,8 +168,8 @@ public:
           error_string +=
               fmt::format("On {:+.1f} deg  expected: {} actual: {} | dist: {:.1f}, dmean: {:.3f}, dstdev: {:.3f}\n",
                           bin_actual.first / 10.,
-                          dist_expected.to_string(),
-                          dist_actual.to_string(),
+                          dist_expected.toString(),
+                          dist_actual.toString(),
                           distance,
                           abs(dist_expected.mean() - dist_actual.mean()),
                           abs(dist_expected.stdev() - dist_actual.stdev()));

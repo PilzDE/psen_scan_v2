@@ -118,15 +118,15 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
 {
   try
   {
-    const auto laserScanMsg = toLaserScanMsg(scan, tf_prefix_, x_axis_rotation_);
+    const auto laser_scan_msg = toLaserScanMsg(scan, tf_prefix_, x_axis_rotation_);
     PSENSCAN_INFO_ONCE(
         "ScannerNode",
         "Publishing laser scan with angle_min={:.1f} angle_max={:.1f} angle_increment={:.1f} degrees. {} angle values.",
-        data_conversion_layer::radianToDegree(laserScanMsg.angle_min),
-        data_conversion_layer::radianToDegree(laserScanMsg.angle_max),
-        data_conversion_layer::radianToDegree(laserScanMsg.angle_increment),
-        laserScanMsg.ranges.size());
-    pub_scan_.publish(laserScanMsg);
+        data_conversion_layer::radianToDegree(laser_scan_msg.angle_min),
+        data_conversion_layer::radianToDegree(laser_scan_msg.angle_max),
+        data_conversion_layer::radianToDegree(laser_scan_msg.angle_increment),
+        laser_scan_msg.ranges.size());
+    pub_scan_.publish(laser_scan_msg);
     std_msgs::UInt8 active_zoneset;
     active_zoneset.data = scan.getActiveZoneset();
     pub_zone_.publish(active_zoneset);

@@ -79,8 +79,8 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
 
   FixedFields frame_header = readFixedFields(ss);
 
-  msg.scanner_id_ = frame_header.scanner_id();
-  msg.from_theta_ = frame_header.from_theta();
+  msg.scanner_id_ = frame_header.scannerId();
+  msg.from_theta_ = frame_header.fromTheta();
   msg.resolution_ = frame_header.resolution();
 
   bool end_of_frame{ false };
@@ -179,7 +179,7 @@ std::vector<diagnostic::Message> deserializeMessages(std::istream& is)
 
       for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
       {
-        if (raw_bits.test(bit_n) && (diagnostic::ErrorType::unused != diagnostic::error_bits[byte_n][bit_n]))
+        if (raw_bits.test(bit_n) && (diagnostic::ErrorType::unused != diagnostic::ERROR_BITS[byte_n][bit_n]))
         {
           diagnostic_messages.push_back(diagnostic::Message(static_cast<configuration::ScannerId>(scanner_id),
                                                             diagnostic::ErrorLocation(byte_n, bit_n)));
