@@ -171,69 +171,52 @@ AdditionalFieldHeader readAdditionalField(std::istream& is, const std::size_t& m
 
 namespace io
 {
-typedef std::function<void(size_t, size_t, bool)> AddPinStateFunction;
+typedef std::function<PinState(size_t, size_t, bool)> AddPinStateFunction;
 
-void deserializePinField(std::istream& is, std::size_t length_in_bytes, const AddPinStateFunction& add_func)
+std::vector<PinState> deserializePinField(std::istream& is, std::size_t length_in_bytes, const AddPinStateFunction& add_func)
 {
+  std::vector<PinState> pin_field;
   for (size_t byte_n = 0; byte_n < length_in_bytes; byte_n++)
   {
     const auto raw_byte = raw_processing::read<uint8_t>(is);
     const std::bitset<8> raw_bits(raw_byte);
     for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
     {
-      add_func(byte_n, bit_n, raw_bits[bit_n]);
+      auto pin_state = add_func(byte_n, bit_n, raw_bits[bit_n]);
+      if (pin_state.name() != "unused")
+      {
+        pin_field.push_back(pin_state);
+      }
     }
   }
+  return pin_field;
 }
 
 IOState deserializePins(std::istream& is)
 {
-  std::vector<PinState> physical_input_0;
-  std::vector<PinState> physical_input_1;
-  std::vector<PinState> physical_input_2;
-  std::vector<PinState> logical_input;
-  std::vector<PinState> output;
-
   // Read physical inputs 0
   raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, [&physical_input_0](size_t byte_n, size_t bit_n, bool value) {
-    if (PHYSICAL_INPUT_BITS.at(byte_n).at(bit_n) != io::PhysicalInputType::unused)
-    {
-      physical_input_0.push_back(createInputPinState(byte_n, bit_n, value));
-    }
-  });
+  std::vector<PinState> physical_input_0 =
+      deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, createInputPinState);
+
   // Read physical inputs 1
   raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, [&physical_input_1](size_t byte_n, size_t bit_n, bool value) {
-    if (PHYSICAL_INPUT_BITS.at(byte_n).at(bit_n) != io::PhysicalInputType::unused)
-    {
-      physical_input_1.push_back(createInputPinState(byte_n, bit_n, value));
-    }
-  });
+  std::vector<PinState> physical_input_1 =
+      deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, createInputPinState);
+
   // Read physical inputs 2
-  raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, [&physical_input_2](size_t byte_n, size_t bit_n, bool value) {
-    if (PHYSICAL_INPUT_BITS.at(byte_n).at(bit_n) != io::PhysicalInputType::unused)
-    {
-      physical_input_2.push_back(createInputPinState(byte_n, bit_n, value));
-    }
-  });
+  std::vector<PinState> physical_input_2 =
+      deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, createInputPinState);
 
   // Read logical inputs
   raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  deserializePinField(
-      is, RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES, [&logical_input](size_t byte_n, size_t bit_n, bool value) {
-        logical_input.push_back(createLogicalPinState(byte_n, bit_n, value));
-      });
+  std::vector<PinState> logical_input =
+      deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, createLogicalPinState);
 
   // Read outputs
   raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  deserializePinField(is, RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES, [&output](size_t byte_n, size_t bit_n, bool value) {
-    if (OUTPUT_BITS.at(byte_n).at(bit_n) != io::OutputType::unused)
-    {
-      output.push_back(createOutputPinState(byte_n, bit_n, value));
-    }
-  });
+  std::vector<PinState> output =
+      deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, createOutputPinState);
 
   return IOState(physical_input_0, physical_input_1, physical_input_2, logical_input, output);
 }
