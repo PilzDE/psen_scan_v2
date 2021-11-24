@@ -82,29 +82,51 @@ class IOState
 {
 public:
   IOState() = default;
-  IOState(std::vector<PinState> input_states,
-          std::vector<PinState> output_states,
-          std::vector<PinState> logical_states);
-  std::vector<PinState> input() const;
+  IOState(std::vector<PinState> physical_input_0,
+          std::vector<PinState> physical_input_1,
+          std::vector<PinState> physical_input_2,
+          std::vector<PinState> output,
+          std::vector<PinState> logical_input);
+  std::vector<PinState> physicalInput0() const;
+  std::vector<PinState> physicalInput1() const;
+  std::vector<PinState> physicalInput2() const;
   std::vector<PinState> output() const;
-  std::vector<PinState> logical() const;
+  std::vector<PinState> logicalInput() const;
 
 private:
-  std::vector<PinState> input_;
-  std::vector<PinState> output_;
-  std::vector<PinState> logical_;
+  std::vector<PinState> physical_input_0_{};
+  std::vector<PinState> physical_input_1_{};
+  std::vector<PinState> physical_input_2_{};
+  std::vector<PinState> logical_input_{};
+  std::vector<PinState> output_{};
 };
 
-inline IOState::IOState(std::vector<PinState> input_states,
-                        std::vector<PinState> output_states,
-                        std::vector<PinState> logical_states)
-  : input_(std::move(input_states)), output_(std::move(output_states)), logical_(std::move(logical_states))
+inline IOState::IOState(std::vector<PinState> physical_input_0,
+                        std::vector<PinState> physical_input_1,
+                        std::vector<PinState> physical_input_2,
+                        std::vector<PinState> logical_input,
+                        std::vector<PinState> output)
+  : physical_input_0_(std::move(physical_input_0))
+  , physical_input_1_(std::move(physical_input_1))
+  , physical_input_2_(std::move(physical_input_2))
+  , logical_input_(std::move(logical_input))
+  , output_(std::move(output))
 {
 }
 
-inline std::vector<PinState> IOState::input() const
+inline std::vector<PinState> IOState::physicalInput0() const
 {
-  return input_;
+  return physical_input_0_;
+}
+
+inline std::vector<PinState> IOState::physicalInput1() const
+{
+  return physical_input_1_;
+}
+
+inline std::vector<PinState> IOState::physicalInput2() const
+{
+  return physical_input_2_;
 }
 
 inline std::vector<PinState> IOState::output() const
@@ -112,17 +134,20 @@ inline std::vector<PinState> IOState::output() const
   return output_;
 }
 
-inline std::vector<PinState> IOState::logical() const
+inline std::vector<PinState> IOState::logicalInput() const
 {
-  return logical_;
+  return logical_input_;
 }
 
 inline std::ostream& operator<<(std::ostream& os, const IOState& io_state)
 {
-  return os << fmt::format("IOState(input = {}, output = {}, logical = {})",
-                           util::formatRange(io_state.input()),
+  return os << fmt::format("IOState(physicalInput0 = {}, physicalInput1 = {}, physicalInput2 = {}, logicalInput "
+                           "= {}, output = {})",
+                           util::formatRange(io_state.physicalInput0()),
+                           util::formatRange(io_state.physicalInput1()),
+                           util::formatRange(io_state.physicalInput2()),
                            util::formatRange(io_state.output()),
-                           util::formatRange(io_state.logical()));
+                           util::formatRange(io_state.logicalInput()));
 }
 }  // namespace psen_scan_v2_standalone
 

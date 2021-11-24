@@ -75,8 +75,10 @@ using namespace std::chrono_literals;
       expected_exception);
 
 #define EXPECT_IO_STATE_EQ(expected_io_state, io_state)                                                                \
-  EXPECT_EQ(expected_io_state.input(), io_state.input());                                                              \
-  EXPECT_EQ(expected_io_state.output(), io_state.output());                                                            \
-  EXPECT_EQ(expected_io_state.logical(), io_state.logical());
+  EXPECT_EQ(expected_io_state.physicalInput0(), io_state.physicalInput0());                                            \
+  EXPECT_EQ(expected_io_state.physicalInput1(), io_state.physicalInput1());                                            \
+  EXPECT_EQ(expected_io_state.physicalInput2(), io_state.physicalInput2());                                            \
+  EXPECT_EQ(expected_io_state.logicalInput(), io_state.logicalInput());                                                \
+  EXPECT_EQ(expected_io_state.output(), io_state.output());
 
 #endif  // PSEN_SCAN_V2_STANDALONE_TEST_EXPECTATIONS_H

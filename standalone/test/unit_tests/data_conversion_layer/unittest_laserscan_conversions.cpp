@@ -43,7 +43,9 @@ createStampedMsg(const int64_t timestamp = DEFAULT_TIMESTAMP,
                  const uint32_t scan_counter = uint32_t{ 42 },
                  const uint8_t active_zoneset = uint8_t{ 0 })
 {
-  const IOState io_state({ PinState(0, fmt::format("input_{}", scan_counter), true) },
+  const IOState io_state({ PinState(0, fmt::format("input0_{}", scan_counter), true) },
+                         { PinState(0, fmt::format("input1_{}", scan_counter), true) },
+                         { PinState(0, fmt::format("input2_{}", scan_counter), true) },
                          { PinState(0, fmt::format("output_{}", scan_counter), false),
                            PinState(1, fmt::format("output2_{}", scan_counter), true) },
                          { PinState(0, fmt::format("logical_{}", scan_counter), false) });  // encode scan counter in
@@ -346,12 +348,12 @@ TEST(LaserScanConversionTest, conversionShouldIgnoreEmptyFramesForMonitoringFram
   // The following from_theta's are a real example from wireshark.
   // (angle_start:=-0.1, angle_end:=0.1)
   std::vector<Stamped> stamped_msgs = {
-    Stamped(Message(Tenth(2500), Tenth(2), 42, 1, IOState({}, {}, {}), {}, {}, {}), 3),
-    Stamped(Message(Tenth(0), Tenth(2), 42, 1, IOState({}, {}, {}), {}, {}, {}), 4),
-    Stamped(Message(Tenth(500), Tenth(2), 42, 1, IOState({}, {}, {}), {}, {}, {}), 5),
-    Stamped(Message(Tenth(1318), Tenth(2), 42, 1, IOState({}, {}, {}), { 1., 2., 3. }, { 4., 5., 6. }, {}), 6),
-    Stamped(Message(Tenth(1500), Tenth(2), 42, 1, IOState({}, {}, {}), {}, {}, {}), 7),
-    Stamped(Message(Tenth(2000), Tenth(2), 42, 1, IOState({}, {}, {}), {}, {}, {}), 8)
+    Stamped(Message(Tenth(2500), Tenth(2), 42, 1, IOState(), {}, {}, {}), 3),
+    Stamped(Message(Tenth(0), Tenth(2), 42, 1, IOState(), {}, {}, {}), 4),
+    Stamped(Message(Tenth(500), Tenth(2), 42, 1, IOState(), {}, {}, {}), 5),
+    Stamped(Message(Tenth(1318), Tenth(2), 42, 1, IOState(), { 1., 2., 3. }, { 4., 5., 6. }, {}), 6),
+    Stamped(Message(Tenth(1500), Tenth(2), 42, 1, IOState(), {}, {}, {}), 7),
+    Stamped(Message(Tenth(2000), Tenth(2), 42, 1, IOState(), {}, {}, {}), 8)
   };
 
   ASSERT_NO_THROW(data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs));
@@ -362,12 +364,12 @@ TEST(LaserScanConversionsTest, conversionShouldIgnoreEmptyFramesForTimestampsCom
   // The following from_theta's are a real example from wireshark.
   // (angle_start:=-0.1, angle_end:=0.1)
   std::vector<Stamped> stamped_msgs = {
-    Stamped(Message(Tenth(2500), Tenth(2), 42, 1, IOState({}, {}, {}), {}, {}, {}), 1),
-    Stamped(Message(Tenth(0), Tenth(2), 42, 1, IOState({}, {}, {}), {}, {}, {}), 2),
-    Stamped(Message(Tenth(500), Tenth(2), 42, 1, IOState({}, {}, {}), {}, {}, {}), 3),
-    Stamped(Message(Tenth(1318), Tenth(2), 42, 1, IOState({}, {}, {}), { 1., 2., 3. }, { 4., 5., 6. }, {}), 40000),
-    Stamped(Message(Tenth(1500), Tenth(2), 42, 1, IOState({}, {}, {}), {}, {}, {}), 5),
-    Stamped(Message(Tenth(2000), Tenth(2), 42, 1, IOState({}, {}, {}), {}, {}, {}), 6)
+    Stamped(Message(Tenth(2500), Tenth(2), 42, 1, IOState(), {}, {}, {}), 1),
+    Stamped(Message(Tenth(0), Tenth(2), 42, 1, IOState(), {}, {}, {}), 2),
+    Stamped(Message(Tenth(500), Tenth(2), 42, 1, IOState(), {}, {}, {}), 3),
+    Stamped(Message(Tenth(1318), Tenth(2), 42, 1, IOState(), { 1., 2., 3. }, { 4., 5., 6. }, {}), 40000),
+    Stamped(Message(Tenth(1500), Tenth(2), 42, 1, IOState(), {}, {}, {}), 5),
+    Stamped(Message(Tenth(2000), Tenth(2), 42, 1, IOState(), {}, {}, {}), 6)
   };
   const int64_t expected_stamp{ 6667 };  // 40000 - ((0.4/360) * 30*10^6)
 

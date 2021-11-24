@@ -34,6 +34,8 @@ static const int64_t DEFAULT_TIMESTAMP{ 1 };
 static const uint32_t DEFAULT_SCAN_COUNTER{ 1 };
 static const uint8_t DEFAULT_ACTIVE_ZONESET{ 2 };
 static const IOState DEFAULT_IO_STATE({ PinState(0, "input_test", true) },
+                                      { PinState(1, "input_test", true) },
+                                      { PinState(2, "input_test", true) },
                                       { PinState(0, "output_test", false), PinState(1, "output_test2", true) },
                                       { PinState(0, "logical_test", false) });
 
@@ -167,9 +169,11 @@ TEST(LaserScanTest, testSetAndGetIOState)
   ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
 
   laser_scan->setIOState(DEFAULT_IO_STATE);
-  EXPECT_EQ(laser_scan->getIOState().input(), DEFAULT_IO_STATE.input());
+  EXPECT_EQ(laser_scan->getIOState().physicalInput0(), DEFAULT_IO_STATE.physicalInput0());
+  EXPECT_EQ(laser_scan->getIOState().physicalInput1(), DEFAULT_IO_STATE.physicalInput1());
+  EXPECT_EQ(laser_scan->getIOState().physicalInput2(), DEFAULT_IO_STATE.physicalInput2());
+  EXPECT_EQ(laser_scan->getIOState().logicalInput(), DEFAULT_IO_STATE.logicalInput());
   EXPECT_EQ(laser_scan->getIOState().output(), DEFAULT_IO_STATE.output());
-  EXPECT_EQ(laser_scan->getIOState().logical(), DEFAULT_IO_STATE.logical());
 }
 
 TEST(LaserScanTest, testPrintMessageSuccess)
@@ -179,7 +183,7 @@ TEST(LaserScanTest, testPrintMessageSuccess)
   ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
 
   laser_scan->setMeasurements({ 45.0, 44.0, 43.0, 42.0 });
-  laser_scan->setIOState(IOState({}, { PinState(3, "io_pin", true) }, {}));
+  laser_scan->setIOState(IOState({}, {}, {}, { PinState(3, "io_pin", true) }, {}));
 
 // For compatibility with different ubuntu versions (resp. fmt), we need to take account of changes in
 // the default formatting of floating point numbers
@@ -187,12 +191,14 @@ TEST(LaserScanTest, testPrintMessageSuccess)
   EXPECT_EQ(fmt::format("{}", *laser_scan),
             "LaserScan(timestamp = 1 nsec, scanCounter = 1, minScanAngle = 0.1 deg, maxScanAngle = 0.2 deg, resolution "
             "= 0.1 deg, active_zoneset = 2, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {}, io_state = "
-            "IOState(input = {}, output = {PinState(id = 3, name = io_pin, state = true)}, logical = {}))");
+            "IOState(physicalInput0 = {}, physicalInput1 = {}, physicalInput2 = {}, logicalInput = {}, output = "
+            "{PinState(id = 3, name = io_pin, state = true)}))");
 #else
   EXPECT_EQ(fmt::format("{}", *laser_scan),
             "LaserScan(timestamp = 1 nsec, scanCounter = 1, minScanAngle = 0.1 deg, maxScanAngle = 0.2 deg, resolution "
             "= 0.1 deg, active_zoneset = 2, measurements = {45, 44, 43, 42}, intensities = {}, io_state = "
-            "IOState(input = {}, output = {PinState(id = 3, name = io_pin, state = true)}, logical = {}))");
+            "IOState(physicalInput0 = {}, physicalInput1 = {}, physicalInput2 = {}, logicalInput = {}, output = "
+            "{PinState(id = 3, name = io_pin, state = true)}))");
 #endif
 }
 

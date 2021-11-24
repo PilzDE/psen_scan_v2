@@ -41,7 +41,9 @@ const util::TenthOfDegree DEFAULT_FROM_THETA(100);
 const util::TenthOfDegree DEFAULT_RESOLUTION(10);
 const uint32_t DEFAULT_SCAN_COUNTER(42);
 const uint8_t DEFAULT_ACTIVE_ZONESET(0);
-const IOState DEFAULT_IO_STATE({ PinState(1, "zone", true) },
+const IOState DEFAULT_IO_STATE({ PinState(1, "zone1", true) },
+                               { PinState(2, "zone1", true) },
+                               { PinState(1, "zone1", false) },
                                { PinState(4, "OSST", false) },
                                { PinState(5, "", true) });
 const std::vector<double> DEFAULT_MEASUREMENTS{ 1, 2, 3 };

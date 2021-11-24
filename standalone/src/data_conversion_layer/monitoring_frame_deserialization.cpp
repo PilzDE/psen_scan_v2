@@ -89,7 +89,7 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
   while (!end_of_frame)
   {
     const AdditionalFieldHeader additional_header{ readAdditionalField(ss, num_bytes) };
-
+    PSENSCAN_ERROR("Debug", "Current id: {:#02x} and its length{}", additional_header.id(), additional_header.length());
     switch (static_cast<AdditionalFieldHeaderID>(additional_header.id()))
     {
       case AdditionalFieldHeaderID::scan_counter:
@@ -143,8 +143,10 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
         break;
       }
       default:
-        throw DecodingFailure(fmt::format(
-            "Header Id {:#04x} unknown. Cannot read additional field of monitoring frame.", additional_header.id()));
+        throw DecodingFailure(
+            fmt::format("Header Id {:#04x} unknown. Cannot read additional field of monitoring frame On Position {}.",
+                        additional_header.id(),
+                        ss.tellp()));
     }
   }
   return msg;
@@ -186,24 +188,42 @@ void deserializePinField(std::istream& is, std::size_t length_in_bytes, const Ad
 
 IOState deserializePins(std::istream& is)
 {
-  std::vector<PinState> input;
-  std::vector<PinState> logical;
+  std::vector<PinState> physical_input_0;
+  std::vector<PinState> physical_input_1;
+  std::vector<PinState> physical_input_2;
+  std::vector<PinState> logical_input;
   std::vector<PinState> output;
 
-  // Read physical inputs
+  // Read physical inputs 0
   raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, [&input](size_t byte_n, size_t bit_n, bool value) {
+  deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, [&physical_input_0](size_t byte_n, size_t bit_n, bool value) {
     if (PHYSICAL_INPUT_BITS.at(byte_n).at(bit_n) != io::PhysicalInputType::unused)
     {
-      input.push_back(createInputPinState(byte_n, bit_n, value));
+      physical_input_0.push_back(createInputPinState(byte_n, bit_n, value));
+    }
+  });
+  // Read physical inputs 1
+  raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
+  deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, [&physical_input_1](size_t byte_n, size_t bit_n, bool value) {
+    if (PHYSICAL_INPUT_BITS.at(byte_n).at(bit_n) != io::PhysicalInputType::unused)
+    {
+      physical_input_1.push_back(createInputPinState(byte_n, bit_n, value));
+    }
+  });
+  // Read physical inputs 2
+  raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
+  deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, [&physical_input_2](size_t byte_n, size_t bit_n, bool value) {
+    if (PHYSICAL_INPUT_BITS.at(byte_n).at(bit_n) != io::PhysicalInputType::unused)
+    {
+      physical_input_2.push_back(createInputPinState(byte_n, bit_n, value));
     }
   });
 
   // Read logical inputs
   raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
   deserializePinField(
-      is, RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES, [&logical](size_t byte_n, size_t bit_n, bool value) {
-        logical.push_back(createLogicalPinState(byte_n, bit_n, value));
+      is, RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES, [&logical_input](size_t byte_n, size_t bit_n, bool value) {
+        logical_input.push_back(createLogicalPinState(byte_n, bit_n, value));
       });
 
   // Read outputs
@@ -215,7 +235,7 @@ IOState deserializePins(std::istream& is)
     }
   });
 
-  return IOState(input, logical, output);
+  return IOState(physical_input_0, physical_input_1, physical_input_2, logical_input, output);
 }
 }  // namespace io
 

@@ -86,7 +86,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
       util::TenthOfDegree(1),
       456,
       2,
-      IOState({}, {}, {}),
+      IOState(),
       { 10, 20, std::numeric_limits<double>::infinity(), 40 },
       { 15, 25, 35, 45 },
       { data_conversion_layer::monitoring_frame::diagnostic::Message(configuration::ScannerId::master,
@@ -105,7 +105,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
 TEST(MonitoringFrameSerializationTest, shouldFailOnSerializeAndDeserializeFrameWithIntensityChannelBits)
 {
   data_conversion_layer::monitoring_frame::Message msg(
-      util::TenthOfDegree(25), util::TenthOfDegree(1), 1, 0, IOState({}, {}, {}), { 0 }, { 70045 }, {});
+      util::TenthOfDegree(25), util::TenthOfDegree(1), 1, 0, IOState(), { 0 }, { 70045 }, {});
 
   auto raw = serialize(msg);
   auto deserialized_msg = data_conversion_layer::monitoring_frame::deserialize(convertToRawData(raw), raw.size());

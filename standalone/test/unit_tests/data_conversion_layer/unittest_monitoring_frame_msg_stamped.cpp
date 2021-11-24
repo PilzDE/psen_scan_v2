@@ -31,7 +31,11 @@ createMsg(const util::TenthOfDegree from_theta = util::TenthOfDegree{ 10 },
           const uint32_t scan_counter = uint32_t{ 42 },
           const uint8_t active_zoneset = uint8_t{ 1 })
 {
-  const IOState io_state({ PinState(1, "zone", true) }, { PinState(4, "OSST", false) }, { PinState(5, "", true) });
+  const IOState io_state({ PinState(1, "zone1", true) },
+                         { PinState(2, "zone1", true) },
+                         { PinState(1, "zone", false) },
+                         { PinState(4, "OSST", false) },
+                         { PinState(5, "", true) });
   const std::vector<double> measurements{ 1., 2., 3., 4.5, 5., 42. };
   const std::vector<double> intensities{ 0., 4., 3., 1007., 508., 14000. };
   const std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnostic_messages{};

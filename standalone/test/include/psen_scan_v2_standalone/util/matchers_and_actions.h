@@ -16,6 +16,9 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_TEST_MATCHERS_AND_ACTIONS_H
 #define PSEN_SCAN_V2_STANDALONE_TEST_MATCHERS_AND_ACTIONS_H
 
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+
 #include "psen_scan_v2_standalone/util/timestamp.h"
 
 namespace psen_scan_v2_standalone_test

@@ -183,15 +183,15 @@ TARGET_LINK_LIBRARIES(unittest_monitoring_frame_diagnostic_message
 ADD_TEST(NAME unittest_monitoring_frame_diagnostic_message
          COMMAND unittest_monitoring_frame_diagnostic_message)
 
-ADD_EXECUTABLE(unittest_create_pin_state test/unit_tests/data_conversion_layer/unittest_create_pin_state.cpp)
+ADD_EXECUTABLE(unittest_pin_state_creation test/unit_tests/data_conversion_layer/unittest_pin_state_creation.cpp)
 
-TARGET_LINK_LIBRARIES(unittest_create_pin_state
+TARGET_LINK_LIBRARIES(unittest_pin_state_creation
     ${PROJECT_NAME}
     gtest
 )
 
-ADD_TEST(NAME unittest_create_pin_state
-         COMMAND unittest_create_pin_state)
+ADD_TEST(NAME unittest_pin_state_creation
+         COMMAND unittest_pin_state_creation)
 
 ADD_EXECUTABLE(unittest_monitoring_frame_msg test/unit_tests/data_conversion_layer/unittest_monitoring_frame_msg.cpp)
 
