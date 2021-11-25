@@ -24,17 +24,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <arg name="tf_prefix" default="laser_1" />
 
   <!-- Start angle of measurement in radian -->
-  <arg name="angle_start" default="-2.398082392240209" />
+  <arg name="angle_start" default="$(eval 'radians(-137.4)')" />
 
   <!-- End angle of measurement in radian -->
 
-  <arg name="angle_end" default="2.398082392240209" />
+  <arg name="angle_end" default="$(eval 'radians(137.4)')" />
 
   <!-- Publishing of intensities -->
   <arg name="intensities" default="false" />
 
   <!-- Scan resolution in radian -->
-  <arg name="resolution" default="0.0017453292519943296" />
+  <arg name="resolution" default="$(eval 'radians(0.1)')" />
 
   <!-- IP-Address of host machine -->
   <arg name="host_ip" default="auto" />
