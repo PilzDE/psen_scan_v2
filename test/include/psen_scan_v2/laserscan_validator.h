@@ -34,9 +34,7 @@
 #include <rclcpp/serialization.hpp>
 #include <rclcpp/serialized_message.hpp>
 
-#include <rosbag2_cpp/readers/sequential_reader.hpp>
-#include <rosbag2_cpp/converter_options.hpp>
-#include <rosbag2_cpp/storage_options.hpp>
+#include <rosbag2_cpp/reader.hpp>
 #include <rosbag2_storage/storage_filter.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
 
@@ -103,21 +101,11 @@ std::map<int16_t, NormalDist> binsFromRosbag(std::string path)
 {
   std::map<int16_t, NormalDist> bins;
 
-  // the following could be simplified if https://github.com/ros2/rosbag2/pull/452 would be released to foxy
-  rosbag2_cpp::StorageOptions storage_options;
-  storage_options.uri = path;
-  storage_options.storage_id = "sqlite3";
-
-  rosbag2_cpp::ConverterOptions converter_options;
-  converter_options.input_serialization_format = "cdr";
-  converter_options.output_serialization_format = "cdr";
+  rosbag2_cpp::Reader reader;
+  reader.open(path);
 
   rosbag2_storage::StorageFilter storage_filter;
   storage_filter.topics.push_back("/laser_1/scan");
-
-  rosbag2_cpp::readers::SequentialReader reader;
-  reader.open(storage_options, converter_options);
-
   reader.set_filter(storage_filter);
 
   rclcpp::Serialization<sensor_msgs::msg::LaserScan> serialization;
