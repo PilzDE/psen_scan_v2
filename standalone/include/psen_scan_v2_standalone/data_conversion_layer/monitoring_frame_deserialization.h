@@ -157,7 +157,7 @@ std::vector<PinState> deserializePinField(std::istream& is,
                                           const AddPinStateFunction& add_func);
 
 IOState deserializePins(std::istream& is);
-}
+}  // namespace io
 
 /**
  * @brief Exception thrown on problems during the extraction of the measurement data.
