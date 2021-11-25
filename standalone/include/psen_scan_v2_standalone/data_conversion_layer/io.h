@@ -132,6 +132,12 @@ static const std::map<Pit, IoName> PHYSICAL_INPUT_BIT_TO_NAME
 
   static constexpr std::array<std::array<Pit, 8>, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES> PHYSICAL_INPUT_BITS{{
   //    Bit7              Bit6              Bit5              Bit4              Bit3              Bit2              Bit1              Bit0
+  {     Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused },
+  {     Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused },
+  {     Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused },
+  {     Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused },
+  {     Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused },
+  {     Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused },
   { REV(Pit::zone_sw_8,   Pit::zone_sw_7,   Pit::zone_sw_6,   Pit::zone_sw_5,   Pit::zone_sw_4,   Pit::zone_sw_3,   Pit::zone_sw_2,   Pit::zone_sw_1) },
   { REV(Pit::override_12, Pit::override_11, Pit::muting_12,   Pit::muting_11,   Pit::muting_en_1, Pit::restart_1,   Pit::unused,      Pit::reset) },
   { REV(Pit::edm_2,       Pit::override_22, Pit::override_21, Pit::muting_22,   Pit::muting_21,   Pit::muting_en_2, Pit::restart_2,   Pit::edm_1) },
@@ -187,7 +193,7 @@ static const std::map<Ot, IoName> OUTPUT_BIT_TO_NAME
   { Ot::warn1_slv3, "WARN1_SLV3" },
   { Ot::ossd3_slv3, "OSSD3_SLV3" },
   { Ot::ossd2_slv3, "OSSD2_SLV3" },
-  
+
   { Ot::ossd1_slv3, "OSSD1_SLV3" },
   { Ot::warn2_slv2, "WARN2_SLV2" },
   { Ot::warn1_slv2, "WARN1_SLV2" },
@@ -196,7 +202,7 @@ static const std::map<Ot, IoName> OUTPUT_BIT_TO_NAME
   { Ot::ossd1_slv2, "OSSD1_SLV2" },
   { Ot::warn2_slv1, "WARN2_SLV1" },
   { Ot::warn1_slv1, "WARN1_SLV1" },
-  
+
   { Ot::ossd3_slv1, "OSSD3_SLV1" },
   { Ot::ossd2_slv1, "OSSD2_SLV1" },
   { Ot::ossd1_slv1, "OSSD1_SLV1" },
@@ -205,7 +211,7 @@ static const std::map<Ot, IoName> OUTPUT_BIT_TO_NAME
   { Ot::ossd3_m, "OSSD3_M" },
   { Ot::ossd2_m, "OSSD2_M" },
   { Ot::ossd1_m, "OSSD1_M" },
-  
+
   { Ot::warn2, "WARN2" },
   { Ot::warn1, "WARN1" },
   { Ot::ossd3_lock, "OSSD3_LOCK" },
@@ -218,11 +224,11 @@ static const std::map<Ot, IoName> OUTPUT_BIT_TO_NAME
 
   static constexpr std::array<std::array<Ot, 8>, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES> OUTPUT_BITS{{
   //    Bit7              Bit6              Bit5              Bit4              Bit3              Bit2              Bit1              Bit0
-  { REV(Ot::unused,       Ot::unused,       Ot::unused,       Ot::ossd1_refpts, Ot::warn2_slv3,   Ot::warn1_slv3,   Ot::ossd3_slv3,   Ot::ossd2_slv3) },
-  { REV(Ot::ossd1_slv3,   Ot::warn2_slv2,   Ot::warn1_slv2,   Ot::ossd3_slv2,   Ot::ossd2_slv2,   Ot::ossd1_slv2,   Ot::warn2_slv1,   Ot::warn1_slv1) },
-  { REV(Ot::ossd3_slv1,   Ot::ossd2_slv1,   Ot::ossd1_slv1,   Ot::warn2_m,      Ot::warn1_m,      Ot::ossd3_m,      Ot::ossd2_m,      Ot::ossd1_m) },
   { REV(Ot::warn2,        Ot::warn1,        Ot::ossd3_lock,   Ot::ossd3,        Ot::ossd2_lock,   Ot::ossd2,        Ot::ossd1_lock,   Ot::ossd1) },
-  }};  // TODO: Verify byte order
+  { REV(Ot::ossd3_slv1,   Ot::ossd2_slv1,   Ot::ossd1_slv1,   Ot::warn2_m,      Ot::warn1_m,      Ot::ossd3_m,      Ot::ossd2_m,      Ot::ossd1_m) },
+  { REV(Ot::ossd1_slv3,   Ot::warn2_slv2,   Ot::warn1_slv2,   Ot::ossd3_slv2,   Ot::ossd2_slv2,   Ot::ossd1_slv2,   Ot::warn2_slv1,   Ot::warn1_slv1) },
+  { REV(Ot::unused,       Ot::unused,       Ot::unused,       Ot::ossd1_refpts, Ot::warn2_slv3,   Ot::warn1_slv3,   Ot::ossd3_slv3,   Ot::ossd2_slv3) }
+  }};
 // clang-format on
 
 static uint32_t createID(size_t byte_n, size_t bit_n)
@@ -230,7 +236,7 @@ static uint32_t createID(size_t byte_n, size_t bit_n)
   return byte_n * 8 + bit_n;
 }
 
-static PinState createInputPinState(size_t byte_n, size_t bit_n, bool value)
+inline PinState createInputPinState(size_t byte_n, size_t bit_n, bool value)
 {
   if (byte_n >= RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES)
   {
@@ -242,13 +248,13 @@ static PinState createInputPinState(size_t byte_n, size_t bit_n, bool value)
   return PinState(id, name, value);
 }
 
-static PinState createLogicalPinState(size_t byte_n, size_t bit_n, bool value)
+inline PinState createLogicalPinState(size_t byte_n, size_t bit_n, bool value)
 {
   auto id = createID(byte_n, bit_n);
   return PinState(id, "", value);
 }
 
-static PinState createOutputPinState(size_t byte_n, size_t bit_n, bool value)
+inline PinState createOutputPinState(size_t byte_n, size_t bit_n, bool value)
 {
   if (byte_n >= RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES)
   {

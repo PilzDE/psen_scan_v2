@@ -23,10 +23,7 @@
 
 #include "psen_scan_v2_standalone/util/async_barrier.h"
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
-
-namespace psen_scan_v2_standalone_test
-{
-using namespace std::chrono_literals;
+#include "psen_scan_v2_standalone/util/format_range.h"
 
 #define EXPECT_FUTURE_IS_READY(future, wait_timeout) EXPECT_EQ(future.wait_for(wait_timeout), std::future_status::ready)
 
@@ -38,6 +35,7 @@ using namespace std::chrono_literals;
 #define EXPECT_NO_BLOCK_NO_THROW(statement)                                                                            \
   do                                                                                                                   \
   {                                                                                                                    \
+    using namespace std::chrono_literals;                                                                              \
     auto future = std::async(std::launch::async, [&]() { statement });                                                 \
     EXPECT_TRUE(future.valid());                                                                                       \
     EXPECT_FUTURE_IS_READY(future, 2s) << #statement << " does not return.";                                           \
@@ -56,8 +54,6 @@ using namespace std::chrono_literals;
   }();
 
 #define EXPECT_ASYNC_CALL(mock, call) EXPECT_N_ASYNC_CALLS(mock, call, 1)
-
-}  // namespace psen_scan_v2_standalone_test
 
 #define EXPECT_THROW_AND_WHAT(statement, expected_exception, expected_message)                                         \
   EXPECT_THROW(                                                                                                        \
@@ -80,5 +76,13 @@ using namespace std::chrono_literals;
   EXPECT_EQ(expected_io_state.physicalInput2(), io_state.physicalInput2());                                            \
   EXPECT_EQ(expected_io_state.logicalInput(), io_state.logicalInput());                                                \
   EXPECT_EQ(expected_io_state.output(), io_state.output());
+
+#define EXPECT_CONTAINER_UNORDERED_EQ(var1, var2)                                                                      \
+  EXPECT_EQ(var1.size(), var2.size());                                                                                 \
+  for (const auto& v : var2)                                                                                           \
+  {                                                                                                                    \
+    EXPECT_NE(std::find(var1.begin(), var1.end(), v), var1.end())                                                      \
+        << "Did not find the expected element: " << v << " in " << util::formatRange(var1);                            \
+  }
 
 #endif  // PSEN_SCAN_V2_STANDALONE_TEST_EXPECTATIONS_H

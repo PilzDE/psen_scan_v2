@@ -89,7 +89,6 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
   while (!end_of_frame)
   {
     const AdditionalFieldHeader additional_header{ readAdditionalField(ss, num_bytes) };
-    PSENSCAN_ERROR("Debug", "Current id: {:#02x} and its length{}", additional_header.id(), additional_header.length());
     switch (static_cast<AdditionalFieldHeaderID>(additional_header.id()))
     {
       case AdditionalFieldHeaderID::scan_counter:
@@ -171,9 +170,9 @@ AdditionalFieldHeader readAdditionalField(std::istream& is, const std::size_t& m
 
 namespace io
 {
-typedef std::function<PinState(size_t, size_t, bool)> AddPinStateFunction;
-
-std::vector<PinState> deserializePinField(std::istream& is, std::size_t length_in_bytes, const AddPinStateFunction& add_func)
+std::vector<PinState> deserializePinField(std::istream& is,
+                                          std::size_t length_in_bytes,
+                                          const AddPinStateFunction& add_func)
 {
   std::vector<PinState> pin_field;
   for (size_t byte_n = 0; byte_n < length_in_bytes; byte_n++)
@@ -205,18 +204,19 @@ IOState deserializePins(std::istream& is)
       deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, createInputPinState);
 
   // Read physical inputs 2
+  raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
   std::vector<PinState> physical_input_2 =
       deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, createInputPinState);
 
   // Read logical inputs
   raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
   std::vector<PinState> logical_input =
-      deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, createLogicalPinState);
+      deserializePinField(is, RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES, createLogicalPinState);
 
   // Read outputs
   raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
   std::vector<PinState> output =
-      deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, createOutputPinState);
+      deserializePinField(is, RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES, createOutputPinState);
 
   return IOState(physical_input_0, physical_input_1, physical_input_2, logical_input, output);
 }

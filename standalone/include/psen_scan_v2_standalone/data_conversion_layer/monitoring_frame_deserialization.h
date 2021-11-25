@@ -148,6 +148,12 @@ std::vector<diagnostic::Message> deserializeMessages(std::istream& is);
 
 namespace io
 {
+typedef std::function<PinState(size_t, size_t, bool)> AddPinStateFunction;
+
+std::vector<PinState> deserializePinField(std::istream& is,
+                                          std::size_t length_in_bytes,
+                                          const AddPinStateFunction& add_func);
+
 IOState deserializePins(std::istream& is);
 }
 

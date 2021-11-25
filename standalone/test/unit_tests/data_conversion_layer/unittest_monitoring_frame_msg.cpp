@@ -28,7 +28,6 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
 
 #include "psen_scan_v2_standalone/data_conversion_layer/istring_stream_builder.h"
-#include "psen_scan_v2_standalone/communication_layer/udp_frame_dumps.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
 #include "psen_scan_v2_standalone/io_state.h"
 
