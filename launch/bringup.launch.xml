@@ -49,7 +49,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- Set the following to true in order to publish scan data as soon as a UDP packet is ready, instead of waiting for a full scan -->
   <arg name="fragmented_scans" default="false" />
 
-  <node name="$(var tf_prefix)" exec="psen_scan_v2_node" pkg="psen_scan_v2" output="screen" required="true">
+  <node name="$(var tf_prefix)" exec="psen_scan_v2_node" pkg="psen_scan_v2" output="screen">
     <param name="sensor_ip" value="$(var sensor_ip)" />
     <param name="tf_prefix" value="$(var tf_prefix)" />
     <param name="angle_start" value="$(var angle_start)" />
