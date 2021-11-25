@@ -143,7 +143,7 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
       }
       default:
         throw DecodingFailure(
-            fmt::format("Header Id {:#04x} unknown. Cannot read additional field of monitoring frame On Position {}.",
+            fmt::format("Header Id {:#04x} unknown. Cannot read additional field of monitoring frame on position {}.",
                         additional_header.id(),
                         ss.tellp()));
     }
@@ -215,8 +215,7 @@ IOState deserializePins(std::istream& is)
 
   // Read outputs
   raw_processing::read<std::array<uint8_t, io::RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  std::vector<PinState> output =
-      deserializePinField(is, RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES, createOutputPinState);
+  std::vector<PinState> output = deserializePinField(is, RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES, createOutputPinState);
 
   return IOState(physical_input_0, physical_input_1, physical_input_2, logical_input, output);
 }

@@ -15,8 +15,10 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_MONITORING_FRAME_DESERIALIZATION_H
 #define PSEN_SCAN_V2_STANDALONE_MONITORING_FRAME_DESERIALIZATION_H
 
+#include <functional>
 #include <istream>
 #include <ostream>
+#include <vector>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
