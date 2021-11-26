@@ -23,6 +23,9 @@
 #include <vector>
 #include <boost/optional.hpp>
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/util/format_range.h"
@@ -83,8 +86,8 @@ inline std::ostream& operator<<(std::ostream& os, const Message& msg)
                            "{}, active_zoneset = {}, measurements = {}, intensities = {}, diagnostics = {})",
                            msg.from_theta_.value() / 10.,
                            msg.resolution_.value() / 10.,
-                           msg.scan_counter_.value_or(""),
-                           msg.active_zoneset_.value_or(""),
+                           msg.scan_counter_.is_initialized() ? fmt::format("{}", *msg.scan_counter_) : "",
+                           msg.active_zoneset_.is_initialized() ? fmt::format("{}", *msg.active_zoneset_) : "",
                            util::formatRange(msg.measurements_),
                            util::formatRange(msg.intensities_),
                            util::formatRange(msg.diagnostic_messages_));
