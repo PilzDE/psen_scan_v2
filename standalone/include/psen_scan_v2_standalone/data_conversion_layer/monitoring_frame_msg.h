@@ -77,15 +77,14 @@ struct MessageStamped
   int64_t stamp_;
 };
 
-//! @throw boost::bad_optional_access if scan_counter or active_zoneset is not set
 inline std::ostream& operator<<(std::ostream& os, const Message& msg)
 {
   return os << fmt::format("monitoring_frame::Message(fromTheta = {} deg, resolution = {} deg, scanCounter = "
                            "{}, active_zoneset = {}, measurements = {}, intensities = {}, diagnostics = {})",
                            msg.from_theta_.value() / 10.,
                            msg.resolution_.value() / 10.,
-                           msg.scan_counter_.value(),
-                           msg.active_zoneset_.value(),
+                           msg.scan_counter_.value_or(""),
+                           msg.active_zoneset_.value_or(""),
                            util::formatRange(msg.measurements_),
                            util::formatRange(msg.intensities_),
                            util::formatRange(msg.diagnostic_messages_));
