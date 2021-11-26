@@ -88,6 +88,8 @@ public:
    * arrived.
    *
    * @param stamped_msg Current received MonitoringFrame.
+   *
+   * @throw boost::bad_optional_access if scan_counter is not set.
    */
   void add(const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg);
 
@@ -129,7 +131,7 @@ inline bool ScanBuffer::isRoundComplete()
 
 inline void ScanBuffer::add(const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg)
 {
-  if (current_round_.empty() || stamped_msg.msg_.scanCounter() == current_round_[0].msg_.scanCounter())
+  if (current_round_.empty() || stamped_msg.msg_.scan_counter_.value() == current_round_[0].msg_.scan_counter_.value())
   {
     current_round_.push_back(stamped_msg);
     if (current_round_.size() > num_expected_msgs_)
@@ -137,7 +139,7 @@ inline void ScanBuffer::add(const data_conversion_layer::monitoring_frame::Messa
       throw ScanRoundOversaturatedError();
     }
   }
-  else if (stamped_msg.msg_.scanCounter() > current_round_[0].msg_.scanCounter())
+  else if (stamped_msg.msg_.scan_counter_.value() > current_round_[0].msg_.scan_counter_.value())
   {
     startNewRound(stamped_msg);
   }

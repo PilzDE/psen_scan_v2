@@ -17,20 +17,16 @@
 #define PSEN_SCAN_V2_STANDALONE_MONITORING_FRAME_MSG_H
 
 #include <cstdint>
-#include <functional>
-#include <map>
-#include <iostream>
-#include <sstream>
+#include <ostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <array>
-#include <bitset>
 #include <boost/optional.hpp>
 
-#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
-#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/util/format_range.h"
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -48,16 +44,6 @@ namespace monitoring_frame
 static constexpr uint8_t MAX_SCANNER_ID{ configuration::VALID_SCANNER_IDS.size() - 1 };
 
 /**
- * @brief Exception thrown if scan_counter was missing during deserialization of a
- * data_conversion_layer::monitoring_frame::Message.
- */
-class ScanCounterMissing : public std::runtime_error
-{
-public:
-  ScanCounterMissing(const std::string& msg = "Scan counter not set! (Contact PILZ support if the error persists.)");
-};
-
-/**
  * @brief Higher level data type representing a single monitoring frame.
  *
  * It contains all information deserialized from a single monitoring frame sent by the scanner hardware.
@@ -67,64 +53,17 @@ public:
 class Message
 {
 public:
-  Message() = default;
-  Message(const util::TenthOfDegree& from_theta,
-          const util::TenthOfDegree& resolution,
-          const uint32_t scan_counter,
-          const uint8_t active_zoneset,
-          const std::vector<double>& measurements)
-    : from_theta_(from_theta)
-    , resolution_(resolution)
-    , scan_counter_(scan_counter)
-    , active_zoneset_(active_zoneset)
-    , measurements_(measurements)
-    , diagnostic_data_enabled_(false){
-
-    };
-
-  Message(const util::TenthOfDegree& from_theta,
-          const util::TenthOfDegree& resolution,
-          const uint32_t scan_counter,
-          const uint8_t active_zoneset,
-          const std::vector<double>& measurements,
-          const std::vector<double>& intensities,
-          const std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message>& diagnostic_messages)
-    : from_theta_(from_theta)
-    , resolution_(resolution)
-    , scan_counter_(scan_counter)
-    , active_zoneset_(active_zoneset)
-    , measurements_(measurements)
-    , intensities_(intensities)
-    , diagnostic_messages_(diagnostic_messages)
-    , diagnostic_data_enabled_(true){
-
-    };
-
-public:
-  util::TenthOfDegree fromTheta() const;
-  util::TenthOfDegree resolution() const;
-  uint32_t scanCounter() const;
-  uint8_t activeZoneset() const;
-  const std::vector<double>& measurements() const;
-  const std::vector<double>& intensities() const;
-  std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnosticMessages() const;
-  bool operator==(const data_conversion_layer::monitoring_frame::Message& rhs) const;
-
-private:
+  // always included
   configuration::ScannerId scanner_id_{ configuration::ScannerId::master };
   util::TenthOfDegree from_theta_{ 0 };
-  util::TenthOfDegree resolution_{ 0 };
-  boost::optional<uint32_t> scan_counter_;
-  uint8_t active_zoneset_{ 0 };
+  util::TenthOfDegree resolution_{ 1 };
   std::vector<double> measurements_;
-  std::vector<double> intensities_;
-  std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnostic_messages_;
-  bool diagnostic_data_enabled_{ false };
 
-public:
-  friend data_conversion_layer::RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg);
-  friend data_conversion_layer::monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data,
-                                                                      const std::size_t& num_bytes);
+  // optional
+  boost::optional<uint32_t> scan_counter_;
+  boost::optional<uint8_t> active_zoneset_;
+  std::vector<double> intensities_;
+  std::vector<diagnostic::Message> diagnostic_messages_;
 };
 
 /**
@@ -138,12 +77,19 @@ struct MessageStamped
   int64_t stamp_;
 };
 
-inline ScanCounterMissing::ScanCounterMissing(const std::string& msg) : std::runtime_error(msg)
+//! @throw boost::bad_optional_access if scan_counter or active_zoneset is not set
+inline std::ostream& operator<<(std::ostream& os, const Message& msg)
 {
+  return os << fmt::format("monitoring_frame::Message(fromTheta = {} deg, resolution = {} deg, scanCounter = "
+                           "{}, active_zoneset = {}, measurements = {}, intensities = {}, diagnostics = {})",
+                           msg.from_theta_.value() / 10.,
+                           msg.resolution_.value() / 10.,
+                           msg.scan_counter_.value(),
+                           msg.active_zoneset_.value(),
+                           util::formatRange(msg.measurements_),
+                           util::formatRange(msg.intensities_),
+                           util::formatRange(msg.diagnostic_messages_));
 }
-
-std::ostream& operator<<(std::ostream& os,
-                         const psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message& msg);
 
 }  // namespace monitoring_frame
 }  // namespace data_conversion_layer

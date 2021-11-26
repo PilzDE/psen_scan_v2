@@ -181,7 +181,7 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
     informUserAboutTheScanData(stamped_msg);
   }
   // LCOV_EXCL_START
-  catch (const data_conversion_layer::monitoring_frame::ScanCounterMissing& e)
+  catch (const boost::bad_optional_access& e)
   {
     PSENSCAN_ERROR("StateMachine", e.what());
   }
@@ -213,20 +213,21 @@ inline void ScannerProtocolDef::notifyUserAboutRefusedStartReply(scanner_events:
 
 inline void ScannerProtocolDef::checkForDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& msg)
 {
-  if (!msg.diagnosticMessages().empty())
+  if (!msg.diagnostic_messages_.empty())
   {
     PSENSCAN_WARN_THROTTLE(
-        1 /* sec */, "StateMachine", "The scanner reports an error: {}", util::formatRange(msg.diagnosticMessages()));
+        1 /* sec */, "StateMachine", "The scanner reports an error: {}", util::formatRange(msg.diagnostic_messages_));
   }
 }
 
 inline void
 ScannerProtocolDef::checkForChangedActiveZoneset(const data_conversion_layer::monitoring_frame::Message& msg)
 {
-  if (!zoneset_reference_msg_.is_initialized() || (msg.scanCounter() >= zoneset_reference_msg_->scanCounter() &&
-                                                   msg.activeZoneset() != zoneset_reference_msg_->activeZoneset()))
+  if (!zoneset_reference_msg_.is_initialized() ||
+      (msg.scan_counter_.value() >= zoneset_reference_msg_->scan_counter_.value() &&
+       msg.active_zoneset_.value() != zoneset_reference_msg_->active_zoneset_.value()))
   {
-    PSENSCAN_INFO("Scanner", "The scanner switched to active zoneset {}", msg.activeZoneset());
+    PSENSCAN_INFO("Scanner", "The scanner switched to active zoneset {}", msg.active_zoneset_.value());
     zoneset_reference_msg_ = msg;
   }
 }
@@ -274,7 +275,7 @@ inline bool ScannerProtocolDef::framesContainMeasurements(
     const std::vector<data_conversion_layer::monitoring_frame::MessageStamped>& stamped_msgs)
 {
   if (std::all_of(stamped_msgs.begin(), stamped_msgs.end(), [](const auto& stamped_msg) {
-        return stamped_msg.msg_.measurements().empty();
+        return stamped_msg.msg_.measurements_.empty();
       }))
   {
     PSENSCAN_DEBUG("StateMachine", "No measurement data in current monitoring frame(s), skipping laser scan callback.");

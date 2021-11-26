@@ -70,9 +70,9 @@ static constexpr double toIntensities(const uint16_t& value)
   return static_cast<double>(retval & 0b0011111111111111);
 }
 
-monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data, const std::size_t& num_bytes)
+Message deserialize(const data_conversion_layer::RawData& data, const std::size_t& num_bytes)
 {
-  data_conversion_layer::monitoring_frame::Message msg;
+  Message msg;
 
   std::stringstream ss;
   ss.write(data.data(), num_bytes);
@@ -126,7 +126,6 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
 
       case AdditionalFieldHeaderID::diagnostics:
         msg.diagnostic_messages_ = diagnostic::deserializeMessages(ss);
-        msg.diagnostic_data_enabled_ = true;
         break;
 
       case AdditionalFieldHeaderID::intensities: {

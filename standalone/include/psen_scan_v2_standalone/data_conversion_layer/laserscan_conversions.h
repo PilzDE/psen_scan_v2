@@ -50,6 +50,8 @@ public:
    *
    * @note expects all monitoring frames to have the same resolution.
    *
+   * @throw boost::bad_optional_access if scan_counter or active_zoneset is not set in one of the frames.
+   *
    * @see data_conversion_layer::monitoring_frame::Message
    * @see ScannerV2
    */
@@ -89,7 +91,7 @@ inline LaserScan LaserScanConverter::toLaserScan(
   std::vector<int> sorted_stamped_msgs_indices = getFilledFramesIndicesSortedByThetaAngle(stamped_msgs);
   validateMonitoringFrames(stamped_msgs, sorted_stamped_msgs_indices);
 
-  const auto min_angle = stamped_msgs[sorted_stamped_msgs_indices[0]].msg_.fromTheta();
+  const auto min_angle = stamped_msgs[sorted_stamped_msgs_indices[0]].msg_.from_theta_;
   const auto max_angle = calculateMaxAngle(stamped_msgs, min_angle);
 
   const auto timestamp = calculateTimestamp(stamped_msgs, sorted_stamped_msgs_indices);
@@ -100,18 +102,17 @@ inline LaserScan LaserScanConverter::toLaserScan(
   for (auto index : sorted_stamped_msgs_indices)
   {
     measurements.insert(measurements.end(),
-                        stamped_msgs[index].msg_.measurements().begin(),
-                        stamped_msgs[index].msg_.measurements().end());
-    intensities.insert(intensities.end(),
-                       stamped_msgs[index].msg_.intensities().begin(),
-                       stamped_msgs[index].msg_.intensities().end());
+                        stamped_msgs[index].msg_.measurements_.begin(),
+                        stamped_msgs[index].msg_.measurements_.end());
+    intensities.insert(
+        intensities.end(), stamped_msgs[index].msg_.intensities_.begin(), stamped_msgs[index].msg_.intensities_.end());
   }
 
-  LaserScan scan(stamped_msgs[0].msg_.resolution(),
+  LaserScan scan(stamped_msgs[0].msg_.resolution_,
                  min_angle,
                  max_angle,
-                 stamped_msgs[0].msg_.scanCounter(),
-                 stamped_msgs[sorted_stamped_msgs_indices.back()].msg_.activeZoneset(),
+                 stamped_msgs[0].msg_.scan_counter_.value(),
+                 stamped_msgs[sorted_stamped_msgs_indices.back()].msg_.active_zoneset_.value(),
                  timestamp);
   scan.setMeasurements(measurements);
   scan.setIntensities(intensities);
@@ -127,7 +128,7 @@ inline std::vector<int> LaserScanConverter::getFilledFramesIndicesSortedByThetaA
   std::sort(sorted_filled_stamped_msgs_indices.begin(),
             sorted_filled_stamped_msgs_indices.end(),
             [&stamped_msgs](int i1, int i2) {
-              return stamped_msgs[i1].msg_.fromTheta() < stamped_msgs[i2].msg_.fromTheta();
+              return stamped_msgs[i1].msg_.from_theta_ < stamped_msgs[i2].msg_.from_theta_;
             });
 
   // The following contains a missing line in the coverage report, which does not make sense.
@@ -135,7 +136,7 @@ inline std::vector<int> LaserScanConverter::getFilledFramesIndicesSortedByThetaA
   sorted_filled_stamped_msgs_indices.erase(
       std::remove_if(sorted_filled_stamped_msgs_indices.begin(),
                      sorted_filled_stamped_msgs_indices.end(),
-                     [&stamped_msgs](int i) { return stamped_msgs[i].msg_.measurements().empty(); }),
+                     [&stamped_msgs](int i) { return stamped_msgs[i].msg_.measurements_.empty(); }),
       sorted_filled_stamped_msgs_indices.end());
   // LCOV_EXCL_STOP
 
@@ -146,10 +147,10 @@ inline util::TenthOfDegree LaserScanConverter::calculateMaxAngle(
     const std::vector<data_conversion_layer::monitoring_frame::MessageStamped>& stamped_msgs,
     const util::TenthOfDegree& min_angle)
 {
-  const auto resolution = stamped_msgs[0].msg_.resolution();
+  const auto resolution = stamped_msgs[0].msg_.resolution_;
   const uint16_t number_of_samples = std::accumulate(
       stamped_msgs.begin(), stamped_msgs.end(), uint16_t{ 0 }, [](uint16_t total, const auto& stamped_msg) {
-        return total + stamped_msg.msg_.measurements().size();
+        return total + stamped_msg.msg_.measurements_.size();
       });
   return min_angle + resolution * static_cast<int>(number_of_samples - 1);
 }
@@ -169,8 +170,8 @@ inline int64_t
 LaserScanConverter::calculateFirstRayTime(const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg)
 {
   const double time_per_scan_in_ns{ configuration::TIME_PER_SCAN_IN_S * 1000000000.0 };
-  const double scan_interval_in_degree{ stamped_msg.msg_.resolution().value() *
-                                        (stamped_msg.msg_.measurements().size() - 1) / 10.0 };
+  const double scan_interval_in_degree{ stamped_msg.msg_.resolution_.value() *
+                                        (stamped_msg.msg_.measurements_.size() - 1) / 10.0 };
   return stamped_msg.stamp_ - static_cast<int64_t>(std::round(scan_interval_in_degree * time_per_scan_in_ns / 360.0));
 }
 
@@ -195,18 +196,18 @@ inline void LaserScanConverter::validateMonitoringFrames(
 inline bool LaserScanConverter::allResolutionsMatch(
     const std::vector<data_conversion_layer::monitoring_frame::MessageStamped>& stamped_msgs)
 {
-  const auto resolution = stamped_msgs[0].msg_.resolution();
+  const auto resolution = stamped_msgs[0].msg_.resolution_;
   return std::all_of(stamped_msgs.begin(), stamped_msgs.end(), [resolution](const auto& stamped_msg) {
-    return stamped_msg.msg_.resolution() == resolution;
+    return stamped_msg.msg_.resolution_ == resolution;
   });
 }
 
 inline bool LaserScanConverter::allScanCountersMatch(
     const std::vector<data_conversion_layer::monitoring_frame::MessageStamped>& stamped_msgs)
 {
-  const auto scan_counter = stamped_msgs[0].msg_.scanCounter();
+  const auto scan_counter = stamped_msgs[0].msg_.scan_counter_.value();
   return std::all_of(stamped_msgs.begin(), stamped_msgs.end(), [scan_counter](const auto& stamped_msg) {
-    return stamped_msg.msg_.scanCounter() == scan_counter;
+    return stamped_msg.msg_.scan_counter_.value() == scan_counter;
   });
 }
 
@@ -214,16 +215,16 @@ inline bool LaserScanConverter::thetaAnglesFitTogether(
     const std::vector<data_conversion_layer::monitoring_frame::MessageStamped>& stamped_msgs,
     const std::vector<int>& sorted_filled_stamped_msgs_indices)
 {
-  util::TenthOfDegree last_end = stamped_msgs[sorted_filled_stamped_msgs_indices[0]].msg_.fromTheta();
+  util::TenthOfDegree last_end = stamped_msgs[sorted_filled_stamped_msgs_indices[0]].msg_.from_theta_;
   for (auto index : sorted_filled_stamped_msgs_indices)
   {
     const auto& stamped_msg = stamped_msgs[index];
-    if (last_end != stamped_msg.msg_.fromTheta())
+    if (last_end != stamped_msg.msg_.from_theta_)
     {
       return false;
     }
-    last_end = stamped_msg.msg_.fromTheta() +
-               stamped_msg.msg_.resolution() * static_cast<int>(stamped_msg.msg_.measurements().size());
+    last_end = stamped_msg.msg_.from_theta_ +
+               stamped_msg.msg_.resolution_ * static_cast<int>(stamped_msg.msg_.measurements_.size());
   }
   return true;
 }
