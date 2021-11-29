@@ -24,6 +24,7 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
@@ -39,6 +40,11 @@ namespace data_conversion_layer
 {
 namespace monitoring_frame
 {
+configuration::ScannerId Message::scannerId() const
+{
+  return scanner_id_;
+}
+
 util::TenthOfDegree Message::fromTheta() const
 {
   return from_theta_;
@@ -63,22 +69,50 @@ uint32_t Message::scanCounter() const
 
 uint8_t Message::activeZoneset() const
 {
-  return active_zoneset_;
+  if (active_zoneset_.is_initialized())
+  {
+    return active_zoneset_.get();
+  }
+  else
+  {
+    throw ActiveZonesetMissing();
+  }
 }
 
 const std::vector<double>& Message::measurements() const
 {
-  return measurements_;
+  if (measurements_.is_initialized())
+  {
+    return measurements_.get();
+  }
+  else
+  {
+    throw MeasurementsMissing();
+  }
 }
 
 const std::vector<double>& Message::intensities() const
 {
-  return intensities_;
+  if (intensities_.is_initialized())
+  {
+    return intensities_.get();
+  }
+  else
+  {
+    throw IntensitiesMissing();
+  }
 }
 
 std::vector<diagnostic::Message> Message::diagnosticMessages() const
 {
-  return diagnostic_messages_;
+  if (diagnostic_messages_.is_initialized())
+  {
+    return diagnostic_messages_.get();
+  }
+  else
+  {
+    throw DiagnosticMessagesMissing();
+  }
 }
 
 bool Message::operator==(const Message& rhs) const
@@ -88,23 +122,50 @@ bool Message::operator==(const Message& rhs) const
           intensities() == rhs.intensities() && diagnosticMessages() == rhs.diagnosticMessages());
 }
 
+bool Message::hasScanCounter() const
+{
+  return scan_counter_.is_initialized();
+}
+
+bool Message::hasActiveZoneset() const
+{
+  return active_zoneset_.is_initialized();
+}
+
+bool Message::hasMeasurements() const
+{
+  return measurements_.is_initialized();
+}
+
+bool Message::hasIntensities() const
+{
+  return intensities_.is_initialized();
+}
+
+bool Message::hasDiagnosticMessages() const
+{
+  return diagnostic_messages_.is_initialized();
+}
+
 MessageBuilder Message::create()
 {
   return MessageBuilder();
 };
 
+#define FORMAT_IF_INITIALIZED(arg) arg.is_initialized() ? fmt::format("{}", arg.get()) : ""
+#define FORMAT_RANGE_IF_INITIALIZED(arg) arg.is_initialized() ? util::formatRange(arg.get()) : "{}"
+
 std::ostream& operator<<(std::ostream& os, const Message& msg)
 {
-  os << fmt::format("monitoring_frame::Message(fromTheta = {} deg, resolution = {} deg, scanCounter = "
-                    "{}, active_zoneset = {}, measurements = {}, intensities = {}, diagnostics = {})",
-                    msg.fromTheta().value() / 10.,
-                    msg.resolution().value() / 10.,
-                    msg.scanCounter(),
-                    msg.activeZoneset(),
-                    util::formatRange(msg.measurements()),
-                    util::formatRange(msg.intensities()),
-                    util::formatRange(msg.diagnosticMessages()));
-  return os;
+  return os << fmt::format("monitoring_frame::Message(fromTheta = {} deg, resolution = {} deg, scanCounter = "
+                           "{}, active_zoneset = {}, measurements = {}, intensities = {}, diagnostics = {})",
+                           msg.from_theta_.value() / 10.,
+                           msg.resolution_.value() / 10.,
+                           FORMAT_IF_INITIALIZED(msg.scan_counter_),
+                           FORMAT_IF_INITIALIZED(msg.active_zoneset_),
+                           FORMAT_RANGE_IF_INITIALIZED(msg.measurements_),
+                           FORMAT_RANGE_IF_INITIALIZED(msg.intensities_),
+                           FORMAT_RANGE_IF_INITIALIZED(msg.diagnostic_messages_));
 }
 }  // namespace monitoring_frame
 }  // namespace data_conversion_layer

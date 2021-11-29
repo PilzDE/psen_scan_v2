@@ -48,6 +48,7 @@ static constexpr double RANGE_MIN_IN_M{ 0.05 };
 static constexpr double RANGE_MAX_IN_M{ 40. };
 
 static const util::TenthOfDegree DEFAULT_ZONESET_ANGLE_STEP(5);
+static constexpr uint8_t DEFAULT_ACTIVE_ZONESET{ 0 };
 }  // namespace configuration
 
 }  // namespace psen_scan_v2_standalone

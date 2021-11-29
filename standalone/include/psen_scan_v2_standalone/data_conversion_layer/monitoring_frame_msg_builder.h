@@ -107,7 +107,6 @@ inline MessageBuilder& MessageBuilder::intensities(const std::vector<double>& in
 inline MessageBuilder& MessageBuilder::diagnosticMessages(const std::vector<diagnostic::Message>& diagnostic_messages)
 {
   msg_.diagnostic_messages_ = diagnostic_messages;
-  msg_.diagnostic_data_enabled_ = true;
   return *this;
 }
 }  // namespace monitoring_frame
