@@ -28,6 +28,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/laserscan_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 #include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/scan_range.h"
@@ -76,22 +77,21 @@ createValidMonitoringFrameMsg(const uint32_t scan_counter = 42,
                               const uint8_t active_zoneset = 1)
 {
   const auto resolution{ util::TenthOfDegree(10) };
+  data_conversion_layer::monitoring_frame::MessageBuilder msg_builder;
+  msg_builder.fromTheta(start_angle).resolution(resolution).scanCounter(scan_counter).activeZoneset(active_zoneset);
 
   const unsigned int num_elements = ((end_angle - start_angle) / resolution).value();
   const double lowest_measurement{ 0. };
   const double highest_measurement{ 10. };
-  const std::vector<double> measurements{ generateMeasurements(num_elements, lowest_measurement, highest_measurement) };
+  msg_builder.measurements(generateMeasurements(num_elements, lowest_measurement, highest_measurement));
 
   const double lowest_intensity{ 0. };
   const double highest_intensity{ 16383. };  // only 14 of 16 bits can be used for the actual intensity value
-  const std::vector<double> intensities{ generateIntensities(num_elements, lowest_intensity, highest_intensity) };
 
-  const std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnostic_messages{
-    { configuration::ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 7) }
-  };
-
-  return data_conversion_layer::monitoring_frame::Message(
-      start_angle, resolution, scan_counter, active_zoneset, measurements, intensities, diagnostic_messages);
+  msg_builder.intensities(generateIntensities(num_elements, lowest_intensity, highest_intensity))
+      .diagnosticMessages({ { configuration::ScannerId::master,
+                              data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 7) } });
+  return msg_builder.build();
 }
 
 static data_conversion_layer::monitoring_frame::Message

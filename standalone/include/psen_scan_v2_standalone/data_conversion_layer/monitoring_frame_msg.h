@@ -67,40 +67,6 @@ public:
 class Message
 {
 public:
-  Message() = default;
-  Message(const util::TenthOfDegree& from_theta,
-          const util::TenthOfDegree& resolution,
-          const uint32_t scan_counter,
-          const uint8_t active_zoneset,
-          const std::vector<double>& measurements)
-    : from_theta_(from_theta)
-    , resolution_(resolution)
-    , scan_counter_(scan_counter)
-    , active_zoneset_(active_zoneset)
-    , measurements_(measurements)
-    , diagnostic_data_enabled_(false){
-
-    };
-
-  Message(const util::TenthOfDegree& from_theta,
-          const util::TenthOfDegree& resolution,
-          const uint32_t scan_counter,
-          const uint8_t active_zoneset,
-          const std::vector<double>& measurements,
-          const std::vector<double>& intensities,
-          const std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message>& diagnostic_messages)
-    : from_theta_(from_theta)
-    , resolution_(resolution)
-    , scan_counter_(scan_counter)
-    , active_zoneset_(active_zoneset)
-    , measurements_(measurements)
-    , intensities_(intensities)
-    , diagnostic_messages_(diagnostic_messages)
-    , diagnostic_data_enabled_(true){
-
-    };
-
-public:
   util::TenthOfDegree fromTheta() const;
   util::TenthOfDegree resolution() const;
   uint32_t scanCounter() const;
@@ -125,6 +91,7 @@ public:
   friend data_conversion_layer::RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg);
   friend data_conversion_layer::monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data,
                                                                       const std::size_t& num_bytes);
+  friend class MessageBuilder;
 };
 
 /**

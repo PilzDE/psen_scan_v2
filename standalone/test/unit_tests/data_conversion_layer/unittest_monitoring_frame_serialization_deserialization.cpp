@@ -21,6 +21,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 
 #include "psen_scan_v2_standalone/data_conversion_layer/istring_stream_builder.h"
@@ -80,19 +81,20 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
            "this test.";
   }
 
-  data_conversion_layer::monitoring_frame::Message msg(
-      util::TenthOfDegree(25),
-      util::TenthOfDegree(1),
-      456,
-      2,
-      { 10, 20, std::numeric_limits<double>::infinity(), 40 },
-      { 15, 25, 35, 45 },
-      { data_conversion_layer::monitoring_frame::diagnostic::Message(configuration::ScannerId::master,
-                                                                     error_locations.at(0)),
-        data_conversion_layer::monitoring_frame::diagnostic::Message(configuration::ScannerId::master,
-                                                                     error_locations.at(1)),
-        data_conversion_layer::monitoring_frame::diagnostic::Message(configuration::ScannerId::slave2,
-                                                                     error_locations.at(2)) });
+  auto msg = data_conversion_layer::monitoring_frame::MessageBuilder()
+                 .fromTheta(util::TenthOfDegree(25))
+                 .resolution(util::TenthOfDegree(1))
+                 .scanCounter(456)
+                 .activeZoneset(2)
+                 .measurements({ 10, 20, std::numeric_limits<double>::infinity(), 40 })
+                 .intensities({ 15, 25, 35, 45 })
+                 .diagnosticMessages({ data_conversion_layer::monitoring_frame::diagnostic::Message(
+                                           configuration::ScannerId::master, error_locations.at(0)),
+                                       data_conversion_layer::monitoring_frame::diagnostic::Message(
+                                           configuration::ScannerId::master, error_locations.at(1)),
+                                       data_conversion_layer::monitoring_frame::diagnostic::Message(
+                                           configuration::ScannerId::slave2, error_locations.at(2)) })
+                 .build();
 
   auto raw = serialize(msg);
   auto deserialized_msg = data_conversion_layer::monitoring_frame::deserialize(convertToRawData(raw), raw.size());
@@ -102,8 +104,15 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
 
 TEST(MonitoringFrameSerializationTest, shouldFailOnSerializeAndDeserializeFrameWithIntensityChannelBits)
 {
-  data_conversion_layer::monitoring_frame::Message msg(
-      util::TenthOfDegree(25), util::TenthOfDegree(1), 1, 0, { 0 }, { 70045 }, {});
+  auto msg = data_conversion_layer::monitoring_frame::MessageBuilder()
+                 .fromTheta(util::TenthOfDegree(25))
+                 .resolution(util::TenthOfDegree(1))
+                 .scanCounter(1)
+                 .activeZoneset(0)
+                 .measurements({ 0 })
+                 .intensities({ 70045 })
+                 .diagnosticMessages({})
+                 .build();
 
   auto raw = serialize(msg);
   auto deserialized_msg = data_conversion_layer::monitoring_frame::deserialize(convertToRawData(raw), raw.size());
