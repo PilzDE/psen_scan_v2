@@ -19,8 +19,6 @@
 #include <cstdint>
 #include <vector>
 
-
-
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
@@ -106,6 +104,7 @@ inline MessageBuilder& MessageBuilder::intensities(const std::vector<double>& in
 inline MessageBuilder& MessageBuilder::diagnosticMessages(const std::vector<diagnostic::Message>& diagnostic_messages)
 {
   msg_.diagnostic_messages_ = diagnostic_messages;
+  msg_.diagnostic_data_enabled_ = true;
   return *this;
 }
 }  // namespace monitoring_frame
