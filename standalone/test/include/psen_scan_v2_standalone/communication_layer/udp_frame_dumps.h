@@ -82,16 +82,16 @@ class WithIntensitiesAndDiagnostics
 public:
   WithIntensitiesAndDiagnostics()
   {
-    MessageBuilder msg_builder;
-    msg_builder.fromTheta(util::TenthOfDegree(0x3e8))
-        .resolution(util::TenthOfDegree(0x02))
-        .scanCounter(0x00008894)
-        .activeZoneset(0x02)
-        .measurements(readMeasurements(hex_dump, 74, 250))
-        .intensities(readIntensities(hex_dump, intensities_offset, 250))
-        .diagnosticMessages({ diagnostic::Message(configuration::ScannerId::master, diagnostic::ErrorLocation(2, 0)),
+    expected_msg_ = Message::create()
+                        .fromTheta(util::TenthOfDegree(0x3e8))
+                        .resolution(util::TenthOfDegree(0x02))
+                        .scanCounter(0x00008894)
+                        .activeZoneset(0x02)
+                        .measurements(readMeasurements(hex_dump, 74, 250))
+                        .intensities(readIntensities(hex_dump, intensities_offset, 250))
+                        .diagnosticMessages(
+                            { diagnostic::Message(configuration::ScannerId::master, diagnostic::ErrorLocation(2, 0)),
                               diagnostic::Message(configuration::ScannerId::master, diagnostic::ErrorLocation(4, 3)) });
-    expected_msg_ = msg_builder.build();
   };
 
   const size_t intensities_offset{ 74 + 3 + (250 * 2) };
@@ -177,13 +177,12 @@ class WithoutMeasurementsAndIntensities
 public:
   WithoutMeasurementsAndIntensities()
   {
-    MessageBuilder msg_builder;
-    msg_builder.fromTheta(util::TenthOfDegree(0x5dc))
-        .resolution(util::TenthOfDegree(0x0a))
-        .scanCounter(0x0661fc)
-        .activeZoneset(0x02)
-        .measurements({});
-    expected_msg_ = msg_builder.build();
+    expected_msg_ = Message::create()
+                        .fromTheta(util::TenthOfDegree(0x5dc))
+                        .resolution(util::TenthOfDegree(0x0a))
+                        .scanCounter(0x0661fc)
+                        .activeZoneset(0x02)
+                        .measurements({});
   }
 
   const std::array<uint8_t, 39> hex_dump = {

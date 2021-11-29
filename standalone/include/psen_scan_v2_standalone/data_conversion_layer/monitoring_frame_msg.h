@@ -57,6 +57,8 @@ public:
   ScanCounterMissing(const std::string& msg = "Scan counter not set! (Contact PILZ support if the error persists.)");
 };
 
+class MessageBuilder;
+
 /**
  * @brief Higher level data type representing a single monitoring frame.
  *
@@ -75,6 +77,9 @@ public:
   const std::vector<double>& intensities() const;
   std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnosticMessages() const;
   bool operator==(const data_conversion_layer::monitoring_frame::Message& rhs) const;
+
+public:
+  static MessageBuilder create();
 
 private:
   configuration::ScannerId scanner_id_{ configuration::ScannerId::master };

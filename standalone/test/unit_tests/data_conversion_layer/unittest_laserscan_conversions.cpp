@@ -308,10 +308,10 @@ TEST(LaserScanConversionTest, conversionShouldIgnoreEmptyFramesForMonitoringFram
   // The following from_theta's are a real example from wireshark.
   // (angle_start:=-0.1, angle_end:=0.1)
   std::vector<Stamped> stamped_msgs = {
-    Stamped(MessageBuilder().fromTheta(Tenth(2500)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 3),
-    Stamped(MessageBuilder().fromTheta(Tenth(0)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 4),
-    Stamped(MessageBuilder().fromTheta(Tenth(500)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 5),
-    Stamped(MessageBuilder()
+    Stamped(Message::create().fromTheta(Tenth(2500)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 3),
+    Stamped(Message::create().fromTheta(Tenth(0)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 4),
+    Stamped(Message::create().fromTheta(Tenth(500)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 5),
+    Stamped(Message::create()
                 .fromTheta(Tenth(1318))
                 .resolution(Tenth(2))
                 .scanCounter(42)
@@ -319,8 +319,8 @@ TEST(LaserScanConversionTest, conversionShouldIgnoreEmptyFramesForMonitoringFram
                 .measurements({ 1., 2., 3. })
                 .intensities({ 4., 5., 6. }),
             6),
-    Stamped(MessageBuilder().fromTheta(Tenth(1500)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 7),
-    Stamped(MessageBuilder().fromTheta(Tenth(2000)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 8)
+    Stamped(Message::create().fromTheta(Tenth(1500)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 7),
+    Stamped(Message::create().fromTheta(Tenth(2000)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 8)
   };
 
   ASSERT_NO_THROW(data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs));
@@ -331,10 +331,10 @@ TEST(LaserScanConversionsTest, conversionShouldIgnoreEmptyFramesForTimestampsCom
   // The following from_theta's are a real example from wireshark.
   // (angle_start:=-0.1, angle_end:=0.1)
   std::vector<Stamped> stamped_msgs = {
-    Stamped(MessageBuilder().fromTheta(Tenth(2500)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 3),
-    Stamped(MessageBuilder().fromTheta(Tenth(0)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 4),
-    Stamped(MessageBuilder().fromTheta(Tenth(500)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 5),
-    Stamped(MessageBuilder()
+    Stamped(Message::create().fromTheta(Tenth(2500)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 3),
+    Stamped(Message::create().fromTheta(Tenth(0)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 4),
+    Stamped(Message::create().fromTheta(Tenth(500)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 5),
+    Stamped(Message::create()
                 .fromTheta(Tenth(1318))
                 .resolution(Tenth(2))
                 .scanCounter(42)
@@ -342,8 +342,8 @@ TEST(LaserScanConversionsTest, conversionShouldIgnoreEmptyFramesForTimestampsCom
                 .measurements({ 1., 2., 3. })
                 .intensities({ 4., 5., 6. }),
             40000),
-    Stamped(MessageBuilder().fromTheta(Tenth(1500)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 7),
-    Stamped(MessageBuilder().fromTheta(Tenth(2000)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 8)
+    Stamped(Message::create().fromTheta(Tenth(1500)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 7),
+    Stamped(Message::create().fromTheta(Tenth(2000)).resolution(Tenth(2)).scanCounter(42).activeZoneset(1), 8)
   };
   const int64_t expected_stamp{ 6667 };  // 40000 - ((0.4/360) * 30*10^6)
 

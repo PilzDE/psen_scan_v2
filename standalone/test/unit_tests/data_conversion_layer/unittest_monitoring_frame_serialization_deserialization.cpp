@@ -81,20 +81,20 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
            "this test.";
   }
 
-  auto msg = data_conversion_layer::monitoring_frame::MessageBuilder()
-                 .fromTheta(util::TenthOfDegree(25))
-                 .resolution(util::TenthOfDegree(1))
-                 .scanCounter(456)
-                 .activeZoneset(2)
-                 .measurements({ 10, 20, std::numeric_limits<double>::infinity(), 40 })
-                 .intensities({ 15, 25, 35, 45 })
-                 .diagnosticMessages({ data_conversion_layer::monitoring_frame::diagnostic::Message(
-                                           configuration::ScannerId::master, error_locations.at(0)),
-                                       data_conversion_layer::monitoring_frame::diagnostic::Message(
-                                           configuration::ScannerId::master, error_locations.at(1)),
-                                       data_conversion_layer::monitoring_frame::diagnostic::Message(
-                                           configuration::ScannerId::slave2, error_locations.at(2)) })
-                 .build();
+  data_conversion_layer::monitoring_frame::Message msg =
+      data_conversion_layer::monitoring_frame::Message::create()
+          .fromTheta(util::TenthOfDegree(25))
+          .resolution(util::TenthOfDegree(1))
+          .scanCounter(456)
+          .activeZoneset(2)
+          .measurements({ 10, 20, std::numeric_limits<double>::infinity(), 40 })
+          .intensities({ 15, 25, 35, 45 })
+          .diagnosticMessages({ data_conversion_layer::monitoring_frame::diagnostic::Message(
+                                    configuration::ScannerId::master, error_locations.at(0)),
+                                data_conversion_layer::monitoring_frame::diagnostic::Message(
+                                    configuration::ScannerId::master, error_locations.at(1)),
+                                data_conversion_layer::monitoring_frame::diagnostic::Message(
+                                    configuration::ScannerId::slave2, error_locations.at(2)) });
 
   auto raw = serialize(msg);
   auto deserialized_msg = data_conversion_layer::monitoring_frame::deserialize(convertToRawData(raw), raw.size());
@@ -104,15 +104,14 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
 
 TEST(MonitoringFrameSerializationTest, shouldFailOnSerializeAndDeserializeFrameWithIntensityChannelBits)
 {
-  auto msg = data_conversion_layer::monitoring_frame::MessageBuilder()
-                 .fromTheta(util::TenthOfDegree(25))
-                 .resolution(util::TenthOfDegree(1))
-                 .scanCounter(1)
-                 .activeZoneset(0)
-                 .measurements({ 0 })
-                 .intensities({ 70045 })
-                 .diagnosticMessages({})
-                 .build();
+  data_conversion_layer::monitoring_frame::Message msg = data_conversion_layer::monitoring_frame::Message::create()
+                                                             .fromTheta(util::TenthOfDegree(25))
+                                                             .resolution(util::TenthOfDegree(1))
+                                                             .scanCounter(1)
+                                                             .activeZoneset(0)
+                                                             .measurements({ 0 })
+                                                             .intensities({ 70045 })
+                                                             .diagnosticMessages({});
 
   auto raw = serialize(msg);
   auto deserialized_msg = data_conversion_layer::monitoring_frame::deserialize(convertToRawData(raw), raw.size());
