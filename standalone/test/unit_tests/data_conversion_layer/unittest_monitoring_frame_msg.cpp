@@ -13,33 +13,25 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <algorithm>
-#include <array>
-#include <memory>
 #include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
-#include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
-
-#include "psen_scan_v2_standalone/data_conversion_layer/istring_stream_builder.h"
-#include "psen_scan_v2_standalone/communication_layer/udp_frame_dumps.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 #include "psen_scan_v2_standalone/util/gtest_expectations.h"
 
 namespace psen_scan_v2_standalone_test
 {
 using namespace psen_scan_v2_standalone;
-using namespace data_conversion_layer;
-using namespace monitoring_frame;
+using namespace data_conversion_layer::monitoring_frame;
 
 static const std::string ADDITIONAL_FIELD_MISSING_TEXT = " not set! (Contact PILZ support if the error persists.)";
 
@@ -102,6 +94,66 @@ TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfDiagnosticMessages)
 {
   EXPECT_FALSE(MessageBuilder().build().hasDiagnosticMessagesField());
   EXPECT_TRUE(MessageBuilder().diagnosticMessages({}).build().hasDiagnosticMessagesField());
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectScannerId)
+{
+  const auto scanner_id{ configuration::ScannerId::slave0 };
+  EXPECT_EQ(scanner_id, MessageBuilder().scannerId(scanner_id).build().scannerId());
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectFromTheta)
+{
+  const auto from_theta{ util::TenthOfDegree(50) };
+  EXPECT_EQ(from_theta, MessageBuilder().fromTheta(from_theta).build().fromTheta());
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectResolution)
+{
+  const auto resolution{ util::TenthOfDegree(10) };
+  EXPECT_EQ(resolution, MessageBuilder().resolution(resolution).build().resolution());
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectScanCounter)
+{
+  const uint32_t expected_scan_counter{ 42 };
+  uint32_t scan_counter{ 0 };
+  ASSERT_NO_THROW(scan_counter = MessageBuilder().scanCounter(expected_scan_counter).build().scanCounter());
+  EXPECT_EQ(expected_scan_counter, scan_counter);
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectActiveZoneset)
+{
+  const uint8_t expected_active_zoneset{ 3 };
+  uint8_t active_zoneset{ 0 };
+  ASSERT_NO_THROW(active_zoneset = MessageBuilder().activeZoneset(expected_active_zoneset).build().activeZoneset());
+  EXPECT_EQ(expected_active_zoneset, active_zoneset);
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectMeasurements)
+{
+  const std::vector<double> expected_measurements{ { 2.1, 1.3 } };
+  std::vector<double> measurements;
+  ASSERT_NO_THROW(measurements = MessageBuilder().measurements(expected_measurements).build().measurements());
+  EXPECT_EQ(expected_measurements, measurements);
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectIntensities)
+{
+  const std::vector<double> expected_intensities{ { 2.1, 1.3 } };
+  std::vector<double> intensities;
+  ASSERT_NO_THROW(intensities = MessageBuilder().intensities(expected_intensities).build().intensities());
+  EXPECT_EQ(expected_intensities, intensities);
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectDiagnosticMessages)
+{
+  const std::vector<diagnostic::Message> expected_diagnostic_messages{ { diagnostic::Message(
+      configuration::ScannerId::master, diagnostic::ErrorLocation(1, 7)) } };
+  std::vector<diagnostic::Message> diagnostic_messages;
+  ASSERT_NO_THROW(diagnostic_messages =
+                      MessageBuilder().diagnosticMessages(expected_diagnostic_messages).build().diagnosticMessages());
+  EXPECT_EQ(expected_diagnostic_messages, diagnostic_messages);
 }
 
 TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccessWithAdditionalFields)
