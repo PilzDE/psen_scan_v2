@@ -43,6 +43,11 @@ MATCHER_P(PointwiseDoubleEq, vec, "")
   });
 }
 
+MATCHER_P2(UnsafePointwiseDoubleItEq, begin, end, "")
+{
+  return std::equal(begin, end, arg, [](const double& a, const double& b) { return Matches(DoubleEq(b))(a); });
+}
+
 MATCHER_P(ScanDataEqual, scan, "")
 {
   return arg.getScanCounter() == scan.getScanCounter() && arg.getScanResolution() == scan.getScanResolution() &&
@@ -50,8 +55,6 @@ MATCHER_P(ScanDataEqual, scan, "")
          Matches(PointwiseDoubleEq(scan.getMeasurements()))(arg.getMeasurements()) &&
          Matches(PointwiseDoubleEq(scan.getIntensities()))(arg.getIntensities());
 }
-
-using namespace ::testing;
 
 MATCHER_P2(TimestampInExpectedTimeframe, reference_scan, reference_timestamp, "")
 {

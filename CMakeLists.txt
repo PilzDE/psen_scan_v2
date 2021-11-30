@@ -336,7 +336,7 @@ if(CATKIN_ENABLE_TESTING)
     fmt::fmt
   )
 
-  catkin_add_gtest(unittest_laserscan_conversions
+  catkin_add_gmock(unittest_laserscan_conversions
     standalone/test/unit_tests/data_conversion_layer/unittest_laserscan_conversions.cpp
     standalone/src/laserscan.cpp
     standalone/src/data_conversion_layer/monitoring_frame_msg.cpp

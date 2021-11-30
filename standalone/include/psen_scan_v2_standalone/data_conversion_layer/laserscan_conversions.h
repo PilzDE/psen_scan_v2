@@ -50,6 +50,9 @@ public:
    *
    * @note expects all monitoring frames to have the same resolution.
    *
+   * @throws data_conversion_layer::monitoring_frame::AdditionalFieldMissing if measurements, scan_counter or
+   * active_zoneset are not set in one of the stamped_msgs.
+   *
    * @see data_conversion_layer::monitoring_frame::Message
    * @see ScannerV2
    */
@@ -110,17 +113,11 @@ inline LaserScan LaserScanConverter::toLaserScan(
     }
   }
 
-  uint8_t active_zoneset = configuration::DEFAULT_ACTIVE_ZONESET;
-  if (stamped_msgs[sorted_stamped_msgs_indices.back()].msg_.hasActiveZonesetField())
-  {
-    active_zoneset = stamped_msgs[sorted_stamped_msgs_indices.back()].msg_.activeZoneset();
-  }
-
   LaserScan scan(stamped_msgs[0].msg_.resolution(),
                  min_angle,
                  max_angle,
                  stamped_msgs[0].msg_.scanCounter(),
-                 active_zoneset,
+                 stamped_msgs[sorted_stamped_msgs_indices.back()].msg_.activeZoneset(),
                  timestamp);
   scan.setMeasurements(measurements);
   scan.setIntensities(intensities);
