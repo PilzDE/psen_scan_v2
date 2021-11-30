@@ -16,8 +16,11 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 
@@ -25,21 +28,18 @@ using namespace psen_scan_v2_standalone;
 
 namespace psen_scan_v2_standalone_test
 {
-static data_conversion_layer::monitoring_frame::Message
-createMsg(const util::TenthOfDegree from_theta = util::TenthOfDegree{ 10 },
-          const util::TenthOfDegree resolution = util::TenthOfDegree{ 90 },
-          const uint32_t scan_counter = uint32_t{ 42 },
-          const uint8_t active_zoneset = uint8_t{ 1 })
+static data_conversion_layer::monitoring_frame::Message createMsg()
 {
-  data_conversion_layer::monitoring_frame::MessageBuilder msg_builder;
-  msg_builder.fromTheta(from_theta)
-      .resolution(resolution)
-      .scanCounter(scan_counter)
-      .activeZoneset(active_zoneset)
+  return data_conversion_layer::monitoring_frame::MessageBuilder()
+      .fromTheta(util::TenthOfDegree{ 10 })
+      .resolution(util::TenthOfDegree{ 90 })
+      .scanCounter(42)
+      .activeZoneset(1)
       .measurements({ 1., 2., 3., 4.5, 5., 42. })
       .intensities({ 0., 4., 3., 1007., 508., 14000. })
-      .diagnosticMessages({});
-  return msg_builder.build();
+      .diagnosticMessages({ data_conversion_layer::monitoring_frame::diagnostic::Message{
+          configuration::ScannerId::master,
+          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 7) } });
 }
 
 TEST(MonitoringFrameMsgStampedTest, testMsg)
