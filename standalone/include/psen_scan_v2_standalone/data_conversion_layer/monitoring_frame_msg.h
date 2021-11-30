@@ -111,7 +111,6 @@ public:
   const std::vector<double>& intensities() const;
   //! @throw DiagnosticMessagesMissing if diagnostic_messages were missing during deserialization of a Message.
   std::vector<diagnostic::Message> diagnosticMessages() const;
-  bool operator==(const Message& rhs) const;
 
   bool hasScanCounter() const;
   bool hasActiveZoneset() const;

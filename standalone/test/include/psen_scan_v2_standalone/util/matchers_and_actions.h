@@ -60,6 +60,15 @@ MATCHER_P2(TimestampInExpectedTimeframe, reference_scan, reference_timestamp, ""
   return arg.getTimestamp() > reference_scan.getTimestamp() &&
          arg.getTimestamp() < (reference_scan.getTimestamp() + elapsed_time);
 }
+
+MATCHER_P(MonitoringFrameEq, reference_msg, "")
+{
+  return arg.fromTheta() == reference_msg.fromTheta() && arg.resolution() == reference_msg.resolution() &&
+         arg.scanCounter() == reference_msg.scanCounter() && arg.activeZoneset() == reference_msg.activeZoneset() &&
+         Matches(PointwiseDoubleEq(reference_msg.measurements()))(arg.measurements()) &&
+         Matches(PointwiseDoubleEq(reference_msg.intensities()))(arg.intensities()) &&
+         Matches(Pointwise(Eq(), reference_msg.diagnosticMessages()))(arg.diagnosticMessages());
+}
 }  // namespace psen_scan_v2_standalone_test
 
 #endif  // PSEN_SCAN_V2_STANDALONE_TEST_MATCHERS_AND_ACTIONS_H

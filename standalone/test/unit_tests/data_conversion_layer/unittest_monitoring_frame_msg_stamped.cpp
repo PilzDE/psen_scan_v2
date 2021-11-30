@@ -14,9 +14,12 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
+
+#include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 
 using namespace psen_scan_v2_standalone;
 
@@ -42,7 +45,7 @@ TEST(MonitoringFrameMsgStampedTest, testMsg)
 {
   const auto expected_msg{ createMsg() };
   const data_conversion_layer::monitoring_frame::MessageStamped stamped_msg(expected_msg, int64_t{ 3 });
-  EXPECT_EQ(expected_msg, stamped_msg.msg_);
+  EXPECT_THAT(stamped_msg.msg_, MonitoringFrameEq(expected_msg));
 }
 
 TEST(MonitoringFrameMsgStampedTest, testStamp)

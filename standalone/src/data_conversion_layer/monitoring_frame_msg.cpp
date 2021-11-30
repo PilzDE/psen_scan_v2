@@ -115,13 +115,6 @@ std::vector<diagnostic::Message> Message::diagnosticMessages() const
   }
 }
 
-bool Message::operator==(const Message& rhs) const
-{
-  return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
-          activeZoneset() == rhs.activeZoneset() && measurements() == rhs.measurements() &&
-          intensities() == rhs.intensities() && diagnosticMessages() == rhs.diagnosticMessages());
-}
-
 bool Message::hasScanCounter() const
 {
   return scan_counter_.is_initialized();

@@ -17,6 +17,7 @@
 #include <array>
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
@@ -28,6 +29,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_serialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
 #include "psen_scan_v2_standalone/communication_layer/udp_frame_dumps.h"
+#include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 
 using namespace psen_scan_v2_standalone;
 
@@ -99,7 +101,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
   auto raw = serialize(msg);
   auto deserialized_msg = data_conversion_layer::monitoring_frame::deserialize(convertToRawData(raw), raw.size());
 
-  EXPECT_EQ(msg, deserialized_msg);
+  EXPECT_THAT(deserialized_msg, MonitoringFrameEq(msg));
 }
 
 TEST(MonitoringFrameSerializationTest, shouldFailOnSerializeAndDeserializeFrameWithIntensityChannelBits)
@@ -116,8 +118,9 @@ TEST(MonitoringFrameSerializationTest, shouldFailOnSerializeAndDeserializeFrameW
   auto raw = serialize(msg);
   auto deserialized_msg = data_conversion_layer::monitoring_frame::deserialize(convertToRawData(raw), raw.size());
 
-  EXPECT_FALSE(msg == deserialized_msg);
-  EXPECT_EQ(deserialized_msg.intensities().at(0), 0b0011111111111111 & 70045);
+  const uint32_t intensity_channel_bit_mask = 0b111111111100000000000000;
+  ASSERT_NE(static_cast<uint32_t>(msg.intensities().at(0)) & intensity_channel_bit_mask, 0);
+  EXPECT_EQ(static_cast<uint32_t>(deserialized_msg.intensities().at(0)) & intensity_channel_bit_mask, 0);
 }
 
 TEST(MonitoringFrameSerializationDiagnosticMessagesTest, shouldSetCorrectBitInSerializedDiagnosticData)
@@ -192,7 +195,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldDeserializeMonitoringFrameCorre
   data_conversion_layer::monitoring_frame::Message msg;
   ASSERT_NO_THROW(
       msg = data_conversion_layer::monitoring_frame::deserialize(with_intensities_raw_, with_intensities_raw_.size()););
-  EXPECT_EQ(msg, with_intensities_.expected_msg_);
+  EXPECT_THAT(msg, MonitoringFrameEq(with_intensities_.expected_msg_));
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnUnknownFieldId)
