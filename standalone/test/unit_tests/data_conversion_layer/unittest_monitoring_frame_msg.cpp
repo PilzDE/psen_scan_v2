@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <array>
 #include <memory>
+#include <string>
 
 #include <gtest/gtest.h>
 
@@ -30,6 +31,8 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/istring_stream_builder.h"
 #include "psen_scan_v2_standalone/communication_layer/udp_frame_dumps.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
+
+#include "psen_scan_v2_standalone/util/gtest_expectations.h"
 
 namespace psen_scan_v2
 {
@@ -63,10 +66,46 @@ protected:
   const std::array<double, 3> expected_measurements_{ 4.4, 4.3, 4.2 };
 };
 
-TEST(MonitoringFrameMsgTest, shouldThrowMissingScanCounterErrorWhenScanCounterWasNeverSet)
+static const std::string ADDITIONAL_FIELD_MISSING_TEXT = " not set! (Contact PILZ support if the error persists.)";
+
+TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetScanCounter)
 {
   data_conversion_layer::monitoring_frame::Message msg{};
-  EXPECT_THROW(msg.scanCounter(), data_conversion_layer::monitoring_frame::AdditionalFieldMissing);
+  EXPECT_THROW_AND_WHAT(msg.scanCounter(),
+                        data_conversion_layer::monitoring_frame::AdditionalFieldMissing,
+                        ("Scan counter" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
+}
+
+TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetMeasurements)
+{
+  data_conversion_layer::monitoring_frame::Message msg{};
+  EXPECT_THROW_AND_WHAT(msg.measurements(),
+                        data_conversion_layer::monitoring_frame::AdditionalFieldMissing,
+                        ("Measurements" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
+}
+
+TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetIntensities)
+{
+  data_conversion_layer::monitoring_frame::Message msg{};
+  EXPECT_THROW_AND_WHAT(msg.intensities(),
+                        data_conversion_layer::monitoring_frame::AdditionalFieldMissing,
+                        ("Intensities" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
+}
+
+TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetActiveZoneset)
+{
+  data_conversion_layer::monitoring_frame::Message msg{};
+  EXPECT_THROW_AND_WHAT(msg.activeZoneset(),
+                        data_conversion_layer::monitoring_frame::AdditionalFieldMissing,
+                        ("Active zoneset" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
+}
+
+TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetDiagnosticMessages)
+{
+  data_conversion_layer::monitoring_frame::Message msg{};
+  EXPECT_THROW_AND_WHAT(msg.diagnosticMessages(),
+                        data_conversion_layer::monitoring_frame::AdditionalFieldMissing,
+                        ("Diagnostic messages" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
 TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)

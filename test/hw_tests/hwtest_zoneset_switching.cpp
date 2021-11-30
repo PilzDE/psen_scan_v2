@@ -23,7 +23,7 @@
 #include <std_msgs/Byte.h>
 #include <std_msgs/UInt8.h>
 
-#include "psen_scan_v2_standalone/util/expectations.h"
+#include "psen_scan_v2_standalone/util/gtest_expectations.h"
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 #include "psen_scan_v2_standalone/util/async_barrier.h"
 
