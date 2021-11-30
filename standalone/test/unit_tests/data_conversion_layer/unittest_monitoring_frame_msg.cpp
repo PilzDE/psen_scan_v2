@@ -25,6 +25,7 @@
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
 
@@ -34,10 +35,11 @@
 
 #include "psen_scan_v2_standalone/util/gtest_expectations.h"
 
-namespace psen_scan_v2
+namespace psen_scan_v2_standalone_test
 {
-using namespace psen_scan_v2_standalone_test;
 using namespace psen_scan_v2_standalone;
+using namespace data_conversion_layer;
+using namespace monitoring_frame;
 
 class MonitoringFrameMsgTest : public ::testing::Test
 {
@@ -70,47 +72,68 @@ static const std::string ADDITIONAL_FIELD_MISSING_TEXT = " not set! (Contact PIL
 
 TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetScanCounter)
 {
-  data_conversion_layer::monitoring_frame::Message msg{};
-  EXPECT_THROW_AND_WHAT(msg.scanCounter(),
-                        data_conversion_layer::monitoring_frame::AdditionalFieldMissing,
-                        ("Scan counter" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
+  EXPECT_THROW_AND_WHAT(
+      Message().scanCounter(), AdditionalFieldMissing, ("Scan counter" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
 TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetMeasurements)
 {
-  data_conversion_layer::monitoring_frame::Message msg{};
-  EXPECT_THROW_AND_WHAT(msg.measurements(),
-                        data_conversion_layer::monitoring_frame::AdditionalFieldMissing,
-                        ("Measurements" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
+  EXPECT_THROW_AND_WHAT(
+      Message().measurements(), AdditionalFieldMissing, ("Measurements" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
 TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetIntensities)
 {
-  data_conversion_layer::monitoring_frame::Message msg{};
-  EXPECT_THROW_AND_WHAT(msg.intensities(),
-                        data_conversion_layer::monitoring_frame::AdditionalFieldMissing,
-                        ("Intensities" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
+  EXPECT_THROW_AND_WHAT(
+      Message().intensities(), AdditionalFieldMissing, ("Intensities" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
 TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetActiveZoneset)
 {
-  data_conversion_layer::monitoring_frame::Message msg{};
-  EXPECT_THROW_AND_WHAT(msg.activeZoneset(),
-                        data_conversion_layer::monitoring_frame::AdditionalFieldMissing,
-                        ("Active zoneset" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
+  EXPECT_THROW_AND_WHAT(
+      Message().activeZoneset(), AdditionalFieldMissing, ("Active zoneset" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
 TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetDiagnosticMessages)
 {
-  data_conversion_layer::monitoring_frame::Message msg{};
-  EXPECT_THROW_AND_WHAT(msg.diagnosticMessages(),
-                        data_conversion_layer::monitoring_frame::AdditionalFieldMissing,
+  EXPECT_THROW_AND_WHAT(Message().diagnosticMessages(),
+                        AdditionalFieldMissing,
                         ("Diagnostic messages" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfScannCounter)
+{
+  EXPECT_FALSE(MessageBuilder().build().hasScanCounter());
+  EXPECT_TRUE(MessageBuilder().scanCounter(2).build().hasScanCounter());
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfActiveZoneset)
+{
+  EXPECT_FALSE(MessageBuilder().build().hasActiveZoneset());
+  EXPECT_TRUE(MessageBuilder().activeZoneset(2).build().hasActiveZoneset());
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfMeasurements)
+{
+  EXPECT_FALSE(MessageBuilder().build().hasMeasurements());
+  EXPECT_TRUE(MessageBuilder().measurements({}).build().hasMeasurements());
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfIntensities)
+{
+  EXPECT_FALSE(MessageBuilder().build().hasIntensities());
+  EXPECT_TRUE(MessageBuilder().intensities({}).build().hasIntensities());
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfDiagnosticMessages)
+{
+  EXPECT_FALSE(MessageBuilder().build().hasDiagnosticMessages());
+  EXPECT_TRUE(MessageBuilder().diagnosticMessages({}).build().hasDiagnosticMessages());
 }
 
 TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)
 {
-  auto msg = data_conversion_layer::monitoring_frame::MessageBuilder()
+  auto msg = MessageBuilder()
                  .fromTheta(util::TenthOfDegree(1234))
                  .resolution(util::TenthOfDegree(56))
                  .scanCounter(78)
@@ -131,7 +154,7 @@ TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)
 #endif
 }
 
-}  // namespace psen_scan_v2
+}  // namespace psen_scan_v2_standalone_test
 
 int main(int argc, char** argv)
 {
