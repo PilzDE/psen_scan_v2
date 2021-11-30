@@ -119,8 +119,8 @@ TEST(MonitoringFrameSerializationTest, shouldFailOnSerializeAndDeserializeFrameW
   auto deserialized_msg = data_conversion_layer::monitoring_frame::deserialize(convertToRawData(raw), raw.size());
 
   const uint32_t intensity_channel_bit_mask = 0b111111111100000000000000;
-  ASSERT_NE(static_cast<uint32_t>(msg.intensities().at(0)) & intensity_channel_bit_mask, 0);
-  EXPECT_EQ(static_cast<uint32_t>(deserialized_msg.intensities().at(0)) & intensity_channel_bit_mask, 0);
+  ASSERT_NE(static_cast<uint32_t>(msg.intensities().at(0)) & intensity_channel_bit_mask, 0u);
+  EXPECT_EQ(static_cast<uint32_t>(deserialized_msg.intensities().at(0)) & intensity_channel_bit_mask, 0u);
 }
 
 TEST(MonitoringFrameSerializationDiagnosticMessagesTest, shouldSetCorrectBitInSerializedDiagnosticData)
