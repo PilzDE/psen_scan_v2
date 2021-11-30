@@ -31,14 +31,15 @@ createMsg(const util::TenthOfDegree from_theta = util::TenthOfDegree{ 10 },
           const uint32_t scan_counter = uint32_t{ 42 },
           const uint8_t active_zoneset = uint8_t{ 1 })
 {
-  return data_conversion_layer::monitoring_frame::Message::create()
-      .fromTheta(from_theta)
+  data_conversion_layer::monitoring_frame::MessageBuilder msg_builder;
+  msg_builder.fromTheta(from_theta)
       .resolution(resolution)
       .scanCounter(scan_counter)
       .activeZoneset(active_zoneset)
       .measurements({ 1., 2., 3., 4.5, 5., 42. })
       .intensities({ 0., 4., 3., 1007., 508., 14000. })
       .diagnosticMessages({});
+  return msg_builder.build();
 }
 
 TEST(MonitoringFrameMsgStampedTest, testMsg)

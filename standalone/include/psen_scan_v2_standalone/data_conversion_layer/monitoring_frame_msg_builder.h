@@ -17,7 +17,6 @@
 #define PSEN_SCAN_V2_STANDALONE_MONITORING_FRAME_MSG_BUILDER_H
 
 #include <cstdint>
-#include <utility>
 #include <vector>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
@@ -33,10 +32,8 @@ namespace monitoring_frame
 class MessageBuilder
 {
 public:
-  operator Message();
-
-public:
   Message build();
+  operator Message();
 
 public:
   MessageBuilder& scannerId(configuration::ScannerId scanner_id);
@@ -52,14 +49,14 @@ private:
   Message msg_;
 };
 
+inline Message MessageBuilder::build()
+{
+  return msg_;
+}
+
 inline MessageBuilder::operator Message()
 {
   return build();
-}
-
-inline Message MessageBuilder::build()
-{
-  return std::move(msg_);
 }
 
 inline MessageBuilder& MessageBuilder::scannerId(configuration::ScannerId scanner_id)

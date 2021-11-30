@@ -71,12 +71,13 @@ TEST(MonitoringFrameMsgTest, shouldThrowMissingScanCounterErrorWhenScanCounterWa
 
 TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)
 {
-  data_conversion_layer::monitoring_frame::Message msg = data_conversion_layer::monitoring_frame::Message::create()
-                                                             .fromTheta(util::TenthOfDegree(1234))
-                                                             .resolution(util::TenthOfDegree(56))
-                                                             .scanCounter(78)
-                                                             .activeZoneset(2)
-                                                             .measurements({ 45, 44, 43, 42 });
+  auto msg = data_conversion_layer::monitoring_frame::MessageBuilder()
+                 .fromTheta(util::TenthOfDegree(1234))
+                 .resolution(util::TenthOfDegree(56))
+                 .scanCounter(78)
+                 .activeZoneset(2)
+                 .measurements({ 45, 44, 43, 42 })
+                 .build();
 
 // For compatibility with different ubuntu versions (resp. fmt), we need to take account of changes in
 // the default formatting of floating point numbers

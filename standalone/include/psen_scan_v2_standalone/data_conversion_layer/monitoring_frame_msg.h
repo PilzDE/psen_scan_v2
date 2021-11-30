@@ -86,8 +86,6 @@ public:
   DiagnosticMessagesMissing();
 };
 
-class MessageBuilder;
-
 /**
  * @brief Higher level data type representing a single monitoring frame.
  *
@@ -117,9 +115,6 @@ public:
   bool hasMeasurements() const;
   bool hasIntensities() const;
   bool hasDiagnosticMessages() const;
-
-public:
-  static MessageBuilder create();
 
 private:
   // fixed fields

@@ -28,7 +28,6 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/util/logging.h"
@@ -139,11 +138,6 @@ bool Message::hasDiagnosticMessages() const
 {
   return diagnostic_messages_.is_initialized();
 }
-
-MessageBuilder Message::create()
-{
-  return MessageBuilder();
-};
 
 #define FORMAT_IF_INITIALIZED(arg) arg.is_initialized() ? fmt::format("{}", arg.get()) : ""
 #define FORMAT_RANGE_IF_INITIALIZED(arg) arg.is_initialized() ? util::formatRange(arg.get()) : "{}"
