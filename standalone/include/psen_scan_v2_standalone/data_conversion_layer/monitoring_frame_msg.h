@@ -56,36 +56,6 @@ public:
   AdditionalFieldMissing(const std::string& field_name);
 };
 
-class ScanCounterMissing : public AdditionalFieldMissing
-{
-public:
-  ScanCounterMissing();
-};
-
-class ActiveZonesetMissing : public AdditionalFieldMissing
-{
-public:
-  ActiveZonesetMissing();
-};
-
-class MeasurementsMissing : public AdditionalFieldMissing
-{
-public:
-  MeasurementsMissing();
-};
-
-class IntensitiesMissing : public AdditionalFieldMissing
-{
-public:
-  IntensitiesMissing();
-};
-
-class DiagnosticMessagesMissing : public AdditionalFieldMissing
-{
-public:
-  DiagnosticMessagesMissing();
-};
-
 /**
  * @brief Higher level data type representing a single monitoring frame.
  *
@@ -99,15 +69,15 @@ public:
   configuration::ScannerId scannerId() const;
   util::TenthOfDegree fromTheta() const;
   util::TenthOfDegree resolution() const;
-  //! @throw ScanCounterMissing if scan_counter was missing during deserialization of a Message.
+  //! @throw AdditionalFieldMissing if scan_counter was missing during deserialization of a Message.
   uint32_t scanCounter() const;
-  //! @throw ActiveZonesetMissing if active_zoneset was missing during deserialization of a Message.
+  //! @throw AdditionalFieldMissing if active_zoneset was missing during deserialization of a Message.
   uint8_t activeZoneset() const;
-  //! @throw MeasurementsMissing if measurements were missing during deserialization of a Message.
+  //! @throw AdditionalFieldMissing if measurements were missing during deserialization of a Message.
   const std::vector<double>& measurements() const;
-  //! @throw IntensitiesMissing if intensities were missing during deserialization of a Message.
+  //! @throw AdditionalFieldMissing if intensities were missing during deserialization of a Message.
   const std::vector<double>& intensities() const;
-  //! @throw DiagnosticMessagesMissing if diagnostic_messages were missing during deserialization of a Message.
+  //! @throw AdditionalFieldMissing if diagnostic_messages were missing during deserialization of a Message.
   std::vector<diagnostic::Message> diagnosticMessages() const;
 
   bool hasScanCounter() const;
@@ -146,26 +116,6 @@ struct MessageStamped
 
 inline AdditionalFieldMissing::AdditionalFieldMissing(const std::string& field_name)
   : std::runtime_error(field_name + " not set! (Contact PILZ support if the error persists.)")
-{
-}
-
-inline ScanCounterMissing::ScanCounterMissing() : AdditionalFieldMissing("Scan counter")
-{
-}
-
-inline ActiveZonesetMissing::ActiveZonesetMissing() : AdditionalFieldMissing("Active zoneset")
-{
-}
-
-inline MeasurementsMissing::MeasurementsMissing() : AdditionalFieldMissing("Measurements")
-{
-}
-
-inline IntensitiesMissing::IntensitiesMissing() : AdditionalFieldMissing("Intensities")
-{
-}
-
-inline DiagnosticMessagesMissing::DiagnosticMessagesMissing() : AdditionalFieldMissing("Diagnostic messages")
 {
 }
 

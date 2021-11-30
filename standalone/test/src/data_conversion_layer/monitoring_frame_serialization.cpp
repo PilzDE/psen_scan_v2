@@ -46,7 +46,7 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
     uint32_t scan_counter_header_payload = msg.scanCounter();
     raw_processing::write(os, scan_counter_header_payload);
   }
-  catch (const ScanCounterMissing& /*unused*/)
+  catch (const AdditionalFieldMissing& /*unused*/)
   {
   }
 
@@ -59,7 +59,7 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
     write(os, diagnostic_data_field_header);
     data_conversion_layer::raw_processing::write(os, diagnostic_data_field_payload);
   }
-  catch (const DiagnosticMessagesMissing& /*unused*/)
+  catch (const AdditionalFieldMissing& /*unused*/)
   {
   }
 
@@ -77,7 +77,7 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
       return (static_cast<uint16_t>(std::round(elem * 1000.)));
     });
   }
-  catch (const MeasurementsMissing& /*unused*/)
+  catch (const AdditionalFieldMissing& /*unused*/)
   {
   }
 
@@ -90,7 +90,7 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
     data_conversion_layer::raw_processing::writeArray<uint16_t, double>(
         os, msg.intensities(), [](double elem) { return (static_cast<uint16_t>(std::round(elem))); });
   }
-  catch (const IntensitiesMissing& /*unused*/)
+  catch (const AdditionalFieldMissing& /*unused*/)
   {
   }
 
@@ -102,7 +102,7 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
     uint8_t zoneset_header_payload = msg.activeZoneset();
     raw_processing::write(os, zoneset_header_payload);
   }
-  catch (const ActiveZonesetMissing& /*unused*/)
+  catch (const AdditionalFieldMissing& /*unused*/)
   {
   }
 

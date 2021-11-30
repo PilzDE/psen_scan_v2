@@ -62,7 +62,7 @@ uint32_t Message::scanCounter() const
   }
   else
   {
-    throw ScanCounterMissing();
+    throw AdditionalFieldMissing("Scan counter");
   }
 }
 
@@ -74,7 +74,7 @@ uint8_t Message::activeZoneset() const
   }
   else
   {
-    throw ActiveZonesetMissing();
+    throw AdditionalFieldMissing("Active zoneset");
   }
 }
 
@@ -86,7 +86,7 @@ const std::vector<double>& Message::measurements() const
   }
   else
   {
-    throw MeasurementsMissing();
+    throw AdditionalFieldMissing("Measurements");
   }
 }
 
@@ -98,7 +98,7 @@ const std::vector<double>& Message::intensities() const
   }
   else
   {
-    throw IntensitiesMissing();
+    throw AdditionalFieldMissing("Intensities");
   }
 }
 
@@ -110,7 +110,7 @@ std::vector<diagnostic::Message> Message::diagnosticMessages() const
   }
   else
   {
-    throw DiagnosticMessagesMissing();
+    throw AdditionalFieldMissing("Diagnostic messages");
   }
 }
 

@@ -66,7 +66,7 @@ protected:
 TEST(MonitoringFrameMsgTest, shouldThrowMissingScanCounterErrorWhenScanCounterWasNeverSet)
 {
   data_conversion_layer::monitoring_frame::Message msg{};
-  EXPECT_THROW(msg.scanCounter(), data_conversion_layer::monitoring_frame::ScanCounterMissing);
+  EXPECT_THROW(msg.scanCounter(), data_conversion_layer::monitoring_frame::AdditionalFieldMissing);
 }
 
 TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)
