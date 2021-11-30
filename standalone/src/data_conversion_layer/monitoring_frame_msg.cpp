@@ -114,33 +114,33 @@ std::vector<diagnostic::Message> Message::diagnosticMessages() const
   }
 }
 
-bool Message::hasScanCounter() const
+bool Message::hasScanCounterField() const
 {
   return scan_counter_.is_initialized();
 }
 
-bool Message::hasActiveZoneset() const
+bool Message::hasActiveZonesetField() const
 {
   return active_zoneset_.is_initialized();
 }
 
-bool Message::hasMeasurements() const
+bool Message::hasMeasurementsField() const
 {
   return measurements_.is_initialized();
 }
 
-bool Message::hasIntensities() const
+bool Message::hasIntensitiesField() const
 {
   return intensities_.is_initialized();
 }
 
-bool Message::hasDiagnosticMessages() const
+bool Message::hasDiagnosticMessagesField() const
 {
   return diagnostic_messages_.is_initialized();
 }
 
-#define FORMAT_IF_INITIALIZED(arg) arg.is_initialized() ? fmt::format("{}", arg.get()) : ""
-#define FORMAT_RANGE_IF_INITIALIZED(arg) arg.is_initialized() ? util::formatRange(arg.get()) : "{}"
+#define FORMAT_IF_INITIALIZED(arg) arg.is_initialized() ? fmt::format("{}", arg.get()) : "_"
+#define FORMAT_RANGE_IF_INITIALIZED(arg) arg.is_initialized() ? util::formatRange(arg.get()) : "_"
 
 std::ostream& operator<<(std::ostream& os, const Message& msg)
 {

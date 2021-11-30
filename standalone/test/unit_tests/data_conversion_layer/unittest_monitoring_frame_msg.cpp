@@ -41,33 +41,6 @@ using namespace psen_scan_v2_standalone;
 using namespace data_conversion_layer;
 using namespace monitoring_frame;
 
-class MonitoringFrameMsgTest : public ::testing::Test
-{
-protected:
-  inline std::istringstream buildExpectedMeasurementsStream()
-  {
-    IStringStreamBuilder builder;
-    for (const auto& measurement : expected_measurements_)
-    {
-      builder.add(static_cast<uint16_t>(measurement * 1000.));
-    }
-    return builder.get();
-  }
-
-  inline bool expectMeasurementsPartEqual(const std::vector<double>& measurements)
-  {
-    return std::equal(measurements.begin(), measurements.end(), expected_measurements_.begin());
-  }
-
-  inline bool expectMeasurementsEqual(const std::vector<double>& measurements)
-  {
-    return (measurements.size() == expected_measurements_.size() && expectMeasurementsPartEqual(measurements));
-  }
-
-protected:
-  const std::array<double, 3> expected_measurements_{ 4.4, 4.3, 4.2 };
-};
-
 static const std::string ADDITIONAL_FIELD_MISSING_TEXT = " not set! (Contact PILZ support if the error persists.)";
 
 TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetScanCounter)
@@ -101,37 +74,37 @@ TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUns
                         ("Diagnostic messages" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
-TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfScannCounter)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfScanCounter)
 {
-  EXPECT_FALSE(MessageBuilder().build().hasScanCounter());
-  EXPECT_TRUE(MessageBuilder().scanCounter(2).build().hasScanCounter());
+  EXPECT_FALSE(MessageBuilder().build().hasScanCounterField());
+  EXPECT_TRUE(MessageBuilder().scanCounter(2).build().hasScanCounterField());
 }
 
 TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfActiveZoneset)
 {
-  EXPECT_FALSE(MessageBuilder().build().hasActiveZoneset());
-  EXPECT_TRUE(MessageBuilder().activeZoneset(2).build().hasActiveZoneset());
+  EXPECT_FALSE(MessageBuilder().build().hasActiveZonesetField());
+  EXPECT_TRUE(MessageBuilder().activeZoneset(2).build().hasActiveZonesetField());
 }
 
 TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfMeasurements)
 {
-  EXPECT_FALSE(MessageBuilder().build().hasMeasurements());
-  EXPECT_TRUE(MessageBuilder().measurements({}).build().hasMeasurements());
+  EXPECT_FALSE(MessageBuilder().build().hasMeasurementsField());
+  EXPECT_TRUE(MessageBuilder().measurements({}).build().hasMeasurementsField());
 }
 
 TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfIntensities)
 {
-  EXPECT_FALSE(MessageBuilder().build().hasIntensities());
-  EXPECT_TRUE(MessageBuilder().intensities({}).build().hasIntensities());
+  EXPECT_FALSE(MessageBuilder().build().hasIntensitiesField());
+  EXPECT_TRUE(MessageBuilder().intensities({}).build().hasIntensitiesField());
 }
 
 TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfDiagnosticMessages)
 {
-  EXPECT_FALSE(MessageBuilder().build().hasDiagnosticMessages());
-  EXPECT_TRUE(MessageBuilder().diagnosticMessages({}).build().hasDiagnosticMessages());
+  EXPECT_FALSE(MessageBuilder().build().hasDiagnosticMessagesField());
+  EXPECT_TRUE(MessageBuilder().diagnosticMessages({}).build().hasDiagnosticMessagesField());
 }
 
-TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)
+TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccessWithAdditionalFields)
 {
   auto msg = MessageBuilder()
                  .fromTheta(util::TenthOfDegree(1234))
@@ -139,6 +112,8 @@ TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)
                  .scanCounter(78)
                  .activeZoneset(2)
                  .measurements({ 45, 44, 43, 42 })
+                 .intensities({ 1 })
+                 .diagnosticMessages({})
                  .build();
 
 // For compatibility with different ubuntu versions (resp. fmt), we need to take account of changes in
@@ -146,12 +121,21 @@ TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
   EXPECT_EQ(fmt::format("{}", msg),
             "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-            "active_zoneset = 2, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {}, diagnostics = {})");
+            "active_zoneset = 2, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {1.0}, diagnostics = {})");
 #else
   EXPECT_EQ(fmt::format("{}", msg),
             "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-            "active_zoneset = 2, measurements = {45, 44, 43, 42}, intensities = {}, diagnostics = {})");
+            "active_zoneset = 2, measurements = {45, 44, 43, 42}, intensities = {1}, diagnostics = {})");
 #endif
+}
+
+TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccessWithoutAdditionalFields)
+{
+  auto msg = MessageBuilder().fromTheta(util::TenthOfDegree(1234)).resolution(util::TenthOfDegree(56)).build();
+
+  EXPECT_EQ(fmt::format("{}", msg),
+            "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = _, "
+            "active_zoneset = _, measurements = _, intensities = _, diagnostics = _)");
 }
 
 }  // namespace psen_scan_v2_standalone_test

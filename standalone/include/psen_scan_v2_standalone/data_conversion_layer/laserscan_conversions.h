@@ -102,7 +102,7 @@ inline LaserScan LaserScanConverter::toLaserScan(
     measurements.insert(measurements.end(),
                         stamped_msgs[index].msg_.measurements().begin(),
                         stamped_msgs[index].msg_.measurements().end());
-    if (stamped_msgs[index].msg_.hasIntensities())
+    if (stamped_msgs[index].msg_.hasIntensitiesField())
     {
       intensities.insert(intensities.end(),
                          stamped_msgs[index].msg_.intensities().begin(),
@@ -111,7 +111,7 @@ inline LaserScan LaserScanConverter::toLaserScan(
   }
 
   uint8_t active_zoneset = configuration::DEFAULT_ACTIVE_ZONESET;
-  if (stamped_msgs[sorted_stamped_msgs_indices.back()].msg_.hasActiveZoneset())
+  if (stamped_msgs[sorted_stamped_msgs_indices.back()].msg_.hasActiveZonesetField())
   {
     active_zoneset = stamped_msgs[sorted_stamped_msgs_indices.back()].msg_.activeZoneset();
   }

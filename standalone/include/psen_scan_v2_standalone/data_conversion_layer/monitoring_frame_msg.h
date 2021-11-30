@@ -80,11 +80,11 @@ public:
   //! @throw AdditionalFieldMissing if diagnostic_messages were missing during deserialization of a Message.
   std::vector<diagnostic::Message> diagnosticMessages() const;
 
-  bool hasScanCounter() const;
-  bool hasActiveZoneset() const;
-  bool hasMeasurements() const;
-  bool hasIntensities() const;
-  bool hasDiagnosticMessages() const;
+  bool hasScanCounterField() const;
+  bool hasActiveZonesetField() const;
+  bool hasMeasurementsField() const;
+  bool hasIntensitiesField() const;
+  bool hasDiagnosticMessagesField() const;
 
 private:
   // fixed fields
