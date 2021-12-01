@@ -16,6 +16,7 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_IO_PIN_H
 #define PSEN_SCAN_V2_STANDALONE_IO_PIN_H
 
+#include <functional>
 #include <stdexcept>
 #include <string>
 #include <utility>
