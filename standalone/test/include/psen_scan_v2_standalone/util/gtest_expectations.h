@@ -56,12 +56,12 @@
       },                                                                                                               \
       expected_exception);
 
-#define EXPECT_IO_STATE_EQ(expected_io_state, io_state)                                                                \
-  EXPECT_EQ(expected_io_state.physicalInput0(), io_state.physicalInput0());                                            \
-  EXPECT_EQ(expected_io_state.physicalInput1(), io_state.physicalInput1());                                            \
-  EXPECT_EQ(expected_io_state.physicalInput2(), io_state.physicalInput2());                                            \
-  EXPECT_EQ(expected_io_state.logicalInput(), io_state.logicalInput());                                                \
-  EXPECT_EQ(expected_io_state.output(), io_state.output());
+#define EXPECT_IO_STATE_EQ_IO_PIN(io_state, io_pin)                                                                    \
+  EXPECT_EQ(io_pin.physical_input_0, io_state.physicalInput0());                                                       \
+  EXPECT_EQ(io_pin.physical_input_1, io_state.physicalInput1());                                                       \
+  EXPECT_EQ(io_pin.physical_input_2, io_state.physicalInput2());                                                       \
+  EXPECT_EQ(io_pin.logical_input, io_state.logicalInput());                                                            \
+  EXPECT_EQ(io_pin.output, io_state.output());
 
 #define EXPECT_CONTAINER_UNORDERED_EQ(var1, var2)                                                                      \
   EXPECT_EQ(var1.size(), var2.size());                                                                                 \
