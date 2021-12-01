@@ -34,53 +34,77 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
   raw_processing::write(os, OP_CODE_MONITORING_FRAME);
   raw_processing::write(os, ONLINE_WORKING_MODE);
   raw_processing::write(os, GUI_MONITORING_TRANSACTION);
-  raw_processing::write(os, msg.scanner_id_);
-  raw_processing::write(os, msg.from_theta_.value());
-  raw_processing::write(os, msg.resolution_.value());
+  raw_processing::write(os, msg.scannerId());
+  raw_processing::write(os, msg.fromTheta().value());
+  raw_processing::write(os, msg.resolution().value());
 
-  AdditionalFieldHeader scan_counter_header(
-      static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::scan_counter), sizeof(msg.scan_counter_.get()));
-  write(os, scan_counter_header);
-  uint32_t scan_counter_header_payload = msg.scan_counter_.get();
-  raw_processing::write(os, scan_counter_header_payload);
-
-  if (msg.diagnostic_data_enabled_)
+  try
   {
+    AdditionalFieldHeader scan_counter_header(
+        static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::scan_counter), sizeof(msg.scanCounter()));
+    write(os, scan_counter_header);
+    uint32_t scan_counter_header_payload = msg.scanCounter();
+    raw_processing::write(os, scan_counter_header_payload);
+  }
+  catch (const AdditionalFieldMissing& /*unused*/)
+  {
+  }
+
+  try
+  {
+    diagnostic::RawChunk diagnostic_data_field_payload = diagnostic::serialize(msg.diagnosticMessages());
     AdditionalFieldHeader diagnostic_data_field_header(
         static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::diagnostics),
         diagnostic::RAW_CHUNK_LENGTH_IN_BYTES);
     write(os, diagnostic_data_field_header);
-    diagnostic::RawChunk diagnostic_data_field_payload = diagnostic::serialize(msg.diagnostic_messages_);
     data_conversion_layer::raw_processing::write(os, diagnostic_data_field_payload);
   }
+  catch (const AdditionalFieldMissing& /*unused*/)
+  {
+  }
 
-  AdditionalFieldHeader measurements_header(
-      static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::measurements),
-      msg.measurements_.size() * NUMBER_OF_BYTES_SINGLE_MEASUREMENT);
-  write(os, measurements_header);
-  data_conversion_layer::raw_processing::writeArray<uint16_t, double>(os, msg.measurements_, [](double elem) {
-    if (elem == std::numeric_limits<double>::infinity())
-    {
-      return NO_SIGNAL_ARRIVED;
-    }
-    return (static_cast<uint16_t>(std::round(elem * 1000.)));
-  });
+  try
+  {
+    AdditionalFieldHeader measurements_header(
+        static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::measurements),
+        msg.measurements().size() * NUMBER_OF_BYTES_SINGLE_MEASUREMENT);
+    write(os, measurements_header);
+    data_conversion_layer::raw_processing::writeArray<uint16_t, double>(os, msg.measurements(), [](double elem) {
+      if (elem == std::numeric_limits<double>::infinity())
+      {
+        return NO_SIGNAL_ARRIVED;
+      }
+      return (static_cast<uint16_t>(std::round(elem * 1000.)));
+    });
+  }
+  catch (const AdditionalFieldMissing& /*unused*/)
+  {
+  }
 
-  if (!msg.intensities_.empty())
+  try
   {
     AdditionalFieldHeader intensities_header(
         static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::intensities),
-        msg.intensities_.size() * NUMBER_OF_BYTES_SINGLE_INTENSITY);
+        msg.intensities().size() * NUMBER_OF_BYTES_SINGLE_INTENSITY);
     write(os, intensities_header);
     data_conversion_layer::raw_processing::writeArray<uint16_t, double>(
-        os, msg.intensities_, [](double elem) { return (static_cast<uint16_t>(std::round(elem))); });
+        os, msg.intensities(), [](double elem) { return (static_cast<uint16_t>(std::round(elem))); });
+  }
+  catch (const AdditionalFieldMissing& /*unused*/)
+  {
   }
 
-  AdditionalFieldHeader zoneset_header(static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::zone_set),
-                                       sizeof(msg.active_zoneset_));
-  write(os, zoneset_header);
-  uint8_t zoneset_header_payload = msg.active_zoneset_;
-  raw_processing::write(os, zoneset_header_payload);
+  try
+  {
+    AdditionalFieldHeader zoneset_header(static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::zone_set),
+                                         sizeof(msg.activeZoneset()));
+    write(os, zoneset_header);
+    uint8_t zoneset_header_payload = msg.activeZoneset();
+    raw_processing::write(os, zoneset_header_payload);
+  }
+  catch (const AdditionalFieldMissing& /*unused*/)
+  {
+  }
 
   AdditionalFieldHeader::Id end_of_frame_header_id =
       static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::end_of_frame);

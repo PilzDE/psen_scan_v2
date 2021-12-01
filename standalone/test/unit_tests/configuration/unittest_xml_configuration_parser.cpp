@@ -18,7 +18,7 @@
 #include "psen_scan_v2_standalone/configuration/xml_configuration_parsing.h"
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
 #include "psen_scan_v2_standalone/configuration/zoneset_configuration.h"
-#include "psen_scan_v2_standalone/util/expectations.h"
+#include "psen_scan_v2_standalone/util/gtest_expectations.h"
 
 template <typename T>
 T concat(const std::initializer_list<T>& lst)

@@ -336,7 +336,7 @@ if(CATKIN_ENABLE_TESTING)
     fmt::fmt
   )
 
-  catkin_add_gtest(unittest_laserscan_conversions
+  catkin_add_gmock(unittest_laserscan_conversions
     standalone/test/unit_tests/data_conversion_layer/unittest_laserscan_conversions.cpp
     standalone/src/laserscan.cpp
     standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
@@ -378,7 +378,7 @@ if(CATKIN_ENABLE_TESTING)
     fmt::fmt
   )
 
-  catkin_add_gtest(unittest_monitoring_frame_msg_stamped
+  catkin_add_gmock(unittest_monitoring_frame_msg_stamped
     standalone/test/unit_tests/data_conversion_layer/unittest_monitoring_frame_msg_stamped.cpp
     standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
     standalone/src/data_conversion_layer/diagnostics.cpp
@@ -388,7 +388,7 @@ if(CATKIN_ENABLE_TESTING)
     fmt::fmt
   )
 
-  catkin_add_gtest(unittest_monitoring_frame_serialization_deserialization
+  catkin_add_gmock(unittest_monitoring_frame_serialization_deserialization
     standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
     standalone/src/data_conversion_layer/monitoring_frame_deserialization.cpp
     standalone/src/data_conversion_layer/diagnostics.cpp

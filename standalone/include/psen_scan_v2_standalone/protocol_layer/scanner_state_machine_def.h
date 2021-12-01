@@ -181,7 +181,7 @@ inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawM
     informUserAboutTheScanData(stamped_msg);
   }
   // LCOV_EXCL_START
-  catch (const data_conversion_layer::monitoring_frame::ScanCounterMissing& e)
+  catch (const data_conversion_layer::monitoring_frame::AdditionalFieldMissing& e)
   {
     PSENSCAN_ERROR("StateMachine", e.what());
   }

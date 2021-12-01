@@ -13,299 +13,184 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <algorithm>
-#include <array>
-#include <memory>
+#include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
-#include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
-#include "psen_scan_v2_standalone/data_conversion_layer/istring_stream_builder.h"
-#include "psen_scan_v2_standalone/communication_layer/udp_frame_dumps.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
+#include "psen_scan_v2_standalone/util/gtest_expectations.h"
 
-namespace psen_scan_v2
+namespace psen_scan_v2_standalone_test
 {
-using namespace psen_scan_v2_standalone_test;
 using namespace psen_scan_v2_standalone;
+using namespace data_conversion_layer::monitoring_frame;
 
-class MonitoringFrameMsgTest : public ::testing::Test
+static const std::string ADDITIONAL_FIELD_MISSING_TEXT = " not set! (Contact PILZ support if the error persists.)";
+
+TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetScanCounter)
 {
-protected:
-  inline std::istringstream buildExpectedMeasurementsStream()
-  {
-    IStringStreamBuilder builder;
-    for (const auto& measurement : expected_measurements_)
-    {
-      builder.add(static_cast<uint16_t>(measurement * 1000.));
-    }
-    return builder.get();
-  }
-
-  inline bool expectMeasurementsPartEqual(const std::vector<double>& measurements)
-  {
-    return std::equal(measurements.begin(), measurements.end(), expected_measurements_.begin());
-  }
-
-  inline bool expectMeasurementsEqual(const std::vector<double>& measurements)
-  {
-    return (measurements.size() == expected_measurements_.size() && expectMeasurementsPartEqual(measurements));
-  }
-
-protected:
-  const std::array<double, 3> expected_measurements_{ 4.4, 4.3, 4.2 };
-};
-
-TEST(MonitoringFrameMsgEqualityTest, testCompareEqualSucces)
-{
-  const data_conversion_layer::monitoring_frame::Message msg0(
-      util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 1, { 1, 2, 3 });
-  const data_conversion_layer::monitoring_frame::Message msg1(
-      util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 1, { 1, 2, 3 });
-  EXPECT_EQ(msg0, msg1);
+  EXPECT_THROW_AND_WHAT(
+      Message().scanCounter(), AdditionalFieldMissing, ("Scan counter" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
-TEST(MonitoringFrameMsgEqualityTest, testCompareEqualIntensitiesSucces)
+TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetMeasurements)
 {
-  const data_conversion_layer::monitoring_frame::Message msg0(
-      util::TenthOfDegree(100),
-      util::TenthOfDegree(10),
-      42,
-      0,
-      { 1, 2, 3 },
-      { 10, 20, 30 },
-      { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          configuration::ScannerId::master,
-          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
-  const data_conversion_layer::monitoring_frame::Message msg1(
-      util::TenthOfDegree(100),
-      util::TenthOfDegree(10),
-      42,
-      0,
-      { 1, 2, 3 },
-      { 10, 20, 30 },
-      { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          configuration::ScannerId::master,
-          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
-  EXPECT_EQ(msg0, msg1);
+  EXPECT_THROW_AND_WHAT(
+      Message().measurements(), AdditionalFieldMissing, ("Measurements" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
-TEST(MonitoringFrameMsgEqualityTest, testCompareEqualEmptySuccess)
+TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetIntensities)
 {
-  const data_conversion_layer::monitoring_frame::Message msg0(
-      util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, {});
-  const data_conversion_layer::monitoring_frame::Message msg1(
-      util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, {});
-  EXPECT_EQ(msg0, msg1);
+  EXPECT_THROW_AND_WHAT(
+      Message().intensities(), AdditionalFieldMissing, ("Intensities" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
-TEST(MonitoringFrameMsgEqualityTest, testCompareEqualIntensitiesEmptySucces)
+TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetActiveZoneset)
 {
-  const data_conversion_layer::monitoring_frame::Message msg0(
-      util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, {}, {}, {});
-  const data_conversion_layer::monitoring_frame::Message msg1(
-      util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, {}, {}, {});
-  EXPECT_EQ(msg0, msg1);
+  EXPECT_THROW_AND_WHAT(
+      Message().activeZoneset(), AdditionalFieldMissing, ("Active zoneset" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
-TEST(MonitoringFrameMsgEqualityTest, testCompareMeasurementsNotEqual)
+TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetDiagnosticMessages)
 {
-  const data_conversion_layer::monitoring_frame::Message msg0(
-      util::TenthOfDegree(100),
-      util::TenthOfDegree(10),
-      42,
-      0,
-      { 1, 42, 3 },
-      { 10, 20, 30 },
-      { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          configuration::ScannerId::master,
-          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
-  const data_conversion_layer::monitoring_frame::Message msg1(
-      util::TenthOfDegree(100),
-      util::TenthOfDegree(10),
-      42,
-      0,
-      { 1, 2, 3 },
-      { 10, 20, 30 },
-      { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          configuration::ScannerId::master,
-          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
-  EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
-                             << "\nexpected to be false but was true";
+  EXPECT_THROW_AND_WHAT(Message().diagnosticMessages(),
+                        AdditionalFieldMissing,
+                        ("Diagnostic messages" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
-TEST(MonitoringFrameMsgEqualityTest, testCompareIntensitiesNotEqual)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfScanCounter)
 {
-  const data_conversion_layer::monitoring_frame::Message msg0(
-      util::TenthOfDegree(100),
-      util::TenthOfDegree(10),
-      42,
-      0,
-      { 1, 2, 3 },
-      { 10, 42, 30 },
-      { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          configuration::ScannerId::master,
-          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
-  const data_conversion_layer::monitoring_frame::Message msg1(
-      util::TenthOfDegree(100),
-      util::TenthOfDegree(10),
-      42,
-      0,
-      { 1, 2, 3 },
-      { 10, 20, 30 },
-      { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          configuration::ScannerId::master,
-          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
-  EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
-                             << "\nexpected to be false but was true";
+  EXPECT_FALSE(MessageBuilder().build().hasScanCounterField());
+  EXPECT_TRUE(MessageBuilder().scanCounter(2).build().hasScanCounterField());
 }
 
-TEST(MonitoringFrameMsgEqualityTest, testCompareFromThetaNotEqual)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfActiveZoneset)
 {
-  const data_conversion_layer::monitoring_frame::Message msg0(
-      util::TenthOfDegree(42),
-      util::TenthOfDegree(10),
-      42,
-      0,
-      { 1, 2, 3 },
-      { 10, 20, 30 },
-      { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          configuration::ScannerId::master,
-          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
-  const data_conversion_layer::monitoring_frame::Message msg1(
-      util::TenthOfDegree(100),
-      util::TenthOfDegree(10),
-      42,
-      0,
-      { 1, 2, 3 },
-      { 10, 20, 30 },
-      { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          configuration::ScannerId::master,
-          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
-  EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
-                             << "\nexpected to be false but was true";
+  EXPECT_FALSE(MessageBuilder().build().hasActiveZonesetField());
+  EXPECT_TRUE(MessageBuilder().activeZoneset(2).build().hasActiveZonesetField());
 }
 
-TEST(MonitoringFrameMsgEqualityTest, testCompareResolutionNotEqual)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfMeasurements)
 {
-  const data_conversion_layer::monitoring_frame::Message msg0(
-      util::TenthOfDegree(100),
-      util::TenthOfDegree(42),
-      42,
-      0,
-      { 1, 2, 3 },
-      { 10, 20, 30 },
-      { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          configuration::ScannerId::master,
-          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
-  const data_conversion_layer::monitoring_frame::Message msg1(
-      util::TenthOfDegree(100),
-      util::TenthOfDegree(10),
-      42,
-      0,
-      { 1, 2, 3 },
-      { 10, 20, 30 },
-      { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          configuration::ScannerId::master,
-          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
-  EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
-                             << "\nexpected to be false but was true";
+  EXPECT_FALSE(MessageBuilder().build().hasMeasurementsField());
+  EXPECT_TRUE(MessageBuilder().measurements({}).build().hasMeasurementsField());
 }
 
-TEST(MonitoringFrameMsgEqualityTest, shouldCompareToFalseOnMessagesWithDifferentCounter)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfIntensities)
 {
-  const data_conversion_layer::monitoring_frame::Message msg0(
-      util::TenthOfDegree(100),
-      util::TenthOfDegree(10),
-      42,
-      0,
-      { 1, 2, 3 },
-      { 10, 20, 30 },
-      { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          configuration::ScannerId::master,
-          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
-  const data_conversion_layer::monitoring_frame::Message msg1(
-      util::TenthOfDegree(100),
-      util::TenthOfDegree(10),
-      1,
-      0,
-      { 1, 2, 3 },
-      { 10, 20, 30 },
-      { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          configuration::ScannerId::master,
-          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
-  EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
-                             << "\nexpected to be false but was true";
+  EXPECT_FALSE(MessageBuilder().build().hasIntensitiesField());
+  EXPECT_TRUE(MessageBuilder().intensities({}).build().hasIntensitiesField());
 }
 
-TEST(MonitoringFrameMsgEqualityTest, shouldCompareToFalseOnMessagesWithDifferentActiveZoneset)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfDiagnosticMessages)
 {
-  const data_conversion_layer::monitoring_frame::Message msg0(
-      util::TenthOfDegree(100),
-      util::TenthOfDegree(10),
-      42,
-      0,
-      { 1, 2, 3 },
-      { 10, 20, 30 },
-      { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          configuration::ScannerId::master,
-          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
-  const data_conversion_layer::monitoring_frame::Message msg1(
-      util::TenthOfDegree(100),
-      util::TenthOfDegree(10),
-      42,
-      42,
-      { 1, 2, 3 },
-      { 10, 20, 30 },
-      { data_conversion_layer::monitoring_frame::diagnostic::Message(
-          configuration::ScannerId::master,
-          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3)) });
-  EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
-                             << "\nexpected to be false but was true";
+  EXPECT_FALSE(MessageBuilder().build().hasDiagnosticMessagesField());
+  EXPECT_TRUE(MessageBuilder().diagnosticMessages({}).build().hasDiagnosticMessagesField());
 }
 
-TEST(MonitoringFrameMsgTest, shouldThrowMissingScanCounterErrorWhenScanCounterWasNeverSet)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectScannerId)
 {
-  data_conversion_layer::monitoring_frame::Message msg{};
-  EXPECT_THROW(msg.scanCounter(), data_conversion_layer::monitoring_frame::ScanCounterMissing);
+  const auto scanner_id{ configuration::ScannerId::slave0 };
+  EXPECT_EQ(scanner_id, MessageBuilder().scannerId(scanner_id).build().scannerId());
 }
 
-TEST(MonitoringFrameMsgEqualityTest, testCompareNotEqualEmpty)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectFromTheta)
 {
-  const data_conversion_layer::monitoring_frame::Message msg0(
-      util::TenthOfDegree(100), util::TenthOfDegree(42), 42, 0, {}, {}, {});
-  const data_conversion_layer::monitoring_frame::Message msg1(
-      util::TenthOfDegree(100), util::TenthOfDegree(42), 0, 0, {}, {}, {});
-  EXPECT_FALSE(msg0 == msg1) << "Comparision between\n\t" << msg0 << "\nand\n\t" << msg1
-                             << "\nexpected to be false but was true";
+  const auto from_theta{ util::TenthOfDegree(50) };
+  EXPECT_EQ(from_theta, MessageBuilder().fromTheta(from_theta).build().fromTheta());
 }
 
-TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectResolution)
 {
-  data_conversion_layer::monitoring_frame::Message msg(
-      util::TenthOfDegree(1234), util::TenthOfDegree(56), 78, 2, { 45, 44, 43, 42 });
+  const auto resolution{ util::TenthOfDegree(10) };
+  EXPECT_EQ(resolution, MessageBuilder().resolution(resolution).build().resolution());
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectScanCounter)
+{
+  const uint32_t expected_scan_counter{ 42 };
+  uint32_t scan_counter{ 0 };
+  ASSERT_NO_THROW(scan_counter = MessageBuilder().scanCounter(expected_scan_counter).build().scanCounter());
+  EXPECT_EQ(expected_scan_counter, scan_counter);
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectActiveZoneset)
+{
+  const uint8_t expected_active_zoneset{ 3 };
+  uint8_t active_zoneset{ 0 };
+  ASSERT_NO_THROW(active_zoneset = MessageBuilder().activeZoneset(expected_active_zoneset).build().activeZoneset());
+  EXPECT_EQ(expected_active_zoneset, active_zoneset);
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectMeasurements)
+{
+  const std::vector<double> expected_measurements{ { 2.1, 1.3 } };
+  std::vector<double> measurements;
+  ASSERT_NO_THROW(measurements = MessageBuilder().measurements(expected_measurements).build().measurements());
+  EXPECT_EQ(expected_measurements, measurements);
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectIntensities)
+{
+  const std::vector<double> expected_intensities{ { 2.1, 1.3 } };
+  std::vector<double> intensities;
+  ASSERT_NO_THROW(intensities = MessageBuilder().intensities(expected_intensities).build().intensities());
+  EXPECT_EQ(expected_intensities, intensities);
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectDiagnosticMessages)
+{
+  const std::vector<diagnostic::Message> expected_diagnostic_messages{ { diagnostic::Message(
+      configuration::ScannerId::master, diagnostic::ErrorLocation(1, 7)) } };
+  std::vector<diagnostic::Message> diagnostic_messages;
+  ASSERT_NO_THROW(diagnostic_messages =
+                      MessageBuilder().diagnosticMessages(expected_diagnostic_messages).build().diagnosticMessages());
+  EXPECT_EQ(expected_diagnostic_messages, diagnostic_messages);
+}
+
+TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccessWithAdditionalFields)
+{
+  auto msg = MessageBuilder()
+                 .fromTheta(util::TenthOfDegree(1234))
+                 .resolution(util::TenthOfDegree(56))
+                 .scanCounter(78)
+                 .activeZoneset(2)
+                 .measurements({ 45, 44, 43, 42 })
+                 .intensities({ 1 })
+                 .diagnosticMessages({})
+                 .build();
 
 // For compatibility with different ubuntu versions (resp. fmt), we need to take account of changes in
 // the default formatting of floating point numbers
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
   EXPECT_EQ(fmt::format("{}", msg),
             "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-            "active_zoneset = 2, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {}, diagnostics = {})");
+            "active_zoneset = 2, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {1.0}, diagnostics = {})");
 #else
   EXPECT_EQ(fmt::format("{}", msg),
             "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-            "active_zoneset = 2, measurements = {45, 44, 43, 42}, intensities = {}, diagnostics = {})");
+            "active_zoneset = 2, measurements = {45, 44, 43, 42}, intensities = {1}, diagnostics = {})");
 #endif
 }
 
-}  // namespace psen_scan_v2
+TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccessWithoutAdditionalFields)
+{
+  auto msg = MessageBuilder().fromTheta(util::TenthOfDegree(1234)).resolution(util::TenthOfDegree(56)).build();
+
+  EXPECT_EQ(fmt::format("{}", msg),
+            "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = _, "
+            "active_zoneset = _, measurements = _, intensities = _, diagnostics = _)");
+}
+
+}  // namespace psen_scan_v2_standalone_test
 
 int main(int argc, char** argv)
 {

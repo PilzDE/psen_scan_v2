@@ -24,7 +24,7 @@
 #include <gmock/gmock.h>
 
 #include "psen_scan_v2_standalone/util/async_barrier.h"
-#include "psen_scan_v2_standalone/util/expectations.h"
+#include "psen_scan_v2_standalone/util/gtest_expectations.h"
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/communication_layer/udp_client.h"
