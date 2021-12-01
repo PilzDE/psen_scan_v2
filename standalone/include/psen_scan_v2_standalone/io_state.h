@@ -13,10 +13,11 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef PSEN_SCAN_V2_STANDALONE_IO_STATUS_H
-#define PSEN_SCAN_V2_STANDALONE_IO_STATUS_H
+#ifndef PSEN_SCAN_V2_STANDALONE_IO_STATE_H
+#define PSEN_SCAN_V2_STANDALONE_IO_STATE_H
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
@@ -26,9 +27,15 @@
 
 namespace psen_scan_v2_standalone
 {
+//! @brief Represents a single I/O pin.
 class PinState
 {
 public:
+  /**
+   * @param pin_id Unique id of the pin inside an I/O record.
+   * @param name Name connected to the pin.
+   * @param state Binary state of the pin.
+   */
   PinState(uint32_t pin_id, const std::string& name, bool state);
   bool operator==(const PinState& ps) const;
   bool operator!=(const PinState& ps) const;
@@ -78,6 +85,7 @@ inline std::ostream& operator<<(std::ostream& os, const PinState& pin_state)
              "PinState(id = {}, name = {}, state = {})", pin_state.id(), pin_state.name(), pin_state.state());
 }
 
+//! @brief Represents the set of all I/Os of the scanner and their states.
 class IOState
 {
 public:
@@ -85,13 +93,13 @@ public:
   IOState(std::vector<PinState> physical_input_0,
           std::vector<PinState> physical_input_1,
           std::vector<PinState> physical_input_2,
-          std::vector<PinState> output,
-          std::vector<PinState> logical_input);
+          std::vector<PinState> logical_input,
+          std::vector<PinState> output);
   std::vector<PinState> physicalInput0() const;
   std::vector<PinState> physicalInput1() const;
   std::vector<PinState> physicalInput2() const;
-  std::vector<PinState> output() const;
   std::vector<PinState> logicalInput() const;
+  std::vector<PinState> output() const;
 
 private:
   std::vector<PinState> physical_input_0_{};
@@ -129,26 +137,26 @@ inline std::vector<PinState> IOState::physicalInput2() const
   return physical_input_2_;
 }
 
-inline std::vector<PinState> IOState::output() const
-{
-  return output_;
-}
-
 inline std::vector<PinState> IOState::logicalInput() const
 {
   return logical_input_;
 }
 
+inline std::vector<PinState> IOState::output() const
+{
+  return output_;
+}
+
 inline std::ostream& operator<<(std::ostream& os, const IOState& io_state)
 {
-  return os << fmt::format("IOState(physicalInput0 = {}, physicalInput1 = {}, physicalInput2 = {}, logicalInput "
-                           "= {}, output = {})",
-                           util::formatRange(io_state.physicalInput0()),
-                           util::formatRange(io_state.physicalInput1()),
-                           util::formatRange(io_state.physicalInput2()),
-                           util::formatRange(io_state.output()),
-                           util::formatRange(io_state.logicalInput()));
+  return os << fmt::format(
+             "IOState(physicalInput0 = {}, physicalInput1 = {}, physicalInput2 = {}, logicalInput = {}, output = {})",
+             util::formatRange(io_state.physicalInput0()),
+             util::formatRange(io_state.physicalInput1()),
+             util::formatRange(io_state.physicalInput2()),
+             util::formatRange(io_state.logicalInput()),
+             util::formatRange(io_state.output()));
 }
 }  // namespace psen_scan_v2_standalone
 
-#endif  // PSEN_SCAN_V2_STANDALONE_IO_STATUS_H
+#endif  // PSEN_SCAN_V2_STANDALONE_IO_STATE_H

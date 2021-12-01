@@ -113,20 +113,20 @@ void LaserScan::setIntensities(const IntensityData& intensities)
   intensities_ = intensities;
 }
 
-void LaserScan::setIOState(const IOState& io_state)
+void LaserScan::setIOStates(const IOData& io_states)
 {
-  io_state_ = io_state;
+  io_states_ = io_states;
 }
 
-const IOState& LaserScan::getIOState() const
+const LaserScan::IOData& LaserScan::getIOStates() const
 {
-  return io_state_;
+  return io_states_;
 }
 
 std::ostream& operator<<(std::ostream& os, const LaserScan& scan)
 {
   os << fmt::format("LaserScan(timestamp = {} nsec, scanCounter = {}, minScanAngle = {} deg, maxScanAngle = {} deg, "
-                    "resolution = {} deg, active_zoneset = {}, measurements = {}, intensities = {}, io_state = {})",
+                    "resolution = {} deg, active_zoneset = {}, measurements = {}, intensities = {}, io_states = {})",
                     scan.getTimestamp(),
                     scan.getScanCounter(),
                     scan.getMinScanAngle().value() / 10.,
@@ -135,7 +135,7 @@ std::ostream& operator<<(std::ostream& os, const LaserScan& scan)
                     scan.getActiveZoneset(),
                     util::formatRange(scan.getMeasurements()),
                     util::formatRange(scan.getIntensities()),
-                    scan.getIOState());
+                    util::formatRange(scan.getIOStates()));
   return os;
 }
 
