@@ -30,7 +30,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 
-#define CHANGE_MSG_PROPERTY(msg, property, offset)                                                                     \
+#define ADD_OFFSET_TO_SCALAR_MSG_PROPERTY(msg, property, offset)                                                       \
   msg = MessageBuilder()                                                                                               \
             .scannerId(msg.scannerId())                                                                                \
             .fromTheta(msg.fromTheta())                                                                                \
@@ -41,22 +41,6 @@
             .intensities(msg.intensities())                                                                            \
             .property(msg.property() + offset)
 
-#define CHANGE_MSG_VECTOR_PROPERTY(msg, property, index, offset)                                                       \
-  {                                                                                                                    \
-    auto prop = msg.property();                                                                                        \
-    prop.at(index) += offset;                                                                                          \
-    msg = MessageBuilder()                                                                                             \
-              .scannerId(msg.scannerId())                                                                              \
-              .fromTheta(msg.fromTheta())                                                                              \
-              .resolution(msg.resolution())                                                                            \
-              .scanCounter(msg.scanCounter())                                                                          \
-              .activeZoneset(msg.activeZoneset())                                                                      \
-              .measurements(msg.measurements())                                                                        \
-              .intensities(msg.intensities())                                                                          \
-              .property(prop);                                                                                         \
-  }                                                                                                                    \
-  while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
-
 using namespace psen_scan_v2_standalone;
 
 namespace psen_scan_v2_standalone_test
@@ -66,6 +50,32 @@ using data_conversion_layer::monitoring_frame::MessageStamped;
 
 static const int64_t DEFAULT_TIMESTAMP{ 4500000 };
 static const int64_t EXPECTED_TIMESTAMP_AFTER_CONVERSION{ 4400000 };  // 4500000 - ((1.2/360) * 30*10^6)
+
+static size_t lastVectorIndex(const std::vector<double>& vec)
+{
+  return vec.size() - 1;
+}
+
+/**
+ * @brief Replaces a monitoring_frame::Message by a copy which has an offset added to one of its measurements.
+ * @return The new value of the changed measurement.
+ */
+static double addOffsetToMsgMeasurement(data_conversion_layer::monitoring_frame::Message& msg,
+                                        std::size_t index,
+                                        const double& offset)
+{
+  auto measurements_copy = msg.measurements();
+  measurements_copy.at(index) += offset;
+  msg = MessageBuilder()
+            .scannerId(msg.scannerId())
+            .fromTheta(msg.fromTheta())
+            .resolution(msg.resolution())
+            .scanCounter(msg.scanCounter())
+            .activeZoneset(msg.activeZoneset())
+            .measurements(measurements_copy)
+            .intensities(msg.intensities());
+  return measurements_copy.at(index);
+}
 
 static MessageBuilder createDefaultMsgBuilder()
 {
@@ -191,7 +201,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectTimestampAfterConver
 TEST(LaserScanConversionsTest, shouldThrowProtocolErrorOnMismatchingResolutions)
 {
   auto stamped_msgs = createValidStampedMsgs(6);
-  CHANGE_MSG_PROPERTY(stamped_msgs[1].msg_, resolution, util::TenthOfDegree(10));
+  ADD_OFFSET_TO_SCALAR_MSG_PROPERTY(stamped_msgs[1].msg_, resolution, util::TenthOfDegree(10));
   ASSERT_THROW(data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs),
                data_conversion_layer::ScannerProtocolViolationError);
 }
@@ -205,7 +215,7 @@ TEST(LaserScanConversionsTest, shouldThrowProtocolErrorOnMissingFrames)
 TEST(LaserScanConversionsTest, shouldThrowProtocolErrorOnMismatchingThetaAngles)
 {
   auto stamped_msgs = createValidStampedMsgs(6);
-  CHANGE_MSG_PROPERTY(stamped_msgs[1].msg_, fromTheta, util::TenthOfDegree(10));
+  ADD_OFFSET_TO_SCALAR_MSG_PROPERTY(stamped_msgs[1].msg_, fromTheta, util::TenthOfDegree(10));
   ASSERT_THROW(data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs),
                data_conversion_layer::ScannerProtocolViolationError);
 }
@@ -213,7 +223,7 @@ TEST(LaserScanConversionsTest, shouldThrowProtocolErrorOnMismatchingThetaAngles)
 TEST(LaserScanConversionsTest, shouldThrowProtocolErrorOnMismatchingScanCounters)
 {
   auto stamped_msgs = createValidStampedMsgs(6);
-  CHANGE_MSG_PROPERTY(stamped_msgs[1].msg_, scanCounter, 1);
+  ADD_OFFSET_TO_SCALAR_MSG_PROPERTY(stamped_msgs[1].msg_, scanCounter, 1);
   ASSERT_THROW(data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs),
                data_conversion_layer::ScannerProtocolViolationError);
 }
@@ -225,23 +235,8 @@ TEST(LaserScanConversionsTest, laserScanShouldContainAllScanInformationWhenBuild
   ASSERT_NO_THROW(
       scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
 
-  auto measurements_it = scan_ptr->getMeasurements().begin();
-  auto intensities_it = scan_ptr->getIntensities().begin();
-  for (const auto& stamped_msg : stamped_msgs)
-  {
-    ASSERT_LE(measurements_it + stamped_msg.msg_.measurements().size(), scan_ptr->getMeasurements().end());
-    ASSERT_LE(intensities_it + stamped_msg.msg_.intensities().size(), scan_ptr->getIntensities().end());
-    EXPECT_THAT(
-        measurements_it,
-        UnsafePointwiseDoubleItEq(stamped_msg.msg_.measurements().begin(), stamped_msg.msg_.measurements().end()));
-    EXPECT_THAT(
-        intensities_it,
-        UnsafePointwiseDoubleItEq(stamped_msg.msg_.intensities().begin(), stamped_msg.msg_.intensities().end()));
-    measurements_it += stamped_msg.msg_.measurements().size();
-    intensities_it += stamped_msg.msg_.intensities().size();
-  }
-  EXPECT_EQ(measurements_it, scan_ptr->getMeasurements().end());
-  EXPECT_EQ(intensities_it, scan_ptr->getIntensities().end());
+  EXPECT_EQ(stamped_msgs.size() * stamped_msgs[0].msg_.measurements().size(), scan_ptr->getMeasurements().size());
+  EXPECT_EQ(stamped_msgs.size() * stamped_msgs[0].msg_.intensities().size(), scan_ptr->getIntensities().size());
 }
 
 TEST(LaserScanConversionsTest, laserScanShouldContainCorrectTimestampWhenBuildingWithMulitpleFrames)
@@ -256,19 +251,18 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectTimestampWhenBuildin
 TEST(LaserScanConversionsTest, laserScanShouldContainMeasurementsOrderedByThetaAngle)
 {
   auto stamped_msgs = createValidStampedMsgs(6);
-  CHANGE_MSG_VECTOR_PROPERTY(stamped_msgs.front().msg_, measurements, 0, 10.0);
-  CHANGE_MSG_VECTOR_PROPERTY(
-      stamped_msgs.back().msg_, measurements, stamped_msgs.back().msg_.measurements().size() - 1, 10.0);
-  auto first_measurement = stamped_msgs.front().msg_.measurements().front();
-  auto last_measurement = stamped_msgs.back().msg_.measurements().back();
+  auto& first_msg = stamped_msgs.front();
+  auto& last_msg = stamped_msgs.back();
+  auto first_measurement = addOffsetToMsgMeasurement(first_msg.msg_, 0, 10.0);
+  auto last_measurement = addOffsetToMsgMeasurement(last_msg.msg_, lastVectorIndex(last_msg.msg_.measurements()), 10.0);
 
-  std::swap(stamped_msgs.front(), stamped_msgs.back());
+  std::swap(first_msg, last_msg);
   std::unique_ptr<LaserScan> scan_ptr;
   ASSERT_NO_THROW(
       scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
 
-  ASSERT_EQ(first_measurement, scan_ptr->getMeasurements().front());
-  ASSERT_EQ(last_measurement, scan_ptr->getMeasurements().back());
+  EXPECT_EQ(first_measurement, scan_ptr->getMeasurements().front());
+  EXPECT_EQ(last_measurement, scan_ptr->getMeasurements().back());
 }
 
 TEST(LaserScanConversionsTest, laserScanShouldContainMinimalTimestamp)
@@ -285,8 +279,8 @@ TEST(LaserScanConversionsTest, laserScanShouldContainMinimalTimestamp)
 TEST(LaserScanConversionsTest, laserScanShouldContainActiveZonesetOfLastMsg)
 {
   auto stamped_msgs = createValidStampedMsgs(6);
-  CHANGE_MSG_PROPERTY(stamped_msgs[4].msg_, activeZoneset, 3);
-  CHANGE_MSG_PROPERTY(stamped_msgs[5].msg_, activeZoneset, 4);
+  ADD_OFFSET_TO_SCALAR_MSG_PROPERTY(stamped_msgs[4].msg_, activeZoneset, 3);
+  ADD_OFFSET_TO_SCALAR_MSG_PROPERTY(stamped_msgs[5].msg_, activeZoneset, 4);
 
   std::unique_ptr<LaserScan> scan_ptr;
   ASSERT_NO_THROW(
@@ -294,37 +288,33 @@ TEST(LaserScanConversionsTest, laserScanShouldContainActiveZonesetOfLastMsg)
   EXPECT_EQ(4, scan_ptr->getActiveZoneset());
 }
 
-using Message = data_conversion_layer::monitoring_frame::Message;
-using Stamped = data_conversion_layer::monitoring_frame::MessageStamped;
-using Tenth = util::TenthOfDegree;
-
-TEST(LaserScanConversionTest, conversionShouldIgnoreEmptyFramesForMonitoringFramesValidation)
+TEST(LaserScanConversionTest, conversionShouldIgnoreEmptyFramesWhenCheckingIfFromThetasFitTogether)
 {
   // The following from_theta's are a real example from wireshark.
   // (angle_start:=-0.1, angle_end:=0.1)
-  std::vector<Stamped> stamped_msgs = {
-    Stamped(createDefaultMsgBuilder().fromTheta(Tenth(2500)).measurements({}), 3),
-    Stamped(createDefaultMsgBuilder().fromTheta(Tenth(0)).measurements({}), 4),
-    Stamped(createDefaultMsgBuilder().fromTheta(Tenth(500)).measurements({}), 5),
-    Stamped(createDefaultMsgBuilder().fromTheta(Tenth(1318)).measurements({ 1., 2., 3. }), 6),
-    Stamped(createDefaultMsgBuilder().fromTheta(Tenth(1500)).measurements({}), 7),
-    Stamped(createDefaultMsgBuilder().fromTheta(Tenth(2000)).measurements({}), 8)
+  std::vector<MessageStamped> stamped_msgs = {
+    MessageStamped(createDefaultMsgBuilder().fromTheta(util::TenthOfDegree(2500)).measurements({}), 3),
+    MessageStamped(createDefaultMsgBuilder().fromTheta(util::TenthOfDegree(0)).measurements({}), 4),
+    MessageStamped(createDefaultMsgBuilder().fromTheta(util::TenthOfDegree(500)).measurements({}), 5),
+    MessageStamped(createDefaultMsgBuilder().fromTheta(util::TenthOfDegree(1318)).measurements({ 1., 2., 3. }), 6),
+    MessageStamped(createDefaultMsgBuilder().fromTheta(util::TenthOfDegree(1500)).measurements({}), 7),
+    MessageStamped(createDefaultMsgBuilder().fromTheta(util::TenthOfDegree(2000)).measurements({}), 8)
   };
 
-  ASSERT_NO_THROW(data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs));
+  EXPECT_NO_THROW(data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs));
 }
 
 TEST(LaserScanConversionsTest, conversionShouldIgnoreEmptyFramesForTimestampsComputation)
 {
   // The following from_theta's are a real example from wireshark.
   // (angle_start:=-0.1, angle_end:=0.1)
-  std::vector<Stamped> stamped_msgs = {
-    Stamped(createDefaultMsgBuilder().fromTheta(Tenth(2500)).measurements({}), 3),
-    Stamped(createDefaultMsgBuilder().fromTheta(Tenth(0)).measurements({}), 4),
-    Stamped(createDefaultMsgBuilder().fromTheta(Tenth(500)).measurements({}), 5),
-    Stamped(createDefaultMsgBuilder().fromTheta(Tenth(1318)).measurements({ 1., 2., 3. }), 40000),
-    Stamped(createDefaultMsgBuilder().fromTheta(Tenth(1500)).measurements({}), 7),
-    Stamped(createDefaultMsgBuilder().fromTheta(Tenth(2000)).measurements({}), 8)
+  std::vector<MessageStamped> stamped_msgs = {
+    MessageStamped(createDefaultMsgBuilder().fromTheta(util::TenthOfDegree(2500)).measurements({}), 3),
+    MessageStamped(createDefaultMsgBuilder().fromTheta(util::TenthOfDegree(0)).measurements({}), 4),
+    MessageStamped(createDefaultMsgBuilder().fromTheta(util::TenthOfDegree(500)).measurements({}), 5),
+    MessageStamped(createDefaultMsgBuilder().fromTheta(util::TenthOfDegree(1318)).measurements({ 1., 2., 3. }), 40000),
+    MessageStamped(createDefaultMsgBuilder().fromTheta(util::TenthOfDegree(1500)).measurements({}), 7),
+    MessageStamped(createDefaultMsgBuilder().fromTheta(util::TenthOfDegree(2000)).measurements({}), 8)
   };
   const int64_t expected_stamp{ 6667 };  // 40000 - ((0.4/360) * 30*10^6)
 
