@@ -88,6 +88,9 @@ public:
    * arrived.
    *
    * @param stamped_msg Current received MonitoringFrame.
+   *
+   * @throws data_conversion_layer::monitoring_frame::AdditionalFieldMissing if scan_counter is not set in
+   * stamped_msg.msg_.
    */
   void add(const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg);
 

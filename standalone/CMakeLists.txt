@@ -126,7 +126,7 @@ ADD_EXECUTABLE(unittest_laserscan_conversions test/unit_tests/data_conversion_la
 
 TARGET_LINK_LIBRARIES(unittest_laserscan_conversions
     ${PROJECT_NAME}
-    gtest
+    gtest gmock
 )
 
 ADD_TEST(NAME unittest_laserscan_conversions
@@ -208,7 +208,7 @@ ADD_EXECUTABLE(unittest_monitoring_frame_msg_stamped
 
 TARGET_LINK_LIBRARIES(unittest_monitoring_frame_msg_stamped
     ${PROJECT_NAME}
-    gtest
+    gtest gmock
 )
 
 ADD_TEST(NAME unittest_monitoring_frame_msg_stamped
@@ -220,7 +220,7 @@ ADD_EXECUTABLE(unittest_monitoring_frame_serialization_deserialization
 
 TARGET_LINK_LIBRARIES(unittest_monitoring_frame_serialization_deserialization
     ${PROJECT_NAME}
-    gtest
+    gtest gmock
 )
 
 ADD_TEST(NAME unittest_monitoring_frame_serialization_deserialization

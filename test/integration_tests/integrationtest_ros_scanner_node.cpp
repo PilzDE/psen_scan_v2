@@ -32,7 +32,7 @@
 #include "psen_scan_v2_standalone/scan_range.h"
 #include "psen_scan_v2_standalone/util/assertions.h"
 #include "psen_scan_v2_standalone/util/async_barrier.h"
-#include "psen_scan_v2_standalone/util/expectations.h"
+#include "psen_scan_v2_standalone/util/gtest_expectations.h"
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 
 #include "psen_scan_v2/laserscan_ros_conversions.h"

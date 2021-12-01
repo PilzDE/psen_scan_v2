@@ -24,6 +24,7 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
@@ -36,17 +37,24 @@ namespace psen_scan_v2_standalone
 {
 namespace data_conversion_layer
 {
-util::TenthOfDegree monitoring_frame::Message::fromTheta() const
+namespace monitoring_frame
+{
+configuration::ScannerId Message::scannerId() const
+{
+  return scanner_id_;
+}
+
+util::TenthOfDegree Message::fromTheta() const
 {
   return from_theta_;
 }
 
-util::TenthOfDegree monitoring_frame::Message::resolution() const
+util::TenthOfDegree Message::resolution() const
 {
   return resolution_;
 }
 
-uint32_t monitoring_frame::Message::scanCounter() const
+uint32_t Message::scanCounter() const
 {
   if (scan_counter_.is_initialized())
   {
@@ -54,28 +62,66 @@ uint32_t monitoring_frame::Message::scanCounter() const
   }
   else
   {
-    throw monitoring_frame::ScanCounterMissing();
+    throw AdditionalFieldMissing("Scan counter");
   }
 }
 
-uint8_t monitoring_frame::Message::activeZoneset() const
+uint8_t Message::activeZoneset() const
 {
-  return active_zoneset_;
+  if (active_zoneset_.is_initialized())
+  {
+    return active_zoneset_.get();
+  }
+  else
+  {
+    throw AdditionalFieldMissing("Active zoneset");
+  }
 }
 
-const std::vector<double>& monitoring_frame::Message::measurements() const
+const std::vector<double>& Message::measurements() const
 {
-  return measurements_;
+  if (measurements_.is_initialized())
+  {
+    return measurements_.get();
+  }
+  else
+  {
+    throw AdditionalFieldMissing("Measurements");
+  }
 }
 
-const std::vector<double>& monitoring_frame::Message::intensities() const
+const std::vector<double>& Message::intensities() const
 {
-  return intensities_;
+  if (intensities_.is_initialized())
+  {
+    return intensities_.get();
+  }
+  else
+  {
+    throw AdditionalFieldMissing("Intensities");
+  }
 }
 
-std::vector<monitoring_frame::diagnostic::Message> monitoring_frame::Message::diagnosticMessages() const
+std::vector<diagnostic::Message> Message::diagnosticMessages() const
 {
-  return diagnostic_messages_;
+  if (diagnostic_messages_.is_initialized())
+  {
+    return diagnostic_messages_.get();
+  }
+  else
+  {
+    throw AdditionalFieldMissing("Diagnostic messages");
+  }
+}
+
+bool Message::hasScanCounterField() const
+{
+  return scan_counter_.is_initialized();
+}
+
+bool Message::hasActiveZonesetField() const
+{
+  return active_zoneset_.is_initialized();
 }
 
 IOState monitoring_frame::Message::ioState() const
@@ -83,31 +129,35 @@ IOState monitoring_frame::Message::ioState() const
   return io_state_;
 }
 
-bool monitoring_frame::Message::operator==(const monitoring_frame::Message& rhs) const
+bool Message::hasMeasurementsField() const
 {
-  return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
-          activeZoneset() == rhs.activeZoneset() && measurements() == rhs.measurements() &&
-          intensities() == rhs.intensities() && diagnosticMessages() == rhs.diagnosticMessages());
+  return measurements_.is_initialized();
 }
 
-bool monitoring_frame::Message::operator!=(const monitoring_frame::Message& rhs) const
+bool Message::hasIntensitiesField() const
 {
-  return !operator==(rhs);
+  return intensities_.is_initialized();
 }
 
-namespace monitoring_frame
+bool Message::hasDiagnosticMessagesField() const
 {
-std::ostream& operator<<(std::ostream& os, const monitoring_frame::Message& msg)
+  return diagnostic_messages_.is_initialized();
+}
+
+#define FORMAT_IF_INITIALIZED(arg) arg.is_initialized() ? fmt::format("{}", arg.get()) : "_"
+#define FORMAT_RANGE_IF_INITIALIZED(arg) arg.is_initialized() ? util::formatRange(arg.get()) : "_"
+
+std::ostream& operator<<(std::ostream& os, const Message& msg)
 {
   os << fmt::format("monitoring_frame::Message(fromTheta = {} deg, resolution = {} deg, scanCounter = "
                     "{}, active_zoneset = {}, measurements = {}, intensities = {}, diagnostics = {})",
-                    msg.fromTheta().value() / 10.,
-                    msg.resolution().value() / 10.,
-                    msg.scanCounter(),
-                    msg.activeZoneset(),
-                    util::formatRange(msg.measurements()),
-                    util::formatRange(msg.intensities()),
-                    util::formatRange(msg.diagnosticMessages()));
+                    msg.from_theta_.value() / 10.,
+                    msg.resolution_.value() / 10.,
+                    FORMAT_IF_INITIALIZED(msg.scan_counter_),
+                    FORMAT_IF_INITIALIZED(msg.active_zoneset_),
+                    FORMAT_RANGE_IF_INITIALIZED(msg.measurements_),
+                    FORMAT_RANGE_IF_INITIALIZED(msg.intensities_),
+                    FORMAT_RANGE_IF_INITIALIZED(msg.diagnostic_messages_));
   return os;
 }
 }  // namespace monitoring_frame

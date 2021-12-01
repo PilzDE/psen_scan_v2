@@ -17,19 +17,22 @@
 #include <array>
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/io.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
+#include "psen_scan_v2_standalone/io_state.h"
 
 #include "psen_scan_v2_standalone/data_conversion_layer/istring_stream_builder.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_serialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
 #include "psen_scan_v2_standalone/communication_layer/udp_frame_dumps.h"
-#include "psen_scan_v2_standalone/io_state.h"
-#include "psen_scan_v2_standalone/util/expectations.h"
+#include "psen_scan_v2_standalone/util/gtest_expectations.h"
+#include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 
 using namespace psen_scan_v2_standalone;
 using namespace data_conversion_layer;
@@ -84,33 +87,43 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
            "this test.";
   }
 
-  monitoring_frame::Message msg(
-      util::TenthOfDegree(25),
-      util::TenthOfDegree(1),
-      456,
-      2,
-      IOState(),
-      { 10, 20, std::numeric_limits<double>::infinity(), 40 },
-      { 15, 25, 35, 45 },
-      { monitoring_frame::diagnostic::Message(configuration::ScannerId::master, error_locations.at(0)),
-        monitoring_frame::diagnostic::Message(configuration::ScannerId::master, error_locations.at(1)),
-        monitoring_frame::diagnostic::Message(configuration::ScannerId::slave2, error_locations.at(2)) });
+  auto msg = monitoring_frame::MessageBuilder()
+                 .fromTheta(util::TenthOfDegree(25))
+                 .resolution(util::TenthOfDegree(1))
+                 .scanCounter(456)
+                 .activeZoneset(2)
+                 .measurements({ 10, 20, std::numeric_limits<double>::infinity(), 40 })
+                 .intensities({ 15, 25, 35, 45 })
+                 .diagnosticMessages(
+                     { monitoring_frame::diagnostic::Message(configuration::ScannerId::master, error_locations.at(0)),
+                       monitoring_frame::diagnostic::Message(configuration::ScannerId::master, error_locations.at(1)),
+                       monitoring_frame::diagnostic::Message(configuration::ScannerId::slave2, error_locations.at(2)) })
+                 .build();
 
   auto raw = serialize(msg);
   auto deserialized_msg = monitoring_frame::deserialize(convertToRawData(raw), raw.size());
 
-  EXPECT_EQ(msg, deserialized_msg);
+  EXPECT_THAT(deserialized_msg, MonitoringFrameEq(msg));
 }
 
 TEST(MonitoringFrameSerializationTest, shouldFailOnSerializeAndDeserializeFrameWithIntensityChannelBits)
 {
-  monitoring_frame::Message msg(util::TenthOfDegree(25), util::TenthOfDegree(1), 1, 0, IOState(), { 0 }, { 70045 }, {});
+  auto msg = data_conversion_layer::monitoring_frame::MessageBuilder()
+                 .fromTheta(util::TenthOfDegree(25))
+                 .resolution(util::TenthOfDegree(1))
+                 .scanCounter(1)
+                 .activeZoneset(0)
+                 .measurements({ 0 })
+                 .intensities({ 70045 })
+                 .diagnosticMessages({})
+                 .build();
 
   auto raw = serialize(msg);
   auto deserialized_msg = monitoring_frame::deserialize(convertToRawData(raw), raw.size());
 
-  EXPECT_FALSE(msg == deserialized_msg);
-  EXPECT_EQ(deserialized_msg.intensities().at(0), 0b0011111111111111 & 70045);
+  const uint32_t intensity_channel_bit_mask = 0b111111111100000000000000;
+  ASSERT_NE(static_cast<uint32_t>(msg.intensities().at(0)) & intensity_channel_bit_mask, 0u);
+  EXPECT_EQ(static_cast<uint32_t>(deserialized_msg.intensities().at(0)) & intensity_channel_bit_mask, 0u);
 }
 
 TEST(MonitoringFrameSerializationDiagnosticMessagesTest, shouldSetCorrectBitInSerializedDiagnosticData)
@@ -180,7 +193,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldDeserializeMonitoringFrameCorre
 {
   monitoring_frame::Message msg;
   ASSERT_NO_THROW(msg = monitoring_frame::deserialize(with_intensities_raw_, with_intensities_raw_.size()););
-  EXPECT_EQ(msg, with_intensities_.expected_msg_);
+  EXPECT_THAT(msg, MonitoringFrameEq(with_intensities_.expected_msg_));
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnUnknownFieldId)

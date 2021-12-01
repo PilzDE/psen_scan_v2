@@ -26,6 +26,8 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/io.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
 #include "psen_scan_v2_standalone/io_state.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -74,16 +76,16 @@ static constexpr double toIntensities(const uint16_t& value)
 
 monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data, const std::size_t& num_bytes)
 {
-  data_conversion_layer::monitoring_frame::Message msg;
+  data_conversion_layer::monitoring_frame::MessageBuilder msg_builder;
 
   std::stringstream ss;
   ss.write(data.data(), num_bytes);
 
   FixedFields frame_header = readFixedFields(ss);
 
-  msg.scanner_id_ = frame_header.scannerId();
-  msg.from_theta_ = frame_header.fromTheta();
-  msg.resolution_ = frame_header.resolution();
+  msg_builder.scannerId(frame_header.scannerId());
+  msg_builder.fromTheta(frame_header.fromTheta());
+  msg_builder.resolution(frame_header.resolution());
 
   bool end_of_frame{ false };
   while (!end_of_frame)
@@ -100,13 +102,15 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
         }
         uint32_t scan_counter_read_buffer;
         raw_processing::read<uint32_t>(ss, scan_counter_read_buffer);
-        msg.scan_counter_ = scan_counter_read_buffer;
+        msg_builder.scanCounter(scan_counter_read_buffer);
         break;
 
       case AdditionalFieldHeaderID::measurements: {
         const size_t num_measurements{ static_cast<size_t>(additional_header.length()) /
                                        NUMBER_OF_BYTES_SINGLE_MEASUREMENT };
-        raw_processing::readArray<uint16_t, double>(ss, msg.measurements_, num_measurements, toMeter);
+        std::vector<double> measurements;
+        raw_processing::readArray<uint16_t, double>(ss, measurements, num_measurements, toMeter);
+        msg_builder.measurements(measurements);
         break;
       }
       case AdditionalFieldHeaderID::end_of_frame:
@@ -122,23 +126,23 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
         }
         uint8_t zone_set_read_buffer;
         raw_processing::read<uint8_t>(ss, zone_set_read_buffer);
-        msg.active_zoneset_ = zone_set_read_buffer;
+        msg_builder.activeZoneset(zone_set_read_buffer);
         break;
 
       case AdditionalFieldHeaderID::io_pins:
-        msg.io_state_ = io::deserializePins(ss);
+        // msg.io_state_ = io::deserializePins(ss);
         break;
 
       case AdditionalFieldHeaderID::diagnostics:
-        msg.diagnostic_messages_ = diagnostic::deserializeMessages(ss);
-        msg.diagnostic_data_enabled_ = true;
+        msg_builder.diagnosticMessages(diagnostic::deserializeMessages(ss));
         break;
 
       case AdditionalFieldHeaderID::intensities: {
         const size_t num_measurements{ static_cast<size_t>(additional_header.length()) /
                                        NUMBER_OF_BYTES_SINGLE_MEASUREMENT };
-        raw_processing::readArray<uint16_t, double>(
-            ss, msg.intensities_, num_measurements, std::bind(toIntensities, _1));
+        std::vector<double> intensities;
+        raw_processing::readArray<uint16_t, double>(ss, intensities, num_measurements, std::bind(toIntensities, _1));
+        msg_builder.intensities(intensities);
         break;
       }
       default:
@@ -148,7 +152,7 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
                         ss.tellp()));
     }
   }
-  return msg;
+  return msg_builder.build();
 }
 
 AdditionalFieldHeader readAdditionalField(std::istream& is, const std::size_t& max_num_bytes)

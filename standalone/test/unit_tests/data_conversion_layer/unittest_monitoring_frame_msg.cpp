@@ -13,223 +13,188 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <algorithm>
-#include <array>
-#include <memory>
+#include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
-#include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
-
-#include "psen_scan_v2_standalone/data_conversion_layer/istring_stream_builder.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 #include "psen_scan_v2_standalone/io_state.h"
+
+#include "psen_scan_v2_standalone/util/gtest_expectations.h"
 
 namespace psen_scan_v2_standalone_test
 {
 using namespace psen_scan_v2_standalone;
 using namespace data_conversion_layer::monitoring_frame;
 
-const util::TenthOfDegree DEFAULT_FROM_THETA(100);
-const util::TenthOfDegree DEFAULT_RESOLUTION(10);
-const uint32_t DEFAULT_SCAN_COUNTER(42);
-const uint8_t DEFAULT_ACTIVE_ZONESET(0);
-const IOState DEFAULT_IO_STATE({ PinState(1, "zone1", true) },
-                               { PinState(2, "zone1", true) },
-                               { PinState(1, "zone1", false) },
-                               { PinState(4, "OSST", false) },
-                               { PinState(5, "", true) });
-const std::vector<double> DEFAULT_MEASUREMENTS{ 1, 2, 3 };
-const std::vector<double> DEFAULT_INTENSITIES{ 10, 20, 30 };
-const std::vector<diagnostic::Message> DEFAULT_DIAGNOSTIC_MSGS{ diagnostic::Message(configuration::ScannerId::master,
-                                                                                    diagnostic::ErrorLocation(5, 3)) };
+// const IOState DEFAULT_IO_STATE({ PinState(1, "zone1", true) },
+//                                { PinState(2, "zone1", true) },
+//                                { PinState(1, "zone1", false) },
+//                                { PinState(4, "OSST", false) },
+//                                { PinState(5, "", true) });
 
-static Message
-createMonitoringFrameMsg(const util::TenthOfDegree& from_theta = DEFAULT_FROM_THETA,
-                         const util::TenthOfDegree& resolution = DEFAULT_RESOLUTION,
-                         const uint32_t scan_counter = DEFAULT_SCAN_COUNTER,
-                         const uint8_t active_zoneset = DEFAULT_ACTIVE_ZONESET,
-                         const IOState& io_state = DEFAULT_IO_STATE,
-                         const std::vector<double>& measurements = DEFAULT_MEASUREMENTS,
-                         const std::vector<double>& intensities = DEFAULT_INTENSITIES,
-                         const std::vector<diagnostic::Message>& diagnostic_messages = DEFAULT_DIAGNOSTIC_MSGS)
+static const std::string ADDITIONAL_FIELD_MISSING_TEXT = " not set! (Contact PILZ support if the error persists.)";
+
+TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetScanCounter)
 {
-  return Message(
-      from_theta, resolution, scan_counter, active_zoneset, io_state, measurements, intensities, diagnostic_messages);
+  EXPECT_THROW_AND_WHAT(
+      Message().scanCounter(), AdditionalFieldMissing, ("Scan counter" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
-static Message createDefaultMsgAndSetIntensities(const std::vector<double>& intensities)
+TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetMeasurements)
 {
-  return createMonitoringFrameMsg(DEFAULT_FROM_THETA,
-                                  DEFAULT_RESOLUTION,
-                                  DEFAULT_SCAN_COUNTER,
-                                  DEFAULT_ACTIVE_ZONESET,
-                                  DEFAULT_IO_STATE,
-                                  DEFAULT_MEASUREMENTS,
-                                  intensities);
+  EXPECT_THROW_AND_WHAT(
+      Message().measurements(), AdditionalFieldMissing, ("Measurements" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
-static Message createDefaultMsgAndSetMeasurements(const std::vector<double>& measurements)
+TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetIntensities)
 {
-  return createMonitoringFrameMsg(DEFAULT_FROM_THETA,
-                                  DEFAULT_RESOLUTION,
-                                  DEFAULT_SCAN_COUNTER,
-                                  DEFAULT_ACTIVE_ZONESET,
-                                  DEFAULT_IO_STATE,
-                                  measurements);
+  EXPECT_THROW_AND_WHAT(
+      Message().intensities(), AdditionalFieldMissing, ("Intensities" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
-static Message createDefaultMsgAndSetFromTheta(util::TenthOfDegree from_theta)
+TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetActiveZoneset)
 {
-  return createMonitoringFrameMsg(from_theta);
+  EXPECT_THROW_AND_WHAT(
+      Message().activeZoneset(), AdditionalFieldMissing, ("Active zoneset" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
-static Message createDefaultMsgAndSetResolution(util::TenthOfDegree resolution)
+TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetDiagnosticMessages)
 {
-  return createMonitoringFrameMsg(DEFAULT_FROM_THETA, resolution);
+  EXPECT_THROW_AND_WHAT(Message().diagnosticMessages(),
+                        AdditionalFieldMissing,
+                        ("Diagnostic messages" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
-static Message createDefaultMsgAndSetScanCounter(uint32_t scan_counter)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfScanCounter)
 {
-  return createMonitoringFrameMsg(DEFAULT_FROM_THETA, DEFAULT_RESOLUTION, scan_counter);
+  EXPECT_FALSE(MessageBuilder().build().hasScanCounterField());
+  EXPECT_TRUE(MessageBuilder().scanCounter(2).build().hasScanCounterField());
 }
 
-static Message createDefaultMsgAndSetActiveZone(uint8_t active_zone)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfActiveZoneset)
 {
-  return createMonitoringFrameMsg(DEFAULT_FROM_THETA, DEFAULT_RESOLUTION, DEFAULT_SCAN_COUNTER, active_zone);
+  EXPECT_FALSE(MessageBuilder().build().hasActiveZonesetField());
+  EXPECT_TRUE(MessageBuilder().activeZoneset(2).build().hasActiveZonesetField());
 }
 
-class MonitoringFrameMsgTest : public ::testing::Test
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfMeasurements)
 {
-protected:
-  inline std::istringstream buildExpectedMeasurementsStream()
-  {
-    IStringStreamBuilder builder;
-    for (const auto& measurement : expected_measurements_)
-    {
-      builder.add(static_cast<uint16_t>(measurement * 1000.));
-    }
-    return builder.get();
-  }
-
-  inline bool expectMeasurementsPartEqual(const std::vector<double>& measurements)
-  {
-    return std::equal(measurements.begin(), measurements.end(), expected_measurements_.begin());
-  }
-
-  inline bool expectMeasurementsEqual(const std::vector<double>& measurements)
-  {
-    return (measurements.size() == expected_measurements_.size() && expectMeasurementsPartEqual(measurements));
-  }
-
-protected:
-  const std::array<double, 3> expected_measurements_{ 4.4, 4.3, 4.2 };
-};
-
-TEST(MonitoringFrameMsgEqualityTest, testCompareEqualSucces)
-{
-  const Message msg0(util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 1, DEFAULT_IO_STATE, { 1, 2, 3 });
-  const Message msg1(util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 1, DEFAULT_IO_STATE, { 1, 2, 3 });
-  EXPECT_EQ(msg0, msg1);
+  EXPECT_FALSE(MessageBuilder().build().hasMeasurementsField());
+  EXPECT_TRUE(MessageBuilder().measurements({}).build().hasMeasurementsField());
 }
 
-TEST(MonitoringFrameMsgEqualityTest, testCompareEqualIntensitiesSucces)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfIntensities)
 {
-  auto msg0 = createMonitoringFrameMsg();
-  auto msg1 = createMonitoringFrameMsg();
-  EXPECT_EQ(msg0, msg1);
+  EXPECT_FALSE(MessageBuilder().build().hasIntensitiesField());
+  EXPECT_TRUE(MessageBuilder().intensities({}).build().hasIntensitiesField());
 }
 
-TEST(MonitoringFrameMsgEqualityTest, testCompareEqualEmptySuccess)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfDiagnosticMessages)
 {
-  const Message msg0(util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, DEFAULT_IO_STATE, {});
-  const Message msg1(util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, DEFAULT_IO_STATE, {});
-  EXPECT_EQ(msg0, msg1);
+  EXPECT_FALSE(MessageBuilder().build().hasDiagnosticMessagesField());
+  EXPECT_TRUE(MessageBuilder().diagnosticMessages({}).build().hasDiagnosticMessagesField());
 }
 
-TEST(MonitoringFrameMsgEqualityTest, testCompareEqualIntensitiesEmptySucces)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectScannerId)
 {
-  const Message msg0(util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, DEFAULT_IO_STATE, {}, {}, {});
-  const Message msg1(util::TenthOfDegree(100), util::TenthOfDegree(10), 42, 0, DEFAULT_IO_STATE, {}, {}, {});
-  EXPECT_EQ(msg0, msg1);
+  const auto scanner_id{ configuration::ScannerId::slave0 };
+  EXPECT_EQ(scanner_id, MessageBuilder().scannerId(scanner_id).build().scannerId());
 }
 
-TEST(MonitoringFrameMsgEqualityTest, testCompareMeasurementsNotEqual)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectFromTheta)
 {
-  const auto msg0 = createDefaultMsgAndSetMeasurements({ 1, 42, 3 });
-  const auto msg1 = createDefaultMsgAndSetMeasurements({ 1, 2, 3 });
-  EXPECT_NE(msg0, msg1);
+  const auto from_theta{ util::TenthOfDegree(50) };
+  EXPECT_EQ(from_theta, MessageBuilder().fromTheta(from_theta).build().fromTheta());
 }
 
-TEST(MonitoringFrameMsgEqualityTest, testCompareIntensitiesNotEqual)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectResolution)
 {
-  const auto msg0 = createDefaultMsgAndSetIntensities({ 10, 42, 30 });
-  const auto msg1 = createDefaultMsgAndSetIntensities({ 10, 20, 30 });
-  EXPECT_NE(msg0, msg1);
+  const auto resolution{ util::TenthOfDegree(10) };
+  EXPECT_EQ(resolution, MessageBuilder().resolution(resolution).build().resolution());
 }
 
-TEST(MonitoringFrameMsgEqualityTest, testCompareFromThetaNotEqual)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectScanCounter)
 {
-  const auto msg0 = createDefaultMsgAndSetFromTheta(util::TenthOfDegree(42));
-  const auto msg1 = createDefaultMsgAndSetFromTheta(util::TenthOfDegree(100));
-  EXPECT_NE(msg0, msg1);
+  const uint32_t expected_scan_counter{ 42 };
+  uint32_t scan_counter{ 0 };
+  ASSERT_NO_THROW(scan_counter = MessageBuilder().scanCounter(expected_scan_counter).build().scanCounter());
+  EXPECT_EQ(expected_scan_counter, scan_counter);
 }
 
-TEST(MonitoringFrameMsgEqualityTest, testCompareResolutionNotEqual)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectActiveZoneset)
 {
-  const auto msg0 = createDefaultMsgAndSetResolution(util::TenthOfDegree(42));
-  const auto msg1 = createDefaultMsgAndSetResolution(util::TenthOfDegree(10));
-  EXPECT_NE(msg0, msg1);
+  const uint8_t expected_active_zoneset{ 3 };
+  uint8_t active_zoneset{ 0 };
+  ASSERT_NO_THROW(active_zoneset = MessageBuilder().activeZoneset(expected_active_zoneset).build().activeZoneset());
+  EXPECT_EQ(expected_active_zoneset, active_zoneset);
 }
 
-TEST(MonitoringFrameMsgEqualityTest, shouldCompareToFalseOnMessagesWithDifferentCounter)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectMeasurements)
 {
-  const auto msg0 = createDefaultMsgAndSetScanCounter(42);
-  const auto msg1 = createDefaultMsgAndSetScanCounter(1);
-  EXPECT_NE(msg0, msg1);
+  const std::vector<double> expected_measurements{ { 2.1, 1.3 } };
+  std::vector<double> measurements;
+  ASSERT_NO_THROW(measurements = MessageBuilder().measurements(expected_measurements).build().measurements());
+  EXPECT_EQ(expected_measurements, measurements);
 }
 
-TEST(MonitoringFrameMsgEqualityTest, shouldCompareToFalseOnMessagesWithDifferentActiveZoneset)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectIntensities)
 {
-  const auto msg0 = createDefaultMsgAndSetActiveZone(0);
-  const auto msg1 = createDefaultMsgAndSetActiveZone(42);
-  EXPECT_NE(msg0, msg1);
+  const std::vector<double> expected_intensities{ { 2.1, 1.3 } };
+  std::vector<double> intensities;
+  ASSERT_NO_THROW(intensities = MessageBuilder().intensities(expected_intensities).build().intensities());
+  EXPECT_EQ(expected_intensities, intensities);
 }
 
-TEST(MonitoringFrameMsgTest, shouldThrowMissingScanCounterErrorWhenScanCounterWasNeverSet)
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectDiagnosticMessages)
 {
-  Message msg{};
-  EXPECT_THROW(msg.scanCounter(), ScanCounterMissing);
+  const std::vector<diagnostic::Message> expected_diagnostic_messages{ { diagnostic::Message(
+      configuration::ScannerId::master, diagnostic::ErrorLocation(1, 7)) } };
+  std::vector<diagnostic::Message> diagnostic_messages;
+  ASSERT_NO_THROW(diagnostic_messages =
+                      MessageBuilder().diagnosticMessages(expected_diagnostic_messages).build().diagnosticMessages());
+  EXPECT_EQ(expected_diagnostic_messages, diagnostic_messages);
 }
 
-TEST(MonitoringFrameMsgEqualityTest, testCompareNotEqualEmpty)
+TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccessWithAdditionalFields)
 {
-  const Message msg0(util::TenthOfDegree(100), util::TenthOfDegree(42), 42, 0, DEFAULT_IO_STATE, {}, {}, {});
-  const Message msg1(util::TenthOfDegree(100), util::TenthOfDegree(42), 0, 0, DEFAULT_IO_STATE, {}, {}, {});
-  EXPECT_NE(msg0, msg1);
-}
-
-TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccess)
-{
-  Message msg(util::TenthOfDegree(1234), util::TenthOfDegree(56), 78, 2, DEFAULT_IO_STATE, { 45, 44, 43, 42 });
+  auto msg = MessageBuilder()
+                 .fromTheta(util::TenthOfDegree(1234))
+                 .resolution(util::TenthOfDegree(56))
+                 .scanCounter(78)
+                 .activeZoneset(2)
+                 .measurements({ 45, 44, 43, 42 })
+                 .intensities({ 1 })
+                 .diagnosticMessages({})
+                 .build();
 
 // For compatibility with different ubuntu versions (resp. fmt), we need to take account of changes in
 // the default formatting of floating point numbers
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
   EXPECT_EQ(fmt::format("{}", msg),
             "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-            "active_zoneset = 2, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {}, diagnostics = {})");
+            "active_zoneset = 2, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {1.0}, diagnostics = {})");
 #else
   EXPECT_EQ(fmt::format("{}", msg),
             "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-            "active_zoneset = 2, measurements = {45, 44, 43, 42}, intensities = {}, diagnostics = {})");
+            "active_zoneset = 2, measurements = {45, 44, 43, 42}, intensities = {1}, diagnostics = {})");
 #endif
+}
+
+TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccessWithoutAdditionalFields)
+{
+  auto msg = MessageBuilder().fromTheta(util::TenthOfDegree(1234)).resolution(util::TenthOfDegree(56)).build();
+
+  EXPECT_EQ(fmt::format("{}", msg),
+            "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = _, "
+            "active_zoneset = _, measurements = _, intensities = _, diagnostics = _)");
 }
 
 }  // namespace psen_scan_v2_standalone_test

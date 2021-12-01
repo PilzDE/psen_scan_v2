@@ -31,7 +31,7 @@
 // Test frameworks
 #include "psen_scan_v2_standalone/communication_layer/scanner_mock.h"
 #include "psen_scan_v2_standalone/util/integrationtest_helper.h"
-#include "psen_scan_v2_standalone/util/expectations.h"
+#include "psen_scan_v2_standalone/util/gtest_expectations.h"
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 #include "psen_scan_v2_standalone/util/mock_console_bridge_output_handler.h"
 
