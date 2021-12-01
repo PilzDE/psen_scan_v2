@@ -15,15 +15,17 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_MONITORING_FRAME_DESERIALIZATION_H
 #define PSEN_SCAN_V2_STANDALONE_MONITORING_FRAME_DESERIALIZATION_H
 
-#include <functional>
 #include <istream>
-#include <ostream>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
-#include "psen_scan_v2_standalone/util/logging.h"
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -150,13 +152,8 @@ std::vector<diagnostic::Message> deserializeMessages(std::istream& is);
 
 namespace io
 {
-typedef std::function<PinState(size_t, size_t, bool)> AddPinStateFunction;
-
-std::vector<PinState> deserializePinField(std::istream& is,
-                                          std::size_t length_in_bytes,
-                                          const AddPinStateFunction& add_func);
-
-IOState deserializePins(std::istream& is);
+IOPin::States deserializePinField(std::istream& is, std::size_t length_in_bytes, const AddPinStateFunction& add_func);
+IOPin deserializePins(std::istream& is);
 }  // namespace io
 
 /**

@@ -23,7 +23,7 @@
 
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/io.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin.h"
 #include "psen_scan_v2_standalone/io_state.h"
 
 using namespace psen_scan_v2_standalone;

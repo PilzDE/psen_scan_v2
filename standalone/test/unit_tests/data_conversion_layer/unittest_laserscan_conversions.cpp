@@ -205,16 +205,17 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectTimestampAfterConver
   EXPECT_EQ(EXPECTED_TIMESTAMP_AFTER_CONVERSION, scan_ptr->getTimestamp());
 }
 
-TEST(LaserScanConversionsTest, laserScanShouldContainCorrectIOStateAfterConversion)
-{
-  const auto stamped_msg{ createDefaultStampedMsg() };
+// TODO
+// TEST(LaserScanConversionsTest, laserScanShouldContainCorrectIOStateAfterConversion)
+// {
+//   const auto stamped_msg{ createDefaultStampedMsg() };
 
-  std::unique_ptr<LaserScan> scan_ptr;
-  ASSERT_NO_THROW(
-      scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan({ stamped_msg }) }););
+//   std::unique_ptr<LaserScan> scan_ptr;
+//   ASSERT_NO_THROW(
+//       scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan({ stamped_msg }) }););
 
-  EXPECT_IO_STATE_EQ(stamped_msg.msg_.ioState(), scan_ptr->getIOState());
-}
+//   EXPECT_IO_STATE_EQ(stamped_msg.msg_.ioState(), scan_ptr->getIOState());
+// }
 
 /////////////////////////////////////////
 //  Test Cases with Multiple Messages  //
@@ -298,28 +299,29 @@ TEST(LaserScanConversionsTest, laserScanShouldContainMinimalTimestamp)
   EXPECT_EQ(EXPECTED_TIMESTAMP_AFTER_CONVERSION, scan_ptr->getTimestamp());
 }
 
-TEST(LaserScanConversionsTest, laserScanShouldContainMostRecentIOStateWhenFramesAreOrdered)
-{
-  const auto stamped_msgs = createValidStampedMsgs(6);
+// TODO
+// TEST(LaserScanConversionsTest, laserScanShouldContainMostRecentIOStateWhenFramesAreOrdered)
+// {
+//   const auto stamped_msgs = createValidStampedMsgs(6);
 
-  std::unique_ptr<LaserScan> scan_ptr;
-  ASSERT_NO_THROW(
-      scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
+//   std::unique_ptr<LaserScan> scan_ptr;
+//   ASSERT_NO_THROW(
+//       scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
 
-  EXPECT_IO_STATE_EQ(stamped_msgs.back().msg_.ioState(), scan_ptr->getIOState());
-}
+//   EXPECT_IO_STATE_EQ(stamped_msgs.back().msg_.ioState(), scan_ptr->getIOState());
+// }
 
-TEST(LaserScanConversionsTest, laserScanShouldContainMostRecentIOStateWhenFramesAreUnordered)
-{
-  auto stamped_msgs = createValidStampedMsgs(6);
-  std::swap(stamped_msgs.back(), stamped_msgs.front());
+// TEST(LaserScanConversionsTest, laserScanShouldContainMostRecentIOStateWhenFramesAreUnordered)
+// {
+//   auto stamped_msgs = createValidStampedMsgs(6);
+//   std::swap(stamped_msgs.back(), stamped_msgs.front());
 
-  std::unique_ptr<LaserScan> scan_ptr;
-  ASSERT_NO_THROW(
-      scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
+//   std::unique_ptr<LaserScan> scan_ptr;
+//   ASSERT_NO_THROW(
+//       scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
 
-  EXPECT_IO_STATE_EQ(stamped_msgs.front().msg_.ioState(), scan_ptr->getIOState());
-}
+//   EXPECT_IO_STATE_EQ(stamped_msgs.front().msg_.ioState(), scan_ptr->getIOState());
+// }
 
 TEST(LaserScanConversionsTest, laserScanShouldContainActiveZonesetOfLastMsg)
 {

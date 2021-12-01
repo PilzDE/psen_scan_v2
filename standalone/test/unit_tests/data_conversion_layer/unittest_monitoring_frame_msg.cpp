@@ -34,7 +34,7 @@ namespace psen_scan_v2_standalone_test
 using namespace psen_scan_v2_standalone;
 using namespace data_conversion_layer::monitoring_frame;
 
-// const IOState DEFAULT_IO_STATE({ PinState(1, "zone1", true) },
+// const IOPinState DEFAULT_IO_STATE({ PinState(1, "zone1", true) },
 //                                { PinState(2, "zone1", true) },
 //                                { PinState(1, "zone1", false) },
 //                                { PinState(4, "OSST", false) },

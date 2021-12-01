@@ -31,7 +31,7 @@ using namespace psen_scan_v2_standalone;
 
 namespace psen_scan_v2_standalone_test
 {
-// const IOState io_state({ PinState(1, "zone1", true) },
+// const IOPinState io_state({ PinState(1, "zone1", true) },
 //                        { PinState(2, "zone1", true) },
 //                        { PinState(1, "zone", false) },
 //                        { PinState(4, "OSST", false) },

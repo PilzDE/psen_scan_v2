@@ -13,14 +13,12 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef PSEN_SCAN_V2_STANDALONE_IO_H
-#define PSEN_SCAN_V2_STANDALONE_IO_H
+#ifndef PSEN_SCAN_V2_STANDALONE_IO_CONSTANTS_H
+#define PSEN_SCAN_V2_STANDALONE_IO_CONSTANTS_H
 
 #include <array>
 #include <map>
-#include <vector>
-
-#include "psen_scan_v2_standalone/io_state.h"
+#include <string>
 
 namespace psen_scan_v2_standalone
 {
@@ -28,10 +26,6 @@ namespace data_conversion_layer
 {
 namespace monitoring_frame
 {
-/**
- * @brief Contains all types, etc. needed to describe the IOs information contained
- * in a  data_conversion_layer::monitoring_frame::Message.
- */
 namespace io
 {
 /**
@@ -45,8 +39,6 @@ static constexpr uint32_t RAW_CHUNK_LENGTH_IN_BYTES{
   RAW_CHUNK_LENGTH_RESERVED_IN_BYTES + RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES + RAW_CHUNK_LENGTH_RESERVED_IN_BYTES +
   RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES + RAW_CHUNK_LENGTH_RESERVED_IN_BYTES + RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES
 };
-
-using RawChunk = std::array<uint8_t, io::RAW_CHUNK_LENGTH_IN_BYTES>;
 
 // clang-format off
 enum class PhysicalInputType
@@ -219,7 +211,7 @@ static const std::map<Ot, IoName> OUTPUT_BIT_TO_NAME
   { Ot::ossd2_lock, "OSSD2_LOCK" },
   { Ot::ossd2, "OSSD2" },
   { Ot::ossd1_lock, "OSSD1_LOCK" },
-  { Ot::ossd1, "OSSD1" } 
+  { Ot::ossd1, "OSSD1" }
 };
 
   static constexpr std::array<std::array<Ot, 8>, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES> OUTPUT_BITS{{
@@ -231,44 +223,9 @@ static const std::map<Ot, IoName> OUTPUT_BIT_TO_NAME
   }};
 // clang-format on
 
-static uint32_t createID(size_t byte_n, size_t bit_n)
-{
-  return byte_n * 8 + bit_n;
-}
-
-inline PinState createInputPinState(size_t byte_n, size_t bit_n, bool value)
-{
-  if (byte_n >= RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES)
-  {
-    throw std::out_of_range("");
-  }
-  auto id = createID(byte_n, bit_n);
-  auto input_bit = PHYSICAL_INPUT_BITS.at(byte_n).at(bit_n);
-  const auto& name = PHYSICAL_INPUT_BIT_TO_NAME.at(input_bit);
-  return PinState(id, name, value);
-}
-
-inline PinState createLogicalPinState(size_t byte_n, size_t bit_n, bool value)
-{
-  auto id = createID(byte_n, bit_n);
-  return PinState(id, "", value);
-}
-
-inline PinState createOutputPinState(size_t byte_n, size_t bit_n, bool value)
-{
-  if (byte_n >= RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES)
-  {
-    throw std::out_of_range("");
-  }
-  auto id = createID(byte_n, bit_n);
-  auto input_bit = OUTPUT_BITS.at(byte_n).at(bit_n);
-  const auto& name = OUTPUT_BIT_TO_NAME.at(input_bit);
-  return PinState(id, name, value);
-}
-
 }  // namespace io
 }  // namespace monitoring_frame
 }  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
 
-#endif  // PSEN_SCAN_V2_STANDALONE_IO_H
+#endif  // PSEN_SCAN_V2_STANDALONE_IO_CONSTANTS_H
