@@ -13,25 +13,14 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <algorithm>
 #include <cstdint>
-#include <iomanip>
-#include <iterator>
-#include <sstream>
 #include <string>
 #include <vector>
 
-#include <fmt/format.h>
-#include <fmt/ostream.h>
-
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
-#include "psen_scan_v2_standalone/util/logging.h"
-#include "psen_scan_v2_standalone/util/format_range.h"
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -137,23 +126,6 @@ bool Message::hasIntensitiesField() const
 bool Message::hasDiagnosticMessagesField() const
 {
   return diagnostic_messages_.is_initialized();
-}
-
-#define FORMAT_IF_INITIALIZED(arg) arg.is_initialized() ? fmt::format("{}", arg.get()) : "_"
-#define FORMAT_RANGE_IF_INITIALIZED(arg) arg.is_initialized() ? util::formatRange(arg.get()) : "_"
-
-std::ostream& operator<<(std::ostream& os, const Message& msg)
-{
-  os << fmt::format("monitoring_frame::Message(fromTheta = {} deg, resolution = {} deg, scanCounter = "
-                    "{}, active_zoneset = {}, measurements = {}, intensities = {}, diagnostics = {})",
-                    msg.from_theta_.value() / 10.,
-                    msg.resolution_.value() / 10.,
-                    FORMAT_IF_INITIALIZED(msg.scan_counter_),
-                    FORMAT_IF_INITIALIZED(msg.active_zoneset_),
-                    FORMAT_RANGE_IF_INITIALIZED(msg.measurements_),
-                    FORMAT_RANGE_IF_INITIALIZED(msg.intensities_),
-                    FORMAT_RANGE_IF_INITIALIZED(msg.diagnostic_messages_));
-  return os;
 }
 }  // namespace monitoring_frame
 }  // namespace data_conversion_layer

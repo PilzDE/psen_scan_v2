@@ -17,20 +17,15 @@
 #define PSEN_SCAN_V2_STANDALONE_MONITORING_FRAME_MSG_H
 
 #include <cstdint>
-#include <functional>
-#include <map>
-#include <iostream>
-#include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <array>
-#include <bitset>
+
 #include <boost/optional.hpp>
 
-#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
-#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -100,7 +95,6 @@ private:
 
 public:
   friend class MessageBuilder;
-  friend std::ostream& operator<<(std::ostream& os, const Message& msg);
 };
 
 /**
@@ -118,9 +112,6 @@ inline AdditionalFieldMissing::AdditionalFieldMissing(const std::string& field_n
   : std::runtime_error(field_name + " not set! (Contact PILZ support if the error persists.)")
 {
 }
-
-std::ostream& operator<<(std::ostream& os, const Message& msg);
-
 }  // namespace monitoring_frame
 }  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone

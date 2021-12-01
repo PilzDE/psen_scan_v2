@@ -22,6 +22,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_helper.h"
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 
 using namespace psen_scan_v2_standalone;
