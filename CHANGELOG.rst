@@ -2,8 +2,8 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.20.0 (2021-12-01)
+-------------------
 * Port to ros2 foxy (#270)
     * Rename launch files to *.launch.xml
     * Update README.md
