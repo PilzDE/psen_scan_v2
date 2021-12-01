@@ -243,11 +243,27 @@ private:
   void checkForInternalErrors(const data_conversion_layer::scanner_reply::Message& msg);
   //! @throws data_conversion_layer::monitoring_frame::AdditionalFieldMissing if diagnostic_messages is not set.
   void checkForDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& msg);
+  /**
+   * @throws data_conversion_layer::monitoring_frame::AdditionalFieldMissing if scan_counter or active_zoneset is not
+   * set.
+   */
   void checkForChangedActiveZoneset(const data_conversion_layer::monitoring_frame::Message& msg);
 
+  /**
+   * @throws data_conversion_layer::monitoring_frame::AdditionalFieldMissing if scan_counter, active_zoneset or
+   * measurements is not set.
+   */
   void informUserAboutTheScanData(const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg);
+  /**
+   * @throws data_conversion_layer::monitoring_frame::AdditionalFieldMissing if scan_counter, active_zoneset or
+   * measurements is not set in one of the msgs.
+   */
   void
   sendMessageWithMeasurements(const std::vector<data_conversion_layer::monitoring_frame::MessageStamped>& stamped_msg);
+  /**
+   * @throws data_conversion_layer::monitoring_frame::AdditionalFieldMissing if measurements is not set in one of the
+   * msgs.
+   */
   bool
   framesContainMeasurements(const std::vector<data_conversion_layer::monitoring_frame::MessageStamped>& stamped_msg);
 
