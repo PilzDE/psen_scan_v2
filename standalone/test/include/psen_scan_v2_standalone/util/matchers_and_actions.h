@@ -67,15 +67,6 @@ MATCHER_P2(TimestampInExpectedTimeframe, reference_scan, reference_timestamp, ""
          arg.getTimestamp() < (reference_scan.getTimestamp() + elapsed_time);
 }
 
-MATCHER_P(MonitoringFrameEq, reference_msg, "")
-{
-  return arg.fromTheta() == reference_msg.fromTheta() && arg.resolution() == reference_msg.resolution() &&
-         arg.scanCounter() == reference_msg.scanCounter() && arg.activeZoneset() == reference_msg.activeZoneset() &&
-         Matches(PointwiseDoubleEq(reference_msg.measurements()))(arg.measurements()) &&
-         Matches(PointwiseDoubleEq(reference_msg.intensities()))(arg.intensities()) &&
-         Matches(Pointwise(Eq(), reference_msg.diagnosticMessages()))(arg.diagnosticMessages());
-}
-
 MATCHER_P(IOPinEq, ref_pin, "")
 {
   return Matches(Pointwise(Eq(), ref_pin.physical_input_0))(arg.physical_input_0) &&
@@ -83,6 +74,16 @@ MATCHER_P(IOPinEq, ref_pin, "")
          Matches(Pointwise(Eq(), ref_pin.physical_input_2))(arg.physical_input_2) &&
          Matches(Pointwise(Eq(), ref_pin.logical_input))(arg.logical_input) &&
          Matches(Pointwise(Eq(), ref_pin.output))(arg.output);
+}
+
+MATCHER_P(MonitoringFrameEq, reference_msg, "")
+{
+  return arg.fromTheta() == reference_msg.fromTheta() && arg.resolution() == reference_msg.resolution() &&
+         arg.scanCounter() == reference_msg.scanCounter() && arg.activeZoneset() == reference_msg.activeZoneset() &&
+         Matches(PointwiseDoubleEq(reference_msg.measurements()))(arg.measurements()) &&
+         Matches(PointwiseDoubleEq(reference_msg.intensities()))(arg.intensities()) &&
+         Matches(Pointwise(Eq(), reference_msg.diagnosticMessages()))(arg.diagnosticMessages()) &&
+         Matches(IOPinEq(reference_msg.iOPin()))(arg.iOPin());
 }
 }  // namespace psen_scan_v2_standalone_test
 

@@ -20,6 +20,7 @@
 
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
@@ -31,14 +32,15 @@ using namespace psen_scan_v2_standalone;
 
 namespace psen_scan_v2_standalone_test
 {
-// const IOPinState io_state({ PinState(1, "zone1", true) },
-//                        { PinState(2, "zone1", true) },
-//                        { PinState(1, "zone", false) },
-//                        { PinState(4, "OSST", false) },
-//                        { PinState(5, "", true) });
-
 static data_conversion_layer::monitoring_frame::Message createMsg()
 {
+  data_conversion_layer::monitoring_frame::io::IOPin io_pin;
+  io_pin.physical_input_0 = { PinState(1, "zone1", true) };
+  io_pin.physical_input_1 = { PinState(2, "zone2", false) };
+  io_pin.physical_input_2 = { PinState(5, "zone1", false) };
+  io_pin.logical_input = { PinState(3, "zone1", true) };
+  io_pin.output = { PinState(1, "OSSD", false) };
+
   return data_conversion_layer::monitoring_frame::MessageBuilder()
       .fromTheta(util::TenthOfDegree{ 10 })
       .resolution(util::TenthOfDegree{ 90 })
@@ -48,7 +50,8 @@ static data_conversion_layer::monitoring_frame::Message createMsg()
       .intensities({ 0., 4., 3., 1007., 508., 14000. })
       .diagnosticMessages({ data_conversion_layer::monitoring_frame::diagnostic::Message{
           configuration::ScannerId::master,
-          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 7) } });
+          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 7) } })
+      .iOPin(io_pin);
 }
 
 TEST(MonitoringFrameMsgStampedTest, testMsg)

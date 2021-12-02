@@ -24,7 +24,7 @@ using psen_scan_v2_standalone::PinState;
 
 static const PinState PIN_STATE(0, "", false);
 
-TEST(PinStateTests, shouldReturnPhysicalInputWithPinState)
+TEST(IOStateTests, shouldReturnPhysicalInputWithPinState)
 {
   IOState io_state({ PIN_STATE }, {}, {});
   EXPECT_EQ(io_state.physicalInput().at(0), PIN_STATE);
@@ -32,7 +32,7 @@ TEST(PinStateTests, shouldReturnPhysicalInputWithPinState)
   EXPECT_TRUE(io_state.output().empty());
 }
 
-TEST(PinStateTests, shouldReturnLogicalInputWithPinState)
+TEST(IOStateTests, shouldReturnLogicalInputWithPinState)
 {
   IOState io_state({}, { PIN_STATE }, {});
   EXPECT_TRUE(io_state.physicalInput().empty());
@@ -40,7 +40,7 @@ TEST(PinStateTests, shouldReturnLogicalInputWithPinState)
   EXPECT_TRUE(io_state.output().empty());
 }
 
-TEST(PinStateTests, shouldReturnOutputWithPinState)
+TEST(IOStateTests, shouldReturnOutputWithPinState)
 {
   IOState io_state({}, {}, { PIN_STATE });
   EXPECT_TRUE(io_state.physicalInput().empty());

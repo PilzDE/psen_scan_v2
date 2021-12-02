@@ -34,8 +34,8 @@ static const int64_t DEFAULT_TIMESTAMP{ 1 };
 static const uint32_t DEFAULT_SCAN_COUNTER{ 1 };
 static const uint8_t DEFAULT_ACTIVE_ZONESET{ 2 };
 static const IOState DEFAULT_IO_STATE({ PinState(0, "input_test", true) },
-                                      { PinState(0, "output_test", false), PinState(1, "output_test2", true) },
-                                      { PinState(0, "logical_test", false) });
+                                      { PinState(0, "logical_test", false) },
+                                      { PinState(0, "output_test", false), PinState(1, "output_test2", true) });
 
 class LaserScanBuilder
 {
