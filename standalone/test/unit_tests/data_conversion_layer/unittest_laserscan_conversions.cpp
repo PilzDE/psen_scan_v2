@@ -81,14 +81,14 @@ static double addOffsetToMsgMeasurement(data_conversion_layer::monitoring_frame:
   return measurements_copy.at(index);
 }
 
-static IOPin createIOPin()
+static IOPin createIOPin(uint32_t msg_nr = 0)
 {
   IOPin io_pin;
-  io_pin.physical_input_0 = { PinState(0, "input0", true) };
-  io_pin.physical_input_1 = { PinState(0, "input1", false) };
-  io_pin.physical_input_2 = { PinState(0, "input21", true), PinState(0, "input22", false) };
+  io_pin.physical_input_0 = { PinState(msg_nr, "input0", true) };
+  io_pin.physical_input_1 = { PinState(msg_nr, "input1", false) };
+  io_pin.physical_input_2 = { PinState(msg_nr, "input21", true), PinState(0, "input22", false) };
   io_pin.logical_input = {};
-  io_pin.output = { PinState(0, "output", true) };
+  io_pin.output = { PinState(msg_nr, "output", true) };
   return io_pin;
 }
 
@@ -104,16 +104,16 @@ static MessageBuilder createDefaultMsgBuilder()
       .intensities({ 0., 4., 3., 1007., 508., 14000., .4 });
 }
 
-static MessageStamped createDefaultStampedMsg(const int64_t timestamp = DEFAULT_TIMESTAMP)
+static MessageStamped createDefaultStampedMsg(const int64_t timestamp = DEFAULT_TIMESTAMP, uint32_t msg_nr = 0)
 {
-  return MessageStamped(createDefaultMsgBuilder(), timestamp);
+  return MessageStamped(createDefaultMsgBuilder().iOPin(createIOPin(msg_nr)), timestamp);
 }
 
-static void addStampedMsg(std::vector<MessageStamped>& msgs)
+static void addStampedMsg(std::vector<MessageStamped>& msgs, uint32_t msg_nr = 0)
 {
   if (msgs.empty())
   {
-    msgs.push_back(createDefaultStampedMsg());
+    msgs.push_back(createDefaultStampedMsg(DEFAULT_TIMESTAMP, msg_nr));
   }
   else
   {
@@ -131,7 +131,7 @@ static std::vector<MessageStamped> createValidStampedMsgs(const std::size_t num_
   std::vector<MessageStamped> msgs;
   for (std::size_t i = 0; i < num_elements; ++i)
   {
-    addStampedMsg(msgs);
+    addStampedMsg(msgs, i);
   }
   return msgs;
 }
@@ -219,7 +219,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectIOStateAfterConversi
       scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan({ stamped_msg }) }););
 
   ASSERT_EQ(scan_ptr->getIOStates().size(), 3);
-  EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msg.msg_.iOPin());
+  EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msg.msg_.iOPin(), /*start index*/ 0);
 }
 
 /////////////////////////////////////////
@@ -304,29 +304,37 @@ TEST(LaserScanConversionsTest, laserScanShouldContainMinimalTimestamp)
   EXPECT_EQ(EXPECTED_TIMESTAMP_AFTER_CONVERSION, scan_ptr->getTimestamp());
 }
 
-// TODO
-// TEST(LaserScanConversionsTest, laserScanShouldContainMostRecentIOStateWhenFramesAreOrdered)
-// {
-//   const auto stamped_msgs = createValidStampedMsgs(6);
+TEST(LaserScanConversionsTest, laserScanShouldContainAllIOStates)
+{
+  const int msg_count = 6;
+  const auto stamped_msgs = createValidStampedMsgs(msg_count);
 
-//   std::unique_ptr<LaserScan> scan_ptr;
-//   ASSERT_NO_THROW(
-//       scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
+  std::unique_ptr<LaserScan> scan_ptr;
+  ASSERT_NO_THROW(
+      scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
 
-//   EXPECT_IO_STATE_EQ(stamped_msgs.back().msg_.ioState(), scan_ptr->getIOState());
-// }
+  ASSERT_EQ(scan_ptr->getIOStates().size(), 3 * msg_count);
+  for (int i = 0; i < msg_count; i++)
+  {
+    EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msgs.at(i).msg_.iOPin(), /*start index*/ i * 3);
+  }
+}
 
-// TEST(LaserScanConversionsTest, laserScanShouldContainMostRecentIOStateWhenFramesAreUnordered)
-// {
-//   auto stamped_msgs = createValidStampedMsgs(6);
-//   std::swap(stamped_msgs.back(), stamped_msgs.front());
+TEST(LaserScanConversionsTest, laserScanShouldContainAllIOStatesInCorrectOrder)
+{
+  const int msg_count = 3;
+  auto stamped_msgs = createValidStampedMsgs(msg_count);
+  std::swap(stamped_msgs.back(), stamped_msgs.front());
 
-//   std::unique_ptr<LaserScan> scan_ptr;
-//   ASSERT_NO_THROW(
-//       scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
+  std::unique_ptr<LaserScan> scan_ptr;
+  ASSERT_NO_THROW(
+      scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
 
-//   EXPECT_IO_STATE_EQ(stamped_msgs.front().msg_.ioState(), scan_ptr->getIOState());
-// }
+  ASSERT_EQ(scan_ptr->getIOStates().size(), 3 * msg_count);
+  EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msgs.at(2).msg_.iOPin(), /*scan start index*/ 0);
+  EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msgs.at(1).msg_.iOPin(), /*scan start index*/ 3);
+  EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msgs.at(0).msg_.iOPin(), /*scan start index*/ 6);
+}
 
 TEST(LaserScanConversionsTest, laserScanShouldContainActiveZonesetOfLastMsg)
 {
