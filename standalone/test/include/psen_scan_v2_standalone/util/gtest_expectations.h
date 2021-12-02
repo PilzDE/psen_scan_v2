@@ -57,11 +57,15 @@
       expected_exception);
 
 #define EXPECT_IO_STATE_EQ_IO_PIN(io_state, io_pin)                                                                    \
-  EXPECT_EQ(io_pin.physical_input_0, io_state.physicalInput0());                                                       \
-  EXPECT_EQ(io_pin.physical_input_1, io_state.physicalInput1());                                                       \
-  EXPECT_EQ(io_pin.physical_input_2, io_state.physicalInput2());                                                       \
-  EXPECT_EQ(io_pin.logical_input, io_state.logicalInput());                                                            \
-  EXPECT_EQ(io_pin.output, io_state.output());
+  EXPECT_EQ(io_pin.physical_input_0, io_state.at(0).physicalInput());                                                  \
+  EXPECT_EQ(io_pin.logical_input, io_state.at(0).logicalInput());                                                      \
+  EXPECT_EQ(io_pin.output, io_state.at(0).output());                                                                   \
+  EXPECT_EQ(io_pin.physical_input_1, io_state.at(1).physicalInput());                                                  \
+  EXPECT_EQ(io_pin.logical_input, io_state.at(1).logicalInput());                                                      \
+  EXPECT_EQ(io_pin.output, io_state.at(1).output());                                                                   \
+  EXPECT_EQ(io_pin.physical_input_2, io_state.at(2).physicalInput());                                                  \
+  EXPECT_EQ(io_pin.logical_input, io_state.at(2).logicalInput());                                                      \
+  EXPECT_EQ(io_pin.output, io_state.at(2).output());
 
 #define EXPECT_CONTAINER_UNORDERED_EQ(var1, var2)                                                                      \
   EXPECT_EQ(var1.size(), var2.size());                                                                                 \

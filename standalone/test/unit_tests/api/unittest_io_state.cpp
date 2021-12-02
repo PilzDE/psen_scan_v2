@@ -24,52 +24,26 @@ using psen_scan_v2_standalone::PinState;
 
 static const PinState PIN_STATE(0, "", false);
 
-TEST(PinStateTests, shouldReturnInput0WithPinState)
+TEST(PinStateTests, shouldReturnPhysicalInputWithPinState)
 {
-  IOState io_state({ PIN_STATE }, {}, {}, {}, {});
-  EXPECT_EQ(io_state.physicalInput0().at(0), PIN_STATE);
-  EXPECT_TRUE(io_state.physicalInput1().empty());
-  EXPECT_TRUE(io_state.physicalInput2().empty());
-  EXPECT_TRUE(io_state.logicalInput().empty());
-  EXPECT_TRUE(io_state.output().empty());
-}
-
-TEST(PinStateTests, shouldReturnInput1WithPinState)
-{
-  IOState io_state({}, { PIN_STATE }, {}, {}, {});
-  EXPECT_TRUE(io_state.physicalInput0().empty());
-  EXPECT_EQ(io_state.physicalInput1().at(0), PIN_STATE);
-  EXPECT_TRUE(io_state.physicalInput2().empty());
-  EXPECT_TRUE(io_state.logicalInput().empty());
-  EXPECT_TRUE(io_state.output().empty());
-}
-
-TEST(PinStateTests, shouldReturnInput2WithPinState)
-{
-  IOState io_state({}, {}, { PIN_STATE }, {}, {});
-  EXPECT_TRUE(io_state.physicalInput0().empty());
-  EXPECT_TRUE(io_state.physicalInput1().empty());
-  EXPECT_EQ(io_state.physicalInput2().at(0), PIN_STATE);
+  IOState io_state({ PIN_STATE }, {}, {});
+  EXPECT_EQ(io_state.physicalInput().at(0), PIN_STATE);
   EXPECT_TRUE(io_state.logicalInput().empty());
   EXPECT_TRUE(io_state.output().empty());
 }
 
 TEST(PinStateTests, shouldReturnLogicalInputWithPinState)
 {
-  IOState io_state({}, {}, {}, { PIN_STATE }, {});
-  EXPECT_TRUE(io_state.physicalInput0().empty());
-  EXPECT_TRUE(io_state.physicalInput1().empty());
-  EXPECT_TRUE(io_state.physicalInput2().empty());
+  IOState io_state({}, { PIN_STATE }, {});
+  EXPECT_TRUE(io_state.physicalInput().empty());
   EXPECT_EQ(io_state.logicalInput().at(0), PIN_STATE);
   EXPECT_TRUE(io_state.output().empty());
 }
 
 TEST(PinStateTests, shouldReturnOutputWithPinState)
 {
-  IOState io_state({}, {}, {}, {}, { PIN_STATE });
-  EXPECT_TRUE(io_state.physicalInput0().empty());
-  EXPECT_TRUE(io_state.physicalInput1().empty());
-  EXPECT_TRUE(io_state.physicalInput2().empty());
+  IOState io_state({}, {}, { PIN_STATE });
+  EXPECT_TRUE(io_state.physicalInput().empty());
   EXPECT_TRUE(io_state.logicalInput().empty());
   EXPECT_EQ(io_state.output().at(0), PIN_STATE);
 }
