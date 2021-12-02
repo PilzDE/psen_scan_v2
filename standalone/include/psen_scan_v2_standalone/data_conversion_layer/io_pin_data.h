@@ -58,8 +58,14 @@ inline PinState createInputPinState(size_t byte_n, size_t bit_n, bool value)
 
 inline PinState createLogicalPinState(size_t byte_n, size_t bit_n, bool value)
 {
+  if (byte_n >= RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES)
+  {
+    throw std::out_of_range("");
+  }
   auto id = createID(byte_n, bit_n);
-  return PinState(id, "", value);
+  auto input_bit = LOGICAL_INPUT_BITS.at(byte_n).at(bit_n);
+  const auto& name = LOGICAL_INPUT_BIT_TO_NAME.at(input_bit);
+  return PinState(id, name, value);
 }
 
 inline PinState createOutputPinState(size_t byte_n, size_t bit_n, bool value)
@@ -69,8 +75,8 @@ inline PinState createOutputPinState(size_t byte_n, size_t bit_n, bool value)
     throw std::out_of_range("");
   }
   auto id = createID(byte_n, bit_n);
-  auto input_bit = OUTPUT_BITS.at(byte_n).at(bit_n);
-  const auto& name = OUTPUT_BIT_TO_NAME.at(input_bit);
+  auto output_bit = OUTPUT_BITS.at(byte_n).at(bit_n);
+  const auto& name = OUTPUT_BIT_TO_NAME.at(output_bit);
   return PinState(id, name, value);
 }
 

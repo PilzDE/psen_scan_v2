@@ -51,12 +51,13 @@ TEST(PinStateTests, shouldReturnCorrectOutputPinState)
 
 TEST(PinStateTests, shouldReturnCorrectLogicalPinState)
 {
-  for (size_t byte_n = 0; byte_n < RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES; byte_n++)
+  for (size_t byte_n = 0; byte_n < RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES; byte_n++)
   {
     for (size_t bit_n = 0; bit_n < 8; ++bit_n)
     {
       const auto id = byte_n * 8 + bit_n;
-      EXPECT_EQ(createLogicalPinState(byte_n, bit_n, true), PinState(id, "", true));
+      const auto& name = LOGICAL_INPUT_BIT_TO_NAME.at(LOGICAL_INPUT_BITS.at(byte_n).at(bit_n));
+      EXPECT_EQ(createLogicalPinState(byte_n, bit_n, true), PinState(id, name, true));
     }
   }
 }
@@ -75,6 +76,14 @@ TEST(PinStateTests, shouldThrowOnInvalidOutputPositions)
   EXPECT_THROW(createOutputPinState(-1, 0, false), std::out_of_range);
   EXPECT_THROW(createOutputPinState(0, 9, false), std::out_of_range);
   EXPECT_THROW(createOutputPinState(0, -1, false), std::out_of_range);
+}
+
+TEST(PinStateTests, shouldThrowOnInvalidLogicalInputPositions)
+{
+  EXPECT_THROW(createLogicalPinState(RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES, 0, false), std::out_of_range);
+  EXPECT_THROW(createLogicalPinState(-1, 0, false), std::out_of_range);
+  EXPECT_THROW(createLogicalPinState(0, 9, false), std::out_of_range);
+  EXPECT_THROW(createLogicalPinState(0, -1, false), std::out_of_range);
 }
 }  // namespace psen_scan_v2_standalone_test
 

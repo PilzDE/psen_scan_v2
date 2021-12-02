@@ -266,7 +266,10 @@ TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectPhysicalInputField
   std::stringstream ss;
   ss.write(raw.data(), 10);
   auto input = deserializePinField(ss, 10, createInputPinState);
+
   std::vector<PinState> expected_states{
+    // unused bytes
+
     PinState(48, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::zone_sw_1), true),
     PinState(49, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::zone_sw_2), false),
     PinState(50, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::zone_sw_3), true),
@@ -275,6 +278,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectPhysicalInputField
     PinState(53, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::zone_sw_6), false),
     PinState(54, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::zone_sw_7), true),
     PinState(55, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::zone_sw_8), false),
+
     PinState(56, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::reset), true),
     // unused bit
     PinState(58, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::restart_1), true),
@@ -283,6 +287,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectPhysicalInputField
     PinState(61, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::muting_12), false),
     PinState(62, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::override_11), true),
     PinState(63, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::override_12), false),
+
     PinState(64, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::edm_1), true),
     PinState(65, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::restart_2), false),
     PinState(66, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::muting_en_2), true),
@@ -291,14 +296,8 @@ TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectPhysicalInputField
     PinState(69, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::override_21), false),
     PinState(70, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::override_22), true),
     PinState(71, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::edm_2), false),
-    PinState(72, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::restart_3), false),
-    PinState(73, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::muting_en_3), false),
-    PinState(74, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::muting_31), false),
-    PinState(75, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::muting_32), false),
-    PinState(76, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::override_31), false),
-    PinState(77, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::override_32), false),
-    PinState(78, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::edm_3), false)
-    // unused bit
+
+    // unused byte
   };
 
   EXPECT_CONTAINER_UNORDERED_EQ(input, expected_states);
@@ -310,18 +309,49 @@ TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectLogicalInputField)
   std::stringstream ss;
   ss.write(raw.data(), 8);
   auto input = deserializePinField(ss, 8, createLogicalPinState);
-  std::vector<PinState> expected_states{};
 
-  uint32_t i = 0;
-  for (; i < 56; i += 2)
-  {
-    expected_states.push_back(PinState(i, "", true));
-    expected_states.push_back(PinState(i + 1, "", false));
-  }
-  for (; i < 64; i++)
-  {
-    expected_states.push_back(PinState(i, "", false));
-  }
+  std::vector<PinState> expected_states{
+    PinState(0, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_0), true),
+    PinState(1, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_1), false),
+    PinState(2, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_2), true),
+    PinState(3, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_3), false),
+    PinState(4, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_4), true),
+    PinState(5, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_5), false),
+    PinState(6, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_6), true),
+    PinState(7, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_7), false),
+
+    // unused bytes
+
+    PinState(32, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::muting_1_a), true),
+    PinState(33, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::muting_2_a), false),
+    // unused bit
+    PinState(35, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::overr_1_a), false),
+    PinState(36, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::overr_2_a), true),
+    // unused bit
+    PinState(38, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_1), true),
+    PinState(39, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_2), false),
+
+    PinState(40, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_3), true),
+    PinState(41, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_4), false),
+    PinState(42, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_5), true),
+    PinState(43, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_6), false),
+    PinState(44, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_7), true),
+    PinState(45, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_8), false),
+    PinState(46, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::reset_a), true),
+    // unused bit
+
+    PinState(48, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::restart_1_a), true),
+    PinState(49, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::mut_en_1_a), false),
+    PinState(50, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::cor_seq_mut_1), true),
+    PinState(51, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::cor_seq_or_1), false),
+    // unused bit
+    PinState(53, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::restart_2_a), false),
+    PinState(54, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::mut_en_2_a), true),
+    PinState(55, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::cor_seq_mut_2), false),
+
+    PinState(56, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::cor_seq_or_2), false),
+    // unused bits
+  };
 
   EXPECT_CONTAINER_UNORDERED_EQ(input, expected_states);
 }
@@ -332,39 +362,21 @@ TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectOutputField)
   std::stringstream ss;
   ss.write(raw.data(), 4);
   auto output = deserializePinField(ss, 4, createOutputPinState);
+
   std::vector<PinState> expected_states{
-    PinState(0, OUTPUT_BIT_TO_NAME.at(OutputType::ossd1), true),
-    PinState(1, OUTPUT_BIT_TO_NAME.at(OutputType::ossd1_lock), false),
-    PinState(2, OUTPUT_BIT_TO_NAME.at(OutputType::ossd2), true),
-    PinState(3, OUTPUT_BIT_TO_NAME.at(OutputType::ossd2_lock), false),
-    PinState(4, OUTPUT_BIT_TO_NAME.at(OutputType::ossd3), true),
-    PinState(5, OUTPUT_BIT_TO_NAME.at(OutputType::ossd3_lock), false),
-    PinState(6, OUTPUT_BIT_TO_NAME.at(OutputType::warn1), true),
-    PinState(7, OUTPUT_BIT_TO_NAME.at(OutputType::warn2), false),
-    PinState(8, OUTPUT_BIT_TO_NAME.at(OutputType::ossd1_m), true),
-    PinState(9, OUTPUT_BIT_TO_NAME.at(OutputType::ossd2_m), false),
-    PinState(10, OUTPUT_BIT_TO_NAME.at(OutputType::ossd3_m), true),
-    PinState(11, OUTPUT_BIT_TO_NAME.at(OutputType::warn1_m), false),
-    PinState(12, OUTPUT_BIT_TO_NAME.at(OutputType::warn2_m), true),
-    PinState(13, OUTPUT_BIT_TO_NAME.at(OutputType::ossd1_slv1), false),
-    PinState(14, OUTPUT_BIT_TO_NAME.at(OutputType::ossd2_slv1), true),
-    PinState(15, OUTPUT_BIT_TO_NAME.at(OutputType::ossd3_slv1), false),
-    PinState(16, OUTPUT_BIT_TO_NAME.at(OutputType::warn1_slv1), true),
-    PinState(17, OUTPUT_BIT_TO_NAME.at(OutputType::warn2_slv1), false),
-    PinState(18, OUTPUT_BIT_TO_NAME.at(OutputType::ossd1_slv2), true),
-    PinState(19, OUTPUT_BIT_TO_NAME.at(OutputType::ossd2_slv2), false),
-    PinState(20, OUTPUT_BIT_TO_NAME.at(OutputType::ossd3_slv2), true),
-    PinState(21, OUTPUT_BIT_TO_NAME.at(OutputType::warn1_slv2), false),
-    PinState(22, OUTPUT_BIT_TO_NAME.at(OutputType::warn2_slv2), true),
-    PinState(23, OUTPUT_BIT_TO_NAME.at(OutputType::ossd1_slv3), false),
-    PinState(24, OUTPUT_BIT_TO_NAME.at(OutputType::ossd2_slv3), false),
-    PinState(25, OUTPUT_BIT_TO_NAME.at(OutputType::ossd3_slv3), false),
-    PinState(26, OUTPUT_BIT_TO_NAME.at(OutputType::warn1_slv3), false),
-    PinState(27, OUTPUT_BIT_TO_NAME.at(OutputType::warn2_slv3), false),
+    PinState(0, OUTPUT_BIT_TO_NAME.at(OutputType::safe_1_int), true),
+    PinState(1, OUTPUT_BIT_TO_NAME.at(OutputType::int_lock_1), false),
+    PinState(2, OUTPUT_BIT_TO_NAME.at(OutputType::safe_2_int), true),
+    PinState(3, OUTPUT_BIT_TO_NAME.at(OutputType::int_lock_2), false),
+    PinState(4, OUTPUT_BIT_TO_NAME.at(OutputType::safe_3_int), true),
+    // unused bit
+    PinState(6, OUTPUT_BIT_TO_NAME.at(OutputType::warn_1_int), true),
+    PinState(7, OUTPUT_BIT_TO_NAME.at(OutputType::warn_2_int), false),
+
+    // unused bytes
+
     PinState(28, OUTPUT_BIT_TO_NAME.at(OutputType::ossd1_refpts), false),
-    // unused bit
-    // unused bit
-    // unused bit
+    // unused bits
   };
 
   EXPECT_CONTAINER_UNORDERED_EQ(output, expected_states);
