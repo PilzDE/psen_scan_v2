@@ -192,33 +192,19 @@ TEST_F(RosScannerNodeTests, shouldThrowDelayedExceptionSetInScannerStartFuture)
 TEST_F(RosScannerNodeTests, shouldProvideScanTopic)
 {
   ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
-
-  util::Barrier start_barrier;
-  setDefaultActions(ros_scanner_node.scanner_, start_barrier);
-
-  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
-  ASSERT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
-
   EXPECT_TRUE(TopicExists("/integrationtest_ros_scanner_node/scan"));
-
-  ros_scanner_node.terminate();
-  loop.wait_for(LOOP_END_TIMEOUT);
 }
 
 TEST_F(RosScannerNodeTests, shouldProvideActiveZonesetTopic)
 {
   ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
-
-  util::Barrier start_barrier;
-  setDefaultActions(ros_scanner_node.scanner_, start_barrier);
-
-  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
-  ASSERT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
-
   EXPECT_TRUE(TopicExists("/integrationtest_ros_scanner_node/active_zoneset"));
+}
 
-  ros_scanner_node.terminate();
-  loop.wait_for(LOOP_END_TIMEOUT);
+TEST_F(RosScannerNodeTests, shouldProvideIOTopic)
+{
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
+  EXPECT_TRUE(TopicExists("/integrationtest_ros_scanner_node/io_state"));
 }
 
 TEST_F(RosScannerNodeTests, shouldPublishScansWhenLaserScanCallbackIsInvoked)
