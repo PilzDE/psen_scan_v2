@@ -75,6 +75,15 @@ MATCHER_P(MonitoringFrameEq, reference_msg, "")
          Matches(PointwiseDoubleEq(reference_msg.intensities()))(arg.intensities()) &&
          Matches(Pointwise(Eq(), reference_msg.diagnosticMessages()))(arg.diagnosticMessages());
 }
+
+MATCHER_P(IOPinEq, ref_pin, "")
+{
+  return Matches(Pointwise(Eq(), ref_pin.physical_input_0))(arg.physical_input_0) &&
+         Matches(Pointwise(Eq(), ref_pin.physical_input_1))(arg.physical_input_1) &&
+         Matches(Pointwise(Eq(), ref_pin.physical_input_2))(arg.physical_input_2) &&
+         Matches(Pointwise(Eq(), ref_pin.logical_input))(arg.logical_input) &&
+         Matches(Pointwise(Eq(), ref_pin.output))(arg.output);
+}
 }  // namespace psen_scan_v2_standalone_test
 
 #endif  // PSEN_SCAN_V2_STANDALONE_TEST_MATCHERS_AND_ACTIONS_H

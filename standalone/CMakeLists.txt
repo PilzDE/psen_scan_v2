@@ -197,7 +197,7 @@ ADD_EXECUTABLE(unittest_monitoring_frame_msg test/unit_tests/data_conversion_lay
 
 TARGET_LINK_LIBRARIES(unittest_monitoring_frame_msg
     ${PROJECT_NAME}
-    gtest
+    gtest gmock
 )
 
 ADD_TEST(NAME unittest_monitoring_frame_msg

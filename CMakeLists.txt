@@ -393,7 +393,7 @@ if(CATKIN_ENABLE_TESTING)
     fmt::fmt
   )
 
-  catkin_add_gtest(unittest_monitoring_frame_msg
+  catkin_add_gmock(unittest_monitoring_frame_msg
     standalone/test/unit_tests/data_conversion_layer/unittest_monitoring_frame_msg.cpp
     standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
     standalone/src/data_conversion_layer/diagnostics.cpp
