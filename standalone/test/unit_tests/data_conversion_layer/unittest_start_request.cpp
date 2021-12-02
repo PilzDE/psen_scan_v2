@@ -47,7 +47,7 @@ public:
     intensities_enabled = 0x1B,
     point_in_safety_enabled = 0x1C,
     active_zone_set_enabled = 0x1D,
-    io_pin_enabled = 0x1E,
+    io_pin_data_enabled = 0x1E,
     scan_counter_enabled = 0x1F,
     speed_encoder_enabled = 0x20,
     diagnostics_enabled = 0x21,
@@ -115,7 +115,7 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::intensities_enabled), 0b00000000));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::point_in_safety_enabled), 0));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::active_zone_set_enabled), 0b00001000));
-  EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::io_pin_enabled), 0b00001000));
+  EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::io_pin_data_enabled), 0b00001000));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::scan_counter_enabled), 0b00001000));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::speed_encoder_enabled), 0));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::diagnostics_enabled), 0));

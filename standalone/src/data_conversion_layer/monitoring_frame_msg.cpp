@@ -78,15 +78,15 @@ uint8_t Message::activeZoneset() const
   }
 }
 
-const io::IOPin& Message::iOPin() const
+const io::PinData& Message::iOPinData() const
 {
-  if (io_pin_.is_initialized())
+  if (io_pin_data_.is_initialized())
   {
-    return io_pin_.get();
+    return io_pin_data_.get();
   }
   else
   {
-    throw AdditionalFieldMissing("IO pin");
+    throw AdditionalFieldMissing("IO pin data");
   }
 }
 
@@ -138,7 +138,7 @@ bool Message::hasActiveZonesetField() const
 
 bool Message::hasIOPinField() const
 {
-  return io_pin_.is_initialized();
+  return io_pin_data_.is_initialized();
 }
 
 bool Message::hasMeasurementsField() const

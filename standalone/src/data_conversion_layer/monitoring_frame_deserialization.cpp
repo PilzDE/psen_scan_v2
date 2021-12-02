@@ -23,7 +23,7 @@
 #include <fmt/format.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/io_pin.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
@@ -132,8 +132,8 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
         msg_builder.activeZoneset(zone_set_read_buffer);
         break;
 
-      case AdditionalFieldHeaderID::io_pins:
-        msg_builder.iOPin(io::deserializePins(ss));
+      case AdditionalFieldHeaderID::io_pin_data:
+        msg_builder.iOPinData(io::deserializePins(ss));
         break;
 
       case AdditionalFieldHeaderID::diagnostics:
@@ -198,26 +198,29 @@ std::vector<PinState> deserializePinField(std::istream& is,
   return pin_field;
 }
 
-IOPin deserializePins(std::istream& is)
+PinData deserializePins(std::istream& is)
 {
-  IOPin io_pin;
+  PinData io_pin_data;
 
   raw_processing::read<std::array<uint8_t, RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  io_pin.physical_input_0 = deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, createInputPinState);
+  io_pin_data.physical_input_0 =
+      deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, createInputPinState);
 
   raw_processing::read<std::array<uint8_t, RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  io_pin.physical_input_1 = deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, createInputPinState);
+  io_pin_data.physical_input_1 =
+      deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, createInputPinState);
 
   raw_processing::read<std::array<uint8_t, RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  io_pin.physical_input_2 = deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, createInputPinState);
+  io_pin_data.physical_input_2 =
+      deserializePinField(is, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES, createInputPinState);
 
   raw_processing::read<std::array<uint8_t, RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  io_pin.logical_input = deserializePinField(is, RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES, createLogicalPinState);
+  io_pin_data.logical_input = deserializePinField(is, RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES, createLogicalPinState);
 
   raw_processing::read<std::array<uint8_t, RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  io_pin.output = deserializePinField(is, RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES, createOutputPinState);
+  io_pin_data.output = deserializePinField(is, RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES, createOutputPinState);
 
-  return io_pin;
+  return io_pin_data;
 }
 }  // namespace io
 

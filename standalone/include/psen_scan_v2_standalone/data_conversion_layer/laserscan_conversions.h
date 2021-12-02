@@ -114,7 +114,7 @@ inline LaserScan LaserScanConverter::toLaserScan(
     }
     if (stamped_msgs[index].msg_.hasIOPinField())
     {
-      auto io = stamped_msgs[index].msg_.iOPin();
+      auto io = stamped_msgs[index].msg_.iOPinData();
       io_states.push_back(IOState(io.physical_input_0, io.logical_input, io.output));
       io_states.push_back(IOState(io.physical_input_1, io.logical_input, io.output));
       io_states.push_back(IOState(io.physical_input_2, io.logical_input, io.output));

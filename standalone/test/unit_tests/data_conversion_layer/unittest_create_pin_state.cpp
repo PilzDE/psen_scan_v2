@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "psen_scan_v2_standalone/io_state.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/io_pin.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 
 namespace psen_scan_v2_standalone_test
 {

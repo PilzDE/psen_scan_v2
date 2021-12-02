@@ -23,7 +23,7 @@
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/io_pin.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
@@ -132,7 +132,7 @@ private:
 
 enum class AdditionalFieldHeaderID : AdditionalFieldHeader::Id
 {
-  io_pins = 0x01,
+  io_pin_data = 0x01,
   scan_counter = 0x02,
   zone_set = 0x03,
   diagnostics = 0x04,
@@ -152,8 +152,8 @@ std::vector<diagnostic::Message> deserializeMessages(std::istream& is);
 
 namespace io
 {
-IOPin::States deserializePinField(std::istream& is, std::size_t length_in_bytes, const AddPinStateFunction& add_func);
-IOPin deserializePins(std::istream& is);
+PinData::States deserializePinField(std::istream& is, std::size_t length_in_bytes, const AddPinStateFunction& add_func);
+PinData deserializePins(std::istream& is);
 }  // namespace io
 
 /**

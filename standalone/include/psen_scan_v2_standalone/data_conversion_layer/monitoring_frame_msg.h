@@ -26,7 +26,7 @@
 
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/io_pin.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
@@ -70,8 +70,8 @@ public:
   uint32_t scanCounter() const;
   //! @throw AdditionalFieldMissing if active_zoneset was missing during deserialization of a Message.
   uint8_t activeZoneset() const;
-  //! @throw AdditionalFieldMissing if io_pin was missing during deserialization of a Message.
-  const io::IOPin& iOPin() const;
+  //! @throw AdditionalFieldMissing if io_pin_data was missing during deserialization of a Message.
+  const io::PinData& iOPinData() const;
   //! @throw AdditionalFieldMissing if measurements were missing during deserialization of a Message.
   const std::vector<double>& measurements() const;
   //! @throw AdditionalFieldMissing if intensities were missing during deserialization of a Message.
@@ -94,7 +94,7 @@ private:
   // additional fields
   boost::optional<uint32_t> scan_counter_;
   boost::optional<uint8_t> active_zoneset_;
-  boost::optional<io::IOPin> io_pin_;
+  boost::optional<io::PinData> io_pin_data_;
   boost::optional<std::vector<double>> measurements_;
   boost::optional<std::vector<double>> intensities_;
   boost::optional<std::vector<diagnostic::Message>> diagnostic_messages_;

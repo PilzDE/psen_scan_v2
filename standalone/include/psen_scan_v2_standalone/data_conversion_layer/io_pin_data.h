@@ -77,7 +77,7 @@ inline PinState createOutputPinState(size_t byte_n, size_t bit_n, bool value)
 /**
  * @brief Represents the IO PIN field of a monitoring frame.
  */
-struct IOPin
+struct PinData
 {
   using States = std::vector<PinState>;
   States physical_input_0{};

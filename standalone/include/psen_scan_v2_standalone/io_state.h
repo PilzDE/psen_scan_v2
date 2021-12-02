@@ -90,9 +90,7 @@ class IOState
 {
 public:
   IOState() = default;
-  IOState(std::vector<PinState> physical_input,
-          std::vector<PinState> logical_input,
-          std::vector<PinState> output);
+  IOState(std::vector<PinState> physical_input, std::vector<PinState> logical_input, std::vector<PinState> output);
   std::vector<PinState> physicalInput() const;
   std::vector<PinState> logicalInput() const;
   std::vector<PinState> output() const;
@@ -106,9 +104,7 @@ private:
 inline IOState::IOState(std::vector<PinState> physical_input,
                         std::vector<PinState> logical_input,
                         std::vector<PinState> output)
-  : physical_input_(std::move(physical_input))
-  , logical_input_(std::move(logical_input))
-  , output_(std::move(output))
+  : physical_input_(std::move(physical_input)), logical_input_(std::move(logical_input)), output_(std::move(output))
 {
 }
 
@@ -129,11 +125,10 @@ inline std::vector<PinState> IOState::output() const
 
 inline std::ostream& operator<<(std::ostream& os, const IOState& io_state)
 {
-  return os << fmt::format(
-             "IOState(physicalInput = {}, logicalInput = {}, output = {})",
-             util::formatRange(io_state.physicalInput()),
-             util::formatRange(io_state.logicalInput()),
-             util::formatRange(io_state.output()));
+  return os << fmt::format("IOState(physicalInput = {}, logicalInput = {}, output = {})",
+                           util::formatRange(io_state.physicalInput()),
+                           util::formatRange(io_state.logicalInput()),
+                           util::formatRange(io_state.output()));
 }
 }  // namespace psen_scan_v2_standalone
 

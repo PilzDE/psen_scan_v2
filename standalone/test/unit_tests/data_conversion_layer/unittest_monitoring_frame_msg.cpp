@@ -22,7 +22,7 @@
 #include <fmt/ostream.h>
 
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/io_pin.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
@@ -60,13 +60,15 @@ TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUns
 
 TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetActiveZoneset)
 {
-  EXPECT_THROW_AND_WHAT(
-      FrameMessage().activeZoneset(), AdditionalFieldMissing, ("Active zoneset" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
+  EXPECT_THROW_AND_WHAT(FrameMessage().activeZoneset(),
+                        AdditionalFieldMissing,
+                        ("Active zoneset" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
 TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetIOPin)
 {
-  EXPECT_THROW_AND_WHAT(FrameMessage().iOPin(), AdditionalFieldMissing, ("IO pin" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
+  EXPECT_THROW_AND_WHAT(
+      FrameMessage().iOPinData(), AdditionalFieldMissing, ("IO pin data" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
 TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetDiagnosticMessages)
@@ -109,7 +111,7 @@ TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfDiagnosticMessages)
 TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfIOPin)
 {
   EXPECT_FALSE(MessageBuilder().build().hasIOPinField());
-  EXPECT_TRUE(MessageBuilder().iOPin(io::IOPin()).build().hasIOPinField());
+  EXPECT_TRUE(MessageBuilder().iOPinData(io::PinData()).build().hasIOPinField());
 }
 
 TEST(MonitoringFrameMsgTest, shouldReturnCorrectScannerId)
@@ -164,15 +166,15 @@ TEST(MonitoringFrameMsgTest, shouldReturnCorrectIntensities)
 
 TEST(MonitoringFrameMsgTest, shouldReturnCorrectIOPin)
 {
-  io::IOPin expected_io_pin;
-  expected_io_pin.physical_input_0 = { PinState(1, "zone1", true) };
-  expected_io_pin.physical_input_1 = { PinState(2, "zone2", false) };
-  expected_io_pin.physical_input_2 = { PinState(5, "zone1", false) };
-  expected_io_pin.logical_input = { PinState(3, "zone1", true) };
-  expected_io_pin.output = { PinState(1, "OSSD", false) };
-  io::IOPin io_pin;
-  ASSERT_NO_THROW(io_pin = MessageBuilder().iOPin(expected_io_pin).build().iOPin());
-  EXPECT_THAT(io_pin, IOPinEq(expected_io_pin));
+  io::PinData expected_io_pin_data;
+  expected_io_pin_data.physical_input_0 = { PinState(1, "zone1", true) };
+  expected_io_pin_data.physical_input_1 = { PinState(2, "zone2", false) };
+  expected_io_pin_data.physical_input_2 = { PinState(5, "zone1", false) };
+  expected_io_pin_data.logical_input = { PinState(3, "zone1", true) };
+  expected_io_pin_data.output = { PinState(1, "OSSD", false) };
+  io::PinData io_pin_data;
+  ASSERT_NO_THROW(io_pin_data = MessageBuilder().iOPinData(expected_io_pin_data).build().iOPinData());
+  EXPECT_THAT(io_pin_data, IOPinEq(expected_io_pin_data));
 }
 
 TEST(MonitoringFrameMsgTest, shouldReturnCorrectDiagnosticMessages)

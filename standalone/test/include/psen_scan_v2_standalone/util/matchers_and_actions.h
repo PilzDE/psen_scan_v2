@@ -83,7 +83,7 @@ MATCHER_P(MonitoringFrameEq, reference_msg, "")
          Matches(PointwiseDoubleEq(reference_msg.measurements()))(arg.measurements()) &&
          Matches(PointwiseDoubleEq(reference_msg.intensities()))(arg.intensities()) &&
          Matches(Pointwise(Eq(), reference_msg.diagnosticMessages()))(arg.diagnosticMessages()) &&
-         Matches(IOPinEq(reference_msg.iOPin()))(arg.iOPin());
+         Matches(IOPinEq(reference_msg.iOPinData()))(arg.iOPinData());
 }
 }  // namespace psen_scan_v2_standalone_test
 

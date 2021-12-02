@@ -20,7 +20,7 @@
 #include <gmock/gmock.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/io_pin.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
