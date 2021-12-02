@@ -70,16 +70,19 @@ public:
 
   MOCK_METHOD1(scan_callback, void(const sensor_msgs::LaserScan& msg));
   MOCK_METHOD1(zone_callback, void(const ros::MessageEvent<std_msgs::UInt8 const>& event));
+  MOCK_METHOD1(io_callback, void(const IOState& msg));
 
 private:
   ros::Subscriber scan_subscriber_;
   ros::Subscriber zone_subscriber_;
+  ros::Subscriber io_subscriber_;
 };
 
 inline SubscriberMock::SubscriberMock(ros::NodeHandle& nh)
 {
   scan_subscriber_ = nh.subscribe("scan", QUEUE_SIZE, &SubscriberMock::scan_callback, this);
   zone_subscriber_ = nh.subscribe("active_zoneset", QUEUE_SIZE, &SubscriberMock::zone_callback, this);
+  io_subscriber_ = nh.subscribe("io_state", QUEUE_SIZE, &SubscriberMock::io_callback, this);
 }
 
 static const std::string HOST_IP{ "127.0.0.1" };
@@ -112,7 +115,8 @@ static standalone::LaserScan createValidLaserScan(const uint8_t active_zoneset =
 {
   standalone::LaserScan laser_scan_fake(
       util::TenthOfDegree(1), util::TenthOfDegree(3), util::TenthOfDegree(5), 14, active_zoneset, 1000000000);
-  laser_scan_fake.getMeasurements().push_back(1);
+  laser_scan_fake.setMeasurements({ 0.1, 2.31 });
+  laser_scan_fake.setIntensities({ 1.0, 0.3 });
   return laser_scan_fake;
 }
 
@@ -252,6 +256,49 @@ TEST_F(RosScannerNodeTests, shouldPublishActiveZonesetWhenLaserScanCallbackIsInv
   ros_scanner_node.scanner_.invokeLaserScanCallback(createValidLaserScan(first_zone));
   ros_scanner_node.scanner_.invokeLaserScanCallback(createValidLaserScan(second_zone));
   zoneset_topic_barrier.waitTillRelease(DEFAULT_TIMEOUT);
+
+  ros_scanner_node.terminate();
+  loop.wait_for(LOOP_END_TIMEOUT);
+}
+
+static const standalone::LaserScan::IOData IO_DATA1{
+  { standalone::IOState({ standalone::PinState(1, "input0", true) }, {}, { standalone::PinState(14, "output", false) }),
+    standalone::IOState({},
+                        { standalone::PinState(21, "logical", true), standalone::PinState(3, "logical2", false) },
+                        {}) }
+};
+static const standalone::LaserScan::IOData IO_DATA2{ {
+    standalone::IOState({ standalone::PinState(3, "input0", false) }, {}, {}),
+} };
+
+TEST_F(RosScannerNodeTests, shouldPublishIOStatesEqualToConversionOfSuppliedStandaloneIOStates)
+{
+  const std::string prefix{ "scanner" };
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", prefix, 1.0 /*x_axis_rotation*/, scanner_config_);
+
+  auto scan = createValidLaserScan();
+
+  util::Barrier io_topic_barrier;
+  SubscriberMock subscriber(nh_priv_);
+  {
+    InSequence s;
+    EXPECT_CALL(subscriber, io_callback(toIOStateMsg(IO_DATA1.at(0), prefix, scan.getTimestamp()))).Times(1);
+    EXPECT_CALL(subscriber, io_callback(toIOStateMsg(IO_DATA1.at(1), prefix, scan.getTimestamp()))).Times(1);
+    EXPECT_CALL(subscriber, io_callback(toIOStateMsg(IO_DATA2.at(0), prefix, scan.getTimestamp())))
+        .WillOnce(standalone_test::OpenBarrier(&io_topic_barrier));
+  }
+
+  util::Barrier start_barrier;
+  setDefaultActions(ros_scanner_node.scanner_, start_barrier);
+
+  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
+  ASSERT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
+
+  scan.setIOStates(IO_DATA1);
+  ros_scanner_node.scanner_.invokeLaserScanCallback(scan);
+  scan.setIOStates(IO_DATA2);
+  ros_scanner_node.scanner_.invokeLaserScanCallback(scan);
+  io_topic_barrier.waitTillRelease(DEFAULT_TIMEOUT);
 
   ros_scanner_node.terminate();
   loop.wait_for(LOOP_END_TIMEOUT);
