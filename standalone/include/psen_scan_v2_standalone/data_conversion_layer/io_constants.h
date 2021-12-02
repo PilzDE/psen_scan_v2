@@ -29,16 +29,19 @@ namespace monitoring_frame
 namespace io
 {
 /**
- * @brief Contains constants and types needed to define the io::Message.
+ * @brief Contains constants and types needed to define PinData and for the (de)serialization.
  */
 static constexpr uint32_t RAW_CHUNK_LENGTH_RESERVED_IN_BYTES{ 4 };
 static constexpr uint32_t RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES{ 10 };
 static constexpr uint32_t RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES{ 8 };
 static constexpr uint32_t RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES{ 4 };
 static constexpr uint32_t RAW_CHUNK_LENGTH_IN_BYTES{
-  RAW_CHUNK_LENGTH_RESERVED_IN_BYTES + RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES + RAW_CHUNK_LENGTH_RESERVED_IN_BYTES +
-  RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES + RAW_CHUNK_LENGTH_RESERVED_IN_BYTES + RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES
+  3 * (RAW_CHUNK_LENGTH_RESERVED_IN_BYTES + RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES) +
+  RAW_CHUNK_LENGTH_RESERVED_IN_BYTES + RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES + RAW_CHUNK_LENGTH_RESERVED_IN_BYTES +
+  RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES
 };
+
+using RawChunk = std::array<uint8_t, io::RAW_CHUNK_LENGTH_IN_BYTES>;
 
 // clang-format off
 enum class PhysicalInputType
@@ -112,9 +115,9 @@ static const std::map<Pit, IoName> PHYSICAL_INPUT_BIT_TO_NAME
   { Pit::edm_1, "EDM 1" },
 };
 
-  #define REV(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) arg8, arg7, arg6, arg5, arg4, arg3, arg2, arg1
+#define REV(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) arg8, arg7, arg6, arg5, arg4, arg3, arg2, arg1
 
-  static constexpr std::array<std::array<Pit, 8>, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES> PHYSICAL_INPUT_BITS{{
+static constexpr std::array<std::array<Pit, 8>, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES> PHYSICAL_INPUT_BITS{{
   //    Bit7              Bit6              Bit5              Bit4              Bit3              Bit2              Bit1              Bit0
   {     Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused },
   {     Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused },
@@ -126,7 +129,7 @@ static const std::map<Pit, IoName> PHYSICAL_INPUT_BIT_TO_NAME
   { REV(Pit::override_12, Pit::override_11, Pit::muting_12,   Pit::muting_11,   Pit::muting_en_1, Pit::restart_1,   Pit::unused,      Pit::reset) },
   { REV(Pit::edm_2,       Pit::override_22, Pit::override_21, Pit::muting_22,   Pit::muting_21,   Pit::muting_en_2, Pit::restart_2,   Pit::edm_1) },
   {     Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused,      Pit::unused },
-  }};
+}};
 
 enum class LogicalInputType
 {
@@ -207,7 +210,7 @@ static const std::map<Lit, IoName> LOGICAL_INPUT_BIT_TO_NAME
   { Lit::unused, "unused" },
 };
 
-  static constexpr std::array<std::array<Lit, 8>, RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES> LOGICAL_INPUT_BITS{{
+static constexpr std::array<std::array<Lit, 8>, RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES> LOGICAL_INPUT_BITS{{
   //    Bit7                Bit6             Bit5              Bit4             Bit3               Bit2                Bit1             Bit0
   { REV(Lit::zone_bit_7,    Lit::zone_bit_6, Lit::zone_bit_5,  Lit::zone_bit_4, Lit::zone_bit_3,   Lit::zone_bit_2,    Lit::zone_bit_1, Lit::zone_bit_0) },
   {     Lit::unused,        Lit::unused,     Lit::unused,      Lit::unused,     Lit::unused,       Lit::unused,        Lit::unused,     Lit::unused },
@@ -217,7 +220,7 @@ static const std::map<Lit, IoName> LOGICAL_INPUT_BIT_TO_NAME
   { REV(Lit::unused,        Lit::reset_a,    Lit::zone_sw_8,   Lit::zone_sw_7,  Lit::zone_sw_6,    Lit::zone_sw_5,     Lit::zone_sw_4,  Lit::zone_sw_3) },
   { REV(Lit::cor_seq_mut_2, Lit::mut_en_2_a, Lit::restart_2_a, Lit::unused,     Lit::cor_seq_or_1, Lit::cor_seq_mut_1, Lit::mut_en_1_a, Lit::restart_1_a) },
   { REV(Lit::unused,        Lit::unused,     Lit::unused,      Lit::unused,     Lit::unused,       Lit::unused,        Lit::unused,     Lit::cor_seq_or_2) },
-  }};
+}};
 
 
 enum class OutputType
@@ -251,13 +254,13 @@ static const std::map<Ot, IoName> OUTPUT_BIT_TO_NAME
   { Ot::safe_1_int, "Safety 1 intrusion" }
 };
 
-  static constexpr std::array<std::array<Ot, 8>, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES> OUTPUT_BITS{{
-//      Bit7            Bit6            Bit5          Bit4              Bit3            Bit2            Bit1            Bit0
+static constexpr std::array<std::array<Ot, 8>, RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES> OUTPUT_BITS{{
+  //      Bit7            Bit6            Bit5          Bit4              Bit3            Bit2            Bit1            Bit0
   { REV(Ot::warn_2_int, Ot::warn_1_int, Ot::unused,   Ot::safe_3_int,   Ot::int_lock_2, Ot::safe_2_int, Ot::int_lock_1, Ot::safe_1_int) },
   { REV(Ot::unused,     Ot::unused,     Ot::unused,   Ot::unused,       Ot::unused,     Ot::unused,     Ot::unused,     Ot::unused) },
   { REV(Ot::unused,     Ot::unused,     Ot::unused,   Ot::unused,       Ot::unused,     Ot::unused,     Ot::unused,     Ot::unused) },
   { REV(Ot::unused,     Ot::unused,     Ot::unused,   Ot::ossd1_refpts, Ot::unused,     Ot::unused,     Ot::unused,     Ot::unused) }
-  }};
+}};
 // clang-format on
 
 }  // namespace io

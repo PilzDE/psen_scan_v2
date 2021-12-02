@@ -26,6 +26,12 @@ namespace data_conversion_layer
 {
 namespace monitoring_frame
 {
+std::size_t sizeOfIOPinData(const io::PinData& pin_data)
+{
+  return pin_data.physical_input_0.size() + pin_data.physical_input_1.size() + pin_data.physical_input_2.size() +
+         pin_data.logical_input.size() + pin_data.output.size();
+}
+
 RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
 {
   std::ostringstream os;
@@ -43,8 +49,8 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
     AdditionalFieldHeader scan_counter_header(
         static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::scan_counter), sizeof(msg.scanCounter()));
     write(os, scan_counter_header);
-    uint32_t scan_counter_header_payload = msg.scanCounter();
-    raw_processing::write(os, scan_counter_header_payload);
+    uint32_t scan_counter_payload = msg.scanCounter();
+    raw_processing::write(os, scan_counter_payload);
   }
   catch (const AdditionalFieldMissing& /*unused*/)
   {
@@ -52,12 +58,12 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
 
   try
   {
-    diagnostic::RawChunk diagnostic_data_field_payload = diagnostic::serialize(msg.diagnosticMessages());
-    AdditionalFieldHeader diagnostic_data_field_header(
+    diagnostic::RawChunk diagnostic_data_payload = diagnostic::serialize(msg.diagnosticMessages());
+    AdditionalFieldHeader diagnostic_data_header(
         static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::diagnostics),
         diagnostic::RAW_CHUNK_LENGTH_IN_BYTES);
-    write(os, diagnostic_data_field_header);
-    data_conversion_layer::raw_processing::write(os, diagnostic_data_field_payload);
+    write(os, diagnostic_data_header);
+    data_conversion_layer::raw_processing::write(os, diagnostic_data_payload);
   }
   catch (const AdditionalFieldMissing& /*unused*/)
   {
@@ -99,8 +105,20 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
     AdditionalFieldHeader zoneset_header(static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::zone_set),
                                          sizeof(msg.activeZoneset()));
     write(os, zoneset_header);
-    uint8_t zoneset_header_payload = msg.activeZoneset();
-    raw_processing::write(os, zoneset_header_payload);
+    uint8_t zoneset_payload = msg.activeZoneset();
+    raw_processing::write(os, zoneset_payload);
+  }
+  catch (const AdditionalFieldMissing& /*unused*/)
+  {
+  }
+
+  try
+  {
+    AdditionalFieldHeader io_pin_data_header(
+        static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::io_pin_data), io::RAW_CHUNK_LENGTH_IN_BYTES);
+    write(os, io_pin_data_header);
+    io::RawChunk io_pin_data_payload = io::serialize(msg.iOPinData());
+    raw_processing::write(os, io_pin_data_payload);
   }
   catch (const AdditionalFieldMissing& /*unused*/)
   {
@@ -139,6 +157,50 @@ RawChunk serialize(const std::vector<data_conversion_layer::monitoring_frame::di
   return raw_diagnostic_data;
 }
 }  // namespace diagnostic
+
+namespace io
+{
+std::size_t calculateByteLocation(uint32_t id)
+{
+  return id / 8;
+}
+
+std::size_t calculateBitLocation(uint32_t id)
+{
+  return id % 8;
+}
+
+void serializeSingleRecord(RawChunk& raw_pin_data, const PinData::States& pin_states, std::size_t offset)
+{
+  for (const auto& pin_state : pin_states)
+  {
+    if (pin_state.state())
+    {
+      raw_pin_data.at(offset + calculateByteLocation(pin_state.id())) += (1 << calculateBitLocation(pin_state.id()));
+    }
+  }
+}
+
+RawChunk serialize(const PinData& pin_data)
+{
+  RawChunk raw_pin_data{};
+  std::size_t offset = RAW_CHUNK_LENGTH_RESERVED_IN_BYTES;
+  serializeSingleRecord(raw_pin_data, pin_data.physical_input_0, offset);
+  offset += RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES + RAW_CHUNK_LENGTH_RESERVED_IN_BYTES;
+
+  serializeSingleRecord(raw_pin_data, pin_data.physical_input_1, offset);
+  offset += RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES + RAW_CHUNK_LENGTH_RESERVED_IN_BYTES;
+
+  serializeSingleRecord(raw_pin_data, pin_data.physical_input_2, offset);
+  offset += RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES + RAW_CHUNK_LENGTH_RESERVED_IN_BYTES;
+
+  serializeSingleRecord(raw_pin_data, pin_data.logical_input, offset);
+  offset += RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES + RAW_CHUNK_LENGTH_RESERVED_IN_BYTES;
+
+  serializeSingleRecord(raw_pin_data, pin_data.output, offset);
+  return raw_pin_data;
+}
+}  // namespace io
 
 void write(std::ostringstream& os, const AdditionalFieldHeader& header)
 {

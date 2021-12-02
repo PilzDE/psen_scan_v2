@@ -174,7 +174,7 @@ TEST(MonitoringFrameMsgTest, shouldReturnCorrectIOPin)
   expected_io_pin_data.output = { PinState(1, "OSSD", false) };
   io::PinData io_pin_data;
   ASSERT_NO_THROW(io_pin_data = MessageBuilder().iOPinData(expected_io_pin_data).build().iOPinData());
-  EXPECT_THAT(io_pin_data, IOPinEq(expected_io_pin_data));
+  EXPECT_THAT(io_pin_data, IOPinDataEq(expected_io_pin_data));
 }
 
 TEST(MonitoringFrameMsgTest, shouldReturnCorrectDiagnosticMessages)

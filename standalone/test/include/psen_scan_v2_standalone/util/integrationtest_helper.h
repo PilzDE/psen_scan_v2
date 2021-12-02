@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <ostream>
 #include <random>
 #include <vector>
 
@@ -26,10 +27,13 @@
 
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/laserscan_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
+#include "psen_scan_v2_standalone/util/format_range.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
+#include "psen_scan_v2_standalone/io_state.h"
 #include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/scan_range.h"
 
@@ -70,6 +74,54 @@ static std::vector<double> generateIntensities(const unsigned int& num_elements,
   return vec;
 }
 
+static void setPin(PinState& pin_state)
+{
+  pin_state = PinState(pin_state.id(), pin_state.name(), true);
+}
+
+static data_conversion_layer::monitoring_frame::io::PinData createCompleteIOPinData()
+{
+  using namespace data_conversion_layer::monitoring_frame::io;
+  PinData pin_data;
+  // First fill everything
+  for (std::size_t bit = 0; bit < 8; ++bit)
+  {
+    for (std::size_t byte = 0; byte < RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES; ++byte)
+    {
+      const auto pin_state = createInputPinState(byte, bit, false);
+      if (pin_state.name() != "unused")
+      {
+        pin_data.physical_input_0.push_back(pin_state);
+        pin_data.physical_input_1.push_back(pin_state);
+        pin_data.physical_input_2.push_back(pin_state);
+      }
+    }
+    for (std::size_t byte = 0; byte < RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES; ++byte)
+    {
+      const auto pin_state = createLogicalPinState(byte, bit, false);
+      if (pin_state.name() != "unused")
+      {
+        pin_data.logical_input.push_back(pin_state);
+      }
+    }
+    for (std::size_t byte = 0; byte < RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES; ++byte)
+    {
+      const auto pin_state = createOutputPinState(byte, bit, false);
+      if (pin_state.name() != "unused")
+      {
+        pin_data.output.push_back(pin_state);
+      }
+    }
+  }
+  // Set arbitrary pins
+  setPin(pin_data.physical_input_0.at(3));
+  setPin(pin_data.physical_input_0.at(11));
+  setPin(pin_data.physical_input_2.at(21));
+  setPin(pin_data.logical_input.at(8));
+  setPin(pin_data.output.at(2));
+  return pin_data;
+}
+
 static data_conversion_layer::monitoring_frame::Message
 createValidMonitoringFrameMsg(const uint32_t scan_counter = 42,
                               const util::TenthOfDegree start_angle = DEFAULT_SCAN_RANGE.getStart(),
@@ -77,11 +129,6 @@ createValidMonitoringFrameMsg(const uint32_t scan_counter = 42,
                               const uint8_t active_zoneset = 1)
 {
   const auto resolution{ util::TenthOfDegree(10) };
-  // const IOState io_state({ PinState(1, "zone", true) },
-  //                        { PinState(2, "zone", true) },
-  //                        { PinState(1, "zone2", true) },
-  //                        { PinState(4, "OSST", false) },
-  //                        { PinState(5, "", true) });
   data_conversion_layer::monitoring_frame::MessageBuilder msg_builder;
   msg_builder.fromTheta(start_angle).resolution(resolution).scanCounter(scan_counter).activeZoneset(active_zoneset);
 
@@ -93,9 +140,13 @@ createValidMonitoringFrameMsg(const uint32_t scan_counter = 42,
   const double lowest_intensity{ 0. };
   const double highest_intensity{ 16383. };  // only 14 of 16 bits can be used for the actual intensity value
 
-  msg_builder.intensities(generateIntensities(num_elements, lowest_intensity, highest_intensity))
-      .diagnosticMessages({ { configuration::ScannerId::master,
-                              data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 7) } });
+  msg_builder.intensities(generateIntensities(num_elements, lowest_intensity, highest_intensity));
+
+  msg_builder.diagnosticMessages({ { configuration::ScannerId::master,
+                                     data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 7) } });
+
+  msg_builder.iOPinData(createCompleteIOPinData());  // A valid frame contains a complete set of pin data
+
   return msg_builder.build();
 }
 
@@ -146,5 +197,23 @@ LaserScan createReferenceScan(const std::vector<data_conversion_layer::monitorin
 }
 
 }  // namespace psen_scan_v2_standalone_test
+
+namespace psen_scan_v2_standalone
+{
+// Avoids too much output with full io pin data
+void PrintTo(const LaserScan& scan, std::ostream* os)
+{
+  *os << fmt::format("LaserScan(timestamp = {} nsec, scanCounter = {}, minScanAngle = {} deg, maxScanAngle = {} deg, "
+                     "resolution = {} deg, active_zoneset = {}, measurements = {}, intensities = {}, io_states = ...)",
+                     scan.getTimestamp(),
+                     scan.getScanCounter(),
+                     scan.getMinScanAngle().value() / 10.,
+                     scan.getMaxScanAngle().value() / 10.,
+                     scan.getScanResolution().value() / 10.,
+                     scan.getActiveZoneset(),
+                     util::formatRange(scan.getMeasurements()),
+                     util::formatRange(scan.getIntensities()));
+}
+}  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_TEST_INTEGRATIONTEST_HELPER_H
