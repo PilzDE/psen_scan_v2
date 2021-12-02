@@ -35,8 +35,8 @@
 namespace psen_scan_v2_test
 {
 using namespace std::chrono_literals;
-using namespace psen_scan_v2_standalone;
-using namespace psen_scan_v2_standalone_test;
+namespace standalone = psen_scan_v2_standalone;
+namespace standalone_test = psen_scan_v2_standalone_test;
 
 MATCHER(hasPoints, "")
 {
@@ -149,10 +149,10 @@ void ActiveZonesetNodeTest::SetUp()
     return ::testing::AssertionFailure() << "Could not connect with subscriber on marker topic.";
   }
 
-  util::Barrier invalid_marker_barrier;
+  standalone::util::Barrier invalid_marker_barrier;
   unsigned count = 0;
   ON_CALL(invalid_marker_mock, callback(hasDeleteAction()))
-      .WillByDefault(OpenBarrierCond(&invalid_marker_barrier, [&count]() { return ++count == 2; }));
+      .WillByDefault(standalone_test::OpenBarrierCond(&invalid_marker_barrier, [&count]() { return ++count == 2; }));
 
   sendActiveZone(5);
   if (!invalid_marker_barrier.waitTillRelease(3s))
@@ -177,11 +177,10 @@ void ActiveZonesetNodeTest::sendActiveZone(uint8_t zone)
     return ::testing::AssertionFailure() << "Could not connect with subscriber on marker topic.";
   }
 
-  util::Barrier reset_marker_barrier;
+  standalone::util::Barrier reset_marker_barrier;
   unsigned count = 0;
-  ON_CALL(reset_marker_mock, callback(hasAddAction())).WillByDefault(OpenBarrierCond(&reset_marker_barrier, [&count]() {
-    return ++count == 2;
-  }));
+  ON_CALL(reset_marker_mock, callback(hasAddAction()))
+      .WillByDefault(standalone_test::OpenBarrierCond(&reset_marker_barrier, [&count]() { return ++count == 2; }));
 
   sendActiveZone(0);
   if (!reset_marker_barrier.waitTillRelease(3s))

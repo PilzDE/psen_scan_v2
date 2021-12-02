@@ -34,19 +34,20 @@
 #include "psen_scan_v2/io_state_ros_conversion.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 
+using namespace std::chrono_literals;
+
 /**
  * @brief Root namespace for the ROS part
  */
 namespace psen_scan_v2
 {
-using namespace psen_scan_v2_standalone;
-using namespace std::chrono_literals;
+namespace standalone = psen_scan_v2_standalone;
 
 /**
  * @brief ROS Node that continuously publishes scan data of a single PSENscan laser scanner.
  *
  */
-template <typename S = ScannerV2>
+template <typename S = standalone::ScannerV2>
 class ROSScannerNodeT
 {
 public:
@@ -63,7 +64,7 @@ public:
                   const std::string& topic,
                   const std::string& tf_prefix,
                   const double& x_axis_rotation,
-                  const ScannerConfiguration& scanner_config);
+                  const standalone::ScannerConfiguration& scanner_config);
 
   /**
    * @brief Continuously fetches data from the scanner and publishes the data into the ROS network.
@@ -74,7 +75,7 @@ public:
   void terminate();
 
 private:
-  void laserScanCallback(const LaserScan& scan);
+  void laserScanCallback(const standalone::LaserScan& scan);
 
 private:
   ros::NodeHandle nh_;
@@ -105,7 +106,7 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
                                     const std::string& topic,
                                     const std::string& tf_prefix,
                                     const double& x_axis_rotation,
-                                    const ScannerConfiguration& scanner_config)
+                                    const standalone::ScannerConfiguration& scanner_config)
   : nh_(nh)
   , tf_prefix_(tf_prefix)
   , x_axis_rotation_(x_axis_rotation)
@@ -113,11 +114,11 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
 {
   pub_scan_ = nh_.advertise<sensor_msgs::LaserScan>(topic, 1);
   pub_zone_ = nh_.advertise<std_msgs::UInt8>("active_zoneset", 1);
-  pub_io_ = nh_.advertise<psen_scan_v2::IOState>("io_state", 18);
+  pub_io_ = nh_.advertise<IOState>("io_state", 18);
 }
 
 template <typename S>
-void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
+void ROSScannerNodeT<S>::laserScanCallback(const standalone::LaserScan& scan)
 {
   try
   {
@@ -125,9 +126,9 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
     PSENSCAN_INFO_ONCE(
         "ScannerNode",
         "Publishing laser scan with angle_min={:.1f} angle_max={:.1f} angle_increment={:.1f} degrees. {} angle values.",
-        data_conversion_layer::radianToDegree(laser_scan_msg.angle_min),
-        data_conversion_layer::radianToDegree(laser_scan_msg.angle_max),
-        data_conversion_layer::radianToDegree(laser_scan_msg.angle_increment),
+        standalone::data_conversion_layer::radianToDegree(laser_scan_msg.angle_min),
+        standalone::data_conversion_layer::radianToDegree(laser_scan_msg.angle_max),
+        standalone::data_conversion_layer::radianToDegree(laser_scan_msg.angle_increment),
         laser_scan_msg.ranges.size());
     pub_scan_.publish(laser_scan_msg);
 

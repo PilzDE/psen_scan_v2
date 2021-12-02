@@ -23,9 +23,10 @@
 
 namespace psen_scan_v2
 {
-using namespace psen_scan_v2_standalone;
+namespace standalone = psen_scan_v2_standalone;
+namespace config = psen_scan_v2_standalone::configuration;
 
-sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
+sensor_msgs::LaserScan toLaserScanMsg(const standalone::LaserScan& laserscan,
                                       const std::string& frame_id,
                                       const double x_axis_rotation)
 {
@@ -41,11 +42,11 @@ sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
   ros_message.angle_max = laserscan.getMaxScanAngle().toRad() - x_axis_rotation;
   ros_message.angle_increment = laserscan.getScanResolution().toRad();
 
-  ros_message.time_increment = configuration::TIME_PER_SCAN_IN_S / (2 * M_PI) * laserscan.getScanResolution().toRad();
+  ros_message.time_increment = config::TIME_PER_SCAN_IN_S / (2 * M_PI) * laserscan.getScanResolution().toRad();
 
-  ros_message.scan_time = configuration::TIME_PER_SCAN_IN_S;
-  ros_message.range_min = configuration::RANGE_MIN_IN_M;
-  ros_message.range_max = configuration::RANGE_MAX_IN_M;
+  ros_message.scan_time = config::TIME_PER_SCAN_IN_S;
+  ros_message.range_min = config::RANGE_MIN_IN_M;
+  ros_message.range_max = config::RANGE_MAX_IN_M;
 
   ros_message.ranges.insert(
       ros_message.ranges.begin(), laserscan.getMeasurements().cbegin(), laserscan.getMeasurements().cend());

@@ -38,10 +38,10 @@
 #include "psen_scan_v2_standalone/util/async_barrier.h"
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 
-using namespace psen_scan_v2;
-using namespace psen_scan_v2_standalone;
-using namespace psen_scan_v2_standalone_test;
 using namespace std::chrono_literals;
+using namespace psen_scan_v2;
+namespace standalone = psen_scan_v2_standalone;
+namespace standalone_test = psen_scan_v2_standalone_test;
 
 static const std::string FRAME_ID_PARAM_NAME{ "frame_id" };
 static const std::string BAG_TESTFILE_PARAM_NAME{ "bag_testfile" };
@@ -178,9 +178,9 @@ TEST_F(ConfigServerNodeTest, shouldAdvertiseZonesetTopic)
 TEST_F(ConfigServerNodeTest, shouldPublishLatchedOnZonesetTopic)
 {
   SubscriberMock subscriber_mock;
-  util::Barrier topic_received_barrier;
+  standalone::util::Barrier topic_received_barrier;
 
-  EXPECT_CALL(subscriber_mock, callback(isLatched())).WillOnce(OpenBarrier(&topic_received_barrier));
+  EXPECT_CALL(subscriber_mock, callback(isLatched())).WillOnce(standalone_test::OpenBarrier(&topic_received_barrier));
 
   topic_received_barrier.waitTillRelease(3s);
 }
@@ -188,10 +188,10 @@ TEST_F(ConfigServerNodeTest, shouldPublishLatchedOnZonesetTopic)
 TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedZoneSetConfig)
 {
   SubscriberMock subscriber_mock;
-  util::Barrier msg_received_barrier;
+  standalone::util::Barrier msg_received_barrier;
 
   EXPECT_CALL(subscriber_mock, callback(msgZoneSetConfigEQ(expectedZoneSetConfig())))
-      .WillOnce(OpenBarrier(&msg_received_barrier));
+      .WillOnce(standalone_test::OpenBarrier(&msg_received_barrier));
 
   msg_received_barrier.waitTillRelease(3s);
 }
