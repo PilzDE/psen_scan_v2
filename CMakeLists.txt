@@ -596,6 +596,11 @@ if(CATKIN_ENABLE_TESTING)
       test/hw_tests/hwtest_zoneset_switching.cpp
     )
 
+    add_rostest_gmock(hwtest_io_state
+      test/hw_tests/hwtest_io_state.test
+      test/hw_tests/hwtest_io_state.cpp
+    )
+
   else()
 
     catkin_add_executable_with_gmock(hwtest_zoneset_switching
@@ -603,13 +608,23 @@ if(CATKIN_ENABLE_TESTING)
                                     EXCLUDE_FROM_ALL)
     add_dependencies(tests hwtest_zoneset_switching)
 
-  endif()
+    catkin_add_executable_with_gmock(hwtest_io_state
+                                    test/hw_tests/hwtest_io_state.cpp
+                                    EXCLUDE_FROM_ALL)
+    add_dependencies(tests hwtest_io_state)
 
+  endif()
 
   target_link_libraries(hwtest_zoneset_switching
     ${catkin_LIBRARIES}
     ${PROJECT_NAME}_standalone
     ${rosbag_LIBRARIES}
+    fmt::fmt
+  )
+
+  target_link_libraries(hwtest_io_state
+    ${catkin_LIBRARIES}
+    ${PROJECT_NAME}_standalone
     fmt::fmt
   )
 
