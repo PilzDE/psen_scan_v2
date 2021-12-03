@@ -43,7 +43,7 @@ void readPinStates(std::vector<psen_scan_v2::PinState>& container,
 }
 
 psen_scan_v2::IOState toIOStateMsg(const psen_scan_v2_standalone::IOState& io_state,
-                                   std::string frame_id,
+                                   const std::string& frame_id,
                                    int64_t stamp)
 {
   psen_scan_v2::IOState ros_message;
