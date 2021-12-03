@@ -135,6 +135,12 @@ Start a preconfigured rviz visualizing the scan data.
 
 * `Hint 2: Will not be advertised if no config_file is provided.`
 
+/\<name\>/io_states ([psen_scan_v2/IOState][])
+* The state published represents the current input and output state of the scanner pins.
+* `Hint 1: There are 3 IO states transfered from the PSENscan HW with the scan data per monitoring frame. They are processed in the same way as the scan data.`
+* `Hint 2: By using <fragmented_scans=true> driver will publish 3 IOStates while with <fragmented_scans=false> it will publish 18 IOStates per single publish of scan data.`
+* `Hint 3: The timesamps of all IO states are the same as the one of the scan data they were transfered with.`
+
 ### TF Frames
 The location of the TF frames is shown in the image below.
 These names are defined by the aforementioned launchfile parameter `name`.
@@ -242,3 +248,4 @@ supply in buildings.
 [std_msgs/UInt8]: https://docs.ros.org/en/api/std_msgs/html/msg/UInt8.html
 [visualization_msgs/Marker]: https://docs.ros.org/en/noetic/api/visualization_msgs/html/msg/Marker.html
 [gmapping]: http://wiki.ros.org/gmapping
+[psen_scan_v2/IOState]: msg/IOState.msg
