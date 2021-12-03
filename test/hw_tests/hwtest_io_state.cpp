@@ -151,7 +151,7 @@ public:
   {
     switchZone(1);
     ActiveZoneSubscriberMock active_zone_subscriber_mock;
-    auto zone_one_barrier = EXPECT_ASYNC_CALL(active_zone_subscriber_mock, callback(UInt8MsgDataEq(1)));
+    auto zone_one_barrier = EXPECT_ASYNC_CALL(active_zone_subscriber_mock, callback(UInt8MsgDataEq(0)));
     zone_one_barrier->waitTillRelease(5s);
   }
 
