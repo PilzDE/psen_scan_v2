@@ -180,6 +180,9 @@ target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
   ${PROJECT_NAME}_standalone
 )
+add_dependencies(${PROJECT_NAME}_node
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+)
 
 
 add_executable(config_server_node
@@ -524,6 +527,9 @@ if(CATKIN_ENABLE_TESTING)
     ${catkin_LIBRARIES}
     fmt::fmt
   )
+  add_dependencies(integrationtest_ros_scanner_node
+    ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  )
 
   add_rostest_gmock(integrationtest_config_server_node
     test/integration_tests/integrationtest_config_server_node.test
@@ -595,10 +601,18 @@ if(CATKIN_ENABLE_TESTING)
       test/hw_tests/hwtest_zoneset_switching.test
       test/hw_tests/hwtest_zoneset_switching.cpp
     )
+    add_dependencies(hwtest_zoneset_switching
+      ${PROJECT_NAME}_node
+      ${${PROJECT_NAME}_EXPORTED_TARGETS}
+    )
 
     add_rostest_gmock(hwtest_io_state
       test/hw_tests/hwtest_io_state.test
       test/hw_tests/hwtest_io_state.cpp
+    )
+    add_dependencies(hwtest_zoneset_switching
+      ${PROJECT_NAME}_node
+      ${${PROJECT_NAME}_EXPORTED_TARGETS}
     )
 
   else()
@@ -674,13 +688,17 @@ if(CATKIN_ENABLE_TESTING)
       test/hw_tests/hwtest_scan_compare.cpp
       standalone/src/laserscan.cpp
     )
+    add_dependencies(hwtest_scan_compare
+      ${PROJECT_NAME}_node
+      ${${PROJECT_NAME}_EXPORTED_TARGETS}
+    )
 
   else()
     # always at least build the test to avoid build breaking changes
     catkin_add_executable_with_gtest(hwtest_scan_compare
-    test/hw_tests/hwtest_scan_compare.cpp
-    standalone/src/laserscan.cpp
-    EXCLUDE_FROM_ALL
+      test/hw_tests/hwtest_scan_compare.cpp
+      standalone/src/laserscan.cpp
+      EXCLUDE_FROM_ALL
     )
     add_dependencies(tests hwtest_scan_compare)
   endif()
