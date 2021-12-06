@@ -218,7 +218,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectIOStateAfterConversi
   ASSERT_NO_THROW(
       scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan({ stamped_msg }) }););
 
-  ASSERT_EQ(scan_ptr->getIOStates().size(), 3);
+  ASSERT_EQ(scan_ptr->getIOStates().size(), 3u);
   EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msg.msg_.iOPinData(), /*start index*/ 0);
 }
 
