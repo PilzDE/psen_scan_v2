@@ -92,6 +92,17 @@ struct PinData
   States logical_input{};
   States output{};
 };
+
+inline std::ostream& operator<<(std::ostream& os, const PinData& pd)
+{
+  return os << fmt::format(
+             "physical_input_1 = {}, physical_input_2 = {}, physical_input_3 = {}, logical_input = {}, output = {}",
+             util::formatRange(pd.physical_input_0),
+             util::formatRange(pd.physical_input_1),
+             util::formatRange(pd.physical_input_2),
+             util::formatRange(pd.logical_input),
+             util::formatRange(pd.output));
+}
 }  // namespace io
 }  // namespace monitoring_frame
 }  // namespace data_conversion_layer
