@@ -13,7 +13,9 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <algorithm>
 #include <chrono>
+#include <ios>
 #include <map>
 #include <ostream>
 #include <string>
@@ -116,7 +118,7 @@ MATCHER_P(UInt8MsgDataEq, data, "")
   return arg.data == data;
 }
 
-MATCHER_P(ZoneSwitchingInputIsTrue, zone_id, "")
+MATCHER_P(ZoneSwitchingInputIsTrueOnly, zone_id, "")
 {
   const std::string pin_name{ "Zone Set Switching Input " + std::to_string(zone_id) };
   bool pin_found{ false };
@@ -144,6 +146,23 @@ MATCHER_P(ZoneSwitchingInputIsTrue, zone_id, "")
   return pin_found;
 }
 
+MATCHER_P(Safety1IntrusionOutputIs, state, "")
+{
+  const auto it = std::find_if(
+      arg.output.begin(), arg.output.end(), [&](const auto& pin) { return pin.name == "Safety 1 intrusion"; });
+  if (it == arg.output.end())
+  {
+    *result_listener << "Pin Safety 1 intrusion not found";
+    return false;
+  }
+  if (it->state != state)
+  {
+    *result_listener << "Safety 1 intrusion is " << (it->state ? "true" : "false");
+    return false;
+  }
+  return true;
+}
+
 class IOStateTests : public Test
 {
 public:
@@ -168,7 +187,7 @@ protected:
   ZoneSwitchExecutor zone_switch_executor_;
 };
 
-TEST_F(IOStateTests, shouldPublishChangedZoneSwitchingIOIfZoneIsSwitched)
+TEST_F(IOStateTests, shouldPublishChangedZoneSwitchingInputIfZoneIsSwitched)
 {
   standalone::util::Barrier zone_switching_1_barrier;
   standalone::util::Barrier zone_switching_2_barrier;
@@ -176,12 +195,12 @@ TEST_F(IOStateTests, shouldPublishChangedZoneSwitchingIOIfZoneIsSwitched)
   IOSubscriberMock io_subscriber_mock;
   {
     InSequence s;
-    EXPECT_CALL(io_subscriber_mock, callback(ZoneSwitchingInputIsTrue(1)))  // This is what we expect after SetUp()
+    EXPECT_CALL(io_subscriber_mock, callback(ZoneSwitchingInputIsTrueOnly(1)))  // This is what we expect after SetUp()
         .Times(AnyNumber());
-    EXPECT_CALL(io_subscriber_mock, callback(ZoneSwitchingInputIsTrue(2)))
+    EXPECT_CALL(io_subscriber_mock, callback(ZoneSwitchingInputIsTrueOnly(2)))
         .Times(AnyNumber())
         .WillOnce(standalone_test::OpenBarrier(&zone_switching_2_barrier));
-    EXPECT_CALL(io_subscriber_mock, callback(ZoneSwitchingInputIsTrue(1)))
+    EXPECT_CALL(io_subscriber_mock, callback(ZoneSwitchingInputIsTrueOnly(1)))
         .Times(AnyNumber())
         .WillOnce(standalone_test::OpenBarrier(&zone_switching_1_barrier));
   }
@@ -190,6 +209,35 @@ TEST_F(IOStateTests, shouldPublishChangedZoneSwitchingIOIfZoneIsSwitched)
   zone_switching_2_barrier.waitTillRelease(5s);
   switchZone(1);
   zone_switching_1_barrier.waitTillRelease(5s);
+}
+
+/**
+ * For this test the scanner and it's configuration need to be set-up as follows:
+ * - In zoneset 1 the safety1 zone is not violated
+ * - In zoneset 2 the safety1 zone is violated
+ */
+TEST_F(IOStateTests, shouldPublishChangedSafetyIntrusionOutputIfZoneIsSwitched)
+{
+  standalone::util::Barrier safety1_intrusion_false_barrier;
+  standalone::util::Barrier safety1_intrusion_true_barrier;
+
+  IOSubscriberMock io_subscriber_mock;
+  {
+    InSequence s;
+    EXPECT_CALL(io_subscriber_mock, callback(Safety1IntrusionOutputIs(false)))  // This is what we expect after SetUp()
+        .Times(AnyNumber());
+    EXPECT_CALL(io_subscriber_mock, callback(Safety1IntrusionOutputIs(true)))
+        .Times(AnyNumber())
+        .WillOnce(standalone_test::OpenBarrier(&safety1_intrusion_true_barrier));
+    EXPECT_CALL(io_subscriber_mock, callback(Safety1IntrusionOutputIs(false)))
+        .Times(AnyNumber())
+        .WillOnce(standalone_test::OpenBarrier(&safety1_intrusion_false_barrier));
+  }
+
+  switchZone(2);
+  safety1_intrusion_true_barrier.waitTillRelease(5s);
+  switchZone(1);
+  safety1_intrusion_false_barrier.waitTillRelease(5s);
 }
 
 }  // namespace psen_scan_v2_test
