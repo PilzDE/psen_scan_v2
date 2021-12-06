@@ -44,7 +44,14 @@ If you are interested in using the PSENscan safety laser scanner without ROS, pl
 4. [Migration](#migration)
 
 ## Installation
-The ros2 branch targets ROS 2 Foxy and is **experimental**. There are no ros2 releases, so you have to build this package from source.
+Needed Equipment:
+- PSENscan safety laser scanner
+- ROS Machine
+
+To use the package, you can install prebuilt packages with
+```
+sudo apt install ros-$ROS_DISTRO-psen-scan-v2
+```
 
 ## Usage
 To start reading data from the safety laser scanner and publishing scans execute `ros2 launch psen_scan_v2 psen_scan_v2.launch.xml` in a command line. This will launch the ROS Node with the default configuration.
@@ -133,15 +140,15 @@ The timestamps of the scan data published are computed to be close to reality an
 
 ## Developer Information
 ### Build Status
-| Platform | Melodic | Noetic |
-| -------- | ------- | ------ |
-| CI | [![CI-Melodic](https://github.com/PilzDE/psen_scan_v2/workflows/CI-Melodic/badge.svg?event=push)](https://github.com/PilzDE/psen_scan_v2/actions?query=event%3Apush+workflow%3ACI-Melodic+branch%3Amain) | [![CI-Noetic](https://github.com/PilzDE/psen_scan_v2/workflows/CI-Noetic/badge.svg?event=push)](https://github.com/PilzDE/psen_scan_v2/actions?query=event%3Apush+workflow%3ACI-Noetic+branch%3Amain) |
-| Buildfarm src | [![Build Status](http://build.ros.org/job/Msrc_uB__psen_scan_v2__ubuntu_bionic__source/badge/icon)](http://build.ros.org/job/Msrc_uB__psen_scan_v2__ubuntu_bionic__source/) | [![Build Status](http://build.ros.org/job/Nsrc_uF__psen_scan_v2__ubuntu_focal__source/badge/icon)](http://build.ros.org/job/Nsrc_uF__psen_scan_v2__ubuntu_focal__source/) |
-| Buildfarm bin | [![Build Status](http://build.ros.org/job/Mbin_uB64__psen_scan_v2__ubuntu_bionic_amd64__binary/badge/icon)](http://build.ros.org/job/Mbin_uB64__psen_scan_v2__ubuntu_bionic_amd64__binary/) | [![Build Status](http://build.ros.org/job/Nbin_uF64__psen_scan_v2__ubuntu_focal_amd64__binary/badge/icon)](http://build.ros.org/job/Nbin_uF64__psen_scan_v2__ubuntu_focal_amd64__binary/) |
+| Platform | Melodic | Noetic | Foxy |
+| -------- | ------- | ------ | ---- |
+| CI | [![CI-Melodic](https://github.com/PilzDE/psen_scan_v2/workflows/CI-Melodic/badge.svg?event=push)](https://github.com/PilzDE/psen_scan_v2/actions?query=event%3Apush+workflow%3ACI-Melodic+branch%3Amain) | [![CI-Noetic](https://github.com/PilzDE/psen_scan_v2/workflows/CI-Noetic/badge.svg?event=push)](https://github.com/PilzDE/psen_scan_v2/actions?query=event%3Apush+workflow%3ACI-Noetic+branch%3Amain) | [![CI-Foxy](https://github.com/PilzDE/psen_scan_v2/actions/workflows/ci_action_foxy.yml/badge.svg?branch=ros2&event=push)](https://github.com/PilzDE/psen_scan_v2/actions?query=event%3Apush+workflow%3ACI-Foxy+branch%3Aros2) |
+| Buildfarm src | [![Build Status](http://build.ros.org/job/Msrc_uB__psen_scan_v2__ubuntu_bionic__source/badge/icon)](http://build.ros.org/job/Msrc_uB__psen_scan_v2__ubuntu_bionic__source/) | [![Build Status](http://build.ros.org/job/Nsrc_uF__psen_scan_v2__ubuntu_focal__source/badge/icon)](http://build.ros.org/job/Nsrc_uF__psen_scan_v2__ubuntu_focal__source/) | [![Build Status](http://build.ros2.org/job/Fsrc_uF__psen_scan_v2__ubuntu_focal__source/badge/icon)](http://build.ros2.org/job/Fsrc_uF__psen_scan_v2__ubuntu_focal__source/) |
+| Buildfarm bin | [![Build Status](http://build.ros.org/job/Mbin_uB64__psen_scan_v2__ubuntu_bionic_amd64__binary/badge/icon)](http://build.ros.org/job/Mbin_uB64__psen_scan_v2__ubuntu_bionic_amd64__binary/) | [![Build Status](http://build.ros.org/job/Nbin_uF64__psen_scan_v2__ubuntu_focal_amd64__binary/badge/icon)](http://build.ros.org/job/Nbin_uF64__psen_scan_v2__ubuntu_focal_amd64__binary/) | [![Build Status](http://build.ros2.org/job/Fbin_uF64__psen_scan_v2__ubuntu_focal_amd64__binary/badge/icon)](http://build.ros2.org/job/Fbin_uF64__psen_scan_v2__ubuntu_focal_amd64__binary/) |
 
 
 ### Branching model
-`main` is considered to be the active development branch, it targets the ROS distributions `melodic` and `noetic`.
+`main` is considered to be the active development branch, it targets the ROS distributions `melodic` and `noetic`. The `ros2` branch targets ROS 2 `foxy`. The first ROS 2 release is tagged with version `0.20.0`.
 
 ### Test concept
 ![psen_scan_test_concept](doc/test_architecture.svg)
