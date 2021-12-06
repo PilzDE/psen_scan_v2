@@ -44,7 +44,16 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
   raw_processing::write(os, msg.fromTheta().value());
   raw_processing::write(os, msg.resolution().value());
 
-  try
+  if (msg.hasIOPinField())
+  {
+    AdditionalFieldHeader io_pin_data_header(
+        static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::io_pin_data), io::RAW_CHUNK_LENGTH_IN_BYTES);
+    write(os, io_pin_data_header);
+    io::RawChunk io_pin_data_payload = io::serialize(msg.iOPinData());
+    raw_processing::write(os, io_pin_data_payload);
+  }
+
+  if (msg.hasScanCounterField())
   {
     AdditionalFieldHeader scan_counter_header(
         static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::scan_counter), sizeof(msg.scanCounter()));
@@ -52,11 +61,17 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
     uint32_t scan_counter_payload = msg.scanCounter();
     raw_processing::write(os, scan_counter_payload);
   }
-  catch (const AdditionalFieldMissing& /*unused*/)
+
+  if (msg.hasActiveZonesetField())
   {
+    AdditionalFieldHeader zoneset_header(static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::zone_set),
+                                         sizeof(msg.activeZoneset()));
+    write(os, zoneset_header);
+    uint8_t zoneset_payload = msg.activeZoneset();
+    raw_processing::write(os, zoneset_payload);
   }
 
-  try
+  if (msg.hasDiagnosticMessagesField())
   {
     diagnostic::RawChunk diagnostic_data_payload = diagnostic::serialize(msg.diagnosticMessages());
     AdditionalFieldHeader diagnostic_data_header(
@@ -65,11 +80,8 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
     write(os, diagnostic_data_header);
     data_conversion_layer::raw_processing::write(os, diagnostic_data_payload);
   }
-  catch (const AdditionalFieldMissing& /*unused*/)
-  {
-  }
 
-  try
+  if (msg.hasMeasurementsField())
   {
     AdditionalFieldHeader measurements_header(
         static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::measurements),
@@ -83,11 +95,8 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
       return (static_cast<uint16_t>(std::round(elem * 1000.)));
     });
   }
-  catch (const AdditionalFieldMissing& /*unused*/)
-  {
-  }
 
-  try
+  if (msg.hasIntensitiesField())
   {
     AdditionalFieldHeader intensities_header(
         static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::intensities),
@@ -95,33 +104,6 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
     write(os, intensities_header);
     data_conversion_layer::raw_processing::writeArray<uint16_t, double>(
         os, msg.intensities(), [](double elem) { return (static_cast<uint16_t>(std::round(elem))); });
-  }
-  catch (const AdditionalFieldMissing& /*unused*/)
-  {
-  }
-
-  try
-  {
-    AdditionalFieldHeader zoneset_header(static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::zone_set),
-                                         sizeof(msg.activeZoneset()));
-    write(os, zoneset_header);
-    uint8_t zoneset_payload = msg.activeZoneset();
-    raw_processing::write(os, zoneset_payload);
-  }
-  catch (const AdditionalFieldMissing& /*unused*/)
-  {
-  }
-
-  try
-  {
-    AdditionalFieldHeader io_pin_data_header(
-        static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::io_pin_data), io::RAW_CHUNK_LENGTH_IN_BYTES);
-    write(os, io_pin_data_header);
-    io::RawChunk io_pin_data_payload = io::serialize(msg.iOPinData());
-    raw_processing::write(os, io_pin_data_payload);
-  }
-  catch (const AdditionalFieldMissing& /*unused*/)
-  {
   }
 
   AdditionalFieldHeader::Id end_of_frame_header_id =
