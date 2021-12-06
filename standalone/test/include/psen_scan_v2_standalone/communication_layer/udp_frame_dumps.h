@@ -61,7 +61,7 @@ inline std::stringstream readIODataToStream(const std::array<uint8_t, ARRAY_SIZE
                                             const size_t offset_io_field)
 {
   std::array<uint8_t, 64> io_dump;
-  std::copy(hex_dump.begin(), hex_dump.begin() + 10, io_dump.begin());
+  std::copy(hex_dump.begin() + offset_io_field, hex_dump.begin() + offset_io_field + 64, io_dump.begin());
   auto raw = convertToRawData(io_dump);
   std::stringstream ss;
   ss.write(raw.data(), 64);
@@ -101,7 +101,12 @@ inline std::vector<double> readMeasurements(const std::array<uint8_t, ARRAY_SIZE
   for (size_t idx = offset_measurements; idx < (offset_measurements + (n_measurements * 2)); idx = idx + 2)
   {
     uint16_t raw_value = convertHexdumpBytesToUint16_t(hex_dump.at(idx + 1), hex_dump.at(idx));
-    measurements.push_back(raw_value / 1000.);
+    double meter = raw_value / 1000.;
+    if (raw_value == NO_SIGNAL_ARRIVED || raw_value == SIGNAL_TOO_LATE)
+    {
+      meter = std::numeric_limits<double>::infinity();
+    }
+    measurements.push_back(meter);
   }
   return measurements;
 }
@@ -128,20 +133,20 @@ public:
     MessageBuilder msg_builder;
     msg_builder.fromTheta(util::TenthOfDegree(0x3e9))
         .resolution(util::TenthOfDegree(0x02))
-        .iOPinData(readIOField(hex_dump, 66))
+        .iOPinData(readIOField(hex_dump, 24))
         .scanCounter(0x00055630)
         .activeZoneset(0x02)
-        .measurements(readMeasurements(hex_dump, 185, 250))
+        .measurements(readMeasurements(hex_dump, 143, 250))
         .intensities(readIntensities(hex_dump, intensities_offset, 250))
         .diagnosticMessages({ diagnostic::Message(configuration::ScannerId::master, diagnostic::ErrorLocation(2, 0)),
                               diagnostic::Message(configuration::ScannerId::master, diagnostic::ErrorLocation(4, 3)) });
     expected_msg_ = msg_builder.build();
   };
 
-  const size_t intensities_offset{ 185 + (250 * 2) + 3};
+  const size_t intensities_offset{ 143 + (250 * 2) + 3 };
   // clang-format off
   const std::array<uint8_t, 1191> hex_dump = {
-                                                            0x90, 0x00, 0x00, 0x00, 0xca, 0x00,  // 0020
+                                                            0x00, 0x00, 0x00, 0x00, 0xca, 0x00,  // 0020
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0xe9, 0x03, 0x02, 0x00, 0x01,  // 0030
 0x3f, 0x00, 0x32, 0x37, 0x39, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,  // 0040
 0x32, 0x38, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x32, 0x37,  // 0050
@@ -238,8 +243,8 @@ public:
     0x00, 0x00, 0x00, 0x00, 0xca, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x05, 0x00, 0x00, 0x00, 0x00, 0xdc, 0x05, 0x0a, 0x00,  // End of FixedFields
     0x02, 0x05, 0x00, 0xfc, 0x61, 0x06, 0x00,                    // Scan counter
-    0x05, 0x01, 0x00,                                            // Measurements
     0x03, 0x02, 0x00, 0x02,                                      // Active zoneset
+    0x05, 0x01, 0x00,                                            // Measurements
     0x09, 0x00, 0x00, 0x00                                       // End of Frame
   };
 
