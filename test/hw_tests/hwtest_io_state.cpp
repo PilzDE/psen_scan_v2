@@ -176,6 +176,8 @@ TEST_F(IOStateTests, shouldPublishChangedZoneSwitchingIOIfZoneIsSwitched)
   IOSubscriberMock io_subscriber_mock;
   {
     InSequence s;
+    EXPECT_CALL(io_subscriber_mock, callback(ZoneSwitchingInputIsTrue(1)))  // This is what we expect after SetUp()
+        .Times(AnyNumber());
     EXPECT_CALL(io_subscriber_mock, callback(ZoneSwitchingInputIsTrue(2)))
         .Times(AnyNumber())
         .WillOnce(standalone_test::OpenBarrier(&zone_switching_2_barrier));
