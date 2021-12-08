@@ -78,7 +78,7 @@ public:
 
 public:
   void sendStartReply(const ReplyMsg::OperationResult& result = ReplyMsg::OperationResult::accepted);
-  void sendStopReply();
+  void sendStopReply(const ReplyMsg::OperationResult& result = ReplyMsg::OperationResult::accepted);
   void sendMonitoringFrame(const MonitoringFrameMsg& msg);
   void sendEmptyMonitoringFrame();
   void sendMonitoringFrames(const std::vector<MonitoringFrameMsg>& msgs);

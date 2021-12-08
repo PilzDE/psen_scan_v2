@@ -47,6 +47,7 @@ ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScan
                                 BIND_RAW_DATA_EVENT(RawReplyReceived),
                                 BIND_EVENT(ReplyReceiveError),
                                 std::bind(&ScannerV2::scannerStartErrorCallback, this, std::placeholders::_1),
+                                std::bind(&ScannerV2::scannerStopErrorCallback, this, std::placeholders::_1),
                                 BIND_RAW_DATA_EVENT(RawMonitoringFrameReceived),
                                 BIND_EVENT(MonitoringFrameReceivedError),
                                 std::bind(&ScannerV2::scannerStartedCallback, this),
@@ -129,6 +130,13 @@ void ScannerV2::scannerStartErrorCallback(const std::string& error_msg)
   PSENSCAN_INFO("ScannerController", "Scanner start failed.");
   scanner_has_started_.value().set_exception(std::make_exception_ptr(std::runtime_error(error_msg)));
   scanner_has_started_ = boost::none;
+}
+
+void ScannerV2::scannerStopErrorCallback(const std::string& error_msg)
+{
+  PSENSCAN_INFO("ScannerController", "Scanner stop failed.");
+  scanner_has_stopped_.value().set_exception(std::make_exception_ptr(std::runtime_error(error_msg)));
+  scanner_has_stopped_ = boost::none;
 }
 
 }  // namespace psen_scan_v2_standalone
