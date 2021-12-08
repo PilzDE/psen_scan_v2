@@ -83,13 +83,12 @@ static constexpr std::chrono::seconds LOOP_END_TIMEOUT{ 4 };
 static constexpr std::chrono::seconds STOP_TIMEOUT{ 1 };
 
 static const standalone::LaserScan::IOData IO_DATA1{
-  { standalone::IOState({ standalone::PinState(1, "input0", true) }, {}, { standalone::PinState(14, "output", false) }),
-    standalone::IOState({},
-                        { standalone::PinState(21, "logical", true), standalone::PinState(3, "logical2", false) },
+  { standalone::IOState({}, { standalone::PinState(14, "output", false) }),
+    standalone::IOState({ standalone::PinState(21, "logical", true), standalone::PinState(3, "logical2", false) },
                         {}) }
 };
 static const standalone::LaserScan::IOData IO_DATA2{ {
-    standalone::IOState({ standalone::PinState(3, "input0", false) }, {}, {}),
+    standalone::IOState({}, {}),
 } };
 
 static void setDefaultActions(ScannerMock& mock, util::Barrier& start_barrier)

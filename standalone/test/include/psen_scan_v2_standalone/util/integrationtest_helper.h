@@ -86,16 +86,6 @@ static data_conversion_layer::monitoring_frame::io::PinData createCompleteIOPinD
   // First fill everything
   for (std::size_t bit = 0; bit < 8; ++bit)
   {
-    for (std::size_t byte = 0; byte < RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES; ++byte)
-    {
-      const auto pin_state = createInputPinState(byte, bit, false);
-      if (pin_state.name() != "unused")
-      {
-        pin_data.physical_input_0.push_back(pin_state);
-        pin_data.physical_input_1.push_back(pin_state);
-        pin_data.physical_input_2.push_back(pin_state);
-      }
-    }
     for (std::size_t byte = 0; byte < RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES; ++byte)
     {
       const auto pin_state = createLogicalPinState(byte, bit, false);
@@ -114,9 +104,6 @@ static data_conversion_layer::monitoring_frame::io::PinData createCompleteIOPinD
     }
   }
   // Set arbitrary pins
-  setPin(pin_data.physical_input_0.at(3));
-  setPin(pin_data.physical_input_0.at(11));
-  setPin(pin_data.physical_input_2.at(21));
   setPin(pin_data.logical_input.at(8));
   setPin(pin_data.output.at(2));
   return pin_data;

@@ -84,9 +84,6 @@ static double addOffsetToMsgMeasurement(data_conversion_layer::monitoring_frame:
 static PinData createIOPin(uint32_t msg_nr = 0)
 {
   PinData io_pin_data;
-  io_pin_data.physical_input_0 = { PinState(msg_nr, "input0", true) };
-  io_pin_data.physical_input_1 = { PinState(msg_nr, "input1", false) };
-  io_pin_data.physical_input_2 = { PinState(msg_nr, "input21", true), PinState(0, "input22", false) };
   io_pin_data.logical_input = {};
   io_pin_data.output = { PinState(msg_nr, "output", true) };
   return io_pin_data;
@@ -218,7 +215,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectIOStateAfterConversi
   ASSERT_NO_THROW(
       scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan({ stamped_msg }) }););
 
-  ASSERT_EQ(scan_ptr->getIOStates().size(), 3u);
+  ASSERT_EQ(scan_ptr->getIOStates().size(), 1u);
   EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msg.msg_.iOPinData(), /*start index*/ 0);
 }
 
@@ -313,10 +310,10 @@ TEST(LaserScanConversionsTest, laserScanShouldContainAllIOStates)
   ASSERT_NO_THROW(
       scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
 
-  ASSERT_EQ(scan_ptr->getIOStates().size(), 3 * msg_count);
+  ASSERT_EQ(scan_ptr->getIOStates().size(), msg_count);
   for (int i = 0; i < msg_count; i++)
   {
-    EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msgs.at(i).msg_.iOPinData(), /*start index*/ i * 3);
+    EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msgs.at(i).msg_.iOPinData(), /*start index*/ i);
   }
 }
 
@@ -330,10 +327,10 @@ TEST(LaserScanConversionsTest, laserScanShouldContainAllIOStatesInCorrectOrder)
   ASSERT_NO_THROW(
       scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
 
-  ASSERT_EQ(scan_ptr->getIOStates().size(), 3 * msg_count);
+  ASSERT_EQ(scan_ptr->getIOStates().size(), msg_count);
   EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msgs.at(2).msg_.iOPinData(), /*scan start index*/ 0);
-  EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msgs.at(1).msg_.iOPinData(), /*scan start index*/ 3);
-  EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msgs.at(0).msg_.iOPinData(), /*scan start index*/ 6);
+  EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msgs.at(1).msg_.iOPinData(), /*scan start index*/ 1);
+  EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msgs.at(0).msg_.iOPinData(), /*scan start index*/ 2);
 }
 
 TEST(LaserScanConversionsTest, laserScanShouldContainActiveZonesetOfLastMsg)

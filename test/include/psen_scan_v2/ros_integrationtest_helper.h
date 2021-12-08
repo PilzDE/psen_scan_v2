@@ -89,8 +89,8 @@ MATCHER_P(StdMsgsHeaderEq, msg, "")
 
 MATCHER_P(IOStateMsgEq, msg, "")
 {
-  return ::testing::Matches(StdMsgsHeaderEq(msg.header))(arg.header) && arg.physical_input == msg.physical_input &&
-         arg.logical_input == msg.logical_input && arg.output == msg.output;
+  return ::testing::Matches(StdMsgsHeaderEq(msg.header))(arg.header) && arg.logical_input == msg.logical_input &&
+         arg.output == msg.output;
 }
 
 MATCHER_P(LaserScanMsgEq, msg, "")

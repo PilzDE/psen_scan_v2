@@ -163,7 +163,7 @@ std::ostream& operator<<(std::ostream& os, const Message& msg)
 {
   os << fmt::format(
       "monitoring_frame::Message(fromTheta = {} deg, resolution = {} deg, scanCounter = "
-      "{}, active_zoneset = {}, measurements = {}, intensities = {}, diagnostics = {}, io_pin_data = io::PinData({}))",
+      "{}, active_zoneset = {}, measurements = {}, intensities = {}, diagnostics = {}, io_pin_data = {})",
       msg.from_theta_.value() / 10.,
       msg.resolution_.value() / 10.,
       FORMAT_IF_INITIALIZED(msg.scan_counter_),

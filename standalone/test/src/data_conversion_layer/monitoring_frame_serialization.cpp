@@ -28,8 +28,7 @@ namespace monitoring_frame
 {
 std::size_t sizeOfIOPinData(const io::PinData& pin_data)
 {
-  return pin_data.physical_input_0.size() + pin_data.physical_input_1.size() + pin_data.physical_input_2.size() +
-         pin_data.logical_input.size() + pin_data.output.size();
+  return pin_data.logical_input.size() + pin_data.output.size();
 }
 
 RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
@@ -166,15 +165,7 @@ void serializeSingleRecord(RawChunk& raw_pin_data, const PinData::States& pin_st
 RawChunk serialize(const PinData& pin_data)
 {
   RawChunk raw_pin_data{};
-  std::size_t offset = RAW_CHUNK_LENGTH_RESERVED_IN_BYTES;
-  serializeSingleRecord(raw_pin_data, pin_data.physical_input_0, offset);
-  offset += RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES + RAW_CHUNK_LENGTH_RESERVED_IN_BYTES;
-
-  serializeSingleRecord(raw_pin_data, pin_data.physical_input_1, offset);
-  offset += RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES + RAW_CHUNK_LENGTH_RESERVED_IN_BYTES;
-
-  serializeSingleRecord(raw_pin_data, pin_data.physical_input_2, offset);
-  offset += RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES + RAW_CHUNK_LENGTH_RESERVED_IN_BYTES;
+  std::size_t offset = 3 * (RAW_CHUNK_LENGTH_RESERVED_IN_BYTES + RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES);
 
   serializeSingleRecord(raw_pin_data, pin_data.logical_input, offset);
   offset += RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES + RAW_CHUNK_LENGTH_RESERVED_IN_BYTES;

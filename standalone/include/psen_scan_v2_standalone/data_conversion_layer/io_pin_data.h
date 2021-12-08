@@ -44,18 +44,6 @@ static uint32_t createID(size_t byte_n, size_t bit_n)
 
 typedef std::function<PinState(size_t, size_t, bool)> AddPinStateFunction;
 
-inline PinState createInputPinState(size_t byte_n, size_t bit_n, bool value)
-{
-  if (byte_n >= RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES)
-  {
-    throw std::out_of_range("");
-  }
-  auto id = createID(byte_n, bit_n);
-  auto input_bit = PHYSICAL_INPUT_BITS.at(byte_n).at(bit_n);
-  const auto& name = PHYSICAL_INPUT_BIT_TO_NAME.at(input_bit);
-  return PinState(id, name, value);
-}
-
 inline PinState createLogicalPinState(size_t byte_n, size_t bit_n, bool value)
 {
   if (byte_n >= RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES)
@@ -86,9 +74,6 @@ inline PinState createOutputPinState(size_t byte_n, size_t bit_n, bool value)
 struct PinData
 {
   using States = std::vector<PinState>;
-  States physical_input_0{};
-  States physical_input_1{};
-  States physical_input_2{};
   States logical_input{};
   States output{};
 };
@@ -96,10 +81,7 @@ struct PinData
 inline std::ostream& operator<<(std::ostream& os, const PinData& pd)
 {
   return os << fmt::format(
-             "physical_input_1 = {}, physical_input_2 = {}, physical_input_3 = {}, logical_input = {}, output = {}",
-             util::formatRange(pd.physical_input_0),
-             util::formatRange(pd.physical_input_1),
-             util::formatRange(pd.physical_input_2),
+             "io::PinData(logical_input = {}, output = {})",
              util::formatRange(pd.logical_input),
              util::formatRange(pd.output));
 }

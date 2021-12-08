@@ -54,7 +54,6 @@ psen_scan_v2::IOState toIOStateMsg(const psen_scan_v2_standalone::IOState& io_st
   ros_message.header.stamp = ros::Time{}.fromNSec(stamp);
   ros_message.header.frame_id = frame_id;
 
-  readPinStates(ros_message.physical_input, io_state.physicalInput());
   readPinStates(ros_message.logical_input, io_state.logicalInput());
   readPinStates(ros_message.output, io_state.output());
 

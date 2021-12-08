@@ -31,6 +31,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/istring_stream_builder.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_serialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
 #include "psen_scan_v2_standalone/communication_layer/udp_frame_dumps.h"
 #include "psen_scan_v2_standalone/util/gtest_expectations.h"
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
@@ -40,6 +41,7 @@ using namespace data_conversion_layer;
 
 namespace psen_scan_v2_standalone_test
 {
+using namespace monitoring_frame::io;
 TEST(MonitoringFrameSerializationTest, shouldSerializeHexdumpFrameCorrectly)
 {
   scanner_udp_datagram_hexdumps::WithIntensitiesAndDiagnostics with_intensities;
@@ -88,6 +90,10 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
            "this test.";
   }
 
+  auto pin_data = createCompleteIOPinData();
+  setInputPin(pin_data, LogicalInputType::muting_1_a);
+  setOutputPin(pin_data, OutputType::safe_1_int);
+
   auto msg = monitoring_frame::MessageBuilder()
                  .fromTheta(util::TenthOfDegree(25))
                  .resolution(util::TenthOfDegree(1))
@@ -95,6 +101,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
                  .activeZoneset(2)
                  .measurements({ 10, 20, std::numeric_limits<double>::infinity(), 40 })
                  .intensities({ 15, 25, 35, 45 })
+                 .iOPinData(pin_data)
                  .diagnosticMessages(
                      { monitoring_frame::diagnostic::Message(configuration::ScannerId::master, error_locations.at(0)),
                        monitoring_frame::diagnostic::Message(configuration::ScannerId::master, error_locations.at(1)),
@@ -102,6 +109,9 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
                  .build();
 
   auto raw = serialize(msg);
+  for (const auto& r: raw)
+  {std::cout << std::hex <<  static_cast<int>(r) << " ";}
+  std::cout << std::endl;
   auto deserialized_msg = monitoring_frame::deserialize(convertToRawData(raw), raw.size());
 
   EXPECT_THAT(deserialized_msg, MonitoringFrameEq(msg));
@@ -257,50 +267,6 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowZoneSetUnexpectedSizeError
   monitoring_frame::Message msg;
   EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);
                , monitoring_frame::ZoneSetUnexpectedSize);
-}
-
-using namespace monitoring_frame::io;
-TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectPhysicalInputField)
-{
-  auto raw = convertToRawData(std::array<uint8_t, 10>{ 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x00 });
-  std::stringstream ss;
-  ss.write(raw.data(), 10);
-  auto input = deserializePinField(ss, 10, createInputPinState);
-
-  std::vector<PinState> expected_states{
-    // unused bytes
-
-    PinState(48, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::zone_sw_1), true),
-    PinState(49, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::zone_sw_2), false),
-    PinState(50, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::zone_sw_3), true),
-    PinState(51, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::zone_sw_4), false),
-    PinState(52, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::zone_sw_5), true),
-    PinState(53, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::zone_sw_6), false),
-    PinState(54, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::zone_sw_7), true),
-    PinState(55, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::zone_sw_8), false),
-
-    PinState(56, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::reset), true),
-    // unused bit
-    PinState(58, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::restart_1), true),
-    PinState(59, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::muting_en_1), false),
-    PinState(60, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::muting_11), true),
-    PinState(61, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::muting_12), false),
-    PinState(62, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::override_11), true),
-    PinState(63, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::override_12), false),
-
-    PinState(64, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::edm_1), true),
-    PinState(65, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::restart_2), false),
-    PinState(66, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::muting_en_2), true),
-    PinState(67, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::muting_21), false),
-    PinState(68, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::muting_22), true),
-    PinState(69, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::override_21), false),
-    PinState(70, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::override_22), true),
-    PinState(71, PHYSICAL_INPUT_BIT_TO_NAME.at(PhysicalInputType::edm_2), false),
-
-    // unused byte
-  };
-
-  EXPECT_CONTAINER_UNORDERED_EQ(input, expected_states);
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectLogicalInputField)

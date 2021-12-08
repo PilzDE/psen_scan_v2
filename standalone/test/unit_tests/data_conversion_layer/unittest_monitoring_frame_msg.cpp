@@ -167,9 +167,6 @@ TEST(MonitoringFrameMsgTest, shouldReturnCorrectIntensities)
 TEST(MonitoringFrameMsgTest, shouldReturnCorrectIOPin)
 {
   io::PinData expected_io_pin_data;
-  expected_io_pin_data.physical_input_0 = { PinState(1, "zone1", true) };
-  expected_io_pin_data.physical_input_1 = { PinState(2, "zone2", false) };
-  expected_io_pin_data.physical_input_2 = { PinState(5, "zone1", false) };
   expected_io_pin_data.logical_input = { PinState(3, "zone1", true) };
   expected_io_pin_data.output = { PinState(1, "OSSD", false) };
   io::PinData io_pin_data;
@@ -204,11 +201,13 @@ TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccessWithAdditionalFields)
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
   EXPECT_EQ(fmt::format("{}", msg),
             "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-            "active_zoneset = 2, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {1.0}, diagnostics = {})");
+            "active_zoneset = 2, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {1.0}, diagnostics = {}, "
+            "io_pin_data = _)");
 #else
-  EXPECT_EQ(fmt::format("{}", msg),
-            "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-            "active_zoneset = 2, measurements = {45, 44, 43, 42}, intensities = {1}, diagnostics = {})");
+  EXPECT_EQ(
+      fmt::format("{}", msg),
+      "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
+      "active_zoneset = 2, measurements = {45, 44, 43, 42}, intensities = {1}, diagnostics = {}, io_pin_data = _)");
 #endif
 }
 
@@ -218,7 +217,7 @@ TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccessWithoutAdditionalFields
 
   EXPECT_EQ(fmt::format("{}", msg),
             "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = _, "
-            "active_zoneset = _, measurements = _, intensities = _, diagnostics = _)");
+            "active_zoneset = _, measurements = _, intensities = _, diagnostics = _, io_pin_data = _)");
 }
 
 }  // namespace psen_scan_v2_standalone_test

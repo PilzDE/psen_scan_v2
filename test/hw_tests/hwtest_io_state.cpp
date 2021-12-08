@@ -121,7 +121,7 @@ MATCHER_P(ZoneSwitchingInputIsTrueOnly, zone_id, "")
 {
   const std::string pin_name{ "Zone Set Switching Input " + std::to_string(zone_id) };
   bool pin_found{ false };
-  for (const auto& pin : arg.physical_input)
+  for (const auto& pin : arg.logical_input)
   {
     if (pin.name == pin_name)
     {
