@@ -407,7 +407,7 @@ TEST_F(ScannerAPITestsDefaultSetUp, shouldShowUserMsgIfMonitoringFrameReceiveTim
                    " (Please check the ethernet connection or contact PILZ support if the error persists.)")
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
-  user_msg_barrier.waitTillRelease(2s);
+  user_msg_barrier.waitTillRelease(3s);  // the tested code itself has a timeout of 1s
 
   EXPECT_SCANNER_TO_STOP_SUCCESSFULLY(hw_mock_, driver_);
   REMOVE_LOG_MOCK
