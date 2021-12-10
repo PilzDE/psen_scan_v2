@@ -47,18 +47,16 @@ std_msgs::UInt8 createActiveZonesetMsg(const uint8_t active_zoneset)
 class SubscriberMock
 {
 public:
-  SubscriberMock(ros::NodeHandle& nh);
+  SubscriberMock(ros::NodeHandle& nh)
+  {
+    subscriber_ = nh.subscribe("/laser_1/active_zoneset", 1, &SubscriberMock::callback, this);
+  }
 
   MOCK_METHOD1(callback, void(const std_msgs::UInt8& msg));
 
 private:
   ros::Subscriber subscriber_;
 };
-
-inline SubscriberMock::SubscriberMock(ros::NodeHandle& nh)
-{
-  subscriber_ = nh.subscribe("/laser_1/active_zoneset", 1, &SubscriberMock::callback, this);
-}
 
 class ActiveZonesetSwitchTests : public ::testing::Test
 {
