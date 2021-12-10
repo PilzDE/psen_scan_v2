@@ -67,7 +67,7 @@ MATCHER(hasAddAction, "")
   return arg->action == visualization_msgs::Marker::ADD;
 }
 
-bool isConnected(SubscriberMock2<visualization_msgs::MarkerConstPtr>& subscriber,
+bool isConnected(SubscriberMock<visualization_msgs::MarkerConstPtr>& subscriber,
                  const ros::Duration& timeout = ros::Duration(3.0))
 {
   const auto start_time = ros::Time::now();
@@ -112,7 +112,7 @@ public:
   ::testing::AssertionResult switchToInvalidActiveZoneAfterSetup();
 
 public:
-  std::unique_ptr<SubscriberMock2<visualization_msgs::MarkerConstPtr>> marker_sub_mock_;
+  std::unique_ptr<SubscriberMock<visualization_msgs::MarkerConstPtr>> marker_sub_mock_;
   ros::NodeHandle nh_;
   ros::Publisher pub_active_;
 };
@@ -125,14 +125,14 @@ void ActiveZonesetNodeTest::SetUp()
   ASSERT_TRUE(resetActiveZoneNode());
 
   // initialize here to avoid traffic of above reset
-  marker_sub_mock_.reset(new SubscriberMock2<visualization_msgs::MarkerConstPtr>{
+  marker_sub_mock_.reset(new SubscriberMock<visualization_msgs::MarkerConstPtr>{
       nh_, "/test_ns_laser_1/active_zoneset_marker", QUEUE_SIZE });
   ASSERT_TRUE(isConnected(*marker_sub_mock_));
 }
 
 ::testing::AssertionResult ActiveZonesetNodeTest::switchToInvalidActiveZoneAfterSetup()
 {
-  SubscriberMock2<visualization_msgs::MarkerConstPtr> invalid_marker_mock(
+  SubscriberMock<visualization_msgs::MarkerConstPtr> invalid_marker_mock(
       nh_, "/test_ns_laser_1/active_zoneset_marker", QUEUE_SIZE);
   if (!isConnected(invalid_marker_mock))
   {
@@ -161,7 +161,7 @@ void ActiveZonesetNodeTest::sendActiveZone(uint8_t zone)
 
 ::testing::AssertionResult ActiveZonesetNodeTest::resetActiveZoneNode()
 {
-  SubscriberMock2<visualization_msgs::MarkerConstPtr> reset_marker_mock(
+  SubscriberMock<visualization_msgs::MarkerConstPtr> reset_marker_mock(
       nh_, "/test_ns_laser_1/active_zoneset_marker", QUEUE_SIZE);
 
   if (!isConnected(reset_marker_mock))

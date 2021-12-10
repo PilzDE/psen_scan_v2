@@ -162,7 +162,7 @@ TEST_F(ConfigServerNodeTest, shouldAdvertiseZonesetTopic)
 TEST_F(ConfigServerNodeTest, shouldPublishLatchedOnZonesetTopic)
 {
   ros::NodeHandle nh;
-  SubscriberMock2<ros::MessageEvent<ZoneSetConfiguration const>> subscriber_mock(
+  SubscriberMock<ros::MessageEvent<ZoneSetConfiguration const>> subscriber_mock(
       nh, "/test_ns_laser_1/zoneconfiguration", 10);
   util::Barrier topic_received_barrier;
 
@@ -174,7 +174,7 @@ TEST_F(ConfigServerNodeTest, shouldPublishLatchedOnZonesetTopic)
 TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedZoneSetConfig)
 {
   ros::NodeHandle nh;
-  SubscriberMock2<ros::MessageEvent<ZoneSetConfiguration const>> subscriber_mock(
+  SubscriberMock<ros::MessageEvent<ZoneSetConfiguration const>> subscriber_mock(
       nh, "/test_ns_laser_1/zoneconfiguration", 10);
   util::Barrier msg_received_barrier;
 

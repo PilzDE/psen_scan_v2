@@ -75,12 +75,12 @@ MATCHER_P(messageEQ, expected_msg, "")
 
 // template <String topicName, int queueSize>
 template <typename T>
-class SubscriberMock2
+class SubscriberMock
 {
 public:
-  SubscriberMock2(ros::NodeHandle& nh, std::string topicName, int queueSize)
+  SubscriberMock(ros::NodeHandle& nh, std::string topicName, int queueSize)
   {
-    subscriber_ = nh.subscribe(topicName, queueSize, &SubscriberMock2::callback, this);
+    subscriber_ = nh.subscribe(topicName, queueSize, &SubscriberMock::callback, this);
   }
 
   MOCK_METHOD1_T(callback, void(const T& t));

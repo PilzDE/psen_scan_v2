@@ -55,7 +55,7 @@ public:
     pub_relay_cmd_ = nh_.advertise<std_msgs::Byte>("/relay_cmd", 1);
     setScannerZoneSet(ZONE_ZERO_CMD);
     util::Barrier zone_zero_barrier;
-    SubscriberMock2<std_msgs::UInt8> sm{ nh_, "/laser_1/active_zoneset", QUEUE_SIZE };
+    SubscriberMock<std_msgs::UInt8> sm{ nh_, "/laser_1/active_zoneset", QUEUE_SIZE };
     EXPECT_CALL(sm, callback(createActiveZonesetMsg(0))).Times(AnyNumber()).WillOnce(OpenBarrier(&zone_zero_barrier));
     zone_zero_barrier.waitTillRelease(DEFAULT_TIMEOUT);
   }
@@ -85,7 +85,7 @@ TEST_F(ActiveZonesetSwitchTests, shouldPublishChangedZonesetIfIOChanges)
   util::Barrier zone_zero_barrier;
   util::Barrier zone_one_barrier;
 
-  SubscriberMock2<std_msgs::UInt8> sm{ nh_, "/laser_1/active_zoneset", 1 };
+  SubscriberMock<std_msgs::UInt8> sm{ nh_, "/laser_1/active_zoneset", 1 };
   {
     ::testing::InSequence s;
     EXPECT_CALL(sm, callback(createActiveZonesetMsg(0))).Times(AnyNumber()).WillOnce(OpenBarrier(&zone_zero_barrier));
