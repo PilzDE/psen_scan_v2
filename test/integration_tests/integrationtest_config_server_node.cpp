@@ -115,22 +115,6 @@ ZoneSetConfiguration readSingleMsgFromBagFile(const std::string& filepath, const
   bag.close();
   return *msg;
 }
-
-class SubscriberMock
-{
-public:
-  SubscriberMock()
-  {
-    subscriber_ = nh_.subscribe("/test_ns_laser_1/zoneconfiguration", 10, &SubscriberMock::callback, this);
-  }
-
-  MOCK_METHOD1(callback, void(const ros::MessageEvent<ZoneSetConfiguration const>& event));
-
-private:
-  ros::NodeHandle nh_;
-  ros::Subscriber subscriber_;
-};
-
 class ConfigServerNodeTest : public testing::Test
 {
 public:
@@ -177,7 +161,9 @@ TEST_F(ConfigServerNodeTest, shouldAdvertiseZonesetTopic)
 
 TEST_F(ConfigServerNodeTest, shouldPublishLatchedOnZonesetTopic)
 {
-  SubscriberMock subscriber_mock;
+  ros::NodeHandle nh;
+  SubscriberMock2<ros::MessageEvent<ZoneSetConfiguration const>> subscriber_mock(
+      nh, "/test_ns_laser_1/zoneconfiguration", 10);
   util::Barrier topic_received_barrier;
 
   EXPECT_CALL(subscriber_mock, callback(isLatched())).WillOnce(OpenBarrier(&topic_received_barrier));
@@ -187,7 +173,9 @@ TEST_F(ConfigServerNodeTest, shouldPublishLatchedOnZonesetTopic)
 
 TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedZoneSetConfig)
 {
-  SubscriberMock subscriber_mock;
+  ros::NodeHandle nh;
+  SubscriberMock2<ros::MessageEvent<ZoneSetConfiguration const>> subscriber_mock(
+      nh, "/test_ns_laser_1/zoneconfiguration", 10);
   util::Barrier msg_received_barrier;
 
   EXPECT_CALL(subscriber_mock, callback(msgZoneSetConfigEQ(expectedZoneSetConfig())))

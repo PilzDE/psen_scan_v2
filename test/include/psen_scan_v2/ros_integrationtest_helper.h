@@ -73,6 +73,22 @@ MATCHER_P(messageEQ, expected_msg, "")
   return expected_msg == *actual_msg;
 }
 
+// template <String topicName, int queueSize>
+template <typename T>
+class SubscriberMock2
+{
+public:
+  SubscriberMock2(ros::NodeHandle& nh, std::string topicName, int queueSize)
+  {
+    subscriber_ = nh.subscribe(topicName, queueSize, &SubscriberMock2::callback, this);
+  }
+
+  MOCK_METHOD1_T(callback, void(const T& t));
+
+private:
+  ros::Subscriber subscriber_;
+};
+
 }  // namespace psen_scan_v2_test
 
 #endif  // PSEN_SCAN_V2_ROS_INTEGRATIONTEST_HELPER_H
