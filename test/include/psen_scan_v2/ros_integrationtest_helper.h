@@ -85,6 +85,11 @@ public:
 
   MOCK_METHOD1_T(callback, void(const T& t));
 
+  ros::Subscriber getSubscriber()
+  {
+    return subscriber_;
+  }
+
 private:
   ros::Subscriber subscriber_;
 };

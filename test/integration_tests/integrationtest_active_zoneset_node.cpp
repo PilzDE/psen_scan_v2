@@ -75,30 +75,35 @@ public:
     subscriber_ = nh_.subscribe("/test_ns_laser_1/active_zoneset_marker", 10, &MarkerSubscriberMock::callback, this);
   }
 
-  bool isConnected(const ros::Duration& timeout = ros::Duration(3.0)) const
-  {
-    const auto start_time = ros::Time::now();
-    while (ros::ok())
-    {
-      if (subscriber_.getNumPublishers() > 0)
-      {
-        return true;
-      }
-      if ((ros::Time::now() - start_time) > timeout)
-      {
-        return false;
-      }
-      ros::Duration(0.1).sleep();
-    }
-    return false;
-  }
-
   MOCK_METHOD1(callback, void(const visualization_msgs::MarkerConstPtr& msg));
+
+  ros::Subscriber getSubscriber()
+  {
+    return subscriber_;
+  }
 
 private:
   ros::NodeHandle nh_;
   ros::Subscriber subscriber_;
 };
+
+bool isConnected(MarkerSubscriberMock& subscriber, const ros::Duration& timeout = ros::Duration(3.0))
+{
+  const auto start_time = ros::Time::now();
+  while (ros::ok())
+  {
+    if (subscriber.getSubscriber().getNumPublishers() > 0)
+    {
+      return true;
+    }
+    if ((ros::Time::now() - start_time) > timeout)
+    {
+      return false;
+    }
+    ros::Duration(0.1).sleep();
+  }
+  return false;
+}
 
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
 static const std::string SAFETY_NS_ZONE_1{ "active zoneset safety1 min:-10.0 max:+10.0" };
@@ -138,13 +143,13 @@ void ActiveZonesetNodeTest::SetUp()
 
   // initialize here to avoid traffic of above reset
   marker_sub_mock_.reset(new MarkerSubscriberMock{});
-  ASSERT_TRUE(marker_sub_mock_->isConnected());
+  ASSERT_TRUE(isConnected(*marker_sub_mock_));
 }
 
 ::testing::AssertionResult ActiveZonesetNodeTest::switchToInvalidActiveZoneAfterSetup()
 {
   MarkerSubscriberMock invalid_marker_mock;
-  if (!invalid_marker_mock.isConnected())
+  if (!isConnected(invalid_marker_mock))
   {
     return ::testing::AssertionFailure() << "Could not connect with subscriber on marker topic.";
   }
@@ -172,7 +177,7 @@ void ActiveZonesetNodeTest::sendActiveZone(uint8_t zone)
 ::testing::AssertionResult ActiveZonesetNodeTest::resetActiveZoneNode()
 {
   MarkerSubscriberMock reset_marker_mock;
-  if (!reset_marker_mock.isConnected())
+  if (!isConnected(reset_marker_mock))
   {
     return ::testing::AssertionFailure() << "Could not connect with subscriber on marker topic.";
   }
