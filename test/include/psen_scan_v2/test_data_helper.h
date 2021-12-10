@@ -36,7 +36,6 @@ using namespace psen_scan_v2_standalone;
 namespace test_data
 {
 static constexpr uint16_t FIRST_FROM_THETA{ 2500 };  // change to 1 after scan counter fix in firmware
-static constexpr uint16_t LAST_FROM_THETA{ 2000 };   // change to 2500 after scan counter fix in firmware
 
 static int64_t secToNSec(const double& sec)
 {
@@ -58,18 +57,14 @@ static void addUdpData(TestData& test_data, const udp_data::UdpData& udp_data)
 {
   for (const auto& udp_datum : udp_data)
   {
-    const auto it = std::find_if(test_data.begin(), test_data.end(), [&udp_datum](const auto& test_datum) {
-      return test_datum.scanCounter() == udp_datum.scan_counter_;
-    });
-    if (it != test_data.end())
+    if (udp_datum.from_theta_ == FIRST_FROM_THETA)
     {
-      if (udp_datum.from_theta_ == FIRST_FROM_THETA)
+      const auto it = std::find_if(test_data.begin(), test_data.end(), [&udp_datum](const auto& test_datum) {
+        return test_datum.scanCounter() == udp_datum.scan_counter_;
+      });
+      if (it != test_data.end())
       {
         it->setFirstFrameTime(secToNSec(udp_datum.timestamp_sec_));
-      }
-      if (udp_datum.from_theta_ == LAST_FROM_THETA)
-      {
-        it->setLastFrameTime(secToNSec(udp_datum.timestamp_sec_));
       }
     }
   }

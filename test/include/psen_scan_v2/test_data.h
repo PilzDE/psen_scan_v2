@@ -31,7 +31,6 @@ public:
   TestDatum(const uint32_t scan_counter, const int64_t timestamp, const int64_t callback_invocation_time);
 
   void setFirstFrameTime(const int64_t first_frame_time);
-  void setLastFrameTime(const int64_t last_frame_time);
 
   bool isComplete() const;
 
@@ -39,14 +38,12 @@ public:
   int64_t timestamp() const;
   int64_t callbackInvocationTime() const;
   int64_t firstFrameTime() const;
-  int64_t lastFrameTime() const;
 
 private:
   uint32_t scan_counter_;
   int64_t timestamp_;
   int64_t callback_invocation_time_;
   boost::optional<int64_t> first_frame_time_;
-  boost::optional<int64_t> last_frame_time_;
 };
 
 using TestData = std::vector<TestDatum>;
