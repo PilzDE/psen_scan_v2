@@ -213,7 +213,7 @@ inline void ScannerProtocolDef::notifyUserAboutRefusedStartReply(scanner_events:
 
 inline void ScannerProtocolDef::checkForDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& msg)
 {
-  if (!msg.diagnosticMessages().empty())
+  if (msg.hasDiagnosticMessagesField() && !msg.diagnosticMessages().empty())
   {
     PSENSCAN_WARN_THROTTLE(
         1 /* sec */, "StateMachine", "The scanner reports an error: {}", util::formatRange(msg.diagnosticMessages()));

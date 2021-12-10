@@ -439,6 +439,21 @@ TEST_F(ScannerAPITestsFragmented, LaserScanShouldContainAllInfosTransferedByMoni
   REMOVE_LOG_MOCK
 }
 
+TEST_F(ScannerAPITestsFragmented, shouldCallLaserscanCallbackInCaseOfMissingDiagnostics)
+{
+  EXPECT_SCANNER_TO_START_SUCCESSFULLY(hw_mock_, driver_, config_);
+
+  util::Barrier monitoring_frame_barrier;
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).WillOnce(OpenBarrier(&monitoring_frame_barrier));
+
+  const auto msg{ createValidMonitoringFrameMsgWithoutDiagnostics() };
+  hw_mock_->sendMonitoringFrame(msg);
+
+  monitoring_frame_barrier.waitTillRelease(2s);
+
+  EXPECT_SCANNER_TO_STOP_SUCCESSFULLY(hw_mock_, driver_);
+}
+
 TEST_F(ScannerAPITestsFragmented, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFrame)
 {
   INJECT_LOG_MOCK;
