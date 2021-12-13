@@ -83,7 +83,7 @@ public:
     subscriber_ = nh.subscribe(topicName, queueSize, &SubscriberMock::callback, this);
   }
 
-  MOCK_METHOD1_T(callback, void(const T& t));
+  MOCK_METHOD1_T(callback, void(const T& msg));
 
   ros::Subscriber getSubscriber()
   {
