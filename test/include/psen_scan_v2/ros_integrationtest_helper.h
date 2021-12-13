@@ -73,7 +73,6 @@ MATCHER_P(messageEQ, expected_msg, "")
   return expected_msg == *actual_msg;
 }
 
-// template <String topicName, int queueSize>
 template <typename T>
 class SubscriberMock
 {
