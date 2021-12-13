@@ -72,8 +72,8 @@ static std::vector<double> generateIntensities(const unsigned int& num_elements,
 }
 
 static data_conversion_layer::monitoring_frame::MessageBuilder
-prepareMinimalValidMonitoringFrameMsg(const util::TenthOfDegree start_angle = DEFAULT_SCAN_RANGE.getStart(),
-                                      const util::TenthOfDegree end_angle = DEFAULT_SCAN_RANGE.getEnd())
+createMonitoringFrameMsgBuilderWithoutDiagnostics(const util::TenthOfDegree start_angle = DEFAULT_SCAN_RANGE.getStart(),
+                                                  const util::TenthOfDegree end_angle = DEFAULT_SCAN_RANGE.getEnd())
 {
   const auto resolution{ util::TenthOfDegree(10) };
   data_conversion_layer::monitoring_frame::MessageBuilder msg_builder;
@@ -92,39 +92,39 @@ prepareMinimalValidMonitoringFrameMsg(const util::TenthOfDegree start_angle = DE
 }
 
 static data_conversion_layer::monitoring_frame::MessageBuilder
-prepareValidMonitoringFrameMsg(const util::TenthOfDegree start_angle = DEFAULT_SCAN_RANGE.getStart(),
-                               const util::TenthOfDegree end_angle = DEFAULT_SCAN_RANGE.getEnd())
+createMonitoringFrameMsgBuilder(const util::TenthOfDegree start_angle = DEFAULT_SCAN_RANGE.getStart(),
+                                const util::TenthOfDegree end_angle = DEFAULT_SCAN_RANGE.getEnd())
 {
-  return prepareMinimalValidMonitoringFrameMsg(start_angle, end_angle)
+  return createMonitoringFrameMsgBuilderWithoutDiagnostics(start_angle, end_angle)
       .diagnosticMessages({ { configuration::ScannerId::master,
                               data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 7) } });
 }
 
 static data_conversion_layer::monitoring_frame::Message
-createValidMonitoringFrameMsg(const uint32_t scan_counter = DEFAULT_SCAN_COUNTER,
-                              const util::TenthOfDegree start_angle = DEFAULT_SCAN_RANGE.getStart(),
-                              const util::TenthOfDegree end_angle = DEFAULT_SCAN_RANGE.getEnd())
+createMonitoringFrameMsg(const uint32_t scan_counter = DEFAULT_SCAN_COUNTER,
+                         const util::TenthOfDegree start_angle = DEFAULT_SCAN_RANGE.getStart(),
+                         const util::TenthOfDegree end_angle = DEFAULT_SCAN_RANGE.getEnd())
 {
-  return prepareValidMonitoringFrameMsg(start_angle, end_angle).scanCounter(scan_counter);
+  return createMonitoringFrameMsgBuilder(start_angle, end_angle).scanCounter(scan_counter);
 }
 
-static data_conversion_layer::monitoring_frame::Message createValidMonitoringFrameMsgWithoutDiagnostics()
+static data_conversion_layer::monitoring_frame::Message createMonitoringFrameMsgWithoutDiagnostics()
 {
-  return prepareMinimalValidMonitoringFrameMsg();
+  return createMonitoringFrameMsgBuilderWithoutDiagnostics();
 }
 
 static data_conversion_layer::monitoring_frame::Message
-createValidMonitoringFrameMsgWithZoneset(const uint8_t active_zoneset)
+createMonitoringFrameMsgWithZoneset(const uint8_t active_zoneset)
 {
-  return prepareValidMonitoringFrameMsg().activeZoneset(active_zoneset);
+  return createMonitoringFrameMsgBuilder().activeZoneset(active_zoneset);
 }
 
-std::vector<data_conversion_layer::monitoring_frame::Message>
-createValidMonitoringFrameMsgs(const uint32_t scan_counter, const std::size_t num_elements)
+std::vector<data_conversion_layer::monitoring_frame::Message> createMonitoringFrameMsgs(const uint32_t scan_counter,
+                                                                                        const std::size_t num_elements)
 {
   std::vector<data_conversion_layer::monitoring_frame::Message> msgs;
   std::generate_n(std::back_inserter(msgs), num_elements, [scan_counter]() {
-    return prepareValidMonitoringFrameMsg().scanCounter(scan_counter);
+    return createMonitoringFrameMsgBuilder().scanCounter(scan_counter);
   });
   return msgs;
 }
@@ -139,7 +139,7 @@ createMonitoringFrameMsgsForScanRound(const uint32_t scan_counter, const std::si
         (DEFAULT_SCAN_RANGE.getEnd() / static_cast<int>(num_elements)) * static_cast<int>(i);
     const util::TenthOfDegree end_angle =
         (DEFAULT_SCAN_RANGE.getEnd() / static_cast<int>(num_elements)) * static_cast<int>(i + 1);
-    msgs.push_back(prepareValidMonitoringFrameMsg(start_angle, end_angle).scanCounter(scan_counter));
+    msgs.push_back(createMonitoringFrameMsgBuilder(start_angle, end_angle).scanCounter(scan_counter));
   }
   return msgs;
 }
