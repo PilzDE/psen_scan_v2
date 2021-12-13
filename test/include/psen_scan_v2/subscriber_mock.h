@@ -21,8 +21,6 @@
 
 #include <ros/master.h>
 
-using namespace std::chrono_literals;
-
 namespace psen_scan_v2_test
 {
 template <typename T>

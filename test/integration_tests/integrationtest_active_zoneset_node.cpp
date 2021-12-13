@@ -69,25 +69,6 @@ MATCHER(hasAddAction, "")
   return arg->action == visualization_msgs::Marker::ADD;
 }
 
-bool isConnected(SubscriberMock<visualization_msgs::MarkerConstPtr>& subscriber,
-                 const ros::Duration& timeout = ros::Duration(3.0))
-{
-  const auto start_time = ros::Time::now();
-  while (ros::ok())
-  {
-    if (subscriber.getSubscriber().getNumPublishers() > 0)
-    {
-      return true;
-    }
-    if ((ros::Time::now() - start_time) > timeout)
-    {
-      return false;
-    }
-    ros::Duration(0.1).sleep();
-  }
-  return false;
-}
-
 static constexpr int QUEUE_SIZE{ 10 };
 
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
