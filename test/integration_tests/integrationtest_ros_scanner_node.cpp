@@ -40,6 +40,7 @@
 
 #include "psen_scan_v2/scanner_mock.h"
 #include "psen_scan_v2/ros_integrationtest_helper.h"
+#include "psen_scan_v2/subscriber_mock.h"
 
 using namespace psen_scan_v2;
 using namespace psen_scan_v2_standalone;

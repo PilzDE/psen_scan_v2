@@ -34,6 +34,7 @@
 #include "psen_scan_v2/zoneset_msg_builder.h"
 
 #include "psen_scan_v2/ros_integrationtest_helper.h"
+#include "psen_scan_v2/subscriber_mock.h"
 
 #include "psen_scan_v2_standalone/util/async_barrier.h"
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
