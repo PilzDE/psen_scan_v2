@@ -161,18 +161,6 @@ TEST_F(RosScannerNodeTests, shouldThrowExceptionSetInScannerStartFuture)
 {
   ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
 
-  std::promise<void> hw_finished_request;
-  const std::string error_msg = "error msg for testing";
-  hw_finished_request.set_exception(std::make_exception_ptr(std::runtime_error(error_msg)));
-
-  ON_CALL(ros_scanner_node.scanner_, start()).WillByDefault(ReturnFuture(&hw_finished_request));
-  EXPECT_THROW_AND_WHAT(ros_scanner_node.run(), std::runtime_error, error_msg.c_str());
-}
-
-TEST_F(RosScannerNodeTests, shouldThrowDelayedExceptionSetInScannerStartFuture)
-{
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
-
   util::Barrier start_barrier;
   std::promise<void> hw_finished_request;
   ON_CALL(ros_scanner_node.scanner_, start())
@@ -315,6 +303,33 @@ TEST_F(RosScannerNodeTests, shouldWaitWhenStopRequestResponseIsMissing)
   ros_scanner_node.terminate();
   EXPECT_FUTURE_TIMEOUT(loop, STOP_TIMEOUT) << "ROS node did not wait for stop response";
   loop.wait_for(LOOP_END_TIMEOUT);
+}
+
+TEST_F(RosScannerNodeTests, shouldThrowExceptionSetInScannerStopFuture)
+{
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
+
+  util::Barrier start_barrier;
+  ON_CALL(ros_scanner_node.scanner_, start())
+      .WillByDefault(DoAll(OpenBarrier(&start_barrier), ReturnReadyVoidFuture()));
+
+  std::promise<void> stop_finished_request;
+  const std::string error_msg = "error msg for testing";
+
+  ON_CALL(ros_scanner_node.scanner_, stop()).WillByDefault(ReturnFuture(&stop_finished_request));
+
+  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
+  ASSERT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
+
+  ros_scanner_node.terminate();
+  ros::Duration(1.0).sleep();
+
+  stop_finished_request.set_exception(std::make_exception_ptr(std::runtime_error(error_msg)));
+
+  EXPECT_FUTURE_IS_READY(loop, STOP_TIMEOUT) << "ROS node did not wait for stop response";
+  loop.wait_for(LOOP_END_TIMEOUT);
+
+  EXPECT_THROW_AND_WHAT(loop.get(), std::runtime_error, error_msg.c_str());
 }
 
 }  // namespace psen_scan_v2
