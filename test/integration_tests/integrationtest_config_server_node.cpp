@@ -154,17 +154,21 @@ private:
   ZoneSetConfiguration zoneset_config_;
 };
 
+const std::string ZONE_CONFIGURATION_TOPICNAME{ "/test_ns_laser_1/zoneconfiguration" };
+
 TEST_F(ConfigServerNodeTest, shouldAdvertiseZonesetTopic)
 {
   // Set param on server
-  EXPECT_TRUE(TopicExists("/test_ns_laser_1/zoneconfiguration"));
+  EXPECT_TRUE(TopicExists(ZONE_CONFIGURATION_TOPICNAME));
 }
+
+static constexpr int QUEUE_SIZE{ 10 };
 
 TEST_F(ConfigServerNodeTest, shouldPublishLatchedOnZonesetTopic)
 {
   ros::NodeHandle nh;
   SubscriberMock<ros::MessageEvent<ZoneSetConfiguration const>> subscriber_mock(
-      nh, "/test_ns_laser_1/zoneconfiguration", 10);
+      nh, ZONE_CONFIGURATION_TOPICNAME, QUEUE_SIZE);
   util::Barrier topic_received_barrier;
 
   EXPECT_CALL(subscriber_mock, callback(isLatched())).WillOnce(OpenBarrier(&topic_received_barrier));
@@ -176,7 +180,7 @@ TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedZoneSetConfig)
 {
   ros::NodeHandle nh;
   SubscriberMock<ros::MessageEvent<ZoneSetConfiguration const>> subscriber_mock(
-      nh, "/test_ns_laser_1/zoneconfiguration", 10);
+      nh, ZONE_CONFIGURATION_TOPICNAME, QUEUE_SIZE);
   util::Barrier msg_received_barrier;
 
   EXPECT_CALL(subscriber_mock, callback(msgZoneSetConfigEQ(expectedZoneSetConfig())))

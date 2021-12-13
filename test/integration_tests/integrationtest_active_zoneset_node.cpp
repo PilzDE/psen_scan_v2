@@ -113,10 +113,12 @@ void ActiveZonesetNodeTest::SetUp()
   ASSERT_TRUE(isConnected(*marker_sub_mock_));
 }
 
+const std::string ACTIVE_ZONESET_MARKER_TOPICNAME{ "/test_ns_laser_1/active_zoneset_marker" };
+
 ::testing::AssertionResult ActiveZonesetNodeTest::switchToInvalidActiveZoneAfterSetup()
 {
   SubscriberMock<visualization_msgs::MarkerConstPtr> invalid_marker_mock(
-      nh_, "/test_ns_laser_1/active_zoneset_marker", QUEUE_SIZE);
+      nh_, ACTIVE_ZONESET_MARKER_TOPICNAME, QUEUE_SIZE);
   if (!isConnected(invalid_marker_mock))
   {
     return ::testing::AssertionFailure() << "Could not connect with subscriber on marker topic.";
@@ -145,7 +147,7 @@ void ActiveZonesetNodeTest::sendActiveZone(uint8_t zone)
 ::testing::AssertionResult ActiveZonesetNodeTest::resetActiveZoneNode()
 {
   SubscriberMock<visualization_msgs::MarkerConstPtr> reset_marker_mock(
-      nh_, "/test_ns_laser_1/active_zoneset_marker", QUEUE_SIZE);
+      nh_, ACTIVE_ZONESET_MARKER_TOPICNAME, QUEUE_SIZE);
 
   if (!isConnected(reset_marker_mock))
   {
