@@ -54,8 +54,15 @@ public:
   virtual std::future<void> stop() = 0;
 
 protected:
-  const ScannerConfiguration& getConfig() const;
-  const LaserScanCallback& getLaserScanCallback() const;
+  /*! deprecated: use const ScannerConfiguration& config() const instead */
+  [[deprecated("use const ScannerConfiguration& config() const instead")]] const ScannerConfiguration&
+  getConfig() const;
+  const ScannerConfiguration& config() const;
+
+  /*! deprecated: use const LaserScanCallback& laserScanCallback() const instead */
+  [[deprecated("use const LaserScanCallback& laserScanCallback() const instead")]] const LaserScanCallback&
+  getLaserScanCallback() const;
+  const LaserScanCallback& laserScanCallback() const;
 
 private:
   const ScannerConfiguration config_;
@@ -69,6 +76,16 @@ inline IScanner::IScanner(const ScannerConfiguration& scanner_config, const Lase
   {
     throw std::invalid_argument("Laserscan-callback must not be null");
   }
+}
+
+inline const ScannerConfiguration& IScanner::config() const
+{
+  return config_;
+}
+
+inline const IScanner::LaserScanCallback& IScanner::laserScanCallback() const
+{
+  return laser_scan_callback_;
 }
 
 inline const ScannerConfiguration& IScanner::getConfig() const
