@@ -73,7 +73,7 @@ static void addUdpData(TestData& test_data, const udp_data::UdpData& udp_data)
       });
       if (it != test_data.end())
       {
-        it->setFirstFrameTime(secToNSec(udp_datum.timestamp_sec_));
+        it->firstFrameTime(secToNSec(udp_datum.timestamp_sec_));
       }
     }
   }
