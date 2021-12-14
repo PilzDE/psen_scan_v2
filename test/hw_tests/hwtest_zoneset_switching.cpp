@@ -67,15 +67,13 @@ public:
   {
     pub_relay_cmd_ = nh_.advertise<std_msgs::Byte>("/relay_cmd", 1);
     setScannerZoneSet(ZONE_ZERO_CMD);
-    util::Barrier zone_zero_barrier;
-    SubscriberMock sm{ nh_ };
-    EXPECT_CALL(sm, callback(createActiveZonesetMsg(0))).Times(AnyNumber()).WillOnce(OpenBarrier(&zone_zero_barrier));
-    zone_zero_barrier.waitTillRelease(DEFAULT_TIMEOUT);
+    ros::Duration(2).sleep();
   }
 
   void TearDown() override
   {
     setScannerZoneSet(ZONE_ZERO_CMD);
+    ros::Duration(2).sleep();
   }
 
 protected:
@@ -101,14 +99,14 @@ TEST_F(ActiveZonesetSwitchTests, shouldPublishChangedZonesetIfIOChanges)
   SubscriberMock sm{ nh_ };
   {
     ::testing::InSequence s;
-    EXPECT_CALL(sm, callback(createActiveZonesetMsg(0))).Times(AnyNumber()).WillOnce(OpenBarrier(&zone_zero_barrier));
     EXPECT_CALL(sm, callback(createActiveZonesetMsg(1))).Times(AnyNumber()).WillOnce(OpenBarrier(&zone_one_barrier));
+    EXPECT_CALL(sm, callback(createActiveZonesetMsg(0))).Times(AnyNumber()).WillOnce(OpenBarrier(&zone_zero_barrier));
   }
 
-  setScannerZoneSet(ZONE_ZERO_CMD);
-  EXPECT_BARRIER_OPENS(zone_zero_barrier, DEFAULT_TIMEOUT);
   setScannerZoneSet(ZONE_ONE_CMD);
   EXPECT_BARRIER_OPENS(zone_one_barrier, DEFAULT_TIMEOUT);
+  setScannerZoneSet(ZONE_ZERO_CMD);
+  EXPECT_BARRIER_OPENS(zone_zero_barrier, DEFAULT_TIMEOUT);
 }
 
 }  // namespace psen_scan_v2_test
