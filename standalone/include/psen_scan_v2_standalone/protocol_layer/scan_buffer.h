@@ -100,12 +100,12 @@ public:
    */
   void reset();
 
-  /*! deprecated: use std::vector<data_conversion_layer::monitoring_frame::MessageStamped> current_round() instead */
-  [[deprecated("use std::vector<data_conversion_layer::monitoring_frame::MessageStamped> current_round() "
+  /*! deprecated: use std::vector<data_conversion_layer::monitoring_frame::MessageStamped> currentRound() instead */
+  [[deprecated("use std::vector<data_conversion_layer::monitoring_frame::MessageStamped> currentRound() "
                "instead")]] std::vector<data_conversion_layer::monitoring_frame::MessageStamped>
   getMsgs();
 
-  std::vector<data_conversion_layer::monitoring_frame::MessageStamped> current_round();
+  std::vector<data_conversion_layer::monitoring_frame::MessageStamped> currentRound();
 
   bool isRoundComplete();
 
@@ -127,7 +127,7 @@ inline void ScanBuffer::reset()
   current_round_.clear();
 }
 
-inline std::vector<data_conversion_layer::monitoring_frame::MessageStamped> ScanBuffer::current_round()
+inline std::vector<data_conversion_layer::monitoring_frame::MessageStamped> ScanBuffer::currentRound()
 {
   return current_round_;
 }

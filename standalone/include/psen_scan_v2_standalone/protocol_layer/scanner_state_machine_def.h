@@ -253,7 +253,7 @@ inline void ScannerProtocolDef::informUserAboutTheScanData(
     scan_buffer_.add(stamped_msg);
     if (!config_.fragmentedScansEnabled() && scan_buffer_.isRoundComplete())
     {
-      sendMessageWithMeasurements(scan_buffer_.current_round());
+      sendMessageWithMeasurements(scan_buffer_.currentRound());
     }
   }
   catch (const ScanRoundError& ex)
