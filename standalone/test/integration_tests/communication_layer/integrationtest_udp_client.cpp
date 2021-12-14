@@ -128,7 +128,7 @@ data_conversion_layer::RawData createRawData(std::string dataString)
 
 TEST_F(UdpClientTests, testGetHostIp)
 {
-  EXPECT_EQ(HOST_IP_ADDRESS, udp_client_->getHostIp().to_string());
+  EXPECT_EQ(HOST_IP_ADDRESS, udp_client_->hostIp().to_string());
 }
 
 TEST_F(UdpClientTests, testAsyncReadOperation)

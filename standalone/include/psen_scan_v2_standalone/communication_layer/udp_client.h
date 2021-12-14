@@ -149,8 +149,14 @@ public:
 
   /**
    * @brief Returns local ip address of current socket connection.
+   * deprecated: use boost::asio::ip::address_v4 hostIp() instead
    */
-  boost::asio::ip::address_v4 getHostIp();
+  [[deprecated("use boost::asio::ip::address_v4 hostIp() instead")]] boost::asio::ip::address_v4 getHostIp();
+
+  /**
+   * @brief Returns local ip address of current socket connection.
+   */
+  boost::asio::ip::address_v4 hostIp();
 
 private:
   void asyncReceive(const ReceiveMode& modi);
@@ -237,6 +243,11 @@ inline void UdpClientImpl::close()
     throw CloseConnectionFailure(ex.what());
   }
   // LCOV_EXCL_STOP
+}
+
+inline boost::asio::ip::address_v4 UdpClientImpl::hostIp()
+{
+  return socket_.local_endpoint().address().to_v4();
 }
 
 inline boost::asio::ip::address_v4 UdpClientImpl::getHostIp()
