@@ -57,7 +57,11 @@ public:
 private:
   void updateMarkers();
   bool isAllInformationAvailable() const;
+
+  /*! deprecated: use ZoneSet activeZoneset() const instead */
+  [[deprecated("use ZoneSet activeZoneset() const instead")]] ZoneSet getActiveZoneset() const;
   ZoneSet activeZoneset() const;
+
   void deleteLastMarkers();
   void addMarkers(std::vector<visualization_msgs::Marker>& new_markers);
   bool containLastMarkers(const std::vector<visualization_msgs::Marker>& new_markers);

@@ -82,6 +82,11 @@ ZoneSet ActiveZonesetNode::activeZoneset() const
   return zoneset_config_->zonesets.at(active_zoneset_id_->data);
 }
 
+ZoneSet ActiveZonesetNode::getActiveZoneset() const
+{
+  return zoneset_config_->zonesets.at(active_zoneset_id_->data);
+}
+
 void ActiveZonesetNode::addMarkers(std::vector<visualization_msgs::Marker>& new_markers)
 {
   for (const auto& marker : new_markers)
