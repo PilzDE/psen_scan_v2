@@ -196,17 +196,39 @@ public:
   constexpr Message(const configuration::ScannerId& id, const diagnostic::ErrorLocation& location);
   constexpr bool operator==(const diagnostic::Message& rhs) const;
 
-  constexpr configuration::ScannerId getScannerId() const
+  friend RawChunk serialize(const std::vector<diagnostic::Message>& messages);
+
+  /*! deprecated: use constexpr configuration::ScannerId scannerId() const instead */
+  [[deprecated("use constexpr configuration::ScannerId scannerId() const instead")]] constexpr configuration::ScannerId
+  getScannerId() const
   {
     return id_;
   }
 
-  constexpr ErrorLocation getErrorLocation() const
+  constexpr configuration::ScannerId scannerId() const
+  {
+    return id_;
+  }
+
+  /*! deprecated: use constexpr ErrorLocation errorLocation() const instead */
+  [[deprecated("use constexpr ErrorLocation errorLocation() const instead")]] constexpr ErrorLocation
+  getErrorLocation() const
   {
     return error_location_;
   }
 
-  constexpr ErrorType getDiagnosticCode() const
+  constexpr ErrorLocation errorLocation() const
+  {
+    return error_location_;
+  }
+
+  /*! deprecated: use constexpr ErrorType diagnosticCode() const instead */
+  [[deprecated("use constexpr ErrorType diagnosticCode() const instead")]] constexpr ErrorType getDiagnosticCode() const
+  {
+    return ERROR_BITS.at(error_location_.byte()).at(error_location_.bit());
+  }
+
+  constexpr ErrorType diagnosticCode() const
   {
     return ERROR_BITS.at(error_location_.byte()).at(error_location_.bit());
   }

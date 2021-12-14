@@ -127,8 +127,8 @@ RawChunk serialize(const std::vector<data_conversion_layer::monitoring_frame::di
 
   for (const auto& elem : messages)
   {
-    raw_diagnostic_data.at(calculateIndexInRawDiagnosticData(elem.getScannerId(), elem.getErrorLocation())) +=
-        (1 << elem.getErrorLocation().bit());
+    raw_diagnostic_data.at(calculateIndexInRawDiagnosticData(elem.scannerId(), elem.errorLocation())) +=
+        (1 << elem.errorLocation().bit());
   }
   return raw_diagnostic_data;
 }

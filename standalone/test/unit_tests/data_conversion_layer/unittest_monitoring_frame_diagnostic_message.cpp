@@ -24,10 +24,10 @@ TEST(MonitoringFrameDiagnosticMessageTest, shouldConstructMonitoringFrameDiagnos
 {
   auto msg = data_conversion_layer::monitoring_frame::diagnostic::Message(
       configuration::ScannerId::slave0, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(4, 3));
-  EXPECT_EQ(msg.getDiagnosticCode(), data_conversion_layer::monitoring_frame::diagnostic::ErrorType::conf_err);
-  EXPECT_EQ(msg.getErrorLocation().byte(), static_cast<size_t>(4));
-  EXPECT_EQ(msg.getErrorLocation().bit(), static_cast<size_t>(3));
-  EXPECT_EQ(msg.getScannerId(), configuration::ScannerId::slave0);
+  EXPECT_EQ(msg.diagnosticCode(), data_conversion_layer::monitoring_frame::diagnostic::ErrorType::conf_err);
+  EXPECT_EQ(msg.errorLocation().byte(), static_cast<size_t>(4));
+  EXPECT_EQ(msg.errorLocation().bit(), static_cast<size_t>(3));
+  EXPECT_EQ(msg.scannerId(), configuration::ScannerId::slave0);
 }
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldBeEqualOnSameInputData)
