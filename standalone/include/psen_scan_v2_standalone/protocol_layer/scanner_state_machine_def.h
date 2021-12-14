@@ -144,7 +144,7 @@ inline void ScannerProtocolDef::sendStartRequest(const T& event)
   if (!config_.hostIp())
   {
     auto host_ip{ control_client_.getHostIp() };
-    config_.setHostIp(host_ip.to_ulong());
+    config_.hostIp(host_ip.to_ulong());
     PSENSCAN_INFO("StateMachine", "No host ip set! Using local ip: {}", host_ip.to_string());
   }
   control_client_.write(

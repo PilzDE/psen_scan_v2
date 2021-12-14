@@ -265,7 +265,7 @@ TEST_F(ScannerConfigurationTest, shouldReturnSetHostIp)
   ScannerConfiguration sc{ createValidConfig() };
 
   const uint32_t host_ip{ util::convertIP(VALID_IP_OTHER) };
-  sc.setHostIp(host_ip);
+  sc.hostIp(host_ip);
 
   EXPECT_EQ(host_ip, sc.hostIp());
 }

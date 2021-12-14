@@ -53,7 +53,9 @@ public:
 
   bool fragmentedScansEnabled() const;
 
-  void setHostIp(const uint32_t& host_ip);
+  /*! deprecated: use void hostIp(const uint32_t& host_ip) instead */
+  [[deprecated("use void hostIp(const uint32_t& host_ip) instead")]] void setHostIp(const uint32_t& host_ip);
+  void hostIp(const uint32_t& host_ip);
 
 private:
   friend class ScannerConfigurationBuilder;
@@ -147,6 +149,11 @@ inline bool ScannerConfiguration::intensitiesEnabled() const
 inline bool ScannerConfiguration::fragmentedScansEnabled() const
 {
   return fragmented_scans_;
+}
+
+inline void ScannerConfiguration::hostIp(const uint32_t& host_ip)
+{
+  host_ip_ = host_ip;
 }
 
 inline void ScannerConfiguration::setHostIp(const uint32_t& host_ip)
