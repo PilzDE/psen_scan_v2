@@ -159,11 +159,6 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
                  .build();
 
   auto raw = serialize(msg);
-  for (const auto& r : raw)
-  {
-    std::cout << std::hex << static_cast<int>(r) << " ";
-  }
-  std::cout << std::endl;
   auto deserialized_msg = monitoring_frame::deserialize(convertToRawData(raw), raw.size());
 
   EXPECT_THAT(deserialized_msg, MonitoringFrameEq(msg));

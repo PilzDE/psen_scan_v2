@@ -62,9 +62,9 @@ inline std::stringstream readIODataToStream(const std::array<uint8_t, ARRAY_SIZE
 {
   std::array<uint8_t, 22> io_dump;
   std::copy(hex_dump.begin() + offset_io_field + 42, hex_dump.begin() + offset_io_field + 64, io_dump.begin());
-  auto raw = convertToRawData(io_dump);
+
   std::stringstream ss;
-  ss.write(raw.data(), 64);
+  ss.write(convertToRawData(io_dump).data(), 22);
   return ss;
 }
 
