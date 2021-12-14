@@ -250,14 +250,14 @@ TEST_F(ScannerConfigurationTest, shouldReturnCorrectStartAngleAfterConstruction)
 {
   const ScannerConfiguration sc{ createValidConfig() };
 
-  EXPECT_EQ(SCAN_RANGE.getStart(), sc.scanRange().getStart());
+  EXPECT_EQ(SCAN_RANGE.start(), sc.scanRange().start());
 }
 
 TEST_F(ScannerConfigurationTest, shouldReturnCorrectEndAngleAfterConstruction)
 {
   const ScannerConfiguration sc{ createValidConfig() };
 
-  EXPECT_EQ(SCAN_RANGE.getEnd(), sc.scanRange().getEnd());
+  EXPECT_EQ(SCAN_RANGE.end(), sc.scanRange().end());
 }
 
 TEST_F(ScannerConfigurationTest, shouldReturnSetHostIp)

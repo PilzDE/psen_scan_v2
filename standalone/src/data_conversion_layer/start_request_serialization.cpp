@@ -98,8 +98,8 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
   raw_processing::write(os, speed_encoder_enabled);
   raw_processing::write(os, diagnostics_enabled);
 
-  const auto start = msg.master_.getScanRange().getStart().value();
-  auto end = msg.master_.getScanRange().getEnd().value();
+  const auto start = msg.master_.getScanRange().start().value();
+  auto end = msg.master_.getScanRange().end().value();
   const auto resolution = msg.master_.getResolution().value();
 
   /* In order to get all the data points we want, the scanner needs a value
@@ -120,8 +120,8 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
 
   for (const auto& slave : msg.slaves_)
   {
-    raw_processing::write(os, slave.getScanRange().getStart().value());
-    raw_processing::write(os, slave.getScanRange().getEnd().value());
+    raw_processing::write(os, slave.getScanRange().start().value());
+    raw_processing::write(os, slave.getScanRange().end().value());
     raw_processing::write(os, slave.getResolution().value());
   }
 

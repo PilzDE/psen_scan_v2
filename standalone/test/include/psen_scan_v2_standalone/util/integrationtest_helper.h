@@ -78,8 +78,8 @@ static std::vector<double> generateIntensities(const unsigned int& num_elements,
 }
 
 static data_conversion_layer::monitoring_frame::MessageBuilder
-createMonitoringFrameMsgBuilderWithoutDiagnostics(const util::TenthOfDegree start_angle = DEFAULT_SCAN_RANGE.getStart(),
-                                                  const util::TenthOfDegree end_angle = DEFAULT_SCAN_RANGE.getEnd())
+createMonitoringFrameMsgBuilderWithoutDiagnostics(const util::TenthOfDegree start_angle = DEFAULT_SCAN_RANGE.start(),
+                                                  const util::TenthOfDegree end_angle = DEFAULT_SCAN_RANGE.end())
 {
   const auto resolution{ util::TenthOfDegree(10) };
   data_conversion_layer::monitoring_frame::MessageBuilder msg_builder;
@@ -148,9 +148,9 @@ createMonitoringFrameMsgsForScanRound(const uint32_t scan_counter, const std::si
   for (std::size_t i = 0; i < num_elements; ++i)
   {
     const util::TenthOfDegree start_angle =
-        (DEFAULT_SCAN_RANGE.getEnd() / static_cast<int>(num_elements)) * static_cast<int>(i);
+        (DEFAULT_SCAN_RANGE.end() / static_cast<int>(num_elements)) * static_cast<int>(i);
     const util::TenthOfDegree end_angle =
-        (DEFAULT_SCAN_RANGE.getEnd() / static_cast<int>(num_elements)) * static_cast<int>(i + 1);
+        (DEFAULT_SCAN_RANGE.end() / static_cast<int>(num_elements)) * static_cast<int>(i + 1);
     msgs.push_back(createMonitoringFrameMsgBuilder(start_angle, end_angle).scanCounter(scan_counter));
   }
   return msgs;
