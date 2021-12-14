@@ -151,11 +151,25 @@ public:
   using ByteLocation = size_t;
   using BitLocation = size_t;
   constexpr ErrorLocation(const ByteLocation& byte, const BitLocation& bit) : byte_(byte), bit_(bit){};
-  inline constexpr ByteLocation getByte() const
+
+  /*! deprecated: use inline constexpr ByteLocation byte() const instead */
+  [[deprecated("use inline constexpr ByteLocation byte() const instead")]] inline constexpr ByteLocation getByte() const
   {
     return byte_;
   };
-  inline constexpr BitLocation getBit() const
+
+  inline constexpr ByteLocation byte() const
+  {
+    return byte_;
+  };
+
+  /*! deprecated: use inline constexpr BitLocation bit() const instead */
+  [[deprecated("use inline constexpr BitLocation bit() const instead")]] inline constexpr BitLocation getBit() const
+  {
+    return bit_;
+  };
+
+  inline constexpr BitLocation bit() const
   {
     return bit_;
   };
@@ -194,7 +208,7 @@ public:
 
   constexpr ErrorType getDiagnosticCode() const
   {
-    return ERROR_BITS.at(error_location_.getByte()).at(error_location_.getBit());
+    return ERROR_BITS.at(error_location_.byte()).at(error_location_.bit());
   }
 
 private:
@@ -209,8 +223,8 @@ constexpr inline Message::Message(const configuration::ScannerId& id, const Erro
 
 constexpr inline bool Message::operator==(const Message& rhs) const
 {
-  return (error_location_.getBit() == rhs.error_location_.getBit() &&
-          error_location_.getByte() == rhs.error_location_.getByte() && id_ == rhs.id_);
+  return (error_location_.bit() == rhs.error_location_.bit() && error_location_.byte() == rhs.error_location_.byte() &&
+          id_ == rhs.id_);
 }
 
 // Store ambiguous errors for additional output

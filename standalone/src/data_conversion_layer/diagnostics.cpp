@@ -36,7 +36,7 @@ std::ostream& operator<<(std::ostream& os, const Message& msg)
 
   if (isAmbiguous(msg.getDiagnosticCode()))
   {
-    os << fmt::format(" (Byte:{} Bit:{})", msg.getErrorLocation().getByte(), msg.getErrorLocation().getBit());
+    os << fmt::format(" (Byte:{} Bit:{})", msg.getErrorLocation().byte(), msg.getErrorLocation().bit());
   }
 
   return os;
