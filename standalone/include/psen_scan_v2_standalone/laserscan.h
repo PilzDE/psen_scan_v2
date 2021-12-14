@@ -59,19 +59,55 @@ public:
             const int64_t timestamp);
 
 public:
-  const util::TenthOfDegree& getScanResolution() const;
-  const util::TenthOfDegree& getMinScanAngle() const;
-  const util::TenthOfDegree& getMaxScanAngle() const;
-  uint32_t getScanCounter() const;
-  uint8_t getActiveZoneset() const;
-  int64_t getTimestamp() const;
+  /*! deprecated: use const util::TenthOfDegree& scanResolution() const instead */
+  [[deprecated("use const util::TenthOfDegree& scanResolution() const instead")]] const util::TenthOfDegree&
+  getScanResolution() const;
+  const util::TenthOfDegree& scanResolution() const;
 
-  const MeasurementData& getMeasurements() const;
-  MeasurementData& getMeasurements();
-  void setMeasurements(const MeasurementData& measurements);
+  /*! deprecated: use const util::TenthOfDegree& minScanAngle() const instead */
+  [[deprecated("use const util::TenthOfDegree& minScanAngle() const instead")]] const util::TenthOfDegree&
+  getMinScanAngle() const;
+  const util::TenthOfDegree& minScanAngle() const;
 
-  const IntensityData& getIntensities() const;
-  void setIntensities(const IntensityData& intensities);
+  /*! deprecated: use const util::TenthOfDegree& maxScanAngle() const instead */
+  [[deprecated("use const util::TenthOfDegree& maxScanAngle() const instead")]] const util::TenthOfDegree&
+  getMaxScanAngle() const;
+  const util::TenthOfDegree& maxScanAngle() const;
+
+  /*! deprecated: use uint32_t scanCounter() const instead */
+  [[deprecated("use uint32_t scanCounter() const instead")]] uint32_t getScanCounter() const;
+  uint32_t scanCounter() const;
+
+  /*! deprecated: use uint8_t activeZoneset() const instead */
+  [[deprecated("use uint8_t activeZoneset() const instead")]] uint8_t getActiveZoneset() const;
+  uint8_t activeZoneset() const;
+
+  /*! deprecated: use int64_t timestamp() const instead */
+  [[deprecated("use int64_t timestamp() const instead")]] int64_t getTimestamp() const;
+  int64_t timestamp() const;
+
+  /*! deprecated: use const MeasurementData& measurements() instead */
+  [[deprecated("use const MeasurementData& measurements() const instead")]] const MeasurementData&
+  getMeasurements() const;
+  const MeasurementData& measurements() const;
+
+  /*! deprecated: use MeasurementData& measurements() instead */
+  [[deprecated("use MeasurementData& measurements() instead")]] MeasurementData& getMeasurements();
+  MeasurementData& measurements();
+
+  /*! deprecated: use void measurements(const MeasurementData& measurements) instead */
+  [[deprecated("use void measurements(const MeasurementData& measurements) instead")]] void
+  setMeasurements(const MeasurementData& measurements);
+  void measurements(const MeasurementData& measurements);
+
+  /*! deprecated: use const IntensityData& intensities() instead */
+  [[deprecated("use const IntensityData& intensities() const instead")]] const IntensityData& getIntensities() const;
+  const IntensityData& intensities() const;
+
+  /*! deprecated: use void intensities(const IntensityData& intensities) instead */
+  [[deprecated("use void intensities(const IntensityData& intensities)) instead")]] void
+  setIntensities(const IntensityData& intensities);
+  void intensities(const IntensityData& intensities);
 
   const IOData& getIOStates() const;
   void setIOStates(const IOData& io_states);

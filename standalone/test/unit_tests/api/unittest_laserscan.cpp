@@ -109,7 +109,7 @@ TEST(LaserScanTest, testGetScanResolution)
   LaserScanBuilder laser_scan_builder;
   std::unique_ptr<LaserScan> laser_scan;
   ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
-  EXPECT_EQ(DEFAULT_RESOLUTION, laser_scan->getScanResolution());
+  EXPECT_EQ(DEFAULT_RESOLUTION, laser_scan->scanResolution());
 }
 
 TEST(LaserScanTest, testGetMinScanAngle)
@@ -117,7 +117,7 @@ TEST(LaserScanTest, testGetMinScanAngle)
   LaserScanBuilder laser_scan_builder;
   std::unique_ptr<LaserScan> laser_scan;
   ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
-  EXPECT_EQ(DEFAULT_START_ANGLE, laser_scan->getMinScanAngle());
+  EXPECT_EQ(DEFAULT_START_ANGLE, laser_scan->minScanAngle());
 }
 
 TEST(LaserScanTest, testGetMaxScanAngle)
@@ -125,7 +125,7 @@ TEST(LaserScanTest, testGetMaxScanAngle)
   LaserScanBuilder laser_scan_builder;
   std::unique_ptr<LaserScan> laser_scan;
   ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
-  EXPECT_EQ(DEFAULT_END_ANGLE, laser_scan->getMaxScanAngle());
+  EXPECT_EQ(DEFAULT_END_ANGLE, laser_scan->maxScanAngle());
 }
 
 TEST(LaserScanTest, testMinEqualsMax)
@@ -140,7 +140,7 @@ TEST(LaserScanTest, testGetScanCounter)
   LaserScanBuilder laser_scan_builder;
   std::unique_ptr<LaserScan> laser_scan;
   ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
-  EXPECT_EQ(DEFAULT_SCAN_COUNTER, laser_scan->getScanCounter());
+  EXPECT_EQ(DEFAULT_SCAN_COUNTER, laser_scan->scanCounter());
 }
 
 TEST(LaserScanTest, testGetTimestamp)
@@ -148,7 +148,7 @@ TEST(LaserScanTest, testGetTimestamp)
   LaserScanBuilder laser_scan_builder;
   std::unique_ptr<LaserScan> laser_scan;
   ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
-  EXPECT_EQ(DEFAULT_TIMESTAMP, laser_scan->getTimestamp());
+  EXPECT_EQ(DEFAULT_TIMESTAMP, laser_scan->timestamp());
 }
 
 TEST(LaserScanTest, testGetActiveZoneset)
@@ -156,7 +156,7 @@ TEST(LaserScanTest, testGetActiveZoneset)
   LaserScanBuilder laser_scan_builder;
   std::unique_ptr<LaserScan> laser_scan;
   ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
-  EXPECT_EQ(DEFAULT_ACTIVE_ZONESET, laser_scan->getActiveZoneset());
+  EXPECT_EQ(DEFAULT_ACTIVE_ZONESET, laser_scan->activeZoneset());
 }
 
 TEST(LaserScanTest, testSetAndGetIOStates)
@@ -176,7 +176,7 @@ TEST(LaserScanTest, testPrintMessageSuccess)
   std::unique_ptr<LaserScan> laser_scan;
   ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
 
-  laser_scan->setMeasurements({ 45.0, 44.0, 43.0, 42.0 });
+  laser_scan->measurements({ 45.0, 44.0, 43.0, 42.0 });
   laser_scan->setIOStates({ { { PinState(3, "io_pin_data", true) }, {} } });
 
 // For compatibility with different ubuntu versions (resp. fmt), we need to take account of changes in

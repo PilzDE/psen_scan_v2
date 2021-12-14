@@ -125,8 +125,9 @@ inline LaserScan LaserScanConverter::toLaserScan(
                  stamped_msgs[0].msg_.scanCounter(),
                  stamped_msgs[sorted_stamped_msgs_indices.back()].msg_.activeZoneset(),
                  timestamp);
-  scan.setMeasurements(measurements);
-  scan.setIntensities(intensities);
+
+  scan.measurements(measurements);
+  scan.intensities(intensities);
   scan.setIOStates(io_states);
 
   return scan;

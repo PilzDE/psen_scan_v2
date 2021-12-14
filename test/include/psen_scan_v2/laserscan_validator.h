@@ -51,16 +51,16 @@ void addScanToBin(const psen_scan_v2_standalone::LaserScan& scan,
                   std::map<int16_t, NormalDist>& bin,
                   const int16_t angle_offset = 0)
 {
-  for (size_t i = 0; i < scan.getMeasurements().size(); ++i)
+  for (size_t i = 0; i < scan.measurements().size(); ++i)
   {
-    auto bin_addr = (scan.getMinScanAngle() + scan.getScanResolution() * i).value() + angle_offset;
+    auto bin_addr = (scan.minScanAngle() + scan.scanResolution() * i).value() + angle_offset;
 
     if (bin.find(bin_addr) == bin.end())
     {
       bin.emplace(bin_addr, NormalDist{});
       // Create bin
     }
-    bin[bin_addr].update(scan.getMeasurements()[i]);
+    bin[bin_addr].update(scan.measurements()[i]);
   }
 }
 
