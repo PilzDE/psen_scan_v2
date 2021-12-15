@@ -124,12 +124,12 @@ constexpr util::TenthOfDegree Message::LaserScanSettings::resolution() const
 
 constexpr const ScanRange& Message::LaserScanSettings::getScanRange() const
 {
-  return scan_range_;
+  return this->scanRange();
 };
 
 constexpr util::TenthOfDegree Message::LaserScanSettings::getResolution() const
 {
-  return resolution_;
+  return this->resolution();
 };
 
 constexpr Message::DeviceSettings::DeviceSettings(const bool diagnostics_enabled, const bool intensities_enabled)

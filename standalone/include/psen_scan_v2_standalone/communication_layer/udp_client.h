@@ -252,7 +252,7 @@ inline boost::asio::ip::address_v4 UdpClientImpl::hostIp()
 
 inline boost::asio::ip::address_v4 UdpClientImpl::getHostIp()
 {
-  return socket_.local_endpoint().address().to_v4();
+  return this->hostIp();
 }
 
 inline UdpClientImpl::~UdpClientImpl()

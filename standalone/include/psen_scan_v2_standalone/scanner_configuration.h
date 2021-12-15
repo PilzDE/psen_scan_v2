@@ -158,7 +158,7 @@ inline void ScannerConfiguration::hostIp(const uint32_t& host_ip)
 
 inline void ScannerConfiguration::setHostIp(const uint32_t& host_ip)
 {
-  host_ip_ = host_ip;
+  this->hostIp(host_ip);
 }
 
 }  // namespace psen_scan_v2_standalone

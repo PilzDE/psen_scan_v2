@@ -105,13 +105,13 @@ const util::TenthOfDegree& ScanRangeTemplated<min_angle, max_angle>::end() const
 template <int16_t min_angle, int16_t max_angle>
 const util::TenthOfDegree& ScanRangeTemplated<min_angle, max_angle>::getStart() const
 {
-  return start_angle_;
+  return this->start();
 }
 
 template <int16_t min_angle, int16_t max_angle>
 const util::TenthOfDegree& ScanRangeTemplated<min_angle, max_angle>::getEnd() const
 {
-  return end_angle_;
+  return this->end();
 }
 
 using ScanRange = ScanRangeTemplated<1, 2749>;

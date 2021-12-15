@@ -66,57 +66,57 @@ const util::TenthOfDegree& LaserScan::scanResolution() const
 // LCOV_EXCL_START
 const util::TenthOfDegree& LaserScan::getScanResolution() const
 {
-  return resolution_;
+  return this->scanResolution();
 }
 
 const util::TenthOfDegree& LaserScan::getMinScanAngle() const
 {
-  return min_scan_angle_;
+  return this->minScanAngle();
 }
 
 const util::TenthOfDegree& LaserScan::getMaxScanAngle() const
 {
-  return max_scan_angle_;
+  return this->maxScanAngle();
 }
 
 const LaserScan::MeasurementData& LaserScan::getMeasurements() const
 {
-  return measurements_;
+  return this->measurements();
 }
 
 uint32_t LaserScan::getScanCounter() const
 {
-  return scan_counter_;
+  return this->scanCounter();
 }
 
 int64_t LaserScan::getTimestamp() const
 {
-  return timestamp_;
+  return this->timestamp();
 }
 
 uint8_t LaserScan::getActiveZoneset() const
 {
-  return active_zoneset_;
+  return this->activeZoneset();
 }
 
 void LaserScan::setMeasurements(const MeasurementData& measurements)
 {
-  measurements_ = measurements;
+  this->measurements(measurements);
 }
 
 LaserScan::MeasurementData& LaserScan::getMeasurements()
 {
-  return measurements_;
+  return this->measurements();
 }
 
 const LaserScan::IntensityData& LaserScan::getIntensities() const
 {
-  return intensities_;
+  return this->intensities();
 }
 
 void LaserScan::setIntensities(const IntensityData& intensities)
 {
-  intensities_ = intensities;
+  this->intensities(intensities);
 }
 // LCOV_EXCL_STOP
 

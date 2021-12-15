@@ -155,7 +155,7 @@ public:
   /*! deprecated: use inline constexpr ByteLocation byte() const instead */
   [[deprecated("use inline constexpr ByteLocation byte() const instead")]] inline constexpr ByteLocation getByte() const
   {
-    return byte_;
+    return this->byte();
   };
 
   inline constexpr ByteLocation byte() const
@@ -166,7 +166,7 @@ public:
   /*! deprecated: use inline constexpr BitLocation bit() const instead */
   [[deprecated("use inline constexpr BitLocation bit() const instead")]] inline constexpr BitLocation getBit() const
   {
-    return bit_;
+    return this->bit();
   };
 
   inline constexpr BitLocation bit() const
@@ -202,7 +202,7 @@ public:
   [[deprecated("use constexpr configuration::ScannerId scannerId() const instead")]] constexpr configuration::ScannerId
   getScannerId() const
   {
-    return id_;
+    return this->scannerId();
   }
 
   constexpr configuration::ScannerId scannerId() const
@@ -214,7 +214,7 @@ public:
   [[deprecated("use constexpr ErrorLocation errorLocation() const instead")]] constexpr ErrorLocation
   getErrorLocation() const
   {
-    return error_location_;
+    return this->errorLocation();
   }
 
   constexpr ErrorLocation errorLocation() const
@@ -225,7 +225,7 @@ public:
   /*! deprecated: use constexpr ErrorType diagnosticCode() const instead */
   [[deprecated("use constexpr ErrorType diagnosticCode() const instead")]] constexpr ErrorType getDiagnosticCode() const
   {
-    return ERROR_BITS.at(error_location_.byte()).at(error_location_.bit());
+    return this->diagnosticCode();
   }
 
   constexpr ErrorType diagnosticCode() const

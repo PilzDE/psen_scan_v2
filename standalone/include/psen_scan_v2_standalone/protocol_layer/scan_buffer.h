@@ -134,7 +134,7 @@ inline std::vector<data_conversion_layer::monitoring_frame::MessageStamped> Scan
 
 inline std::vector<data_conversion_layer::monitoring_frame::MessageStamped> ScanBuffer::getMsgs()
 {
-  return current_round_;
+  return this->currentRound();
 }
 
 inline bool ScanBuffer::isRoundComplete()

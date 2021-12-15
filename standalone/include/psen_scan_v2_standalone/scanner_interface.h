@@ -90,12 +90,12 @@ inline const IScanner::LaserScanCallback& IScanner::laserScanCallback() const
 
 inline const ScannerConfiguration& IScanner::getConfig() const
 {
-  return config_;
+  return this->config();
 }
 
 inline const IScanner::LaserScanCallback& IScanner::getLaserScanCallback() const
 {
-  return laser_scan_callback_;
+  return this->laserScanCallback();
 }
 
 }  // namespace psen_scan_v2_standalone
