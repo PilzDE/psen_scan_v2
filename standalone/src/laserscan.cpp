@@ -63,19 +63,10 @@ const util::TenthOfDegree& LaserScan::scanResolution() const
   return resolution_;
 }
 
+// LCOV_EXCL_START
 const util::TenthOfDegree& LaserScan::getScanResolution() const
 {
   return resolution_;
-}
-
-const util::TenthOfDegree& LaserScan::minScanAngle() const
-{
-  return min_scan_angle_;
-}
-
-const util::TenthOfDegree& LaserScan::maxScanAngle() const
-{
-  return max_scan_angle_;
 }
 
 const util::TenthOfDegree& LaserScan::getMinScanAngle() const
@@ -93,6 +84,52 @@ const LaserScan::MeasurementData& LaserScan::getMeasurements() const
   return measurements_;
 }
 
+uint32_t LaserScan::getScanCounter() const
+{
+  return scan_counter_;
+}
+
+int64_t LaserScan::getTimestamp() const
+{
+  return timestamp_;
+}
+
+uint8_t LaserScan::getActiveZoneset() const
+{
+  return active_zoneset_;
+}
+
+void LaserScan::setMeasurements(const MeasurementData& measurements)
+{
+  measurements_ = measurements;
+}
+
+LaserScan::MeasurementData& LaserScan::getMeasurements()
+{
+  return measurements_;
+}
+
+const LaserScan::IntensityData& LaserScan::getIntensities() const
+{
+  return intensities_;
+}
+
+void LaserScan::setIntensities(const IntensityData& intensities)
+{
+  intensities_ = intensities;
+}
+// LCOV_EXCL_STOP
+
+const util::TenthOfDegree& LaserScan::minScanAngle() const
+{
+  return min_scan_angle_;
+}
+
+const util::TenthOfDegree& LaserScan::maxScanAngle() const
+{
+  return max_scan_angle_;
+}
+
 const LaserScan::MeasurementData& LaserScan::measurements() const
 {
   return measurements_;
@@ -103,17 +140,7 @@ uint32_t LaserScan::scanCounter() const
   return scan_counter_;
 }
 
-uint32_t LaserScan::getScanCounter() const
-{
-  return scan_counter_;
-}
-
 uint8_t LaserScan::activeZoneset() const
-{
-  return active_zoneset_;
-}
-
-uint8_t LaserScan::getActiveZoneset() const
 {
   return active_zoneset_;
 }
@@ -123,34 +150,14 @@ int64_t LaserScan::timestamp() const
   return timestamp_;
 }
 
-int64_t LaserScan::getTimestamp() const
-{
-  return timestamp_;
-}
-
-void LaserScan::setMeasurements(const MeasurementData& measurements)
-{
-  measurements_ = measurements;
-}
-
 void LaserScan::measurements(const MeasurementData& measurements)
 {
   measurements_ = measurements;
 }
 
-LaserScan::MeasurementData& LaserScan::getMeasurements()
-{
-  return measurements_;
-}
-
 LaserScan::MeasurementData& LaserScan::measurements()
 {
   return measurements_;
-}
-
-const LaserScan::IntensityData& LaserScan::getIntensities() const
-{
-  return intensities_;
 }
 
 const LaserScan::IntensityData& LaserScan::intensities() const
@@ -159,11 +166,6 @@ const LaserScan::IntensityData& LaserScan::intensities() const
 }
 
 void LaserScan::intensities(const IntensityData& intensities)
-{
-  intensities_ = intensities;
-}
-
-void LaserScan::setIntensities(const IntensityData& intensities)
 {
   intensities_ = intensities;
 }

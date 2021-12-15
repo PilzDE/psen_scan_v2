@@ -82,10 +82,12 @@ ZoneSet ActiveZonesetNode::activeZoneset() const
   return zoneset_config_->zonesets.at(active_zoneset_id_->data);
 }
 
+// LCOV_EXCL_START
 ZoneSet ActiveZonesetNode::getActiveZoneset() const
 {
-  return zoneset_config_->zonesets.at(active_zoneset_id_->data);
+  return this->activeZoneset();
 }
+// LCOV_EXCL_STOP
 
 void ActiveZonesetNode::addMarkers(std::vector<visualization_msgs::Marker>& new_markers)
 {
