@@ -99,8 +99,7 @@ private:
   std::vector<PinState> output_{};
 };
 
-inline IOState::IOState(std::vector<PinState> logical_input,
-                        std::vector<PinState> output)
+inline IOState::IOState(std::vector<PinState> logical_input, std::vector<PinState> output)
   : logical_input_(std::move(logical_input)), output_(std::move(output))
 {
 }

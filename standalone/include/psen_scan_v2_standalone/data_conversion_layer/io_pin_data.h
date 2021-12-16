@@ -80,10 +80,9 @@ struct PinData
 
 inline std::ostream& operator<<(std::ostream& os, const PinData& pd)
 {
-  return os << fmt::format(
-             "io::PinData(logical_input = {}, output = {})",
-             util::formatRange(pd.logical_input),
-             util::formatRange(pd.output));
+  return os << fmt::format("io::PinData(logical_input = {}, output = {})",
+                           util::formatRange(pd.logical_input),
+                           util::formatRange(pd.output));
 }
 }  // namespace io
 }  // namespace monitoring_frame

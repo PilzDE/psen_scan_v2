@@ -85,9 +85,8 @@ enum class LogicalInputType
 
 using Lit = LogicalInputType;
 using IoName = std::string;
-
-static const std::map<Lit, IoName> LOGICAL_INPUT_BIT_TO_NAME
-{
+// clang-format off
+static const std::map<Lit, IoName> LOGICAL_INPUT_BIT_TO_NAME{
   { Lit::zone_bit_0, "Zone Bit 0" },
   { Lit::zone_bit_1, "Zone Bit 1" },
   { Lit::zone_bit_2, "Zone Bit 2" },
@@ -135,7 +134,7 @@ static constexpr std::array<std::array<Lit, 8>, RAW_CHUNK_LOGICAL_INPUT_SIGNALS_
   { REV(Lit::cor_seq_mut_2, Lit::mut_en_2_a, Lit::restart_2_a, Lit::unused,     Lit::cor_seq_or_1, Lit::cor_seq_mut_1, Lit::mut_en_1_a, Lit::restart_1_a) },
   { REV(Lit::unused,        Lit::unused,     Lit::unused,      Lit::unused,     Lit::unused,       Lit::unused,        Lit::unused,     Lit::cor_seq_or_2) },
 }};
-
+// clang-format on
 
 enum class OutputType
 {
@@ -154,6 +153,7 @@ enum class OutputType
 
 using Ot = OutputType;
 
+// clang-format off
 static const std::map<Ot, IoName> OUTPUT_BIT_TO_NAME
 {
   { Ot::unused, "unused" },
