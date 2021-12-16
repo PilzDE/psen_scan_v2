@@ -79,11 +79,13 @@ inline bool PinState::state() const
   return state_;
 }
 
+// LCOV_EXCL_START
 inline std::ostream& operator<<(std::ostream& os, const PinState& pin_state)
 {
   return os << fmt::format(
              "PinState(id = {}, name = {}, state = {})", pin_state.id(), pin_state.name(), pin_state.state());
 }
+// LCOV_EXCL_STOP
 
 //! @brief Represents the set of all I/Os of the scanner and their states.
 class IOState

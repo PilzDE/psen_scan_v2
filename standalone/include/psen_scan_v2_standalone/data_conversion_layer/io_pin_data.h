@@ -78,12 +78,15 @@ struct PinData
   States output{};
 };
 
+// LCOV_EXCL_START
 inline std::ostream& operator<<(std::ostream& os, const PinData& pd)
 {
   return os << fmt::format("io::PinData(logical_input = {}, output = {})",
                            util::formatRange(pd.logical_input),
                            util::formatRange(pd.output));
 }
+// LCOV_EXCL_STOP
+
 }  // namespace io
 }  // namespace monitoring_frame
 }  // namespace data_conversion_layer
