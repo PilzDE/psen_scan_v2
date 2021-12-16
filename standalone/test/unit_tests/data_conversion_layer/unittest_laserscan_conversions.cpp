@@ -303,7 +303,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainMinimalTimestamp)
 
 TEST(LaserScanConversionsTest, laserScanShouldContainAllIOStates)
 {
-  const int msg_count = 6;
+  const size_t msg_count = 6;
   const auto stamped_msgs = createValidStampedMsgs(msg_count);
 
   std::unique_ptr<LaserScan> scan_ptr;
@@ -311,7 +311,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainAllIOStates)
       scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
 
   ASSERT_EQ(scan_ptr->getIOStates().size(), msg_count);
-  for (int i = 0; i < msg_count; i++)
+  for (size_t i = 0; i < msg_count; i++)
   {
     EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msgs.at(i).msg_.iOPinData(), /*start index*/ i);
   }
@@ -319,7 +319,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainAllIOStates)
 
 TEST(LaserScanConversionsTest, laserScanShouldContainAllIOStatesInCorrectOrder)
 {
-  const int msg_count = 3;
+  const size_t msg_count = 3;
   auto stamped_msgs = createValidStampedMsgs(msg_count);
   std::swap(stamped_msgs.back(), stamped_msgs.front());
 
