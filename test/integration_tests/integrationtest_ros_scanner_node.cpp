@@ -330,7 +330,7 @@ TEST_F(RosScannerNodeTests, shouldThrowExceptionSetInScannerStopFuture)
 
   util::Barrier start_barrier;
   ON_CALL(ros_scanner_node.scanner_, start())
-      .WillByDefault(DoAll(OpenBarrier(&start_barrier), ReturnReadyVoidFuture()));
+      .WillByDefault(DoAll(standalone_test::OpenBarrier(&start_barrier), ReturnReadyVoidFuture()));
 
   std::promise<void> stop_finished_request;
   const std::string error_msg = "error msg for testing";
