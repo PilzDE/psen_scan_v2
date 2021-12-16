@@ -26,8 +26,8 @@
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
 
 using namespace psen_scan_v2;
-namespace util = psen_scan_v2_standalone::util;
-namespace config = psen_scan_v2_standalone::configuration;
+using namespace psen_scan_v2_standalone;
+using namespace psen_scan_v2_standalone::configuration;
 
 namespace psen_scan_v2_test
 {
@@ -68,8 +68,6 @@ TEST(ZoneSetROSConversionsTest, fromPolarWithActualOffset)
 
 TEST(ZoneSetROSConversionsTest, ZoneSetToRosMsgCorrectPointConversion)
 {
-  using config::DEFAULT_ZONESET_ANGLE_STEP;
-
   ZoneSetStandalone zoneset;
   zoneset.safety1_ = { 1000, 2000, 2500 };
   zoneset.safety2_ = { 3000, 4000 };
@@ -78,7 +76,7 @@ TEST(ZoneSetROSConversionsTest, ZoneSetToRosMsgCorrectPointConversion)
   zoneset.warn2_ = { 9000, 10000 };
   zoneset.muting1_ = { 11000, 12000 };
   zoneset.muting2_ = { 13000, 14000 };
-  zoneset.speed_range_ = config::ZoneSetSpeedRange(-5, 10);
+  zoneset.speed_range_ = ZoneSetSpeedRange(-5, 10);
 
   zoneset.resolution_ = DEFAULT_ZONESET_ANGLE_STEP;
 
@@ -142,7 +140,7 @@ TEST(ZoneSetROSConversionsTest, ZoneSetToRosMsgCorrectPointConversion)
 TEST(ZoneSetROSConversionsTest, ZoneSetToRosMsgCorrectSpeedRangeConversion)
 {
   ZoneSetStandalone zoneset;
-  zoneset.speed_range_ = config::ZoneSetSpeedRange(-5, 10);
+  zoneset.speed_range_ = ZoneSetSpeedRange(-5, 10);
 
   psen_scan_v2::ZoneSet zoneset_msg = toRosMsg(zoneset, "test_frame_id");
   EXPECT_FLOAT_EQ(zoneset_msg.speed_lower, -5.0);
@@ -152,7 +150,7 @@ TEST(ZoneSetROSConversionsTest, ZoneSetToRosMsgCorrectSpeedRangeConversion)
 TEST(ZoneSetROSConversionsTest, ZoneSetToRosMsgCorrectHeader)
 {
   ZoneSetStandalone zoneset;
-  zoneset.speed_range_ = config::ZoneSetSpeedRange(-5, 10);
+  zoneset.speed_range_ = ZoneSetSpeedRange(-5, 10);
 
   psen_scan_v2::ZoneSet zoneset_msg = toRosMsg(zoneset, "test_frame_id", ros::Time(1));
   EXPECT_EQ(zoneset_msg.header.frame_id, "test_frame_id");
