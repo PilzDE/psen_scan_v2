@@ -96,7 +96,7 @@ private:
   FRIEND_TEST(RosScannerNodeTests, shouldProvideActiveZonesetTopic);
   FRIEND_TEST(RosScannerNodeTests, shouldPublishScanEqualToConversionOfSuppliedLaserScan);
   FRIEND_TEST(RosScannerNodeTests, shouldThrowExceptionSetInScannerStartFuture);
-  FRIEND_TEST(RosScannerNodeTests, shouldThrowDelayedExceptionSetInScannerStartFuture);
+  FRIEND_TEST(RosScannerNodeTests, shouldThrowExceptionSetInScannerStopFuture);
   FRIEND_TEST(RosScannerNodeTests, shouldPublishIOStatesEqualToConversionOfSuppliedStandaloneIOStates);
 };
 
@@ -171,11 +171,12 @@ void ROSScannerNodeT<S>::run()
   {
     r.sleep();  // LCOV_EXCL_LINE can not be reached deterministically
   }
-  const auto stop_future = scanner_.stop();
+  auto stop_future = scanner_.stop();
+
   const auto stop_status = stop_future.wait_for(3s);
-  if (stop_status == std::future_status::timeout)
+  if (stop_status == std::future_status::ready)
   {
-    ROS_ERROR("Scanner did not finish properly");
+    stop_future.get();  // Throws std::runtime_error if stop not successful
   }
 }
 

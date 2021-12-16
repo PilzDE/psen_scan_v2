@@ -24,6 +24,7 @@ inline ScannerProtocolDef::ScannerProtocolDef(const ScannerConfiguration& config
                                               const communication_layer::NewMessageCallback& control_msg_callback,
                                               const communication_layer::ErrorCallback& control_error_callback,
                                               const communication_layer::ErrorCallback& start_error_callback,
+                                              const communication_layer::ErrorCallback& stop_error_callback,
                                               const communication_layer::NewMessageCallback& data_msg_callback,
                                               const communication_layer::ErrorCallback& data_error_callback,
                                               const ScannerStartedCallback& scanner_started_callback,
@@ -45,6 +46,7 @@ inline ScannerProtocolDef::ScannerProtocolDef(const ScannerConfiguration& config
   , scanner_started_callback_(scanner_started_callback)
   , scanner_stopped_callback_(scanner_stopped_callback)
   , start_error_callback_(start_error_callback)
+  , stop_error_callback_(stop_error_callback)
   , inform_user_about_laser_scan_callback_(laser_scan_callback)
   , start_timeout_callback_(start_timeout_callback)
   , monitoring_frame_timeout_callback_(monitoring_frame_timeout_callback)
@@ -208,7 +210,19 @@ inline void ScannerProtocolDef::notifyUserAboutUnknownStartReply(scanner_events:
 
 inline void ScannerProtocolDef::notifyUserAboutRefusedStartReply(scanner_events::RawReplyReceived const& reply_event)
 {
-  start_error_callback_("Request refused by device.");
+  start_error_callback_("Start Request refused by device.");
+}
+
+inline void ScannerProtocolDef::notifyUserAboutUnknownStopReply(scanner_events::RawReplyReceived const& reply_event)
+{
+  const data_conversion_layer::scanner_reply::Message msg{ data_conversion_layer::scanner_reply::deserialize(
+      *(reply_event.data_)) };
+  stop_error_callback_(fmt::format("Unknown result code {:#04x} in stop reply.", static_cast<uint32_t>(msg.result())));
+}
+
+inline void ScannerProtocolDef::notifyUserAboutRefusedStopReply(scanner_events::RawReplyReceived const& reply_event)
+{
+  stop_error_callback_("Stop Request refused by device.");
 }
 
 inline void ScannerProtocolDef::checkForDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& msg)
@@ -343,6 +357,27 @@ inline bool ScannerProtocolDef::isRefusedStartReply(scanner_events::RawReplyRece
   return isStartReply(msg) && isRefusedReply(msg);
 }
 
+inline bool ScannerProtocolDef::isAcceptedStopReply(scanner_events::RawReplyReceived const& reply_event)
+{
+  const data_conversion_layer::scanner_reply::Message msg{ data_conversion_layer::scanner_reply::deserialize(
+      *(reply_event.data_)) };
+  return isStopReply(msg) && isAcceptedReply(msg);
+}
+
+inline bool ScannerProtocolDef::isUnknownStopReply(scanner_events::RawReplyReceived const& reply_event)
+{
+  const data_conversion_layer::scanner_reply::Message msg{ data_conversion_layer::scanner_reply::deserialize(
+      *(reply_event.data_)) };
+  return isStopReply(msg) && isUnknownReply(msg);
+}
+
+inline bool ScannerProtocolDef::isRefusedStopReply(scanner_events::RawReplyReceived const& reply_event)
+{
+  const data_conversion_layer::scanner_reply::Message msg{ data_conversion_layer::scanner_reply::deserialize(
+      *(reply_event.data_)) };
+  return isStopReply(msg) && isRefusedReply(msg);
+}
+
 inline bool ScannerProtocolDef::isAcceptedReply(data_conversion_layer::scanner_reply::Message const& msg)
 {
   return msg.result() == data_conversion_layer::scanner_reply::Message::OperationResult::accepted;
@@ -363,11 +398,8 @@ inline bool ScannerProtocolDef::isStartReply(data_conversion_layer::scanner_repl
   return msg.type() == data_conversion_layer::scanner_reply::Message::Type::start;
 }
 
-inline bool ScannerProtocolDef::isStopReply(scanner_events::RawReplyReceived const& reply_event)
+inline bool ScannerProtocolDef::isStopReply(data_conversion_layer::scanner_reply::Message const& msg)
 {
-  const data_conversion_layer::scanner_reply::Message msg{ data_conversion_layer::scanner_reply::deserialize(
-      *(reply_event.data_)) };
-  checkForInternalErrors(msg);
   return msg.type() == data_conversion_layer::scanner_reply::Message::Type::stop;
 }
 

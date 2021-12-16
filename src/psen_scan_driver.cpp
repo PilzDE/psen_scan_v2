@@ -117,6 +117,8 @@ int main(int argc, char** argv)
   }
   catch (std::exception& e)
   {
+    // The line below is needed since ROS_ERROR won't probably work during shutdown
+    std::cerr << "\x1B[91m" << e.what() << "\033[0m\n";
     ROS_ERROR_STREAM(e.what());
     return 1;
   }
