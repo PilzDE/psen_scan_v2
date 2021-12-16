@@ -14,7 +14,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <array>
-#include <bitset>
 #include <functional>
 #include <istream>
 #include <sstream>
@@ -177,27 +176,6 @@ AdditionalFieldHeader readAdditionalField(std::istream& is, const std::size_t& m
 
 namespace io
 {
-std::vector<PinState> deserializePinField(std::istream& is,
-                                          std::size_t length_in_bytes,
-                                          const AddPinStateFunction& add_func)
-{
-  std::vector<PinState> pin_field;
-  for (size_t byte_n = 0; byte_n < length_in_bytes; byte_n++)
-  {
-    const auto raw_byte = raw_processing::read<uint8_t>(is);
-    const std::bitset<8> raw_bits(raw_byte);
-    for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
-    {
-      auto pin_state = add_func(byte_n, bit_n, raw_bits[bit_n]);
-      if (pin_state.name() != "unused")
-      {
-        pin_field.push_back(pin_state);
-      }
-    }
-  }
-  return pin_field;
-}
-
 PinData deserializePins(std::istream& is)
 {
   PinData io_pin_data;
@@ -206,10 +184,11 @@ PinData deserializePins(std::istream& is)
       std::array<uint8_t, 3 * (RAW_CHUNK_LENGTH_RESERVED_IN_BYTES + RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES)>>(is);
 
   raw_processing::read<std::array<uint8_t, RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  io_pin_data.logical_input = deserializePinField(is, RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES, createLogicalPinState);
+  io_pin_data.logical_input =
+      deserializePinField(is, RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES, LOGICAL_INPUT_BITS, LOGICAL_INPUT_BIT_TO_NAME);
 
   raw_processing::read<std::array<uint8_t, RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  io_pin_data.output = deserializePinField(is, RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES, createOutputPinState);
+  io_pin_data.output = deserializePinField(is, RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES, OUTPUT_BITS, OUTPUT_BIT_TO_NAME);
 
   return io_pin_data;
 }

@@ -19,12 +19,14 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <bitset>
 
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
@@ -152,7 +154,29 @@ std::vector<diagnostic::Message> deserializeMessages(std::istream& is);
 
 namespace io
 {
-PinData::States deserializePinField(std::istream& is, std::size_t length_in_bytes, const AddPinStateFunction& add_func);
+template <typename PinType, size_t ChunkSize>
+PinData::States deserializePinField(std::istream& is,
+                                    std::size_t length_in_bytes,
+                                    const std::array<std::array<PinType, 8>, ChunkSize>& type_lookup_array,
+                                    const std::map<PinType, IoName>& name_lookup_map)
+{
+  std::vector<PinState> pin_field;
+  for (size_t byte_n = 0; byte_n < length_in_bytes; byte_n++)
+  {
+    const auto raw_byte = raw_processing::read<uint8_t>(is);
+    const std::bitset<8> raw_bits(raw_byte);
+    for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
+    {
+      // auto pin_state = add_func(byte_n, bit_n, raw_bits[bit_n]);
+      auto input_bit = type_lookup_array.at(byte_n).at(bit_n);
+      if (input_bit != PinType::unused)
+      {
+        pin_field.emplace_back(createID(byte_n, bit_n), name_lookup_map.at(input_bit), raw_bits[bit_n]);
+      }
+    }
+  }
+  return pin_field;
+}
 PinData deserializePins(std::istream& is);
 }  // namespace io
 

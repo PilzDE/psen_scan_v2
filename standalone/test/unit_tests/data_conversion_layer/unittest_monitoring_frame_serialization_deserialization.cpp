@@ -79,15 +79,34 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeHexdumpFrameCorrectly)
 
   ASSERT_EQ(with_intensities.hex_dump.size(), serialized_monitoring_frame_message.size());
 
-  // TODO re-enable intensities by removing `&& i < with_intensities.intensities_offset`
-  for (size_t i = 0; i < with_intensities.hex_dump.size() && i < with_intensities.intensities_offset; i++)
+  for (size_t i = 0; i < with_intensities.hex_dump.size(); i++)
   {
-    uint8_t expected_byte = scanner_udp_datagram_hexdumps::clearIntensityChannelBits(
-        i,
-        with_intensities.intensities_offset,
-        2 * with_intensities.expected_msg_.intensities().size(),
-        with_intensities.hex_dump.at(i));
-    EXPECT_EQ((uint8_t)serialized_monitoring_frame_message.at(i), expected_byte) << " index " << i;
+    // Intensities are a special case since here only the last 14 bytes are important since
+    // the first two are reserved for the channel which is not checked
+    if (i > with_intensities.intensities_offset &&
+        i < with_intensities.intensities_offset + 2 * with_intensities.expected_msg_.intensities().size())
+    {
+      // The following line makes sure we compare the proper tuples. E.g. if the offset is 650
+      // we want to compare (650, 651), (652, 653), ....
+      if (i % 2 == with_intensities.intensities_offset % 2)
+      {
+        uint16_t raw_value_expected = scanner_udp_datagram_hexdumps::convertHexdumpBytesToUint16_t(
+            with_intensities.hex_dump.at(i + 1), with_intensities.hex_dump.at(i));
+        uint16_t raw_value_actual = scanner_udp_datagram_hexdumps::convertHexdumpBytesToUint16_t(
+            serialized_monitoring_frame_message.at(i + 1), serialized_monitoring_frame_message.at(i));
+
+        ASSERT_EQ(0b0011111111111111 & raw_value_expected, 0b0011111111111111 & raw_value_actual)
+            << " index " << i << " hexdump value: " << fmt::format("{:#04x}", (uint16_t)raw_value_expected)
+            << " actual_value: " << fmt::format("{:#04x}", (uint16_t)raw_value_actual);
+      }
+    }
+    // Compare all non intensity values directly
+    else
+    {
+      ASSERT_EQ((uint8_t)with_intensities.hex_dump.at(i), (uint8_t)serialized_monitoring_frame_message.at(i))
+          << " index " << i << " hexdump value: " << fmt::format("{:#04x}", (uint8_t)with_intensities.hex_dump.at(i))
+          << " actual_value: " << fmt::format("{:#04x}", (uint8_t)serialized_monitoring_frame_message.at(i));
+    }
   }
 }
 
@@ -305,7 +324,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectLogicalInputField)
   auto raw = convertToRawData(std::array<uint8_t, 8>{ 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x00 });
   std::stringstream ss;
   ss.write(raw.data(), 8);
-  auto input = deserializePinField(ss, 8, createLogicalPinState);
+  auto input = deserializePinField(ss, 8, LOGICAL_INPUT_BITS, LOGICAL_INPUT_BIT_TO_NAME);
 
   std::vector<PinState> expected_states{
     PinState(0, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_0), true),
@@ -358,7 +377,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectOutputField)
   auto raw = convertToRawData(std::array<uint8_t, 4>{ 0x55, 0x55, 0x55, 0x00 });
   std::stringstream ss;
   ss.write(raw.data(), 4);
-  auto output = deserializePinField(ss, 4, createOutputPinState);
+  auto output = deserializePinField(ss, 4, OUTPUT_BITS, OUTPUT_BIT_TO_NAME);
 
   std::vector<PinState> expected_states{
     PinState(0, OUTPUT_BIT_TO_NAME.at(OutputType::safe_1_int), true),

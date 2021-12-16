@@ -75,10 +75,10 @@ inline io::PinData readIOField(const std::array<uint8_t, ARRAY_SIZE> hex_dump, c
   io::PinData io_pin_data;
 
   raw_processing::read<std::array<uint8_t, 4>>(ss);
-  io_pin_data.logical_input = io::deserializePinField(ss, 8, io::createLogicalPinState);
+  io_pin_data.logical_input = io::deserializePinField(ss, 8, io::LOGICAL_INPUT_BITS, io::LOGICAL_INPUT_BIT_TO_NAME);
 
   raw_processing::read<std::array<uint8_t, 4>>(ss);
-  io_pin_data.output = io::deserializePinField(ss, 4, io::createOutputPinState);
+  io_pin_data.output = io::deserializePinField(ss, 4, io::OUTPUT_BITS, io::OUTPUT_BIT_TO_NAME);
 
   return io_pin_data;
 }
