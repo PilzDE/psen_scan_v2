@@ -34,6 +34,7 @@
 #include "psen_scan_v2/zoneset_msg_builder.h"
 
 #include "psen_scan_v2/ros_integrationtest_helper.h"
+#include "psen_scan_v2/subscriber_mock.h"
 
 #include "psen_scan_v2_standalone/util/async_barrier.h"
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
@@ -115,22 +116,6 @@ ZoneSetConfiguration readSingleMsgFromBagFile(const std::string& filepath, const
   bag.close();
   return *msg;
 }
-
-class SubscriberMock
-{
-public:
-  SubscriberMock()
-  {
-    subscriber_ = nh_.subscribe("/test_ns_laser_1/zoneconfiguration", 10, &SubscriberMock::callback, this);
-  }
-
-  MOCK_METHOD1(callback, void(const ros::MessageEvent<ZoneSetConfiguration const>& event));
-
-private:
-  ros::NodeHandle nh_;
-  ros::Subscriber subscriber_;
-};
-
 class ConfigServerNodeTest : public testing::Test
 {
 public:
@@ -169,15 +154,21 @@ private:
   ZoneSetConfiguration zoneset_config_;
 };
 
+const std::string ZONE_CONFIGURATION_TOPICNAME{ "/test_ns_laser_1/zoneconfiguration" };
+
 TEST_F(ConfigServerNodeTest, shouldAdvertiseZonesetTopic)
 {
   // Set param on server
-  EXPECT_TRUE(TopicExists("/test_ns_laser_1/zoneconfiguration"));
+  EXPECT_TRUE(TopicExists(ZONE_CONFIGURATION_TOPICNAME));
 }
+
+static constexpr int QUEUE_SIZE{ 10 };
 
 TEST_F(ConfigServerNodeTest, shouldPublishLatchedOnZonesetTopic)
 {
-  SubscriberMock subscriber_mock;
+  ros::NodeHandle nh;
+  SubscriberMock<ros::MessageEvent<ZoneSetConfiguration const>> subscriber_mock(
+      nh, ZONE_CONFIGURATION_TOPICNAME, QUEUE_SIZE);
   util::Barrier topic_received_barrier;
 
   EXPECT_CALL(subscriber_mock, callback(isLatched())).WillOnce(OpenBarrier(&topic_received_barrier));
@@ -187,7 +178,9 @@ TEST_F(ConfigServerNodeTest, shouldPublishLatchedOnZonesetTopic)
 
 TEST_F(ConfigServerNodeTest, shouldPublishMessageMatchingExpectedZoneSetConfig)
 {
-  SubscriberMock subscriber_mock;
+  ros::NodeHandle nh;
+  SubscriberMock<ros::MessageEvent<ZoneSetConfiguration const>> subscriber_mock(
+      nh, ZONE_CONFIGURATION_TOPICNAME, QUEUE_SIZE);
   util::Barrier msg_received_barrier;
 
   EXPECT_CALL(subscriber_mock, callback(msgZoneSetConfigEQ(expectedZoneSetConfig())))

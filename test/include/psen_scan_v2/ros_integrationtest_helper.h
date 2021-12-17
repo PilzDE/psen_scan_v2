@@ -24,6 +24,10 @@
 
 #include <ros/master.h>
 
+#include <visualization_msgs/Marker.h>
+
+#include "psen_scan_v2/subscriber_mock.h"
+
 using namespace std::chrono_literals;
 
 namespace psen_scan_v2_test
@@ -71,6 +75,25 @@ MATCHER_P(messageEQ, expected_msg, "")
 {
   auto actual_msg = arg.getMessage();
   return expected_msg == *actual_msg;
+}
+
+bool isConnected(SubscriberMock<visualization_msgs::MarkerConstPtr>& subscriber,
+                 const ros::Duration& timeout = ros::Duration(3.0))
+{
+  const auto start_time = ros::Time::now();
+  while (ros::ok())
+  {
+    if (subscriber.getSubscriber().getNumPublishers() > 0)
+    {
+      return true;
+    }
+    if ((ros::Time::now() - start_time) > timeout)
+    {
+      return false;
+    }
+    ros::Duration(0.1).sleep();
+  }
+  return false;
 }
 
 }  // namespace psen_scan_v2_test

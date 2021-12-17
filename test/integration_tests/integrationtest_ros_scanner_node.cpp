@@ -40,6 +40,7 @@
 
 #include "psen_scan_v2/scanner_mock.h"
 #include "psen_scan_v2/ros_integrationtest_helper.h"
+#include "psen_scan_v2/subscriber_mock.h"
 
 using namespace psen_scan_v2;
 using namespace psen_scan_v2_standalone;
@@ -63,26 +64,6 @@ ACTION(ReturnReadyVoidFuture)
 }
 
 static constexpr int QUEUE_SIZE{ 10 };
-
-class SubscriberMock
-{
-public:
-  SubscriberMock(ros::NodeHandle& nh);
-
-  MOCK_METHOD1(scan_callback, void(const sensor_msgs::LaserScan& msg));
-  MOCK_METHOD1(zone_callback, void(const ros::MessageEvent<std_msgs::UInt8 const>& event));
-
-private:
-  ros::Subscriber scan_subscriber_;
-  ros::Subscriber zone_subscriber_;
-};
-
-inline SubscriberMock::SubscriberMock(ros::NodeHandle& nh)
-{
-  scan_subscriber_ = nh.subscribe("scan", QUEUE_SIZE, &SubscriberMock::scan_callback, this);
-  zone_subscriber_ = nh.subscribe("active_zoneset", QUEUE_SIZE, &SubscriberMock::zone_callback, this);
-}
-
 static const std::string HOST_IP{ "127.0.0.1" };
 static constexpr int HOST_UDP_PORT_DATA{ 50505 };
 static constexpr int HOST_UDP_PORT_CONTROL{ 55055 };
@@ -209,13 +190,16 @@ TEST_F(RosScannerNodeTests, shouldProvideActiveZonesetTopic)
   loop.wait_for(LOOP_END_TIMEOUT);
 }
 
+const std::string SCAN_TOPICNAME{ "scan" };
+
 TEST_F(RosScannerNodeTests, shouldPublishScansWhenLaserScanCallbackIsInvoked)
 {
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(
+      nh_priv_, SCAN_TOPICNAME, "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
 
   util::Barrier scan_topic_barrier;
-  SubscriberMock subscriber(nh_priv_);
-  EXPECT_CALL(subscriber, scan_callback(::testing::_)).WillOnce(Return()).WillOnce(OpenBarrier(&scan_topic_barrier));
+  SubscriberMock<sensor_msgs::LaserScan> subscriber(nh_priv_, SCAN_TOPICNAME, QUEUE_SIZE);
+  EXPECT_CALL(subscriber, callback(::testing::_)).WillOnce(Return()).WillOnce(OpenBarrier(&scan_topic_barrier));
 
   util::Barrier start_barrier;
   setDefaultActions(ros_scanner_node.scanner_, start_barrier);
@@ -231,19 +215,22 @@ TEST_F(RosScannerNodeTests, shouldPublishScansWhenLaserScanCallbackIsInvoked)
   loop.wait_for(LOOP_END_TIMEOUT);
 }
 
+const std::string ACTIVE_ZONESET_TOPICNAME{ "active_zoneset" };
+
 TEST_F(RosScannerNodeTests, shouldPublishActiveZonesetWhenLaserScanCallbackIsInvoked)
 {
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(
+      nh_priv_, SCAN_TOPICNAME, "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
 
   const uint8_t first_zone{ 2 };
   const uint8_t second_zone{ 4 };
 
   util::Barrier zoneset_topic_barrier;
-  SubscriberMock subscriber(nh_priv_);
+  SubscriberMock<ros::MessageEvent<std_msgs::UInt8 const>> subscriber(nh_priv_, ACTIVE_ZONESET_TOPICNAME, QUEUE_SIZE);
   {
     InSequence s;
-    EXPECT_CALL(subscriber, zone_callback(messageEQ(createActiveZonesetMsg(first_zone)))).Times(1);
-    EXPECT_CALL(subscriber, zone_callback(messageEQ(createActiveZonesetMsg(second_zone))))
+    EXPECT_CALL(subscriber, callback(messageEQ(createActiveZonesetMsg(first_zone)))).Times(1);
+    EXPECT_CALL(subscriber, callback(messageEQ(createActiveZonesetMsg(second_zone))))
         .WillOnce(OpenBarrier(&zoneset_topic_barrier));
   }
 
@@ -264,15 +251,16 @@ TEST_F(RosScannerNodeTests, shouldPublishActiveZonesetWhenLaserScanCallbackIsInv
 TEST_F(RosScannerNodeTests, shouldPublishScanEqualToConversionOfSuppliedLaserScan)
 {
   const std::string prefix = "scanner";
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", prefix, 1.0 /*x_axis_rotation*/, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(
+      nh_priv_, SCAN_TOPICNAME, prefix, 1.0 /*x_axis_rotation*/, scanner_config_);
 
   util::Barrier start_barrier;
   setDefaultActions(ros_scanner_node.scanner_, start_barrier);
 
   util::Barrier scan_topic_barrier;
-  SubscriberMock subscriber(nh_priv_);
+  SubscriberMock<sensor_msgs::LaserScan> subscriber(nh_priv_, SCAN_TOPICNAME, QUEUE_SIZE);
   const auto scan = createValidLaserScan();
-  EXPECT_CALL(subscriber, scan_callback(toLaserScanMsg(scan, prefix, 1.0 /*x_axis_rotation*/)))
+  EXPECT_CALL(subscriber, callback(toLaserScanMsg(scan, prefix, 1.0 /*x_axis_rotation*/)))
       .WillOnce(OpenBarrier(&scan_topic_barrier));
 
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
@@ -288,7 +276,8 @@ TEST_F(RosScannerNodeTests, shouldPublishScanEqualToConversionOfSuppliedLaserSca
 
 TEST_F(RosScannerNodeTests, shouldWaitWhenStopRequestResponseIsMissing)
 {
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(
+      nh_priv_, SCAN_TOPICNAME, "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
 
   util::Barrier start_barrier;
   ON_CALL(ros_scanner_node.scanner_, start())
