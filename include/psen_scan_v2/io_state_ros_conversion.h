@@ -18,9 +18,9 @@
 
 #include <string>
 
-#include <psen_scan_v2/IOState.h>
-#include <psen_scan_v2/PinState.h>
-#include <psen_scan_v2_standalone/io_state.h>
+#include "psen_scan_v2/IOState.h"
+#include "psen_scan_v2/PinState.h"
+#include "psen_scan_v2_standalone/io_state.h"
 
 namespace psen_scan_v2
 {

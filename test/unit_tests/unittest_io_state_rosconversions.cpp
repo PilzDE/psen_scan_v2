@@ -14,7 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <gtest/gtest.h>
-#include <psen_scan_v2/IOState.h>
+#include "psen_scan_v2/IOState.h"
 
 #include "psen_scan_v2/io_state_ros_conversion.h"
 
