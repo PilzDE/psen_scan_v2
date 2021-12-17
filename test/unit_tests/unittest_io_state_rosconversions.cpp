@@ -36,21 +36,21 @@ TEST(IOStateROSConversionsTest, shouldConvertSuccessfully)
 
   ASSERT_EQ(ros_message.logical_input.size(), 2u);
 
-  EXPECT_EQ(ros_message.logical_input[0].pin_id, 1u);
+  EXPECT_EQ(ros_message.logical_input[0].pin_id, 1);
   EXPECT_EQ(ros_message.logical_input[0].name, "logical_input1");
   EXPECT_EQ(ros_message.logical_input[0].state, true);
 
-  EXPECT_EQ(ros_message.logical_input[1].pin_id, 2u);
+  EXPECT_EQ(ros_message.logical_input[1].pin_id, 2);
   EXPECT_EQ(ros_message.logical_input[1].name, "logical_input2");
   EXPECT_EQ(ros_message.logical_input[1].state, false);
 
   ASSERT_EQ(ros_message.output.size(), 2u);
 
-  EXPECT_EQ(ros_message.output[0].pin_id, 3u);
+  EXPECT_EQ(ros_message.output[0].pin_id, 3);
   EXPECT_EQ(ros_message.output[0].name, "output1");
   EXPECT_EQ(ros_message.output[0].state, true);
 
-  EXPECT_EQ(ros_message.output[1].pin_id, 4u);
+  EXPECT_EQ(ros_message.output[1].pin_id, 4);
   EXPECT_EQ(ros_message.output[1].name, "output2");
   EXPECT_EQ(ros_message.output[1].state, false);
 }
