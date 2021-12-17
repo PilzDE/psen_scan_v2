@@ -26,6 +26,10 @@
 
 #include <ros/master.h>
 
+#include <visualization_msgs/Marker.h>
+
+#include "psen_scan_v2/subscriber_mock.h"
+
 using namespace std::chrono_literals;
 
 namespace psen_scan_v2_test
@@ -60,6 +64,12 @@ namespace psen_scan_v2_test
   }
 
   return ::testing::AssertionFailure() << "Topic \"" << topic << "\" not found. Available topics: " << topic_names;
+}
+
+MATCHER_P(messageEQ, expected_msg, "")
+{
+  auto actual_msg = arg.getMessage();
+  return expected_msg == *actual_msg;
 }
 
 ACTION_P(ReturnFuture, promise_obj_ptr)
@@ -99,6 +109,25 @@ MATCHER_P(LaserScanMsgEq, msg, "")
          arg.angle_max == msg.angle_max && arg.angle_increment == msg.angle_increment &&
          arg.time_increment == msg.time_increment && arg.scan_time == msg.scan_time && arg.range_min == msg.range_min &&
          arg.range_max == msg.range_max && arg.ranges == msg.ranges && arg.intensities == msg.intensities;
+}
+
+bool isConnected(SubscriberMock<visualization_msgs::MarkerConstPtr>& subscriber,
+                 const ros::Duration& timeout = ros::Duration(3.0))
+{
+  const auto start_time = ros::Time::now();
+  while (ros::ok())
+  {
+    if (subscriber.getSubscriber().getNumPublishers() > 0)
+    {
+      return true;
+    }
+    if ((ros::Time::now() - start_time) > timeout)
+    {
+      return false;
+    }
+    ros::Duration(0.1).sleep();
+  }
+  return false;
 }
 
 }  // namespace psen_scan_v2_test
