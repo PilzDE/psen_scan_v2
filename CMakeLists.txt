@@ -619,7 +619,7 @@ if(CATKIN_ENABLE_TESTING)
       test/hw_tests/hwtest_io_state.test
       test/hw_tests/hwtest_io_state.cpp
     )
-    add_dependencies(hwtest_zoneset_switching
+    add_dependencies(hwtest_io_state
       ${PROJECT_NAME}_node
       ${${PROJECT_NAME}_EXPORTED_TARGETS}
     )
