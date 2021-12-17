@@ -239,7 +239,7 @@ TEST_F(RosScannerNodeTests, shouldPublishIOStatesEqualToConversionOfSuppliedStan
   auto scan = createValidLaserScan();
 
   util::Barrier io_topic_barrier;
-  SubscriberMock<psen_scan_v2::IOState> subscriber(nh_priv_, SCAN_TOPICNAME, QUEUE_SIZE);
+  SubscriberMock<psen_scan_v2::IOState> subscriber(nh_priv_, "io_state", QUEUE_SIZE);
   {
     InSequence s;
     EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA1.at(0), prefix, scan.getTimestamp())))).Times(1);
