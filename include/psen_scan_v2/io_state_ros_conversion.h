@@ -33,13 +33,15 @@ psen_scan_v2::PinState toPinStateMsg(const psen_scan_v2_standalone::PinState& pi
   return pin_msg;
 }
 
-void readPinStates(std::vector<psen_scan_v2::PinState>& container,
-                   const std::vector<psen_scan_v2_standalone::PinState>& pins)
+std::vector<psen_scan_v2::PinState> readPinStates(const std::vector<psen_scan_v2_standalone::PinState>& pins)
 {
+  std::vector<psen_scan_v2::PinState> container;
   for (const auto& pin : pins)
   {
-    container.push_back(toPinStateMsg(pin));
+    container.emplace_back(toPinStateMsg(pin));
   }
+
+  return container;
 }
 
 psen_scan_v2::IOState toIOStateMsg(const psen_scan_v2_standalone::IOState& io_state,
@@ -54,8 +56,8 @@ psen_scan_v2::IOState toIOStateMsg(const psen_scan_v2_standalone::IOState& io_st
   ros_message.header.stamp = ros::Time{}.fromNSec(stamp);
   ros_message.header.frame_id = frame_id;
 
-  readPinStates(ros_message.logical_input, io_state.logicalInput());
-  readPinStates(ros_message.output, io_state.output());
+  ros_message.logical_input = readPinStates(io_state.logicalInput());
+  ros_message.output = readPinStates(io_state.output());
 
   return ros_message;
 }
