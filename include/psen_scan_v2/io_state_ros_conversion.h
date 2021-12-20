@@ -36,6 +36,7 @@ psen_scan_v2::PinState toPinStateMsg(const psen_scan_v2_standalone::PinState& pi
 std::vector<psen_scan_v2::PinState> readPinStates(const std::vector<psen_scan_v2_standalone::PinState>& pins)
 {
   std::vector<psen_scan_v2::PinState> container;
+  container.reserve(pins.size());
   for (const auto& pin : pins)
   {
     container.emplace_back(toPinStateMsg(pin));
