@@ -58,6 +58,7 @@ public:
     setScannerZoneSet(ZONE_ZERO_CMD);
     util::Barrier zone_zero_barrier;
     SubscriberMock<std_msgs::UInt8> sm{ nh_, ACTIVE_ZONESET_TOPICNAME, QUEUE_SIZE };
+    EXPECT_CALL(sm, callback(::testing::_)).Times(AnyNumber());
     EXPECT_CALL(sm, callback(createActiveZonesetMsg(0))).Times(AnyNumber()).WillOnce(OpenBarrier(&zone_zero_barrier));
     zone_zero_barrier.waitTillRelease(DEFAULT_TIMEOUT);
   }
