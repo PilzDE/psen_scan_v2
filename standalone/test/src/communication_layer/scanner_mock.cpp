@@ -105,10 +105,10 @@ void ScannerMock::sendStartReply(const ReplyMsg::OperationResult& result)
   sendReply(ReplyMsg::Type::start, result);
 }
 
-void ScannerMock::sendStopReply()
+void ScannerMock::sendStopReply(const ReplyMsg::OperationResult& result)
 {
   std::cout << "ScannerMock: Send stop reply..." << std::endl;
-  sendReply(ReplyMsg::Type::stop);
+  sendReply(ReplyMsg::Type::stop, result);
 }
 
 void ScannerMock::sendMonitoringFrame(const MonitoringFrameMsg& msg)

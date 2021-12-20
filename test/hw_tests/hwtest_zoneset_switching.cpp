@@ -27,6 +27,9 @@
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 #include "psen_scan_v2_standalone/util/async_barrier.h"
 
+#include "psen_scan_v2/ros_integrationtest_helper.h"
+#include "psen_scan_v2/subscriber_mock.h"
+
 namespace psen_scan_v2_test
 {
 namespace util = psen_scan_v2_standalone::util;
@@ -44,22 +47,8 @@ std_msgs::UInt8 createActiveZonesetMsg(const uint8_t active_zoneset)
   return zone;
 }
 
-class SubscriberMock
-{
-public:
-  SubscriberMock(ros::NodeHandle& nh);
-
-  MOCK_METHOD1(callback, void(const std_msgs::UInt8& msg));
-
-private:
-  ros::Subscriber subscriber_;
-};
-
-inline SubscriberMock::SubscriberMock(ros::NodeHandle& nh)
-{
-  subscriber_ = nh.subscribe("/laser_1/active_zoneset", 1, &SubscriberMock::callback, this);
-}
-
+static constexpr int QUEUE_SIZE{ 1 };
+const std::string ACTIVE_ZONESET_TOPICNAME{ "/laser_1/active_zoneset" };
 class ActiveZonesetSwitchTests : public ::testing::Test
 {
 public:
@@ -68,7 +57,7 @@ public:
     pub_relay_cmd_ = nh_.advertise<std_msgs::Byte>("/relay_cmd", 1);
     setScannerZoneSet(ZONE_ZERO_CMD);
     util::Barrier zone_zero_barrier;
-    SubscriberMock sm{ nh_ };
+    SubscriberMock<std_msgs::UInt8> sm{ nh_, ACTIVE_ZONESET_TOPICNAME, QUEUE_SIZE };
     EXPECT_CALL(sm, callback(::testing::_)).Times(AnyNumber());
     EXPECT_CALL(sm, callback(createActiveZonesetMsg(0))).Times(AnyNumber()).WillOnce(OpenBarrier(&zone_zero_barrier));
     zone_zero_barrier.waitTillRelease(DEFAULT_TIMEOUT);
@@ -99,7 +88,7 @@ TEST_F(ActiveZonesetSwitchTests, shouldPublishChangedZonesetIfIOChanges)
   util::Barrier zone_zero_barrier;
   util::Barrier zone_one_barrier;
 
-  SubscriberMock sm{ nh_ };
+  SubscriberMock<std_msgs::UInt8> sm{ nh_, ACTIVE_ZONESET_TOPICNAME, QUEUE_SIZE };
   {
     ::testing::InSequence s;
     EXPECT_CALL(sm, callback(createActiveZonesetMsg(0))).Times(AnyNumber()).WillOnce(OpenBarrier(&zone_zero_barrier));

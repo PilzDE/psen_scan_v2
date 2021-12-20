@@ -165,10 +165,10 @@ Once you setup the scanner and created a configuration according to our [tutoria
 The configured zonesets will be published.
 
 The zonesets you created in the Pilz configurator:
-![configurator_screenshot](doc/zones_screenshot_configurator.png)
+![configurator_screenshot](img/zones_screenshot_configurator.png)
 
 will be exactly the same in ROS:
-![configurator_screenshot](doc/zones_screenshot_rviz.png)
+![configurator_screenshot](img/zones_screenshot_rviz.png)
 
 You can try this out with:
 ```
