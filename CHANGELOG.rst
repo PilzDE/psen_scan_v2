@@ -2,8 +2,8 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.4 (2021-12-20)
+------------------
 * Prevent error when diagnostics are disabled. Fix #294
 * Set exception in stop-future
 * Apply clang-tidy fixes to header-files. Fix #277
