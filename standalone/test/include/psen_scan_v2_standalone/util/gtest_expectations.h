@@ -21,6 +21,8 @@
 
 #include <gtest/gtest.h>
 
+#define ASSERT_FUTURE_IS_READY(future, wait_timeout) ASSERT_EQ(future.wait_for(wait_timeout), std::future_status::ready)
+
 #define EXPECT_FUTURE_IS_READY(future, wait_timeout) EXPECT_EQ(future.wait_for(wait_timeout), std::future_status::ready)
 
 #define EXPECT_FUTURE_TIMEOUT(future, wait_timeout)                                                                    \

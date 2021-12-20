@@ -17,8 +17,11 @@
 #define PSEN_SCAN_V2_TEST_TEST_DATA_HELPER_H
 
 #include <algorithm>
+#include <chrono>
 #include <cstdint>
+#include <future>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <thread>
 #include <vector>
@@ -31,6 +34,7 @@
 
 namespace psen_scan_v2_test
 {
+using namespace std::chrono_literals;
 using namespace psen_scan_v2_standalone;
 
 namespace test_data
@@ -50,7 +54,12 @@ static void runScanner(const ScannerConfiguration& scanner_config,
   ScannerV2 scanner(scanner_config, laserscan_callback);
   scanner.start();
   std::this_thread::sleep_for(std::chrono::seconds(scanner_run_duration_sec));
-  scanner.stop();
+  auto stop_future = scanner.stop();
+  if (stop_future.wait_for(3s) != std::future_status::ready)
+  {
+    throw std::runtime_error("Timeout while waiting for the scanner to stop.");
+  }
+  stop_future.get();  // catch exceptions of scanner stop
 }
 
 static void addUdpData(TestData& test_data, const udp_data::UdpData& udp_data)
