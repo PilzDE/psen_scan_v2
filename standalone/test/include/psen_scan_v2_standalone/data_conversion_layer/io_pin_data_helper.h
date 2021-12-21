@@ -14,11 +14,12 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #ifndef PSEN_SCAN_V2_STANDALONE_TEST_IO_PIN_DATA_HELPER_H
-#define PSEN_SCAN_V2_STAND
+#define PSEN_SCAN_V2_STANDALONE_TEST_IO_PIN_DATA_HELPER_H
 
+#include <algorithm>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/io_state.h"
@@ -28,28 +29,31 @@ namespace psen_scan_v2_standalone_test
 using namespace psen_scan_v2_standalone;
 namespace dmi = data_conversion_layer::monitoring_frame::io;
 
-inline std::vector<PinState> createPinField(uint32_t count, const dmi::AddPinStateFunction& add_func)
+template <typename PinType, size_t ChunkSize>
+inline std::vector<PinState>
+createCompletePinField(const std::array<std::array<PinType, 8>, ChunkSize>& type_lookup_array,
+                       const std::map<PinType, std::string>& name_lookup_map)
 {
-  std::vector<PinState> io_field;
-  for (std::size_t byte = 0; byte < count; ++byte)
+  std::vector<PinState> pin_field;
+  for (std::size_t byte = 0; byte < ChunkSize; ++byte)
   {
     for (std::size_t bit = 0; bit < 8; ++bit)
     {
-      const auto pin_state = add_func(byte, bit, false);
-      if (pin_state.name() != "unused")
+      auto pin_type = type_lookup_array.at(byte).at(bit);
+      if (pin_type != PinType::unused)
       {
-        io_field.push_back(pin_state);
+        pin_field.emplace_back(dmi::createID(byte, bit), name_lookup_map.at(pin_type), false);
       }
     }
   }
-  return io_field;
+  return pin_field;
 }
 
 inline dmi::PinData createCompleteIOPinData()
 {
   dmi::PinData pin_data;
-  pin_data.logical_input = createPinField(dmi::RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES, dmi::createLogicalPinState);
-  pin_data.output = createPinField(dmi::RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES, dmi::createOutputPinState);
+  pin_data.logical_input = createCompletePinField(dmi::LOGICAL_INPUT_BITS, dmi::LOGICAL_INPUT_BIT_TO_NAME);
+  pin_data.output = createCompletePinField(dmi::OUTPUT_BITS, dmi::OUTPUT_BIT_TO_NAME);
   return pin_data;
 }
 
@@ -60,16 +64,28 @@ inline void setPin(PinState& pin_state)
 
 inline void setInputPin(dmi::PinData& io_pin_data, const dmi::LogicalInputType& type)
 {
-  setPin(*std::find_if(io_pin_data.logical_input.begin(), io_pin_data.logical_input.end(), [&](const auto& a) {
+  const auto it = std::find_if(io_pin_data.logical_input.begin(), io_pin_data.logical_input.end(), [&](const auto& a) {
     return a.name() == dmi::LOGICAL_INPUT_BIT_TO_NAME.at(type);
-  }));
+  });
+  if (it == io_pin_data.logical_input.end())
+  {
+    throw std::invalid_argument("Could not set input pin because type " + dmi::LOGICAL_INPUT_BIT_TO_NAME.at(type) +
+                                " is not included in the pin data.");
+  }
+  setPin(*it);
 }
 
 inline void setOutputPin(dmi::PinData& io_pin_data, const dmi::OutputType& type)
 {
-  setPin(*std::find_if(io_pin_data.output.begin(), io_pin_data.output.end(), [&](const auto& a) {
+  const auto it = std::find_if(io_pin_data.output.begin(), io_pin_data.output.end(), [&](const auto& a) {
     return a.name() == dmi::OUTPUT_BIT_TO_NAME.at(type);
-  }));
+  });
+  if (it == io_pin_data.output.end())
+  {
+    throw std::invalid_argument("Could not set output pin because type " + dmi::OUTPUT_BIT_TO_NAME.at(type) +
+                                " is not included in the pin data.");
+  }
+  setPin(*it);
 }
 }  // namespace psen_scan_v2_standalone_test
 
