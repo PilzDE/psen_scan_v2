@@ -250,7 +250,6 @@ private:
   bool isRefusedReply(data_conversion_layer::scanner_reply::Message const& msg);
 
   void checkForInternalErrors(const data_conversion_layer::scanner_reply::Message& msg);
-  //! @throws data_conversion_layer::monitoring_frame::AdditionalFieldMissing if diagnostic_messages is not set.
   void checkForDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& msg);
   /**
    * @throws data_conversion_layer::monitoring_frame::AdditionalFieldMissing if scan_counter or active_zoneset is not

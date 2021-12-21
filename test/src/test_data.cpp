@@ -33,14 +33,9 @@ void TestDatum::setFirstFrameTime(const int64_t first_frame_time)
   first_frame_time_ = first_frame_time;
 }
 
-void TestDatum::setLastFrameTime(const int64_t last_frame_time)
-{
-  last_frame_time_ = last_frame_time;
-}
-
 bool TestDatum::isComplete() const
 {
-  return first_frame_time_ && last_frame_time_;
+  return first_frame_time_.is_initialized();
 }
 
 uint32_t TestDatum::scanCounter() const
@@ -61,11 +56,6 @@ int64_t TestDatum::callbackInvocationTime() const
 int64_t TestDatum::firstFrameTime() const
 {
   return first_frame_time_.get();
-}
-
-int64_t TestDatum::lastFrameTime() const
-{
-  return last_frame_time_.get();
 }
 
 }  // namespace test_data
