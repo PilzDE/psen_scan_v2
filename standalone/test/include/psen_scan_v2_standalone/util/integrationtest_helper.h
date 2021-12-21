@@ -37,6 +37,8 @@
 #include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/scan_range.h"
 
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
+
 namespace psen_scan_v2_standalone_test
 {
 using namespace psen_scan_v2_standalone;
@@ -75,41 +77,6 @@ static std::vector<double> generateIntensities(const unsigned int& num_elements,
   return vec;
 }
 
-static void setPin(PinState& pin_state)
-{
-  pin_state = PinState(pin_state.id(), pin_state.name(), true);
-}
-
-static data_conversion_layer::monitoring_frame::io::PinData createCompleteIOPinData()
-{
-  using namespace data_conversion_layer::monitoring_frame::io;
-  PinData pin_data;
-  // First fill everything
-  for (std::size_t bit = 0; bit < 8; ++bit)
-  {
-    for (std::size_t byte = 0; byte < RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES; ++byte)
-    {
-      const auto pin_state = createLogicalPinState(byte, bit, false);
-      if (pin_state.name() != "unused")
-      {
-        pin_data.logical_input.push_back(pin_state);
-      }
-    }
-    for (std::size_t byte = 0; byte < RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES; ++byte)
-    {
-      const auto pin_state = createOutputPinState(byte, bit, false);
-      if (pin_state.name() != "unused")
-      {
-        pin_data.output.push_back(pin_state);
-      }
-    }
-  }
-  // Set arbitrary pins
-  setPin(pin_data.logical_input.at(8));
-  setPin(pin_data.output.at(2));
-  return pin_data;
-}
-
 static data_conversion_layer::monitoring_frame::MessageBuilder
 createMonitoringFrameMsgBuilderWithoutDiagnostics(const util::TenthOfDegree start_angle = DEFAULT_SCAN_RANGE.getStart(),
                                                   const util::TenthOfDegree end_angle = DEFAULT_SCAN_RANGE.getEnd())
@@ -128,7 +95,10 @@ createMonitoringFrameMsgBuilderWithoutDiagnostics(const util::TenthOfDegree star
 
   msg_builder.intensities(generateIntensities(num_elements, lowest_intensity, highest_intensity));
 
-  msg_builder.iOPinData(createCompleteIOPinData());  // A valid frame contains a complete set of pin data
+  auto pin_data = createCompleteIOPinData();  // A valid frame contains a complete set of pin data
+  setInputPin(pin_data, data_conversion_layer::monitoring_frame::io::LogicalInputType::muting_1_a);
+  setOutputPin(pin_data, data_conversion_layer::monitoring_frame::io::OutputType::safe_1_int);
+  msg_builder.iOPinData(pin_data);
 
   return msg_builder;
 }
