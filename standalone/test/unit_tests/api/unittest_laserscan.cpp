@@ -34,7 +34,7 @@ static const int64_t DEFAULT_TIMESTAMP{ 1 };
 static const uint32_t DEFAULT_SCAN_COUNTER{ 1 };
 static const uint8_t DEFAULT_ACTIVE_ZONESET{ 2 };
 static const IOState DEFAULT_IO_STATE({ PinState(0, "logical_test", false) },
-                                      { PinState(0, "output_test", false), PinState(1, "output_test2", true) });
+                                      { PinState(0, "output_test1", false), PinState(1, "output_test2", true) });
 
 class LaserScanBuilder
 {
@@ -177,7 +177,7 @@ TEST(LaserScanTest, testPrintMessageSuccess)
   ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
 
   laser_scan->setMeasurements({ 45.0, 44.0, 43.0, 42.0 });
-  laser_scan->setIOStates({ IOState({ PinState(3, "io_pin_data", true) }, {}) });
+  laser_scan->setIOStates({ { { PinState(3, "io_pin_data", true) }, {} } });
 
 // For compatibility with different ubuntu versions (resp. fmt), we need to take account of changes in
 // the default formatting of floating point numbers

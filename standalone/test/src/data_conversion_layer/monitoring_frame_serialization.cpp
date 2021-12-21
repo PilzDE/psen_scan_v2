@@ -26,11 +26,6 @@ namespace data_conversion_layer
 {
 namespace monitoring_frame
 {
-std::size_t sizeOfIOPinData(const io::PinData& pin_data)
-{
-  return pin_data.logical_input.size() + pin_data.output.size();
-}
-
 RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
 {
   std::ostringstream os;
