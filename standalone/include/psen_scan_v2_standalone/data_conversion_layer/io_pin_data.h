@@ -37,35 +37,9 @@ namespace monitoring_frame
  */
 namespace io
 {
-static uint32_t createID(size_t byte_n, size_t bit_n)
+inline static uint32_t createID(size_t byte_n, size_t bit_n)
 {
   return byte_n * 8 + bit_n;
-}
-
-typedef std::function<PinState(size_t, size_t, bool)> AddPinStateFunction;
-
-inline PinState createLogicalPinState(size_t byte_n, size_t bit_n, bool value)
-{
-  if (byte_n >= RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES)
-  {
-    throw std::out_of_range("");
-  }
-  auto id = createID(byte_n, bit_n);
-  auto input_bit = LOGICAL_INPUT_BITS.at(byte_n).at(bit_n);
-  const auto& name = LOGICAL_INPUT_BIT_TO_NAME.at(input_bit);
-  return PinState(id, name, value);
-}
-
-inline PinState createOutputPinState(size_t byte_n, size_t bit_n, bool value)
-{
-  if (byte_n >= RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES)
-  {
-    throw std::out_of_range("");
-  }
-  auto id = createID(byte_n, bit_n);
-  auto output_bit = OUTPUT_BITS.at(byte_n).at(bit_n);
-  const auto& name = OUTPUT_BIT_TO_NAME.at(output_bit);
-  return PinState(id, name, value);
 }
 
 /**

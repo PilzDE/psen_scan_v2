@@ -368,14 +368,6 @@ if(CATKIN_ENABLE_TESTING)
     fmt::fmt
   )
 
-  catkin_add_gtest(unittest_create_pin_state
-    standalone/test/unit_tests/data_conversion_layer/unittest_create_pin_state.cpp
-  )
-  target_link_libraries(unittest_create_pin_state
-    ${catkin_LIBRARIES}
-    fmt::fmt
-  )
-
   catkin_add_gtest(unittest_laserscan_ros_conversions
     test/unit_tests/unittest_laserscan_ros_conversions.cpp
     standalone/src/laserscan.cpp

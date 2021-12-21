@@ -36,7 +36,6 @@
 #define EXPECT_NO_BLOCK_NO_THROW(statement)                                                                            \
   do                                                                                                                   \
   {                                                                                                                    \
-    using namespace std::chrono_literals;                                                                              \
     auto future = std::async(std::launch::async, [&]() { statement });                                                 \
     EXPECT_TRUE(future.valid());                                                                                       \
     EXPECT_FUTURE_IS_READY(future, std::chrono::seconds(2)) << #statement << " does not return.";                      \
