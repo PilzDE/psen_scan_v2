@@ -27,7 +27,7 @@
 namespace psen_scan_v2_standalone_test
 {
 using namespace psen_scan_v2_standalone;
-namespace dmi = data_conversion_layer::monitoring_frame::io;
+using namespace data_conversion_layer::monitoring_frame::io;
 
 template <typename PinType, size_t ChunkSize>
 inline std::vector<PinState>
@@ -42,18 +42,18 @@ createCompletePinField(const std::array<std::array<PinType, 8>, ChunkSize>& type
       auto pin_type = type_lookup_array.at(byte).at(bit);
       if (pin_type != PinType::unused)
       {
-        pin_field.emplace_back(dmi::createID(byte, bit), name_lookup_map.at(pin_type), false);
+        pin_field.emplace_back(createID(byte, bit), name_lookup_map.at(pin_type), false);
       }
     }
   }
   return pin_field;
 }
 
-inline dmi::PinData createCompleteIOPinData()
+inline PinData createCompleteIOPinData()
 {
-  dmi::PinData pin_data;
-  pin_data.logical_input = createCompletePinField(dmi::LOGICAL_INPUT_BITS, dmi::LOGICAL_INPUT_BIT_TO_NAME);
-  pin_data.output = createCompletePinField(dmi::OUTPUT_BITS, dmi::OUTPUT_BIT_TO_NAME);
+  PinData pin_data;
+  pin_data.logical_input = createCompletePinField(LOGICAL_INPUT_BITS, LOGICAL_INPUT_BIT_TO_NAME);
+  pin_data.output = createCompletePinField(OUTPUT_BITS, OUTPUT_BIT_TO_NAME);
   return pin_data;
 }
 
@@ -62,27 +62,27 @@ inline void setPin(PinState& pin_state)
   pin_state = PinState(pin_state.id(), pin_state.name(), true);
 }
 
-inline void setInputPin(dmi::PinData& io_pin_data, const dmi::LogicalInputType& type)
+inline void setInputPin(PinData& io_pin_data, const LogicalInputType& type)
 {
   const auto it = std::find_if(io_pin_data.logical_input.begin(), io_pin_data.logical_input.end(), [&](const auto& a) {
-    return a.name() == dmi::LOGICAL_INPUT_BIT_TO_NAME.at(type);
+    return a.name() == LOGICAL_INPUT_BIT_TO_NAME.at(type);
   });
   if (it == io_pin_data.logical_input.end())
   {
-    throw std::invalid_argument("Could not set input pin because type " + dmi::LOGICAL_INPUT_BIT_TO_NAME.at(type) +
+    throw std::invalid_argument("Could not set input pin because type " + LOGICAL_INPUT_BIT_TO_NAME.at(type) +
                                 " is not included in the pin data.");
   }
   setPin(*it);
 }
 
-inline void setOutputPin(dmi::PinData& io_pin_data, const dmi::OutputType& type)
+inline void setOutputPin(PinData& io_pin_data, const OutputType& type)
 {
   const auto it = std::find_if(io_pin_data.output.begin(), io_pin_data.output.end(), [&](const auto& a) {
-    return a.name() == dmi::OUTPUT_BIT_TO_NAME.at(type);
+    return a.name() == OUTPUT_BIT_TO_NAME.at(type);
   });
   if (it == io_pin_data.output.end())
   {
-    throw std::invalid_argument("Could not set output pin because type " + dmi::OUTPUT_BIT_TO_NAME.at(type) +
+    throw std::invalid_argument("Could not set output pin because type " + OUTPUT_BIT_TO_NAME.at(type) +
                                 " is not included in the pin data.");
   }
   setPin(*it);
