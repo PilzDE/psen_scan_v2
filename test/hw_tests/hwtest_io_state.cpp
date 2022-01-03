@@ -34,12 +34,24 @@
 #include "psen_scan_v2_standalone/util/gtest_expectations.h"
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 
+#include "psen_scan_v2/subscriber_mock.h"
+
 namespace psen_scan_v2
 {
 // Avoids too much output with full io pin data
 void PrintTo(const IOState& io_state, std::ostream* os)
 {
-  *os << "IOState(...)";
+  *os << "IOState(logical_input:";
+  for (const auto& input_pin : io_state.logical_input)
+  {
+    *os << input_pin.name << ": " << (int)input_pin.state << ", ";
+  }
+  *os << "\noutput:";
+  for (const auto& output_pin : io_state.output)
+  {
+    *os << output_pin.name << ": " << (int)output_pin.state << ", ";
+  }
+  *os << ")";
 }
 }  // namespace psen_scan_v2
 
@@ -51,42 +63,21 @@ namespace standalone_test = psen_scan_v2_standalone_test;
 
 namespace psen_scan_v2_test
 {
-class IOSubscriberMock
+class IOSubscriberMock : public SubscriberMock<IOState>
 {
 public:
-  IOSubscriberMock();
-  MOCK_METHOD1(callback, void(const IOState&));
-
-private:
-  ros::NodeHandle nh_;
-  ros::Subscriber subscriber_;
+  IOSubscriberMock(ros::NodeHandle& nh);
 };
 
-inline IOSubscriberMock::IOSubscriberMock()
+IOSubscriberMock::IOSubscriberMock(ros::NodeHandle& nh) : SubscriberMock<IOState>{ nh, "/laser_1/io_state", 6 }
 {
-  subscriber_ = nh_.subscribe("/laser_1/io_state", 40, &IOSubscriberMock::callback, this);
-}
-
-class ActiveZoneSubscriberMock
-{
-public:
-  ActiveZoneSubscriberMock();
-  MOCK_METHOD1(callback, void(const std_msgs::UInt8&));
-
-private:
-  ros::NodeHandle nh_;
-  ros::Subscriber subscriber_;
-};
-
-inline ActiveZoneSubscriberMock::ActiveZoneSubscriberMock()
-{
-  subscriber_ = nh_.subscribe("/laser_1/active_zoneset", 1, &ActiveZoneSubscriberMock::callback, this);
 }
 
 class ZoneSwitchExecutor
 {
 public:
   ZoneSwitchExecutor();
+  bool isConnected(const ros::Duration& timeout = ros::Duration(3.0)) const;
   // Throw std::out_of_range if zone_id is not supported.
   void execute(unsigned int zone_id);
 
@@ -105,6 +96,24 @@ inline ZoneSwitchExecutor::ZoneSwitchExecutor()
   relay_cmd_publisher_ = nh_.advertise<std_msgs::Byte>("/relay_cmd", 1);
 }
 
+bool ZoneSwitchExecutor::isConnected(const ros::Duration& timeout) const
+{
+  const auto start_time = ros::Time::now();
+  while (ros::ok())
+  {
+    if (relay_cmd_publisher_.getNumSubscribers() > 0)
+    {
+      return true;
+    }
+    if ((ros::Time::now() - start_time) > timeout)
+    {
+      return false;
+    }
+    ros::Duration(0.1).sleep();
+  }
+  return false;
+}
+
 inline void ZoneSwitchExecutor::execute(unsigned int zone_id)
 {
   std_msgs::Byte command;
@@ -117,32 +126,24 @@ MATCHER_P(UInt8MsgDataEq, data, "")
   return arg.data == data;
 }
 
-MATCHER_P(ZoneSwitchingInputIsTrueOnly, zone_id, "")
+MATCHER_P(ZoneSwitchingInputIsTrue, zone_id, "")
 {
   const std::string pin_name{ "Zone Set Switching Input " + std::to_string(zone_id) };
-  bool pin_found{ false };
-  for (const auto& pin : arg.logical_input)
-  {
-    if (pin.name == pin_name)
-    {
-      pin_found = true;
-      if (!pin.state)
-      {
-        *result_listener << "Pin " << pin.name << " is not true";
-        return false;
-      }
-    }
-    else if (pin.state)
-    {
-      *result_listener << "Pin " << pin.name << " is true";
-      return false;
-    }
-  }
-  if (!pin_found)
+  const auto it = std::find_if(
+      arg.logical_input.begin(), arg.logical_input.end(), [pin_name](const auto& pin) { return pin.name == pin_name; });
+  if (it == arg.logical_input.end())
   {
     *result_listener << "Pin " << pin_name << " not found";
+    return false;
   }
-  return pin_found;
+  return it->state == true;
+}
+
+MATCHER(OnlyOneZoneSwitchingInputIsTrue, "")
+{
+  return std::count_if(arg.logical_input.begin(), arg.logical_input.end(), [](const auto& pin) {
+           return (pin.name.substr(0, 24) == "Zone Set Switching Input") && (pin.state == true);
+         }) == 1;
 }
 
 MATCHER_P(Safety1IntrusionOutputIs, state, "")
@@ -154,23 +155,27 @@ MATCHER_P(Safety1IntrusionOutputIs, state, "")
     *result_listener << "Pin Safety 1 intrusion not found";
     return false;
   }
-  if (it->state != state)
-  {
-    *result_listener << "Safety 1 intrusion is " << (it->state ? "true" : "false");
-    return false;
-  }
-  return true;
+  return it->state == state;
 }
 
+/**
+ * For this test the scanner and it's configuration need to be set-up as follows:
+ * - In zoneset 1 the safety1 zone is not violated
+ * - In zoneset 2 the safety1 zone is violated
+ */
 class IOStateTests : public Test
 {
 public:
   void SetUp() override
   {
+    IOSubscriberMock io_subscriber_mock(nh_);
+    standalone::util::Barrier zone_one_barrier;
+    ON_CALL(io_subscriber_mock, callback(AllOf(ZoneSwitchingInputIsTrue(1), Safety1IntrusionOutputIs(false))))
+        .WillByDefault(standalone_test::OpenBarrier(&zone_one_barrier));
+
+    ASSERT_TRUE(zone_switch_executor_.isConnected());
     switchZone(1);
-    ActiveZoneSubscriberMock active_zone_subscriber_mock;
-    auto zone_one_barrier = EXPECT_ASYNC_CALL(active_zone_subscriber_mock, callback(UInt8MsgDataEq(0)));
-    zone_one_barrier->waitTillRelease(5s);
+    zone_one_barrier.waitTillRelease(5s);
   }
 
   void TearDown() override
@@ -183,6 +188,7 @@ public:
   }
 
 protected:
+  ros::NodeHandle nh_;
   ZoneSwitchExecutor zone_switch_executor_;
 };
 
@@ -191,52 +197,43 @@ TEST_F(IOStateTests, shouldPublishChangedZoneSwitchingInputIfZoneIsSwitched)
   standalone::util::Barrier zone_switching_1_barrier;
   standalone::util::Barrier zone_switching_2_barrier;
 
-  IOSubscriberMock io_subscriber_mock;
+  IOSubscriberMock io_subscriber_mock(nh_);
   {
     InSequence s;
-    EXPECT_CALL(io_subscriber_mock, callback(ZoneSwitchingInputIsTrueOnly(1)))  // This is what we expect after SetUp()
-        .Times(AnyNumber());
-    EXPECT_CALL(io_subscriber_mock, callback(ZoneSwitchingInputIsTrueOnly(2)))
-        .Times(AnyNumber())
-        .WillOnce(standalone_test::OpenBarrier(&zone_switching_2_barrier));
-    EXPECT_CALL(io_subscriber_mock, callback(ZoneSwitchingInputIsTrueOnly(1)))
-        .Times(AnyNumber())
+    EXPECT_CALL(io_subscriber_mock,
+                callback(AllOf(OnlyOneZoneSwitchingInputIsTrue(),
+                               ZoneSwitchingInputIsTrue(1))))  // This is what we expect after SetUp()
+        .Times(AtLeast(1))
         .WillOnce(standalone_test::OpenBarrier(&zone_switching_1_barrier));
+    EXPECT_CALL(io_subscriber_mock, callback(AllOf(OnlyOneZoneSwitchingInputIsTrue(), ZoneSwitchingInputIsTrue(2))))
+        .Times(AtLeast(1))
+        .WillOnce(standalone_test::OpenBarrier(&zone_switching_2_barrier));
   }
 
+  zone_switching_1_barrier.waitTillRelease(5s);
   switchZone(2);
   zone_switching_2_barrier.waitTillRelease(5s);
-  switchZone(1);
-  zone_switching_1_barrier.waitTillRelease(5s);
 }
 
-/**
- * For this test the scanner and it's configuration need to be set-up as follows:
- * - In zoneset 1 the safety1 zone is not violated
- * - In zoneset 2 the safety1 zone is violated
- */
 TEST_F(IOStateTests, shouldPublishChangedSafetyIntrusionOutputIfZoneIsSwitched)
 {
   standalone::util::Barrier safety1_intrusion_false_barrier;
   standalone::util::Barrier safety1_intrusion_true_barrier;
 
-  IOSubscriberMock io_subscriber_mock;
+  IOSubscriberMock io_subscriber_mock(nh_);
   {
     InSequence s;
     EXPECT_CALL(io_subscriber_mock, callback(Safety1IntrusionOutputIs(false)))  // This is what we expect after SetUp()
-        .Times(AnyNumber());
-    EXPECT_CALL(io_subscriber_mock, callback(Safety1IntrusionOutputIs(true)))
-        .Times(AnyNumber())
-        .WillOnce(standalone_test::OpenBarrier(&safety1_intrusion_true_barrier));
-    EXPECT_CALL(io_subscriber_mock, callback(Safety1IntrusionOutputIs(false)))
-        .Times(AnyNumber())
+        .Times(AtLeast(1))
         .WillOnce(standalone_test::OpenBarrier(&safety1_intrusion_false_barrier));
+    EXPECT_CALL(io_subscriber_mock, callback(Safety1IntrusionOutputIs(true)))
+        .Times(AtLeast(1))
+        .WillOnce(standalone_test::OpenBarrier(&safety1_intrusion_true_barrier));
   }
 
+  safety1_intrusion_false_barrier.waitTillRelease(5s);
   switchZone(2);
   safety1_intrusion_true_barrier.waitTillRelease(5s);
-  switchZone(1);
-  safety1_intrusion_false_barrier.waitTillRelease(5s);
 }
 
 }  // namespace psen_scan_v2_test
