@@ -93,8 +93,8 @@ class IOState
 public:
   IOState() = default;
   IOState(std::vector<PinState> logical_input, std::vector<PinState> output);
-  std::vector<PinState> logicalInput() const;
-  std::vector<PinState> output() const;
+  const std::vector<PinState>& logicalInput() const;
+  const std::vector<PinState>& output() const;
 
 private:
   std::vector<PinState> logical_input_{};
@@ -106,12 +106,12 @@ inline IOState::IOState(std::vector<PinState> logical_input, std::vector<PinStat
 {
 }
 
-inline std::vector<PinState> IOState::logicalInput() const
+inline const std::vector<PinState>& IOState::logicalInput() const
 {
   return logical_input_;
 }
 
-inline std::vector<PinState> IOState::output() const
+inline const std::vector<PinState>& IOState::output() const
 {
   return output_;
 }
