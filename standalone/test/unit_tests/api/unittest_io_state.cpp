@@ -26,7 +26,7 @@ TEST(IOStateTests, shouldOnlyContainAddedInputPinState)
 {
   IOState io_state({ PinState(5, "some name", false) }, {});
 
-  EXPECT_EQ(io_state.logicalInput().size(), 1);
+  EXPECT_EQ(io_state.logicalInput().size(), 1u);
   EXPECT_EQ(io_state.logicalInput().at(0), PinState(5, "some name", false));
 
   EXPECT_TRUE(io_state.output().empty());
@@ -38,7 +38,7 @@ TEST(IOStateTests, shouldOnlyContainAddedOutputPinState)
 
   EXPECT_TRUE(io_state.logicalInput().empty());
 
-  EXPECT_EQ(io_state.output().size(), 1);
+  EXPECT_EQ(io_state.output().size(), 1u);
   EXPECT_EQ(io_state.output().at(0), PinState(5, "some name", false));
 }
 
@@ -47,7 +47,7 @@ TEST(IOStateTests, shouldContainAllInputPinStatesInCorrectOrder)
   std::vector<PinState> pins{ PinState(1, "a", false), PinState(5, "b", true), PinState(3, "c", false) };
   IOState io_state(pins, {});
 
-  ASSERT_EQ(io_state.logicalInput().size(), 3);
+  ASSERT_EQ(io_state.logicalInput().size(), 3u);
   for (size_t i = 0; i < pins.size(); ++i)
   {
     EXPECT_EQ(io_state.logicalInput().at(i), pins.at(i));
@@ -59,7 +59,7 @@ TEST(IOStateTests, shouldContainAllOutputPinStatesInCorrectOrder)
   std::vector<PinState> pins{ PinState(1, "a", false), PinState(5, "b", true), PinState(3, "c", false) };
   IOState io_state({}, pins);
 
-  ASSERT_EQ(io_state.output().size(), 3);
+  ASSERT_EQ(io_state.output().size(), 3u);
   for (size_t i = 0; i < pins.size(); ++i)
   {
     EXPECT_EQ(io_state.output().at(i), pins.at(i));
