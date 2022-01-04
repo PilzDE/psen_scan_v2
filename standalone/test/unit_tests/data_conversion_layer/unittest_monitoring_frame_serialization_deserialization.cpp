@@ -68,7 +68,7 @@ void printDump(const T& data)
 
 namespace psen_scan_v2_standalone_test
 {
-using namespace monitoring_frame::io;
+namespace io = monitoring_frame::io;
 
 TEST(MonitoringFrameSerializationTest, shouldSerializeHexdumpFrameCorrectly)
 {
