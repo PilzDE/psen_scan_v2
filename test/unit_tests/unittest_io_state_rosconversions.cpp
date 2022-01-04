@@ -19,7 +19,6 @@
 #include "psen_scan_v2/io_state_ros_conversion.h"
 
 using namespace psen_scan_v2;
-using namespace psen_scan_v2_standalone;
 
 namespace psen_scan_v2_test
 {
