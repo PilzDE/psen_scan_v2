@@ -60,6 +60,22 @@ TEST(IOStateROSConversionsTest, shouldThrowOnNegativeTime)
   EXPECT_THROW(toIOStateMsg(iostate, "some_frame", -10), std::invalid_argument);
 }
 
+TEST(IOStateROSConversionsTest, shouldSuccesfulConvertEmptyIOState)
+{
+  psen_scan_v2_standalone::IOState iostate({}, {});
+  psen_scan_v2::IOState ros_message = toIOStateMsg(iostate, "some_frame", 10 /* stamp */);
+  EXPECT_EQ(ros_message.logical_input.size(), 0);
+  EXPECT_EQ(ros_message.output.size(), 0);
+}
+
+TEST(IOStateROSConversionsTest, shouldSuccesfulConvertEmptyIOStateWithDefaultCTor)
+{
+  psen_scan_v2_standalone::IOState iostate;
+  psen_scan_v2::IOState ros_message = toIOStateMsg(iostate, "some_frame", 10 /* stamp */);
+  EXPECT_EQ(ros_message.logical_input.size(), 0);
+  EXPECT_EQ(ros_message.output.size(), 0);
+}
+
 }  // namespace psen_scan_v2_test
 
 int main(int argc, char* argv[])
