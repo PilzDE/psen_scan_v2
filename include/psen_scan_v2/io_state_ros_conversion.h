@@ -19,27 +19,30 @@
 #include <string>
 
 #include "psen_scan_v2/IOState.h"
-#include "psen_scan_v2/PinState.h"
+#include "psen_scan_v2/InputPinState.h"
+#include "psen_scan_v2/OutputPinState.h"
 #include "psen_scan_v2_standalone/io_state.h"
 
 namespace psen_scan_v2
 {
-psen_scan_v2::PinState toPinStateMsg(const psen_scan_v2_standalone::PinState& pin)
+template <typename PinStateType>
+PinStateType toPinStateMsg(const psen_scan_v2_standalone::PinState& pin)
 {
-  psen_scan_v2::PinState pin_msg;
-  pin_msg.pin_id = pin.id();
+  PinStateType pin_msg;
+  pin_msg.pin_id.id = pin.id();
   pin_msg.name = pin.name();
   pin_msg.state = pin.state();
   return pin_msg;
 }
 
-std::vector<psen_scan_v2::PinState> readPinStates(const std::vector<psen_scan_v2_standalone::PinState>& pins)
+template <typename PinStateType>
+std::vector<PinStateType> readPinStates(const std::vector<psen_scan_v2_standalone::PinState>& pins)
 {
-  std::vector<psen_scan_v2::PinState> container;
+  std::vector<PinStateType> container;
   container.reserve(pins.size());
   for (const auto& pin : pins)
   {
-    container.emplace_back(toPinStateMsg(pin));
+    container.emplace_back(toPinStateMsg<PinStateType>(pin));
   }
 
   return container;
@@ -57,8 +60,8 @@ psen_scan_v2::IOState toIOStateMsg(const psen_scan_v2_standalone::IOState& io_st
   ros_message.header.stamp = ros::Time{}.fromNSec(stamp);
   ros_message.header.frame_id = frame_id;
 
-  ros_message.logical_input = readPinStates(io_state.logicalInput());
-  ros_message.output = readPinStates(io_state.output());
+  ros_message.logical_input = readPinStates<InputPinState>(io_state.logicalInput());
+  ros_message.output = readPinStates<OutputPinState>(io_state.output());
 
   return ros_message;
 }

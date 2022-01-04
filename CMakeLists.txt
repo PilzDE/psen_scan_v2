@@ -50,7 +50,10 @@ find_package(TinyXML2 REQUIRED)
 
 add_message_files(
   FILES
-  PinState.msg
+  InputPinState.msg
+  InputPinID.msg
+  OutputPinState.msg
+  OutputPinID.msg
   IOState.msg
   ZoneSet.msg
   ZoneSetConfiguration.msg
