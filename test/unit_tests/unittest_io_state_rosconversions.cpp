@@ -64,16 +64,16 @@ TEST(IOStateROSConversionsTest, shouldSuccesfulConvertEmptyIOState)
 {
   psen_scan_v2_standalone::IOState iostate({}, {});
   psen_scan_v2::IOState ros_message = toIOStateMsg(iostate, "some_frame", 10 /* stamp */);
-  EXPECT_EQ(ros_message.logical_input.size(), 0);
-  EXPECT_EQ(ros_message.output.size(), 0);
+  EXPECT_EQ(ros_message.logical_input.size(), 0u);
+  EXPECT_EQ(ros_message.output.size(), 0u);
 }
 
 TEST(IOStateROSConversionsTest, shouldSuccesfulConvertEmptyIOStateWithDefaultCTor)
 {
   psen_scan_v2_standalone::IOState iostate;
   psen_scan_v2::IOState ros_message = toIOStateMsg(iostate, "some_frame", 10 /* stamp */);
-  EXPECT_EQ(ros_message.logical_input.size(), 0);
-  EXPECT_EQ(ros_message.output.size(), 0);
+  EXPECT_EQ(ros_message.logical_input.size(), 0u);
+  EXPECT_EQ(ros_message.output.size(), 0u);
 }
 
 }  // namespace psen_scan_v2_test
