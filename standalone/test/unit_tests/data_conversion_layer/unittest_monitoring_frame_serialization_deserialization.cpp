@@ -83,8 +83,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeHexdumpFrameCorrectly)
   {
     // Intensities are a special case since here only the last 14 bytes are important since
     // the first two are reserved for the channel which is not checked
-    if (i > with_intensities.intensities_offset &&
-        i < with_intensities.intensities_offset + 2 * with_intensities.expected_msg_.intensities().size())
+    if (with_intensities.hasIntensityAt(i))
     {
       // The following line makes sure we compare the proper tuples. E.g. if the offset is 650
       // we want to compare (650, 651), (652, 653), ....
