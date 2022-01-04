@@ -15,7 +15,26 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """ Dump parser
-Parse dump from wireshark to the one used in udp_frame_dumps.h
+This is a simple parser to transofrm a wireshark dump of the shape 
+
+0000 6f 10 20 f3 6f 10 20 f3 6f 10 20 f3 6f 10 20 f3
+...
+
+to the format used in the udp_frame_dumps.h
+
+0x6f, 0x10, ..... // 0030
+...
+
+The output has to be corrected by:
+- truncating the header bits at the start
+- inputing the desired diagnostic bits
+- nullifying the physical input bits.
+
+Additionally this script outputs the locations that fit the additional header IDs and sizes, since they are needed in the same header file
+for the deserialization.
+
+To use this script create a "dump" file next to this with the wireshark dump and then execute this script.
+
 """
 
 from pathlib import Path

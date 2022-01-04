@@ -135,6 +135,8 @@ public:
   };
 
   const size_t intensities_offset{ 143 + (250 * 2) + 3 };
+
+  // This is a dump read with wireshark and transformed with the script test/scripts/parse_dump.py.
   // clang-format off
   const std::array<uint8_t, 1150> hex_dump = {
                                                             0x00, 0x00, 0x00, 0x00, 0xca, 0x00,  // 0020
