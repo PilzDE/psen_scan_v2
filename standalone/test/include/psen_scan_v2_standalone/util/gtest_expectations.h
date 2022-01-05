@@ -16,10 +16,15 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_TEST_GTEST_EXPECTATIONS_H
 #define PSEN_SCAN_V2_STANDALONE_TEST_GTEST_EXPECTATIONS_H
 
+#include <algorithm>
 #include <chrono>
 #include <future>
 
 #include <gtest/gtest.h>
+
+#include "psen_scan_v2_standalone/util/format_range.h"
+
+#define ASSERT_FUTURE_IS_READY(future, wait_timeout) ASSERT_EQ(future.wait_for(wait_timeout), std::future_status::ready)
 
 #define EXPECT_FUTURE_IS_READY(future, wait_timeout) EXPECT_EQ(future.wait_for(wait_timeout), std::future_status::ready)
 
@@ -51,5 +56,17 @@
         }                                                                                                              \
       },                                                                                                               \
       expected_exception);
+
+#define EXPECT_IO_STATE_EQ_IO_PIN(io_state, io_pin_data, start_index)                                                  \
+  EXPECT_EQ(io_pin_data.logical_input, io_state.at(start_index).logicalInput());                                       \
+  EXPECT_EQ(io_pin_data.output, io_state.at(start_index).output());
+
+#define EXPECT_CONTAINER_UNORDERED_EQ(var1, var2)                                                                      \
+  EXPECT_EQ(var1.size(), var2.size());                                                                                 \
+  for (const auto& v : var2)                                                                                           \
+  {                                                                                                                    \
+    EXPECT_NE(std::find(var1.begin(), var1.end(), v), var1.end())                                                      \
+        << "Did not find the expected element: " << v << " in " << util::formatRange(var1);                            \
+  }
 
 #endif  // PSEN_SCAN_V2_STANDALONE_TEST_GTEST_EXPECTATIONS_H

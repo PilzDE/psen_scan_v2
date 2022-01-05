@@ -16,6 +16,8 @@
 #define PSEN_SCAN_V2_MONITORING_FRAME_SERIALIZATION_H
 
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_constants.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
@@ -31,6 +33,10 @@ namespace diagnostic
 {
 RawChunk serialize(const std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message>& messages);
 }  // namespace diagnostic
+namespace io
+{
+RawChunk serialize(const PinData& pin_data);
+}  // namespace io
 void write(std::ostringstream& os, const data_conversion_layer::monitoring_frame::AdditionalFieldHeader& header);
 }  // namespace monitoring_frame
 }  // namespace data_conversion_layer

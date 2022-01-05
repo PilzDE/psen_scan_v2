@@ -20,6 +20,7 @@
 #include <ostream>
 #include <vector>
 
+#include "psen_scan_v2_standalone/io_state.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
@@ -37,6 +38,7 @@ namespace psen_scan_v2_standalone
  * - Counter of scan round.
  * - ID of the currently active zoneset.
  * - Time of the first scan ray.
+ * - All states of the I/O pins recorded during the scan.
  *
  * The measures use the target frame defined as \<tf_prefix\>.
  * @see https://github.com/PilzDE/psen_scan_v2_standalone/blob/main/README.md#tf-frames
@@ -46,6 +48,7 @@ class LaserScan
 public:
   using MeasurementData = std::vector<double>;
   using IntensityData = std::vector<double>;
+  using IOData = std::vector<IOState>;
 
 public:
   LaserScan(const util::TenthOfDegree& resolution,
@@ -70,11 +73,16 @@ public:
   const IntensityData& getIntensities() const;
   void setIntensities(const IntensityData& intensities);
 
+  const IOData& getIOStates() const;
+  void setIOStates(const IOData& io_states);
+
 private:
   //! Measurement data of the laserscan (in Millimeters).
   MeasurementData measurements_;
   //! Stores the received normalized signal intensities.
   IntensityData intensities_;
+  //! States of the I/O pins.
+  IOData io_states_;
   //! Distance of angle between the measurements.
   const util::TenthOfDegree resolution_;
   //! Lowest angle the scanner is scanning.

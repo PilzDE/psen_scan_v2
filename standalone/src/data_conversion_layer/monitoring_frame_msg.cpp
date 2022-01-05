@@ -67,6 +67,18 @@ uint8_t Message::activeZoneset() const
   }
 }
 
+const io::PinData& Message::iOPinData() const
+{
+  if (io_pin_data_.is_initialized())
+  {
+    return io_pin_data_.get();
+  }
+  else
+  {
+    throw AdditionalFieldMissing("IO pin data");
+  }
+}
+
 const std::vector<double>& Message::measurements() const
 {
   if (measurements_.is_initialized())
@@ -111,6 +123,11 @@ bool Message::hasScanCounterField() const
 bool Message::hasActiveZonesetField() const
 {
   return active_zoneset_.is_initialized();
+}
+
+bool Message::hasIOPinField() const
+{
+  return io_pin_data_.is_initialized();
 }
 
 bool Message::hasMeasurementsField() const

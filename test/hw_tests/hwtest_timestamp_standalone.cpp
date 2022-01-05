@@ -38,9 +38,9 @@ static const int HOST_UDP_DATA_PORT{ 55007 };
 static const util::TenthOfDegree ANGLE_START{ 1 };
 static const util::TenthOfDegree ANGLE_END{ 2749 };
 
-static constexpr int64_t SCANNER_RUN_DURATION_S{ 30 };
-static constexpr std::size_t MINIMUM_TEST_SIZE{ 900 };
-static constexpr int64_t TIME_COMPARISON_EPSILON_NS{ 1000000 };
+static constexpr int64_t SCANNER_RUN_DURATION_S{ 10 };
+static constexpr std::size_t MINIMUM_TEST_SIZE{ 100 };
+static constexpr int64_t FIRST_SCAN_FRAME_DURATION{ 2083334 };  // change to 4166667 after scan counter fix in firmware
 static const std::string UDP_DATA_FILENAME_ENV_VAR{ "UDP_DATA_FILENAME" };
 
 class TimestampTests : public ::testing::Test
@@ -114,25 +114,22 @@ TEST_F(TimestampTests, testTimestampIncreasing)
   }
 }
 
-TEST_F(TimestampTests, testTimestampIsNearOrGreaterThanLastUdpFrameTime)
-{
-  for (std::size_t i = 1; i < testSize(); ++i)
-  {
-    const auto& datum1{ testData().at(i) };
-    const auto& datum2{ testData().at(i - 1) };
-    EXPECT_GT(datum1.timestamp() - datum2.lastFrameTime(), -TIME_COMPARISON_EPSILON_NS)
-        << "Timestamp " << datum1.timestamp() << " for scan counter " << datum1.scanCounter()
-        << " not near or greater than last udp frame time " << datum2.lastFrameTime() << " for scan counter "
-        << datum2.scanCounter();
-  }
-}
-
 TEST_F(TimestampTests, testTimestampIsLessThanFirstUdpFrameTime)
 {
   for (const auto& datum : testData())
   {
     EXPECT_LT(datum.timestamp(), datum.firstFrameTime())
         << "Timestamp not less then first udp frame time for scan counter " << datum.scanCounter();
+  }
+}
+
+TEST_F(TimestampTests, testTimestampIsGreaterThanScanStartTimeDerivedFromFirstUdpFrameTime)
+{
+  for (const auto& datum : testData())
+  {
+    EXPECT_GT(datum.timestamp(), datum.firstFrameTime() - FIRST_SCAN_FRAME_DURATION)
+        << "Timestamp not greater then scan start time derived from first udp frame time for scan counter "
+        << datum.scanCounter();
   }
 }
 

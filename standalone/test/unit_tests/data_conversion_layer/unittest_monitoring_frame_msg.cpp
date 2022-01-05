@@ -19,46 +19,58 @@
 #include <gtest/gtest.h>
 
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
+#include "psen_scan_v2_standalone/io_state.h"
 
 #include "psen_scan_v2_standalone/util/gtest_expectations.h"
+#include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 
 namespace psen_scan_v2_standalone_test
 {
 using namespace psen_scan_v2_standalone;
 using namespace data_conversion_layer::monitoring_frame;
 
+typedef data_conversion_layer::monitoring_frame::Message FrameMessage;
+
 static const std::string ADDITIONAL_FIELD_MISSING_TEXT = " not set! (Contact PILZ support if the error persists.)";
 
 TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetScanCounter)
 {
   EXPECT_THROW_AND_WHAT(
-      Message().scanCounter(), AdditionalFieldMissing, ("Scan counter" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
+      FrameMessage().scanCounter(), AdditionalFieldMissing, ("Scan counter" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
 TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetMeasurements)
 {
   EXPECT_THROW_AND_WHAT(
-      Message().measurements(), AdditionalFieldMissing, ("Measurements" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
+      FrameMessage().measurements(), AdditionalFieldMissing, ("Measurements" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
 TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetIntensities)
 {
   EXPECT_THROW_AND_WHAT(
-      Message().intensities(), AdditionalFieldMissing, ("Intensities" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
+      FrameMessage().intensities(), AdditionalFieldMissing, ("Intensities" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
 TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetActiveZoneset)
 {
+  EXPECT_THROW_AND_WHAT(FrameMessage().activeZoneset(),
+                        AdditionalFieldMissing,
+                        ("Active zoneset" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
+}
+
+TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetIOPin)
+{
   EXPECT_THROW_AND_WHAT(
-      Message().activeZoneset(), AdditionalFieldMissing, ("Active zoneset" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
+      FrameMessage().iOPinData(), AdditionalFieldMissing, ("IO pin data" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
 TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetDiagnosticMessages)
 {
-  EXPECT_THROW_AND_WHAT(Message().diagnosticMessages(),
+  EXPECT_THROW_AND_WHAT(FrameMessage().diagnosticMessages(),
                         AdditionalFieldMissing,
                         ("Diagnostic messages" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
@@ -91,6 +103,12 @@ TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfDiagnosticMessages)
 {
   EXPECT_FALSE(MessageBuilder().build().hasDiagnosticMessagesField());
   EXPECT_TRUE(MessageBuilder().diagnosticMessages({}).build().hasDiagnosticMessagesField());
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfIOPin)
+{
+  EXPECT_FALSE(MessageBuilder().build().hasIOPinField());
+  EXPECT_TRUE(MessageBuilder().iOPinData(io::PinData()).build().hasIOPinField());
 }
 
 TEST(MonitoringFrameMsgTest, shouldReturnCorrectScannerId)
@@ -141,6 +159,16 @@ TEST(MonitoringFrameMsgTest, shouldReturnCorrectIntensities)
   std::vector<double> intensities;
   ASSERT_NO_THROW(intensities = MessageBuilder().intensities(expected_intensities).build().intensities());
   EXPECT_EQ(expected_intensities, intensities);
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectIOPin)
+{
+  io::PinData expected_io_pin_data;
+  expected_io_pin_data.logical_input = { PinState(3, "zone1", true) };
+  expected_io_pin_data.output = { PinState(1, "OSSD", false) };
+  io::PinData io_pin_data;
+  ASSERT_NO_THROW(io_pin_data = MessageBuilder().iOPinData(expected_io_pin_data).build().iOPinData());
+  EXPECT_THAT(io_pin_data, IOPinDataEq(expected_io_pin_data));
 }
 
 TEST(MonitoringFrameMsgTest, shouldReturnCorrectDiagnosticMessages)

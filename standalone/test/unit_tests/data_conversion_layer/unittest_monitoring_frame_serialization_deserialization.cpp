@@ -20,37 +20,94 @@
 #include <gmock/gmock.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
+#include "psen_scan_v2_standalone/io_state.h"
 
 #include "psen_scan_v2_standalone/data_conversion_layer/istring_stream_builder.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_helper.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_serialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
 #include "psen_scan_v2_standalone/communication_layer/udp_frame_dumps.h"
+#include "psen_scan_v2_standalone/util/gtest_expectations.h"
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 
 using namespace psen_scan_v2_standalone;
+using namespace data_conversion_layer;
+
+template <typename T>
+void printDump(const T& data)
+{
+  size_t id = 0;
+  size_t len = 0;
+  size_t next_offset = 21;
+  std::cout << "Const part" << std::endl;
+  for (size_t i = 0; i < data.size(); i++)
+  {
+    if (i == next_offset)
+    {
+      id = data.at(i);
+      if (id != 0x09)
+      {
+        len = (((unsigned char)data.at(i + 2)) << 8) | ((unsigned char)data.at(i + 1));
+        next_offset = i + len + 3 - 1;
+      }
+    }
+    std::cout << fmt::format("\x1B[{}m{:#04x}\033[0m", 30 + id, (uint8_t)data.at(i)) << " ";
+    if (i % 10 == 0)
+    {
+      std::cout << i << "    ID " << id << " len: " << len;
+      std::cout << std::endl;
+    }
+  }
+}
 
 namespace psen_scan_v2_standalone_test
 {
+namespace io = monitoring_frame::io;
+
 TEST(MonitoringFrameSerializationTest, shouldSerializeHexdumpFrameCorrectly)
 {
   scanner_udp_datagram_hexdumps::WithIntensitiesAndDiagnostics with_intensities;
   auto serialized_monitoring_frame_message = serialize(with_intensities.expected_msg_);
+  printDump(serialized_monitoring_frame_message);
+  printDump(with_intensities.hex_dump);
 
-  EXPECT_EQ(with_intensities.hex_dump.size(), serialized_monitoring_frame_message.size());
+  ASSERT_EQ(with_intensities.hex_dump.size(), serialized_monitoring_frame_message.size());
 
   for (size_t i = 0; i < with_intensities.hex_dump.size(); i++)
   {
-    uint8_t expected_byte = scanner_udp_datagram_hexdumps::clearIntensityChannelBits(
-        i,
-        with_intensities.intensities_offset,
-        2 * with_intensities.expected_msg_.intensities().size(),
-        with_intensities.hex_dump.at(i));
-    EXPECT_EQ((uint8_t)serialized_monitoring_frame_message.at(i), expected_byte) << " index " << i;
+    // Intensities are a special case since here only the last 14 bytes are important since
+    // the first two are reserved for the channel which is not checked
+    if (i > with_intensities.intensities_offset &&
+        i < with_intensities.intensities_offset + 2 * with_intensities.expected_msg_.intensities().size())
+    {
+      // The following line makes sure we compare the proper tuples. E.g. if the offset is 650
+      // we want to compare (650, 651), (652, 653), ....
+      if (i % 2 == with_intensities.intensities_offset % 2)
+      {
+        uint16_t raw_value_expected = scanner_udp_datagram_hexdumps::convertHexdumpBytesToUint16_t(
+            with_intensities.hex_dump.at(i + 1), with_intensities.hex_dump.at(i));
+        uint16_t raw_value_actual = scanner_udp_datagram_hexdumps::convertHexdumpBytesToUint16_t(
+            serialized_monitoring_frame_message.at(i + 1), serialized_monitoring_frame_message.at(i));
+
+        ASSERT_EQ(0b0011111111111111 & raw_value_expected, 0b0011111111111111 & raw_value_actual)
+            << " index " << i << " hexdump value: " << fmt::format("{:#04x}", (uint16_t)raw_value_expected)
+            << " actual_value: " << fmt::format("{:#04x}", (uint16_t)raw_value_actual);
+      }
+    }
+    // Compare all non intensity values directly
+    else
+    {
+      ASSERT_EQ((uint8_t)with_intensities.hex_dump.at(i), (uint8_t)serialized_monitoring_frame_message.at(i))
+          << " index " << i << " hexdump value: " << fmt::format("{:#04x}", (uint8_t)with_intensities.hex_dump.at(i))
+          << " actual_value: " << fmt::format("{:#04x}", (uint8_t)serialized_monitoring_frame_message.at(i));
+    }
   }
 }
 
@@ -70,37 +127,40 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeHexdumpFrameWithoutMeasure
 
 TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsistently)
 {
-  std::array<data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation, 3> error_locations = {
-    data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(0, 0),
-    data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 0),
-    data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(4, 7)
+  std::array<monitoring_frame::diagnostic::ErrorLocation, 3> error_locations = {
+    monitoring_frame::diagnostic::ErrorLocation(0, 0),
+    monitoring_frame::diagnostic::ErrorLocation(5, 0),
+    monitoring_frame::diagnostic::ErrorLocation(4, 7)
   };
 
   for (const auto& elem : error_locations)
   {
-    ASSERT_NE(data_conversion_layer::monitoring_frame::diagnostic::ERROR_BITS.at(elem.getByte()).at(elem.getBit()),
-              data_conversion_layer::monitoring_frame::diagnostic::ErrorType::unused)
+    ASSERT_NE(monitoring_frame::diagnostic::ERROR_BITS.at(elem.getByte()).at(elem.getBit()),
+              monitoring_frame::diagnostic::ErrorType::unused)
         << "The unused diagnostic bits are discarded during deserialization. You should use different test data for "
            "this test.";
   }
 
-  auto msg = data_conversion_layer::monitoring_frame::MessageBuilder()
+  auto pin_data = createCompleteIOPinData();
+  setInputPin(pin_data, LogicalInputType::muting_1_a);
+  setOutputPin(pin_data, OutputType::safe_1_int);
+
+  auto msg = monitoring_frame::MessageBuilder()
                  .fromTheta(util::TenthOfDegree(25))
                  .resolution(util::TenthOfDegree(1))
                  .scanCounter(456)
                  .activeZoneset(2)
                  .measurements({ 10, 20, std::numeric_limits<double>::infinity(), 40 })
                  .intensities({ 15, 25, 35, 45 })
-                 .diagnosticMessages({ data_conversion_layer::monitoring_frame::diagnostic::Message(
-                                           configuration::ScannerId::master, error_locations.at(0)),
-                                       data_conversion_layer::monitoring_frame::diagnostic::Message(
-                                           configuration::ScannerId::master, error_locations.at(1)),
-                                       data_conversion_layer::monitoring_frame::diagnostic::Message(
-                                           configuration::ScannerId::slave2, error_locations.at(2)) })
+                 .iOPinData(pin_data)
+                 .diagnosticMessages(
+                     { monitoring_frame::diagnostic::Message(configuration::ScannerId::master, error_locations.at(0)),
+                       monitoring_frame::diagnostic::Message(configuration::ScannerId::master, error_locations.at(1)),
+                       monitoring_frame::diagnostic::Message(configuration::ScannerId::slave2, error_locations.at(2)) })
                  .build();
 
   auto raw = serialize(msg);
-  auto deserialized_msg = data_conversion_layer::monitoring_frame::deserialize(convertToRawData(raw), raw.size());
+  auto deserialized_msg = monitoring_frame::deserialize(convertToRawData(raw), raw.size());
 
   EXPECT_THAT(deserialized_msg, MonitoringFrameEq(msg));
 }
@@ -118,7 +178,7 @@ TEST(MonitoringFrameSerializationTest, shouldFailOnSerializeAndDeserializeFrameW
                  .build();
 
   auto raw = serialize(msg);
-  auto deserialized_msg = data_conversion_layer::monitoring_frame::deserialize(convertToRawData(raw), raw.size());
+  auto deserialized_msg = monitoring_frame::deserialize(convertToRawData(raw), raw.size());
 
   const uint32_t intensity_channel_bit_mask = 0b111111111100000000000000;
   ASSERT_NE(static_cast<uint32_t>(msg.intensities().at(0)) & intensity_channel_bit_mask, 0u);
@@ -127,23 +187,20 @@ TEST(MonitoringFrameSerializationTest, shouldFailOnSerializeAndDeserializeFrameW
 
 TEST(MonitoringFrameSerializationDiagnosticMessagesTest, shouldSetCorrectBitInSerializedDiagnosticData)
 {
-  std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnostic_data{
-    { configuration::ScannerId::master, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(5, 3) }
+  std::vector<monitoring_frame::diagnostic::Message> diagnostic_data{
+    { configuration::ScannerId::master, monitoring_frame::diagnostic::ErrorLocation(5, 3) }
   };
-  auto diagnostic_data_serialized = data_conversion_layer::monitoring_frame::diagnostic::serialize(diagnostic_data);
+  auto diagnostic_data_serialized = monitoring_frame::diagnostic::serialize(diagnostic_data);
 
-  EXPECT_EQ(diagnostic_data_serialized.size(),
-            data_conversion_layer::monitoring_frame::diagnostic::RAW_CHUNK_LENGTH_IN_BYTES);
-  EXPECT_EQ(diagnostic_data_serialized.at(
-                data_conversion_layer::monitoring_frame::diagnostic::RAW_CHUNK_UNUSED_OFFSET_IN_BYTES + 5),
-            0b1000);
+  EXPECT_EQ(diagnostic_data_serialized.size(), monitoring_frame::diagnostic::RAW_CHUNK_LENGTH_IN_BYTES);
+  EXPECT_EQ(diagnostic_data_serialized.at(monitoring_frame::diagnostic::RAW_CHUNK_UNUSED_OFFSET_IN_BYTES + 5), 0b1000);
 }
 
 TEST(MonitoringFrameDeserializationFieldHeaderTest, shouldGetIdAndLengthCorrectly)
 {
   uint8_t id = 5;
   uint16_t length = 7;
-  data_conversion_layer::monitoring_frame::AdditionalFieldHeader header(id, length);
+  monitoring_frame::AdditionalFieldHeader header(id, length);
   EXPECT_EQ(id, header.id());
   EXPECT_EQ(length, header.length());
 }
@@ -160,9 +217,9 @@ TEST(MonitoringFrameDeserializationFieldHeaderTest, shouldDeserializeMonitoringF
   builder.add(length);
   std::istringstream is{ builder.get() };
 
-  std::unique_ptr<data_conversion_layer::monitoring_frame::AdditionalFieldHeader> header_ptr;
-  ASSERT_NO_THROW(header_ptr.reset(new data_conversion_layer::monitoring_frame::AdditionalFieldHeader{
-      data_conversion_layer::monitoring_frame::readAdditionalField(is, max_num_bytes) }););
+  std::unique_ptr<monitoring_frame::AdditionalFieldHeader> header_ptr;
+  ASSERT_NO_THROW(header_ptr.reset(
+      new monitoring_frame::AdditionalFieldHeader{ monitoring_frame::readAdditionalField(is, max_num_bytes) }););
   EXPECT_EQ(id, header_ptr->id());
   EXPECT_EQ(expected_length, header_ptr->length());
 }
@@ -176,8 +233,7 @@ TEST(MonitoringFrameDeserializationFieldHeaderTest, shouldFailOnReadHeaderWhichI
   builder.add(too_short_header);
   std::istringstream is{ builder.get() };
 
-  EXPECT_THROW(data_conversion_layer::monitoring_frame::readAdditionalField(is, max_num_bytes);
-               , data_conversion_layer::raw_processing::StringStreamFailure);
+  EXPECT_THROW(monitoring_frame::readAdditionalField(is, max_num_bytes);, raw_processing::StringStreamFailure);
 }
 class MonitoringFrameDeserializationTest : public ::testing::Test
 {
@@ -188,15 +244,14 @@ protected:
   }
 
 protected:
-  data_conversion_layer::RawData with_intensities_raw_;
+  RawData with_intensities_raw_;
   scanner_udp_datagram_hexdumps::WithIntensitiesAndDiagnostics with_intensities_;
 };
 
 TEST_F(MonitoringFrameDeserializationTest, shouldDeserializeMonitoringFrameCorrectly)
 {
-  data_conversion_layer::monitoring_frame::Message msg;
-  ASSERT_NO_THROW(
-      msg = data_conversion_layer::monitoring_frame::deserialize(with_intensities_raw_, with_intensities_raw_.size()););
+  monitoring_frame::Message msg;
+  ASSERT_NO_THROW(msg = monitoring_frame::deserialize(with_intensities_raw_, with_intensities_raw_.size()););
   EXPECT_THAT(msg, MonitoringFrameEq(with_intensities_.expected_msg_));
 }
 
@@ -206,9 +261,8 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
   const auto raw_frame_data = convertToRawData(with_unknown_field_id.hex_dump);
   const auto num_bytes = 2 * with_unknown_field_id.hex_dump.size();
 
-  data_conversion_layer::monitoring_frame::Message msg;
-  EXPECT_THROW(msg = data_conversion_layer::monitoring_frame::deserialize(raw_frame_data, num_bytes);
-               , data_conversion_layer::monitoring_frame::DecodingFailure);
+  monitoring_frame::Message msg;
+  EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);, monitoring_frame::DecodingFailure);
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeMonitoringLength)
@@ -217,9 +271,8 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
   const auto raw_frame_data = convertToRawData(with_too_large_field_length.hex_dump);
   const auto num_bytes = 2 * with_too_large_field_length.hex_dump.size();
 
-  data_conversion_layer::monitoring_frame::Message msg;
-  EXPECT_THROW(msg = data_conversion_layer::monitoring_frame::deserialize(raw_frame_data, num_bytes);
-               , data_conversion_layer::monitoring_frame::DecodingFailure);
+  monitoring_frame::Message msg;
+  EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);, monitoring_frame::DecodingFailure);
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeIntensityLength)
@@ -228,9 +281,8 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
   const auto raw_frame_data = convertToRawData(with_too_large_field_length.hex_dump);
   const auto num_bytes = 2 * with_too_large_field_length.hex_dump.size();
 
-  data_conversion_layer::monitoring_frame::Message msg;
-  EXPECT_THROW(msg = data_conversion_layer::monitoring_frame::deserialize(raw_frame_data, num_bytes);
-               , data_conversion_layer::monitoring_frame::DecodingFailure);
+  monitoring_frame::Message msg;
+  EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);, monitoring_frame::DecodingFailure);
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnMissingEndOfFrame)
@@ -239,31 +291,141 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
   const auto raw_frame_data = convertToRawData(with_no_end_of_frame.hex_dump);
   const auto num_bytes = 2 * with_no_end_of_frame.hex_dump.size();
 
-  data_conversion_layer::monitoring_frame::Message msg;
-  EXPECT_THROW(msg = data_conversion_layer::monitoring_frame::deserialize(raw_frame_data, num_bytes);
-               , data_conversion_layer::monitoring_frame::DecodingFailure);
+  monitoring_frame::Message msg;
+  EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);, monitoring_frame::DecodingFailure);
 }
 
-TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeScanCounterLength)
+TEST_F(MonitoringFrameDeserializationTest, shouldThrowUnexpectedSizeErrorOnTooLargeScanCounterLength)
 {
   scanner_udp_datagram_hexdumps::WithTooLargeScanCounterLength with_too_large_scan_counter_length;
   const auto raw_frame_data = convertToRawData(with_too_large_scan_counter_length.hex_dump);
   const auto num_bytes = 2 * with_too_large_scan_counter_length.hex_dump.size();
 
-  data_conversion_layer::monitoring_frame::Message msg;
-  EXPECT_THROW(msg = data_conversion_layer::monitoring_frame::deserialize(raw_frame_data, num_bytes);
-               , data_conversion_layer::monitoring_frame::ScanCounterUnexpectedSize);
+  monitoring_frame::Message msg;
+  EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);
+               , monitoring_frame::AdditionalFieldUnexpectedSize);
 }
 
-TEST_F(MonitoringFrameDeserializationTest, shouldThrowZoneSetUnexpectedSizeErrorOnTooLargeZoneSetLength)
+TEST_F(MonitoringFrameDeserializationTest, shouldThrowUnexpectedSizeErrorOnTooLargeZoneSetLength)
 {
   scanner_udp_datagram_hexdumps::WithTooLargeActiveZoneSetLength with_too_large_active_zone_set_length;
   const auto raw_frame_data = convertToRawData(with_too_large_active_zone_set_length.hex_dump);
   const auto num_bytes = 2 * with_too_large_active_zone_set_length.hex_dump.size();
 
-  data_conversion_layer::monitoring_frame::Message msg;
-  EXPECT_THROW(msg = data_conversion_layer::monitoring_frame::deserialize(raw_frame_data, num_bytes);
-               , data_conversion_layer::monitoring_frame::ZoneSetUnexpectedSize);
+  monitoring_frame::Message msg;
+  EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);
+               , monitoring_frame::AdditionalFieldUnexpectedSize);
+}
+
+TEST_F(MonitoringFrameDeserializationTest, shouldThrowUnexpectedSizeErrorOnTooSmallIOStateFieldLength)
+{
+  scanner_udp_datagram_hexdumps::WithTooSmallIOStateFieldLength with_too_small_io_state_field_length;
+  const auto raw_frame_data = convertToRawData(with_too_small_io_state_field_length.hex_dump);
+  const auto num_bytes = 2 * with_too_small_io_state_field_length.hex_dump.size();
+
+  monitoring_frame::Message msg;
+  EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);
+               , monitoring_frame::AdditionalFieldUnexpectedSize);
+}
+
+TEST_F(MonitoringFrameDeserializationTest, shouldNotThrowIfIOStateWasMissing)
+{
+  scanner_udp_datagram_hexdumps::WithMissingIOStateField with_missing_io_state_field_length;
+  const auto raw_frame_data = convertToRawData(with_missing_io_state_field_length.hex_dump);
+  const auto num_bytes = 2 * with_missing_io_state_field_length.hex_dump.size();
+
+  monitoring_frame::Message msg;
+  EXPECT_NO_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes));
+}
+
+TEST_F(MonitoringFrameDeserializationTest, shouldNotSetIOStateIfIOStateWasMissing)
+{
+  scanner_udp_datagram_hexdumps::WithMissingIOStateField with_missing_io_state_field_length;
+  const auto raw_frame_data = convertToRawData(with_missing_io_state_field_length.hex_dump);
+  const auto num_bytes = 2 * with_missing_io_state_field_length.hex_dump.size();
+
+  monitoring_frame::Message msg;
+  ASSERT_NO_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes));
+  EXPECT_FALSE(msg.hasIOPinField());
+}
+
+TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectLogicalInputField)
+{
+  auto raw = convertToRawData(std::array<uint8_t, 8>{ 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x00 });
+  std::stringstream ss;
+  ss.write(raw.data(), 8);
+  auto input = deserializePinField(ss, 8, LOGICAL_INPUT_BITS, LOGICAL_INPUT_BIT_TO_NAME);
+
+  std::vector<PinState> expected_states{
+    PinState(0, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_0), true),
+    PinState(1, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_1), false),
+    PinState(2, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_2), true),
+    PinState(3, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_3), false),
+    PinState(4, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_4), true),
+    PinState(5, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_5), false),
+    PinState(6, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_6), true),
+    PinState(7, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_7), false),
+
+    // unused bytes
+
+    PinState(32, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::muting_1_a), true),
+    PinState(33, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::muting_2_a), false),
+    // unused bit
+    PinState(35, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::overr_1_a), false),
+    PinState(36, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::overr_2_a), true),
+    // unused bit
+    PinState(38, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_1), true),
+    PinState(39, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_2), false),
+
+    PinState(40, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_3), true),
+    PinState(41, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_4), false),
+    PinState(42, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_5), true),
+    PinState(43, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_6), false),
+    PinState(44, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_7), true),
+    PinState(45, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_8), false),
+    PinState(46, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::reset_a), true),
+    // unused bit
+
+    PinState(48, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::restart_1_a), true),
+    PinState(49, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::mut_en_1_a), false),
+    PinState(50, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::cor_seq_mut_1), true),
+    PinState(51, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::cor_seq_or_1), false),
+    // unused bit
+    PinState(53, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::restart_2_a), false),
+    PinState(54, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::mut_en_2_a), true),
+    PinState(55, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::cor_seq_mut_2), false),
+
+    PinState(56, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::cor_seq_or_2), false),
+    // unused bits
+  };
+
+  EXPECT_CONTAINER_UNORDERED_EQ(input, expected_states);
+}
+
+TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectOutputField)
+{
+  auto raw = convertToRawData(std::array<uint8_t, 4>{ 0x55, 0x55, 0x55, 0x00 });
+  std::stringstream ss;
+  ss.write(raw.data(), 4);
+  auto output = deserializePinField(ss, 4, OUTPUT_BITS, OUTPUT_BIT_TO_NAME);
+
+  std::vector<PinState> expected_states{
+    PinState(0, OUTPUT_BIT_TO_NAME.at(OutputType::safe_1_int), true),
+    PinState(1, OUTPUT_BIT_TO_NAME.at(OutputType::int_lock_1), false),
+    PinState(2, OUTPUT_BIT_TO_NAME.at(OutputType::safe_2_int), true),
+    PinState(3, OUTPUT_BIT_TO_NAME.at(OutputType::int_lock_2), false),
+    PinState(4, OUTPUT_BIT_TO_NAME.at(OutputType::safe_3_int), true),
+    // unused bit
+    PinState(6, OUTPUT_BIT_TO_NAME.at(OutputType::warn_1_int), true),
+    PinState(7, OUTPUT_BIT_TO_NAME.at(OutputType::warn_2_int), false),
+
+    // unused bytes
+
+    PinState(28, OUTPUT_BIT_TO_NAME.at(OutputType::ossd1_refpts), false),
+    // unused bits
+  };
+
+  EXPECT_CONTAINER_UNORDERED_EQ(output, expected_states);
 }
 
 }  // namespace psen_scan_v2_standalone_test

@@ -28,7 +28,7 @@
     {                                                                                                                  \
       ::testing::InSequence s;                                                                                         \
       EXPECT_CALL(mock, call).Times(times - 1);                                                                        \
-      EXPECT_CALL(mock, call).WillOnce(OpenBarrier(b1.get()));                                                         \
+      EXPECT_CALL(mock, call).WillOnce(psen_scan_v2_standalone_test::OpenBarrier(b1.get()));                           \
     }                                                                                                                  \
     return b1;                                                                                                         \
   }();

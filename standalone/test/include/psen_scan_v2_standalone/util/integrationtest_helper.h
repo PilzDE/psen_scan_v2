@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <ostream>
 #include <random>
 #include <vector>
 
@@ -26,17 +27,23 @@
 
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/laserscan_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
+#include "psen_scan_v2_standalone/util/format_range.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
+#include "psen_scan_v2_standalone/io_state.h"
 #include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/scan_range.h"
+
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
 
 namespace psen_scan_v2_standalone_test
 {
 using namespace psen_scan_v2_standalone;
 
+static constexpr uint32_t DEFAULT_SCAN_COUNTER{ 42 };
 static constexpr ScanRange DEFAULT_SCAN_RANGE{ util::TenthOfDegree(1), util::TenthOfDegree(60) };
 static constexpr util::TenthOfDegree DEFAULT_SCAN_RESOLUTION{ 2 };
 static constexpr int64_t DEFAULT_TIMESTAMP{ 1000000000 };
@@ -70,15 +77,13 @@ static std::vector<double> generateIntensities(const unsigned int& num_elements,
   return vec;
 }
 
-static data_conversion_layer::monitoring_frame::Message
-createValidMonitoringFrameMsg(const uint32_t scan_counter = 42,
-                              const util::TenthOfDegree start_angle = DEFAULT_SCAN_RANGE.getStart(),
-                              const util::TenthOfDegree end_angle = DEFAULT_SCAN_RANGE.getEnd(),
-                              const uint8_t active_zoneset = 1)
+static data_conversion_layer::monitoring_frame::MessageBuilder
+createMonitoringFrameMsgBuilderWithoutDiagnostics(const util::TenthOfDegree start_angle = DEFAULT_SCAN_RANGE.getStart(),
+                                                  const util::TenthOfDegree end_angle = DEFAULT_SCAN_RANGE.getEnd())
 {
   const auto resolution{ util::TenthOfDegree(10) };
   data_conversion_layer::monitoring_frame::MessageBuilder msg_builder;
-  msg_builder.fromTheta(start_angle).resolution(resolution).scanCounter(scan_counter).activeZoneset(active_zoneset);
+  msg_builder.fromTheta(start_angle).resolution(resolution).scanCounter(DEFAULT_SCAN_COUNTER).activeZoneset(1);
 
   const unsigned int num_elements = ((end_angle - start_angle) / resolution).value();
   const double lowest_measurement{ 0. };
@@ -88,24 +93,51 @@ createValidMonitoringFrameMsg(const uint32_t scan_counter = 42,
   const double lowest_intensity{ 0. };
   const double highest_intensity{ 16383. };  // only 14 of 16 bits can be used for the actual intensity value
 
-  msg_builder.intensities(generateIntensities(num_elements, lowest_intensity, highest_intensity))
+  msg_builder.intensities(generateIntensities(num_elements, lowest_intensity, highest_intensity));
+
+  auto pin_data = createCompleteIOPinData();  // A valid frame contains a complete set of pin data
+  setInputPin(pin_data, data_conversion_layer::monitoring_frame::io::LogicalInputType::muting_1_a);
+  setOutputPin(pin_data, data_conversion_layer::monitoring_frame::io::OutputType::safe_1_int);
+  msg_builder.iOPinData(pin_data);
+
+  return msg_builder;
+}
+
+static data_conversion_layer::monitoring_frame::MessageBuilder
+createMonitoringFrameMsgBuilder(const util::TenthOfDegree start_angle = DEFAULT_SCAN_RANGE.getStart(),
+                                const util::TenthOfDegree end_angle = DEFAULT_SCAN_RANGE.getEnd())
+{
+  return createMonitoringFrameMsgBuilderWithoutDiagnostics(start_angle, end_angle)
       .diagnosticMessages({ { configuration::ScannerId::master,
                               data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 7) } });
-  return msg_builder.build();
 }
 
 static data_conversion_layer::monitoring_frame::Message
-createValidMonitoringFrameMsgWithZoneset(const uint8_t active_zoneset)
+createMonitoringFrameMsg(const uint32_t scan_counter = DEFAULT_SCAN_COUNTER,
+                         const util::TenthOfDegree start_angle = DEFAULT_SCAN_RANGE.getStart(),
+                         const util::TenthOfDegree end_angle = DEFAULT_SCAN_RANGE.getEnd())
 {
-  return createValidMonitoringFrameMsg(42, DEFAULT_SCAN_RANGE.getStart(), DEFAULT_SCAN_RANGE.getEnd(), active_zoneset);
+  return createMonitoringFrameMsgBuilder(start_angle, end_angle).scanCounter(scan_counter);
 }
 
-std::vector<data_conversion_layer::monitoring_frame::Message>
-createValidMonitoringFrameMsgs(const uint32_t scan_counter, const std::size_t num_elements)
+static data_conversion_layer::monitoring_frame::Message createMonitoringFrameMsgWithoutDiagnostics()
+{
+  return createMonitoringFrameMsgBuilderWithoutDiagnostics();
+}
+
+static data_conversion_layer::monitoring_frame::Message
+createMonitoringFrameMsgWithZoneset(const uint8_t active_zoneset)
+{
+  return createMonitoringFrameMsgBuilder().activeZoneset(active_zoneset);
+}
+
+std::vector<data_conversion_layer::monitoring_frame::Message> createMonitoringFrameMsgs(const uint32_t scan_counter,
+                                                                                        const std::size_t num_elements)
 {
   std::vector<data_conversion_layer::monitoring_frame::Message> msgs;
-  std::generate_n(
-      std::back_inserter(msgs), num_elements, [scan_counter]() { return createValidMonitoringFrameMsg(scan_counter); });
+  std::generate_n(std::back_inserter(msgs), num_elements, [scan_counter]() {
+    return createMonitoringFrameMsgBuilder().scanCounter(scan_counter);
+  });
   return msgs;
 }
 
@@ -119,7 +151,7 @@ createMonitoringFrameMsgsForScanRound(const uint32_t scan_counter, const std::si
         (DEFAULT_SCAN_RANGE.getEnd() / static_cast<int>(num_elements)) * static_cast<int>(i);
     const util::TenthOfDegree end_angle =
         (DEFAULT_SCAN_RANGE.getEnd() / static_cast<int>(num_elements)) * static_cast<int>(i + 1);
-    msgs.push_back(createValidMonitoringFrameMsg(scan_counter, start_angle, end_angle));
+    msgs.push_back(createMonitoringFrameMsgBuilder(start_angle, end_angle).scanCounter(scan_counter));
   }
   return msgs;
 }
@@ -141,5 +173,23 @@ LaserScan createReferenceScan(const std::vector<data_conversion_layer::monitorin
 }
 
 }  // namespace psen_scan_v2_standalone_test
+
+namespace psen_scan_v2_standalone
+{
+// Avoids too much output with full io pin data
+void PrintTo(const LaserScan& scan, std::ostream* os)
+{
+  *os << fmt::format("LaserScan(timestamp = {} nsec, scanCounter = {}, minScanAngle = {} deg, maxScanAngle = {} deg, "
+                     "resolution = {} deg, active_zoneset = {}, measurements = {}, intensities = {}, io_states = ...)",
+                     scan.getTimestamp(),
+                     scan.getScanCounter(),
+                     scan.getMinScanAngle().value() / 10.,
+                     scan.getMaxScanAngle().value() / 10.,
+                     scan.getScanResolution().value() / 10.,
+                     scan.getActiveZoneset(),
+                     util::formatRange(scan.getMeasurements()),
+                     util::formatRange(scan.getIntensities()));
+}
+}  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_TEST_INTEGRATIONTEST_HELPER_H

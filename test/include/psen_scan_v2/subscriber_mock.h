@@ -12,43 +12,37 @@
 //
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#ifndef PSEN_SCAN_V2_SUBSCRIBER_MOCK_H
+#define PSEN_SCAN_V2_SUBSCRIBER_MOCK_H
 
-#ifndef PSEN_SCAN_V2_TEST_TEST_DATA_H
-#define PSEN_SCAN_V2_TEST_TEST_DATA_H
+#include <string>
 
-#include <cstdint>
-#include <vector>
+#include <gtest/gtest.h>
 
-#include <boost/optional.hpp>
+#include <ros/master.h>
 
 namespace psen_scan_v2_test
 {
-namespace test_data
-{
-class TestDatum
+template <typename T>
+class SubscriberMock
 {
 public:
-  TestDatum(const uint32_t scan_counter, const int64_t timestamp, const int64_t callback_invocation_time);
+  SubscriberMock(ros::NodeHandle& nh, std::string topicName, int queueSize)
+  {
+    subscriber_ = nh.subscribe(topicName, queueSize, &SubscriberMock::callback, this);
+  }
 
-  void setFirstFrameTime(const int64_t first_frame_time);
+  MOCK_METHOD1_T(callback, void(const T& msg));
 
-  bool isComplete() const;
-
-  uint32_t scanCounter() const;
-  int64_t timestamp() const;
-  int64_t callbackInvocationTime() const;
-  int64_t firstFrameTime() const;
+  ros::Subscriber getSubscriber()
+  {
+    return subscriber_;
+  }
 
 private:
-  uint32_t scan_counter_;
-  int64_t timestamp_;
-  int64_t callback_invocation_time_;
-  boost::optional<int64_t> first_frame_time_;
+  ros::Subscriber subscriber_;
 };
 
-using TestData = std::vector<TestDatum>;
-
-}  // namespace test_data
 }  // namespace psen_scan_v2_test
 
-#endif  // PSEN_SCAN_V2_TEST_TEST_DATA_H
+#endif  // PSEN_SCAN_V2_SUBSCRIBER_MOCK_H

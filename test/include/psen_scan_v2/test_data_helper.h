@@ -17,8 +17,11 @@
 #define PSEN_SCAN_V2_TEST_TEST_DATA_HELPER_H
 
 #include <algorithm>
+#include <chrono>
 #include <cstdint>
+#include <future>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <thread>
 #include <vector>
@@ -31,12 +34,12 @@
 
 namespace psen_scan_v2_test
 {
+using namespace std::chrono_literals;
 using namespace psen_scan_v2_standalone;
 
 namespace test_data
 {
 static constexpr uint16_t FIRST_FROM_THETA{ 2500 };  // change to 1 after scan counter fix in firmware
-static constexpr uint16_t LAST_FROM_THETA{ 2000 };   // change to 2500 after scan counter fix in firmware
 
 static int64_t secToNSec(const double& sec)
 {
@@ -51,25 +54,26 @@ static void runScanner(const ScannerConfiguration& scanner_config,
   ScannerV2 scanner(scanner_config, laserscan_callback);
   scanner.start();
   std::this_thread::sleep_for(std::chrono::seconds(scanner_run_duration_sec));
-  scanner.stop();
+  auto stop_future = scanner.stop();
+  if (stop_future.wait_for(3s) != std::future_status::ready)
+  {
+    throw std::runtime_error("Timeout while waiting for the scanner to stop.");
+  }
+  stop_future.get();  // catch exceptions of scanner stop
 }
 
 static void addUdpData(TestData& test_data, const udp_data::UdpData& udp_data)
 {
   for (const auto& udp_datum : udp_data)
   {
-    const auto it = std::find_if(test_data.begin(), test_data.end(), [&udp_datum](const auto& test_datum) {
-      return test_datum.scanCounter() == udp_datum.scan_counter_;
-    });
-    if (it != test_data.end())
+    if (udp_datum.from_theta_ == FIRST_FROM_THETA)
     {
-      if (udp_datum.from_theta_ == FIRST_FROM_THETA)
+      const auto it = std::find_if(test_data.begin(), test_data.end(), [&udp_datum](const auto& test_datum) {
+        return test_datum.scanCounter() == udp_datum.scan_counter_;
+      });
+      if (it != test_data.end())
       {
         it->setFirstFrameTime(secToNSec(udp_datum.timestamp_sec_));
-      }
-      if (udp_datum.from_theta_ == LAST_FROM_THETA)
-      {
-        it->setLastFrameTime(secToNSec(udp_datum.timestamp_sec_));
       }
     }
   }

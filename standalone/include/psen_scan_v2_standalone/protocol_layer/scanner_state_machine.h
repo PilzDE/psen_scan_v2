@@ -24,7 +24,7 @@
 #include <vector>
 #include <boost/optional.hpp>
 
-#define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 11  // see https://www.boost.org/doc/libs/1_66_0/libs/msm/doc/HTML/ch03s05.html
+#define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 12  // see https://www.boost.org/doc/libs/1_66_0/libs/msm/doc/HTML/ch03s05.html
 
 // back-end
 #include <boost/msm/back/state_machine.hpp>
@@ -85,6 +85,7 @@ static constexpr uint32_t DEFAULT_NUM_MSG_PER_ROUND{ 6 };
 using ScannerStartedCallback = std::function<void()>;
 using ScannerStoppedCallback = std::function<void()>;
 using StartErrorCallback = std::function<void(const std::string&)>;
+using StopErrorCallback = std::function<void(const std::string&)>;
 using TimeoutCallback = std::function<void()>;
 using InformUserAboutLaserScanCallback = std::function<void(const LaserScan&)>;
 
@@ -148,6 +149,7 @@ public:
                      const communication_layer::NewMessageCallback& control_msg_callback,
                      const communication_layer::ErrorCallback& control_error_callback,
                      const communication_layer::ErrorCallback& start_error_callback,
+                     const communication_layer::ErrorCallback& stop_error_callback,
                      const communication_layer::NewMessageCallback& data_msg_callback,
                      const communication_layer::ErrorCallback& data_error_callback,
                      const ScannerStartedCallback& scanner_started_callback,
@@ -176,9 +178,13 @@ public:  // Action methods
   void notifyUserAboutUnknownStartReply(scanner_events::RawReplyReceived const& reply_event);
   void notifyUserAboutRefusedStartReply(scanner_events::RawReplyReceived const& reply_event);
   void notifyUserAboutStop(scanner_events::RawReplyReceived const& reply_event);
+  void notifyUserAboutUnknownStopReply(scanner_events::RawReplyReceived const& reply_event);
+  void notifyUserAboutRefusedStopReply(scanner_events::RawReplyReceived const& reply_event);
 
 public:  // Guards
-  bool isStopReply(scanner_events::RawReplyReceived const& reply_event);
+  bool isAcceptedStopReply(scanner_events::RawReplyReceived const& reply_event);
+  bool isUnknownStopReply(scanner_events::RawReplyReceived const& reply_event);
+  bool isRefusedStopReply(scanner_events::RawReplyReceived const& reply_event);
   bool isAcceptedStartReply(scanner_events::RawReplyReceived const& reply_event);
   bool isUnknownStartReply(scanner_events::RawReplyReceived const& reply_event);
   bool isRefusedStartReply(scanner_events::RawReplyReceived const& reply_event);
@@ -216,7 +222,9 @@ public:  // Definition of state machine via table
       a_row  < WaitForStartReply,         e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                            >,
       a_row  < WaitForMonitoringFrame,    e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                            >,
       _irow  < WaitForStopReply,          e::RawMonitoringFrameReceived                                                                                            >,
-      row    < WaitForStopReply,          e::RawReplyReceived,          Stopped,                    &m::notifyUserAboutStop,              &m::isStopReply          >,
+      row    < WaitForStopReply,          e::RawReplyReceived,          Stopped,                    &m::notifyUserAboutStop,              &m::isAcceptedStopReply  >,
+      row    < WaitForStopReply,          e::RawReplyReceived,          Error,                      &m::notifyUserAboutRefusedStopReply,  &m::isRefusedStopReply   >,
+      row    < WaitForStopReply,          e::RawReplyReceived,          Error,                      &m::notifyUserAboutUnknownStopReply,  &m::isUnknownStopReply   >,
       _irow  < Stopped,                   e::RawMonitoringFrameReceived                                                                                            >
       //  +------------------------------+----------------------------+--------------------------+---------------------------------------+-------------------------+
       > {};
@@ -236,12 +244,12 @@ private:
   };
   // LCOV_EXCL_STOP
   bool isStartReply(data_conversion_layer::scanner_reply::Message const& msg);
+  bool isStopReply(data_conversion_layer::scanner_reply::Message const& msg);
   bool isAcceptedReply(data_conversion_layer::scanner_reply::Message const& msg);
   bool isUnknownReply(data_conversion_layer::scanner_reply::Message const& msg);
   bool isRefusedReply(data_conversion_layer::scanner_reply::Message const& msg);
 
   void checkForInternalErrors(const data_conversion_layer::scanner_reply::Message& msg);
-  //! @throws data_conversion_layer::monitoring_frame::AdditionalFieldMissing if diagnostic_messages is not set.
   void checkForDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& msg);
   /**
    * @throws data_conversion_layer::monitoring_frame::AdditionalFieldMissing if scan_counter or active_zoneset is not
@@ -284,6 +292,7 @@ private:
   const ScannerStartedCallback scanner_started_callback_;
   const ScannerStoppedCallback scanner_stopped_callback_;
   const StartErrorCallback start_error_callback_;
+  const StopErrorCallback stop_error_callback_;
   const InformUserAboutLaserScanCallback inform_user_about_laser_scan_callback_;
 
   // Timeout Handler

@@ -37,6 +37,7 @@ If you are interested in using the PSENscan safety laser scanner without ROS, pl
    + [TF Frames](#tf-frames)
    + [Defining the scan range](#defining-the-scan-range)
    + [Timestamp details](#timestamp-details)
+   + [Transferred IOs](#transferred-ios)
    + [Importing the zoneset configuration](#importing-the-zoneset-configuration)
    + [Visualizing the active zoneset](#visualizing-the-active-zoneset)
 3. [Developer Information](#developer-information)
@@ -135,6 +136,12 @@ Start a preconfigured rviz visualizing the scan data.
 
 * `Hint 2: Will not be advertised if no config_file is provided.`
 
+/\<name\>/io_states ([psen_scan_v2/IOState][])
+* The state published represents the current input and output state of the scanner IOs. A list of all available IOs can be found [here](#transferred-ios)
+* `Hint 1: With every scan data of a monitoring frame the IO states are transferred from the PSENscan safety laser scanner. They are processed in the same way as the scan data.`
+* `Hint 2: By using <fragmented_scans=true> the driver will publish 1 IOStates while with <fragmented_scans=false> it will publish 6 IOStates per single publish of scan data.`
+* `Hint 3: The timesamps of all IO states are the same as the one of their corresponding LaserScan msg.`
+
 ### TF Frames
 The location of the TF frames is shown in the image below.
 These names are defined by the aforementioned launchfile parameter `name`.
@@ -155,20 +162,42 @@ Both limits are defined within the _laser_1_ frame as shown in the image below.
 ### Timestamp details
 The timestamps of the scan data published are computed to be close to reality and processing speed of incoming data was optimized to reduce the time for the scan data to be published. This should suffice for localization and slam algorithms. If you application benefits from getting the scan data any sooner there are two possibilities:
 
-* Use fragmented scans. This will publish the individual frames received by the PsenScan hardware immediately instead of waiting for a scan round to be completed and combined to a single laser scan message.
+* Use fragmented scans. This will publish the individual frames received by the PSENscan safety laser scanner immediately instead of waiting for a scan round to be completed and combined to a single laser scan message.
 * Use the tcp_nodelay flag in your ROS subscriber. This will disable the nagle's algorithm, which is a TCP optimization. This algorithm can produce a jitter of about 20ms in the ros topic.
    * The cpp API of ROS does not support disabling this on the publisher side. If you don't have control over the subscriber e.g. due to using a third party package you can create a python node which acts as a repeater for the scan topic. rospy subscriber and publisher both allow setting this flag and thus can disable it for this driver and the third party package.
 
+### Transferred IOs
+
+The following IOs of the PSENscan safety laser scanner are available in the published ([psen_scan_v2/IOState][]).
+
+| Input name |
+|-|
+|Correct activation sequence of Muting [1/2] pins|
+|Correct activation sequence of Override [1/2] pins|
+|Muting [1/2] Activated|
+|Muting Enable [1/2] Activated|
+|Override [1/2] Activated|
+|Reset Activated|
+|Restart [1/2] Activated|
+|Zone Bit [0..7]|
+|Zone Set Switching Input [1..8]|
+
+| Output name |
+|-|
+|INTERLOCK [1/2]|
+|OSSD1_REFPTS|
+|Safety [1..3] intrusion|
+|Warning [1/2] intrusion|
 
 ### Importing the zoneset configuration
 Once you setup the scanner and created a configuration according to our [tutorial](http://wiki.ros.org/psen_scan_v2/Tutorials/SettingUpPSENscanHW#Create_a_new_configuration) you can use an exported xml configuration file within ROS.
 The configured zonesets will be published.
 
 The zonesets you created in the Pilz configurator:
-![configurator_screenshot](doc/zones_screenshot_configurator.png)
+![configurator_screenshot](img/zones_screenshot_configurator.png)
 
 will be exactly the same in ROS:
-![configurator_screenshot](doc/zones_screenshot_rviz.png)
+![configurator_screenshot](img/zones_screenshot_rviz.png)
 
 You can try this out with:
 ```
@@ -242,3 +271,4 @@ supply in buildings.
 [std_msgs/UInt8]: https://docs.ros.org/en/api/std_msgs/html/msg/UInt8.html
 [visualization_msgs/Marker]: https://docs.ros.org/en/noetic/api/visualization_msgs/html/msg/Marker.html
 [gmapping]: http://wiki.ros.org/gmapping
+[psen_scan_v2/IOState]: msg/IOState.msg

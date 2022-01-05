@@ -182,8 +182,6 @@ public:
   constexpr Message(const configuration::ScannerId& id, const diagnostic::ErrorLocation& location);
   constexpr bool operator==(const diagnostic::Message& rhs) const;
 
-  friend RawChunk serialize(const std::vector<diagnostic::Message>& messages);
-
   constexpr configuration::ScannerId getScannerId() const
   {
     return id_;

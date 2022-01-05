@@ -259,7 +259,27 @@ TEST_F(ScannerAPITestsDefaultSetUp, startShouldReturnFutureWithExceptionIfStartR
 
   hw_mock_->sendStartReply(data_conversion_layer::scanner_reply::Message::OperationResult::refused);
   EXPECT_FUTURE_IS_READY(start_future, 2s);
-  EXPECT_THROW_AND_WHAT(start_future.get(), std::runtime_error, "Request refused by device.");
+  EXPECT_THROW_AND_WHAT(start_future.get(), std::runtime_error, "Start Request refused by device.");
+}
+
+TEST_F(ScannerAPITestsDefaultSetUp, stopShouldReturnFutureWithExceptionIfStopRequestRefused)
+{
+  util::Barrier start_req_received_barrier;
+  EXPECT_START_REQUEST_CALL(*hw_mock_, *config_).WillOnce(OpenBarrier(&start_req_received_barrier));
+
+  std::future<void> start_future = driver_->start();
+  start_req_received_barrier.waitTillRelease(2s);
+
+  hw_mock_->sendStartReply(data_conversion_layer::scanner_reply::Message::OperationResult::accepted);
+  EXPECT_FUTURE_IS_READY(start_future, 2s) << "Scanner::start() not finished";
+
+  util::Barrier stop_req_received_barrier;
+  EXPECT_STOP_REQUEST_CALL(*hw_mock_).WillOnce(OpenBarrier(&stop_req_received_barrier));
+
+  std::future<void> stop_future = driver_->stop();
+  stop_req_received_barrier.waitTillRelease(2s);
+  hw_mock_->sendStopReply(data_conversion_layer::scanner_reply::Message::OperationResult::refused);
+  EXPECT_THROW_AND_WHAT(stop_future.get(), std::runtime_error, "Stop Request refused by device.");
 }
 
 TEST_F(ScannerAPITestsDefaultSetUp, startShouldReturnFutureWithExceptionIfUnknownResultSent)
@@ -280,6 +300,31 @@ TEST_F(ScannerAPITestsDefaultSetUp, startShouldReturnFutureWithExceptionIfUnknow
           .c_str());
 }
 
+TEST_F(ScannerAPITestsDefaultSetUp, stopShouldReturnFutureWithExceptionIfUnknownResultSent)
+{
+  util::Barrier start_req_received_barrier;
+  EXPECT_START_REQUEST_CALL(*hw_mock_, *config_).WillOnce(OpenBarrier(&start_req_received_barrier));
+
+  std::future<void> start_future = driver_->start();
+  start_req_received_barrier.waitTillRelease(2s);
+
+  hw_mock_->sendStartReply(data_conversion_layer::scanner_reply::Message::OperationResult::accepted);
+  EXPECT_FUTURE_IS_READY(start_future, 2s) << "Scanner::start() not finished";
+
+  util::Barrier stop_req_received_barrier;
+  EXPECT_STOP_REQUEST_CALL(*hw_mock_).WillOnce(OpenBarrier(&stop_req_received_barrier));
+
+  std::future<void> stop_future = driver_->stop();
+  stop_req_received_barrier.waitTillRelease(2s);
+  hw_mock_->sendStopReply(data_conversion_layer::scanner_reply::Message::OperationResult::unknown);
+  EXPECT_THROW_AND_WHAT(
+      stop_future.get(),
+      std::runtime_error,
+      fmt::format("Unknown result code {:#04x} in stop reply.",
+                  static_cast<uint32_t>(data_conversion_layer::scanner_reply::Message::OperationResult::unknown))
+          .c_str());
+}
+
 TEST_F(ScannerAPITestsDefaultSetUp, startShouldSucceedDespiteUnexpectedMonitoringFrame)
 {
   util::Barrier start_req_received_barrier;
@@ -290,7 +335,7 @@ TEST_F(ScannerAPITestsDefaultSetUp, startShouldSucceedDespiteUnexpectedMonitorin
 
   start_req_received_barrier.waitTillRelease(2s);
 
-  hw_mock_->sendMonitoringFrame(createValidMonitoringFrameMsg());
+  hw_mock_->sendMonitoringFrame(createMonitoringFrameMsg());
   EXPECT_FUTURE_TIMEOUT(start_future, FUTURE_WAIT_TIMEOUT) << "Scanner::start() finished without receiveing reply";
 
   hw_mock_->sendStartReply();
@@ -377,8 +422,8 @@ TEST_F(ScannerAPITestsDefaultSetUp, shouldShowInfoWithNewActiveZonesetOnlyWhenIt
   EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_SCANNER_TO_START_SUCCESSFULLY(hw_mock_, driver_, config_);
 
-  const auto msg1{ createValidMonitoringFrameMsgWithZoneset(2) };
-  const auto msg2{ createValidMonitoringFrameMsgWithZoneset(4) };
+  const auto msg1{ createMonitoringFrameMsgWithZoneset(2) };
+  const auto msg2{ createMonitoringFrameMsgWithZoneset(4) };
   util::Barrier diagnostic_barrier;
 
   EXPECT_LOG_SHORT(INFO, "Scanner: The scanner switched to active zoneset 2").Times(1);
@@ -407,7 +452,7 @@ TEST_F(ScannerAPITestsDefaultSetUp, shouldShowUserMsgIfMonitoringFrameReceiveTim
                    " (Please check the ethernet connection or contact PILZ support if the error persists.)")
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
-  user_msg_barrier.waitTillRelease(2s);
+  user_msg_barrier.waitTillRelease(3s);  // the tested code itself has a timeout of 1s
 
   EXPECT_SCANNER_TO_STOP_SUCCESSFULLY(hw_mock_, driver_);
   REMOVE_LOG_MOCK
@@ -419,7 +464,7 @@ TEST_F(ScannerAPITestsFragmented, LaserScanShouldContainAllInfosTransferedByMoni
   EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_SCANNER_TO_START_SUCCESSFULLY(hw_mock_, driver_, config_);
 
-  const auto msg{ createValidMonitoringFrameMsg() };
+  const auto msg{ createMonitoringFrameMsg() };
   util::Barrier monitoring_frame_barrier;
   EXPECT_CALLBACK_WILL_OPEN_BARRIER(user_callbacks_, { msg }, monitoring_frame_barrier);
   util::Barrier diagnostic_barrier;
@@ -437,6 +482,21 @@ TEST_F(ScannerAPITestsFragmented, LaserScanShouldContainAllInfosTransferedByMoni
 
   EXPECT_SCANNER_TO_STOP_SUCCESSFULLY(hw_mock_, driver_);
   REMOVE_LOG_MOCK
+}
+
+TEST_F(ScannerAPITestsFragmented, shouldCallLaserscanCallbackInCaseOfMissingDiagnostics)
+{
+  EXPECT_SCANNER_TO_START_SUCCESSFULLY(hw_mock_, driver_, config_);
+
+  util::Barrier monitoring_frame_barrier;
+  EXPECT_CALL(user_callbacks_, LaserScanCallback(_)).WillOnce(OpenBarrier(&monitoring_frame_barrier));
+
+  const auto msg{ createMonitoringFrameMsgWithoutDiagnostics() };
+  hw_mock_->sendMonitoringFrame(msg);
+
+  monitoring_frame_barrier.waitTillRelease(2s);
+
+  EXPECT_SCANNER_TO_STOP_SUCCESSFULLY(hw_mock_, driver_);
 }
 
 TEST_F(ScannerAPITestsFragmented, shouldNotCallLaserscanCallbackInCaseOfEmptyMonitoringFrame)
@@ -474,7 +534,7 @@ TEST_F(ScannerAPITestsFragmented, shouldNotCallLaserscanCallbackInCaseOfMissingM
                    "callback.")
       .WillOnce(OpenBarrier(&log_msgs_barrier));
 
-  hw_mock_->sendMonitoringFrame(createValidMonitoringFrameMsg(42, util::TenthOfDegree{ 0 }, util::TenthOfDegree{ 0 }));
+  hw_mock_->sendMonitoringFrame(createMonitoringFrameMsg(42, util::TenthOfDegree{ 0 }, util::TenthOfDegree{ 0 }));
   log_msgs_barrier.waitTillRelease(2s);
 
   EXPECT_SCANNER_TO_STOP_SUCCESSFULLY(hw_mock_, driver_);
@@ -488,9 +548,9 @@ TEST_F(ScannerAPITestsFragmented, shouldShowUserMsgIfMonitoringFramesAreMissing)
   EXPECT_SCANNER_TO_START_SUCCESSFULLY(hw_mock_, driver_, config_);
 
   const std::size_t num_scans_per_round{ 6 };
-  auto valid_scan_msgs{ createValidMonitoringFrameMsgs(41, num_scans_per_round) };
-  auto invalid_scan_round_msgs{ createValidMonitoringFrameMsgs(42, num_scans_per_round - 1) };
-  auto new_scan_round_msg{ createValidMonitoringFrameMsg(43) };
+  auto valid_scan_msgs{ createMonitoringFrameMsgs(41, num_scans_per_round) };
+  auto invalid_scan_round_msgs{ createMonitoringFrameMsgs(42, num_scans_per_round - 1) };
+  auto new_scan_round_msg{ createMonitoringFrameMsg(43) };
 
   util::Barrier all_frames_received_barrier;
   {
@@ -525,7 +585,7 @@ TEST_F(ScannerAPITestsFragmented, shouldShowUserMsgIfTooManyMonitoringFramesAreR
 
   const std::size_t num_scans_per_round{ 6 };
 
-  auto invalid_scan_round{ createValidMonitoringFrameMsgs(42, num_scans_per_round + 1) };
+  auto invalid_scan_round{ createMonitoringFrameMsgs(42, num_scans_per_round + 1) };
 
   util::Barrier all_frames_received;
   {
@@ -600,7 +660,7 @@ TEST_F(ScannerAPITestsUnfragmented, shouldIgnoreMonitoringFrameOfFormerScanRound
   EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_SCANNER_TO_START_SUCCESSFULLY(hw_mock_, driver_, config_);
 
-  auto msg_round2 = createValidMonitoringFrameMsg(2);
+  auto msg_round2 = createMonitoringFrameMsg(2);
   auto msgs_round3 = createMonitoringFrameMsgsForScanRound(3, 6);
 
   util::Barrier monitoring_frame_barrier;
