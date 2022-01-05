@@ -18,8 +18,10 @@
 
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/laserscan.h"
+#include "psen_scan_v2_standalone/io_state.h"
 
 #include <algorithm>
 #include <numeric>
@@ -37,6 +39,61 @@ class ScannerProtocolViolationError : public std::runtime_error
 public:
   ScannerProtocolViolationError(const std::string& msg) : std::runtime_error(msg){};
 };
+
+static inline PinState generateInputPinState(const monitoring_frame::io::PinData& pin_data,
+                                             std::size_t byte_location,
+                                             std::size_t bit_location)
+{
+  return { byte_location * 8 + bit_location,
+           monitoring_frame::io::getInputName(byte_location, bit_location),
+           pin_data.getInputState(byte_location, bit_location) };
+}
+
+static inline PinState generateOutputPinState(const monitoring_frame::io::PinData& pin_data,
+                                              std::size_t byte_location,
+                                              std::size_t bit_location)
+{
+  return { byte_location * 8 + bit_location,
+           monitoring_frame::io::getOutputName(byte_location, bit_location),
+           pin_data.getOutputState(byte_location, bit_location) };
+}
+
+static inline void generateInputPinStates(std::vector<PinState>& pin_states,
+                                          const monitoring_frame::io::PinData& pin_data)
+{
+  for (std::size_t byte_n = 0, bit_n = 0; byte_n < monitoring_frame::io::NUMBER_OF_INPUT_BYTES && bit_n < 8;
+       ++byte_n, ++bit_n)
+  {
+    if (monitoring_frame::io::getInputType(byte_n, bit_n) != monitoring_frame::io::LogicalInputType::unused)
+    {
+      pin_states.emplace_back(generateInputPinState(pin_data, byte_n, bit_n));
+    }
+  }
+}
+
+static inline void generateOutputPinStates(std::vector<PinState>& pin_states,
+                                           const monitoring_frame::io::PinData& pin_data)
+{
+  for (std::size_t byte_n = 0, bit_n = 0; byte_n < monitoring_frame::io::NUMBER_OF_INPUT_BYTES && bit_n < 8;
+       ++byte_n, ++bit_n)
+  {
+    if (monitoring_frame::io::getOutputType(byte_n, bit_n) != monitoring_frame::io::OutputType::unused)
+    {
+      pin_states.emplace_back(generateOutputPinState(pin_data, byte_n, bit_n));
+    }
+  }
+}
+
+static inline IOState toIOState(const monitoring_frame::io::PinData& pin_data)
+{
+  std::vector<PinState> input_pins;
+  std::vector<PinState> output_pins;
+
+  generateInputPinStates(input_pins, pin_data);
+  generateOutputPinStates(input_pins, pin_data);
+
+  return { input_pins, output_pins };
+}
 
 /**
  * @brief: Responsible for converting Monitoring frames into LaserScan messages.
@@ -114,8 +171,7 @@ inline LaserScan LaserScanConverter::toLaserScan(
     }
     if (stamped_msgs[index].msg_.hasIOPinField())
     {
-      auto io = stamped_msgs[index].msg_.iOPinData();
-      io_states.emplace_back(io.input, io.output);
+      io_states.push_back(toIOState(stamped_msgs[index].msg_.iOPinData()));
     }
   }
 
