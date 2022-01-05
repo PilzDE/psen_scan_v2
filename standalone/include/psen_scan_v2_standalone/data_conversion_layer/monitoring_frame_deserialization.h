@@ -190,46 +190,28 @@ public:
 };
 
 /**
- * @brief Exception thrown on problems with the additional field: scan_counter
+ * @brief Exception thrown on problems with the additional fields with fixed size
  *
- * The length specified in the Header of the additional field "scan_counter"
- * must be exactly as defined in NUMBER_OF_BYTES_SCAN_COUNTER for it to be converted.
- *
- * @see data_conversion_layer::monitoring_frame::AdditionalFieldHeader
- * @see data_conversion_layer::monitoring_frame::AdditionalFieldHeaderID
- * @see data_conversion_layer::monitoring_frame::NUMBER_OF_BYTES_SCAN_COUNTER
- */
-class ScanCounterUnexpectedSize : public DecodingFailure
-{
-public:
-  ScanCounterUnexpectedSize(const std::string& msg);
-};
-
-/**
- * @brief Exception thrown on problems with the additional field: active_zoneset
- *
- * The length specified in the Header of the additional field "active_zoneset"
- * must be exactly as defined in NUMBER_OF_BYTES_ZONE_SET for it to be converted.
+ * The length specified in the Header of the additional fields scan_counter, zone_set and io_state
+ * must be exactly as defined in the protocol.
  *
  * @see data_conversion_layer::monitoring_frame::AdditionalFieldHeader
  * @see data_conversion_layer::monitoring_frame::AdditionalFieldHeaderID
  * @see data_conversion_layer::monitoring_frame::NUMBER_OF_BYTES_ZONE_SET
+ * @see data_conversion_layer::monitoring_frame::NUMBER_OF_BYTES_SCAN_COUNTER
+ * @see data_conversion_layer::monitoring_frame::io::RAW_CHUNK_LENGTH_IN_BYTES
  */
-class ZoneSetUnexpectedSize : public DecodingFailure
+class AdditionalFieldUnexpectedSize : public DecodingFailure
 {
 public:
-  ZoneSetUnexpectedSize(const std::string& msg);
+  AdditionalFieldUnexpectedSize(const std::string& msg);
 };
 
 inline DecodingFailure::DecodingFailure(const std::string& msg) : std::runtime_error(msg)
 {
 }
 
-inline ScanCounterUnexpectedSize::ScanCounterUnexpectedSize(const std::string& msg) : DecodingFailure(msg)
-{
-}
-
-inline ZoneSetUnexpectedSize::ZoneSetUnexpectedSize(const std::string& msg) : DecodingFailure(msg)
+inline AdditionalFieldUnexpectedSize::AdditionalFieldUnexpectedSize(const std::string& msg) : DecodingFailure(msg)
 {
 }
 

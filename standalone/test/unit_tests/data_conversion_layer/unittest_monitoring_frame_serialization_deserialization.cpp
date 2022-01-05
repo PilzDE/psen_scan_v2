@@ -294,7 +294,7 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
   EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);, monitoring_frame::DecodingFailure);
 }
 
-TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatErrorOnTooLargeScanCounterLength)
+TEST_F(MonitoringFrameDeserializationTest, shouldThrowUnexpectedSizeErrorOnTooLargeScanCounterLength)
 {
   scanner_udp_datagram_hexdumps::WithTooLargeScanCounterLength with_too_large_scan_counter_length;
   const auto raw_frame_data = convertToRawData(with_too_large_scan_counter_length.hex_dump);
@@ -302,10 +302,10 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowMonitoringFrameFormatError
 
   monitoring_frame::Message msg;
   EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);
-               , monitoring_frame::ScanCounterUnexpectedSize);
+               , monitoring_frame::AdditionalFieldUnexpectedSize);
 }
 
-TEST_F(MonitoringFrameDeserializationTest, shouldThrowZoneSetUnexpectedSizeErrorOnTooLargeZoneSetLength)
+TEST_F(MonitoringFrameDeserializationTest, shouldThrowUnexpectedSizeErrorOnTooLargeZoneSetLength)
 {
   scanner_udp_datagram_hexdumps::WithTooLargeActiveZoneSetLength with_too_large_active_zone_set_length;
   const auto raw_frame_data = convertToRawData(with_too_large_active_zone_set_length.hex_dump);
@@ -313,7 +313,39 @@ TEST_F(MonitoringFrameDeserializationTest, shouldThrowZoneSetUnexpectedSizeError
 
   monitoring_frame::Message msg;
   EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);
-               , monitoring_frame::ZoneSetUnexpectedSize);
+               , monitoring_frame::AdditionalFieldUnexpectedSize);
+}
+
+TEST_F(MonitoringFrameDeserializationTest, shouldThrowUnexpectedSizeErrorOnTooSmallIOStateFieldLength)
+{
+  scanner_udp_datagram_hexdumps::WithTooSmallIOStateFieldLength with_too_small_io_state_field_length;
+  const auto raw_frame_data = convertToRawData(with_too_small_io_state_field_length.hex_dump);
+  const auto num_bytes = 2 * with_too_small_io_state_field_length.hex_dump.size();
+
+  monitoring_frame::Message msg;
+  EXPECT_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes);
+               , monitoring_frame::AdditionalFieldUnexpectedSize);
+}
+
+TEST_F(MonitoringFrameDeserializationTest, shouldNotThrowIfIOStateWasMissing)
+{
+  scanner_udp_datagram_hexdumps::WithMissingIOStateField with_missing_io_state_field_length;
+  const auto raw_frame_data = convertToRawData(with_missing_io_state_field_length.hex_dump);
+  const auto num_bytes = 2 * with_missing_io_state_field_length.hex_dump.size();
+
+  monitoring_frame::Message msg;
+  EXPECT_NO_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes));
+}
+
+TEST_F(MonitoringFrameDeserializationTest, shouldNotSetIOStateIfIOStateWasMissing)
+{
+  scanner_udp_datagram_hexdumps::WithMissingIOStateField with_missing_io_state_field_length;
+  const auto raw_frame_data = convertToRawData(with_missing_io_state_field_length.hex_dump);
+  const auto num_bytes = 2 * with_missing_io_state_field_length.hex_dump.size();
+
+  monitoring_frame::Message msg;
+  ASSERT_NO_THROW(msg = monitoring_frame::deserialize(raw_frame_data, num_bytes));
+  EXPECT_FALSE(msg.hasIOPinField());
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectLogicalInputField)

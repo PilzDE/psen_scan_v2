@@ -8,7 +8,6 @@ Forthcoming
 * Publish IO states to ~/io_state
 * Contributors: Pilz GmbH and Co. KG
 
-
 0.3.4 (2021-12-20)
 ------------------
 * Prevent error when diagnostics are disabled. Fix #294

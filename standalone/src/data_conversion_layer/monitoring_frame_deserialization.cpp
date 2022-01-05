@@ -98,9 +98,9 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
       case AdditionalFieldHeaderID::scan_counter:
         if (additional_header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
         {
-          throw ScanCounterUnexpectedSize(fmt::format("Length of scan counter field is {}, but should be {}.",
-                                                      additional_header.length(),
-                                                      NUMBER_OF_BYTES_SCAN_COUNTER));
+          throw AdditionalFieldUnexpectedSize(fmt::format("Length of scan counter field is {}, but should be {}.",
+                                                          additional_header.length(),
+                                                          NUMBER_OF_BYTES_SCAN_COUNTER));
         }
         uint32_t scan_counter_read_buffer;
         raw_processing::read<uint32_t>(ss, scan_counter_read_buffer);
@@ -122,9 +122,9 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
       case AdditionalFieldHeaderID::zone_set:
         if (additional_header.length() != NUMBER_OF_BYTES_ZONE_SET)
         {
-          throw ZoneSetUnexpectedSize(fmt::format("Length of zone set field is {}, but should be {}.",
-                                                  additional_header.length(),
-                                                  NUMBER_OF_BYTES_ZONE_SET));
+          throw AdditionalFieldUnexpectedSize(fmt::format("Length of zone set field is {}, but should be {}.",
+                                                          additional_header.length(),
+                                                          NUMBER_OF_BYTES_ZONE_SET));
         }
         uint8_t zone_set_read_buffer;
         raw_processing::read<uint8_t>(ss, zone_set_read_buffer);
@@ -132,6 +132,12 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
         break;
 
       case AdditionalFieldHeaderID::io_pin_data:
+        if (additional_header.length() != io::RAW_CHUNK_LENGTH_IN_BYTES)
+        {
+          throw AdditionalFieldUnexpectedSize(fmt::format("Length of io state field is {}, but should be {}.",
+                                                          additional_header.length(),
+                                                          io::RAW_CHUNK_LENGTH_IN_BYTES));
+        }
         msg_builder.iOPinData(io::deserializePins(ss));
         break;
 
