@@ -140,7 +140,7 @@ Start a preconfigured rviz visualizing the scan data.
 * The state published represents the current input and output state of the scanner IOs. A list of all available IOs can be found [here](#transferred-ios)
 * `Hint 1: With every scan data of a monitoring frame the IO states are transferred from the PSENscan safety laser scanner. They are processed in the same way as the scan data.`
 * `Hint 2: By using <fragmented_scans=true> the driver will publish 1 IOStates while with <fragmented_scans=false> it will publish 6 IOStates per single publish of scan data.`
-* `Hint 3: The timesamps of all IO states are the same as the one of the scan data they were transferred with.`
+* `Hint 3: The timesamps of all IO states are the same as the one of their corresponding LaserScan msg.`
 
 ### TF Frames
 The location of the TF frames is shown in the image below.
