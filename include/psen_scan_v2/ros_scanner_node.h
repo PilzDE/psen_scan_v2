@@ -31,6 +31,7 @@
 #include "psen_scan_v2_standalone/scanner_v2.h"
 
 #include "psen_scan_v2/laserscan_ros_conversions.h"
+#include "psen_scan_v2/io_state_ros_conversion.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 
 /**
@@ -79,6 +80,7 @@ private:
   ros::NodeHandle nh_;
   ros::Publisher pub_scan_;
   ros::Publisher pub_zone_;
+  ros::Publisher pub_io_;
   std::string tf_prefix_;
   double x_axis_rotation_;
   S scanner_;
@@ -94,6 +96,7 @@ private:
   FRIEND_TEST(RosScannerNodeTests, shouldPublishScanEqualToConversionOfSuppliedLaserScan);
   FRIEND_TEST(RosScannerNodeTests, shouldThrowExceptionSetInScannerStartFuture);
   FRIEND_TEST(RosScannerNodeTests, shouldThrowExceptionSetInScannerStopFuture);
+  FRIEND_TEST(RosScannerNodeTests, shouldPublishIOStatesEqualToConversionOfSuppliedStandaloneIOStates);
 };
 
 typedef ROSScannerNodeT<> ROSScannerNode;
@@ -111,6 +114,7 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
 {
   pub_scan_ = nh_.advertise<sensor_msgs::LaserScan>(topic, 1);
   pub_zone_ = nh_.advertise<std_msgs::UInt8>("active_zoneset", 1);
+  pub_io_ = nh_.advertise<psen_scan_v2::IOState>("io_state", 6);
 }
 
 template <typename S>
@@ -127,9 +131,15 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
         data_conversion_layer::radianToDegree(laser_scan_msg.angle_increment),
         laser_scan_msg.ranges.size());
     pub_scan_.publish(laser_scan_msg);
+
     std_msgs::UInt8 active_zoneset;
     active_zoneset.data = scan.getActiveZoneset();
     pub_zone_.publish(active_zoneset);
+
+    for (const auto& io : scan.getIOStates())
+    {
+      pub_io_.publish(toIOStateMsg(io, tf_prefix_, scan.getTimestamp()));
+    }
   }
   // LCOV_EXCL_START
   catch (const std::invalid_argument& e)

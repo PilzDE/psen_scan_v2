@@ -78,6 +78,18 @@ uint8_t Message::activeZoneset() const
   }
 }
 
+const io::PinData& Message::iOPinData() const
+{
+  if (io_pin_data_.is_initialized())
+  {
+    return io_pin_data_.get();
+  }
+  else
+  {
+    throw AdditionalFieldMissing("IO pin data");
+  }
+}
+
 const std::vector<double>& Message::measurements() const
 {
   if (measurements_.is_initialized())
@@ -124,6 +136,11 @@ bool Message::hasActiveZonesetField() const
   return active_zoneset_.is_initialized();
 }
 
+bool Message::hasIOPinField() const
+{
+  return io_pin_data_.is_initialized();
+}
+
 bool Message::hasMeasurementsField() const
 {
   return measurements_.is_initialized();
@@ -145,14 +162,15 @@ bool Message::hasDiagnosticMessagesField() const
 std::ostream& operator<<(std::ostream& os, const Message& msg)
 {
   os << fmt::format("monitoring_frame::Message(fromTheta = {} deg, resolution = {} deg, scanCounter = "
-                    "{}, active_zoneset = {}, measurements = {}, intensities = {}, diagnostics = {})",
+                    "{}, active_zoneset = {}, measurements = {}, intensities = {}, diagnostics = {}, io_pin_data = {})",
                     msg.from_theta_.value() / 10.,
                     msg.resolution_.value() / 10.,
                     FORMAT_IF_INITIALIZED(msg.scan_counter_),
                     FORMAT_IF_INITIALIZED(msg.active_zoneset_),
                     FORMAT_RANGE_IF_INITIALIZED(msg.measurements_),
                     FORMAT_RANGE_IF_INITIALIZED(msg.intensities_),
-                    FORMAT_RANGE_IF_INITIALIZED(msg.diagnostic_messages_));
+                    FORMAT_RANGE_IF_INITIALIZED(msg.diagnostic_messages_),
+                    FORMAT_IF_INITIALIZED(msg.io_pin_data_));
   return os;
 }
 }  // namespace monitoring_frame

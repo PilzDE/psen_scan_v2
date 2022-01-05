@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-SCAN_COUNTER_POSITION="49"
+SCAN_COUNTER_POSITION="179"
 FROM_THETA_POSITION="35"
 
 OUTPUT_FORMAT_STR='udp_port: %s time_epoch: %s scan_counter: %s from_theta: %s'

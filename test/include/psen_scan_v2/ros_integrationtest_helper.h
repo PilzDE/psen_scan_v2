@@ -16,11 +16,13 @@
 #define PSEN_SCAN_V2_ROS_INTEGRATIONTEST_HELPER_H
 
 #include <chrono>
+#include <future>
 #include <string>
 #include <sstream>
 #include <thread>
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include <ros/master.h>
 
@@ -64,6 +66,24 @@ namespace psen_scan_v2_test
   return ::testing::AssertionFailure() << "Topic \"" << topic << "\" not found. Available topics: " << topic_names;
 }
 
+MATCHER_P(messageEQ, expected_msg, "")
+{
+  auto actual_msg = arg.getMessage();
+  return expected_msg == *actual_msg;
+}
+
+ACTION_P(ReturnFuture, promise_obj_ptr)
+{
+  return promise_obj_ptr->get_future();
+}
+
+ACTION(ReturnReadyVoidFuture)
+{
+  std::promise<void> promise_obj;
+  promise_obj.set_value();
+  return promise_obj.get_future();
+}
+
 MATCHER(isLatched, "")
 {
   auto connection_header = arg.getConnectionHeader();
@@ -71,10 +91,24 @@ MATCHER(isLatched, "")
   return (search != connection_header.end() && search->second == "1");
 }
 
-MATCHER_P(messageEQ, expected_msg, "")
+// Do not match header.seq since it might have been overwritten by ROS
+MATCHER_P(StdMsgsHeaderEq, msg, "")
 {
-  auto actual_msg = arg.getMessage();
-  return expected_msg == *actual_msg;
+  return arg.frame_id == msg.frame_id && arg.stamp == msg.stamp;
+}
+
+MATCHER_P(IOStateMsgEq, msg, "")
+{
+  return ::testing::Matches(StdMsgsHeaderEq(msg.header))(arg.header) && arg.logical_input == msg.logical_input &&
+         arg.output == msg.output;
+}
+
+MATCHER_P(LaserScanMsgEq, msg, "")
+{
+  return ::testing::Matches(StdMsgsHeaderEq(msg.header))(arg.header) && arg.angle_min == msg.angle_min &&
+         arg.angle_max == msg.angle_max && arg.angle_increment == msg.angle_increment &&
+         arg.time_increment == msg.time_increment && arg.scan_time == msg.scan_time && arg.range_min == msg.range_min &&
+         arg.range_max == msg.range_max && arg.ranges == msg.ranges && arg.intensities == msg.intensities;
 }
 
 bool isConnected(SubscriberMock<visualization_msgs::MarkerConstPtr>& subscriber,

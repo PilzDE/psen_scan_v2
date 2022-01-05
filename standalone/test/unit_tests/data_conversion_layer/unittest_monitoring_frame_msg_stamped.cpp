@@ -13,14 +13,18 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <vector>
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
+#include "psen_scan_v2_standalone/io_state.h"
 
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 
@@ -30,6 +34,10 @@ namespace psen_scan_v2_standalone_test
 {
 static data_conversion_layer::monitoring_frame::Message createMsg()
 {
+  data_conversion_layer::monitoring_frame::io::PinData io_pin_data;
+  io_pin_data.logical_input = { PinState(3, "zone1", true) };
+  io_pin_data.output = { PinState(1, "OSSD", false) };
+
   return data_conversion_layer::monitoring_frame::MessageBuilder()
       .fromTheta(util::TenthOfDegree{ 10 })
       .resolution(util::TenthOfDegree{ 90 })
@@ -39,7 +47,8 @@ static data_conversion_layer::monitoring_frame::Message createMsg()
       .intensities({ 0., 4., 3., 1007., 508., 14000. })
       .diagnosticMessages({ data_conversion_layer::monitoring_frame::diagnostic::Message{
           configuration::ScannerId::master,
-          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 7) } });
+          data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 7) } })
+      .iOPinData(io_pin_data);
 }
 
 TEST(MonitoringFrameMsgStampedTest, testMsg)

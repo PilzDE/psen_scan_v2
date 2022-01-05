@@ -17,20 +17,17 @@
 #define PSEN_SCAN_V2_STANDALONE_MONITORING_FRAME_MSG_H
 
 #include <cstdint>
-#include <functional>
-#include <map>
-#include <iostream>
-#include <sstream>
+#include <ostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <array>
-#include <bitset>
+
 #include <boost/optional.hpp>
 
-#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
-#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -48,7 +45,7 @@ namespace monitoring_frame
 static constexpr uint8_t MAX_SCANNER_ID{ configuration::VALID_SCANNER_IDS.size() - 1 };
 
 /**
- * @brief Base class for exceptions thrown if an additional field was missing during deserialization of a Message.
+ * @brief Exception thrown if an additional field was missing during deserialization of a Message.
  */
 class AdditionalFieldMissing : public std::runtime_error
 {
@@ -73,6 +70,8 @@ public:
   uint32_t scanCounter() const;
   //! @throw AdditionalFieldMissing if active_zoneset was missing during deserialization of a Message.
   uint8_t activeZoneset() const;
+  //! @throw AdditionalFieldMissing if io_pin_data was missing during deserialization of a Message.
+  const io::PinData& iOPinData() const;
   //! @throw AdditionalFieldMissing if measurements were missing during deserialization of a Message.
   const std::vector<double>& measurements() const;
   //! @throw AdditionalFieldMissing if intensities were missing during deserialization of a Message.
@@ -82,6 +81,7 @@ public:
 
   bool hasScanCounterField() const;
   bool hasActiveZonesetField() const;
+  bool hasIOPinField() const;
   bool hasMeasurementsField() const;
   bool hasIntensitiesField() const;
   bool hasDiagnosticMessagesField() const;
@@ -94,6 +94,7 @@ private:
   // additional fields
   boost::optional<uint32_t> scan_counter_;
   boost::optional<uint8_t> active_zoneset_;
+  boost::optional<io::PinData> io_pin_data_;
   boost::optional<std::vector<double>> measurements_;
   boost::optional<std::vector<double>> intensities_;
   boost::optional<std::vector<diagnostic::Message>> diagnostic_messages_;

@@ -99,6 +99,7 @@ inline LaserScan LaserScanConverter::toLaserScan(
 
   std::vector<double> measurements;
   std::vector<double> intensities;
+  std::vector<IOState> io_states;
 
   for (auto index : sorted_stamped_msgs_indices)
   {
@@ -111,6 +112,11 @@ inline LaserScan LaserScanConverter::toLaserScan(
                          stamped_msgs[index].msg_.intensities().begin(),
                          stamped_msgs[index].msg_.intensities().end());
     }
+    if (stamped_msgs[index].msg_.hasIOPinField())
+    {
+      auto io = stamped_msgs[index].msg_.iOPinData();
+      io_states.emplace_back(io.logical_input, io.output);
+    }
   }
 
   LaserScan scan(stamped_msgs[0].msg_.resolution(),
@@ -121,6 +127,7 @@ inline LaserScan LaserScanConverter::toLaserScan(
                  timestamp);
   scan.setMeasurements(measurements);
   scan.setIntensities(intensities);
+  scan.setIOStates(io_states);
 
   return scan;
 }

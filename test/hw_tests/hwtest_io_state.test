@@ -1,0 +1,31 @@
+<!--
+Copyright (c) 2021 Pilz GmbH & Co. KG
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<launch>
+  <node pkg="sainsmart_relay_usb" type="relay_node" name="sainsmart_relay_node" />
+
+  <include file="$(find psen_scan_v2)/launch/bringup.launch">
+    <arg name="angle_start" value="-1.2" />
+    <arg name="angle_end" value="1.2" />
+    <arg name="sensor_ip" value="$(optenv SENSOR_IP 192.168.0.10)" />
+    <arg name="host_ip" value="$(optenv HOST_IP auto)" />
+    <arg name="host_udp_port_data" value="55009" />
+  </include>
+
+  <test test-name="hwtest_io_state" pkg="psen_scan_v2" type="hwtest_io_state" />
+
+</launch>

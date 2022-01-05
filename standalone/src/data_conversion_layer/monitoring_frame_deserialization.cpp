@@ -14,7 +14,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <array>
-#include <bitset>
 #include <functional>
 #include <istream>
 #include <sstream>
@@ -23,9 +22,14 @@
 #include <fmt/format.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/io_state.h"
+#include "psen_scan_v2_standalone/util/logging.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -89,15 +93,14 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
   while (!end_of_frame)
   {
     const AdditionalFieldHeader additional_header{ readAdditionalField(ss, num_bytes) };
-
     switch (static_cast<AdditionalFieldHeaderID>(additional_header.id()))
     {
       case AdditionalFieldHeaderID::scan_counter:
         if (additional_header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
         {
-          throw ScanCounterUnexpectedSize(fmt::format("Length of scan counter field is {}, but should be {}.",
-                                                      additional_header.length(),
-                                                      NUMBER_OF_BYTES_SCAN_COUNTER));
+          throw AdditionalFieldUnexpectedSize(fmt::format("Length of scan counter field is {}, but should be {}.",
+                                                          additional_header.length(),
+                                                          NUMBER_OF_BYTES_SCAN_COUNTER));
         }
         uint32_t scan_counter_read_buffer;
         raw_processing::read<uint32_t>(ss, scan_counter_read_buffer);
@@ -119,13 +122,23 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
       case AdditionalFieldHeaderID::zone_set:
         if (additional_header.length() != NUMBER_OF_BYTES_ZONE_SET)
         {
-          throw ZoneSetUnexpectedSize(fmt::format("Length of zone set field is {}, but should be {}.",
-                                                  additional_header.length(),
-                                                  NUMBER_OF_BYTES_ZONE_SET));
+          throw AdditionalFieldUnexpectedSize(fmt::format("Length of zone set field is {}, but should be {}.",
+                                                          additional_header.length(),
+                                                          NUMBER_OF_BYTES_ZONE_SET));
         }
         uint8_t zone_set_read_buffer;
         raw_processing::read<uint8_t>(ss, zone_set_read_buffer);
         msg_builder.activeZoneset(zone_set_read_buffer);
+        break;
+
+      case AdditionalFieldHeaderID::io_pin_data:
+        if (additional_header.length() != io::RAW_CHUNK_LENGTH_IN_BYTES)
+        {
+          throw AdditionalFieldUnexpectedSize(fmt::format("Length of io state field is {}, but should be {}.",
+                                                          additional_header.length(),
+                                                          io::RAW_CHUNK_LENGTH_IN_BYTES));
+        }
+        msg_builder.iOPinData(io::deserializePins(ss));
         break;
 
       case AdditionalFieldHeaderID::diagnostics:
@@ -141,8 +154,10 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
         break;
       }
       default:
-        throw DecodingFailure(fmt::format(
-            "Header Id {:#04x} unknown. Cannot read additional field of monitoring frame.", additional_header.id()));
+        throw DecodingFailure(
+            fmt::format("Header Id {:#04x} unknown. Cannot read additional field of monitoring frame on position {}.",
+                        additional_header.id(),
+                        ss.tellp()));
     }
   }
   return msg_builder.build();
@@ -164,6 +179,26 @@ AdditionalFieldHeader readAdditionalField(std::istream& is, const std::size_t& m
   }
   return AdditionalFieldHeader(id, length);
 }
+
+namespace io
+{
+PinData deserializePins(std::istream& is)
+{
+  PinData io_pin_data;
+
+  raw_processing::read<
+      std::array<uint8_t, 3 * (RAW_CHUNK_LENGTH_RESERVED_IN_BYTES + RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES)>>(is);
+
+  raw_processing::read<std::array<uint8_t, RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
+  io_pin_data.logical_input =
+      deserializePinField(is, RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES, LOGICAL_INPUT_BITS, LOGICAL_INPUT_BIT_TO_NAME);
+
+  raw_processing::read<std::array<uint8_t, RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
+  io_pin_data.output = deserializePinField(is, RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES, OUTPUT_BITS, OUTPUT_BIT_TO_NAME);
+
+  return io_pin_data;
+}
+}  // namespace io
 
 namespace diagnostic
 {

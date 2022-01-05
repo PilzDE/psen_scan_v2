@@ -47,7 +47,7 @@ public:
     intensities_enabled = 0x1B,
     point_in_safety_enabled = 0x1C,
     active_zone_set_enabled = 0x1D,
-    io_pin_enabled = 0x1E,
+    io_pin_data_enabled = 0x1E,
     scan_counter_enabled = 0x1F,
     speed_encoder_enabled = 0x20,
     diagnostics_enabled = 0x21,
@@ -115,7 +115,7 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::intensities_enabled), 0b00000000));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::point_in_safety_enabled), 0));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::active_zone_set_enabled), 0b00001000));
-  EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::io_pin_enabled), 0));
+  EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::io_pin_data_enabled), 0b00001000));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::scan_counter_enabled), 0b00001000));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::speed_encoder_enabled), 0));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::diagnostics_enabled), 0));
@@ -171,7 +171,7 @@ TEST_F(StartRequestTest, crcWithIntensities)
 
   // see wireshark for this number
   // generated with `roslaunch psen_scan_v2 psen_scan_v2.launch intensities:=true resolution:=0.0035`
-  const std::array<unsigned char, 4> expected_crc = { 0x9d, 0xfb, 0x2c, 0x7a };
+  const std::array<unsigned char, 4> expected_crc = { 0x75, 0x13, 0x83, 0x77 };
 
   for (size_t i = 0; i < expected_crc.size(); ++i)
   {

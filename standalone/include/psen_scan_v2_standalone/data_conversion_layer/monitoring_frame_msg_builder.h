@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
@@ -44,6 +45,7 @@ public:
   MessageBuilder& activeZoneset(uint8_t active_zoneset);
   MessageBuilder& intensities(const std::vector<double>& intensities);
   MessageBuilder& diagnosticMessages(const std::vector<diagnostic::Message>& diagnostic_messages);
+  MessageBuilder& iOPinData(const io::PinData& io_pin_data);
 
 private:
   Message msg_;
@@ -104,6 +106,12 @@ inline MessageBuilder& MessageBuilder::intensities(const std::vector<double>& in
 inline MessageBuilder& MessageBuilder::diagnosticMessages(const std::vector<diagnostic::Message>& diagnostic_messages)
 {
   msg_.diagnostic_messages_ = diagnostic_messages;
+  return *this;
+}
+
+inline MessageBuilder& MessageBuilder::iOPinData(const io::PinData& io_pin_data)
+{
+  msg_.io_pin_data_ = io_pin_data;
   return *this;
 }
 }  // namespace monitoring_frame

@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <ostream>
 #include <random>
 #include <vector>
 
@@ -26,12 +27,17 @@
 
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/laserscan_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
+#include "psen_scan_v2_standalone/util/format_range.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
+#include "psen_scan_v2_standalone/io_state.h"
 #include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/scan_range.h"
+
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
 
 namespace psen_scan_v2_standalone_test
 {
@@ -88,6 +94,12 @@ createMonitoringFrameMsgBuilderWithoutDiagnostics(const util::TenthOfDegree star
   const double highest_intensity{ 16383. };  // only 14 of 16 bits can be used for the actual intensity value
 
   msg_builder.intensities(generateIntensities(num_elements, lowest_intensity, highest_intensity));
+
+  auto pin_data = createCompleteIOPinData();  // A valid frame contains a complete set of pin data
+  setInputPin(pin_data, data_conversion_layer::monitoring_frame::io::LogicalInputType::muting_1_a);
+  setOutputPin(pin_data, data_conversion_layer::monitoring_frame::io::OutputType::safe_1_int);
+  msg_builder.iOPinData(pin_data);
+
   return msg_builder;
 }
 
@@ -161,5 +173,23 @@ LaserScan createReferenceScan(const std::vector<data_conversion_layer::monitorin
 }
 
 }  // namespace psen_scan_v2_standalone_test
+
+namespace psen_scan_v2_standalone
+{
+// Avoids too much output with full io pin data
+void PrintTo(const LaserScan& scan, std::ostream* os)
+{
+  *os << fmt::format("LaserScan(timestamp = {} nsec, scanCounter = {}, minScanAngle = {} deg, maxScanAngle = {} deg, "
+                     "resolution = {} deg, active_zoneset = {}, measurements = {}, intensities = {}, io_states = ...)",
+                     scan.getTimestamp(),
+                     scan.getScanCounter(),
+                     scan.getMinScanAngle().value() / 10.,
+                     scan.getMaxScanAngle().value() / 10.,
+                     scan.getScanResolution().value() / 10.,
+                     scan.getActiveZoneset(),
+                     util::formatRange(scan.getMeasurements()),
+                     util::formatRange(scan.getIntensities()));
+}
+}  // namespace psen_scan_v2_standalone
 
 #endif  // PSEN_SCAN_V2_STANDALONE_TEST_INTEGRATIONTEST_HELPER_H
