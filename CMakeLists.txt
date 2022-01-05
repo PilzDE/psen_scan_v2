@@ -752,10 +752,13 @@ if(CATKIN_ENABLE_TESTING)
     set(COVERAGE_EXCLUDES "*/${PROJECT_NAME}/standalone/test*"
                           "*/${PROJECT_NAME}/test*"
                           "*/${PROJECT_NAME}/src/psen_scan_driver.cpp"
+                          "*/InputPinID.h" # generated message
+                          "*/InputPinState.h" # generated message
+                          "*/IOState.h" # generated message
+                          "*/OutputPinID.h" # generated message
+                          "*/OutputPinState.h" # generated message
                           "*/ZoneSet.h" # generated message
                           "*/ZoneSetConfiguration.h" # generated message
-                          "*/PinState.h" # generated message
-                          "*/IOState.h" # generated message
         )
     add_code_coverage(
       NAME ${PROJECT_NAME}_coverage
