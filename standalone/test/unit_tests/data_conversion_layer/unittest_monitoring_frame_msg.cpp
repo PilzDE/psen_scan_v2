@@ -18,9 +18,6 @@
 
 #include <gtest/gtest.h>
 
-#include <fmt/format.h>
-#include <fmt/ostream.h>
-
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
@@ -183,43 +180,6 @@ TEST(MonitoringFrameMsgTest, shouldReturnCorrectDiagnosticMessages)
                       MessageBuilder().diagnosticMessages(expected_diagnostic_messages).build().diagnosticMessages());
   EXPECT_EQ(expected_diagnostic_messages, diagnostic_messages);
 }
-
-TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccessWithAdditionalFields)
-{
-  auto msg = MessageBuilder()
-                 .fromTheta(util::TenthOfDegree(1234))
-                 .resolution(util::TenthOfDegree(56))
-                 .scanCounter(78)
-                 .activeZoneset(2)
-                 .measurements({ 45, 44, 43, 42 })
-                 .intensities({ 1 })
-                 .diagnosticMessages({})
-                 .build();
-
-// For compatibility with different ubuntu versions (resp. fmt), we need to take account of changes in
-// the default formatting of floating point numbers
-#if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
-  EXPECT_EQ(fmt::format("{}", msg),
-            "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-            "active_zoneset = 2, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {1.0}, diagnostics = {}, "
-            "io_pin_data = _)");
-#else
-  EXPECT_EQ(
-      fmt::format("{}", msg),
-      "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = 78, "
-      "active_zoneset = 2, measurements = {45, 44, 43, 42}, intensities = {1}, diagnostics = {}, io_pin_data = _)");
-#endif
-}
-
-TEST(MonitoringFrameMsgPrintTest, testPrintMessageSuccessWithoutAdditionalFields)
-{
-  auto msg = MessageBuilder().fromTheta(util::TenthOfDegree(1234)).resolution(util::TenthOfDegree(56)).build();
-
-  EXPECT_EQ(fmt::format("{}", msg),
-            "monitoring_frame::Message(fromTheta = 123.4 deg, resolution = 5.6 deg, scanCounter = _, "
-            "active_zoneset = _, measurements = _, intensities = _, diagnostics = _, io_pin_data = _)");
-}
-
 }  // namespace psen_scan_v2_standalone_test
 
 int main(int argc, char** argv)

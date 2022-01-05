@@ -29,6 +29,7 @@
 #include "psen_scan_v2_standalone/io_state.h"
 
 #include "psen_scan_v2_standalone/data_conversion_layer/istring_stream_builder.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_helper.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_serialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
