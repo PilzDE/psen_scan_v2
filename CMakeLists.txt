@@ -118,6 +118,7 @@ target_include_directories(${PROJECT_NAME}_node
 )
 target_link_libraries(${PROJECT_NAME}_node
   ${PROJECT_NAME}_standalone
+  fmt
 )
 ament_target_dependencies(${PROJECT_NAME}_node
   rclcpp
