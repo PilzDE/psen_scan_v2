@@ -44,7 +44,7 @@ static inline PinState generateInputPinState(const monitoring_frame::io::PinData
                                              std::size_t byte_location,
                                              std::size_t bit_location)
 {
-  return { byte_location * 8 + bit_location,
+  return { static_cast<uint32_t>(byte_location * 8 + bit_location),
            monitoring_frame::io::getInputName(byte_location, bit_location),
            pin_data.getInputState(byte_location, bit_location) };
 }
@@ -53,7 +53,7 @@ static inline PinState generateOutputPinState(const monitoring_frame::io::PinDat
                                               std::size_t byte_location,
                                               std::size_t bit_location)
 {
-  return { byte_location * 8 + bit_location,
+  return { static_cast<uint32_t>(byte_location * 8 + bit_location),
            monitoring_frame::io::getOutputName(byte_location, bit_location),
            pin_data.getOutputState(byte_location, bit_location) };
 }
