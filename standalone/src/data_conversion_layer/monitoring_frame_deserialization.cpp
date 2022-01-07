@@ -190,10 +190,10 @@ PinData deserializePins(std::istream& is)
       std::array<uint8_t, 3 * (RAW_CHUNK_LENGTH_RESERVED_IN_BYTES + RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES)>>(is);
 
   raw_processing::read<std::array<uint8_t, RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  deserializePinField(is, io_pin_data.input_states_);
+  deserializePinField(is, io_pin_data.inputState());
 
   raw_processing::read<std::array<uint8_t, RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  deserializePinField(is, io_pin_data.output_states_);
+  deserializePinField(is, io_pin_data.outputState());
 
   return io_pin_data;
 }

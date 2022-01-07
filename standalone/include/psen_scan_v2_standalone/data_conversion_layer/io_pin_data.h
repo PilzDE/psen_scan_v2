@@ -75,40 +75,63 @@ class PinData
 {
 public:
   //! @throws std::out_of_range if byte_location >= NUMBER_OF_INPUT_BYTES or bit_location >= 8
-  bool getInputState(std::size_t byte_location, std::size_t bit_location) const;
+  bool inputPinState(std::size_t byte_location, std::size_t bit_location) const;
   //! @throws std::out_of_range if byte_location >= NUMBER_OF_OUTPUT_BYTES or bit_location >= 8
-  bool getOutputState(std::size_t byte_location, std::size_t bit_location) const;
+  bool outputPinState(std::size_t byte_location, std::size_t bit_location) const;
 
   //! @throws std::out_of_range if byte_location >= NUMBER_OF_INPUT_BYTES or bit_location >= 8
-  void setInputState(std::size_t byte_location, std::size_t bit_location, bool pin_state);
+  void inputPinState(std::size_t byte_location, std::size_t bit_location, bool pin_state);
   //! @throws std::out_of_range if byte_location >= NUMBER_OF_OUTPUT_BYTES or bit_location >= 8
-  void setOutputState(std::size_t byte_location, std::size_t bit_location, bool pin_state);
+  void outputPinState(std::size_t byte_location, std::size_t bit_location, bool pin_state);
 
-public:
+  std::array<std::bitset<8>, NUMBER_OF_INPUT_BYTES>& inputState();
+  std::array<std::bitset<8>, NUMBER_OF_OUTPUT_BYTES>& outputState();
+  const std::array<std::bitset<8>, NUMBER_OF_INPUT_BYTES>& inputState() const;
+  const std::array<std::bitset<8>, NUMBER_OF_OUTPUT_BYTES>& outputState() const;
+
+private:
   std::array<std::bitset<8>, NUMBER_OF_INPUT_BYTES> input_states_{};
   std::array<std::bitset<8>, NUMBER_OF_OUTPUT_BYTES> output_states_{};
 };
 
-inline bool PinData::getInputState(std::size_t byte_location, std::size_t bit_location) const
+inline bool PinData::inputPinState(std::size_t byte_location, std::size_t bit_location) const
 {
-  input_states_.at(byte_location).test(bit_location);
-  return input_states_.at(byte_location)[bit_location];
+  return input_states_.at(byte_location).test(bit_location);
 }
 
-inline bool PinData::getOutputState(std::size_t byte_location, std::size_t bit_location) const
+inline bool PinData::outputPinState(std::size_t byte_location, std::size_t bit_location) const
 {
-  output_states_.at(byte_location).test(bit_location);
-  return output_states_.at(byte_location)[bit_location];
+  return output_states_.at(byte_location).test(bit_location);
 }
 
-inline void PinData::setInputState(std::size_t byte_location, std::size_t bit_location, bool pin_state)
+inline void PinData::inputPinState(std::size_t byte_location, std::size_t bit_location, bool pin_state)
 {
   input_states_.at(byte_location).set(bit_location, pin_state);
 }
 
-inline void PinData::setOutputState(std::size_t byte_location, std::size_t bit_location, bool pin_state)
+inline void PinData::outputPinState(std::size_t byte_location, std::size_t bit_location, bool pin_state)
 {
   output_states_.at(byte_location).set(bit_location, pin_state);
+}
+
+inline std::array<std::bitset<8>, NUMBER_OF_INPUT_BYTES>& PinData::inputState()
+{
+  return input_states_;
+}
+
+inline std::array<std::bitset<8>, NUMBER_OF_OUTPUT_BYTES>& PinData::outputState()
+{
+  return output_states_;
+}
+
+inline const std::array<std::bitset<8>, NUMBER_OF_INPUT_BYTES>& PinData::inputState() const
+{
+  return input_states_;
+}
+
+inline const std::array<std::bitset<8>, NUMBER_OF_OUTPUT_BYTES>& PinData::outputState() const
+{
+  return output_states_;
 }
 
 // LCOV_EXCL_START

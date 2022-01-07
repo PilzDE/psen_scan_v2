@@ -101,7 +101,8 @@ MATCHER_P2(TimestampInExpectedTimeframe, reference_scan, reference_timestamp, ""
 
 MATCHER_P(IOPinDataEq, ref_pin, "")
 {
-  return Matches(Pointwise(Eq(), ref_pin.input))(arg.input) && Matches(Pointwise(Eq(), ref_pin.output))(arg.output);
+  return Matches(Pointwise(Eq(), ref_pin.inputState()))(arg.inputState()) &&
+         Matches(Pointwise(Eq(), ref_pin.outputState()))(arg.outputState());
 }
 
 MATCHER_P(MonitoringFrameEq, reference_msg, "")
