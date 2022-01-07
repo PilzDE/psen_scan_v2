@@ -27,7 +27,7 @@ PSENscan firmware >= 3.1.0 is supported on the following models:
 If you are interested in using the PSENscan safety laser scanner without ROS, please take a look at our C++ standalone library. You can read more about it [in the `standalone` folder](https://github.com/PilzDE/psen_scan_v2/blob/main/standalone/README.md)
 
 ## Table of Contents
-
+ 
 1. [Installation](#installation)
 2. [Usage](#usage)
    + [Parameters](#parameters)
