@@ -138,7 +138,7 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
 
     for (const auto& io : scan.getIOStates())
     {
-      pub_io_.publish(toIOStateMsg(io, tf_prefix_, scan.getTimestamp()));
+      pub_io_.publish(toIOStateMsg(io, tf_prefix_, scan.timestamp()));
     }
   }
   // LCOV_EXCL_START

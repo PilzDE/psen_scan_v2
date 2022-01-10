@@ -104,8 +104,8 @@ createMonitoringFrameMsgBuilderWithoutDiagnostics(const util::TenthOfDegree star
 }
 
 static data_conversion_layer::monitoring_frame::MessageBuilder
-createMonitoringFrameMsgBuilder(const util::TenthOfDegree start_angle = DEFAULT_SCAN_RANGE.getStart(),
-                                const util::TenthOfDegree end_angle = DEFAULT_SCAN_RANGE.getEnd())
+createMonitoringFrameMsgBuilder(const util::TenthOfDegree start_angle = DEFAULT_SCAN_RANGE.start(),
+                                const util::TenthOfDegree end_angle = DEFAULT_SCAN_RANGE.end())
 {
   return createMonitoringFrameMsgBuilderWithoutDiagnostics(start_angle, end_angle)
       .diagnosticMessages({ { configuration::ScannerId::master,
@@ -114,8 +114,8 @@ createMonitoringFrameMsgBuilder(const util::TenthOfDegree start_angle = DEFAULT_
 
 static data_conversion_layer::monitoring_frame::Message
 createMonitoringFrameMsg(const uint32_t scan_counter = DEFAULT_SCAN_COUNTER,
-                         const util::TenthOfDegree start_angle = DEFAULT_SCAN_RANGE.getStart(),
-                         const util::TenthOfDegree end_angle = DEFAULT_SCAN_RANGE.getEnd())
+                         const util::TenthOfDegree start_angle = DEFAULT_SCAN_RANGE.start(),
+                         const util::TenthOfDegree end_angle = DEFAULT_SCAN_RANGE.end())
 {
   return createMonitoringFrameMsgBuilder(start_angle, end_angle).scanCounter(scan_counter);
 }
@@ -181,14 +181,14 @@ void PrintTo(const LaserScan& scan, std::ostream* os)
 {
   *os << fmt::format("LaserScan(timestamp = {} nsec, scanCounter = {}, minScanAngle = {} deg, maxScanAngle = {} deg, "
                      "resolution = {} deg, active_zoneset = {}, measurements = {}, intensities = {}, io_states = ...)",
-                     scan.getTimestamp(),
-                     scan.getScanCounter(),
-                     scan.getMinScanAngle().value() / 10.,
-                     scan.getMaxScanAngle().value() / 10.,
-                     scan.getScanResolution().value() / 10.,
-                     scan.getActiveZoneset(),
-                     util::formatRange(scan.getMeasurements()),
-                     util::formatRange(scan.getIntensities()));
+                     scan.timestamp(),
+                     scan.scanCounter(),
+                     scan.minScanAngle().value() / 10.,
+                     scan.maxScanAngle().value() / 10.,
+                     scan.scanResolution().value() / 10.,
+                     scan.activeZoneset(),
+                     util::formatRange(scan.measurements()),
+                     util::formatRange(scan.intensities()));
 }
 }  // namespace psen_scan_v2_standalone
 

@@ -242,9 +242,9 @@ TEST_F(RosScannerNodeTests, shouldPublishIOStatesEqualToConversionOfSuppliedStan
   SubscriberMock<psen_scan_v2::IOState> subscriber(nh_priv_, "io_state", QUEUE_SIZE);
   {
     InSequence s;
-    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA1.at(0), prefix, scan.getTimestamp())))).Times(1);
-    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA1.at(1), prefix, scan.getTimestamp())))).Times(1);
-    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA2.at(0), prefix, scan.getTimestamp()))))
+    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA1.at(0), prefix, scan.timestamp())))).Times(1);
+    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA1.at(1), prefix, scan.timestamp())))).Times(1);
+    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA2.at(0), prefix, scan.timestamp()))))
         .WillOnce(OpenBarrier(&io_topic_barrier));
   }
 
