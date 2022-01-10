@@ -22,6 +22,8 @@
 #include <fmt/ostream.h>
 
 #include "psen_scan_v2_standalone/io_state.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_state_conversions.h"
 #include "psen_scan_v2_standalone/util/format_range.h"
 
 namespace psen_scan_v2_standalone
@@ -55,28 +57,31 @@ bool PinState::state() const
   return state_;
 }
 
+// LCOV_EXCL_START
 std::ostream& operator<<(std::ostream& os, const PinState& pin_state)
 {
-  return os << fmt::format(  // LCOV_EXCL_LINE lcov bug?
-             "PinState(id = {}, name = {}, state = {})",
-             pin_state.id(),
-             pin_state.name(),
-             pin_state.state());
+  return os << fmt::format(
+             "PinState(id = {}, name = {}, state = {})", pin_state.id(), pin_state.name(), pin_state.state());
+}
+// LCOV_EXCL_STOP
+
+IOState::IOState(const std::vector<PinState>& input, const std::vector<PinState>& output)
+{
+  data_conversion_layer::updatePinData(pin_data_, input, output);
 }
 
-IOState::IOState(std::vector<PinState> input, std::vector<PinState> output)
-  : input_(std::move(input)), output_(std::move(output))
+IOState::IOState(data_conversion_layer::monitoring_frame::io::PinData pin_data) : pin_data_(std::move(pin_data))
 {
 }
 
-const std::vector<PinState>& IOState::input() const
+std::vector<PinState> IOState::input() const
 {
-  return input_;
+  return data_conversion_layer::generateInputPinStates(pin_data_);
 }
 
-const std::vector<PinState>& IOState::output() const
+std::vector<PinState> IOState::output() const
 {
-  return output_;
+  return data_conversion_layer::generateOutputPinStates(pin_data_);
 }
 
 std::ostream& operator<<(std::ostream& os, const IOState& io_state)

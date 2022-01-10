@@ -20,6 +20,8 @@
 #include <string>
 #include <vector>
 
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
+
 namespace psen_scan_v2_standalone
 {
 //! @brief Represents a single I/O pin.
@@ -51,13 +53,13 @@ class IOState
 {
 public:
   IOState() = default;
-  IOState(std::vector<PinState> input, std::vector<PinState> output);
-  const std::vector<PinState>& input() const;
-  const std::vector<PinState>& output() const;
+  IOState(const std::vector<PinState>& input, const std::vector<PinState>& output);
+  IOState(data_conversion_layer::monitoring_frame::io::PinData pin_data);
+  std::vector<PinState> input() const;
+  std::vector<PinState> output() const;
 
 private:
-  std::vector<PinState> input_{};
-  std::vector<PinState> output_{};
+  data_conversion_layer::monitoring_frame::io::PinData pin_data_{};
 };
 
 std::ostream& operator<<(std::ostream& os, const IOState& io_state);

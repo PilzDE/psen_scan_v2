@@ -137,6 +137,7 @@ set(${PROJECT_NAME}_standalone_sources
   standalone/src/scanner_v2.cpp
   standalone/src/io_state.cpp
   standalone/src/laserscan.cpp
+  standalone/src/io_state.cpp
   standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
   standalone/src/data_conversion_layer/start_request.cpp
   standalone/src/data_conversion_layer/start_request_serialization.cpp
