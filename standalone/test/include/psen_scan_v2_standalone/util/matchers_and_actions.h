@@ -89,7 +89,7 @@ MATCHER_P(ScanDataEqual, scan, "")
          arg.minScanAngle() == scan.minScanAngle() && arg.maxScanAngle() == scan.maxScanAngle() &&
          Matches(PointwiseDoubleEq(scan.measurements()))(arg.measurements()) &&
          Matches(PointwiseDoubleEq(scan.intensities()))(arg.intensities()) &&
-         ExplainMatchResult(PointwiseIOStateUnorderedEq(scan.getIOStates()), arg.getIOStates(), result_listener);
+         ExplainMatchResult(PointwiseIOStateUnorderedEq(scan.ioStates()), arg.ioStates(), result_listener);
 }
 
 MATCHER_P2(TimestampInExpectedTimeframe, reference_scan, reference_timestamp, "")

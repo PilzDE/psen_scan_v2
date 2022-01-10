@@ -109,8 +109,13 @@ public:
   setIntensities(const IntensityData& intensities);
   void intensities(const IntensityData& intensities);
 
-  const IOData& getIOStates() const;
-  void setIOStates(const IOData& io_states);
+  /*! deprecated: use const IOData& ioStates() const instead */
+  [[deprecated("use const IOData& getIOStates() const instead")]] const IOData& getIOStates() const;
+  const IOData& ioStates() const;
+
+  /*! deprecated: use void ioStates(const IOData& io_states) instead */
+  [[deprecated("use void ioStates(const IOData& io_states) instead")]] void setIOStates(const IOData& io_states);
+  void ioStates(const IOData& io_states);
 
 private:
   //! Measurement data of the laserscan (in Millimeters).

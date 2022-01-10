@@ -165,9 +165,9 @@ TEST(LaserScanTest, testSetAndGetIOStates)
   std::unique_ptr<LaserScan> laser_scan;
   ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
 
-  laser_scan->setIOStates({ DEFAULT_IO_STATE });
-  EXPECT_EQ(laser_scan->getIOStates()[0].logicalInput(), DEFAULT_IO_STATE.logicalInput());
-  EXPECT_EQ(laser_scan->getIOStates()[0].output(), DEFAULT_IO_STATE.output());
+  laser_scan->ioStates({ DEFAULT_IO_STATE });
+  EXPECT_EQ(laser_scan->ioStates()[0].logicalInput(), DEFAULT_IO_STATE.logicalInput());
+  EXPECT_EQ(laser_scan->ioStates()[0].output(), DEFAULT_IO_STATE.output());
 }
 
 TEST(LaserScanTest, testPrintMessageSuccess)
@@ -177,7 +177,7 @@ TEST(LaserScanTest, testPrintMessageSuccess)
   ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
 
   laser_scan->measurements({ 45.0, 44.0, 43.0, 42.0 });
-  laser_scan->setIOStates({ { { PinState(3, "io_pin_data", true) }, {} } });
+  laser_scan->ioStates({ { { PinState(3, "io_pin_data", true) }, {} } });
 
 // For compatibility with different ubuntu versions (resp. fmt), we need to take account of changes in
 // the default formatting of floating point numbers

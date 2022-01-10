@@ -254,9 +254,9 @@ TEST_F(RosScannerNodeTests, shouldPublishIOStatesEqualToConversionOfSuppliedStan
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
   ASSERT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
 
-  scan.setIOStates(IO_DATA1);
+  scan.ioStates(IO_DATA1);
   ros_scanner_node.scanner_.invokeLaserScanCallback(scan);
-  scan.setIOStates(IO_DATA2);
+  scan.ioStates(IO_DATA2);
   ros_scanner_node.scanner_.invokeLaserScanCallback(scan);
   io_topic_barrier.waitTillRelease(DEFAULT_TIMEOUT);
 

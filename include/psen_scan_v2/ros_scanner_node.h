@@ -136,7 +136,7 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
     active_zoneset.data = scan.activeZoneset();
     pub_zone_.publish(active_zoneset);
 
-    for (const auto& io : scan.getIOStates())
+    for (const auto& io : scan.ioStates())
     {
       pub_io_.publish(toIOStateMsg(io, tf_prefix_, scan.timestamp()));
     }

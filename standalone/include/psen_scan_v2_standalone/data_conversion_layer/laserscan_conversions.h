@@ -128,7 +128,7 @@ inline LaserScan LaserScanConverter::toLaserScan(
 
   scan.measurements(measurements);
   scan.intensities(intensities);
-  scan.setIOStates(io_states);
+  scan.ioStates(io_states);
 
   return scan;
 }
