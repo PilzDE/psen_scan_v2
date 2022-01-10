@@ -34,7 +34,7 @@ public:
 
   MOCK_METHOD1_T(callback, void(const T& msg));
 
-  ros::Subscriber getSubscriber()
+  ros::Subscriber subscriber()
   {
     return subscriber_;
   }
