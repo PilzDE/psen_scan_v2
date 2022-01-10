@@ -74,7 +74,7 @@ static inline void generateInputPinStates(std::vector<PinState>& pin_states,
 static inline void generateOutputPinStates(std::vector<PinState>& pin_states,
                                            const monitoring_frame::io::PinData& pin_data)
 {
-  for (std::size_t byte_n = 0, bit_n = 0; byte_n < monitoring_frame::io::NUMBER_OF_INPUT_BYTES && bit_n < 8;
+  for (std::size_t byte_n = 0, bit_n = 0; byte_n < monitoring_frame::io::NUMBER_OF_OUTPUT_BYTES && bit_n < 8;
        ++byte_n, ++bit_n)
   {
     if (monitoring_frame::io::getOutputType(byte_n, bit_n) != monitoring_frame::io::OutputType::unused)

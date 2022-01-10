@@ -147,7 +147,7 @@ std::size_t calculateBitLocation(uint32_t id)
 }
 
 template <std::size_t ChunkSize>
-void serializeSingleRecord(RawChunk& raw_pin_data, std::array<std::bitset<8>, ChunkSize>& pin_states, std::size_t offset)
+void serializeSingleRecord(RawChunk& raw_pin_data, const std::array<std::bitset<8>, ChunkSize>& pin_states, std::size_t offset)
 {
   for (std::size_t byte = 0; byte < pin_states.size(); ++byte)
   {
