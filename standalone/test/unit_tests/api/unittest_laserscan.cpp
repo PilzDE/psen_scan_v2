@@ -33,7 +33,7 @@ static const util::TenthOfDegree DEFAULT_END_ANGLE{ 2 };
 static const int64_t DEFAULT_TIMESTAMP{ 1 };
 static const uint32_t DEFAULT_SCAN_COUNTER{ 1 };
 static const uint8_t DEFAULT_ACTIVE_ZONESET{ 2 };
-static const IOState DEFAULT_IO_STATE({ PinState(0, "logical_test", false) },
+static const IOState DEFAULT_IO_STATE({ PinState(0, "input_test", false) },
                                       { PinState(0, "output_test1", false), PinState(1, "output_test2", true) });
 
 class LaserScanBuilder
@@ -166,7 +166,7 @@ TEST(LaserScanTest, testSetAndGetIOStates)
   ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
 
   laser_scan->setIOStates({ DEFAULT_IO_STATE });
-  EXPECT_EQ(laser_scan->getIOStates()[0].logicalInput(), DEFAULT_IO_STATE.logicalInput());
+  EXPECT_EQ(laser_scan->getIOStates()[0].input(), DEFAULT_IO_STATE.input());
   EXPECT_EQ(laser_scan->getIOStates()[0].output(), DEFAULT_IO_STATE.output());
 }
 
@@ -185,13 +185,13 @@ TEST(LaserScanTest, testPrintMessageSuccess)
   EXPECT_EQ(fmt::format("{}", *laser_scan),
             "LaserScan(timestamp = 1 nsec, scanCounter = 1, minScanAngle = 0.1 deg, maxScanAngle = 0.2 deg, resolution "
             "= 0.1 deg, active_zoneset = 2, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {}, io_states = "
-            "{IOState(logicalInput = {PinState(id = 3, "
+            "{IOState(input = {PinState(id = 3, "
             "name = io_pin_data, state = true)}, output = {})})");
 #else
   EXPECT_EQ(fmt::format("{}", *laser_scan),
             "LaserScan(timestamp = 1 nsec, scanCounter = 1, minScanAngle = 0.1 deg, maxScanAngle = 0.2 deg, resolution "
             "= 0.1 deg, active_zoneset = 2, measurements = {45, 44, 43, 42}, intensities = {}, io_states = "
-            "{IOState(logicalInput = {PinState(id = 3, "
+            "{IOState(input = {PinState(id = 3, "
             "name = io_pin_data, state = true)}, output = {})})");
 #endif
 }

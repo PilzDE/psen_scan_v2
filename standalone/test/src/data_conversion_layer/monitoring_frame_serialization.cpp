@@ -163,7 +163,7 @@ RawChunk serialize(const PinData& pin_data)
   std::size_t offset = 3 * (RAW_CHUNK_LENGTH_RESERVED_IN_BYTES + RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES) +
                        RAW_CHUNK_LENGTH_RESERVED_IN_BYTES;
 
-  serializeSingleRecord(raw_pin_data, pin_data.logical_input, offset);
+  serializeSingleRecord(raw_pin_data, pin_data.input, offset);
   offset += RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES + RAW_CHUNK_LENGTH_RESERVED_IN_BYTES;
 
   serializeSingleRecord(raw_pin_data, pin_data.output, offset);

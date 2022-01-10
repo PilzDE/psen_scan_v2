@@ -92,23 +92,23 @@ class IOState
 {
 public:
   IOState() = default;
-  IOState(std::vector<PinState> logical_input, std::vector<PinState> output);
-  const std::vector<PinState>& logicalInput() const;
+  IOState(std::vector<PinState> input, std::vector<PinState> output);
+  const std::vector<PinState>& input() const;
   const std::vector<PinState>& output() const;
 
 private:
-  std::vector<PinState> logical_input_{};
+  std::vector<PinState> input_{};
   std::vector<PinState> output_{};
 };
 
-inline IOState::IOState(std::vector<PinState> logical_input, std::vector<PinState> output)
-  : logical_input_(std::move(logical_input)), output_(std::move(output))
+inline IOState::IOState(std::vector<PinState> input, std::vector<PinState> output)
+  : input_(std::move(input)), output_(std::move(output))
 {
 }
 
-inline const std::vector<PinState>& IOState::logicalInput() const
+inline const std::vector<PinState>& IOState::input() const
 {
-  return logical_input_;
+  return input_;
 }
 
 inline const std::vector<PinState>& IOState::output() const
@@ -118,8 +118,8 @@ inline const std::vector<PinState>& IOState::output() const
 
 inline std::ostream& operator<<(std::ostream& os, const IOState& io_state)
 {
-  return os << fmt::format("IOState(logicalInput = {}, output = {})",
-                           util::formatRange(io_state.logicalInput()),
+  return os << fmt::format("IOState(input = {}, output = {})",
+                           util::formatRange(io_state.input()),
                            util::formatRange(io_state.output()));
 }
 }  // namespace psen_scan_v2_standalone

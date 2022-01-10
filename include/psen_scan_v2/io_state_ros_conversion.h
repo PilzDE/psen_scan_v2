@@ -47,9 +47,9 @@ psen_scan_v2::IOState toIOStateMsg(const psen_scan_v2_standalone::IOState& io_st
   ros_message.header.stamp = ros::Time{}.fromNSec(stamp);
   ros_message.header.frame_id = frame_id;
 
-  std::transform(io_state.logicalInput().begin(),
-                 io_state.logicalInput().end(),
-                 std::back_inserter(ros_message.logical_input),
+  std::transform(io_state.input().begin(),
+                 io_state.input().end(),
+                 std::back_inserter(ros_message.input),
                  [](const auto& pin) { return toPinStateMsg<InputPinState>(pin); });
 
   std::transform(io_state.output().begin(),

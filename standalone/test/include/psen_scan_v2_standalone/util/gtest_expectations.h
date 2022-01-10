@@ -58,7 +58,7 @@
       expected_exception);
 
 #define EXPECT_IO_STATE_EQ_IO_PIN(io_state, io_pin_data, start_index)                                                  \
-  EXPECT_EQ(io_pin_data.logical_input, io_state.at(start_index).logicalInput());                                       \
+  EXPECT_EQ(io_pin_data.input, io_state.at(start_index).input());                                       \
   EXPECT_EQ(io_pin_data.output, io_state.at(start_index).output());
 
 #define EXPECT_CONTAINER_UNORDERED_EQ(var1, var2)                                                                      \
