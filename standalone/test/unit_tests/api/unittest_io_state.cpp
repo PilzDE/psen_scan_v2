@@ -16,54 +16,101 @@
 #include <gtest/gtest.h>
 
 #include "psen_scan_v2_standalone/io_state.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_state_conversions.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
+
+#include "psen_scan_v2_standalone/util/assertions.h"
 
 namespace psen_scan_v2_standalone_test
 {
 using psen_scan_v2_standalone::IOState;
-using psen_scan_v2_standalone::PinState;
 
-TEST(IOStateTests, shouldOnlyContainAddedInputPinState)
+TEST(IOStateTests, shouldReturnInputsWhereAllAreUnsetWhenDefaultConstructed)
 {
+<<<<<<< HEAD
   IOState io_state({ PinState(5, "some name", false) }, {});
 
   EXPECT_EQ(io_state.input().size(), 1u);
   EXPECT_EQ(io_state.input().at(0), PinState(5, "some name", false));
 
   EXPECT_TRUE(io_state.output().empty());
+=======
+  const auto inputs{ IOState().input() };
+  ASSERT_FALSE(inputs.empty());
+  for (const auto& input : inputs)
+  {
+    EXPECT_FALSE(input.state());
+  }
+>>>>>>> Update unittest_io_state and partly fix overall tests compilation
 }
 
-TEST(IOStateTests, shouldOnlyContainAddedOutputPinState)
+TEST(IOStateTests, shouldReturnOutputsWhereAllAreUnsetWhenDefaultConstructed)
 {
+<<<<<<< HEAD
   IOState io_state({}, { PinState(5, "some name", false) });
 
   EXPECT_TRUE(io_state.input().empty());
 
   EXPECT_EQ(io_state.output().size(), 1u);
   EXPECT_EQ(io_state.output().at(0), PinState(5, "some name", false));
+=======
+  const auto outputs{ IOState().output() };
+  ASSERT_FALSE(outputs.empty());
+  for (const auto& output : outputs)
+  {
+    EXPECT_FALSE(output.state());
+  }
+>>>>>>> Update unittest_io_state and partly fix overall tests compilation
 }
 
-TEST(IOStateTests, shouldContainAllInputPinStatesInCorrectOrder)
+TEST(IOStateTests, shouldReturnInputsWhereOneIsSetViaConstructor)
 {
-  std::vector<PinState> pins{ PinState(1, "a", false), PinState(5, "b", true), PinState(3, "c", false) };
-  IOState io_state(pins, {});
-
-  ASSERT_EQ(io_state.input().size(), 3u);
-  for (size_t i = 0; i < pins.size(); ++i)
+  const auto inputs{ IOState({ { 3, "pin_name", true } }, {}).input() };  // make sure to not use "unused" bits
+  ASSERT_CONTAINS_WITH_PROPERTY_EQ(inputs, id, 3);
+  for (const auto& input : inputs)
   {
-    EXPECT_EQ(io_state.input().at(i), pins.at(i));
+    if (input.id() == 3)
+      EXPECT_TRUE(input.state());
+    else
+      EXPECT_FALSE(input.state());
   }
 }
 
-TEST(IOStateTests, shouldContainAllOutputPinStatesInCorrectOrder)
+TEST(IOStateTests, shouldReturnOutputsWhereOneIsSetViaConstructor)
 {
-  std::vector<PinState> pins{ PinState(1, "a", false), PinState(5, "b", true), PinState(3, "c", false) };
-  IOState io_state({}, pins);
-
-  ASSERT_EQ(io_state.output().size(), 3u);
-  for (size_t i = 0; i < pins.size(); ++i)
+  const auto outputs{ IOState({}, { { 3, "pin_name", true } }).output() };  // make sure to not use "unused" bits
+  ASSERT_CONTAINS_WITH_PROPERTY_EQ(outputs, id, 3);
+  for (const auto& output : outputs)
   {
-    EXPECT_EQ(io_state.output().at(i), pins.at(i));
+    if (output.id() == 3)
+      EXPECT_TRUE(output.state());
+    else
+      EXPECT_FALSE(output.state());
   }
+}
+
+using namespace psen_scan_v2_standalone;
+
+static inline data_conversion_layer::monitoring_frame::io::PinData createPinData()
+{
+  data_conversion_layer::monitoring_frame::io::PinData pin_data;
+  pin_data.inputPinState(5, 1, true);   // make sure to not use "unused" bits
+  pin_data.outputPinState(0, 2, true);  // make sure to not use "unused" bits
+  return pin_data;
+}
+
+TEST(IOStateTests, shouldReturnInputsEqualToConvertedInputPinData)
+{
+  const auto pin_data{ createPinData() };
+  const auto inputs{ IOState(pin_data).input() };
+  EXPECT_EQ(inputs, data_conversion_layer::generateInputPinStates(pin_data));
+}
+
+TEST(IOStateTests, shouldReturnOutputsEqualToConvertedOutputPinData)
+{
+  const auto pin_data{ createPinData() };
+  const auto outputs{ IOState(pin_data).output() };
+  EXPECT_EQ(outputs, data_conversion_layer::generateOutputPinStates(pin_data));
 }
 
 }  // namespace psen_scan_v2_standalone_test

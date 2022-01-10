@@ -165,9 +165,9 @@ TEST(LaserScanTest, testSetAndGetIOStates)
   std::unique_ptr<LaserScan> laser_scan;
   ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
 
-  laser_scan->ioStates({ DEFAULT_IO_STATE });
-  EXPECT_EQ(laser_scan->ioStates()[0].input(), DEFAULT_IO_STATE.input());
-  EXPECT_EQ(laser_scan->ioStates()[0].output(), DEFAULT_IO_STATE.output());
+  laser_scan->setIOStates({ DEFAULT_IO_STATE });
+  EXPECT_EQ(laser_scan->getIOStates()[0].input(), DEFAULT_IO_STATE.input());
+  EXPECT_EQ(laser_scan->getIOStates()[0].output(), DEFAULT_IO_STATE.output());
 }
 
 TEST(LaserScanTest, testPrintMessageSuccess)

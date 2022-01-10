@@ -46,12 +46,14 @@ static inline PinState generateOutputPinState(const monitoring_frame::io::PinDat
 static inline std::vector<PinState> generateInputPinStates(const monitoring_frame::io::PinData& pin_data)
 {
   std::vector<PinState> pin_states;
-  for (std::size_t byte_n = 0, bit_n = 0; byte_n < monitoring_frame::io::NUMBER_OF_INPUT_BYTES && bit_n < 8;
-       ++byte_n, ++bit_n)
+  for (std::size_t byte_n = 0; byte_n < monitoring_frame::io::NUMBER_OF_INPUT_BYTES; ++byte_n)
   {
-    if (monitoring_frame::io::getInputType(byte_n, bit_n) != monitoring_frame::io::LogicalInputType::unused)
+    for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
     {
-      pin_states.emplace_back(generateInputPinState(pin_data, byte_n, bit_n));
+      if (monitoring_frame::io::getInputType(byte_n, bit_n) != monitoring_frame::io::LogicalInputType::unused)
+      {
+        pin_states.emplace_back(generateInputPinState(pin_data, byte_n, bit_n));
+      }
     }
   }
   return pin_states;
@@ -60,12 +62,14 @@ static inline std::vector<PinState> generateInputPinStates(const monitoring_fram
 static inline std::vector<PinState> generateOutputPinStates(const monitoring_frame::io::PinData& pin_data)
 {
   std::vector<PinState> pin_states;
-  for (std::size_t byte_n = 0, bit_n = 0; byte_n < monitoring_frame::io::NUMBER_OF_OUTPUT_BYTES && bit_n < 8;
-       ++byte_n, ++bit_n)
+  for (std::size_t byte_n = 0; byte_n < monitoring_frame::io::NUMBER_OF_OUTPUT_BYTES; ++byte_n)
   {
-    if (monitoring_frame::io::getOutputType(byte_n, bit_n) != monitoring_frame::io::OutputType::unused)
+    for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
     {
-      pin_states.emplace_back(generateOutputPinState(pin_data, byte_n, bit_n));
+      if (monitoring_frame::io::getOutputType(byte_n, bit_n) != monitoring_frame::io::OutputType::unused)
+      {
+        pin_states.emplace_back(generateOutputPinState(pin_data, byte_n, bit_n));
+      }
     }
   }
   return pin_states;

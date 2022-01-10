@@ -129,8 +129,8 @@ MATCHER_P(UInt8MsgDataEq, data, "")
 MATCHER_P(ZoneSwitchingInputIsTrue, zone_id, "")
 {
   const std::string pin_name{ "Zone Set Switching Input " + std::to_string(zone_id) };
-  const auto it =
-      std::find_if(arg.input.begin(), arg.input.end(), [pin_name](const auto& pin) { return pin.name == pin_name; });
+  const auto it = std::find_if(
+      arg.input.begin(), arg.input.end(), [pin_name](const auto& pin) { return pin.name == pin_name; });
   if (it == arg.input.end())
   {
     *result_listener << "Pin " << pin_name << " not found";
