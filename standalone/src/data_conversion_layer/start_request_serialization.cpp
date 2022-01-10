@@ -75,7 +75,7 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
   /**< The following 'enable' fields are a 1-byte mask each.
    * Only the last 4 bits (little endian) are used, each of which represents a device.
    * For example, (1000) only enables the Master device, while (1010) enables both the Master
-   * and the second Slave device.
+   * and the second Subscriber device.
    */
 
   const uint8_t device_enabled{ 0b00001000 };
@@ -118,11 +118,12 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
                  end,
                  resolution);
 
-  for (const auto& slave : msg.slaves_)
+  for (const auto& subscriber :
+       msg.subscribers_)  // Note: This refers to the scanner type subscriber, *not* a ros subscriber
   {
-    raw_processing::write(os, slave.getScanRange().getStart().value());
-    raw_processing::write(os, slave.getScanRange().getEnd().value());
-    raw_processing::write(os, slave.getResolution().value());
+    raw_processing::write(os, subscriber.getScanRange().getStart().value());
+    raw_processing::write(os, subscriber.getScanRange().getEnd().value());
+    raw_processing::write(os, subscriber.getResolution().value());
   }
 
   const std::string raw_data_as_str{ os.str() };

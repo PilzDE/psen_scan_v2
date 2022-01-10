@@ -49,7 +49,7 @@ public:
 
 private:
   /**
-   * @brief Class describing the scan settings of the master and slave devices.
+   * @brief Class describing the scan settings of the master and subscriber devices.
    *
    * The settings include the scan range and the scan resolution of the respective device.
    */
@@ -69,7 +69,7 @@ private:
   };
 
   /**
-   * @brief Class describing the fundamental settings of the master and slave devices, like id and diagnostics.
+   * @brief Class describing the fundamental settings of the master and subscriber devices, like id and diagnostics.
    */
   class DeviceSettings
   {
@@ -86,7 +86,7 @@ private:
   };
 
 private:
-  static constexpr std::size_t NUM_SLAVES{ 3 };
+  static constexpr std::size_t NUM_SUBSCRIBERS{ 3 };
 
 private:
   const uint32_t host_ip_;  ///< network byte order = big endian
@@ -94,7 +94,8 @@ private:
 
   const DeviceSettings master_device_settings_;
   const LaserScanSettings master_;
-  const std::array<LaserScanSettings, NUM_SLAVES> slaves_;
+  const std::array<LaserScanSettings, NUM_SUBSCRIBERS> subscribers_;  // Note: This refers to the scanner type
+                                                                      // subscriber, *not* a ros subscriber
 };
 
 constexpr Message::LaserScanSettings::LaserScanSettings(const ScanRange& scan_range,
