@@ -170,6 +170,7 @@ void LaserScan::intensities(const IntensityData& intensities)
   intensities_ = intensities;
 }
 
+// LCOV_EXCL_START
 void LaserScan::setIOStates(const IOData& io_states)
 {
   ioStates(io_states);
@@ -179,6 +180,7 @@ const LaserScan::IOData& LaserScan::getIOStates() const
 {
   return ioStates();
 }
+// LCOV_EXCL_STOP
 
 void LaserScan::ioStates(const IOData& io_states)
 {
