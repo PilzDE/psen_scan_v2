@@ -110,7 +110,7 @@ public:
   void intensities(const IntensityData& intensities);
 
   /*! deprecated: use const IOData& ioStates() const instead */
-  [[deprecated("use const IOData& getIOStates() const instead")]] const IOData& getIOStates() const;
+  [[deprecated("use const IOData& ioStates() const instead")]] const IOData& getIOStates() const;
   const IOData& ioStates() const;
 
   /*! deprecated: use void ioStates(const IOData& io_states) instead */
