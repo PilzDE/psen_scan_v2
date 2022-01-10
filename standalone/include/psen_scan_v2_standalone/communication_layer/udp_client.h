@@ -149,12 +149,6 @@ public:
 
   /**
    * @brief Returns local ip address of current socket connection.
-   * deprecated: use boost::asio::ip::address_v4 hostIp() instead
-   */
-  [[deprecated("use boost::asio::ip::address_v4 hostIp() instead")]] boost::asio::ip::address_v4 getHostIp();
-
-  /**
-   * @brief Returns local ip address of current socket connection.
    */
   boost::asio::ip::address_v4 hostIp();
 
@@ -248,11 +242,6 @@ inline void UdpClientImpl::close()
 inline boost::asio::ip::address_v4 UdpClientImpl::hostIp()
 {
   return socket_.local_endpoint().address().to_v4();
-}
-
-inline boost::asio::ip::address_v4 UdpClientImpl::getHostIp()
-{
-  return this->hostIp();
 }
 
 inline UdpClientImpl::~UdpClientImpl()

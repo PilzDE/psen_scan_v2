@@ -99,12 +99,6 @@ public:
    * there is an expected brake in the receiving of MonitoringFrames.
    */
   void reset();
-
-  /*! deprecated: use std::vector<data_conversion_layer::monitoring_frame::MessageStamped> currentRound() instead */
-  [[deprecated("use std::vector<data_conversion_layer::monitoring_frame::MessageStamped> currentRound() "
-               "instead")]] std::vector<data_conversion_layer::monitoring_frame::MessageStamped>
-  getMsgs();
-
   std::vector<data_conversion_layer::monitoring_frame::MessageStamped> currentRound();
 
   bool isRoundComplete();
@@ -130,11 +124,6 @@ inline void ScanBuffer::reset()
 inline std::vector<data_conversion_layer::monitoring_frame::MessageStamped> ScanBuffer::currentRound()
 {
   return current_round_;
-}
-
-inline std::vector<data_conversion_layer::monitoring_frame::MessageStamped> ScanBuffer::getMsgs()
-{
-  return this->currentRound();
 }
 
 inline bool ScanBuffer::isRoundComplete()

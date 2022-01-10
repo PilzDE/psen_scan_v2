@@ -152,21 +152,9 @@ public:
   using BitLocation = size_t;
   constexpr ErrorLocation(const ByteLocation& byte, const BitLocation& bit) : byte_(byte), bit_(bit){};
 
-  /*! deprecated: use inline constexpr ByteLocation byte() const instead */
-  [[deprecated("use inline constexpr ByteLocation byte() const instead")]] inline constexpr ByteLocation getByte() const
-  {
-    return this->byte();
-  };
-
   inline constexpr ByteLocation byte() const
   {
     return byte_;
-  };
-
-  /*! deprecated: use inline constexpr BitLocation bit() const instead */
-  [[deprecated("use inline constexpr BitLocation bit() const instead")]] inline constexpr BitLocation getBit() const
-  {
-    return this->bit();
   };
 
   inline constexpr BitLocation bit() const
@@ -198,34 +186,14 @@ public:
 
   friend RawChunk serialize(const std::vector<diagnostic::Message>& messages);
 
-  /*! deprecated: use constexpr configuration::ScannerId scannerId() const instead */
-  [[deprecated("use constexpr configuration::ScannerId scannerId() const instead")]] constexpr configuration::ScannerId
-  getScannerId() const
-  {
-    return this->scannerId();
-  }
-
   constexpr configuration::ScannerId scannerId() const
   {
     return id_;
   }
 
-  /*! deprecated: use constexpr ErrorLocation errorLocation() const instead */
-  [[deprecated("use constexpr ErrorLocation errorLocation() const instead")]] constexpr ErrorLocation
-  getErrorLocation() const
-  {
-    return this->errorLocation();
-  }
-
   constexpr ErrorLocation errorLocation() const
   {
     return error_location_;
-  }
-
-  /*! deprecated: use constexpr ErrorType diagnosticCode() const instead */
-  [[deprecated("use constexpr ErrorType diagnosticCode() const instead")]] constexpr ErrorType getDiagnosticCode() const
-  {
-    return this->diagnosticCode();
   }
 
   constexpr ErrorType diagnosticCode() const

@@ -60,16 +60,7 @@ private:
     constexpr LaserScanSettings(const ScanRange& scan_range, const util::TenthOfDegree& resolution);
 
   public:
-    /*! deprecated: use constexpr const ScanRange& scanRange() const instead */
-    [[deprecated("use constexpr const ScanRange& scanRange() const instead")]] constexpr const ScanRange&
-    getScanRange() const;
-
     constexpr const ScanRange& scanRange() const;
-
-    /*! deprecated: use constexpr util::TenthOfDegree resolution() const instead */
-    [[deprecated("use constexpr util::TenthOfDegree resolution() const instead")]] constexpr util::TenthOfDegree
-    getResolution() const;
-
     constexpr util::TenthOfDegree resolution() const;
 
   private:
@@ -120,16 +111,6 @@ constexpr const ScanRange& Message::LaserScanSettings::scanRange() const
 constexpr util::TenthOfDegree Message::LaserScanSettings::resolution() const
 {
   return resolution_;
-};
-
-constexpr const ScanRange& Message::LaserScanSettings::getScanRange() const
-{
-  return this->scanRange();
-};
-
-constexpr util::TenthOfDegree Message::LaserScanSettings::getResolution() const
-{
-  return this->resolution();
 };
 
 constexpr Message::DeviceSettings::DeviceSettings(const bool diagnostics_enabled, const bool intensities_enabled)
