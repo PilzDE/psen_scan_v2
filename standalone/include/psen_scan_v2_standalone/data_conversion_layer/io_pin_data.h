@@ -55,9 +55,8 @@ struct PinData
 // LCOV_EXCL_START
 inline std::ostream& operator<<(std::ostream& os, const PinData& pd)
 {
-  return os << fmt::format("io::PinData(input = {}, output = {})",
-                           util::formatRange(pd.input),
-                           util::formatRange(pd.output));
+  return os << fmt::format(
+             "io::PinData(input = {}, output = {})", util::formatRange(pd.input), util::formatRange(pd.output));
 }
 // LCOV_EXCL_STOP
 
