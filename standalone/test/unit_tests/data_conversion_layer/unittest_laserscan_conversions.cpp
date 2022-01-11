@@ -220,8 +220,12 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectIOStateAfterConversi
   EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->ioStates(), stamped_msg.msg_.iOPinData(), /*start index*/ 0);
 =======
   ASSERT_EQ(scan_ptr->getIOStates().size(), 1u);
+<<<<<<< HEAD
   EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msg.msg_.iOPinData(), /*index*/ 0);
 >>>>>>> Updating some tests
+=======
+  EXPECT_EQ(scan_ptr->getIOStates().at(0), IOState(stamped_msg.msg_.iOPinData()));
+>>>>>>> Fix more unittests, introduce IOState::operator==
 }
 
 /////////////////////////////////////////
@@ -319,10 +323,14 @@ TEST(LaserScanConversionsTest, laserScanShouldContainAllIOStates)
   for (size_t i = 0; i < msg_count; i++)
   {
 <<<<<<< HEAD
+<<<<<<< HEAD
     EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->ioStates(), stamped_msgs.at(i).msg_.iOPinData(), /*start index*/ i);
 =======
     EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msgs.at(i).msg_.iOPinData(), /*index*/ i);
 >>>>>>> Updating some tests
+=======
+    EXPECT_EQ(scan_ptr->getIOStates().at(i), IOState(stamped_msgs.at(i).msg_.iOPinData()));
+>>>>>>> Fix more unittests, introduce IOState::operator==
   }
 }
 
@@ -343,10 +351,16 @@ TEST(LaserScanConversionsTest, laserScanShouldContainAllIOStatesInCorrectOrder)
   EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->ioStates(), stamped_msgs.at(0).msg_.iOPinData(), /*scan start index*/ 2);
 =======
   ASSERT_EQ(scan_ptr->getIOStates().size(), msg_count);
+<<<<<<< HEAD
   EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msgs.at(2).msg_.iOPinData(), /*scan index*/ 0);
   EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msgs.at(1).msg_.iOPinData(), /*scan index*/ 1);
   EXPECT_IO_STATE_EQ_IO_PIN(scan_ptr->getIOStates(), stamped_msgs.at(0).msg_.iOPinData(), /*scan index*/ 2);
 >>>>>>> Updating some tests
+=======
+  EXPECT_EQ(scan_ptr->getIOStates().at(0), IOState(stamped_msgs.at(2).msg_.iOPinData()));
+  EXPECT_EQ(scan_ptr->getIOStates().at(1), IOState(stamped_msgs.at(1).msg_.iOPinData()));
+  EXPECT_EQ(scan_ptr->getIOStates().at(2), IOState(stamped_msgs.at(0).msg_.iOPinData()));
+>>>>>>> Fix more unittests, introduce IOState::operator==
 }
 
 TEST(LaserScanConversionsTest, laserScanShouldContainActiveZonesetOfLastMsg)

@@ -36,8 +36,8 @@ namespace psen_scan_v2_standalone_test
 static data_conversion_layer::monitoring_frame::Message createMsg()
 {
   data_conversion_layer::monitoring_frame::io::PinData io_pin_data;
-  io_pin_data.input = { PinState(3, "zone1", true) };
-  io_pin_data.output = { PinState(1, "OSSD", false) };
+  io_pin_data.inputPinState(0, 3, true);
+  io_pin_data.outputPinState(0, 1, false);
 
   return data_conversion_layer::monitoring_frame::MessageBuilder()
       .fromTheta(util::TenthOfDegree{ 10 })

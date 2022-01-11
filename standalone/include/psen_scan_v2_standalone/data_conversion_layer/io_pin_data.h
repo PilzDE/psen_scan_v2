@@ -89,6 +89,8 @@ public:
   const std::array<std::bitset<8>, NUMBER_OF_INPUT_BYTES>& inputState() const;
   const std::array<std::bitset<8>, NUMBER_OF_OUTPUT_BYTES>& outputState() const;
 
+  bool operator==(const PinData& pin_data) const;
+
 private:
   std::array<std::bitset<8>, NUMBER_OF_INPUT_BYTES> input_states_{};
   std::array<std::bitset<8>, NUMBER_OF_OUTPUT_BYTES> output_states_{};
@@ -132,6 +134,11 @@ inline const std::array<std::bitset<8>, NUMBER_OF_INPUT_BYTES>& PinData::inputSt
 inline const std::array<std::bitset<8>, NUMBER_OF_OUTPUT_BYTES>& PinData::outputState() const
 {
   return output_states_;
+}
+
+inline bool PinData::operator==(const PinData& pin_data) const
+{
+  return input_states_ == pin_data.input_states_ && output_states_ == pin_data.output_states_;
 }
 
 // LCOV_EXCL_START

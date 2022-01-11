@@ -58,6 +58,9 @@ public:
   std::vector<PinState> input() const;
   std::vector<PinState> output() const;
 
+  bool operator==(const IOState& io_state) const;
+  bool operator!=(const IOState& io_state) const;
+
 private:
   data_conversion_layer::monitoring_frame::io::PinData pin_data_{};
 };

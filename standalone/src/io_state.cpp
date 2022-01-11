@@ -74,6 +74,16 @@ IOState::IOState(data_conversion_layer::monitoring_frame::io::PinData pin_data) 
 {
 }
 
+bool IOState::operator==(const IOState& io_state) const
+{
+  return pin_data_ == io_state.pin_data_;
+}
+
+bool IOState::operator!=(const IOState& io_state) const
+{
+  return !operator==(io_state);
+}
+
 std::vector<PinState> IOState::input() const
 {
   return data_conversion_layer::generateInputPinStates(pin_data_);
