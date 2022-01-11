@@ -55,7 +55,7 @@ void ActiveZonesetNode::updateMarkers()
   {
     try
     {
-      auto new_markers = toMarkers(getActiveZoneset());
+      auto new_markers = toMarkers(activeZoneset());
       if (!containLastMarkers(new_markers))
       {
         deleteLastMarkers();
@@ -77,10 +77,17 @@ bool ActiveZonesetNode::isAllInformationAvailable() const
   return active_zoneset_id_.is_initialized() && zoneset_config_.is_initialized();
 }
 
-ZoneSet ActiveZonesetNode::getActiveZoneset() const
+ZoneSet ActiveZonesetNode::activeZoneset() const
 {
   return zoneset_config_->zonesets.at(active_zoneset_id_->data);
 }
+
+// LCOV_EXCL_START
+ZoneSet ActiveZonesetNode::getActiveZoneset() const
+{
+  return this->activeZoneset();
+}
+// LCOV_EXCL_STOP
 
 void ActiveZonesetNode::addMarkers(std::vector<visualization_msgs::Marker>& new_markers)
 {
