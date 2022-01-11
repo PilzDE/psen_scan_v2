@@ -37,8 +37,6 @@
 #include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/scan_range.h"
 
-#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
-
 namespace psen_scan_v2_standalone_test
 {
 using namespace psen_scan_v2_standalone;
@@ -95,9 +93,9 @@ createMonitoringFrameMsgBuilderWithoutDiagnostics(const util::TenthOfDegree star
 
   msg_builder.intensities(generateIntensities(num_elements, lowest_intensity, highest_intensity));
 
-  auto pin_data = createCompleteIOPinData();  // A valid frame contains a complete set of pin data
-  setInputPin(pin_data, data_conversion_layer::monitoring_frame::io::LogicalInputType::muting_1_a);
-  setOutputPin(pin_data, data_conversion_layer::monitoring_frame::io::OutputType::safe_1_int);
+  data_conversion_layer::monitoring_frame::io::PinData pin_data;
+  pin_data.inputPinState(5, 4, true);
+  pin_data.outputPinState(0, 3, true);
   msg_builder.iOPinData(pin_data);
 
   return msg_builder;
