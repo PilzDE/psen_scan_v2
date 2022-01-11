@@ -73,7 +73,7 @@ static void addUdpData(TestData& test_data, const udp_data::UdpData& udp_data)
       });
       if (it != test_data.end())
       {
-        it->setFirstFrameTime(secToNSec(udp_datum.timestamp_sec_));
+        it->firstFrameTime(secToNSec(udp_datum.timestamp_sec_));
       }
     }
   }
@@ -95,7 +95,7 @@ static void sortWithRespectToScanCounter(TestData& test_data)
 
 static void extractDataFromScan(TestData& test_data, const LaserScan& scan)
 {
-  test_data.push_back(TestDatum(scan.getScanCounter(), scan.getTimestamp(), util::getCurrentTime()));
+  test_data.push_back(TestDatum(scan.scanCounter(), scan.timestamp(), util::getCurrentTime()));
 }
 
 static std::unique_ptr<TestData> assemble(const ScannerConfiguration& scanner_config,

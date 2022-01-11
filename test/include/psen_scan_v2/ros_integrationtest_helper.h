@@ -117,7 +117,7 @@ bool isConnected(SubscriberMock<visualization_msgs::MarkerConstPtr>& subscriber,
   const auto start_time = ros::Time::now();
   while (ros::ok())
   {
-    if (subscriber.getSubscriber().getNumPublishers() > 0)
+    if (subscriber.subscriber().getNumPublishers() > 0)
     {
       return true;
     }

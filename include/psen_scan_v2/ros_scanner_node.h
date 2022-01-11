@@ -133,12 +133,12 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
     pub_scan_.publish(laser_scan_msg);
 
     std_msgs::UInt8 active_zoneset;
-    active_zoneset.data = scan.getActiveZoneset();
+    active_zoneset.data = scan.activeZoneset();
     pub_zone_.publish(active_zoneset);
 
-    for (const auto& io : scan.getIOStates())
+    for (const auto& io : scan.ioStates())
     {
-      pub_io_.publish(toIOStateMsg(io, tf_prefix_, scan.getTimestamp()));
+      pub_io_.publish(toIOStateMsg(io, tf_prefix_, scan.timestamp()));
     }
   }
   // LCOV_EXCL_START

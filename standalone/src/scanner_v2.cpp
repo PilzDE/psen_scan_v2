@@ -40,7 +40,7 @@ std::unique_ptr<util::Watchdog> WatchdogFactory::create(const util::Watchdog::Ti
 
 ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback)
   : IScanner(scanner_config, laser_scan_callback)
-  , sm_(new ScannerStateMachine(IScanner::getConfig(),
+  , sm_(new ScannerStateMachine(IScanner::config(),
                                 // LCOV_EXCL_START
                                 // The following includes calls to std::bind which are not marked correctly
                                 // by some gcc versions, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96006
@@ -52,7 +52,7 @@ ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScan
                                 BIND_EVENT(MonitoringFrameReceivedError),
                                 std::bind(&ScannerV2::scannerStartedCallback, this),
                                 std::bind(&ScannerV2::scannerStoppedCallback, this),
-                                IScanner::getLaserScanCallback(),
+                                IScanner::laserScanCallback(),
                                 BIND_EVENT(scanner_events::StartTimeout),
                                 BIND_EVENT(scanner_events::MonitoringFrameTimeout)))
 // LCOV_EXCL_STOP

@@ -37,7 +37,7 @@ void laserScanCallback(const LaserScan& scan)
 {
   // Other data fields are listed on
   // https://docs.ros.org/en/melodic/api/psen_scan_v2/html/classpsen__scan__v2__standalone_1_1LaserScan.html
-  PSENSCAN_INFO_THROTTLE(1 /* sec */, "laserScanCallback()", "Ranges {}", util::formatRange(scan.getMeasurements()));
+  PSENSCAN_INFO_THROTTLE(1 /* sec */, "laserScanCallback()", "Ranges {}", util::formatRange(scan.measurements()));
 }
 
 int main(int argc, char** argv)

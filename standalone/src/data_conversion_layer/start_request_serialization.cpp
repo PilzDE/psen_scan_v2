@@ -98,9 +98,9 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
   raw_processing::write(os, speed_encoder_enabled);
   raw_processing::write(os, diagnostics_enabled);
 
-  const auto start = msg.master_.getScanRange().getStart().value();
-  auto end = msg.master_.getScanRange().getEnd().value();
-  const auto resolution = msg.master_.getResolution().value();
+  const auto start = msg.master_.scanRange().start().value();
+  auto end = msg.master_.scanRange().end().value();
+  const auto resolution = msg.master_.resolution().value();
 
   /* In order to get all the data points we want, the scanner needs a value
      that is strictly greater than the end point */
@@ -121,9 +121,9 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
   for (const auto& subscriber :
        msg.subscribers_)  // Note: This refers to the scanner type subscriber, *not* a ros subscriber
   {
-    raw_processing::write(os, subscriber.getScanRange().getStart().value());
-    raw_processing::write(os, subscriber.getScanRange().getEnd().value());
-    raw_processing::write(os, subscriber.getResolution().value());
+    raw_processing::write(os, subscriber.scanRange().start().value());
+    raw_processing::write(os, subscriber.scanRange().end().value());
+    raw_processing::write(os, subscriber.resolution().value());
   }
 
   const std::string raw_data_as_str{ os.str() };
