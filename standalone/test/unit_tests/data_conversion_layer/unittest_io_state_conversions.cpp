@@ -158,6 +158,26 @@ TEST(IOStateConversionsTest, shouldReturnOutputPinStatesForAllUsedOutputsWithout
   }
 }
 
+TEST(IOStateConversionsTest, shouldCorrectlyUpdatePinData)
+{
+  PinData pin_data;
+  data_conversion_layer::updatePinData(pin_data, { { 3, "pin_name", true } }, { { 4, "pin_name", true } });
+  for (std::size_t byte_n = 0; byte_n < data_conversion_layer::monitoring_frame::io::NUMBER_OF_INPUT_BYTES; ++byte_n)
+  {
+    for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
+    {
+      EXPECT_EQ(pin_data.inputPinState(byte_n, bit_n), createId(byte_n, bit_n) == 3);
+    }
+  }
+  for (std::size_t byte_n = 0; byte_n < data_conversion_layer::monitoring_frame::io::NUMBER_OF_OUTPUT_BYTES; ++byte_n)
+  {
+    for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
+    {
+      EXPECT_EQ(pin_data.outputPinState(byte_n, bit_n), createId(byte_n, bit_n) == 4);
+    }
+  }
+}
+
 }  // namespace psen_scan_v2_standalone_test
 
 int main(int argc, char** argv)

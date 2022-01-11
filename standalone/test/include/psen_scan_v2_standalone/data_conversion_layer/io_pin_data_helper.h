@@ -18,10 +18,6 @@
 
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 
-namespace psen_scan_v2_standalone_test
-{
-using namespace psen_scan_v2_standalone;
-
 // template <typename PinType, size_t ChunkSize>
 // inline std::vector<PinState>
 // createCompletePinField(const std::array<std::array<PinType, 8>, ChunkSize>& type_lookup_array,
@@ -80,6 +76,5 @@ using namespace psen_scan_v2_standalone;
 //   }
 //   setPin(*it);
 // }
-}  // namespace psen_scan_v2_standalone_test
 
 #endif  // PSEN_SCAN_V2_STANDALONE_TEST_IO_PIN_DATA_HELPER_H
