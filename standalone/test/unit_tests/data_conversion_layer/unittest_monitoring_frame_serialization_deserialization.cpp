@@ -32,7 +32,6 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_helper.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_serialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
 #include "psen_scan_v2_standalone/communication_layer/udp_frame_dumps.h"
 #include "psen_scan_v2_standalone/util/gtest_expectations.h"
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
@@ -141,9 +140,9 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
            "this test.";
   }
 
-  auto pin_data = createCompleteIOPinData();
-  setInputPin(pin_data, LogicalInputType::muting_1_a);
-  setOutputPin(pin_data, OutputType::safe_1_int);
+  monitoring_frame::io::PinData pin_data;
+  pin_data.inputPinState(5, 4, true);
+  pin_data.outputPinState(0, 5, true);
 
   auto msg =
       monitoring_frame::MessageBuilder()
@@ -350,57 +349,29 @@ TEST_F(MonitoringFrameDeserializationTest, shouldNotSetIOStateIfIOStateWasMissin
   EXPECT_FALSE(msg.hasIOPinField());
 }
 
-TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectLogicalInputField)
+TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectInputField)
 {
   auto raw = convertToRawData(std::array<uint8_t, 8>{ 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x00 });
   std::stringstream ss;
   ss.write(raw.data(), 8);
-  auto input = deserializePinField(ss, 8, LOGICAL_INPUT_BITS, LOGICAL_INPUT_BIT_TO_NAME);
+  std::array<std::bitset<8>, 8> input;
+  io::deserializePinField(ss, input);
 
-  std::vector<PinState> expected_states{
-    PinState(0, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_0), true),
-    PinState(1, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_1), false),
-    PinState(2, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_2), true),
-    PinState(3, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_3), false),
-    PinState(4, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_4), true),
-    PinState(5, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_5), false),
-    PinState(6, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_6), true),
-    PinState(7, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_bit_7), false),
-
-    // unused bytes
-
-    PinState(32, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::muting_1_a), true),
-    PinState(33, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::muting_2_a), false),
-    // unused bit
-    PinState(35, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::overr_1_a), false),
-    PinState(36, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::overr_2_a), true),
-    // unused bit
-    PinState(38, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_1), true),
-    PinState(39, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_2), false),
-
-    PinState(40, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_3), true),
-    PinState(41, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_4), false),
-    PinState(42, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_5), true),
-    PinState(43, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_6), false),
-    PinState(44, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_7), true),
-    PinState(45, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::zone_sw_8), false),
-    PinState(46, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::reset_a), true),
-    // unused bit
-
-    PinState(48, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::restart_1_a), true),
-    PinState(49, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::mut_en_1_a), false),
-    PinState(50, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::cor_seq_mut_1), true),
-    PinState(51, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::cor_seq_or_1), false),
-    // unused bit
-    PinState(53, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::restart_2_a), false),
-    PinState(54, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::mut_en_2_a), true),
-    PinState(55, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::cor_seq_mut_2), false),
-
-    PinState(56, LOGICAL_INPUT_BIT_TO_NAME.at(LogicalInputType::cor_seq_or_2), false),
-    // unused bits
-  };
-
-  EXPECT_CONTAINER_UNORDERED_EQ(input, expected_states);
+  for (std::size_t byte_n = 0; byte_n < 7; ++byte_n)
+  {
+    for (std::size_t bit_n = 0; bit_n < 8; ++(++bit_n))
+    {
+      EXPECT_TRUE(input.at(byte_n).test(bit_n));
+    }
+    for (std::size_t bit_n = 1; bit_n < 8; ++(++bit_n))
+    {
+      EXPECT_FALSE(input.at(byte_n).test(bit_n));
+    }
+  }
+  for (std::size_t bit_n = 1; bit_n < 8; ++bit_n)
+  {
+    EXPECT_FALSE(input.at(7).test(bit_n));
+  }
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectOutputField)
@@ -408,25 +379,24 @@ TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectOutputField)
   auto raw = convertToRawData(std::array<uint8_t, 4>{ 0x55, 0x55, 0x55, 0x00 });
   std::stringstream ss;
   ss.write(raw.data(), 4);
-  auto output = deserializePinField(ss, 4, OUTPUT_BITS, OUTPUT_BIT_TO_NAME);
+  std::array<std::bitset<8>, 4> output;
+  io::deserializePinField(ss, output);
 
-  std::vector<PinState> expected_states{
-    PinState(0, OUTPUT_BIT_TO_NAME.at(OutputType::safe_1_int), true),
-    PinState(1, OUTPUT_BIT_TO_NAME.at(OutputType::int_lock_1), false),
-    PinState(2, OUTPUT_BIT_TO_NAME.at(OutputType::safe_2_int), true),
-    PinState(3, OUTPUT_BIT_TO_NAME.at(OutputType::int_lock_2), false),
-    PinState(4, OUTPUT_BIT_TO_NAME.at(OutputType::safe_3_int), true),
-    // unused bit
-    PinState(6, OUTPUT_BIT_TO_NAME.at(OutputType::warn_1_int), true),
-    PinState(7, OUTPUT_BIT_TO_NAME.at(OutputType::warn_2_int), false),
-
-    // unused bytes
-
-    PinState(28, OUTPUT_BIT_TO_NAME.at(OutputType::ossd1_refpts), false),
-    // unused bits
-  };
-
-  EXPECT_CONTAINER_UNORDERED_EQ(output, expected_states);
+  for (std::size_t byte_n = 0; byte_n < 3; ++byte_n)
+  {
+    for (std::size_t bit_n = 0; bit_n < 8; ++(++bit_n))
+    {
+      EXPECT_TRUE(output.at(byte_n).test(bit_n));
+    }
+    for (std::size_t bit_n = 1; bit_n < 8; ++(++bit_n))
+    {
+      EXPECT_FALSE(output.at(byte_n).test(bit_n));
+    }
+  }
+  for (std::size_t bit_n = 1; bit_n < 8; ++bit_n)
+  {
+    EXPECT_FALSE(output.at(3).test(bit_n));
+  }
 }
 
 }  // namespace psen_scan_v2_standalone_test
