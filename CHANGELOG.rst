@@ -6,6 +6,7 @@ Forthcoming
 ------------------
 * Add IO state to LaserScan
 * Publish IO states to ~/io_state
+* Renaming Slave to Subscriber
 * Contributors: Pilz GmbH and Co. KG
 
 0.3.4 (2021-12-20)
