@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2021 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -23,7 +23,8 @@
 
 namespace psen_scan_v2_standalone_test
 {
-using psen_scan_v2_standalone::IOState;
+using namespace psen_scan_v2_standalone;
+using data_conversion_layer::monitoring_frame::io::PinData;
 
 TEST(IOStateTests, shouldReturnInputsWhereAllAreUnsetWhenDefaultConstructed)
 {
@@ -89,26 +90,18 @@ TEST(IOStateTests, shouldReturnOutputsWhereOneIsSetViaConstructor)
   }
 }
 
-using namespace psen_scan_v2_standalone;
-
-static inline data_conversion_layer::monitoring_frame::io::PinData createPinData()
-{
-  data_conversion_layer::monitoring_frame::io::PinData pin_data;
-  pin_data.inputPinState(5, 1, true);   // make sure to not use "unused" bits
-  pin_data.outputPinState(0, 2, true);  // make sure to not use "unused" bits
-  return pin_data;
-}
-
 TEST(IOStateTests, shouldReturnInputsEqualToConvertedInputPinData)
 {
-  const auto pin_data{ createPinData() };
+  PinData pin_data;
+  pin_data.inputPinState(5, 1, true);  // make sure to not use "unused" bits
   const auto inputs{ IOState(pin_data).input() };
   EXPECT_EQ(inputs, data_conversion_layer::generateInputPinStates(pin_data));
 }
 
 TEST(IOStateTests, shouldReturnOutputsEqualToConvertedOutputPinData)
 {
-  const auto pin_data{ createPinData() };
+  PinData pin_data;
+  pin_data.outputPinState(0, 2, true);  // make sure to not use "unused" bits
   const auto outputs{ IOState(pin_data).output() };
   EXPECT_EQ(outputs, data_conversion_layer::generateOutputPinStates(pin_data));
 }

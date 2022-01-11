@@ -168,6 +168,18 @@ TARGET_LINK_LIBRARIES(unittest_io_state
 ADD_TEST(NAME unittest_io_state
          COMMAND unittest_io_state)
 
+ADD_EXECUTABLE(unittest_io_state_conversions
+               test/unit_tests/api/unittest_io_state_conversions.cpp
+               src/io_state.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_io_state_conversions
+    ${PROJECT_NAME}
+    gtest
+)
+
+ADD_TEST(NAME unittest_io_state_conversions
+   COMMAND unittest_io_state_conversions)
+
 ADD_EXECUTABLE(unittest_logging test/unit_tests/util/unittest_logging.cpp)
 
 TARGET_LINK_LIBRARIES(unittest_logging

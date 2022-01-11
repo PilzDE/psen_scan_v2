@@ -365,6 +365,15 @@ if(CATKIN_ENABLE_TESTING)
     fmt::fmt
   )
 
+  catkin_add_gtest(unittest_io_state_conversions
+    standalone/test/unit_tests/data_conversion_layer/unittest_io_state_conversions.cpp
+    standalone/src/io_state.cpp
+  )
+  target_link_libraries(unittest_io_state_conversions
+    ${catkin_LIBRARIES}
+    fmt::fmt
+  )
+
   catkin_add_gmock(unittest_laserscan_conversions
     standalone/test/unit_tests/data_conversion_layer/unittest_laserscan_conversions.cpp
     standalone/src/io_state.cpp
