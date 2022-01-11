@@ -116,7 +116,7 @@ constexpr size_t calculateIndexInRawDiagnosticData(const configuration::ScannerI
                                                    const diagnostic::ErrorLocation& location)
 {
   return diagnostic::RAW_CHUNK_UNUSED_OFFSET_IN_BYTES +
-         (static_cast<uint8_t>(id) * diagnostic::RAW_CHUNK_LENGTH_FOR_ONE_DEVICE_IN_BYTES) + location.getByte();
+         (static_cast<uint8_t>(id) * diagnostic::RAW_CHUNK_LENGTH_FOR_ONE_DEVICE_IN_BYTES) + location.byte();
 }
 
 namespace diagnostic
@@ -127,8 +127,8 @@ RawChunk serialize(const std::vector<data_conversion_layer::monitoring_frame::di
 
   for (const auto& elem : messages)
   {
-    raw_diagnostic_data.at(calculateIndexInRawDiagnosticData(elem.getScannerId(), elem.getErrorLocation())) +=
-        (1 << elem.getErrorLocation().getBit());
+    raw_diagnostic_data.at(calculateIndexInRawDiagnosticData(elem.scannerId(), elem.errorLocation())) +=
+        (1 << elem.errorLocation().bit());
   }
   return raw_diagnostic_data;
 }

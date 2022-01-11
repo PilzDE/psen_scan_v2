@@ -120,8 +120,8 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::speed_encoder_enabled), 0));
   EXPECT_TRUE(DecodingEquals<uint8_t>(data, static_cast<size_t>(Offset::diagnostics_enabled), 0));
 
-  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::master_start_angle), scan_range.getStart().value()));
-  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::master_end_angle), scan_range.getEnd().value()));
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::master_start_angle), scan_range.start().value()));
+  EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::master_end_angle), scan_range.end().value()));
   EXPECT_TRUE(DecodingEquals(
       data, static_cast<size_t>(Offset::master_angle_resolution), data_conversion_layer::degreeToTenthDegree(1.0)));
 
@@ -149,10 +149,10 @@ TEST_F(StartRequestTest, endAngleIncreasedWhenMatchingDataPoint)
   const auto raw_start_request{ data_conversion_layer::start_request::serialize(
       data_conversion_layer::start_request::Message(config)) };
 
-  EXPECT_TRUE(DecodingEquals(
-      raw_start_request, static_cast<size_t>(Offset::master_start_angle), scan_range.getStart().value()));
+  EXPECT_TRUE(
+      DecodingEquals(raw_start_request, static_cast<size_t>(Offset::master_start_angle), scan_range.start().value()));
   EXPECT_TRUE(DecodingEquals<uint16_t>(
-      raw_start_request, static_cast<size_t>(Offset::master_end_angle), scan_range.getEnd().value() + 1));
+      raw_start_request, static_cast<size_t>(Offset::master_end_angle), scan_range.end().value() + 1));
   EXPECT_TRUE(
       DecodingEquals(raw_start_request, static_cast<size_t>(Offset::master_angle_resolution), resolution.value()));
 }

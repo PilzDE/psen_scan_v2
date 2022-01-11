@@ -151,11 +151,13 @@ public:
   using ByteLocation = size_t;
   using BitLocation = size_t;
   constexpr ErrorLocation(const ByteLocation& byte, const BitLocation& bit) : byte_(byte), bit_(bit){};
-  inline constexpr ByteLocation getByte() const
+
+  inline constexpr ByteLocation byte() const
   {
     return byte_;
   };
-  inline constexpr BitLocation getBit() const
+
+  inline constexpr BitLocation bit() const
   {
     return bit_;
   };
@@ -182,19 +184,21 @@ public:
   constexpr Message(const configuration::ScannerId& id, const diagnostic::ErrorLocation& location);
   constexpr bool operator==(const diagnostic::Message& rhs) const;
 
-  constexpr configuration::ScannerId getScannerId() const
+  friend RawChunk serialize(const std::vector<diagnostic::Message>& messages);
+
+  constexpr configuration::ScannerId scannerId() const
   {
     return id_;
   }
 
-  constexpr ErrorLocation getErrorLocation() const
+  constexpr ErrorLocation errorLocation() const
   {
     return error_location_;
   }
 
-  constexpr ErrorType getDiagnosticCode() const
+  constexpr ErrorType diagnosticCode() const
   {
-    return ERROR_BITS.at(error_location_.getByte()).at(error_location_.getBit());
+    return ERROR_BITS.at(error_location_.byte()).at(error_location_.bit());
   }
 
 private:
@@ -209,8 +213,8 @@ constexpr inline Message::Message(const configuration::ScannerId& id, const Erro
 
 constexpr inline bool Message::operator==(const Message& rhs) const
 {
-  return (error_location_.getBit() == rhs.error_location_.getBit() &&
-          error_location_.getByte() == rhs.error_location_.getByte() && id_ == rhs.id_);
+  return (error_location_.bit() == rhs.error_location_.bit() && error_location_.byte() == rhs.error_location_.byte() &&
+          id_ == rhs.id_);
 }
 
 // Store ambiguous errors for additional output

@@ -85,19 +85,18 @@ MATCHER_P(PointwiseIOStateUnorderedEq, vec, "")
 
 MATCHER_P(ScanDataEqual, scan, "")
 {
-  return arg.getScanCounter() == scan.getScanCounter() && arg.getScanResolution() == scan.getScanResolution() &&
-         arg.getMinScanAngle() == scan.getMinScanAngle() && arg.getMaxScanAngle() == scan.getMaxScanAngle() &&
-         Matches(PointwiseDoubleEq(scan.getMeasurements()))(arg.getMeasurements()) &&
-         Matches(PointwiseDoubleEq(scan.getIntensities()))(arg.getIntensities()) &&
-         ExplainMatchResult(PointwiseIOStateUnorderedEq(scan.getIOStates()), arg.getIOStates(), result_listener);
+  return arg.scanCounter() == scan.scanCounter() && arg.scanResolution() == scan.scanResolution() &&
+         arg.minScanAngle() == scan.minScanAngle() && arg.maxScanAngle() == scan.maxScanAngle() &&
+         Matches(PointwiseDoubleEq(scan.measurements()))(arg.measurements()) &&
+         Matches(PointwiseDoubleEq(scan.intensities()))(arg.intensities()) &&
+         ExplainMatchResult(PointwiseIOStateUnorderedEq(scan.ioStates()), arg.ioStates(), result_listener);
 }
 
 MATCHER_P2(TimestampInExpectedTimeframe, reference_scan, reference_timestamp, "")
 {
   const int64_t elapsed_time{ util::getCurrentTime() - reference_timestamp };
   *result_listener << "where the elapsed time is " << elapsed_time << " nsec";
-  return arg.getTimestamp() > reference_scan.getTimestamp() &&
-         arg.getTimestamp() < (reference_scan.getTimestamp() + elapsed_time);
+  return arg.timestamp() > reference_scan.timestamp() && arg.timestamp() < (reference_scan.timestamp() + elapsed_time);
 }
 
 MATCHER_P(IOPinDataEq, ref_pin, "")

@@ -28,7 +28,7 @@ TestDatum::TestDatum(const uint32_t scan_counter, const int64_t timestamp, const
 {
 }
 
-void TestDatum::setFirstFrameTime(const int64_t first_frame_time)
+void TestDatum::firstFrameTime(const int64_t first_frame_time)
 {
   first_frame_time_ = first_frame_time;
 }

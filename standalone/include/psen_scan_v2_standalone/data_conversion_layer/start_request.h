@@ -60,8 +60,8 @@ private:
     constexpr LaserScanSettings(const ScanRange& scan_range, const util::TenthOfDegree& resolution);
 
   public:
-    constexpr const ScanRange& getScanRange() const;
-    constexpr util::TenthOfDegree getResolution() const;
+    constexpr const ScanRange& scanRange() const;
+    constexpr util::TenthOfDegree resolution() const;
 
   private:
     const ScanRange scan_range_{ ScanRange::createInvalidScanRange() };
@@ -103,12 +103,12 @@ constexpr Message::LaserScanSettings::LaserScanSettings(const ScanRange& scan_ra
 {
 }
 
-constexpr const ScanRange& Message::LaserScanSettings::getScanRange() const
+constexpr const ScanRange& Message::LaserScanSettings::scanRange() const
 {
   return scan_range_;
 };
 
-constexpr util::TenthOfDegree Message::LaserScanSettings::getResolution() const
+constexpr util::TenthOfDegree Message::LaserScanSettings::resolution() const
 {
   return resolution_;
 };
