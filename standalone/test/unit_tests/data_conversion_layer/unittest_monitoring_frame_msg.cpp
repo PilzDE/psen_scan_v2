@@ -113,7 +113,7 @@ TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfIOPin)
 
 TEST(MonitoringFrameMsgTest, shouldReturnCorrectScannerId)
 {
-  const auto scanner_id{ configuration::ScannerId::slave0 };
+  const auto scanner_id{ configuration::ScannerId::subscriber0 };
   EXPECT_EQ(scanner_id, MessageBuilder().scannerId(scanner_id).build().scannerId());
 }
 

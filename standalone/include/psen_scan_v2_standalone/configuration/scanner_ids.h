@@ -27,20 +27,20 @@ namespace configuration
 enum class ScannerId : uint8_t
 {
   master = 0,
-  slave0 = 1,
-  slave1 = 2,
-  slave2 = 3
+  subscriber0 = 1,  // Note: This refers to the scanner type subscriber, *not* a ros subscriber
+  subscriber1 = 2,
+  subscriber2 = 3
 };
 
 static constexpr std::array<ScannerId, 4> VALID_SCANNER_IDS{ ScannerId::master,
-                                                             ScannerId::slave0,
-                                                             ScannerId::slave1,
-                                                             ScannerId::slave2 };
+                                                             ScannerId::subscriber0,
+                                                             ScannerId::subscriber1,
+                                                             ScannerId::subscriber2 };
 
 static const std::map<ScannerId, std::string> SCANNER_ID_TO_STRING{ { ScannerId::master, "Master" },
-                                                                    { ScannerId::slave0, "Slave0" },
-                                                                    { ScannerId::slave1, "Slave1" },
-                                                                    { ScannerId::slave2, "Slave2" } };
+                                                                    { ScannerId::subscriber0, "Subscriber0" },
+                                                                    { ScannerId::subscriber1, "Subscriber1" },
+                                                                    { ScannerId::subscriber2, "Subscriber2" } };
 
 }  // namespace configuration
 }  // namespace psen_scan_v2_standalone
