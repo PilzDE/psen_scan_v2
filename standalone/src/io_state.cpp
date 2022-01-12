@@ -65,11 +65,6 @@ std::ostream& operator<<(std::ostream& os, const PinState& pin_state)
 }
 // LCOV_EXCL_STOP
 
-IOState::IOState(const std::vector<PinState>& input, const std::vector<PinState>& output)
-{
-  data_conversion_layer::updatePinData(pin_data_, input, output);
-}
-
 IOState::IOState(data_conversion_layer::monitoring_frame::io::PinData pin_data) : pin_data_(pin_data)
 {
 }

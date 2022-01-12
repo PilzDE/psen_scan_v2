@@ -37,6 +37,8 @@
 #include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/scan_range.h"
 
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
+
 namespace psen_scan_v2_standalone_test
 {
 using namespace psen_scan_v2_standalone;
@@ -93,10 +95,7 @@ createMonitoringFrameMsgBuilderWithoutDiagnostics(const util::TenthOfDegree star
 
   msg_builder.intensities(generateIntensities(num_elements, lowest_intensity, highest_intensity));
 
-  data_conversion_layer::monitoring_frame::io::PinData pin_data;
-  pin_data.inputPinState(5, 4, true);
-  pin_data.outputPinState(0, 3, true);
-  msg_builder.iOPinData(pin_data);
+  msg_builder.iOPinData(createPinData());
 
   return msg_builder;
 }

@@ -19,6 +19,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/io_state_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
 #include "psen_scan_v2_standalone/util/assertions.h"
 
 namespace psen_scan_v2_standalone_test
@@ -43,32 +44,6 @@ TEST(IOStateTests, shouldReturnOutputsWhereAllAreUnsetWhenDefaultConstructed)
   for (const auto& output : outputs)
   {
     EXPECT_FALSE(output.state());
-  }
-}
-
-TEST(IOStateTests, shouldReturnInputsWhereOneIsSetViaConstructor)
-{
-  const auto inputs{ IOState({ { 3, "pin_name", true } }, {}).input() };  // make sure to not use "unused" bits
-  ASSERT_CONTAINS_WITH_PROPERTY_EQ(inputs, id, 3);
-  for (const auto& input : inputs)
-  {
-    if (input.id() == 3)
-      EXPECT_TRUE(input.state());
-    else
-      EXPECT_FALSE(input.state());
-  }
-}
-
-TEST(IOStateTests, shouldReturnOutputsWhereOneIsSetViaConstructor)
-{
-  const auto outputs{ IOState({}, { { 3, "pin_name", true } }).output() };  // make sure to not use "unused" bits
-  ASSERT_CONTAINS_WITH_PROPERTY_EQ(outputs, id, 3);
-  for (const auto& output : outputs)
-  {
-    if (output.id() == 3)
-      EXPECT_TRUE(output.state());
-    else
-      EXPECT_FALSE(output.state());
   }
 }
 

@@ -18,6 +18,10 @@
 
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 
+using psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::io::NUMBER_OF_INPUT_BYTES;
+using psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::io::NUMBER_OF_OUTPUT_BYTES;
+using psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::io::PinData;
+
 namespace psen_scan_v2_standalone_test
 {
 inline std::size_t idToByte(uint32_t id)
@@ -30,17 +34,25 @@ inline std::size_t idToBit(uint32_t id)
   return static_cast<std::size_t>(id % 8);
 }
 
-inline void setInputBit(psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::io::PinData& pin_data,
-                        uint32_t id)
+inline void setInputBit(PinData& pin_data, uint32_t id)
 {
   return pin_data.inputPinState(idToByte(id), idToBit(id), true);
 }
 
-inline void setOutputBit(psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::io::PinData& pin_data,
-                         uint32_t id)
+inline void setOutputBit(PinData& pin_data, uint32_t id)
 {
   return pin_data.outputPinState(idToByte(id), idToBit(id), true);
 }
 
+inline PinData
+createPinData(const std::array<std::bitset<8>, NUMBER_OF_INPUT_BYTES>& input_states = { 77, 0, 0, 0, 154, 0, 0 },
+              const std::array<std::bitset<8>, NUMBER_OF_OUTPUT_BYTES>& output_states = { 85, 0, 0, 0 })
+{
+  PinData pin_data;
+  pin_data.inputState() = input_states;
+  pin_data.outputState() = output_states;
+  return pin_data;
+}
 }  // namespace psen_scan_v2_standalone_test
+
 #endif  // PSEN_SCAN_V2_STANDALONE_TEST_IO_PIN_DATA_HELPER_H

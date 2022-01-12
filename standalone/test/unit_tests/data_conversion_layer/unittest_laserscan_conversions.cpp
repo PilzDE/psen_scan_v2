@@ -28,6 +28,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_data_array_conversion.h"
 #include "psen_scan_v2_standalone/util/gtest_expectations.h"
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
@@ -81,14 +82,6 @@ static double addOffsetToMsgMeasurement(data_conversion_layer::monitoring_frame:
   return measurements_copy.at(index);
 }
 
-static PinData createIOPin(uint32_t msg_nr = 0)
-{
-  PinData io_pin_data;
-  io_pin_data.inputPinState(0u, 2u, true);
-  io_pin_data.outputPinState(2u, 6u, true);
-  return io_pin_data;
-}
-
 static MessageBuilder createDefaultMsgBuilder()
 {
   return MessageBuilder()
@@ -96,14 +89,16 @@ static MessageBuilder createDefaultMsgBuilder()
       .resolution(util::TenthOfDegree{ 2 })
       .scanCounter(42)
       .activeZoneset(0)
-      .iOPinData(createIOPin())
+      .iOPinData(createPinData())
       .measurements({ 1., 2., 3., 4.5, 5., 42., .4 })
       .intensities({ 0., 4., 3., 1007., 508., 14000., .4 });
 }
 
 static MessageStamped createDefaultStampedMsg(const int64_t timestamp = DEFAULT_TIMESTAMP, uint32_t msg_nr = 0)
 {
-  return MessageStamped(createDefaultMsgBuilder().iOPinData(createIOPin(msg_nr)), timestamp);
+  return MessageStamped(createDefaultMsgBuilder().iOPinData(
+                            createPinData({ msg_nr % 8, 0, 0, 0, 0, 0, 0, 0 }, { 7 - (msg_nr % 8), 0, 0, 0 })),
+                        timestamp);
 }
 
 static void addStampedMsg(std::vector<MessageStamped>& msgs, uint32_t msg_nr = 0)

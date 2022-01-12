@@ -22,6 +22,8 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/io_state_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
+
 namespace psen_scan_v2_standalone_test
 {
 using namespace psen_scan_v2_standalone;
@@ -73,20 +75,9 @@ TEST(IOStateConversionsTest, shouldReturnOutputPinStateWithCorrectState)
   EXPECT_TRUE(pin_state2.state());
 }
 
-std::size_t idToByte(uint32_t id)
-{
-  return static_cast<std::size_t>(id / 8);
-}
-
-std::size_t idToBit(uint32_t id)
-{
-  return static_cast<std::size_t>(id % 8);
-}
-
 TEST(IOStateConversionsTest, shouldReturnInputPinStatesEqualToIndividuallyGeneratedPinStates)
 {
-  PinData pin_data;
-  pin_data.inputPinState(4, 3, true);
+  const auto pin_data{ createPinData() };
   const auto pin_states{ data_conversion_layer::generateInputPinStates(pin_data) };
 
   ASSERT_FALSE(pin_states.empty());
@@ -125,8 +116,7 @@ TEST(IOStateConversionsTest, shouldReturnInputPinStatesForAllUsedInputsWithoutRe
 
 TEST(IOStateConversionsTest, shouldReturnOutputPinStatesEqualToIndividuallyGeneratedPinStates)
 {
-  PinData pin_data;
-  pin_data.outputPinState(0, 3, true);
+  const auto pin_data{ createPinData() };
   const auto pin_states{ data_conversion_layer::generateOutputPinStates(pin_data) };
 
   ASSERT_FALSE(pin_states.empty());
@@ -154,26 +144,6 @@ TEST(IOStateConversionsTest, shouldReturnOutputPinStatesForAllUsedOutputsWithout
                   1)
             << "Wrong number of elements with id " << createId(byte_n, bit_n);
       }
-    }
-  }
-}
-
-TEST(IOStateConversionsTest, shouldCorrectlyUpdatePinData)
-{
-  PinData pin_data;
-  data_conversion_layer::updatePinData(pin_data, { { 3, "pin_name", true } }, { { 4, "pin_name", true } });
-  for (std::size_t byte_n = 0; byte_n < data_conversion_layer::monitoring_frame::io::NUMBER_OF_INPUT_BYTES; ++byte_n)
-  {
-    for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
-    {
-      EXPECT_EQ(pin_data.inputPinState(byte_n, bit_n), createId(byte_n, bit_n) == 3);
-    }
-  }
-  for (std::size_t byte_n = 0; byte_n < data_conversion_layer::monitoring_frame::io::NUMBER_OF_OUTPUT_BYTES; ++byte_n)
-  {
-    for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
-    {
-      EXPECT_EQ(pin_data.outputPinState(byte_n, bit_n), createId(byte_n, bit_n) == 4);
     }
   }
 }

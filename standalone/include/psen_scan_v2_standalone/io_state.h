@@ -53,7 +53,6 @@ class IOState
 {
 public:
   IOState() = default;
-  IOState(const std::vector<PinState>& input, const std::vector<PinState>& output);
   IOState(data_conversion_layer::monitoring_frame::io::PinData pin_data);
   std::vector<PinState> input() const;
   std::vector<PinState> output() const;

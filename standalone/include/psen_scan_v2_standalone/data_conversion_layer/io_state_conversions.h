@@ -75,20 +75,6 @@ static inline std::vector<PinState> generateOutputPinStates(const monitoring_fra
   return pin_states;
 }
 
-static inline void updatePinData(monitoring_frame::io::PinData& pin_data,
-                                 const std::vector<PinState>& input,
-                                 const std::vector<PinState>& output)
-{
-  for (const auto& input_pin : input)
-  {
-    pin_data.inputPinState(input_pin.id() / 8, input_pin.id() % 8, input_pin.state());
-  }
-  for (const auto& output_pin : output)
-  {
-    pin_data.outputPinState(output_pin.id() / 8, output_pin.id() % 8, output_pin.state());
-  }
-}
-
 }  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
 
