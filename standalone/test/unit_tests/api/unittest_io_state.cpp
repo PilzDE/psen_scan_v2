@@ -28,40 +28,22 @@ using data_conversion_layer::monitoring_frame::io::PinData;
 
 TEST(IOStateTests, shouldReturnInputsWhereAllAreUnsetWhenDefaultConstructed)
 {
-<<<<<<< HEAD
-  IOState io_state({ PinState(5, "some name", false) }, {});
-
-  EXPECT_EQ(io_state.input().size(), 1u);
-  EXPECT_EQ(io_state.input().at(0), PinState(5, "some name", false));
-
-  EXPECT_TRUE(io_state.output().empty());
-=======
   const auto inputs{ IOState().input() };
   ASSERT_FALSE(inputs.empty());
   for (const auto& input : inputs)
   {
     EXPECT_FALSE(input.state());
   }
->>>>>>> Update unittest_io_state and partly fix overall tests compilation
 }
 
 TEST(IOStateTests, shouldReturnOutputsWhereAllAreUnsetWhenDefaultConstructed)
 {
-<<<<<<< HEAD
-  IOState io_state({}, { PinState(5, "some name", false) });
-
-  EXPECT_TRUE(io_state.input().empty());
-
-  EXPECT_EQ(io_state.output().size(), 1u);
-  EXPECT_EQ(io_state.output().at(0), PinState(5, "some name", false));
-=======
   const auto outputs{ IOState().output() };
   ASSERT_FALSE(outputs.empty());
   for (const auto& output : outputs)
   {
     EXPECT_FALSE(output.state());
   }
->>>>>>> Update unittest_io_state and partly fix overall tests compilation
 }
 
 TEST(IOStateTests, shouldReturnInputsWhereOneIsSetViaConstructor)

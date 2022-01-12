@@ -70,7 +70,7 @@ IOState::IOState(const std::vector<PinState>& input, const std::vector<PinState>
   data_conversion_layer::updatePinData(pin_data_, input, output);
 }
 
-IOState::IOState(data_conversion_layer::monitoring_frame::io::PinData pin_data) : pin_data_(std::move(pin_data))
+IOState::IOState(data_conversion_layer::monitoring_frame::io::PinData pin_data) : pin_data_(pin_data)
 {
 }
 
