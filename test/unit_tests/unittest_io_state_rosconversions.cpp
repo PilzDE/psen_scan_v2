@@ -40,7 +40,7 @@ TEST(IOStateROSConversionsTest, shouldConvertSuccessfully)
 
 TEST(IOStateRosConversionsTest, shouldSetCorrectHeaderData)
 {
-  psen_scan_v2_standalone::IOState io_state(PinData{});
+  psen_scan_v2_standalone::IOState io_state{};
   psen_scan_v2::IOState ros_message = toIOStateMsg(io_state, "some_frame", 10 /* stamp */);
 
   EXPECT_EQ(ros_message.header.stamp, ros::Time{}.fromNSec(10));
@@ -49,7 +49,7 @@ TEST(IOStateRosConversionsTest, shouldSetCorrectHeaderData)
 
 TEST(IOStateRosConversionsTest, shouldAddTheCorrectNumberOfInputStates)
 {
-  psen_scan_v2_standalone::IOState io_state(PinData{});
+  psen_scan_v2_standalone::IOState io_state{};
   psen_scan_v2::IOState ros_message = toIOStateMsg(io_state, "some_frame", 10 /* stamp */);
 
   ASSERT_EQ(ros_message.input.size(), 29u);
@@ -57,14 +57,14 @@ TEST(IOStateRosConversionsTest, shouldAddTheCorrectNumberOfInputStates)
 
 TEST(IOStateRosConversionsTest, shouldAddTheCorrectNumberOfOutputStates)
 {
-  psen_scan_v2_standalone::IOState io_state(PinData{});
+  psen_scan_v2_standalone::IOState io_state{};
   psen_scan_v2::IOState ros_message = toIOStateMsg(io_state, "some_frame", 10 /* stamp */);
   ASSERT_EQ(ros_message.output.size(), 8u);
 }
 
 TEST(IOStateRosConversionsTest, shouldAddAllInputStatesOnce)
 {
-  psen_scan_v2_standalone::IOState io_state(PinData{});
+  psen_scan_v2_standalone::IOState io_state{};
   psen_scan_v2::IOState ros_message = toIOStateMsg(io_state, "some_frame", 10 /* stamp */);
 
   for (const auto& pin : io_state.input())
@@ -79,7 +79,7 @@ TEST(IOStateRosConversionsTest, shouldAddAllInputStatesOnce)
 
 TEST(IOStateRosConversionsTest, shouldAddAllOutputStatesOnce)
 {
-  psen_scan_v2_standalone::IOState io_state(PinData{});
+  psen_scan_v2_standalone::IOState io_state{};
   psen_scan_v2::IOState ros_message = toIOStateMsg(io_state, "some_frame", 10 /* stamp */);
 
   for (const auto& pin : io_state.output())
@@ -130,7 +130,7 @@ TEST(IOStateRosConversionsTest, shouldContainCorrectOutputStates)
 
 TEST(IOStateROSConversionsTest, shouldThrowOnNegativeTime)
 {
-  psen_scan_v2_standalone::IOState io_state(PinData{});
+  psen_scan_v2_standalone::IOState io_state{};
   EXPECT_THROW(toIOStateMsg(io_state, "some_frame", -10), std::invalid_argument);
 }
 
