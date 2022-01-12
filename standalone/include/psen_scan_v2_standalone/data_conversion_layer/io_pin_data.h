@@ -144,11 +144,9 @@ inline bool PinData::operator==(const PinData& pin_data) const
 // LCOV_EXCL_START
 inline std::ostream& operator<<(std::ostream& os, const PinData& pd)
 {
-  return os;
-  // todo
-  // return os << fmt::format("io::PinData(input_states_ = {}, output_states_ = {})",
-  //                          util::formatRange(pd.input_states_),
-  //                          util::formatRange(pd.output_states_));
+  return os << fmt::format("io::PinData(input = {}, output = {})",
+                           util::formatRange(pd.inputState()),
+                           util::formatRange(pd.outputState()));
 }
 // LCOV_EXCL_STOP
 

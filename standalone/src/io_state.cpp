@@ -91,8 +91,6 @@ std::vector<PinState> IOState::output() const
 
 std::ostream& operator<<(std::ostream& os, const IOState& io_state)
 {
-  return os << fmt::format("IOState(input = {}, output = {})",
-                           util::formatRange(io_state.input()),
-                           util::formatRange(io_state.output()));
+  return os << io_state.pin_data_;
 }
 }  // namespace psen_scan_v2_standalone

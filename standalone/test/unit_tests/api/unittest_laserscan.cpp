@@ -180,7 +180,7 @@ TEST(LaserScanTest, testPrintMessageSuccess)
   ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
 
   laser_scan->measurements({ 45.0, 44.0, 43.0, 42.0 });
-  laser_scan->ioStates({});
+  laser_scan->ioStates({ IOState(createPinData()) });
 
 // For compatibility with different ubuntu versions (resp. fmt), we need to take account of changes in
 // the default formatting of floating point numbers
@@ -188,12 +188,14 @@ TEST(LaserScanTest, testPrintMessageSuccess)
   EXPECT_EQ(fmt::format("{}", *laser_scan),
             "LaserScan(timestamp = 1 nsec, scanCounter = 1, minScanAngle = 0.1 deg, maxScanAngle = 0.2 deg, resolution "
             "= 0.1 deg, active_zoneset = 2, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {}, io_states = "
-            "{})");
+            "{io::PinData(input = {01001101, 00000000, 00000000, 00000000, 10011010, 00000000, 00000000, 00000000}, "
+            "output = {01010101, 00000000, 00000000, 00000000})})");
 #else
   EXPECT_EQ(fmt::format("{}", *laser_scan),
             "LaserScan(timestamp = 1 nsec, scanCounter = 1, minScanAngle = 0.1 deg, maxScanAngle = 0.2 deg, resolution "
             "= 0.1 deg, active_zoneset = 2, measurements = {45, 44, 43, 42}, intensities = {}, io_states = "
-            "{})");
+            "{io::PinData(input = {01001101, 00000000, 00000000, 00000000, 10011010, 00000000, 00000000, 00000000}, "
+            "output = {01010101, 00000000, 00000000, 00000000})})");
 #endif
 }
 

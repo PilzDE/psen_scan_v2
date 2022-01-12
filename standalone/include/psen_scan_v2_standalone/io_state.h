@@ -60,6 +60,9 @@ public:
   bool operator==(const IOState& io_state) const;
   bool operator!=(const IOState& io_state) const;
 
+public:
+  friend std::ostream& operator<<(std::ostream& os, const IOState& io_state);
+
 private:
   data_conversion_layer::monitoring_frame::io::PinData pin_data_{};
 };
