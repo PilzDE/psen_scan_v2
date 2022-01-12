@@ -185,7 +185,7 @@ The following IOs of the PSENscan safety laser scanner are available in the publ
 | Output name |
 |-|
 |INTERLOCK [1/2]|
-|OSSD1_REFPTS|
+|REFERENCE_POINTS_VIOLATION|
 |Safety [1..3] intrusion|
 |Warning [1/2] intrusion|
 
