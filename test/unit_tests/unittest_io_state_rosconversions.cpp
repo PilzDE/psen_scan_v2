@@ -13,70 +13,125 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <string>
+#include <algorithm>
 #include <gtest/gtest.h>
 #include "psen_scan_v2/IOState.h"
 #include "psen_scan_v2/InputPinID.h"
 #include "psen_scan_v2/OutputPinID.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
 
 #include "psen_scan_v2/io_state_ros_conversion.h"
 
 using namespace psen_scan_v2;
-
+using namespace psen_scan_v2_standalone_test;
+using psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::io::PinData;
 namespace psen_scan_v2_test
 {
 TEST(IOStateROSConversionsTest, shouldConvertSuccessfully)
 {
-  psen_scan_v2_standalone::IOState iostate(
-      { psen_scan_v2_standalone::PinState(InputPinID::MUTING_1_ACTIVE, "input1", true),
-        psen_scan_v2_standalone::PinState(InputPinID::RESET_ACTIVATED, "input2", false) },
-      { psen_scan_v2_standalone::PinState(OutputPinID::SAFETY_1_INTRUSION, "output1", true),
-        psen_scan_v2_standalone::PinState(OutputPinID::WARNING_1_INTRUSION, "output2", false) });
-  psen_scan_v2::IOState ros_message = toIOStateMsg(iostate, "some_frame", 10 /* stamp */);
+  PinData pin_data{};
+  setInputBit(pin_data, InputPinID::MUTING_1_ACTIVE);
+  setOutputBit(pin_data, OutputPinID::SAFETY_1_INTRUSION);
+  psen_scan_v2_standalone::IOState iostate(pin_data);
+
+  EXPECT_NO_THROW(psen_scan_v2::IOState ros_message = toIOStateMsg(iostate, "some_frame", 10 /* stamp */));
+}
+
+TEST(IOStateRosConversionsTest, shouldSetCorrectHeaderData)
+{
+  psen_scan_v2_standalone::IOState io_state(PinData{});
+  psen_scan_v2::IOState ros_message = toIOStateMsg(io_state, "some_frame", 10 /* stamp */);
 
   EXPECT_EQ(ros_message.header.stamp, ros::Time{}.fromNSec(10));
   EXPECT_EQ(ros_message.header.frame_id, "some_frame");
+}
 
-  ASSERT_EQ(ros_message.input.size(), 2u);
+TEST(IOStateRosConversionsTest, shouldAddTheCorrectNumberOfInputStates)
+{
+  psen_scan_v2_standalone::IOState io_state(PinData{});
+  psen_scan_v2::IOState ros_message = toIOStateMsg(io_state, "some_frame", 10 /* stamp */);
 
-  EXPECT_EQ(ros_message.input[0].pin_id.id, InputPinID::MUTING_1_ACTIVE);
-  EXPECT_EQ(ros_message.input[0].name, "input1");
-  EXPECT_EQ(ros_message.input[0].state, true);
+  ASSERT_EQ(ros_message.input.size(), 29u);
+}
 
-  EXPECT_EQ(ros_message.input[1].pin_id.id, InputPinID::RESET_ACTIVATED);
-  EXPECT_EQ(ros_message.input[1].name, "input2");
-  EXPECT_EQ(ros_message.input[1].state, false);
+TEST(IOStateRosConversionsTest, shouldAddTheCorrectNumberOfOutputStates)
+{
+  psen_scan_v2_standalone::IOState io_state(PinData{});
+  psen_scan_v2::IOState ros_message = toIOStateMsg(io_state, "some_frame", 10 /* stamp */);
+  ASSERT_EQ(ros_message.output.size(), 8u);
+}
 
-  ASSERT_EQ(ros_message.output.size(), 2u);
+TEST(IOStateRosConversionsTest, shouldAddAllInputStatesOnce)
+{
+  psen_scan_v2_standalone::IOState io_state(PinData{});
+  psen_scan_v2::IOState ros_message = toIOStateMsg(io_state, "some_frame", 10 /* stamp */);
 
-  EXPECT_EQ(ros_message.output[0].pin_id.id, OutputPinID::SAFETY_1_INTRUSION);
-  EXPECT_EQ(ros_message.output[0].name, "output1");
-  EXPECT_EQ(ros_message.output[0].state, true);
+  for (const auto& pin : io_state.input())
+  {
+    EXPECT_EQ(std::count_if(ros_message.input.begin(),
+                            ros_message.input.end(),
+                            [&pin](const auto& i) { return static_cast<uint32_t>(i.pin_id.id) == pin.id(); }),
+              1)
+        << "Wrong number of inputs with id " << pin.id() << " in the resulting Message";
+  }
+}
 
-  EXPECT_EQ(ros_message.output[1].pin_id.id, OutputPinID::WARNING_1_INTRUSION);
-  EXPECT_EQ(ros_message.output[1].name, "output2");
-  EXPECT_EQ(ros_message.output[1].state, false);
+TEST(IOStateRosConversionsTest, shouldAddAllOutputStatesOnce)
+{
+  psen_scan_v2_standalone::IOState io_state(PinData{});
+  psen_scan_v2::IOState ros_message = toIOStateMsg(io_state, "some_frame", 10 /* stamp */);
+
+  for (const auto& pin : io_state.output())
+  {
+    EXPECT_EQ(std::count_if(ros_message.output.begin(),
+                            ros_message.output.end(),
+                            [&pin](const auto& i) { return static_cast<uint32_t>(i.pin_id.id) == pin.id(); }),
+              1)
+        << "Wrong number of outputs with id " << pin.id() << " in the resulting Message";
+  }
+}
+
+TEST(IOStateRosConversionsTest, shouldContainCorrectInputStates)
+{
+  PinData pin_data{};
+  setInputBit(pin_data, InputPinID::MUTING_1_ACTIVE);
+  psen_scan_v2_standalone::IOState io_state(pin_data);
+  psen_scan_v2::IOState ros_message = toIOStateMsg(io_state, "some_frame", 10 /* stamp */);
+
+  for (const auto& pin : io_state.input())
+  {
+    auto it = std::find_if(ros_message.input.begin(), ros_message.input.end(), [&pin](const auto& i) {
+      return static_cast<uint32_t>(i.pin_id.id) == pin.id();
+    });
+    ASSERT_NE(it, ros_message.input.end());
+    EXPECT_EQ(it->name, pin.name());
+    EXPECT_EQ(it->state, pin.state());
+  }
+}
+
+TEST(IOStateRosConversionsTest, shouldContainCorrectOutputStates)
+{
+  PinData pin_data{};
+  setInputBit(pin_data, OutputPinID::SAFETY_1_INTRUSION);
+  psen_scan_v2_standalone::IOState io_state(pin_data);
+  psen_scan_v2::IOState ros_message = toIOStateMsg(io_state, "some_frame", 10 /* stamp */);
+
+  for (const auto& pin : io_state.output())
+  {
+    auto it = std::find_if(ros_message.output.begin(), ros_message.output.end(), [&pin](const auto& i) {
+      return static_cast<uint32_t>(i.pin_id.id) == pin.id();
+    });
+    ASSERT_NE(it, ros_message.output.end());
+    EXPECT_EQ(it->name, pin.name());
+    EXPECT_EQ(it->state, pin.state());
+  }
 }
 
 TEST(IOStateROSConversionsTest, shouldThrowOnNegativeTime)
 {
-  psen_scan_v2_standalone::IOState iostate({}, {});
-  EXPECT_THROW(toIOStateMsg(iostate, "some_frame", -10), std::invalid_argument);
-}
-
-TEST(IOStateROSConversionsTest, shouldSuccesfulConvertEmptyIOState)
-{
-  psen_scan_v2_standalone::IOState iostate({}, {});
-  psen_scan_v2::IOState ros_message = toIOStateMsg(iostate, "some_frame", 10 /* stamp */);
-  EXPECT_EQ(ros_message.input.size(), 0u);
-  EXPECT_EQ(ros_message.output.size(), 0u);
-}
-
-TEST(IOStateROSConversionsTest, shouldSuccesfulConvertEmptyIOStateWithDefaultCTor)
-{
-  psen_scan_v2_standalone::IOState iostate;
-  psen_scan_v2::IOState ros_message = toIOStateMsg(iostate, "some_frame", 10 /* stamp */);
-  EXPECT_EQ(ros_message.input.size(), 0u);
-  EXPECT_EQ(ros_message.output.size(), 0u);
+  psen_scan_v2_standalone::IOState io_state(PinData{});
+  EXPECT_THROW(toIOStateMsg(io_state, "some_frame", -10), std::invalid_argument);
 }
 
 }  // namespace psen_scan_v2_test
