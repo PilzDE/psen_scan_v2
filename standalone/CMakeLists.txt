@@ -169,7 +169,7 @@ ADD_TEST(NAME unittest_io_state
          COMMAND unittest_io_state)
 
 ADD_EXECUTABLE(unittest_io_state_conversions
-               test/unit_tests/api/unittest_io_state_conversions.cpp
+               test/unit_tests/data_conversion_layer/unittest_io_state_conversions.cpp
                src/io_state.cpp)
 
 TARGET_LINK_LIBRARIES(unittest_io_state_conversions
@@ -180,7 +180,7 @@ TARGET_LINK_LIBRARIES(unittest_io_state_conversions
 ADD_TEST(NAME unittest_io_state_conversions
          COMMAND unittest_io_state_conversions)
 
-ADD_EXECUTABLE(unittest_io_pin_data test/unit_tests/api/unittest_io_pin_data.cpp)
+ADD_EXECUTABLE(unittest_io_pin_data test/unit_tests/data_conversion_layer/unittest_io_pin_data.cpp)
 
 TARGET_LINK_LIBRARIES(unittest_io_pin_data
     ${PROJECT_NAME}
