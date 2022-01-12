@@ -36,7 +36,7 @@ namespace psen_scan_v2_standalone_test
 static data_conversion_layer::monitoring_frame::Message createMsg()
 {
   data_conversion_layer::monitoring_frame::io::PinData io_pin_data;
-  io_pin_data.logical_input = { PinState(3, "zone1", true) };
+  io_pin_data.input = { PinState(3, "zone1", true) };
   io_pin_data.output = { PinState(1, "OSSD", false) };
 
   return data_conversion_layer::monitoring_frame::MessageBuilder()

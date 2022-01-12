@@ -41,8 +41,8 @@ namespace psen_scan_v2
 // Avoids too much output with full io pin data
 void PrintTo(const IOState& io_state, std::ostream* os)
 {
-  *os << "IOState(logical_input:";
-  for (const auto& input_pin : io_state.logical_input)
+  *os << "IOState(input:";
+  for (const auto& input_pin : io_state.input)
   {
     *os << input_pin.name << ": " << (int)input_pin.state << ", ";
   }
@@ -129,9 +129,9 @@ MATCHER_P(UInt8MsgDataEq, data, "")
 MATCHER_P(ZoneSwitchingInputIsTrue, zone_id, "")
 {
   const std::string pin_name{ "Zone Set Switching Input " + std::to_string(zone_id) };
-  const auto it = std::find_if(
-      arg.logical_input.begin(), arg.logical_input.end(), [pin_name](const auto& pin) { return pin.name == pin_name; });
-  if (it == arg.logical_input.end())
+  const auto it =
+      std::find_if(arg.input.begin(), arg.input.end(), [pin_name](const auto& pin) { return pin.name == pin_name; });
+  if (it == arg.input.end())
   {
     *result_listener << "Pin " << pin_name << " not found";
     return false;
@@ -141,7 +141,7 @@ MATCHER_P(ZoneSwitchingInputIsTrue, zone_id, "")
 
 MATCHER(OnlyOneZoneSwitchingInputIsTrue, "")
 {
-  return std::count_if(arg.logical_input.begin(), arg.logical_input.end(), [](const auto& pin) {
+  return std::count_if(arg.input.begin(), arg.input.end(), [](const auto& pin) {
            return (pin.name.substr(0, 24) == "Zone Set Switching Input") && (pin.state == true);
          }) == 1;
 }

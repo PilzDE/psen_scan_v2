@@ -63,9 +63,9 @@ static constexpr std::chrono::seconds STOP_TIMEOUT{ 1 };
 
 static const psen_scan_v2_standalone::LaserScan::IOData IO_DATA1{
   { psen_scan_v2_standalone::IOState({}, { psen_scan_v2_standalone::PinState(14, "output", false) }),
-    psen_scan_v2_standalone::IOState({ psen_scan_v2_standalone::PinState(21, "logical", true),
-                                       psen_scan_v2_standalone::PinState(3, "logical2", false) },
-                                     {}) }
+    psen_scan_v2_standalone::IOState(
+        { psen_scan_v2_standalone::PinState(21, "input", true), psen_scan_v2_standalone::PinState(3, "input2", false) },
+        {}) }
 };
 static const psen_scan_v2_standalone::LaserScan::IOData IO_DATA2{ {
     psen_scan_v2_standalone::IOState({}, {}),

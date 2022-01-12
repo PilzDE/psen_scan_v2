@@ -48,16 +48,15 @@ inline static uint32_t createID(size_t byte_n, size_t bit_n)
 struct PinData
 {
   using States = std::vector<PinState>;
-  States logical_input{};
+  States input{};
   States output{};
 };
 
 // LCOV_EXCL_START
 inline std::ostream& operator<<(std::ostream& os, const PinData& pd)
 {
-  return os << fmt::format("io::PinData(logical_input = {}, output = {})",
-                           util::formatRange(pd.logical_input),
-                           util::formatRange(pd.output));
+  return os << fmt::format(
+             "io::PinData(input = {}, output = {})", util::formatRange(pd.input), util::formatRange(pd.output));
 }
 // LCOV_EXCL_STOP
 

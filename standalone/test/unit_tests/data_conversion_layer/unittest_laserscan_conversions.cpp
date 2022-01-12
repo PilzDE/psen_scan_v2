@@ -84,7 +84,7 @@ static double addOffsetToMsgMeasurement(data_conversion_layer::monitoring_frame:
 static PinData createIOPin(uint32_t msg_nr = 0)
 {
   PinData io_pin_data;
-  io_pin_data.logical_input = {};
+  io_pin_data.input = {};
   io_pin_data.output = { PinState(msg_nr, "output", true) };
   return io_pin_data;
 }

@@ -164,7 +164,7 @@ TEST(MonitoringFrameMsgTest, shouldReturnCorrectIntensities)
 TEST(MonitoringFrameMsgTest, shouldReturnCorrectIOPin)
 {
   io::PinData expected_io_pin_data;
-  expected_io_pin_data.logical_input = { PinState(3, "zone1", true) };
+  expected_io_pin_data.input = { PinState(3, "zone1", true) };
   expected_io_pin_data.output = { PinState(1, "OSSD", false) };
   io::PinData io_pin_data;
   ASSERT_NO_THROW(io_pin_data = MessageBuilder().iOPinData(expected_io_pin_data).build().iOPinData());

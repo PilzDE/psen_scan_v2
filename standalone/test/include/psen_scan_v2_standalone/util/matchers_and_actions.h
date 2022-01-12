@@ -72,7 +72,7 @@ MATCHER_P(ContainerUnorderedEq, vec, "")
 
 MATCHER_P(IOStateUnorderedEq, io_state, "")
 {
-  return ExplainMatchResult(ContainerUnorderedEq(io_state.logicalInput()), arg.logicalInput(), result_listener) &&
+  return ExplainMatchResult(ContainerUnorderedEq(io_state.input()), arg.input(), result_listener) &&
          ExplainMatchResult(ContainerUnorderedEq(io_state.output()), arg.output(), result_listener);
 }
 
@@ -101,8 +101,7 @@ MATCHER_P2(TimestampInExpectedTimeframe, reference_scan, reference_timestamp, ""
 
 MATCHER_P(IOPinDataEq, ref_pin, "")
 {
-  return Matches(Pointwise(Eq(), ref_pin.logical_input))(arg.logical_input) &&
-         Matches(Pointwise(Eq(), ref_pin.output))(arg.output);
+  return Matches(Pointwise(Eq(), ref_pin.input))(arg.input) && Matches(Pointwise(Eq(), ref_pin.output))(arg.output);
 }
 
 MATCHER_P(MonitoringFrameEq, reference_msg, "")

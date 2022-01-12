@@ -27,8 +27,8 @@ namespace psen_scan_v2_test
 TEST(IOStateROSConversionsTest, shouldConvertSuccessfully)
 {
   psen_scan_v2_standalone::IOState iostate(
-      { psen_scan_v2_standalone::PinState(InputPinID::MUTING_1_ACTIVE, "logical_input1", true),
-        psen_scan_v2_standalone::PinState(InputPinID::RESET_ACTIVATED, "logical_input2", false) },
+      { psen_scan_v2_standalone::PinState(InputPinID::MUTING_1_ACTIVE, "input1", true),
+        psen_scan_v2_standalone::PinState(InputPinID::RESET_ACTIVATED, "input2", false) },
       { psen_scan_v2_standalone::PinState(OutputPinID::SAFETY_1_INTRUSION, "output1", true),
         psen_scan_v2_standalone::PinState(OutputPinID::WARNING_1_INTRUSION, "output2", false) });
   psen_scan_v2::IOState ros_message = toIOStateMsg(iostate, "some_frame", 10 /* stamp */);
@@ -36,15 +36,15 @@ TEST(IOStateROSConversionsTest, shouldConvertSuccessfully)
   EXPECT_EQ(ros_message.header.stamp, ros::Time{}.fromNSec(10));
   EXPECT_EQ(ros_message.header.frame_id, "some_frame");
 
-  ASSERT_EQ(ros_message.logical_input.size(), 2u);
+  ASSERT_EQ(ros_message.input.size(), 2u);
 
-  EXPECT_EQ(ros_message.logical_input[0].pin_id.id, InputPinID::MUTING_1_ACTIVE);
-  EXPECT_EQ(ros_message.logical_input[0].name, "logical_input1");
-  EXPECT_EQ(ros_message.logical_input[0].state, true);
+  EXPECT_EQ(ros_message.input[0].pin_id.id, InputPinID::MUTING_1_ACTIVE);
+  EXPECT_EQ(ros_message.input[0].name, "input1");
+  EXPECT_EQ(ros_message.input[0].state, true);
 
-  EXPECT_EQ(ros_message.logical_input[1].pin_id.id, InputPinID::RESET_ACTIVATED);
-  EXPECT_EQ(ros_message.logical_input[1].name, "logical_input2");
-  EXPECT_EQ(ros_message.logical_input[1].state, false);
+  EXPECT_EQ(ros_message.input[1].pin_id.id, InputPinID::RESET_ACTIVATED);
+  EXPECT_EQ(ros_message.input[1].name, "input2");
+  EXPECT_EQ(ros_message.input[1].state, false);
 
   ASSERT_EQ(ros_message.output.size(), 2u);
 
@@ -67,7 +67,7 @@ TEST(IOStateROSConversionsTest, shouldSuccesfulConvertEmptyIOState)
 {
   psen_scan_v2_standalone::IOState iostate({}, {});
   psen_scan_v2::IOState ros_message = toIOStateMsg(iostate, "some_frame", 10 /* stamp */);
-  EXPECT_EQ(ros_message.logical_input.size(), 0u);
+  EXPECT_EQ(ros_message.input.size(), 0u);
   EXPECT_EQ(ros_message.output.size(), 0u);
 }
 
@@ -75,7 +75,7 @@ TEST(IOStateROSConversionsTest, shouldSuccesfulConvertEmptyIOStateWithDefaultCTo
 {
   psen_scan_v2_standalone::IOState iostate;
   psen_scan_v2::IOState ros_message = toIOStateMsg(iostate, "some_frame", 10 /* stamp */);
-  EXPECT_EQ(ros_message.logical_input.size(), 0u);
+  EXPECT_EQ(ros_message.input.size(), 0u);
   EXPECT_EQ(ros_message.output.size(), 0u);
 }
 

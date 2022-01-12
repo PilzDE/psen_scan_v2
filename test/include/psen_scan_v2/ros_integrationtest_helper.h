@@ -99,7 +99,7 @@ MATCHER_P(StdMsgsHeaderEq, msg, "")
 
 MATCHER_P(IOStateMsgEq, msg, "")
 {
-  return ::testing::Matches(StdMsgsHeaderEq(msg.header))(arg.header) && arg.logical_input == msg.logical_input &&
+  return ::testing::Matches(StdMsgsHeaderEq(msg.header))(arg.header) && arg.input == msg.input &&
          arg.output == msg.output;
 }
 

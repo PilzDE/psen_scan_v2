@@ -52,7 +52,7 @@ createCompletePinField(const std::array<std::array<PinType, 8>, ChunkSize>& type
 inline PinData createCompleteIOPinData()
 {
   PinData pin_data;
-  pin_data.logical_input = createCompletePinField(LOGICAL_INPUT_BITS, LOGICAL_INPUT_BIT_TO_NAME);
+  pin_data.input = createCompletePinField(LOGICAL_INPUT_BITS, LOGICAL_INPUT_BIT_TO_NAME);
   pin_data.output = createCompletePinField(OUTPUT_BITS, OUTPUT_BIT_TO_NAME);
   return pin_data;
 }
@@ -64,10 +64,10 @@ inline void setPin(PinState& pin_state)
 
 inline void setInputPin(PinData& io_pin_data, const LogicalInputType& type)
 {
-  const auto it = std::find_if(io_pin_data.logical_input.begin(), io_pin_data.logical_input.end(), [&](const auto& a) {
+  const auto it = std::find_if(io_pin_data.input.begin(), io_pin_data.input.end(), [&](const auto& a) {
     return a.name() == LOGICAL_INPUT_BIT_TO_NAME.at(type);
   });
-  if (it == io_pin_data.logical_input.end())
+  if (it == io_pin_data.input.end())
   {
     throw std::invalid_argument("Could not set input pin because type " + LOGICAL_INPUT_BIT_TO_NAME.at(type) +
                                 " is not included in the pin data.");
