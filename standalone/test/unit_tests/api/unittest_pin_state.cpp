@@ -17,6 +17,9 @@
 
 #include <gtest/gtest.h>
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 #include "psen_scan_v2_standalone/io_state.h"
 
 namespace psen_scan_v2_standalone_test
@@ -80,6 +83,12 @@ TEST(PinStateTests, shouldBeEqual)
   PinState pin1(EXPECTED_ID_1, EXPECTED_NAME_1, EXPECTED_STATE_1);
   PinState pin2(EXPECTED_ID_1, EXPECTED_NAME_1, EXPECTED_STATE_1);
   EXPECT_EQ(pin1, pin2);
+}
+
+TEST(PinStateTests, shouldBePrintedCorrectly)
+{
+  PinState pin_state(5u, "pin_name", true);
+  EXPECT_EQ(fmt::format("{}", pin_state), "PinState(id = 5, name = pin_name, state = true)");
 }
 }  // namespace psen_scan_v2_standalone_test
 

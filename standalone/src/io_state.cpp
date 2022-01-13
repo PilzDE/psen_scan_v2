@@ -57,13 +57,11 @@ bool PinState::state() const
   return state_;
 }
 
-// LCOV_EXCL_START
 std::ostream& operator<<(std::ostream& os, const PinState& pin_state)
 {
-  return os << fmt::format(
-             "PinState(id = {}, name = {}, state = {})", pin_state.id(), pin_state.name(), pin_state.state());
+  os << fmt::format("PinState(id = {}, name = {}, state = {})", pin_state.id(), pin_state.name(), pin_state.state());
+  return os;
 }
-// LCOV_EXCL_STOP
 
 IOState::IOState(data_conversion_layer::monitoring_frame::io::PinData pin_data) : pin_data_(pin_data)
 {

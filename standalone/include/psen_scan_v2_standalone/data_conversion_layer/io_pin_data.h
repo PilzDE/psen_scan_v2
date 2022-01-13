@@ -139,14 +139,12 @@ inline bool PinData::operator==(const PinData& pin_data) const
   return input_states_ == pin_data.input_states_ && output_states_ == pin_data.output_states_;
 }
 
-// LCOV_EXCL_START
 inline std::ostream& operator<<(std::ostream& os, const PinData& pd)
 {
   return os << fmt::format("io::PinData(input = {}, output = {})",
                            util::formatRange(pd.inputState()),
                            util::formatRange(pd.outputState()));
 }
-// LCOV_EXCL_STOP
 
 }  // namespace io
 }  // namespace monitoring_frame
