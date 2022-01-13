@@ -173,7 +173,7 @@ TEST(IOPinDataTest, shouldReturnCorrectOutputName)
   EXPECT_EQ(getOutputName(3, 1), "unused");
   EXPECT_EQ(getOutputName(3, 2), "unused");
   EXPECT_EQ(getOutputName(3, 3), "unused");
-  EXPECT_EQ(getOutputName(3, 4), "OSSD1_REFPTS");
+  EXPECT_EQ(getOutputName(3, 4), "REFERENCE POINTS VIOLATION");
   EXPECT_EQ(getOutputName(3, 5), "unused");
   EXPECT_EQ(getOutputName(3, 6), "unused");
   EXPECT_EQ(getOutputName(3, 7), "unused");

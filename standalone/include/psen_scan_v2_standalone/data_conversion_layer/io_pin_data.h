@@ -26,7 +26,6 @@
 #include <fmt/ostream.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/io_constants.h"
-#include "psen_scan_v2_standalone/io_state.h"
 #include "psen_scan_v2_standalone/util/format_range.h"
 
 namespace psen_scan_v2_standalone
