@@ -181,7 +181,7 @@ TEST(IOPinDataTest, shouldReturnCorrectOutputName)
 
 TEST(IOPinDataTest, shouldReturnFalseInputPinStatesAfterConstruction)
 {
-  PinData pin_data;
+  PinData pin_data{};
   for (std::size_t byte_n = 0; byte_n < NUMBER_OF_INPUT_BYTES; ++byte_n)
   {
     for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
@@ -194,7 +194,7 @@ TEST(IOPinDataTest, shouldReturnFalseInputPinStatesAfterConstruction)
 
 TEST(IOPinDataTest, shouldSetOnlySpecifiedInputPinState)
 {
-  PinData pin_data;
+  PinData pin_data{};
   pin_data.inputPinState(4, 3, true);
   for (std::size_t byte_n = 0; byte_n < NUMBER_OF_INPUT_BYTES; ++byte_n)
   {
@@ -208,7 +208,7 @@ TEST(IOPinDataTest, shouldSetOnlySpecifiedInputPinState)
 
 TEST(IOPinDataTest, shouldReturnFalseOutputPinStatesAfterConstruction)
 {
-  PinData pin_data;
+  PinData pin_data{};
   for (std::size_t byte_n = 0; byte_n < NUMBER_OF_OUTPUT_BYTES; ++byte_n)
   {
     for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
@@ -221,7 +221,7 @@ TEST(IOPinDataTest, shouldReturnFalseOutputPinStatesAfterConstruction)
 
 TEST(IOPinDataTest, shouldSetOnlySpecifiedOutputPinState)
 {
-  PinData pin_data;
+  PinData pin_data{};
   pin_data.outputPinState(2, 3, true);
   for (std::size_t byte_n = 0; byte_n < NUMBER_OF_OUTPUT_BYTES; ++byte_n)
   {
@@ -231,6 +231,53 @@ TEST(IOPinDataTest, shouldSetOnlySpecifiedOutputPinState)
       EXPECT_EQ(pin_data.outputState().at(byte_n).test(bit_n), byte_n == 2 && bit_n == 3);
     }
   }
+}
+
+TEST(IOPinDataTest, shouldCorrectlyWriteToInputStateArray)
+{
+  PinData pin_data{};
+  pin_data.inputState().at(4).set(3);
+  for (std::size_t byte_n = 0; byte_n < NUMBER_OF_INPUT_BYTES; ++byte_n)
+  {
+    for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
+    {
+      EXPECT_EQ(pin_data.inputPinState(byte_n, bit_n), byte_n == 4 && bit_n == 3);
+      EXPECT_EQ(pin_data.inputState().at(byte_n).test(bit_n), byte_n == 4 && bit_n == 3);
+    }
+  }
+}
+
+TEST(IOPinDataTest, shouldCorrectlyWriteToOutputStateArray)
+{
+  PinData pin_data{};
+  pin_data.outputState().at(2).set(3);
+  for (std::size_t byte_n = 0; byte_n < NUMBER_OF_OUTPUT_BYTES; ++byte_n)
+  {
+    for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
+    {
+      EXPECT_EQ(pin_data.outputPinState(byte_n, bit_n), byte_n == 2 && bit_n == 3);
+      EXPECT_EQ(pin_data.outputState().at(byte_n).test(bit_n), byte_n == 2 && bit_n == 3);
+    }
+  }
+}
+
+TEST(IOPinDataTest, shouldNotBeEqualWithDifferentInputState)
+{
+  PinData pin_data{};
+  pin_data.inputState().at(4).set(3);
+  EXPECT_FALSE(pin_data == PinData{});
+}
+
+TEST(IOPinDataTest, shouldNotBeEqualWithDifferentOutputState)
+{
+  PinData pin_data{};
+  pin_data.outputState().at(2).set(3);
+  EXPECT_FALSE(pin_data == PinData{});
+}
+
+TEST(IOPinDataTest, shouldBeEqual)
+{
+  EXPECT_TRUE(PinData{} == PinData{});
 }
 }  // namespace psen_scan_v2_standalone_test
 

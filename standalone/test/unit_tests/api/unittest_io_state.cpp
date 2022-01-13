@@ -49,7 +49,7 @@ TEST(IOStateTests, shouldReturnOutputsWhereAllAreUnsetWhenDefaultConstructed)
 
 TEST(IOStateTests, shouldReturnInputsEqualToConvertedInputPinData)
 {
-  PinData pin_data;
+  PinData pin_data{};
   pin_data.inputPinState(5, 1, true);  // make sure to not use "unused" bits
   const auto inputs{ IOState(pin_data).input() };
   EXPECT_EQ(inputs, data_conversion_layer::generateInputPinStates(pin_data));
@@ -57,10 +57,27 @@ TEST(IOStateTests, shouldReturnInputsEqualToConvertedInputPinData)
 
 TEST(IOStateTests, shouldReturnOutputsEqualToConvertedOutputPinData)
 {
-  PinData pin_data;
+  PinData pin_data{};
   pin_data.outputPinState(0, 2, true);  // make sure to not use "unused" bits
   const auto outputs{ IOState(pin_data).output() };
   EXPECT_EQ(outputs, data_conversion_layer::generateOutputPinStates(pin_data));
+}
+
+TEST(IOStateTests, shouldNotBeEqualWithDifferentPinData)
+{
+  PinData pin_data{};
+  pin_data.inputState().at(5).set(1);
+  EXPECT_NE(IOState(pin_data), IOState(PinData{}));
+}
+
+TEST(IOStateTests, shouldBeEqualWhithEqualPinData)
+{
+  EXPECT_EQ(IOState(PinData{}), IOState(PinData{}));
+}
+
+TEST(IOStateTests, shouldBeEqualWhenDefaultConstructed)
+{
+  EXPECT_EQ(IOState{}, IOState{});
 }
 
 }  // namespace psen_scan_v2_standalone_test

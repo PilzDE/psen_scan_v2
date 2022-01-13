@@ -140,7 +140,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
            "this test.";
   }
 
-  monitoring_frame::io::PinData pin_data;
+  monitoring_frame::io::PinData pin_data{};
   pin_data.inputPinState(5, 4, true);
   pin_data.outputPinState(0, 5, true);
 

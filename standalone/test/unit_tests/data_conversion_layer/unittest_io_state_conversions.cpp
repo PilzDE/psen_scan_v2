@@ -48,7 +48,7 @@ TEST(IOStateConversionsTest, shouldReturnInputPinStateWithCorrectState)
   const auto pin_state1{ data_conversion_layer::generateInputPinState(PinData(), 4, 3) };
   EXPECT_FALSE(pin_state1.state());
 
-  PinData pin_data;
+  PinData pin_data{};
   pin_data.inputPinState(4, 3, true);
   const auto pin_state2{ data_conversion_layer::generateInputPinState(pin_data, 4, 3) };
   EXPECT_TRUE(pin_state2.state());
@@ -71,7 +71,7 @@ TEST(IOStateConversionsTest, shouldReturnOutputPinStateWithCorrectState)
   const auto pin_state1{ data_conversion_layer::generateOutputPinState(PinData(), 0, 3) };
   EXPECT_FALSE(pin_state1.state());
 
-  PinData pin_data;
+  PinData pin_data{};
   pin_data.outputPinState(0, 3, true);
   const auto pin_state2{ data_conversion_layer::generateOutputPinState(pin_data, 0, 3) };
   EXPECT_TRUE(pin_state2.state());

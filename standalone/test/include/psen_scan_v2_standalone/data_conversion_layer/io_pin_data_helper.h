@@ -48,7 +48,7 @@ inline PinData
 createPinData(const std::array<std::bitset<8>, NUMBER_OF_INPUT_BYTES>& input_states = { 77, 0, 0, 0, 154, 0, 0 },
               const std::array<std::bitset<8>, NUMBER_OF_OUTPUT_BYTES>& output_states = { 85, 0, 0, 0 })
 {
-  PinData pin_data;
+  PinData pin_data{};
   pin_data.inputState() = input_states;
   pin_data.outputState() = output_states;
   return pin_data;
