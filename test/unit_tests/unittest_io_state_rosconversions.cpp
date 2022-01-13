@@ -62,6 +62,23 @@ TEST(IOStateRosConversionsTest, shouldAddTheCorrectNumberOfOutputStates)
   ASSERT_EQ(ros_message.output.size(), 8u);
 }
 
+template <typename PinState>
+std::size_t countROSPinStatesWithId(const std::vector<PinState>& pin_states, uint32_t id)
+{
+  return std::count_if(pin_states.begin(), pin_states.end(), [id](const auto& pin_state) {
+    return static_cast<uint32_t>(pin_state.pin_id.id) == id;
+  });
+}
+
+template <typename PinState>
+typename std::vector<PinState>::const_iterator findROSPinStateWithId(const std::vector<PinState>& pin_states,
+                                                                     uint32_t id)
+{
+  return std::find_if(pin_states.begin(), pin_states.end(), [id](const auto& pin_state) {
+    return static_cast<uint32_t>(pin_state.pin_id.id) == id;
+  });
+}
+
 TEST(IOStateRosConversionsTest, shouldAddAllInputStatesOnce)
 {
   psen_scan_v2_standalone::IOState io_state{};
@@ -69,11 +86,8 @@ TEST(IOStateRosConversionsTest, shouldAddAllInputStatesOnce)
 
   for (const auto& pin : io_state.input())
   {
-    EXPECT_EQ(std::count_if(ros_message.input.begin(),
-                            ros_message.input.end(),
-                            [&pin](const auto& i) { return static_cast<uint32_t>(i.pin_id.id) == pin.id(); }),
-              1)
-        << "Wrong number of inputs with id " << pin.id() << " in the resulting Message";
+    const auto pin_state_count{ countROSPinStatesWithId(ros_message.input, pin.id()) };
+    EXPECT_EQ(pin_state_count, 1) << "Wrong number of inputs with id " << pin.id() << " in the resulting Message";
   }
 }
 
@@ -84,11 +98,8 @@ TEST(IOStateRosConversionsTest, shouldAddAllOutputStatesOnce)
 
   for (const auto& pin : io_state.output())
   {
-    EXPECT_EQ(std::count_if(ros_message.output.begin(),
-                            ros_message.output.end(),
-                            [&pin](const auto& i) { return static_cast<uint32_t>(i.pin_id.id) == pin.id(); }),
-              1)
-        << "Wrong number of outputs with id " << pin.id() << " in the resulting Message";
+    const auto pin_state_count{ countROSPinStatesWithId(ros_message.output, pin.id()) };
+    EXPECT_EQ(pin_state_count, 1) << "Wrong number of outputs with id " << pin.id() << " in the resulting Message";
   }
 }
 
@@ -101,9 +112,7 @@ TEST(IOStateRosConversionsTest, shouldContainCorrectInputStates)
 
   for (const auto& pin : io_state.input())
   {
-    auto it = std::find_if(ros_message.input.begin(), ros_message.input.end(), [&pin](const auto& i) {
-      return static_cast<uint32_t>(i.pin_id.id) == pin.id();
-    });
+    const auto it{ findROSPinStateWithId(ros_message.input, pin.id()) };
     ASSERT_NE(it, ros_message.input.end());
     EXPECT_EQ(it->name, pin.name());
     EXPECT_EQ(it->state, pin.state());
@@ -119,9 +128,7 @@ TEST(IOStateRosConversionsTest, shouldContainCorrectOutputStates)
 
   for (const auto& pin : io_state.output())
   {
-    auto it = std::find_if(ros_message.output.begin(), ros_message.output.end(), [&pin](const auto& i) {
-      return static_cast<uint32_t>(i.pin_id.id) == pin.id();
-    });
+    const auto it{ findROSPinStateWithId(ros_message.output, pin.id()) };
     ASSERT_NE(it, ros_message.output.end());
     EXPECT_EQ(it->name, pin.name());
     EXPECT_EQ(it->state, pin.state());
