@@ -87,7 +87,7 @@ TEST(IOStateRosConversionsTest, shouldAddAllInputStatesOnce)
   for (const auto& pin : io_state.input())
   {
     const auto pin_state_count{ countROSPinStatesWithId(ros_message.input, pin.id()) };
-    EXPECT_EQ(pin_state_count, 1) << "Wrong number of inputs with id " << pin.id() << " in the resulting Message";
+    EXPECT_EQ(pin_state_count, 1u) << "Wrong number of inputs with id " << pin.id() << " in the resulting Message";
   }
 }
 
@@ -99,7 +99,7 @@ TEST(IOStateRosConversionsTest, shouldAddAllOutputStatesOnce)
   for (const auto& pin : io_state.output())
   {
     const auto pin_state_count{ countROSPinStatesWithId(ros_message.output, pin.id()) };
-    EXPECT_EQ(pin_state_count, 1) << "Wrong number of outputs with id " << pin.id() << " in the resulting Message";
+    EXPECT_EQ(pin_state_count, 1u) << "Wrong number of outputs with id " << pin.id() << " in the resulting Message";
   }
 }
 
