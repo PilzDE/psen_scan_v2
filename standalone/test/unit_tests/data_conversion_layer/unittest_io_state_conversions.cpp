@@ -138,7 +138,7 @@ TEST(IOStateConversionsTest, shouldReturnInputPinStatesForAllUsedInputsWithoutRe
       if (isUsedInputBit(byte_n, bit_n))
       {
         const auto pin_state_count{ countPinStatesWithId(pin_states, createId(byte_n, bit_n)) };
-        EXPECT_EQ(pin_state_count, 1) << "Wrong number of pin states with id " << createId(byte_n, bit_n);
+        EXPECT_EQ(pin_state_count, 1u) << "Wrong number of pin states with id " << createId(byte_n, bit_n);
       }
     }
   }
@@ -154,7 +154,7 @@ TEST(IOStateConversionsTest, shouldReturnOutputPinStatesForAllUsedOutputsWithout
       if (isUsedOutputBit(byte_n, bit_n))
       {
         const auto pin_state_count{ countPinStatesWithId(pin_states, createId(byte_n, bit_n)) };
-        EXPECT_EQ(pin_state_count, 1) << "Wrong number of pin states with id " << createId(byte_n, bit_n);
+        EXPECT_EQ(pin_state_count, 1u) << "Wrong number of pin states with id " << createId(byte_n, bit_n);
       }
     }
   }
