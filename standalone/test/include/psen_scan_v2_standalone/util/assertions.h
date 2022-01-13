@@ -16,16 +16,8 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_TEST_ASSERTIONS_H
 #define PSEN_SCAN_V2_STANDALONE_TEST_ASSERTIONS_H
 
-#include <algorithm>
-
 #include <gtest/gtest.h>
 
 #define ASSERT_BARRIER_OPENS(barrier, wait_timeout) ASSERT_TRUE(barrier.waitTillRelease(wait_timeout))
-
-#define ASSERT_CONTAINS_WITH_PROPERTY_EQ(container, property, value)                                                   \
-  ASSERT_NE(                                                                                                           \
-      std::find_if(container.begin(), container.end(), [](const auto& input) { return input.property() == value; }),   \
-      container.end())                                                                                                 \
-      << #container << " does not contain an element with " << #property << "()==" << #value
 
 #endif  // PSEN_SCAN_V2_STANDALONE_TEST_ASSERTIONS_H
