@@ -54,7 +54,9 @@ class IOState
 public:
   IOState() = default;
   IOState(data_conversion_layer::monitoring_frame::io::PinData pin_data);
+  //! @return std::vector<PinState> containing a PinState for every (logical) input pin of the scanner.
   std::vector<PinState> input() const;
+  //! @return std::vector<PinState> containing a PinState for every output pin of the scanner.
   std::vector<PinState> output() const;
 
   bool operator==(const IOState& io_state) const;
