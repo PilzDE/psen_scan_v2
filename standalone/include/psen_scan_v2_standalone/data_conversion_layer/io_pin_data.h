@@ -17,13 +17,18 @@
 #define PSEN_SCAN_V2_STANDALONE_IO_PIN_H
 
 #include <functional>
+#include <ostream>
 #include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 #include "psen_scan_v2_standalone/data_conversion_layer/io_constants.h"
 #include "psen_scan_v2_standalone/io_state.h"
+#include "psen_scan_v2_standalone/util/format_range.h"
 
 namespace psen_scan_v2_standalone
 {

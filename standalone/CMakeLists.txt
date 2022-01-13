@@ -56,6 +56,7 @@ include_directories(
 
 set(${PROJECT_NAME}_sources
   src/scanner_v2.cpp
+  src/io_state.cpp
   src/laserscan.cpp
   src/data_conversion_layer/monitoring_frame_msg.cpp
   src/data_conversion_layer/start_request.cpp
@@ -320,16 +321,7 @@ add_executable(integrationtest_scanner_api
         test/integration_tests/api/integrationtest_scanner_api.cpp
         test/src/communication_layer/mock_udp_server.cpp
         test/src/communication_layer/scanner_mock.cpp
-        test/src/data_conversion_layer/monitoring_frame_serialization.cpp
-        src/scanner_v2.cpp
-        src/laserscan.cpp
-        src/data_conversion_layer/monitoring_frame_msg.cpp
-        src/data_conversion_layer/monitoring_frame_deserialization.cpp
-        src/data_conversion_layer/start_request.cpp
-        src/data_conversion_layer/stop_request_serialization.cpp
-        src/data_conversion_layer/diagnostics.cpp
-        src/data_conversion_layer/start_request_serialization.cpp
-        src/data_conversion_layer/scanner_reply_serialization_deserialization.cpp)
+        test/src/data_conversion_layer/monitoring_frame_serialization.cpp)
 
 target_link_libraries(integrationtest_scanner_api
     ${PROJECT_NAME}
