@@ -43,6 +43,18 @@ static inline PinState generateOutputPinState(const monitoring_frame::io::PinDat
            pin_data.outputPinState(byte_location, bit_location) };
 }
 
+static inline bool isUsedInputBit(std::size_t byte_n, std::size_t bit_n)
+{
+  return data_conversion_layer::monitoring_frame::io::getInputType(byte_n, bit_n) !=
+         data_conversion_layer::monitoring_frame::io::LogicalInputType::unused;
+}
+
+static inline bool isUsedOutputBit(std::size_t byte_n, std::size_t bit_n)
+{
+  return data_conversion_layer::monitoring_frame::io::getOutputType(byte_n, bit_n) !=
+         data_conversion_layer::monitoring_frame::io::OutputType::unused;
+}
+
 static inline std::vector<PinState> generateInputPinStates(const monitoring_frame::io::PinData& pin_data)
 {
   std::vector<PinState> pin_states;
@@ -50,7 +62,7 @@ static inline std::vector<PinState> generateInputPinStates(const monitoring_fram
   {
     for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
     {
-      if (monitoring_frame::io::getInputType(byte_n, bit_n) != monitoring_frame::io::LogicalInputType::unused)
+      if (isUsedInputBit(byte_n, bit_n))
       {
         pin_states.emplace_back(generateInputPinState(pin_data, byte_n, bit_n));
       }
@@ -66,7 +78,7 @@ static inline std::vector<PinState> generateOutputPinStates(const monitoring_fra
   {
     for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
     {
-      if (monitoring_frame::io::getOutputType(byte_n, bit_n) != monitoring_frame::io::OutputType::unused)
+      if (isUsedOutputBit(byte_n, bit_n))
       {
         pin_states.emplace_back(generateOutputPinState(pin_data, byte_n, bit_n));
       }

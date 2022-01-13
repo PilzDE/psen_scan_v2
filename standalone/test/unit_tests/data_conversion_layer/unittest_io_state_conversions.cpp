@@ -27,8 +27,10 @@
 namespace psen_scan_v2_standalone_test
 {
 using namespace psen_scan_v2_standalone;
+using data_conversion_layer::monitoring_frame::io::LogicalInputType;
 using data_conversion_layer::monitoring_frame::io::NUMBER_OF_INPUT_BYTES;
 using data_conversion_layer::monitoring_frame::io::NUMBER_OF_OUTPUT_BYTES;
+using data_conversion_layer::monitoring_frame::io::OutputType;
 using data_conversion_layer::monitoring_frame::io::PinData;
 
 TEST(IOStateConversionsTest, shouldReturnInputPinStateWithCorrectId)
@@ -77,6 +79,30 @@ TEST(IOStateConversionsTest, shouldReturnOutputPinStateWithCorrectState)
   EXPECT_TRUE(pin_state2.state());
 }
 
+TEST(IOStateConversionsTest, shouldReturnFalseForUnusedInputBit)
+{
+  ASSERT_EQ(data_conversion_layer::monitoring_frame::io::getInputType(1, 0), LogicalInputType::unused);
+  EXPECT_FALSE(data_conversion_layer::isUsedInputBit(1, 0));
+}
+
+TEST(IOStateConversionsTest, shouldReturnTrueForUsedInputBit)
+{
+  ASSERT_NE(data_conversion_layer::monitoring_frame::io::getInputType(0, 0), LogicalInputType::unused);
+  EXPECT_TRUE(data_conversion_layer::isUsedInputBit(0, 0));
+}
+
+TEST(IOStateConversionsTest, shouldReturnFalseForUnusedOutputBit)
+{
+  ASSERT_EQ(data_conversion_layer::monitoring_frame::io::getOutputType(1, 0), OutputType::unused);
+  EXPECT_FALSE(data_conversion_layer::isUsedOutputBit(1, 0));
+}
+
+TEST(IOStateConversionsTest, shouldReturnTrueForUsedOutputBit)
+{
+  ASSERT_NE(data_conversion_layer::monitoring_frame::io::getOutputType(0, 0), OutputType::unused);
+  EXPECT_TRUE(data_conversion_layer::isUsedOutputBit(0, 0));
+}
+
 TEST(IOStateConversionsTest, shouldReturnInputPinStatesEqualToIndividuallyGeneratedPinStates)
 {
   const auto pin_data{ createPinData() };
@@ -110,18 +136,6 @@ uint32_t createId(std::size_t byte, std::size_t bit)
   return static_cast<uint32_t>(byte * 8 + bit);
 }
 
-bool isUsedInputBit(std::size_t byte_n, std::size_t bit_n)
-{
-  return data_conversion_layer::monitoring_frame::io::getInputType(byte_n, bit_n) !=
-         data_conversion_layer::monitoring_frame::io::LogicalInputType::unused;
-}
-
-bool isUsedOutputBit(std::size_t byte_n, std::size_t bit_n)
-{
-  return data_conversion_layer::monitoring_frame::io::getOutputType(byte_n, bit_n) !=
-         data_conversion_layer::monitoring_frame::io::OutputType::unused;
-}
-
 std::size_t countPinStatesWithId(const std::vector<PinState>& pin_states, uint32_t id)
 {
   return std::count_if(
@@ -135,7 +149,7 @@ TEST(IOStateConversionsTest, shouldReturnInputPinStatesForAllUsedInputsWithoutRe
   {
     for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
     {
-      if (isUsedInputBit(byte_n, bit_n))
+      if (data_conversion_layer::isUsedInputBit(byte_n, bit_n))
       {
         const auto pin_state_count{ countPinStatesWithId(pin_states, createId(byte_n, bit_n)) };
         EXPECT_EQ(pin_state_count, 1u) << "Wrong number of pin states with id " << createId(byte_n, bit_n);
@@ -151,7 +165,7 @@ TEST(IOStateConversionsTest, shouldReturnOutputPinStatesForAllUsedOutputsWithout
   {
     for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
     {
-      if (isUsedOutputBit(byte_n, bit_n))
+      if (data_conversion_layer::isUsedOutputBit(byte_n, bit_n))
       {
         const auto pin_state_count{ countPinStatesWithId(pin_states, createId(byte_n, bit_n)) };
         EXPECT_EQ(pin_state_count, 1u) << "Wrong number of pin states with id " << createId(byte_n, bit_n);

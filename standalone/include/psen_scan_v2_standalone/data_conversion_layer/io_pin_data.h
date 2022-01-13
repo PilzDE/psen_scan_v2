@@ -19,7 +19,6 @@
 #include <array>
 #include <bitset>
 #include <ostream>
-#include <sstream>
 #include <string>
 
 #include <fmt/format.h>
