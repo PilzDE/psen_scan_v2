@@ -27,6 +27,8 @@
 namespace psen_scan_v2_standalone_test
 {
 using namespace psen_scan_v2_standalone;
+using data_conversion_layer::monitoring_frame::io::NUMBER_OF_INPUT_BYTES;
+using data_conversion_layer::monitoring_frame::io::NUMBER_OF_OUTPUT_BYTES;
 using data_conversion_layer::monitoring_frame::io::PinData;
 
 TEST(IOStateConversionsTest, shouldReturnInputPinStateWithCorrectId)
@@ -89,31 +91,6 @@ TEST(IOStateConversionsTest, shouldReturnInputPinStatesEqualToIndividuallyGenera
   }
 }
 
-uint32_t createId(std::size_t byte, std::size_t bit)
-{
-  return static_cast<uint32_t>(byte * 8 + bit);
-}
-
-TEST(IOStateConversionsTest, shouldReturnInputPinStatesForAllUsedInputsWithoutRepetition)
-{
-  const auto pin_states{ data_conversion_layer::generateInputPinStates(PinData()) };
-  for (std::size_t byte_n = 0; byte_n < data_conversion_layer::monitoring_frame::io::NUMBER_OF_INPUT_BYTES; ++byte_n)
-  {
-    for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
-    {
-      if (data_conversion_layer::monitoring_frame::io::getInputType(byte_n, bit_n) !=
-          data_conversion_layer::monitoring_frame::io::LogicalInputType::unused)
-      {
-        EXPECT_EQ(std::count_if(pin_states.begin(),
-                                pin_states.end(),
-                                [&](const auto& pin_state) { return pin_state.id() == createId(byte_n, bit_n); }),
-                  1)
-            << "Wrong number of elements with id " << createId(byte_n, bit_n);
-      }
-    }
-  }
-}
-
 TEST(IOStateConversionsTest, shouldReturnOutputPinStatesEqualToIndividuallyGeneratedPinStates)
 {
   const auto pin_data{ createPinData() };
@@ -128,21 +105,56 @@ TEST(IOStateConversionsTest, shouldReturnOutputPinStatesEqualToIndividuallyGener
   }
 }
 
-TEST(IOStateConversionsTest, shouldReturnOutputPinStatesForAllUsedOutputsWithoutRepetition)
+uint32_t createId(std::size_t byte, std::size_t bit)
 {
-  const auto pin_states{ data_conversion_layer::generateOutputPinStates(PinData()) };
-  for (std::size_t byte_n = 0; byte_n < data_conversion_layer::monitoring_frame::io::NUMBER_OF_OUTPUT_BYTES; ++byte_n)
+  return static_cast<uint32_t>(byte * 8 + bit);
+}
+
+bool isUsedInputBit(std::size_t byte_n, std::size_t bit_n)
+{
+  return data_conversion_layer::monitoring_frame::io::getInputType(byte_n, bit_n) !=
+         data_conversion_layer::monitoring_frame::io::LogicalInputType::unused;
+}
+
+bool isUsedOutputBit(std::size_t byte_n, std::size_t bit_n)
+{
+  return data_conversion_layer::monitoring_frame::io::getOutputType(byte_n, bit_n) !=
+         data_conversion_layer::monitoring_frame::io::OutputType::unused;
+}
+
+std::size_t countPinStatesWithId(const std::vector<PinState>& pin_states, uint32_t id)
+{
+  return std::count_if(
+      pin_states.begin(), pin_states.end(), [id](const auto& pin_state) { return pin_state.id() == id; });
+}
+
+TEST(IOStateConversionsTest, shouldReturnInputPinStatesForAllUsedInputsWithoutRepetition)
+{
+  const auto pin_states{ data_conversion_layer::generateInputPinStates(PinData()) };
+  for (std::size_t byte_n = 0; byte_n < NUMBER_OF_INPUT_BYTES; ++byte_n)
   {
     for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
     {
-      if (data_conversion_layer::monitoring_frame::io::getOutputType(byte_n, bit_n) !=
-          data_conversion_layer::monitoring_frame::io::OutputType::unused)
+      if (isUsedInputBit(byte_n, bit_n))
       {
-        EXPECT_EQ(std::count_if(pin_states.begin(),
-                                pin_states.end(),
-                                [&](const auto& pin_state) { return pin_state.id() == createId(byte_n, bit_n); }),
-                  1)
-            << "Wrong number of elements with id " << createId(byte_n, bit_n);
+        const auto pin_state_count{ countPinStatesWithId(pin_states, createId(byte_n, bit_n)) };
+        EXPECT_EQ(pin_state_count, 1) << "Wrong number of pin states with id " << createId(byte_n, bit_n);
+      }
+    }
+  }
+}
+
+TEST(IOStateConversionsTest, shouldReturnOutputPinStatesForAllUsedOutputsWithoutRepetition)
+{
+  const auto pin_states{ data_conversion_layer::generateOutputPinStates(PinData()) };
+  for (std::size_t byte_n = 0; byte_n < NUMBER_OF_OUTPUT_BYTES; ++byte_n)
+  {
+    for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
+    {
+      if (isUsedOutputBit(byte_n, bit_n))
+      {
+        const auto pin_state_count{ countPinStatesWithId(pin_states, createId(byte_n, bit_n)) };
+        EXPECT_EQ(pin_state_count, 1) << "Wrong number of pin states with id " << createId(byte_n, bit_n);
       }
     }
   }
