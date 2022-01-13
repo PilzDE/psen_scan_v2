@@ -137,7 +137,6 @@ set(${PROJECT_NAME}_standalone_sources
   standalone/src/scanner_v2.cpp
   standalone/src/io_state.cpp
   standalone/src/laserscan.cpp
-  standalone/src/io_state.cpp
   standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
   standalone/src/data_conversion_layer/start_request.cpp
   standalone/src/data_conversion_layer/start_request_serialization.cpp
@@ -689,16 +688,12 @@ if(CATKIN_ENABLE_TESTING)
 
     catkin_add_gtest(hwtest_scan_compare_standalone
       test/hw_tests/hwtest_scan_compare_standalone.cpp
-      standalone/src/io_state.cpp
-      standalone/src/laserscan.cpp
     )
 
   else()
     # always at least build the test to avoid build breaking changes
     catkin_add_executable_with_gtest(hwtest_scan_compare_standalone
                                             test/hw_tests/hwtest_scan_compare_standalone.cpp
-                                            standalone/src/io_state.cpp
-                                            standalone/src/laserscan.cpp
                                             EXCLUDE_FROM_ALL)
     add_dependencies(tests hwtest_scan_compare_standalone)
 
