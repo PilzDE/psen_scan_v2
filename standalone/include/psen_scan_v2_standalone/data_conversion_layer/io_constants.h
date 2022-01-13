@@ -157,7 +157,7 @@ using Ot = OutputType;
 static const std::map<Ot, IoName> OUTPUT_BIT_TO_NAME
 {
   { Ot::unused, "unused" },
-  { Ot::ossd1_refpts, "OSSD1_REFPTS" },
+  { Ot::ossd1_refpts, "REFERENCE POINTS VIOLATION" },
 
   { Ot::warn_2_int, "Warning 2 intrusion" },
   { Ot::warn_1_int, "Warning 1 intrusion" },
