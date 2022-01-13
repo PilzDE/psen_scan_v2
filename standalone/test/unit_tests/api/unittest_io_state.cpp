@@ -50,7 +50,9 @@ TEST(IOStateTests, shouldReturnOutputsWhereAllAreUnsetWhenDefaultConstructed)
 TEST(IOStateTests, shouldReturnInputsEqualToConvertedInputPinData)
 {
   PinData pin_data{};
-  pin_data.inputPinState(5, 1, true);  // make sure to not use "unused" bits
+  pin_data.inputPinState(5, 1, true);
+  ASSERT_TRUE(data_conversion_layer::isUsedInputBit(5, 1));
+
   const auto inputs{ IOState(pin_data).input() };
   EXPECT_EQ(inputs, data_conversion_layer::generateInputPinStates(pin_data));
 }
@@ -58,7 +60,9 @@ TEST(IOStateTests, shouldReturnInputsEqualToConvertedInputPinData)
 TEST(IOStateTests, shouldReturnOutputsEqualToConvertedOutputPinData)
 {
   PinData pin_data{};
-  pin_data.outputPinState(0, 2, true);  // make sure to not use "unused" bits
+  pin_data.outputPinState(0, 2, true);
+  ASSERT_TRUE(data_conversion_layer::isUsedOutputBit(0, 2));
+
   const auto outputs{ IOState(pin_data).output() };
   EXPECT_EQ(outputs, data_conversion_layer::generateOutputPinStates(pin_data));
 }
