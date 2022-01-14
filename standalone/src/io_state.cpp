@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Pilz GmbH & Co. KG
+// Copyright (c) 2021-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -22,6 +22,8 @@
 #include <fmt/ostream.h>
 
 #include "psen_scan_v2_standalone/io_state.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_state_conversions.h"
 #include "psen_scan_v2_standalone/util/format_range.h"
 
 namespace psen_scan_v2_standalone
@@ -57,32 +59,36 @@ bool PinState::state() const
 
 std::ostream& operator<<(std::ostream& os, const PinState& pin_state)
 {
-  return os << fmt::format(  // LCOV_EXCL_LINE lcov bug?
-             "PinState(id = {}, name = {}, state = {})",
-             pin_state.id(),
-             pin_state.name(),
-             pin_state.state());
+  os << fmt::format("PinState(id = {}, name = {}, state = {})", pin_state.id(), pin_state.name(), pin_state.state());
+  return os;
 }
 
-IOState::IOState(std::vector<PinState> input, std::vector<PinState> output)
-  : input_(std::move(input)), output_(std::move(output))
+IOState::IOState(data_conversion_layer::monitoring_frame::io::PinData pin_data) : pin_data_(pin_data)
 {
 }
 
-const std::vector<PinState>& IOState::input() const
+bool IOState::operator==(const IOState& io_state) const
 {
-  return input_;
+  return pin_data_ == io_state.pin_data_;
 }
 
-const std::vector<PinState>& IOState::output() const
+bool IOState::operator!=(const IOState& io_state) const
 {
-  return output_;
+  return !operator==(io_state);
+}
+
+std::vector<PinState> IOState::input() const
+{
+  return data_conversion_layer::generateInputPinStates(pin_data_);
+}
+
+std::vector<PinState> IOState::output() const
+{
+  return data_conversion_layer::generateOutputPinStates(pin_data_);
 }
 
 std::ostream& operator<<(std::ostream& os, const IOState& io_state)
 {
-  return os << fmt::format("IOState(input = {}, output = {})",
-                           util::formatRange(io_state.input()),
-                           util::formatRange(io_state.output()));
+  return os << io_state.pin_data_;
 }
 }  // namespace psen_scan_v2_standalone

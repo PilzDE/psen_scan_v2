@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -114,8 +114,7 @@ inline LaserScan LaserScanConverter::toLaserScan(
     }
     if (stamped_msgs[index].msg_.hasIOPinField())
     {
-      auto io = stamped_msgs[index].msg_.iOPinData();
-      io_states.emplace_back(io.input, io.output);
+      io_states.emplace_back(stamped_msgs[index].msg_.iOPinData());
     }
   }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Pilz GmbH & Co. KG
+// Copyright (c) 2021-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -19,6 +19,8 @@
 #include <ostream>
 #include <string>
 #include <vector>
+
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -51,13 +53,20 @@ class IOState
 {
 public:
   IOState() = default;
-  IOState(std::vector<PinState> input, std::vector<PinState> output);
-  const std::vector<PinState>& input() const;
-  const std::vector<PinState>& output() const;
+  IOState(data_conversion_layer::monitoring_frame::io::PinData pin_data);
+  //! @return std::vector<PinState> containing a PinState for every (logical) input pin of the scanner.
+  std::vector<PinState> input() const;
+  //! @return std::vector<PinState> containing a PinState for every output pin of the scanner.
+  std::vector<PinState> output() const;
+
+  bool operator==(const IOState& io_state) const;
+  bool operator!=(const IOState& io_state) const;
+
+public:
+  friend std::ostream& operator<<(std::ostream& os, const IOState& io_state);
 
 private:
-  std::vector<PinState> input_{};
-  std::vector<PinState> output_{};
+  data_conversion_layer::monitoring_frame::io::PinData pin_data_{};
 };
 
 std::ostream& operator<<(std::ostream& os, const IOState& io_state);

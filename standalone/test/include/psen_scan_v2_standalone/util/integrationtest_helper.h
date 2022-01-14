@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -95,10 +95,7 @@ createMonitoringFrameMsgBuilderWithoutDiagnostics(const util::TenthOfDegree star
 
   msg_builder.intensities(generateIntensities(num_elements, lowest_intensity, highest_intensity));
 
-  auto pin_data = createCompleteIOPinData();  // A valid frame contains a complete set of pin data
-  setInputPin(pin_data, data_conversion_layer::monitoring_frame::io::LogicalInputType::muting_1_a);
-  setOutputPin(pin_data, data_conversion_layer::monitoring_frame::io::OutputType::safe_1_int);
-  msg_builder.iOPinData(pin_data);
+  msg_builder.iOPinData(createPinData());
 
   return msg_builder;
 }

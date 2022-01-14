@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -75,10 +75,10 @@ inline io::PinData readIOField(const std::array<uint8_t, ARRAY_SIZE> hex_dump, c
   io::PinData io_pin_data;
 
   raw_processing::read<std::array<uint8_t, 4>>(ss);
-  io_pin_data.input = io::deserializePinField(ss, 8, io::LOGICAL_INPUT_BITS, io::LOGICAL_INPUT_BIT_TO_NAME);
+  io::deserializePinField(ss, io_pin_data.input_state);
 
   raw_processing::read<std::array<uint8_t, 4>>(ss);
-  io_pin_data.output = io::deserializePinField(ss, 4, io::OUTPUT_BITS, io::OUTPUT_BIT_TO_NAME);
+  io::deserializePinField(ss, io_pin_data.output_state);
 
   return io_pin_data;
 }

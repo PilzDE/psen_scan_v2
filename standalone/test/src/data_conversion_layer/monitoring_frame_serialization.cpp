@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -146,13 +146,19 @@ std::size_t calculateBitLocation(uint32_t id)
   return id % 8;
 }
 
-void serializeSingleRecord(RawChunk& raw_pin_data, const PinData::States& pin_states, std::size_t offset)
+template <std::size_t ChunkSize>
+void serializeSingleRecord(RawChunk& raw_pin_data,
+                           const std::array<std::bitset<8>, ChunkSize>& pin_states,
+                           std::size_t offset)
 {
-  for (const auto& pin_state : pin_states)
+  for (std::size_t byte = 0; byte < pin_states.size(); ++byte)
   {
-    if (pin_state.state())
+    for (std::size_t bit = 0; bit < 8; ++bit)
     {
-      raw_pin_data.at(offset + calculateByteLocation(pin_state.id())) += (1 << calculateBitLocation(pin_state.id()));
+      if (pin_states[byte][bit])
+      {
+        raw_pin_data.at(offset + byte) += (1 << bit);
+      }
     }
   }
 }
@@ -163,10 +169,10 @@ RawChunk serialize(const PinData& pin_data)
   std::size_t offset = 3 * (RAW_CHUNK_LENGTH_RESERVED_IN_BYTES + RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES) +
                        RAW_CHUNK_LENGTH_RESERVED_IN_BYTES;
 
-  serializeSingleRecord(raw_pin_data, pin_data.input, offset);
+  serializeSingleRecord(raw_pin_data, pin_data.input_state, offset);
   offset += RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES + RAW_CHUNK_LENGTH_RESERVED_IN_BYTES;
 
-  serializeSingleRecord(raw_pin_data, pin_data.output, offset);
+  serializeSingleRecord(raw_pin_data, pin_data.output_state, offset);
   return raw_pin_data;
 }
 }  // namespace io

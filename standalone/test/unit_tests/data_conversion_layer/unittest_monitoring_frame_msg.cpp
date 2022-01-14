@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2019-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -164,8 +164,8 @@ TEST(MonitoringFrameMsgTest, shouldReturnCorrectIntensities)
 TEST(MonitoringFrameMsgTest, shouldReturnCorrectIOPin)
 {
   io::PinData expected_io_pin_data;
-  expected_io_pin_data.input = { PinState(3, "zone1", true) };
-  expected_io_pin_data.output = { PinState(1, "OSSD", false) };
+  expected_io_pin_data.input_state.at(2u).set(5u);
+  expected_io_pin_data.output_state.at(1u).set(3u);
   io::PinData io_pin_data;
   ASSERT_NO_THROW(io_pin_data = MessageBuilder().iOPinData(expected_io_pin_data).build().iOPinData());
   EXPECT_THAT(io_pin_data, IOPinDataEq(expected_io_pin_data));

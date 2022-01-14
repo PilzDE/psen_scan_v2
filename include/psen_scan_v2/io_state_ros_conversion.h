@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Pilz GmbH & Co. KG
+// Copyright (c) 2021-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -17,6 +17,7 @@
 #define PSEN_SCAN_V2_IO_STATE_ROS_CONVERSIONS_H
 
 #include <string>
+#include <algorithm>
 
 #include "psen_scan_v2/IOState.h"
 #include "psen_scan_v2/InputPinState.h"
@@ -47,15 +48,15 @@ psen_scan_v2::IOState toIOStateMsg(const psen_scan_v2_standalone::IOState& io_st
   ros_message.header.stamp = ros::Time{}.fromNSec(stamp);
   ros_message.header.frame_id = frame_id;
 
-  std::transform(io_state.input().begin(),
-                 io_state.input().end(),
-                 std::back_inserter(ros_message.input),
-                 [](const auto& pin) { return toPinStateMsg<InputPinState>(pin); });
+  auto input = io_state.input();
+  std::transform(input.begin(), input.end(), std::back_inserter(ros_message.input), [](const auto& pin) {
+    return toPinStateMsg<InputPinState>(pin);
+  });
 
-  std::transform(io_state.output().begin(),
-                 io_state.output().end(),
-                 std::back_inserter(ros_message.output),
-                 [](const auto& pin) { return toPinStateMsg<OutputPinState>(pin); });
+  auto output = io_state.output();
+  std::transform(output.begin(), output.end(), std::back_inserter(ros_message.output), [](const auto& pin) {
+    return toPinStateMsg<OutputPinState>(pin);
+  });
 
   return ros_message;
 }

@@ -57,16 +57,11 @@
       },                                                                                                               \
       expected_exception);
 
-#define EXPECT_IO_STATE_EQ_IO_PIN(io_state, io_pin_data, start_index)                                                  \
-  EXPECT_EQ(io_pin_data.input, io_state.at(start_index).input());                                                      \
-  EXPECT_EQ(io_pin_data.output, io_state.at(start_index).output());
-
-#define EXPECT_CONTAINER_UNORDERED_EQ(var1, var2)                                                                      \
-  EXPECT_EQ(var1.size(), var2.size());                                                                                 \
-  for (const auto& v : var2)                                                                                           \
+#define EXPECT_BITSETS_EQ(ref_bitset, expected_bitset)                                                                 \
+  ASSERT_EQ(ref_bitset.size(), expected_bitset.size());                                                                \
+  for (std::size_t i = 0; i < ref_bitset.size(); i++)                                                                  \
   {                                                                                                                    \
-    EXPECT_NE(std::find(var1.begin(), var1.end(), v), var1.end())                                                      \
-        << "Did not find the expected element: " << v << " in " << util::formatRange(var1);                            \
+    EXPECT_EQ(ref_bitset[i], expected_bitset[i]);                                                                      \
   }
 
 #endif  // PSEN_SCAN_V2_STANDALONE_TEST_GTEST_EXPECTATIONS_H

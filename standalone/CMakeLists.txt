@@ -143,7 +143,9 @@ TARGET_LINK_LIBRARIES(unittest_laserscan
 ADD_TEST(NAME unittest_laserscan
          COMMAND unittest_laserscan)
 
-ADD_EXECUTABLE(unittest_pin_state test/unit_tests/api/unittest_pin_state.cpp)
+ADD_EXECUTABLE(unittest_pin_state
+               test/unit_tests/api/unittest_pin_state.cpp
+               src/io_state.cpp)
 
 TARGET_LINK_LIBRARIES(unittest_pin_state
     ${PROJECT_NAME}
@@ -153,7 +155,9 @@ TARGET_LINK_LIBRARIES(unittest_pin_state
 ADD_TEST(NAME unittest_pin_state
          COMMAND unittest_pin_state)
 
-ADD_EXECUTABLE(unittest_io_state test/unit_tests/api/unittest_io_state.cpp)
+ADD_EXECUTABLE(unittest_io_state
+               test/unit_tests/api/unittest_io_state.cpp
+               src/io_state.cpp)
 
 TARGET_LINK_LIBRARIES(unittest_io_state
     ${PROJECT_NAME}
@@ -162,6 +166,28 @@ TARGET_LINK_LIBRARIES(unittest_io_state
 
 ADD_TEST(NAME unittest_io_state
          COMMAND unittest_io_state)
+
+ADD_EXECUTABLE(unittest_io_state_conversions
+               test/unit_tests/data_conversion_layer/unittest_io_state_conversions.cpp
+               src/io_state.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_io_state_conversions
+    ${PROJECT_NAME}
+    gtest
+)
+
+ADD_TEST(NAME unittest_io_state_conversions
+         COMMAND unittest_io_state_conversions)
+
+ADD_EXECUTABLE(unittest_io_pin_data test/unit_tests/data_conversion_layer/unittest_io_pin_data.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_io_pin_data
+    ${PROJECT_NAME}
+    gtest
+)
+
+ADD_TEST(NAME unittest_io_pin_data
+         COMMAND unittest_io_pin_data)
 
 ADD_EXECUTABLE(unittest_logging test/unit_tests/util/unittest_logging.cpp)
 

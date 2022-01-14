@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Pilz GmbH & Co. KG
+// Copyright (c) 2021-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -36,8 +36,8 @@ namespace psen_scan_v2_standalone_test
 static data_conversion_layer::monitoring_frame::Message createMsg()
 {
   data_conversion_layer::monitoring_frame::io::PinData io_pin_data;
-  io_pin_data.input = { PinState(3, "zone1", true) };
-  io_pin_data.output = { PinState(1, "OSSD", false) };
+  io_pin_data.input_state.at(0).set(3);
+  io_pin_data.output_state.at(0).reset(1);
 
   return data_conversion_layer::monitoring_frame::MessageBuilder()
       .fromTheta(util::TenthOfDegree{ 10 })

@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2021-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -16,54 +16,72 @@
 #include <gtest/gtest.h>
 
 #include "psen_scan_v2_standalone/io_state.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_state_conversions.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
+
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
+#include "psen_scan_v2_standalone/util/assertions.h"
 
 namespace psen_scan_v2_standalone_test
 {
-using psen_scan_v2_standalone::IOState;
-using psen_scan_v2_standalone::PinState;
+using namespace psen_scan_v2_standalone;
+using data_conversion_layer::monitoring_frame::io::PinData;
 
-TEST(IOStateTests, shouldOnlyContainAddedInputPinState)
+TEST(IOStateTests, shouldReturnInputsWhereAllAreUnsetWhenDefaultConstructed)
 {
-  IOState io_state({ PinState(5, "some name", false) }, {});
-
-  EXPECT_EQ(io_state.input().size(), 1u);
-  EXPECT_EQ(io_state.input().at(0), PinState(5, "some name", false));
-
-  EXPECT_TRUE(io_state.output().empty());
-}
-
-TEST(IOStateTests, shouldOnlyContainAddedOutputPinState)
-{
-  IOState io_state({}, { PinState(5, "some name", false) });
-
-  EXPECT_TRUE(io_state.input().empty());
-
-  EXPECT_EQ(io_state.output().size(), 1u);
-  EXPECT_EQ(io_state.output().at(0), PinState(5, "some name", false));
-}
-
-TEST(IOStateTests, shouldContainAllInputPinStatesInCorrectOrder)
-{
-  std::vector<PinState> pins{ PinState(1, "a", false), PinState(5, "b", true), PinState(3, "c", false) };
-  IOState io_state(pins, {});
-
-  ASSERT_EQ(io_state.input().size(), 3u);
-  for (size_t i = 0; i < pins.size(); ++i)
+  const auto inputs{ IOState().input() };
+  ASSERT_FALSE(inputs.empty());
+  for (const auto& input : inputs)
   {
-    EXPECT_EQ(io_state.input().at(i), pins.at(i));
+    EXPECT_FALSE(input.state());
   }
 }
 
-TEST(IOStateTests, shouldContainAllOutputPinStatesInCorrectOrder)
+TEST(IOStateTests, shouldReturnOutputsWhereAllAreUnsetWhenDefaultConstructed)
 {
-  std::vector<PinState> pins{ PinState(1, "a", false), PinState(5, "b", true), PinState(3, "c", false) };
-  IOState io_state({}, pins);
-
-  ASSERT_EQ(io_state.output().size(), 3u);
-  for (size_t i = 0; i < pins.size(); ++i)
+  const auto outputs{ IOState().output() };
+  ASSERT_FALSE(outputs.empty());
+  for (const auto& output : outputs)
   {
-    EXPECT_EQ(io_state.output().at(i), pins.at(i));
+    EXPECT_FALSE(output.state());
   }
+}
+
+TEST(IOStateTests, shouldReturnInputsEqualToConvertedInputPinData)
+{
+  PinData pin_data{};
+  pin_data.input_state.at(5).set(1);
+  ASSERT_TRUE(data_conversion_layer::isUsedInputBit(5, 1));
+
+  const auto inputs{ IOState(pin_data).input() };
+  EXPECT_EQ(inputs, data_conversion_layer::generateInputPinStates(pin_data));
+}
+
+TEST(IOStateTests, shouldReturnOutputsEqualToConvertedOutputPinData)
+{
+  PinData pin_data{};
+  pin_data.output_state.at(0).set(2);
+  ASSERT_TRUE(data_conversion_layer::isUsedOutputBit(0, 2));
+
+  const auto outputs{ IOState(pin_data).output() };
+  EXPECT_EQ(outputs, data_conversion_layer::generateOutputPinStates(pin_data));
+}
+
+TEST(IOStateTests, shouldNotBeEqualWithDifferentPinData)
+{
+  PinData pin_data{};
+  pin_data.input_state.at(5).set(1);
+  EXPECT_NE(IOState(pin_data), IOState(PinData{}));
+}
+
+TEST(IOStateTests, shouldBeEqualWhithEqualPinData)
+{
+  EXPECT_EQ(IOState(PinData{}), IOState(PinData{}));
+}
+
+TEST(IOStateTests, shouldBeEqualWhenDefaultConstructed)
+{
+  EXPECT_EQ(IOState{}, IOState{});
 }
 
 }  // namespace psen_scan_v2_standalone_test

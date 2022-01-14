@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -190,11 +190,10 @@ PinData deserializePins(std::istream& is)
       std::array<uint8_t, 3 * (RAW_CHUNK_LENGTH_RESERVED_IN_BYTES + RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES)>>(is);
 
   raw_processing::read<std::array<uint8_t, RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  io_pin_data.input =
-      deserializePinField(is, RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES, LOGICAL_INPUT_BITS, LOGICAL_INPUT_BIT_TO_NAME);
+  deserializePinField(is, io_pin_data.input_state);
 
   raw_processing::read<std::array<uint8_t, RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
-  io_pin_data.output = deserializePinField(is, RAW_CHUNK_OUTPUT_SIGNALS_IN_BYTES, OUTPUT_BITS, OUTPUT_BIT_TO_NAME);
+  deserializePinField(is, io_pin_data.output_state);
 
   return io_pin_data;
 }

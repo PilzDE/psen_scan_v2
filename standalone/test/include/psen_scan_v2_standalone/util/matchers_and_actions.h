@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Pilz GmbH & Co. KG
+// Copyright (c) 2021-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -101,7 +101,8 @@ MATCHER_P2(TimestampInExpectedTimeframe, reference_scan, reference_timestamp, ""
 
 MATCHER_P(IOPinDataEq, ref_pin, "")
 {
-  return Matches(Pointwise(Eq(), ref_pin.input))(arg.input) && Matches(Pointwise(Eq(), ref_pin.output))(arg.output);
+  return Matches(Pointwise(Eq(), ref_pin.input_state))(arg.input_state) &&
+         Matches(Pointwise(Eq(), ref_pin.output_state))(arg.output_state);
 }
 
 MATCHER_P(MonitoringFrameEq, reference_msg, "")

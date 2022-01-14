@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -154,28 +154,14 @@ std::vector<diagnostic::Message> deserializeMessages(std::istream& is);
 
 namespace io
 {
-template <typename PinType, size_t ChunkSize>
-PinData::States deserializePinField(std::istream& is,
-                                    std::size_t length_in_bytes,
-                                    const std::array<std::array<PinType, 8>, ChunkSize>& type_lookup_array,
-                                    const std::map<PinType, IoName>& name_lookup_map)
+template <size_t ChunkSize>
+void deserializePinField(std::istream& is, std::array<std::bitset<8>, ChunkSize>& pin_states)
 {
-  std::vector<PinState> pin_field;
-  for (size_t byte_n = 0; byte_n < length_in_bytes; byte_n++)
+  for (auto& byte_states : pin_states)
   {
     const auto raw_byte = raw_processing::read<uint8_t>(is);
-    const std::bitset<8> raw_bits(raw_byte);
-    for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
-    {
-      // auto pin_state = add_func(byte_n, bit_n, raw_bits[bit_n]);
-      auto input_bit = type_lookup_array.at(byte_n).at(bit_n);
-      if (input_bit != PinType::unused)
-      {
-        pin_field.emplace_back(createID(byte_n, bit_n), name_lookup_map.at(input_bit), raw_bits[bit_n]);
-      }
-    }
+    byte_states |= std::bitset<8>(raw_byte);
   }
-  return pin_field;
 }
 PinData deserializePins(std::istream& is);
 }  // namespace io

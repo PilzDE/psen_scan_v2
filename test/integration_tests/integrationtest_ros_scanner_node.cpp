@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -26,6 +26,7 @@
 #include <std_msgs/UInt8.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scanner_config_builder.h"
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
@@ -62,13 +63,11 @@ static constexpr std::chrono::seconds LOOP_END_TIMEOUT{ 4 };
 static constexpr std::chrono::seconds STOP_TIMEOUT{ 1 };
 
 static const psen_scan_v2_standalone::LaserScan::IOData IO_DATA1{
-  { psen_scan_v2_standalone::IOState({}, { psen_scan_v2_standalone::PinState(14, "output", false) }),
-    psen_scan_v2_standalone::IOState(
-        { psen_scan_v2_standalone::PinState(21, "input", true), psen_scan_v2_standalone::PinState(3, "input2", false) },
-        {}) }
+  { psen_scan_v2_standalone::IOState(createPinData({ 1, 0, 0, 0, 0, 0, 0, 0 }, { 1, 0, 0, 0 })),
+    psen_scan_v2_standalone::IOState(createPinData({ 0, 0, 0, 0, 0, 0, 0, 0 }, { 85, 0, 0, 0 })) }
 };
 static const psen_scan_v2_standalone::LaserScan::IOData IO_DATA2{ {
-    psen_scan_v2_standalone::IOState({}, {}),
+    psen_scan_v2_standalone::IOState(createPinData({ 1, 0, 0, 0, 0, 0, 0, 0 }, { 0, 0, 0, 0 })),
 } };
 
 static void setDefaultActions(ScannerMock& mock, util::Barrier& start_barrier)
