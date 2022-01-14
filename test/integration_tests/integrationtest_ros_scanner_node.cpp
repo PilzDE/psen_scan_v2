@@ -231,6 +231,26 @@ TEST_F(RosScannerNodeTests, shouldPublishActiveZonesetWhenLaserScanCallbackIsInv
   loop.wait_for(LOOP_END_TIMEOUT);
 }
 
+TEST_F(RosScannerNodeTests, shouldPublishLatchedOnIOStatesTopic)
+{
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
+  util::Barrier start_barrier;
+  setDefaultActions(ros_scanner_node.scanner_, start_barrier);
+
+  util::Barrier io_topic_barrier;
+  SubscriberMock<ros::MessageEvent<psen_scan_v2::IOState const>> subscriber(nh_priv_, "io_state", QUEUE_SIZE);
+  EXPECT_CALL(subscriber, callback(isLatched())).WillOnce(OpenBarrier(&io_topic_barrier));
+
+  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
+  ASSERT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
+
+  ros_scanner_node.scanner_.invokeLaserScanCallback(createValidLaserScan());
+  io_topic_barrier.waitTillRelease(DEFAULT_TIMEOUT);
+
+  ros_scanner_node.terminate();
+  loop.wait_for(LOOP_END_TIMEOUT);
+}
+
 TEST_F(RosScannerNodeTests, shouldPublishIOStatesEqualToConversionOfSuppliedStandaloneIOStates)
 {
   const std::string prefix{ "scanner" };
