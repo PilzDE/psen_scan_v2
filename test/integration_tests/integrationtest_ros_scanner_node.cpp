@@ -244,7 +244,9 @@ TEST_F(RosScannerNodeTests, shouldPublishLatchedOnIOStatesTopic)
   std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
   ASSERT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
 
-  ros_scanner_node.scanner_.invokeLaserScanCallback(createValidLaserScan());
+  auto scan = createValidLaserScan();
+  scan.ioStates(IO_DATA2);
+  ros_scanner_node.scanner_.invokeLaserScanCallback(scan);
   io_topic_barrier.waitTillRelease(DEFAULT_TIMEOUT);
 
   ros_scanner_node.terminate();
@@ -263,8 +265,8 @@ TEST_F(RosScannerNodeTests, shouldPublishIOStatesEqualToConversionOfSuppliedStan
   {
     InSequence s;
     EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA1.at(0), prefix, scan.timestamp())))).Times(1);
-    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA2.at(0), prefix, scan.timestamp())))).Times(1);
-    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA2.at(1), prefix, scan.timestamp()))))
+    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA1.at(1), prefix, scan.timestamp())))).Times(1);
+    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA2.at(0), prefix, scan.timestamp()))))
         .WillOnce(OpenBarrier(&io_topic_barrier));
   }
 
