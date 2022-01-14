@@ -164,8 +164,8 @@ TEST(MonitoringFrameMsgTest, shouldReturnCorrectIntensities)
 TEST(MonitoringFrameMsgTest, shouldReturnCorrectIOPin)
 {
   io::PinData expected_io_pin_data;
-  expected_io_pin_data.inputPinState(2u, 5u, true);
-  expected_io_pin_data.outputPinState(1u, 3u, true);
+  expected_io_pin_data.input_state.at(2u).set(5u);
+  expected_io_pin_data.output_state.at(1u).set(3u);
   io::PinData io_pin_data;
   ASSERT_NO_THROW(io_pin_data = MessageBuilder().iOPinData(expected_io_pin_data).build().iOPinData());
   EXPECT_THAT(io_pin_data, IOPinDataEq(expected_io_pin_data));

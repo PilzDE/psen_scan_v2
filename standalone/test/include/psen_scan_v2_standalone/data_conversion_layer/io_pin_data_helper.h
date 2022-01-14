@@ -36,12 +36,12 @@ inline std::size_t idToBit(uint32_t id)
 
 inline void setInputBit(PinData& pin_data, uint32_t id)
 {
-  return pin_data.inputPinState(idToByte(id), idToBit(id), true);
+  pin_data.input_state.at(idToByte(id)).set(idToBit(id));
 }
 
 inline void setOutputBit(PinData& pin_data, uint32_t id)
 {
-  return pin_data.outputPinState(idToByte(id), idToBit(id), true);
+  pin_data.output_state.at(idToByte(id)).set(idToBit(id));
 }
 
 inline PinData
@@ -49,8 +49,8 @@ createPinData(const std::array<std::bitset<8>, NUMBER_OF_INPUT_BYTES>& input_sta
               const std::array<std::bitset<8>, NUMBER_OF_OUTPUT_BYTES>& output_states = { 85, 0, 0, 0 })
 {
   PinData pin_data{};
-  pin_data.inputState() = input_states;
-  pin_data.outputState() = output_states;
+  pin_data.input_state = input_states;
+  pin_data.output_state = output_states;
   return pin_data;
 }
 }  // namespace psen_scan_v2_standalone_test

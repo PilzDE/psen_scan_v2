@@ -69,81 +69,23 @@ static inline std::string getOutputName(std::size_t byte_location, std::size_t b
 /**
  * @brief Represents the IO PIN field of a monitoring frame.
  */
-class PinData
+struct PinData
 {
-public:
-  //! @throws std::out_of_range if byte_location >= NUMBER_OF_INPUT_BYTES or bit_location >= 8
-  bool inputPinState(std::size_t byte_location, std::size_t bit_location) const;
-  //! @throws std::out_of_range if byte_location >= NUMBER_OF_OUTPUT_BYTES or bit_location >= 8
-  bool outputPinState(std::size_t byte_location, std::size_t bit_location) const;
-
-  //! @throws std::out_of_range if byte_location >= NUMBER_OF_INPUT_BYTES or bit_location >= 8
-  void inputPinState(std::size_t byte_location, std::size_t bit_location, bool pin_state);
-  //! @throws std::out_of_range if byte_location >= NUMBER_OF_OUTPUT_BYTES or bit_location >= 8
-  void outputPinState(std::size_t byte_location, std::size_t bit_location, bool pin_state);
-
-  std::array<std::bitset<8>, NUMBER_OF_INPUT_BYTES>& inputState();
-  std::array<std::bitset<8>, NUMBER_OF_OUTPUT_BYTES>& outputState();
-  const std::array<std::bitset<8>, NUMBER_OF_INPUT_BYTES>& inputState() const;
-  const std::array<std::bitset<8>, NUMBER_OF_OUTPUT_BYTES>& outputState() const;
-
   bool operator==(const PinData& pin_data) const;
-
-private:
-  std::array<std::bitset<8>, NUMBER_OF_INPUT_BYTES> input_states_{};
-  std::array<std::bitset<8>, NUMBER_OF_OUTPUT_BYTES> output_states_{};
+  std::array<std::bitset<8>, NUMBER_OF_INPUT_BYTES> input_state{};
+  std::array<std::bitset<8>, NUMBER_OF_OUTPUT_BYTES> output_state{};
 };
-
-inline bool PinData::inputPinState(std::size_t byte_location, std::size_t bit_location) const
-{
-  return input_states_.at(byte_location).test(bit_location);
-}
-
-inline bool PinData::outputPinState(std::size_t byte_location, std::size_t bit_location) const
-{
-  return output_states_.at(byte_location).test(bit_location);
-}
-
-inline void PinData::inputPinState(std::size_t byte_location, std::size_t bit_location, bool pin_state)
-{
-  input_states_.at(byte_location).set(bit_location, pin_state);
-}
-
-inline void PinData::outputPinState(std::size_t byte_location, std::size_t bit_location, bool pin_state)
-{
-  output_states_.at(byte_location).set(bit_location, pin_state);
-}
-
-inline std::array<std::bitset<8>, NUMBER_OF_INPUT_BYTES>& PinData::inputState()
-{
-  return input_states_;
-}
-
-inline std::array<std::bitset<8>, NUMBER_OF_OUTPUT_BYTES>& PinData::outputState()
-{
-  return output_states_;
-}
-
-inline const std::array<std::bitset<8>, NUMBER_OF_INPUT_BYTES>& PinData::inputState() const
-{
-  return input_states_;
-}
-
-inline const std::array<std::bitset<8>, NUMBER_OF_OUTPUT_BYTES>& PinData::outputState() const
-{
-  return output_states_;
-}
 
 inline bool PinData::operator==(const PinData& pin_data) const
 {
-  return input_states_ == pin_data.input_states_ && output_states_ == pin_data.output_states_;
+  return input_state == pin_data.input_state && output_state == pin_data.output_state;
 }
 
 inline std::ostream& operator<<(std::ostream& os, const PinData& pd)
 {
   return os << fmt::format("io::PinData(input = {}, output = {})",
-                           util::formatRange(pd.inputState()),
-                           util::formatRange(pd.outputState()));
+                           util::formatRange(pd.input_state),
+                           util::formatRange(pd.output_state));
 }
 
 }  // namespace io

@@ -31,7 +31,7 @@ static inline PinState generateInputPinState(const monitoring_frame::io::PinData
 {
   return { static_cast<uint32_t>(byte_location * 8 + bit_location),
            monitoring_frame::io::getInputName(byte_location, bit_location),
-           pin_data.inputPinState(byte_location, bit_location) };
+           pin_data.input_state.at(byte_location).test(bit_location) };
 }
 
 static inline PinState generateOutputPinState(const monitoring_frame::io::PinData& pin_data,
@@ -40,7 +40,7 @@ static inline PinState generateOutputPinState(const monitoring_frame::io::PinDat
 {
   return { static_cast<uint32_t>(byte_location * 8 + bit_location),
            monitoring_frame::io::getOutputName(byte_location, bit_location),
-           pin_data.outputPinState(byte_location, bit_location) };
+           pin_data.output_state.at(byte_location).test(bit_location) };
 }
 
 static inline bool isUsedInputBit(std::size_t byte_n, std::size_t bit_n)

@@ -141,8 +141,8 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
   }
 
   monitoring_frame::io::PinData pin_data{};
-  pin_data.inputPinState(5, 4, true);
-  pin_data.outputPinState(0, 5, true);
+  pin_data.input_state.at(5).set(4);
+  pin_data.output_state.at(0).set(5);
 
   auto msg =
       monitoring_frame::MessageBuilder()
