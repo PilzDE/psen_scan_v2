@@ -62,7 +62,7 @@ public:
   void SetUp() override  // Omit using SetUpTestSuite() for googletest below v1.11.0, see
                          // https://github.com/google/googletest/issues/247
   {
-    node_ptr_->declare_parameter<int>(TEST_DURATION_PARAM_NAME);
+    node_ptr_->declare_parameter(TEST_DURATION_PARAM_NAME, 60);
     rclcpp::Parameter test_duration_param = node_ptr_->get_parameter(TEST_DURATION_PARAM_NAME);
     try
     {
