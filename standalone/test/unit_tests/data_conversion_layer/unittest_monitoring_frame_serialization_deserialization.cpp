@@ -359,19 +359,9 @@ TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectInputField)
 
   for (std::size_t byte_n = 0; byte_n < 7; ++byte_n)
   {
-    for (std::size_t bit_n = 0; bit_n < 8; ++(++bit_n))
-    {
-      EXPECT_TRUE(input.at(byte_n).test(bit_n));
-    }
-    for (std::size_t bit_n = 1; bit_n < 8; ++(++bit_n))
-    {
-      EXPECT_FALSE(input.at(byte_n).test(bit_n));
-    }
+    EXPECT_BITSETS_EQ(input.at(byte_n), std::bitset<8>(0x55));
   }
-  for (std::size_t bit_n = 1; bit_n < 8; ++bit_n)
-  {
-    EXPECT_FALSE(input.at(7).test(bit_n));
-  }
+  EXPECT_BITSETS_EQ(input.at(7), std::bitset<8>(0x00));
 }
 
 TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectOutputField)
@@ -384,19 +374,9 @@ TEST_F(MonitoringFrameDeserializationTest, shouldCreateCorrectOutputField)
 
   for (std::size_t byte_n = 0; byte_n < 3; ++byte_n)
   {
-    for (std::size_t bit_n = 0; bit_n < 8; ++(++bit_n))
-    {
-      EXPECT_TRUE(output.at(byte_n).test(bit_n));
-    }
-    for (std::size_t bit_n = 1; bit_n < 8; ++(++bit_n))
-    {
-      EXPECT_FALSE(output.at(byte_n).test(bit_n));
-    }
+    EXPECT_BITSETS_EQ(output.at(byte_n), std::bitset<8>(0x55));
   }
-  for (std::size_t bit_n = 1; bit_n < 8; ++bit_n)
-  {
-    EXPECT_FALSE(output.at(3).test(bit_n));
-  }
+  EXPECT_BITSETS_EQ(output.at(3), std::bitset<8>(0x00));
 }
 
 }  // namespace psen_scan_v2_standalone_test

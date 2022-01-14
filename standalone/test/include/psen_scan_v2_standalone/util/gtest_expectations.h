@@ -57,4 +57,11 @@
       },                                                                                                               \
       expected_exception);
 
+#define EXPECT_BITSETS_EQ(ref_bitset, expected_bitset)                                                                 \
+  ASSERT_EQ(ref_bitset.size(), expected_bitset.size());                                                                \
+  for (std::size_t i = 0; i < ref_bitset.size(); i++)                                                                  \
+  {                                                                                                                    \
+    EXPECT_EQ(ref_bitset[i], expected_bitset[i]);                                                                      \
+  }
+
 #endif  // PSEN_SCAN_V2_STANDALONE_TEST_GTEST_EXPECTATIONS_H
