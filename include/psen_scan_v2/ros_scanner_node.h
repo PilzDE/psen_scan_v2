@@ -23,6 +23,7 @@
 #include <future>
 
 #include <gtest/gtest_prod.h>
+#include <boost/optional.hpp>
 
 #include <ros/ros.h>
 #include <std_msgs/UInt8.h>
@@ -86,6 +87,8 @@ private:
   S scanner_;
   std::atomic_bool terminate_{ false };
 
+  boost::optional<psen_scan_v2_standalone::IOState> last_io_state;
+
   friend class RosScannerNodeTests;
   FRIEND_TEST(RosScannerNodeTests, shouldStartAndStopSuccessfullyIfScannerRespondsToRequests);
   FRIEND_TEST(RosScannerNodeTests, shouldPublishScansWhenLaserScanCallbackIsInvoked);
@@ -116,7 +119,7 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
 {
   pub_scan_ = nh_.advertise<sensor_msgs::LaserScan>(topic, 1);
   pub_zone_ = nh_.advertise<std_msgs::UInt8>("active_zoneset", 1);
-  pub_io_ = nh_.advertise<psen_scan_v2::IOState>("io_state", 6);
+  pub_io_ = nh_.advertise<psen_scan_v2::IOState>("io_state", 6, true);
 }
 
 template <typename S>
@@ -137,10 +140,17 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
     std_msgs::UInt8 active_zoneset;
     active_zoneset.data = scan.activeZoneset();
     pub_zone_.publish(active_zoneset);
-
-    for (const auto& io : scan.ioStates())
+    if (!scan.ioStates().empty())
     {
-      pub_io_.publish(toIOStateMsg(io, tf_prefix_, scan.timestamp()));
+      for (const auto& io : scan.ioStates())
+      {
+        if (!last_io_state.is_initialized() || last_io_state.get() != io)
+        {
+          pub_io_.publish(toIOStateMsg(io, tf_prefix_, scan.timestamp()));
+          PSENSCAN_INFO("ScannerNode", "New IOState is: {}", io);
+          last_io_state = io;
+        }
+      }
     }
   }
   // LCOV_EXCL_START
