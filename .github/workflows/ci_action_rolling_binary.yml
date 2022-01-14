@@ -21,13 +21,13 @@ jobs:
           source /opt/ros/rolling/setup.bash
           bloom-generate rosdebian --ros-distro rolling
           fakeroot debian/rules binary
-          cp ../ros-rolling-psen-scan-v2_*.deb cached_binary.deb
+          cp ../ros-rolling-psen-scan-v2_*.deb cached-rolling-binary.deb
         shell: bash
 
       - uses: actions/cache@v2
         with:
           key: debian-${{ github.sha }}
-          path: cached_binary.deb
+          path: cached-rolling-binary.deb
 
   launch-check:
     name: "Launch check for psen_scan_v2"
@@ -38,10 +38,10 @@ jobs:
       - uses: actions/cache@v2
         with:
           key: debian-${{ github.sha }}
-          path: cached_binary.deb
+          path: cached-rolling-binary.deb
 
       - name: Install debian
-        run: apt-get update && apt-get install -y ros-rolling-ros-testing ./cached_binary.deb
+        run: apt-get update && apt-get install -y ros-rolling-ros-testing ./cached-rolling-binary.deb
 
       - uses: actions/checkout@v1
 
