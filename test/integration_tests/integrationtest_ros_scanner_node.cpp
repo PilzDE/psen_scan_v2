@@ -35,6 +35,7 @@
 #include "psen_scan_v2_standalone/util/async_barrier.h"
 #include "psen_scan_v2_standalone/util/gtest_expectations.h"
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
+#include "psen_scan_v2_standalone/util/mock_console_bridge_output_handler.h"
 
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 #include "psen_scan_v2/ros_scanner_node.h"
@@ -242,8 +243,8 @@ TEST_F(RosScannerNodeTests, shouldPublishIOStatesEqualToConversionOfSuppliedStan
   {
     InSequence s;
     EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA1.at(0), prefix, scan.timestamp())))).Times(1);
-    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA1.at(1), prefix, scan.timestamp())))).Times(1);
-    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA2.at(0), prefix, scan.timestamp()))))
+    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA2.at(0), prefix, scan.timestamp())))).Times(1);
+    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA2.at(1), prefix, scan.timestamp()))))
         .WillOnce(OpenBarrier(&io_topic_barrier));
   }
 
@@ -261,6 +262,37 @@ TEST_F(RosScannerNodeTests, shouldPublishIOStatesEqualToConversionOfSuppliedStan
 
   ros_scanner_node.terminate();
   loop.wait_for(LOOP_END_TIMEOUT);
+}
+
+TEST_F(RosScannerNodeTests, shouldLogChangedIOState)
+{
+  INJECT_LOG_MOCK;
+
+  const std::string prefix{ "scanner" };
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", prefix, 1.0 /*x_axis_rotation*/, scanner_config_);
+
+  util::Barrier start_barrier;
+  setDefaultActions(ros_scanner_node.scanner_, start_barrier);
+
+  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
+  ASSERT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
+
+  {
+    InSequence seq;
+    EXPECT_LOG_SHORT(INFO, "RosScannerNode: IOs changed, new state: logical2 = true");
+    EXPECT_LOG_SHORT(INFO, "RosScannerNode: IOs changed, new state: logical2 = false, output = true");
+  }
+
+  auto scan = createValidLaserScan();
+  scan.ioStates(IO_DATA1);
+  ros_scanner_node.scanner_.invokeLaserScanCallback(scan);
+  scan.ioStates(IO_DATA2);
+  ros_scanner_node.scanner_.invokeLaserScanCallback(scan);
+
+  ros_scanner_node.terminate();
+  loop.wait_for(LOOP_END_TIMEOUT);
+
+  REMOVE_LOG_MOCK;
 }
 
 TEST_F(RosScannerNodeTests, shouldPublishScanEqualToConversionOfSuppliedLaserScan)
