@@ -288,38 +288,6 @@ TEST_F(RosScannerNodeTests, shouldPublishChangedIOStatesEqualToConversionOfSuppl
   loop.wait_for(LOOP_END_TIMEOUT);
 }
 
-TEST_F(RosScannerNodeTests, shouldLogInitialIOState)
-{
-  INJECT_LOG_MOCK;
-  setLogLevel(CONSOLE_BRIDGE_LOG_DEBUG);
-
-  const std::string prefix{ "scanner" };
-  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", prefix, 1.0 /*x_axis_rotation*/, scanner_config_);
-
-  util::Barrier start_barrier;
-  setDefaultActions(ros_scanner_node.scanner_, start_barrier);
-
-  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
-  ASSERT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
-
-  util::Barrier initial_io_state_barrier;
-  EXPECT_LOG_SHORT(INFO,
-                   "RosScannerNode: IOs changed, new input: {Zone Bit 0 = true}, new output: {INTERLOCK 1 = true, "
-                   "Safety 2 intrusion = true}")
-      .WillOnce(OpenBarrier(&initial_io_state_barrier));
-
-  auto scan = createValidLaserScan();
-  scan.ioStates(IO_DATA1);
-  ros_scanner_node.scanner_.invokeLaserScanCallback(scan);
-
-  initial_io_state_barrier.waitTillRelease(DEFAULT_TIMEOUT);
-
-  ros_scanner_node.terminate();
-  loop.wait_for(LOOP_END_TIMEOUT);
-
-  REMOVE_LOG_MOCK;
-}
-
 TEST_F(RosScannerNodeTests, shouldLogChangedIOStates)
 {
   INJECT_LOG_MOCK;
