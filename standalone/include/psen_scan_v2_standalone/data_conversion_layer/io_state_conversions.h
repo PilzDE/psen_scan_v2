@@ -87,6 +87,40 @@ static inline std::vector<PinState> generateOutputPinStates(const monitoring_fra
   return pin_states;
 }
 
+static inline std::vector<PinState> generateChangedInputStates(const monitoring_frame::io::PinData& new_state,
+                                                               const monitoring_frame::io::PinData& old_state)
+{
+  std::vector<PinState> pin_states;
+  for (std::size_t byte_n = 0; byte_n < new_state.input_state.size(); ++byte_n)
+  {
+    for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
+    {
+      if (new_state.input_state.at(byte_n).test(bit_n) ^ old_state.input_state.at(byte_n).test(bit_n))
+      {
+        pin_states.emplace_back(generateInputPinState(new_state, byte_n, bit_n));
+      }
+    }
+  }
+  return pin_states;
+}
+
+static inline std::vector<PinState> generateChangedOutputStates(const monitoring_frame::io::PinData& new_state,
+                                                                const monitoring_frame::io::PinData& old_state)
+{
+  std::vector<PinState> pin_states;
+  for (std::size_t byte_n = 0; byte_n < new_state.output_state.size(); ++byte_n)
+  {
+    for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
+    {
+      if (new_state.output_state.at(byte_n).test(bit_n) ^ old_state.output_state.at(byte_n).test(bit_n))
+      {
+        pin_states.emplace_back(generateOutputPinState(new_state, byte_n, bit_n));
+      }
+    }
+  }
+  return pin_states;
+}
+
 }  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
 

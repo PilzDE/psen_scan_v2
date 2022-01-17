@@ -58,6 +58,16 @@ public:
   std::vector<PinState> input() const;
   //! @return std::vector<PinState> containing a PinState for every output pin of the scanner.
   std::vector<PinState> output() const;
+  /**
+   * @param ref_state another IOState that is used as reference for the changed state calculation.
+   * @return std::vector<PinState> containing a PinState for every changed input pin.
+   */
+  std::vector<PinState> changedInputStates(const IOState& ref_state) const;
+  /**
+   * @param ref_state another IOState that is used as reference for the changed state calculation.
+   * @return std::vector<PinState> containing a PinState for every changed output pin.
+   */
+  std::vector<PinState> changedOutputStates(const IOState& ref_state) const;
 
   bool operator==(const IOState& io_state) const;
   bool operator!=(const IOState& io_state) const;

@@ -21,9 +21,9 @@
 #include <atomic>
 #include <chrono>
 #include <future>
+#include <algorithm>
 
 #include <gtest/gtest_prod.h>
-#include <boost/optional.hpp>
 
 #include <ros/ros.h>
 #include <std_msgs/UInt8.h>
@@ -34,6 +34,7 @@
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 #include "psen_scan_v2/io_state_ros_conversion.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
+#include "psen_scan_v2_standalone/util/format_range.h"
 
 /**
  * @brief Root namespace for the ROS part
@@ -76,6 +77,8 @@ public:
 
 private:
   void laserScanCallback(const LaserScan& scan);
+  void publishChangedIOStates(const std::vector<psen_scan_v2_standalone::IOState>& io_states, int64_t timestamp);
+  std::string formatPinState(const PinState& pin);
 
 private:
   ros::NodeHandle nh_;
@@ -87,7 +90,7 @@ private:
   S scanner_;
   std::atomic_bool terminate_{ false };
 
-  boost::optional<psen_scan_v2_standalone::IOState> last_io_state;
+  psen_scan_v2_standalone::IOState last_io_state{};
 
   friend class RosScannerNodeTests;
   FRIEND_TEST(RosScannerNodeTests, shouldStartAndStopSuccessfullyIfScannerRespondsToRequests);
@@ -142,15 +145,7 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
     pub_zone_.publish(active_zoneset);
     if (!scan.ioStates().empty())
     {
-      for (const auto& io : scan.ioStates())
-      {
-        if (!last_io_state.is_initialized() || last_io_state.get() != io)
-        {
-          pub_io_.publish(toIOStateMsg(io, tf_prefix_, scan.timestamp()));
-          PSENSCAN_INFO("ScannerNode", "New IOState is: {}", io);
-          last_io_state = io;
-        }
-      }
+      publishChangedIOStates(scan.ioStates(), scan.timestamp());
     }
   }
   // LCOV_EXCL_START
@@ -159,6 +154,30 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
     ROS_ERROR_STREAM(e.what());
   }
   // LCOV_EXCL_STOP
+}
+
+template <typename S>
+void ROSScannerNodeT<S>::publishChangedIOStates(const std::vector<psen_scan_v2_standalone::IOState>& io_states,
+                                                int64_t timestamp)
+{
+  for (const auto& io : io_states)
+  {
+    if (last_io_state != io)
+    {
+      pub_io_.publish(toIOStateMsg(io, tf_prefix_, timestamp));
+
+      PSENSCAN_INFO("RosScannerNode",
+                    "IOs changed, new input: {}, new output: {}",
+                    util::formatRange(io.changedInputStates(last_io_state), formatPinState),
+                    util::formatRange(io.changedOutputStates(last_io_state), formatPinState));
+      last_io_state = io;
+    }
+  }
+}
+template <typename S>
+std::string ROSScannerNodeT<S>::formatPinState(const PinState& pin)
+{
+  return fmt::format("{} = {}", pin.name(), pin.state());
 }
 
 template <typename S>

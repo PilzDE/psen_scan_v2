@@ -18,9 +18,9 @@
 
 #include <algorithm>
 #include <iterator>
-
 #include <sstream>
 #include <string>
+#include <functional>
 
 #include <fmt/format.h>
 
@@ -36,17 +36,19 @@ namespace util
  * \verbatim "{}" (Empty Range) \endverbatim
  */
 template <typename T>
-std::string formatRange(const T& range)
+std::string formatRange(
+    const T& range,
+    std::function<T, std::string> element_formatter = [](const T& t) { return fmt::format("{}", t); })
 {
   std::stringstream strstr;
   strstr << "{";
   for (auto it = range.begin(); std::next(it) < range.end(); ++it)
   {
-    strstr << fmt::format("{}, ", *it);
+    strstr << element_formatter(*it) << ", ";
   }
   if (range.begin() < range.end())
   {
-    strstr << fmt::format("{}", *std::prev(range.end()));
+    strstr << element_formatter(*std::prev(range.end()));
   }
   strstr << "}";
   return strstr.str();

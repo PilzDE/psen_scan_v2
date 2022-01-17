@@ -87,6 +87,16 @@ std::vector<PinState> IOState::output() const
   return data_conversion_layer::generateOutputPinStates(pin_data_);
 }
 
+std::vector<PinState> IOState::changedInputStates(const IOState& ref_state) const
+{
+  return data_conversion_layer::generateChangedInputStates(pin_data_, ref_state.pin_data_);
+}
+
+std::vector<PinState> IOState::changedOutputStates(const IOState& ref_state) const
+{
+  return data_conversion_layer::generateChangedOutputStates(pin_data_, ref_state.pin_data_);
+}
+
 std::ostream& operator<<(std::ostream& os, const IOState& io_state)
 {
   return os << io_state.pin_data_;
