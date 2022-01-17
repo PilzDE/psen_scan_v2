@@ -106,9 +106,10 @@ private:
   FRIEND_TEST(RosScannerNodeTests, shouldPublishScanEqualToConversionOfSuppliedLaserScan);
   FRIEND_TEST(RosScannerNodeTests, shouldThrowExceptionSetInScannerStartFuture);
   FRIEND_TEST(RosScannerNodeTests, shouldThrowExceptionSetInScannerStopFuture);
-  FRIEND_TEST(RosScannerNodeTests, shouldPublishIOStatesEqualToConversionOfSuppliedStandaloneIOStates);
-  FRIEND_TEST(RosScannerNodeTests, shouldLogChangedIOState);
+  FRIEND_TEST(RosScannerNodeTests, shouldPublishChangedIOStatesEqualToConversionOfSuppliedStandaloneIOStates);
+  FRIEND_TEST(RosScannerNodeTests, shouldLogInitialIOState);
   FRIEND_TEST(RosScannerNodeTests, shouldPublishLatchedOnIOStatesTopic);
+  FRIEND_TEST(RosScannerNodeTests, shouldLogChangedIOStates);
 };
 
 typedef ROSScannerNodeT<> ROSScannerNode;
