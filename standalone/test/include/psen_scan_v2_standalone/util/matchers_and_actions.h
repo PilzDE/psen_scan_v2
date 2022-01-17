@@ -70,16 +70,17 @@ MATCHER_P(ContainerUnorderedEq, vec, "")
          });
 }
 
-MATCHER_P(IOStateUnorderedEq, io_state, "")
+MATCHER_P(IOStateEq, io_state, "")
 {
-  return ExplainMatchResult(ContainerUnorderedEq(io_state.input()), arg.input(), result_listener) &&
-         ExplainMatchResult(ContainerUnorderedEq(io_state.output()), arg.output(), result_listener);
+  return io_state.input() == arg.input() && io_state.output() == arg.output() &&
+         io_state.timestamp() == arg.timestamp();
 }
 
-MATCHER_P(PointwiseIOStateUnorderedEq, vec, "")
+MATCHER_P(PointwiseIOStateEq, vec, "")
 {
   return std::equal(vec.begin(), vec.end(), arg.begin(), arg.end(), [result_listener](const auto& a, const auto& b) {
-    return ExplainMatchResult(IOStateUnorderedEq(b), a, result_listener);
+    return ExplainMatchResult(Eq(b), a, result_listener);  // TODO: ignores timestamp of iostate, which probably cannot
+                                                           // be matched directly (as with the scan timestamp)
   });
 }
 
@@ -89,7 +90,7 @@ MATCHER_P(ScanDataEqual, scan, "")
          arg.minScanAngle() == scan.minScanAngle() && arg.maxScanAngle() == scan.maxScanAngle() &&
          Matches(PointwiseDoubleEq(scan.measurements()))(arg.measurements()) &&
          Matches(PointwiseDoubleEq(scan.intensities()))(arg.intensities()) &&
-         ExplainMatchResult(PointwiseIOStateUnorderedEq(scan.ioStates()), arg.ioStates(), result_listener);
+         ExplainMatchResult(PointwiseIOStateEq(scan.ioStates()), arg.ioStates(), result_listener);
 }
 
 MATCHER_P2(TimestampInExpectedTimeframe, reference_scan, reference_timestamp, "")

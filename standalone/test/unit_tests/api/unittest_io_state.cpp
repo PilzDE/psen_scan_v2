@@ -27,6 +27,12 @@ namespace psen_scan_v2_standalone_test
 using namespace psen_scan_v2_standalone;
 using data_conversion_layer::monitoring_frame::io::PinData;
 
+TEST(IOStateTests, shouldReturnCorrectTimestamp)
+{
+  const IOState io_state{ PinData{}, 42 /*timestamp*/ };
+  EXPECT_EQ(42, io_state.timestamp());
+}
+
 TEST(IOStateTests, shouldReturnInputsWhereAllAreUnsetWhenDefaultConstructed)
 {
   const auto inputs{ IOState().input() };
@@ -53,7 +59,7 @@ TEST(IOStateTests, shouldReturnInputsEqualToConvertedInputPinData)
   pin_data.input_state.at(5).set(1);
   ASSERT_TRUE(data_conversion_layer::isUsedInputBit(5, 1));
 
-  const auto inputs{ IOState(pin_data).input() };
+  const auto inputs{ IOState(pin_data, 0 /*timestamp*/).input() };
   EXPECT_EQ(inputs, data_conversion_layer::generateInputPinStates(pin_data));
 }
 
@@ -63,7 +69,7 @@ TEST(IOStateTests, shouldReturnOutputsEqualToConvertedOutputPinData)
   pin_data.output_state.at(0).set(2);
   ASSERT_TRUE(data_conversion_layer::isUsedOutputBit(0, 2));
 
-  const auto outputs{ IOState(pin_data).output() };
+  const auto outputs{ IOState(pin_data, 0 /*timestamp*/).output() };
   EXPECT_EQ(outputs, data_conversion_layer::generateOutputPinStates(pin_data));
 }
 
@@ -71,12 +77,17 @@ TEST(IOStateTests, shouldNotBeEqualWithDifferentPinData)
 {
   PinData pin_data{};
   pin_data.input_state.at(5).set(1);
-  EXPECT_NE(IOState(pin_data), IOState(PinData{}));
+  EXPECT_NE(IOState(pin_data, 0 /*timestamp*/), IOState(PinData{}, 0 /*timestamp*/));
 }
 
 TEST(IOStateTests, shouldBeEqualWhithEqualPinData)
 {
-  EXPECT_EQ(IOState(PinData{}), IOState(PinData{}));
+  EXPECT_EQ(IOState(PinData{}, 0 /*timestamp*/), IOState(PinData{}, 0 /*timestamp*/));
+}
+
+TEST(IOStateTests, shouldBeEqualWithDifferentTimestamps)
+{
+  EXPECT_EQ(IOState(PinData{}, 0 /*timestamp*/), IOState(PinData{}, 42 /*timestamp*/));
 }
 
 TEST(IOStateTests, shouldBeEqualWhenDefaultConstructed)

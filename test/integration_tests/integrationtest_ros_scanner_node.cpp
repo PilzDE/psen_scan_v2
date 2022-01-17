@@ -64,12 +64,12 @@ static constexpr std::chrono::seconds LOOP_END_TIMEOUT{ 4 };
 static constexpr std::chrono::seconds STOP_TIMEOUT{ 1 };
 
 static const psen_scan_v2_standalone::LaserScan::IOData IO_DATA1{ {
-    psen_scan_v2_standalone::IOState(createPinData({ 1, 0, 0, 0, 0, 0, 0, 0 }, { 6, 0, 0, 0 })),
+    psen_scan_v2_standalone::IOState(createPinData({ 1, 0, 0, 0, 0, 0, 0, 0 }, { 6, 0, 0, 0 }), 0 /*timestamp*/),
 } };
 static const psen_scan_v2_standalone::LaserScan::IOData IO_DATA2{
-  { psen_scan_v2_standalone::IOState(createPinData({ 1, 0, 0, 0, 64, 0, 0, 0 }, { 6, 0, 0, 0 })),
-    psen_scan_v2_standalone::IOState(createPinData({ 1, 0, 0, 0, 64, 0, 0, 0 }, { 6, 0, 0, 0 })),
-    psen_scan_v2_standalone::IOState(createPinData({ 0, 0, 0, 0, 64, 0, 0, 0 }, { 1, 0, 0, 0 })) }
+  { psen_scan_v2_standalone::IOState(createPinData({ 1, 0, 0, 0, 64, 0, 0, 0 }, { 6, 0, 0, 0 }), 0 /*timestamp*/),
+    psen_scan_v2_standalone::IOState(createPinData({ 1, 0, 0, 0, 64, 0, 0, 0 }, { 6, 0, 0, 0 }), 0 /*timestamp*/),
+    psen_scan_v2_standalone::IOState(createPinData({ 0, 0, 0, 0, 64, 0, 0, 0 }, { 1, 0, 0, 0 }), 0 /*timestamp*/) }
 };
 
 static void setDefaultActions(ScannerMock& mock, util::Barrier& start_barrier)
@@ -265,9 +265,9 @@ TEST_F(RosScannerNodeTests, shouldPublishChangedIOStatesEqualToConversionOfSuppl
   SubscriberMock<psen_scan_v2::IOState> subscriber(nh_priv_, "io_state", QUEUE_SIZE);
   {
     InSequence s;
-    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA1.at(0), prefix, scan.timestamp())))).Times(1);
-    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA2.at(0), prefix, scan.timestamp())))).Times(1);
-    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA2.at(2), prefix, scan.timestamp()))))
+    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA1.at(0), prefix)))).Times(1);
+    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA2.at(0), prefix)))).Times(1);
+    EXPECT_CALL(subscriber, callback(IOStateMsgEq(toIOStateMsg(IO_DATA2.at(2), prefix))))
         .WillOnce(OpenBarrier(&io_topic_barrier));
   }
 

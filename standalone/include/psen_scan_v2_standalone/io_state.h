@@ -16,6 +16,7 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_IO_STATE_H
 #define PSEN_SCAN_V2_STANDALONE_IO_STATE_H
 
+#include <cstdint>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -53,11 +54,13 @@ class IOState
 {
 public:
   IOState() = default;
-  IOState(data_conversion_layer::monitoring_frame::io::PinData pin_data);
+  IOState(data_conversion_layer::monitoring_frame::io::PinData pin_data, const int64_t& timestamp);
   //! @return std::vector<PinState> containing a PinState for every (logical) input pin of the scanner.
   std::vector<PinState> input() const;
   //! @return std::vector<PinState> containing a PinState for every output pin of the scanner.
   std::vector<PinState> output() const;
+  //! @return time[ns] of the monitoring frame this state is linked to.
+  int64_t timestamp() const;
   /**
    * @param ref_state another IOState that is used as reference for the changed state calculation.
    * @return std::vector<PinState> containing a PinState for every changed input pin.
@@ -77,6 +80,7 @@ public:
 
 private:
   data_conversion_layer::monitoring_frame::io::PinData pin_data_{};
+  int64_t timestamp_{};
 };
 
 std::ostream& operator<<(std::ostream& os, const IOState& io_state);

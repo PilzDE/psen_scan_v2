@@ -79,7 +79,7 @@ public:
 
 private:
   void laserScanCallback(const LaserScan& scan);
-  void publishChangedIOStates(const std::vector<psen_scan_v2_standalone::IOState>& io_states, int64_t timestamp);
+  void publishChangedIOStates(const std::vector<psen_scan_v2_standalone::IOState>& io_states);
 
 private:
   static std::string formatPinState(const PinState& pin);
@@ -148,7 +148,7 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
     active_zoneset.data = scan.activeZoneset();
     pub_zone_.publish(active_zoneset);
 
-    publishChangedIOStates(scan.ioStates(), scan.timestamp());
+    publishChangedIOStates(scan.ioStates());
   }
   // LCOV_EXCL_START
   catch (const std::invalid_argument& e)
@@ -159,14 +159,13 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
 }
 
 template <typename S>
-void ROSScannerNodeT<S>::publishChangedIOStates(const std::vector<psen_scan_v2_standalone::IOState>& io_states,
-                                                int64_t timestamp)
+void ROSScannerNodeT<S>::publishChangedIOStates(const std::vector<psen_scan_v2_standalone::IOState>& io_states)
 {
   for (const auto& io : io_states)
   {
     if (last_io_state_ != io)
     {
-      pub_io_.publish(toIOStateMsg(io, tf_prefix_, timestamp));
+      pub_io_.publish(toIOStateMsg(io, tf_prefix_));
 
       PSENSCAN_INFO("RosScannerNode",
                     "IOs changed, new input: {}, new output: {}",
