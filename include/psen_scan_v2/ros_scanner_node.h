@@ -94,7 +94,7 @@ private:
   S scanner_;
   std::atomic_bool terminate_{ false };
 
-  psen_scan_v2_standalone::IOState last_io_state{};
+  psen_scan_v2_standalone::IOState last_io_state_{};
 
   friend class RosScannerNodeTests;
   FRIEND_TEST(RosScannerNodeTests, shouldStartAndStopSuccessfullyIfScannerRespondsToRequests);
@@ -147,10 +147,8 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
     std_msgs::UInt8 active_zoneset;
     active_zoneset.data = scan.activeZoneset();
     pub_zone_.publish(active_zoneset);
-    if (!scan.ioStates().empty())
-    {
-      publishChangedIOStates(scan.ioStates(), scan.timestamp());
-    }
+
+    publishChangedIOStates(scan.ioStates(), scan.timestamp());
   }
   // LCOV_EXCL_START
   catch (const std::invalid_argument& e)
@@ -166,15 +164,15 @@ void ROSScannerNodeT<S>::publishChangedIOStates(const std::vector<psen_scan_v2_s
 {
   for (const auto& io : io_states)
   {
-    if (last_io_state != io)
+    if (last_io_state_ != io)
     {
       pub_io_.publish(toIOStateMsg(io, tf_prefix_, timestamp));
 
       PSENSCAN_INFO("RosScannerNode",
                     "IOs changed, new input: {}, new output: {}",
-                    util::formatRange(io.changedInputStates(last_io_state), formatPinState),
-                    util::formatRange(io.changedOutputStates(last_io_state), formatPinState));
-      last_io_state = io;
+                    util::formatRange(io.changedInputStates(last_io_state_), formatPinState),
+                    util::formatRange(io.changedOutputStates(last_io_state_), formatPinState));
+      last_io_state_ = io;
     }
   }
 }
