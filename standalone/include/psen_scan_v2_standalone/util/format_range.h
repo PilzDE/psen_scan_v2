@@ -38,7 +38,8 @@ namespace util
 template <typename T>
 std::string formatRange(
     const T& range,
-    std::function<T, std::string> element_formatter = [](const T& t) { return fmt::format("{}", t); })
+    const std::function<std::string(const typename T::value_type&)>& element_formatter =
+        [](const typename T::value_type& v) { return fmt::format("{}", v); })
 {
   std::stringstream strstr;
   strstr << "{";

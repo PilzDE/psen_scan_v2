@@ -23,6 +23,8 @@
 #include <future>
 #include <algorithm>
 
+#include <fmt/format.h>
+
 #include <gtest/gtest_prod.h>
 
 #include <ros/ros.h>
@@ -78,7 +80,9 @@ public:
 private:
   void laserScanCallback(const LaserScan& scan);
   void publishChangedIOStates(const std::vector<psen_scan_v2_standalone::IOState>& io_states, int64_t timestamp);
-  std::string formatPinState(const PinState& pin);
+
+private:
+  static std::string formatPinState(const PinState& pin);
 
 private:
   ros::NodeHandle nh_;
