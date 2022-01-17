@@ -20,7 +20,6 @@
 #include <iterator>
 #include <sstream>
 #include <string>
-#include <functional>
 
 #include <fmt/format.h>
 
@@ -38,8 +37,10 @@ namespace util
 template <typename T>
 std::string formatRange(
     const T& range,
-    const std::function<std::string(const typename T::value_type&)>& element_formatter =
-        [](const typename T::value_type& v) { return fmt::format("{}", v); })
+    std::string (*element_formatter)(
+        const typename T::value_type&) =  // prevents usage of std::function on ubuntu 18.04:
+                                          // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70570
+    [](const typename T::value_type& v) { return fmt::format("{}", v); })
 {
   std::stringstream strstr;
   strstr << "{";
