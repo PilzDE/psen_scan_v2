@@ -79,8 +79,7 @@ MATCHER_P(IOStateEq, io_state, "")
 MATCHER_P(PointwiseIOStateEq, vec, "")
 {
   return std::equal(vec.begin(), vec.end(), arg.begin(), arg.end(), [result_listener](const auto& a, const auto& b) {
-    return ExplainMatchResult(Eq(b), a, result_listener);  // TODO: ignores timestamp of iostate, which probably cannot
-                                                           // be matched directly (as with the scan timestamp)
+    return ExplainMatchResult(Eq(b), a, result_listener);
   });
 }
 
