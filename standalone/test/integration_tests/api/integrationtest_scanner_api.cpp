@@ -79,7 +79,7 @@ public:
   {                                                                                                                    \
     const auto timestamp{ util::getCurrentTime() };                                                                    \
     const auto scan{ createReferenceScan(msgs, timestamp) };                                                           \
-    EXPECT_CALL(cb, LaserScanCallback(AllOf(ScanDataEqual(scan), TimestampInExpectedTimeframe(scan, timestamp))))      \
+    EXPECT_CALL(cb, LaserScanCallback(AllOf(ScanDataEqual(scan), ScanTimestampsInExpectedTimeframe(scan, timestamp)))) \
         .WillOnce(OpenBarrier(&barrier));                                                                              \
   } while (false)
 

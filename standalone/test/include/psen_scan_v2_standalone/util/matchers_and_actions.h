@@ -93,11 +93,26 @@ MATCHER_P(ScanDataEqual, scan, "")
          ExplainMatchResult(PointwiseIOStateEq(scan.ioStates()), arg.ioStates(), result_listener);
 }
 
-MATCHER_P2(TimestampInExpectedTimeframe, reference_scan, reference_timestamp, "")
+MATCHER_P2(IOTimestampsInExpectedTimeframe, reference_ios, reference_timestamp, "")
+{
+  const int64_t elapsed_time{ util::getCurrentTime() - reference_timestamp };
+  return std::equal(reference_ios.begin(),
+                    reference_ios.end(),
+                    arg.begin(),
+                    arg.end(),
+                    [elapsed_time](const auto& ref, const auto& act) {
+                      return act.timestamp() > ref.timestamp() && act.timestamp() < (ref.timestamp() + elapsed_time);
+                    });
+  ;
+}
+
+MATCHER_P2(ScanTimestampsInExpectedTimeframe, reference_scan, reference_timestamp, "")
 {
   const int64_t elapsed_time{ util::getCurrentTime() - reference_timestamp };
   *result_listener << "where the elapsed time is " << elapsed_time << " nsec";
-  return arg.timestamp() > reference_scan.timestamp() && arg.timestamp() < (reference_scan.timestamp() + elapsed_time);
+  return arg.timestamp() > reference_scan.timestamp() &&
+         arg.timestamp() < (reference_scan.timestamp() + elapsed_time) &&
+         Matches(IOTimestampsInExpectedTimeframe(reference_scan.ioStates(), reference_timestamp))(arg.ioStates());
 }
 
 MATCHER_P(IOPinDataEq, ref_pin, "")
