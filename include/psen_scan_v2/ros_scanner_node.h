@@ -126,7 +126,7 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
 {
   pub_scan_ = nh_.advertise<sensor_msgs::LaserScan>(topic, 1);
   pub_zone_ = nh_.advertise<std_msgs::UInt8>("active_zoneset", 1);
-  pub_io_ = nh_.advertise<psen_scan_v2::IOState>("io_state", 6, true);
+  pub_io_ = nh_.advertise<psen_scan_v2::IOState>("io_state", 6, true /* latched */);
 }
 
 template <typename S>
@@ -175,6 +175,7 @@ void ROSScannerNodeT<S>::publishChangedIOStates(const std::vector<psen_scan_v2_s
     }
   }
 }
+
 template <typename S>
 std::string ROSScannerNodeT<S>::formatPinState(const PinState& pin)
 {
