@@ -229,6 +229,7 @@ With the first ROS 2 release the version number model of this package was change
 - ROS 1 releases now count from 0.10.0 upwards.
 - ROS 2 releases start with 0.20.0.
 
+All version numbers < 0.10.0 are from releases prior to this change.
 ### Test concept
 ![psen_scan_test_concept](doc/test_architecture.svg)
 
