@@ -224,6 +224,7 @@ For visualizing the active zoneset in RViz you can run the `active_zoneset_node`
 ### Branching model
 `main` is considered to be the active development branch, it targets the ROS distributions `melodic` and `noetic`.
 
+All version numbers < 0.10.0 are from releases prior to this change.
 ### Test concept
 ![psen_scan_test_concept](doc/test_architecture.svg)
 
