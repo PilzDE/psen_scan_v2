@@ -222,7 +222,12 @@ For visualizing the active zoneset in RViz you can run the `active_zoneset_node`
 
 
 ### Branching model
-`main` is considered to be the active development branch, it targets the ROS distributions `melodic` and `noetic`.
+`main` is considered to be the active development branch, it targets the ROS distributions `melodic` and `noetic`. \
+The `ros2` branch targets ROS 2 `foxy`.
+
+With the first ROS 2 release the version number model of this package was changed:
+- ROS 1 releases now count from 0.10.0 upwards.
+- ROS 2 releases start with 0.20.0.
 
 ### Test concept
 ![psen_scan_test_concept](doc/test_architecture.svg)
