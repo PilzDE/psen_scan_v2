@@ -2,11 +2,12 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
-------------------
-* Add IO state to LaserScan
-* Publish IO states to ~/io_state
-* Renaming Slave to Subscriber
+0.10.0 (2022-01-20)
+-------------------
+* Change to new versioning method for ROS1 (0.10.0+) and ROS2 (0.20.0+).
+* Deprecate get/set methods with 'get/set' prefix in favour of methods without the prefix(#298)
+* ADD IO states to LaserScan and publish them at ~/io_state (#281)
+* Renaming Slave to Subscriber (#303)
 * Contributors: Pilz GmbH and Co. KG
 
 0.3.4 (2021-12-20)
