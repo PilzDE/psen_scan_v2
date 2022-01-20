@@ -21,13 +21,13 @@ jobs:
           source /opt/ros/foxy/setup.bash
           bloom-generate rosdebian --ros-distro foxy
           fakeroot debian/rules binary
-          cp ../ros-foxy-psen-scan-v2_*.deb cached_binary.deb
+          cp ../ros-foxy-psen-scan-v2_*.deb cached-foxy-binary.deb
         shell: bash
 
       - uses: actions/cache@v2
         with:
           key: debian-${{ github.sha }}
-          path: cached_binary.deb
+          path: cached-foxy-binary.deb
 
   launch-check:
     name: "Launch check for psen_scan_v2"
@@ -38,10 +38,10 @@ jobs:
       - uses: actions/cache@v2
         with:
           key: debian-${{ github.sha }}
-          path: cached_binary.deb
+          path: cached-foxy-binary.deb
 
       - name: Install debian
-        run: apt-get update && apt-get install -y ros-foxy-ros-testing ./cached_binary.deb
+        run: apt-get update && apt-get install -y ros-foxy-ros-testing ./cached-foxy-binary.deb
 
       - uses: actions/checkout@v1
 
