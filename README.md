@@ -142,7 +142,8 @@ The timestamps of the scan data published are computed to be close to reality an
 
 ### Branching model
 `main` is considered to be the active development branch, it targets the ROS distributions `melodic` and `noetic`.
-`ros2` is still experimental and targets the ROS 2 distributions `foxy` and `rolling`.
+
+The branch `ros2` is still experimental and targets the ROS 2 distributions `foxy` and `rolling`.
 
 ### Test concept
 ![psen_scan_test_concept](doc/test_architecture.svg)
