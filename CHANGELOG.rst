@@ -2,8 +2,8 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
-------------------
+0.10.0 (2022-01-20)
+-------------------
 * Change to new versioning method for ROS1 (0.10.0+) and ROS2 (0.20.0+).
 * Deprecate get/set methods with 'get/set' prefix in favour of methods without the prefix(#298)
 * ADD IO states to LaserScan and publish them at ~/io_state (#281)
