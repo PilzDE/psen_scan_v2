@@ -44,7 +44,7 @@ If you are interested in using the PSENscan safety laser scanner without ROS, pl
 4. [Migration](#migration)
 
 ## Installation
-The ros2 branch targets ROS 2 Foxy and is **experimental**. There are no ros2 releases, so you have to build this package from source.
+The ros2 branch targets ROS 2 Foxy and ROS 2 rolling, but is **experimental**. There are ros2 releases, so you can install the package using apt.
 
 ## Usage
 To start reading data from the safety laser scanner and publishing scans execute `ros2 launch psen_scan_v2 psen_scan_v2.launch.xml` in a command line. This will launch the ROS Node with the default configuration.
@@ -142,6 +142,7 @@ The timestamps of the scan data published are computed to be close to reality an
 
 ### Branching model
 `main` is considered to be the active development branch, it targets the ROS distributions `melodic` and `noetic`.
+`ros2` is still experimental and targets the ROS 2 distributions `foxy` and `rolling`.
 
 ### Test concept
 ![psen_scan_test_concept](doc/test_architecture.svg)
