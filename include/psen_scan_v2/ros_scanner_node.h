@@ -82,9 +82,6 @@ private:
   void publishChangedIOStates(const std::vector<psen_scan_v2_standalone::IOState>& io_states);
 
 private:
-  static std::string formatPinState(const PinState& pin);
-
-private:
   ros::NodeHandle nh_;
   ros::Publisher pub_scan_;
   ros::Publisher pub_zone_;
@@ -174,12 +171,6 @@ void ROSScannerNodeT<S>::publishChangedIOStates(const std::vector<psen_scan_v2_s
       last_io_state_ = io;
     }
   }
-}
-
-template <typename S>
-std::string ROSScannerNodeT<S>::formatPinState(const PinState& pin)
-{
-  return fmt::format("{} = {}", pin.name(), pin.state());
 }
 
 template <typename S>
