@@ -202,6 +202,11 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectTimestampAfterConver
   EXPECT_EQ(EXPECTED_TIMESTAMP_AFTER_CONVERSION, scan_ptr->timestamp());
 }
 
+MATCHER_P(IOStateFromStampedMsg, stamped_msg, "")
+{
+  return ExplainMatchResult(IOStateEq(IOState(stamped_msg.msg_.iOPinData(), stamped_msg.stamp_)), arg, result_listener);
+}
+
 TEST(LaserScanConversionsTest, laserScanShouldContainCorrectIOStateAfterConversion)
 {
   const auto stamped_msg{ createDefaultStampedMsg() };
@@ -211,7 +216,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectIOStateAfterConversi
       scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan({ stamped_msg }) }););
 
   ASSERT_EQ(scan_ptr->ioStates().size(), 1u);
-  EXPECT_EQ(scan_ptr->ioStates().at(0), IOState(stamped_msg.msg_.iOPinData()));
+  EXPECT_THAT(scan_ptr->ioStates().at(0), IOStateFromStampedMsg(stamped_msg));
 }
 
 /////////////////////////////////////////
@@ -308,7 +313,7 @@ TEST(LaserScanConversionsTest, laserScanShouldContainAllIOStates)
   ASSERT_EQ(scan_ptr->ioStates().size(), msg_count);
   for (size_t i = 0; i < msg_count; i++)
   {
-    EXPECT_EQ(scan_ptr->ioStates().at(i), IOState(stamped_msgs.at(i).msg_.iOPinData()));
+    EXPECT_THAT(scan_ptr->ioStates().at(i), IOStateFromStampedMsg(stamped_msgs.at(i)));
   }
 }
 
@@ -322,9 +327,9 @@ TEST(LaserScanConversionsTest, laserScanShouldContainAllIOStatesInCorrectOrder)
   ASSERT_NO_THROW(
       scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
 
-  EXPECT_EQ(scan_ptr->ioStates().at(0), IOState(stamped_msgs.at(2).msg_.iOPinData()));
-  EXPECT_EQ(scan_ptr->ioStates().at(1), IOState(stamped_msgs.at(1).msg_.iOPinData()));
-  EXPECT_EQ(scan_ptr->ioStates().at(2), IOState(stamped_msgs.at(0).msg_.iOPinData()));
+  EXPECT_THAT(scan_ptr->ioStates().at(0), IOStateFromStampedMsg(stamped_msgs.at(2)));
+  EXPECT_THAT(scan_ptr->ioStates().at(1), IOStateFromStampedMsg(stamped_msgs.at(1)));
+  EXPECT_THAT(scan_ptr->ioStates().at(2), IOStateFromStampedMsg(stamped_msgs.at(0)));
 }
 
 TEST(LaserScanConversionsTest, laserScanShouldContainActiveZonesetOfLastMsg)

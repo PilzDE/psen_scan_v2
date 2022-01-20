@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -79,7 +79,7 @@ public:
   {                                                                                                                    \
     const auto timestamp{ util::getCurrentTime() };                                                                    \
     const auto scan{ createReferenceScan(msgs, timestamp) };                                                           \
-    EXPECT_CALL(cb, LaserScanCallback(AllOf(ScanDataEqual(scan), TimestampInExpectedTimeframe(scan, timestamp))))      \
+    EXPECT_CALL(cb, LaserScanCallback(AllOf(ScanDataEqual(scan), ScanTimestampsInExpectedTimeframe(scan, timestamp)))) \
         .WillOnce(OpenBarrier(&barrier));                                                                              \
   } while (false)
 

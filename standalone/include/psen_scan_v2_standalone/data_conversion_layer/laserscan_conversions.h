@@ -114,7 +114,7 @@ inline LaserScan LaserScanConverter::toLaserScan(
     }
     if (stamped_msgs[index].msg_.hasIOPinField())
     {
-      io_states.emplace_back(stamped_msgs[index].msg_.iOPinData());
+      io_states.emplace_back(stamped_msgs[index].msg_.iOPinData(), stamped_msgs[index].stamp_);
     }
   }
 

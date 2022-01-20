@@ -36,16 +36,15 @@ PinStateType toPinStateMsg(const psen_scan_v2_standalone::PinState& pin)
   return pin_msg;
 }
 
-psen_scan_v2::IOState toIOStateMsg(const psen_scan_v2_standalone::IOState& io_state,
-                                   const std::string& frame_id,
-                                   int64_t stamp)
+psen_scan_v2::IOState toIOStateMsg(const psen_scan_v2_standalone::IOState& io_state, const std::string& frame_id)
 {
   psen_scan_v2::IOState ros_message;
-  if (stamp < 0)
+  if (io_state.timestamp() < 0)
   {
-    throw std::invalid_argument("Laserscan message has an invalid timestamp: " + std::to_string(stamp));
+    throw std::invalid_argument("IOState of Laserscan message has an invalid timestamp: " +
+                                std::to_string(io_state.timestamp()));
   }
-  ros_message.header.stamp = ros::Time{}.fromNSec(stamp);
+  ros_message.header.stamp = ros::Time{}.fromNSec(io_state.timestamp());
   ros_message.header.frame_id = frame_id;
 
   auto input = io_state.input();

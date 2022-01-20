@@ -168,26 +168,22 @@ The timestamps of the scan data published are computed to be close to reality an
 
 ### Transferred IOs
 
-The following IOs of the PSENscan safety laser scanner are available in the published ([psen_scan_v2/IOState][]).
+The state of inputs and outputs of the PSENscan safety laser scanner are published as 
+([psen_scan_v2/IOState][]). The topic at `/\<name\>/io_states` is latched and always gives 
+the most recent pin state. On changes at the physical IOs, the changes are logged to
+the console and the new state is published to the topic.
 
-| Input name |
-|-|
-|Correct activation sequence of Muting [1/2] pins|
-|Correct activation sequence of Override [1/2] pins|
-|Muting [1/2] Activated|
-|Muting Enable [1/2] Activated|
-|Override [1/2] Activated|
-|Reset Activated|
-|Restart [1/2] Activated|
-|Zone Bit [0..7]|
-|Zone Set Switching Input [1..8]|
+The [input pin state][psen_scan_v2/InputPins] contains information about
+* muting
+* override
+* zone set switching inputs
 
-| Output name |
-|-|
-|INTERLOCK [1/2]|
-|REFERENCE_POINTS_VIOLATION|
-|Safety [1..3] intrusion|
-|Warning [1/2] intrusion|
+The [output pin state][psen_scan_v2/OutputPins] consists of
+* OSSD safety states
+* warning output
+* reference points violation
+
+Please see the message descriptions for full lists of bits.
 
 ### Importing the zoneset configuration
 Once you setup the scanner and created a configuration according to our [tutorial](http://wiki.ros.org/psen_scan_v2/Tutorials/SettingUpPSENscanHW#Create_a_new_configuration) you can use an exported xml configuration file within ROS.

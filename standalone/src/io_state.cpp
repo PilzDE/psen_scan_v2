@@ -24,7 +24,6 @@
 #include "psen_scan_v2_standalone/io_state.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/io_state_conversions.h"
-#include "psen_scan_v2_standalone/util/format_range.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -63,7 +62,8 @@ std::ostream& operator<<(std::ostream& os, const PinState& pin_state)
   return os;
 }
 
-IOState::IOState(data_conversion_layer::monitoring_frame::io::PinData pin_data) : pin_data_(pin_data)
+IOState::IOState(data_conversion_layer::monitoring_frame::io::PinData pin_data, const int64_t& timestamp)
+  : pin_data_(pin_data), timestamp_(timestamp)
 {
 }
 
@@ -87,8 +87,23 @@ std::vector<PinState> IOState::output() const
   return data_conversion_layer::generateOutputPinStates(pin_data_);
 }
 
+int64_t IOState::timestamp() const
+{
+  return timestamp_;
+}
+
+std::vector<PinState> IOState::changedInputStates(const IOState& ref_state) const
+{
+  return data_conversion_layer::generateChangedInputStates(pin_data_, ref_state.pin_data_);
+}
+
+std::vector<PinState> IOState::changedOutputStates(const IOState& ref_state) const
+{
+  return data_conversion_layer::generateChangedOutputStates(pin_data_, ref_state.pin_data_);
+}
+
 std::ostream& operator<<(std::ostream& os, const IOState& io_state)
 {
-  return os << io_state.pin_data_;
+  return os << "IOState(timestamp = " << io_state.timestamp_ << " nsec, " << io_state.pin_data_ << ")";
 }
 }  // namespace psen_scan_v2_standalone
