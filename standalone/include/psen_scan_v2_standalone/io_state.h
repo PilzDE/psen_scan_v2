@@ -49,7 +49,7 @@ private:
 
 std::ostream& operator<<(std::ostream& os, const PinState& pin_state);
 
-//! @brief Compact formater for a PinState just using its name and state. (e.g. Safety 1 intrusion = true)
+//! @brief Formats a PinState just using its name and state. (e.g. Safety 1 intrusion = true)
 inline std::string formatPinState(const PinState& pin)
 {
   return fmt::format("{} = {}", pin.name(), pin.state());
