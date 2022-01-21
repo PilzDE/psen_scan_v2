@@ -169,16 +169,16 @@ The timestamps of the scan data published are computed to be close to reality an
 ### Transferred IOs
 
 The state of inputs and outputs of the PSENscan safety laser scanner are published as 
-([psen_scan_v2/IOState][]). The topic at `/\<name\>/io_states` is latched and always gives 
+[psen_scan_v2/IOState][]. The topic at `/<name>/io_states` is latched and always gives 
 the most recent pin state. On changes at the physical IOs, the changes are logged to
 the console and the new state is published to the topic.
 
-The [input pin state][psen_scan_v2/InputPins] contains information about
+The [input pin states][psen_scan_v2/InputPins] contains information about
 * muting
 * override
 * zone set switching inputs
 
-The [output pin state][psen_scan_v2/OutputPins] consists of
+The [output pin states][psen_scan_v2/OutputPins] consists of
 * OSSD safety states
 * warning output
 * reference points violation
@@ -275,3 +275,5 @@ supply in buildings.
 [visualization_msgs/Marker]: https://docs.ros.org/en/noetic/api/visualization_msgs/html/msg/Marker.html
 [gmapping]: http://wiki.ros.org/gmapping
 [psen_scan_v2/IOState]: msg/IOState.msg
+[psen_scan_v2/InputPins]: msg/InputPinState.msg
+[psen_scan_v2/OutputPins]: msg/OutputPinState.msg
