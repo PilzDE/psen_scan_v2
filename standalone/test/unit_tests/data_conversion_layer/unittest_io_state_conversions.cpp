@@ -87,8 +87,8 @@ TEST(IOStateConversionsTest, shouldReturnFalseForUnusedInputBit)
 
 TEST(IOStateConversionsTest, shouldReturnTrueForUsedInputBit)
 {
-  ASSERT_NE(data_conversion_layer::monitoring_frame::io::getInputType(0, 0), LogicalInputType::unused);
-  EXPECT_TRUE(data_conversion_layer::isUsedInputBit(0, 0));
+  ASSERT_NE(data_conversion_layer::monitoring_frame::io::getInputType(4, 1), LogicalInputType::unused);
+  EXPECT_TRUE(data_conversion_layer::isUsedInputBit(4, 1));
 }
 
 TEST(IOStateConversionsTest, shouldReturnFalseForUnusedOutputBit)

@@ -64,11 +64,11 @@ static constexpr std::chrono::seconds LOOP_END_TIMEOUT{ 4 };
 static constexpr std::chrono::seconds STOP_TIMEOUT{ 1 };
 
 static const psen_scan_v2_standalone::LaserScan::IOData IO_DATA1{ {
-    psen_scan_v2_standalone::IOState(createPinData({ 1, 0, 0, 0, 0, 0, 0, 0 }, { 6, 0, 0, 0 }), 0 /*timestamp*/),
+    psen_scan_v2_standalone::IOState(createPinData({ 0, 0, 0, 0, 0, 0, 0, 0 }, { 6, 0, 0, 0 }), 0 /*timestamp*/),
 } };
 static const psen_scan_v2_standalone::LaserScan::IOData IO_DATA2{
-  { psen_scan_v2_standalone::IOState(createPinData({ 1, 0, 0, 0, 64, 0, 0, 0 }, { 6, 0, 0, 0 }), 0 /*timestamp*/),
-    psen_scan_v2_standalone::IOState(createPinData({ 1, 0, 0, 0, 64, 0, 0, 0 }, { 6, 0, 0, 0 }), 0 /*timestamp*/),
+  { psen_scan_v2_standalone::IOState(createPinData({ 0, 0, 0, 0, 64, 0, 0, 0 }, { 6, 0, 0, 0 }), 0 /*timestamp*/),
+    psen_scan_v2_standalone::IOState(createPinData({ 0, 0, 0, 0, 64, 0, 0, 0 }, { 6, 0, 0, 0 }), 0 /*timestamp*/),
     psen_scan_v2_standalone::IOState(createPinData({ 0, 0, 0, 0, 64, 0, 0, 0 }, { 1, 0, 0, 0 }), 0 /*timestamp*/) }
 };
 
@@ -303,14 +303,14 @@ TEST_F(RosScannerNodeTests, shouldLogChangedIOStates)
   {
     InSequence s;
     EXPECT_LOG_SHORT(INFO,
-                     "RosScannerNode: IOs changed, new input: {Zone Bit 0 = true}, new output: {INTERLOCK 1 = true, "
+                     "RosScannerNode: IOs changed, new input: {}, new output: {INTERLOCK 1 = true, "
                      "Safety 2 intrusion = true}")
         .Times(1);
     EXPECT_LOG_SHORT(INFO,
                      "RosScannerNode: IOs changed, new input: {Zone Set Switching Input 1 = true}, new output: {}")
         .Times(1);
     EXPECT_LOG_SHORT(INFO,
-                     "RosScannerNode: IOs changed, new input: {Zone Bit 0 = false}, new output: {Safety 1 intrusion = "
+                     "RosScannerNode: IOs changed, new input: {}, new output: {Safety 1 intrusion = "
                      "true, INTERLOCK 1 = false, Safety 2 intrusion = false}")
         .WillOnce(OpenBarrier(&changed_io_state_barrier));
   }

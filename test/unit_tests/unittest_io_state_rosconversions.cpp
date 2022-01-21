@@ -52,7 +52,7 @@ TEST(IOStateRosConversionsTest, shouldAddTheCorrectNumberOfInputStates)
   psen_scan_v2_standalone::IOState io_state{};
   psen_scan_v2::IOState ros_message = toIOStateMsg(io_state, "some_frame");
 
-  ASSERT_EQ(ros_message.input.size(), 29u);
+  ASSERT_EQ(ros_message.input.size(), 21u);
 }
 
 TEST(IOStateRosConversionsTest, shouldAddTheCorrectNumberOfOutputStates)

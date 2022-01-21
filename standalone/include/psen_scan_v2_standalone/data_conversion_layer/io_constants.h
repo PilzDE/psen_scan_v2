@@ -87,14 +87,6 @@ using Lit = LogicalInputType;
 using IoName = std::string;
 // clang-format off
 static const std::map<Lit, IoName> LOGICAL_INPUT_BIT_TO_NAME{
-  { Lit::zone_bit_0, "Zone Bit 0" },
-  { Lit::zone_bit_1, "Zone Bit 1" },
-  { Lit::zone_bit_2, "Zone Bit 2" },
-  { Lit::zone_bit_3, "Zone Bit 3" },
-  { Lit::zone_bit_4, "Zone Bit 4" },
-  { Lit::zone_bit_5, "Zone Bit 5" },
-  { Lit::zone_bit_6, "Zone Bit 6" },
-  { Lit::zone_bit_7, "Zone Bit 7" },
 
   { Lit::zone_sw_2, "Zone Set Switching Input 2" },
   { Lit::zone_sw_1, "Zone Set Switching Input 1" },
@@ -125,7 +117,7 @@ static const std::map<Lit, IoName> LOGICAL_INPUT_BIT_TO_NAME{
 
 static constexpr std::array<std::array<Lit, 8>, RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES> LOGICAL_INPUT_BITS{{
   //    Bit7                Bit6             Bit5              Bit4             Bit3               Bit2                Bit1             Bit0
-  { REV(Lit::zone_bit_7,    Lit::zone_bit_6, Lit::zone_bit_5,  Lit::zone_bit_4, Lit::zone_bit_3,   Lit::zone_bit_2,    Lit::zone_bit_1, Lit::zone_bit_0) },
+  {     Lit::unused,        Lit::unused,     Lit::unused,      Lit::unused,     Lit::unused,       Lit::unused,        Lit::unused,     Lit::unused },
   {     Lit::unused,        Lit::unused,     Lit::unused,      Lit::unused,     Lit::unused,       Lit::unused,        Lit::unused,     Lit::unused },
   {     Lit::unused,        Lit::unused,     Lit::unused,      Lit::unused,     Lit::unused,       Lit::unused,        Lit::unused,     Lit::unused },
   {     Lit::unused,        Lit::unused,     Lit::unused,      Lit::unused,     Lit::unused,       Lit::unused,        Lit::unused,     Lit::unused },
