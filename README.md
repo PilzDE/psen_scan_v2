@@ -200,6 +200,13 @@ You can try this out with:
 roslaunch psen_scan_v2 psen_scan_v2.lauch config_file:='full_path_to/example_config.xml'
 ```
 
+```
+WARNING
+There is no verification this configuration matches the one actually loaded on the PSENscan device!
+
+Please always make sure, to keep those configurations syncronized otherwise this visualization might be missleading!
+```
+
 If you want to use the configuration node in your launchfile add a section such as:
 
 ```
