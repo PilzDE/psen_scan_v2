@@ -35,7 +35,8 @@ ConfigServerNode::ConfigServerNode(ros::NodeHandle& nh, const char* config_file_
     ROS_WARN_STREAM_NAMED(
         "ConfigurationServer",
         "The configuration server doesn't verfiy the provided config mathes the one on the connected hardware! "
-        "You are using \"" + std::string(config_file_path) + "\" please verfiy its validity.");
+        "You are using \"" +
+            std::string(config_file_path) + "\" please verfiy its validity.");
 
     zoneset_pub_.publish(toRosMsg(zoneconfig, frame_id));
   }
