@@ -55,6 +55,23 @@ inline std::string formatPinState(const PinState& pin)
   return fmt::format("{} = {}", pin.name(), pin.state());
 }
 
+//! @brief Formats a vector of PinStates
+inline std::string formatPinStates(const std::vector<PinState>& pins)
+{
+  std::stringstream strstr;
+  strstr << "{";
+  for (auto it = pins.begin(); std::next(it) < pins.end(); ++it)
+  {
+    strstr << formatPinState(*it) << ", ";
+  }
+  if (!pins.empty())
+  {
+    strstr << formatPinState(pins.back());
+  }
+  strstr << "}";
+  return strstr.str();
+}
+
 //! @brief Represents the set of all I/Os of the scanner and their states.
 class IOState
 {
