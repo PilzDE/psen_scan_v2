@@ -2,8 +2,8 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.10.1 (2022-01-24)
+-------------------
 * Separate 'PinState' formating from 'formatRange' (#313)
 * Contributors: Pilz GmbH and Co. KG
 
