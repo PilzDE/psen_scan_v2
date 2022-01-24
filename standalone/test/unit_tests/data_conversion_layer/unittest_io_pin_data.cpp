@@ -24,7 +24,6 @@ using namespace psen_scan_v2_standalone::data_conversion_layer::monitoring_frame
 
 TEST(IOPinDataTest, shouldReturnCorrectInputType)
 {
-
   for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
   {
     EXPECT_EQ(getInputType(0, bit_n), LogicalInputType::unused);
@@ -69,7 +68,6 @@ TEST(IOPinDataTest, shouldReturnCorrectInputType)
 
 TEST(IOPinDataTest, shouldReturnCorrectInputName)
 {
-
   for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
   {
     EXPECT_EQ(getInputName(0, bit_n), "unused");
