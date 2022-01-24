@@ -2,6 +2,11 @@
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.10.1 (2022-01-24)
+-------------------
+* Separate 'PinState' formating from 'formatRange' (#313)
+* Contributors: Pilz GmbH and Co. KG
+
 0.10.0 (2022-01-20)
 -------------------
 * Change to new versioning method for ROS1 (0.10.0+) and ROS2 (0.20.0+).
