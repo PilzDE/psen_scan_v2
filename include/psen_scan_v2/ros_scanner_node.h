@@ -166,8 +166,8 @@ void ROSScannerNodeT<S>::publishChangedIOStates(const std::vector<psen_scan_v2_s
 
       PSENSCAN_INFO("RosScannerNode",
                     "IOs changed, new input: {}, new output: {}",
-                    util::formatRange(io.changedInputStates(last_io_state_), formatPinState),
-                    util::formatRange(io.changedOutputStates(last_io_state_), formatPinState));
+                    formatPinStates(io.changedInputStates(last_io_state_)),
+                    formatPinStates(io.changedOutputStates(last_io_state_)));
       last_io_state_ = io;
     }
   }

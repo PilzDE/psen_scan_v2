@@ -35,22 +35,17 @@ namespace util
  * \verbatim "{}" (Empty Range) \endverbatim
  */
 template <typename T>
-std::string formatRange(
-    const T& range,
-    std::string (*element_formatter)(
-        const typename T::value_type&) =  // prevents usage of std::function on ubuntu 18.04:
-                                          // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70570
-    [](const typename T::value_type& v) { return fmt::format("{}", v); })
+std::string formatRange(const T& range)
 {
   std::stringstream strstr;
   strstr << "{";
   for (auto it = range.begin(); std::next(it) < range.end(); ++it)
   {
-    strstr << element_formatter(*it) << ", ";
+    strstr << fmt::format("{}, ", *it);
   }
   if (range.begin() < range.end())
   {
-    strstr << element_formatter(*std::prev(range.end()));
+    strstr << fmt::format("{}", *std::prev(range.end()));
   }
   strstr << "}";
   return strstr.str();
