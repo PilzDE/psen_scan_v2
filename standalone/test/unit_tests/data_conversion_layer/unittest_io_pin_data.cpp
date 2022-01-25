@@ -24,17 +24,9 @@ using namespace psen_scan_v2_standalone::data_conversion_layer::monitoring_frame
 
 TEST(IOPinDataTest, shouldReturnCorrectInputType)
 {
-  EXPECT_EQ(getInputType(0, 0), LogicalInputType::zone_bit_0);
-  EXPECT_EQ(getInputType(0, 1), LogicalInputType::zone_bit_1);
-  EXPECT_EQ(getInputType(0, 2), LogicalInputType::zone_bit_2);
-  EXPECT_EQ(getInputType(0, 3), LogicalInputType::zone_bit_3);
-  EXPECT_EQ(getInputType(0, 4), LogicalInputType::zone_bit_4);
-  EXPECT_EQ(getInputType(0, 5), LogicalInputType::zone_bit_5);
-  EXPECT_EQ(getInputType(0, 6), LogicalInputType::zone_bit_6);
-  EXPECT_EQ(getInputType(0, 7), LogicalInputType::zone_bit_7);
-
   for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
   {
+    EXPECT_EQ(getInputType(0, bit_n), LogicalInputType::unused);
     EXPECT_EQ(getInputType(1, bit_n), LogicalInputType::unused);
     EXPECT_EQ(getInputType(2, bit_n), LogicalInputType::unused);
     EXPECT_EQ(getInputType(3, bit_n), LogicalInputType::unused);
@@ -76,17 +68,9 @@ TEST(IOPinDataTest, shouldReturnCorrectInputType)
 
 TEST(IOPinDataTest, shouldReturnCorrectInputName)
 {
-  EXPECT_EQ(getInputName(0, 0), "Zone Bit 0");
-  EXPECT_EQ(getInputName(0, 1), "Zone Bit 1");
-  EXPECT_EQ(getInputName(0, 2), "Zone Bit 2");
-  EXPECT_EQ(getInputName(0, 3), "Zone Bit 3");
-  EXPECT_EQ(getInputName(0, 4), "Zone Bit 4");
-  EXPECT_EQ(getInputName(0, 5), "Zone Bit 5");
-  EXPECT_EQ(getInputName(0, 6), "Zone Bit 6");
-  EXPECT_EQ(getInputName(0, 7), "Zone Bit 7");
-
   for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
   {
+    EXPECT_EQ(getInputName(0, bit_n), "unused");
     EXPECT_EQ(getInputName(1, bit_n), "unused");
     EXPECT_EQ(getInputName(2, bit_n), "unused");
     EXPECT_EQ(getInputName(3, bit_n), "unused");
