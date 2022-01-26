@@ -36,7 +36,8 @@ ConfigServerNode::ConfigServerNode(ros::NodeHandle& nh, const char* config_file_
         "ConfigurationServer",
         "The configuration server doesn't verfiy the provided configuration file matches the one on the connected "
         "device! "
-        "Mismatching configurations can amongst other things lead to confusing errors in navigation and misleading visualization. "
+        "Mismatching configurations can amongst other things lead to confusing errors in navigation and misleading "
+        "visualization. "
         "You are using \"" +
             std::string(config_file_path) + "\" please make sure that is the one you intented to use.");
 
