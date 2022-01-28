@@ -3,6 +3,8 @@
   <name>psen_scan_v2</name>
   <version>0.10.1</version>
   <description>ROS support for the Pilz laser scanner</description>
+  
+  <author>Pilz GmbH & Co. KG</author>
 
   <maintainer email="a.gutenkunst@pilz.de">Alexander Gutenkunst</maintainer>
   <maintainer email="c.doehn@pilz.de">Christian Döhn</maintainer>
