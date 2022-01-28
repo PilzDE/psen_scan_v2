@@ -180,6 +180,7 @@ public:  // Action methods
   void notifyUserAboutStop(scanner_events::RawReplyReceived const& reply_event);
   void notifyUserAboutUnknownStopReply(scanner_events::RawReplyReceived const& reply_event);
   void notifyUserAboutRefusedStopReply(scanner_events::RawReplyReceived const& reply_event);
+  void notifyUserAboutReachedRetryLimit(scanner_events::MonitoringFrameTimeout const& timeout_event);
 
 public:  // Guards
   bool isAcceptedStopReply(scanner_events::RawReplyReceived const& reply_event);
@@ -188,6 +189,8 @@ public:  // Guards
   bool isAcceptedStartReply(scanner_events::RawReplyReceived const& reply_event);
   bool isUnknownStartReply(scanner_events::RawReplyReceived const& reply_event);
   bool isRefusedStartReply(scanner_events::RawReplyReceived const& reply_event);
+  bool hasRetriesLeft(scanner_events::MonitoringFrameTimeout const& reply_event);
+  bool hasReachedRetryLimit(scanner_events::MonitoringFrameTimeout const& reply_event);
 
 public:  // Replaces the default exception/no-transition responses
   template <class FSM, class Event>
@@ -209,24 +212,26 @@ public:  // Definition of state machine via table
    * @brief Table describing the state machine which is specified in the scanner protocol.
    */
   struct transition_table : mpl::vector<  // NOLINT
-      //    Start                         Event                         Next                        Action                        Guard
-      //  +------------------------------+----------------------------+---------------------------+--------------------------------------+-------------------------+
-      a_row  < Idle,                      e::StartRequest,              WaitForStartReply,          &m::sendStartRequest                                           >,
-      a_row  < Idle,                      e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                            >,
-      row    < WaitForStartReply,         e::RawReplyReceived,          WaitForMonitoringFrame,     &m::notifyUserAboutStart,             &m::isAcceptedStartReply >,
-      row    < WaitForStartReply,         e::RawReplyReceived,          Error,                      &m::notifyUserAboutRefusedStartReply, &m::isRefusedStartReply  >,
-      row    < WaitForStartReply,         e::RawReplyReceived,          Error,                      &m::notifyUserAboutUnknownStartReply, &m::isUnknownStartReply  >,
-      a_irow < WaitForStartReply,         e::StartTimeout,                                          &m::handleStartRequestTimeout                                  >,
-      a_irow < WaitForMonitoringFrame,    e::RawMonitoringFrameReceived,                            &m::handleMonitoringFrame                                      >,
-      a_irow < WaitForMonitoringFrame,    e::MonitoringFrameTimeout,                                &m::handleMonitoringFrameTimeout                               >,
-      a_row  < WaitForStartReply,         e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                            >,
-      a_row  < WaitForMonitoringFrame,    e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                            >,
+      //    Start                         Event                         Next                    Action                                    Guard
+      //  +------------------------------+----------------------------+------------------------+-----------------------------------------+-------------------------+
+      a_row  < Idle,                      e::StartRequest,              WaitForStartReply,      &m::sendStartRequest                                               >,
+      a_row  < Idle,                      e::StopRequest,               WaitForStopReply,       &m::sendStopRequest                                                >,
+      row    < WaitForStartReply,         e::RawReplyReceived,          WaitForMonitoringFrame, &m::notifyUserAboutStart,                 &m::isAcceptedStartReply >,
+      row    < WaitForStartReply,         e::RawReplyReceived,          Error,                  &m::notifyUserAboutRefusedStartReply,     &m::isRefusedStartReply  >,
+      row    < WaitForStartReply,         e::RawReplyReceived,          Error,                  &m::notifyUserAboutUnknownStartReply,     &m::isUnknownStartReply  >,
+      a_irow < WaitForStartReply,         e::StartTimeout,                                      &m::handleStartRequestTimeout                                      >,
+      _irow  < WaitForStartReply,         e::RawMonitoringFrameReceived                                                                                            >,
+      a_irow < WaitForMonitoringFrame,    e::RawMonitoringFrameReceived,                        &m::handleMonitoringFrame                                          >,
+      row    < WaitForMonitoringFrame,    e::MonitoringFrameTimeout,    Error,                  &m::handleMonitoringFrameTimeout,         &m::hasRetriesLeft       >,
+      row    < WaitForMonitoringFrame,    e::MonitoringFrameTimeout,    Error,                  &m::notifyUserAboutReachedRetryLimit,     &m::hasReachedRetryLimit >,
+      a_row  < WaitForStartReply,         e::StopRequest,               WaitForStopReply,       &m::sendStopRequest                                                >,
+      a_row  < WaitForMonitoringFrame,    e::StopRequest,               WaitForStopReply,       &m::sendStopRequest                                                >,
       _irow  < WaitForStopReply,          e::RawMonitoringFrameReceived                                                                                            >,
-      row    < WaitForStopReply,          e::RawReplyReceived,          Stopped,                    &m::notifyUserAboutStop,              &m::isAcceptedStopReply  >,
-      row    < WaitForStopReply,          e::RawReplyReceived,          Error,                      &m::notifyUserAboutRefusedStopReply,  &m::isRefusedStopReply   >,
-      row    < WaitForStopReply,          e::RawReplyReceived,          Error,                      &m::notifyUserAboutUnknownStopReply,  &m::isUnknownStopReply   >,
+      row    < WaitForStopReply,          e::RawReplyReceived,          Stopped,                &m::notifyUserAboutStop,                  &m::isAcceptedStopReply  >,
+      row    < WaitForStopReply,          e::RawReplyReceived,          Error,                  &m::notifyUserAboutRefusedStopReply,      &m::isRefusedStopReply   >,
+      row    < WaitForStopReply,          e::RawReplyReceived,          Error,                  &m::notifyUserAboutUnknownStopReply,      &m::isUnknownStopReply   >,
       _irow  < Stopped,                   e::RawMonitoringFrameReceived                                                                                            >
-      //  +------------------------------+----------------------------+--------------------------+---------------------------------------+-------------------------+
+      //  +------------------------------+----------------------------+-----------------------+---------------------------------------+-------------------------+
       > {};
   // clang-format on
 
@@ -281,6 +286,8 @@ private:
   std::unique_ptr<util::Watchdog> start_reply_watchdog_{};
 
   std::unique_ptr<util::Watchdog> monitoring_frame_watchdog_{};
+  uint16_t consecutive_monitoring_retries{0};
+
   ScanBuffer scan_buffer_{ DEFAULT_NUM_MSG_PER_ROUND };
   boost::optional<data_conversion_layer::monitoring_frame::Message> zoneset_reference_msg_;
 

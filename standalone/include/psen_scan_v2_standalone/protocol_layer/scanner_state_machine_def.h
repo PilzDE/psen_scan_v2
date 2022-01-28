@@ -170,6 +170,7 @@ inline void ScannerProtocolDef::sendStopRequest(const T& event)
 
 inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawMonitoringFrameReceived& event)
 {
+  consecutive_monitoring_retries = 0;
   PSENSCAN_DEBUG("StateMachine", "Action: handleMonitoringFrame");
   monitoring_frame_watchdog_->reset();
 
@@ -206,6 +207,11 @@ inline void ScannerProtocolDef::notifyUserAboutUnknownStartReply(scanner_events:
       *(reply_event.data_)) };
   start_error_callback_(
       fmt::format("Unknown result code {:#04x} in start reply.", static_cast<uint32_t>(msg.result())));
+}
+
+inline void ScannerProtocolDef::notifyUserAboutReachedRetryLimit(scanner_events::MonitoringFrameTimeout const& timeout_event)
+{
+  stop_error_callback_("There still is no response from the device. Shutting down now.");
 }
 
 inline void ScannerProtocolDef::notifyUserAboutRefusedStartReply(scanner_events::RawReplyReceived const& reply_event)
@@ -299,6 +305,7 @@ inline bool ScannerProtocolDef::framesContainMeasurements(
 
 inline void ScannerProtocolDef::handleMonitoringFrameTimeout(const scanner_events::MonitoringFrameTimeout& event)
 {
+  consecutive_monitoring_retries ++;
   PSENSCAN_DEBUG("StateMachine", "Action: handleMonitoringFrameTimeout");
 
   PSENSCAN_WARN("StateMachine",
@@ -348,6 +355,16 @@ inline bool ScannerProtocolDef::isUnknownStartReply(scanner_events::RawReplyRece
   const data_conversion_layer::scanner_reply::Message msg{ data_conversion_layer::scanner_reply::deserialize(
       *(reply_event.data_)) };
   return isStartReply(msg) && isUnknownReply(msg);
+}
+
+inline bool ScannerProtocolDef::hasRetriesLeft(scanner_events::MonitoringFrameTimeout const& reply_event)
+{
+  return consecutive_monitoring_retries <= 10;
+}
+
+inline bool ScannerProtocolDef::hasReachedRetryLimit(scanner_events::MonitoringFrameTimeout const& reply_event)
+{
+  return consecutive_monitoring_retries > 10;
 }
 
 inline bool ScannerProtocolDef::isRefusedStartReply(scanner_events::RawReplyReceived const& reply_event)
