@@ -11,6 +11,13 @@
   <maintainer email="r.feistenauer@pilz.de">Richard Feistenauer</maintainer>
 
   <license>LGPLv3</license>
+  
+  <url type="bugtracker">https://github.com/PilzDE/psen_scan_v2/issues</url>
+  <url type="repository">https://github.com/PilzDE/psen_scan_v2</url>
+  
+  <author>Pilz GmbH + Co. KG</author>
+
+
 
   <buildtool_depend>catkin</buildtool_depend>
   <depend>fmt</depend>
