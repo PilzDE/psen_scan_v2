@@ -28,6 +28,7 @@ jobs:
           ROS_DISTRO: noetic
           ADDITIONAL_DEBS: "clang-tidy libclang-dev"
           CMAKE_ARGS: "-DCATKIN_ENABLE_CLANG_TIDY=true"
+          NOT_TEST_BUILD: "true"
 
   main-repo:
     name: "Build + Test with Main Repo of noetic (http://packages.ros.org/ros/ubuntu)"
