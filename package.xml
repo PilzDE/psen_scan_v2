@@ -3,7 +3,7 @@
   <name>psen_scan_v2</name>
   <version>0.10.1</version>
   <description>ROS support for the Pilz laser scanner</description>
-  
+
   <maintainer email="a.gutenkunst@pilz.de">Alexander Gutenkunst</maintainer>
   <maintainer email="c.doehn@pilz.de">Christian Döhn</maintainer>
   <maintainer email="c.henkel@pilz.de">Christian Henkel</maintainer>
@@ -12,7 +12,6 @@
 
   <license>LGPLv3</license>
   
-  <url type="website">https://wiki.ros.org/psen_scan_v2</url>
   <url type="bugtracker">https://github.com/PilzDE/psen_scan_v2/issues</url>
   <url type="repository">https://github.com/PilzDE/psen_scan_v2</url>
   
