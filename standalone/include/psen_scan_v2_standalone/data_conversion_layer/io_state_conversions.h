@@ -95,7 +95,8 @@ static inline std::vector<PinState> generateChangedInputStates(const monitoring_
   {
     for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
     {
-      if (new_state.input_state.at(byte_n).test(bit_n) ^ old_state.input_state.at(byte_n).test(bit_n))
+      if (isUsedInputBit(byte_n, bit_n) &&
+          (new_state.input_state.at(byte_n).test(bit_n) ^ old_state.input_state.at(byte_n).test(bit_n)))
       {
         pin_states.emplace_back(generateInputPinState(new_state, byte_n, bit_n));
       }
@@ -112,7 +113,8 @@ static inline std::vector<PinState> generateChangedOutputStates(const monitoring
   {
     for (std::size_t bit_n = 0; bit_n < 8; ++bit_n)
     {
-      if (new_state.output_state.at(byte_n).test(bit_n) ^ old_state.output_state.at(byte_n).test(bit_n))
+      if (isUsedOutputBit(byte_n, bit_n) &&
+          (new_state.output_state.at(byte_n).test(bit_n) ^ old_state.output_state.at(byte_n).test(bit_n)))
       {
         pin_states.emplace_back(generateOutputPinState(new_state, byte_n, bit_n));
       }
