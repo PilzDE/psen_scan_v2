@@ -214,8 +214,8 @@ inline void ScannerProtocolDef::notifyUserAboutUnknownStartReply(scanner_events:
 inline void
 ScannerProtocolDef::notifyUserAboutReachedRetryLimit(scanner_events::MonitoringFrameTimeout const& timeout_event)
 {
-  scanner_error_callback_(fmt::format("There is still no response from the device after {} retries.",
-                                      consecutive_monitoring_retries));
+  scanner_error_callback_(
+      fmt::format("There is still no response from the device after {} retries.", consecutive_monitoring_retries));
 }
 
 inline void ScannerProtocolDef::notifyUserAboutRefusedStartReply(scanner_events::RawReplyReceived const& reply_event)
