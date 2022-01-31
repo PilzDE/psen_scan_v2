@@ -65,7 +65,7 @@ ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config,
 }
 
 ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback)
-  : ScannerV2(scanner_config, laser_scan_callback, NULL)
+  : ScannerV2(scanner_config, laser_scan_callback, nullptr)
 {
 }
 
