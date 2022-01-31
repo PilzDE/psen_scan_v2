@@ -16,6 +16,8 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request_serialization.h"
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/communication_layer/udp_client.h"
+#include "psen_scan_v2_standalone/configuration/default_parameters.h"
+
 namespace psen_scan_v2_standalone
 {
 namespace protocol_layer
@@ -214,8 +216,8 @@ inline void ScannerProtocolDef::notifyUserAboutUnknownStartReply(scanner_events:
 inline void
 ScannerProtocolDef::notifyUserAboutReachedRetryLimit(scanner_events::MonitoringFrameTimeout const& timeout_event)
 {
-  scanner_error_callback_(
-      fmt::format("There is still no response from the device after {} retries.", consecutive_monitoring_retries));
+  scanner_error_callback_(fmt::format("No incoming Monitoring frame for {:.1f} seconds",
+                                      consecutive_monitoring_retries * WATCHDOG_TIMEOUT.count() / 1000.0));
 }
 
 inline void ScannerProtocolDef::notifyUserAboutRefusedStartReply(scanner_events::RawReplyReceived const& reply_event)
@@ -363,12 +365,12 @@ inline bool ScannerProtocolDef::isUnknownStartReply(scanner_events::RawReplyRece
 
 inline bool ScannerProtocolDef::hasRetriesLeft(scanner_events::MonitoringFrameTimeout const& reply_event)
 {
-  return consecutive_monitoring_retries < 10;
+  return consecutive_monitoring_retries < psen_scan_v2_standalone::configuration::MONITORING_FRAME_TIMEOUT_RETRIES;
 }
 
 inline bool ScannerProtocolDef::hasReachedRetryLimit(scanner_events::MonitoringFrameTimeout const& reply_event)
 {
-  return consecutive_monitoring_retries >= 10;
+  return consecutive_monitoring_retries >= psen_scan_v2_standalone::configuration::MONITORING_FRAME_TIMEOUT_RETRIES;
 }
 
 inline bool ScannerProtocolDef::isRefusedStartReply(scanner_events::RawReplyReceived const& reply_event)
