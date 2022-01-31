@@ -24,7 +24,7 @@
 #include <vector>
 #include <boost/optional.hpp>
 
-#define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 12  // see https://www.boost.org/doc/libs/1_66_0/libs/msm/doc/HTML/ch03s05.html
+#define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 13  // see https://www.boost.org/doc/libs/1_66_0/libs/msm/doc/HTML/ch03s05.html
 
 // back-end
 #include <boost/msm/back/state_machine.hpp>
@@ -86,6 +86,7 @@ using ScannerStartedCallback = std::function<void()>;
 using ScannerStoppedCallback = std::function<void()>;
 using StartErrorCallback = std::function<void(const std::string&)>;
 using StopErrorCallback = std::function<void(const std::string&)>;
+using ScannerErrorCallback = std::function<void(const std::string&)>;
 using TimeoutCallback = std::function<void()>;
 using InformUserAboutLaserScanCallback = std::function<void(const LaserScan&)>;
 
@@ -150,6 +151,7 @@ public:
                      const communication_layer::ErrorCallback& control_error_callback,
                      const communication_layer::ErrorCallback& start_error_callback,
                      const communication_layer::ErrorCallback& stop_error_callback,
+                     const communication_layer::ErrorCallback& scanner_error_callback,
                      const communication_layer::NewMessageCallback& data_msg_callback,
                      const communication_layer::ErrorCallback& data_error_callback,
                      const ScannerStartedCallback& scanner_started_callback,
@@ -222,8 +224,8 @@ public:  // Definition of state machine via table
       a_irow < WaitForStartReply,         e::StartTimeout,                                      &m::handleStartRequestTimeout                                      >,
       _irow  < WaitForStartReply,         e::RawMonitoringFrameReceived                                                                                            >,
       a_irow < WaitForMonitoringFrame,    e::RawMonitoringFrameReceived,                        &m::handleMonitoringFrame                                          >,
-      row    < WaitForMonitoringFrame,    e::MonitoringFrameTimeout,    Error,                  &m::handleMonitoringFrameTimeout,         &m::hasRetriesLeft       >,
-      row    < WaitForMonitoringFrame,    e::MonitoringFrameTimeout,    Error,                  &m::notifyUserAboutReachedRetryLimit,     &m::hasReachedRetryLimit >,
+      irow   < WaitForMonitoringFrame,    e::MonitoringFrameTimeout,                            &m::handleMonitoringFrameTimeout,         &m::hasRetriesLeft       >,
+      irow   < WaitForMonitoringFrame,    e::MonitoringFrameTimeout,                            &m::notifyUserAboutReachedRetryLimit,     &m::hasReachedRetryLimit >,
       a_row  < WaitForStartReply,         e::StopRequest,               WaitForStopReply,       &m::sendStopRequest                                                >,
       a_row  < WaitForMonitoringFrame,    e::StopRequest,               WaitForStopReply,       &m::sendStopRequest                                                >,
       _irow  < WaitForStopReply,          e::RawMonitoringFrameReceived                                                                                            >,
@@ -286,7 +288,7 @@ private:
   std::unique_ptr<util::Watchdog> start_reply_watchdog_{};
 
   std::unique_ptr<util::Watchdog> monitoring_frame_watchdog_{};
-  uint16_t consecutive_monitoring_retries{0};
+  uint16_t consecutive_monitoring_retries{ 0 };
 
   ScanBuffer scan_buffer_{ DEFAULT_NUM_MSG_PER_ROUND };
   boost::optional<data_conversion_layer::monitoring_frame::Message> zoneset_reference_msg_;
@@ -300,6 +302,7 @@ private:
   const ScannerStoppedCallback scanner_stopped_callback_;
   const StartErrorCallback start_error_callback_;
   const StopErrorCallback stop_error_callback_;
+  const ScannerErrorCallback scanner_error_callback_;
   const InformUserAboutLaserScanCallback inform_user_about_laser_scan_callback_;
 
   // Timeout Handler

@@ -42,9 +42,12 @@ class IScanner
 public:
   //! @brief Represents the user-provided callback for processing incoming scan data.
   using LaserScanCallback = std::function<void(const LaserScan&)>;
+  using ErrorCallback = std::function<void(const std::string&)>;
 
 public:
-  IScanner(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback);
+  IScanner(const ScannerConfiguration& scanner_config,
+           const LaserScanCallback& laser_scan_callback,
+           const ErrorCallback& error_callback);
   virtual ~IScanner() = default;
 
 public:
@@ -63,14 +66,18 @@ protected:
   [[deprecated("use const LaserScanCallback& laserScanCallback() const instead")]] const LaserScanCallback&
   getLaserScanCallback() const;
   const LaserScanCallback& laserScanCallback() const;
+  const ErrorCallback& errorCallback() const;
 
 private:
   const ScannerConfiguration config_;
   const LaserScanCallback laser_scan_callback_;
+  const ErrorCallback error_callback_;
 };
 
-inline IScanner::IScanner(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback)
-  : config_(scanner_config), laser_scan_callback_(laser_scan_callback)
+inline IScanner::IScanner(const ScannerConfiguration& scanner_config,
+                          const LaserScanCallback& laser_scan_callback,
+                          const ErrorCallback& error_callback)
+  : config_(scanner_config), laser_scan_callback_(laser_scan_callback), error_callback_(error_callback)
 {
   if (!laser_scan_callback)
   {
@@ -86,6 +93,11 @@ inline const ScannerConfiguration& IScanner::config() const
 inline const IScanner::LaserScanCallback& IScanner::laserScanCallback() const
 {
   return laser_scan_callback_;
+}
+
+inline const IScanner::ErrorCallback& IScanner::errorCallback() const
+{
+  return error_callback_;
 }
 
 inline const ScannerConfiguration& IScanner::getConfig() const

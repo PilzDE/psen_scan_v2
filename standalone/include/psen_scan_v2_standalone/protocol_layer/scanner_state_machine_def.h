@@ -25,6 +25,7 @@ inline ScannerProtocolDef::ScannerProtocolDef(const ScannerConfiguration& config
                                               const communication_layer::ErrorCallback& control_error_callback,
                                               const communication_layer::ErrorCallback& start_error_callback,
                                               const communication_layer::ErrorCallback& stop_error_callback,
+                                              const communication_layer::ErrorCallback& scanner_error_callback,
                                               const communication_layer::NewMessageCallback& data_msg_callback,
                                               const communication_layer::ErrorCallback& data_error_callback,
                                               const ScannerStartedCallback& scanner_started_callback,
@@ -47,6 +48,7 @@ inline ScannerProtocolDef::ScannerProtocolDef(const ScannerConfiguration& config
   , scanner_stopped_callback_(scanner_stopped_callback)
   , start_error_callback_(start_error_callback)
   , stop_error_callback_(stop_error_callback)
+  , scanner_error_callback_(scanner_error_callback)
   , inform_user_about_laser_scan_callback_(laser_scan_callback)
   , start_timeout_callback_(start_timeout_callback)
   , monitoring_frame_timeout_callback_(monitoring_frame_timeout_callback)
@@ -209,9 +211,11 @@ inline void ScannerProtocolDef::notifyUserAboutUnknownStartReply(scanner_events:
       fmt::format("Unknown result code {:#04x} in start reply.", static_cast<uint32_t>(msg.result())));
 }
 
-inline void ScannerProtocolDef::notifyUserAboutReachedRetryLimit(scanner_events::MonitoringFrameTimeout const& timeout_event)
+inline void
+ScannerProtocolDef::notifyUserAboutReachedRetryLimit(scanner_events::MonitoringFrameTimeout const& timeout_event)
 {
-  stop_error_callback_("There still is no response from the device. Shutting down now.");
+  scanner_error_callback_(fmt::format("There is still no response from the device after {} retries.",
+                                      consecutive_monitoring_retries));
 }
 
 inline void ScannerProtocolDef::notifyUserAboutRefusedStartReply(scanner_events::RawReplyReceived const& reply_event)
@@ -305,7 +309,7 @@ inline bool ScannerProtocolDef::framesContainMeasurements(
 
 inline void ScannerProtocolDef::handleMonitoringFrameTimeout(const scanner_events::MonitoringFrameTimeout& event)
 {
-  consecutive_monitoring_retries ++;
+  consecutive_monitoring_retries++;
   PSENSCAN_DEBUG("StateMachine", "Action: handleMonitoringFrameTimeout");
 
   PSENSCAN_WARN("StateMachine",
@@ -359,12 +363,12 @@ inline bool ScannerProtocolDef::isUnknownStartReply(scanner_events::RawReplyRece
 
 inline bool ScannerProtocolDef::hasRetriesLeft(scanner_events::MonitoringFrameTimeout const& reply_event)
 {
-  return consecutive_monitoring_retries <= 10;
+  return consecutive_monitoring_retries < 10;
 }
 
 inline bool ScannerProtocolDef::hasReachedRetryLimit(scanner_events::MonitoringFrameTimeout const& reply_event)
 {
-  return consecutive_monitoring_retries > 10;
+  return consecutive_monitoring_retries >= 10;
 }
 
 inline bool ScannerProtocolDef::isRefusedStartReply(scanner_events::RawReplyReceived const& reply_event)

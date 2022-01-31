@@ -30,8 +30,9 @@ class ScannerMock
 {
 public:
   ScannerMock(const psen_scan_v2_standalone::ScannerConfiguration& scanner_config,
-              const psen_scan_v2_standalone::protocol_layer::LaserScanCallback& laser_scan_callback)
-    : laser_scan_callback_(laser_scan_callback){};
+              const psen_scan_v2_standalone::protocol_layer::LaserScanCallback& laser_scan_callback,
+              const psen_scan_v2_standalone::protocol_layer::ErrorCallback& error_callback)
+    : laser_scan_callback_(laser_scan_callback), error_callback_(error_callback){};
 
   MOCK_METHOD0(start, std::future<void>());
   MOCK_METHOD0(stop, std::future<void>());
@@ -40,6 +41,7 @@ public:
 
 private:
   psen_scan_v2_standalone::protocol_layer::LaserScanCallback laser_scan_callback_;
+  psen_scan_v2_standalone::protocol_layer::ErrorCallback error_callback_;
 };
 
 inline void ScannerMock::invokeLaserScanCallback(const psen_scan_v2_standalone::LaserScan& scan)
