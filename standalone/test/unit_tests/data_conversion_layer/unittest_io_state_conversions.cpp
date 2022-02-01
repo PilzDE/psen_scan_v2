@@ -23,7 +23,6 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
-#include "psen_scan_v2_standalone/util/gtest_expectations.h"
 
 namespace psen_scan_v2_standalone_test
 {
