@@ -107,6 +107,7 @@ private:
   FRIEND_TEST(RosScannerNodeTests, shouldPublishChangedIOStatesEqualToConversionOfSuppliedStandaloneIOStates);
   FRIEND_TEST(RosScannerNodeTests, shouldPublishLatchedOnIOStatesTopic);
   FRIEND_TEST(RosScannerNodeTests, shouldLogChangedIOStates);
+  FRIEND_TEST(RosScannerNodeTests, shouldTerminateOnErrorCallbackInvocation);
 };
 
 typedef ROSScannerNodeT<> ROSScannerNode;

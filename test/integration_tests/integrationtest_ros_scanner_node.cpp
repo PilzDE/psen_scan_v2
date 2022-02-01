@@ -407,6 +407,29 @@ TEST_F(RosScannerNodeTests, shouldThrowExceptionSetInScannerStopFuture)
   EXPECT_THROW_AND_WHAT(loop.get(), std::runtime_error, error_msg.c_str());
 }
 
+TEST_F(RosScannerNodeTests, shouldTerminateOnErrorCallbackInvocation)
+{
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
+
+  util::Barrier start_barrier;
+  util::Barrier stop_barrier;
+
+  {
+    InSequence s;
+    EXPECT_CALL(ros_scanner_node.scanner_, start())
+        .WillOnce(DoAll(OpenBarrier(&start_barrier), ReturnReadyVoidFuture()));
+    EXPECT_CALL(ros_scanner_node.scanner_, stop()).WillOnce(DoAll(OpenBarrier(&stop_barrier), ReturnReadyVoidFuture()));
+  }
+
+  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
+  start_barrier.waitTillRelease(DEFAULT_TIMEOUT);
+
+  ros_scanner_node.scanner_.invokeErrorCallback();
+
+  stop_barrier.waitTillRelease(DEFAULT_TIMEOUT);
+  EXPECT_FUTURE_IS_READY(loop, LOOP_END_TIMEOUT);
+}
+
 }  // namespace psen_scan_v2
 
 int main(int argc, char* argv[])

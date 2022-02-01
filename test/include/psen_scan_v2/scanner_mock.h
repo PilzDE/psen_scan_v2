@@ -17,6 +17,7 @@
 #define PSEN_SCAN_V2_TEST_MOCK_SCANNER_IMPL_H
 
 #include <future>
+#include <string>
 
 #include <gmock/gmock.h>
 
@@ -38,6 +39,7 @@ public:
   MOCK_METHOD0(stop, std::future<void>());
 
   void invokeLaserScanCallback(const psen_scan_v2_standalone::LaserScan& scan);
+  void invokeErrorCallback(const std::string& error_msg);
 
 private:
   psen_scan_v2_standalone::protocol_layer::LaserScanCallback laser_scan_callback_;
@@ -47,6 +49,11 @@ private:
 inline void ScannerMock::invokeLaserScanCallback(const psen_scan_v2_standalone::LaserScan& scan)
 {
   laser_scan_callback_(scan);
+}
+
+inline void ScannerMock::invokeErrorCallback(const std::string& error_msg = "")
+{
+  error_callback_(error_msg);
 }
 
 }  // namespace psen_scan_v2_test
