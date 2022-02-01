@@ -19,6 +19,19 @@ jobs:
         env:
           ROS_REPO: testing
 
+  build_test_clang_tidy:
+    name: "clang tidy melodic"
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v1
+      - uses: 'ros-industrial/industrial_ci@master'
+        env:
+          ROS_REPO: testing
+          ROS_DISTRO: melodic
+          ADDITIONAL_DEBS: "clang-tidy libclang-dev"
+          CMAKE_ARGS: "-DCATKIN_ENABLE_CLANG_TIDY=true"
+          NOT_TEST_BUILD: "true"
+
   main-repo:
     name: "Build + Test with Main Repo of melodic (http://packages.ros.org/ros/ubuntu)"
     runs-on: ubuntu-18.04

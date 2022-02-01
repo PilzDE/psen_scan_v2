@@ -47,15 +47,6 @@ using RawChunk = std::array<uint8_t, io::RAW_CHUNK_LENGTH_IN_BYTES>;
 
 enum class LogicalInputType
 {
-  zone_bit_0,
-  zone_bit_1,
-  zone_bit_2,
-  zone_bit_3,
-  zone_bit_4,
-  zone_bit_5,
-  zone_bit_6,
-  zone_bit_7,
-
   zone_sw_2,
   zone_sw_1,
   overr_2_a,

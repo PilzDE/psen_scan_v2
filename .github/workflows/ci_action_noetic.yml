@@ -3,10 +3,8 @@ name: CI-Noetic
 on: [push, pull_request]
 
 env:
-  ADDITIONAL_DEBS: "clang-tidy libclang-dev"
   CATKIN_LINT: true
   CATKIN_LINT_ARGS: '--strict'
-  CMAKE_ARGS: "-DCATKIN_ENABLE_CLANG_TIDY=true"
   ROS_DISTRO: noetic
 
 jobs:
@@ -18,6 +16,19 @@ jobs:
       - uses: 'ros-industrial/industrial_ci@master'
         env:
           ROS_REPO: testing
+
+  build_test_clang_tidy:
+    name: "clang tidy noetic"
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v1
+      - uses: 'ros-industrial/industrial_ci@master'
+        env:
+          ROS_REPO: testing
+          ROS_DISTRO: noetic
+          ADDITIONAL_DEBS: "clang-tidy libclang-dev"
+          CMAKE_ARGS: "-DCATKIN_ENABLE_CLANG_TIDY=true"
+          NOT_TEST_BUILD: "true"
 
   main-repo:
     name: "Build + Test with Main Repo of noetic (http://packages.ros.org/ros/ubuntu)"
