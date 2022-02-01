@@ -45,13 +45,13 @@ TEST_F(ErrorCallbackTests, shouldCallErrorCallbackWhenScannerIsTurnedOffToLong)
 {
   ros::NodeHandle pnh("~");
 
-  const util::TenthOfDegree ANGLE_START{ data_conversion_layer::degreeToTenthDegree(137) };
-  const util::TenthOfDegree ANGLE_END{ data_conversion_layer::degreeToTenthDegree(138) };
-  const int WRONG_DATA_PORT = 9999;
+  const util::TenthOfDegree angle_start{ data_conversion_layer::degreeToTenthDegree(137) };
+  const util::TenthOfDegree angle_end{ data_conversion_layer::degreeToTenthDegree(138) };
+  const int wrong_data_port = 9999;
 
   ScannerConfiguration scanner_configuration{ ScannerConfigurationBuilder("192.168.0.10")
-                                                  .scanRange(ScanRange{ ANGLE_START, ANGLE_END })
-                                                  .hostDataPort(WRONG_DATA_PORT)
+                                                  .scanRange(ScanRange{ angle_start, angle_end })
+                                                  .hostDataPort(wrong_data_port)
                                                   .secondsUntilDataTimeoutCountsAsError(2.0)
                                                   .build() };
 
