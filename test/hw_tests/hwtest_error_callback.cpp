@@ -52,11 +52,12 @@ TEST_F(ErrorCallbackTests, shouldCallErrorCallbackWhenScannerIsTurnedOffToLong)
   ScannerConfiguration scanner_configuration{ ScannerConfigurationBuilder("192.168.0.10")
                                                   .scanRange(ScanRange{ ANGLE_START, ANGLE_END })
                                                   .hostDataPort(WRONG_DATA_PORT)
+                                                  .secondsUntilDataTimeoutCountsAsError(2.0)
                                                   .build() };
 
   ROSScannerNode ros_scanner_node(pnh, "test/scan", "test", DEFAULT_X_AXIS_ROTATION, scanner_configuration);
 
-  EXPECT_NO_BLOCK_WITH_TIMEOUT_AND_NO_THROW(ros_scanner_node.run();, 35s);
+  EXPECT_NO_BLOCK_WITH_TIMEOUT_AND_NO_THROW(ros_scanner_node.run();, 5s);
 }
 }  // namespace psen_scan_v2_test
 

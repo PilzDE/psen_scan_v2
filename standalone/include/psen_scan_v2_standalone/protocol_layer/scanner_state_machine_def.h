@@ -174,7 +174,7 @@ inline void ScannerProtocolDef::sendStopRequest(const T& event)
 
 inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawMonitoringFrameReceived& event)
 {
-  consecutive_monitoring_frame_timeouts = 0;
+  monitoring_frame_timeout_secs = 0.0;
   PSENSCAN_DEBUG("StateMachine", "Action: handleMonitoringFrame");
   monitoring_frame_watchdog_->reset();
 
@@ -214,10 +214,10 @@ inline void ScannerProtocolDef::notifyUserAboutUnknownStartReply(scanner_events:
 }
 
 inline void
-ScannerProtocolDef::notifyUserAboutReachedRetryLimit(scanner_events::MonitoringFrameTimeout const& timeout_event)
+ScannerProtocolDef::notifyUserAboutDataTimeoutError(scanner_events::MonitoringFrameTimeout const& timeout_event)
 {
-  scanner_error_callback_(fmt::format("No incoming Monitoring frame for {:.1f} seconds",
-                                      consecutive_monitoring_frame_timeouts * WATCHDOG_TIMEOUT.count() / 1000.0));
+  scanner_error_callback_(
+      fmt::format("No incoming Monitoring frame for {:.1f} seconds", monitoring_frame_timeout_secs));
 }
 
 inline void ScannerProtocolDef::notifyUserAboutRefusedStartReply(scanner_events::RawReplyReceived const& reply_event)
@@ -311,7 +311,7 @@ inline bool ScannerProtocolDef::framesContainMeasurements(
 
 inline void ScannerProtocolDef::handleMonitoringFrameTimeout(const scanner_events::MonitoringFrameTimeout& event)
 {
-  consecutive_monitoring_frame_timeouts++;
+  monitoring_frame_timeout_secs += WATCHDOG_TIMEOUT.count() / 1000.0;
   PSENSCAN_DEBUG("StateMachine", "Action: handleMonitoringFrameTimeout");
 
   PSENSCAN_WARN("StateMachine",
@@ -363,16 +363,14 @@ inline bool ScannerProtocolDef::isUnknownStartReply(scanner_events::RawReplyRece
   return isStartReply(msg) && isUnknownReply(msg);
 }
 
-inline bool ScannerProtocolDef::hasRetriesLeft(scanner_events::MonitoringFrameTimeout const& reply_event)
+inline bool ScannerProtocolDef::isDataTimeoutWarning(scanner_events::MonitoringFrameTimeout const& error_event)
 {
-  return consecutive_monitoring_frame_timeouts <
-         psen_scan_v2_standalone::configuration::MONITORING_FRAME_TIMEOUT_RETRIES;
+  return monitoring_frame_timeout_secs < config_.secondsUntilDataTimeoutCountsAsError();
 }
 
-inline bool ScannerProtocolDef::hasReachedRetryLimit(scanner_events::MonitoringFrameTimeout const& reply_event)
+inline bool ScannerProtocolDef::isDataTimeoutError(scanner_events::MonitoringFrameTimeout const& error_event)
 {
-  return consecutive_monitoring_frame_timeouts >=
-         psen_scan_v2_standalone::configuration::MONITORING_FRAME_TIMEOUT_RETRIES;
+  return !isDataTimeoutWarning(error_event);
 }
 
 inline bool ScannerProtocolDef::isRefusedStartReply(scanner_events::RawReplyReceived const& reply_event)

@@ -49,6 +49,7 @@ const std::string PARAM_X_AXIS_ROTATION{ "x_axis_rotation" };
 const std::string PARAM_FRAGMENTED_SCANS{ "fragmented_scans" };
 const std::string PARAM_INTENSITIES{ "intensities" };
 const std::string PARAM_RESOLUTION{ "resolution" };
+const std::string PARAM_SECONDS_UNTIL_DATA_TIMEOUT_COUNTS_AS_ERROR{ "seconds_until_data_timeout_counts_as_error" };
 
 static const std::string DEFAULT_TF_PREFIX = "laser_1";
 
@@ -97,6 +98,8 @@ int main(int argc, char** argv)
           .enableIntensities(getOptionalParamFromServer<bool>(pnh, PARAM_INTENSITIES, configuration::INTENSITIES))
           .scanResolution(util::TenthOfDegree::fromRad(
               getOptionalParamFromServer<double>(pnh, PARAM_RESOLUTION, configuration::DEFAULT_SCAN_ANGLE_RESOLUTION)))
+          .secondsUntilDataTimeoutCountsAsError(getOptionalParamFromServer<double>(
+              pnh, PARAM_SECONDS_UNTIL_DATA_TIMEOUT_COUNTS_AS_ERROR, configuration::SECONDS_UNTIL_DATA_TIMEOUT_COUNTS_AS_ERROR))
           .build()
     };
 

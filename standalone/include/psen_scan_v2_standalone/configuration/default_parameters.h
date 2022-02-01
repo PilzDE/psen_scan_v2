@@ -47,7 +47,7 @@ static constexpr double TIME_PER_SCAN_IN_S{ 0.03 };
 static constexpr double RANGE_MIN_IN_M{ 0.05 };
 static constexpr double RANGE_MAX_IN_M{ 40. };
 
-static constexpr uint16_t MONITORING_FRAME_TIMEOUT_RETRIES = 30;
+static constexpr double SECONDS_UNTIL_DATA_TIMEOUT_COUNTS_AS_ERROR = 30.0;
 
 static const util::TenthOfDegree DEFAULT_ZONESET_ANGLE_STEP(5);
 }  // namespace configuration

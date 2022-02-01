@@ -57,6 +57,8 @@ public:
   [[deprecated("use void hostIp(const uint32_t& host_ip) instead")]] void setHostIp(const uint32_t& host_ip);
   void hostIp(const uint32_t& host_ip);
 
+  double secondsUntilDataTimeoutCountsAsError() const;
+
 private:
   friend class ScannerConfigurationBuilder;
 
@@ -79,6 +81,8 @@ private:
   bool diagnostics_enabled_{ configuration::DIAGNOSTICS };
   bool intensities_enabled_{ configuration::INTENSITIES };
   bool fragmented_scans_{ configuration::FRAGMENTED_SCANS };
+
+  double seconds_until_data_timeout_counts_as_error_{ configuration::SECONDS_UNTIL_DATA_TIMEOUT_COUNTS_AS_ERROR };
 };
 
 inline bool ScannerConfiguration::isComplete() const
@@ -159,6 +163,11 @@ inline void ScannerConfiguration::hostIp(const uint32_t& host_ip)
 inline void ScannerConfiguration::setHostIp(const uint32_t& host_ip)
 {
   this->hostIp(host_ip);
+}
+
+inline double ScannerConfiguration::secondsUntilDataTimeoutCountsAsError() const
+{
+  return seconds_until_data_timeout_counts_as_error_;
 }
 
 }  // namespace psen_scan_v2_standalone

@@ -182,7 +182,7 @@ public:  // Action methods
   void notifyUserAboutStop(scanner_events::RawReplyReceived const& reply_event);
   void notifyUserAboutUnknownStopReply(scanner_events::RawReplyReceived const& reply_event);
   void notifyUserAboutRefusedStopReply(scanner_events::RawReplyReceived const& reply_event);
-  void notifyUserAboutReachedRetryLimit(scanner_events::MonitoringFrameTimeout const& timeout_event);
+  void notifyUserAboutDataTimeoutError(scanner_events::MonitoringFrameTimeout const& timeout_event);
 
 public:  // Guards
   bool isAcceptedStopReply(scanner_events::RawReplyReceived const& reply_event);
@@ -191,8 +191,8 @@ public:  // Guards
   bool isAcceptedStartReply(scanner_events::RawReplyReceived const& reply_event);
   bool isUnknownStartReply(scanner_events::RawReplyReceived const& reply_event);
   bool isRefusedStartReply(scanner_events::RawReplyReceived const& reply_event);
-  bool hasRetriesLeft(scanner_events::MonitoringFrameTimeout const& reply_event);
-  bool hasReachedRetryLimit(scanner_events::MonitoringFrameTimeout const& reply_event);
+  bool isDataTimeoutWarning(scanner_events::MonitoringFrameTimeout const& reply_event);
+  bool isDataTimeoutError(scanner_events::MonitoringFrameTimeout const& reply_event);
 
 public:  // Replaces the default exception/no-transition responses
   template <class FSM, class Event>
@@ -224,8 +224,8 @@ public:  // Definition of state machine via table
       a_irow < WaitForStartReply,         e::StartTimeout,                                      &m::handleStartRequestTimeout                                      >,
       _irow  < WaitForStartReply,         e::RawMonitoringFrameReceived                                                                                            >,
       a_irow < WaitForMonitoringFrame,    e::RawMonitoringFrameReceived,                        &m::handleMonitoringFrame                                          >,
-      irow   < WaitForMonitoringFrame,    e::MonitoringFrameTimeout,                            &m::handleMonitoringFrameTimeout,         &m::hasRetriesLeft       >,
-      irow   < WaitForMonitoringFrame,    e::MonitoringFrameTimeout,                            &m::notifyUserAboutReachedRetryLimit,     &m::hasReachedRetryLimit >,
+      irow   < WaitForMonitoringFrame,    e::MonitoringFrameTimeout,                            &m::handleMonitoringFrameTimeout,         &m::isDataTimeoutWarning >,
+      irow   < WaitForMonitoringFrame,    e::MonitoringFrameTimeout,                            &m::notifyUserAboutDataTimeoutError,      &m::isDataTimeoutError   >,
       a_row  < WaitForStartReply,         e::StopRequest,               WaitForStopReply,       &m::sendStopRequest                                                >,
       a_row  < WaitForMonitoringFrame,    e::StopRequest,               WaitForStopReply,       &m::sendStopRequest                                                >,
       _irow  < WaitForStopReply,          e::RawMonitoringFrameReceived                                                                                            >,
@@ -288,7 +288,7 @@ private:
   std::unique_ptr<util::Watchdog> start_reply_watchdog_{};
 
   std::unique_ptr<util::Watchdog> monitoring_frame_watchdog_{};
-  uint16_t consecutive_monitoring_frame_timeouts{ 0 };
+  double monitoring_frame_timeout_secs{ 0 };
 
   ScanBuffer scan_buffer_{ DEFAULT_NUM_MSG_PER_ROUND };
   boost::optional<data_conversion_layer::monitoring_frame::Message> zoneset_reference_msg_;

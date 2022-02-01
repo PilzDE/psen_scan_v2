@@ -51,6 +51,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- Load scanner config file to publish zonesets -->
   <arg name="config_file" default="" />
 
+  <!-- After how many seconds a data connection loss should be counted as an error and invoke the error callback -->
+  <arg name="seconds_until_data_timeout_counts_as_error" default="30.0" />
+
   <!-- Start rviz -->
   <arg name="rviz" default="true" />
 
@@ -66,6 +69,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <arg name="host_udp_port_data" value="$(arg host_udp_port_data)" />
     <arg name="host_udp_port_control" value="$(arg host_udp_port_control)" />
     <arg name="fragmented_scans" value="$(arg fragmented_scans)" />
+    <arg name="seconds_until_data_timeout_counts_as_error" value="$(arg seconds_until_data_timeout_counts_as_error)" />
   </include>
 
   <!-- Publish tf frames for the device -->
