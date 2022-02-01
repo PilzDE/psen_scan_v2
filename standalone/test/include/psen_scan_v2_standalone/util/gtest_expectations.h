@@ -64,9 +64,4 @@
     EXPECT_EQ(ref_bitset[i], expected_bitset[i]);                                                                      \
   }
 
-#define EXPECT_CONTAINS_WITH_PROPERTY(container, property, value)                                                      \
-  EXPECT_NE(                                                                                                           \
-      std::find_if(container.begin(), container.end(), [&](const auto& el) { return el.property() == value; }),      \
-      container.end())
-
 #endif  // PSEN_SCAN_V2_STANDALONE_TEST_GTEST_EXPECTATIONS_H

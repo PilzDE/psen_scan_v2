@@ -14,7 +14,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <algorithm>
-#include <utility>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -25,14 +24,6 @@
 
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
 #include "psen_scan_v2_standalone/util/gtest_expectations.h"
-
-#define ASSERT_INPUT_BIT_IS_USED(byte_number, bit_number)                                                              \
-  ASSERT_TRUE(psen_scan_v2_standalone::data_conversion_layer::isUsedInputBit(byte_number, bit_number))                 \
-      << "Input byte " << byte_bit_pair.first << " bit " << byte_bit_pair.second << " is unused."
-
-#define ASSERT_OUTPUT_BIT_IS_USED(byte_number, bit_number)                                                             \
-  ASSERT_TRUE(psen_scan_v2_standalone::data_conversion_layer::isUsedOutputBit(byte_number, bit_number))                \
-      << "Output byte " << byte_bit_pair.first << " bit " << byte_bit_pair.second << " is unused."
 
 namespace psen_scan_v2_standalone_test
 {
@@ -184,33 +175,28 @@ TEST(IOStateConversionsTest, shouldReturnOutputPinStatesForAllUsedOutputsWithout
   }
 }
 
-TEST(IOStateConversionsTest, shouldReturnInputPinStatesOnlyForChangedInputs)
+TEST(IOStateConversionsTest, shouldIgnoreChangeOfUnusedInput)
 {
   PinData pin_data1{};
   PinData pin_data2{};
-  using ByteBitPairs = std::vector<std::pair<std::size_t, std::size_t>>;
-  const ByteBitPairs byte_bit_pairs1{ { 4, 4 }, { 5, 1 } };
-  const ByteBitPairs byte_bit_pairs2{ { 4, 4 }, { 5, 0 }, { 5, 6 } };
-  for (const auto& byte_bit_pair : byte_bit_pairs1)
-  {
-    ASSERT_INPUT_BIT_IS_USED(byte_bit_pair.first, byte_bit_pair.second);
-    pin_data1.input_state.at(byte_bit_pair.first).set(byte_bit_pair.second);
-  }
-  for (const auto& byte_bit_pair : byte_bit_pairs2)
-  {
-    ASSERT_INPUT_BIT_IS_USED(byte_bit_pair.first, byte_bit_pair.second);
-    pin_data2.input_state.at(byte_bit_pair.first).set(byte_bit_pair.second);
-  }
+  ASSERT_FALSE(data_conversion_layer::isUsedInputBit(2, 3));
+  pin_data2.input_state.at(2).set(3);
 
-  const ByteBitPairs expected_byte_bit_pairs{ { 5, 0 }, { 5, 1 }, { 5, 6 } };
   const auto pin_states{ data_conversion_layer::generateChangedInputStates(pin_data2, pin_data1) };
 
-  EXPECT_EQ(pin_states.size(), expected_byte_bit_pairs.size());
-  for (const auto& byte_bit_pair : expected_byte_bit_pairs)
-  {
-    EXPECT_CONTAINS_WITH_PROPERTY(pin_states, id, createId(byte_bit_pair.first, byte_bit_pair.second));
-    // TODO: check state
-  }
+  EXPECT_TRUE(pin_states.empty());
+}
+
+TEST(IOStateConversionsTest, shouldIgnoreChangeOfUnusedOutput)
+{
+  PinData pin_data1{};
+  PinData pin_data2{};
+  ASSERT_FALSE(data_conversion_layer::isUsedOutputBit(2, 3));
+  pin_data2.output_state.at(2).set(3);
+
+  const auto pin_states{ data_conversion_layer::generateChangedOutputStates(pin_data2, pin_data1) };
+
+  EXPECT_TRUE(pin_states.empty());
 }
 
 }  // namespace psen_scan_v2_standalone_test
