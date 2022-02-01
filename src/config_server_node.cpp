@@ -34,7 +34,7 @@ ConfigServerNode::ConfigServerNode(ros::NodeHandle& nh, const char* config_file_
 
     ROS_WARN_STREAM_NAMED(
         "ConfigurationServer",
-        "The configuration server doesn't verfiy the provided configuration file matches the one on the connected "
+        "The configuration server doesn't verfiy that the provided configuration file matches the one on the connected "
         "device! "
         "Mismatching configurations can amongst other things lead to confusing errors in navigation and misleading "
         "visualization. "
