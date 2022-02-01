@@ -174,7 +174,7 @@ inline void ScannerProtocolDef::sendStopRequest(const T& event)
 
 inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawMonitoringFrameReceived& event)
 {
-  consecutive_monitoring_retries = 0;
+  consecutive_monitoring_frame_timeouts = 0;
   PSENSCAN_DEBUG("StateMachine", "Action: handleMonitoringFrame");
   monitoring_frame_watchdog_->reset();
 
@@ -217,7 +217,7 @@ inline void
 ScannerProtocolDef::notifyUserAboutReachedRetryLimit(scanner_events::MonitoringFrameTimeout const& timeout_event)
 {
   scanner_error_callback_(fmt::format("No incoming Monitoring frame for {:.1f} seconds",
-                                      consecutive_monitoring_retries * WATCHDOG_TIMEOUT.count() / 1000.0));
+                                      consecutive_monitoring_frame_timeouts * WATCHDOG_TIMEOUT.count() / 1000.0));
 }
 
 inline void ScannerProtocolDef::notifyUserAboutRefusedStartReply(scanner_events::RawReplyReceived const& reply_event)
@@ -311,7 +311,7 @@ inline bool ScannerProtocolDef::framesContainMeasurements(
 
 inline void ScannerProtocolDef::handleMonitoringFrameTimeout(const scanner_events::MonitoringFrameTimeout& event)
 {
-  consecutive_monitoring_retries++;
+  consecutive_monitoring_frame_timeouts++;
   PSENSCAN_DEBUG("StateMachine", "Action: handleMonitoringFrameTimeout");
 
   PSENSCAN_WARN("StateMachine",
@@ -365,12 +365,14 @@ inline bool ScannerProtocolDef::isUnknownStartReply(scanner_events::RawReplyRece
 
 inline bool ScannerProtocolDef::hasRetriesLeft(scanner_events::MonitoringFrameTimeout const& reply_event)
 {
-  return consecutive_monitoring_retries < psen_scan_v2_standalone::configuration::MONITORING_FRAME_TIMEOUT_RETRIES;
+  return consecutive_monitoring_frame_timeouts <
+         psen_scan_v2_standalone::configuration::MONITORING_FRAME_TIMEOUT_RETRIES;
 }
 
 inline bool ScannerProtocolDef::hasReachedRetryLimit(scanner_events::MonitoringFrameTimeout const& reply_event)
 {
-  return consecutive_monitoring_retries >= psen_scan_v2_standalone::configuration::MONITORING_FRAME_TIMEOUT_RETRIES;
+  return consecutive_monitoring_frame_timeouts >=
+         psen_scan_v2_standalone::configuration::MONITORING_FRAME_TIMEOUT_RETRIES;
 }
 
 inline bool ScannerProtocolDef::isRefusedStartReply(scanner_events::RawReplyReceived const& reply_event)

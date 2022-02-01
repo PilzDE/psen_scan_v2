@@ -288,7 +288,7 @@ private:
   std::unique_ptr<util::Watchdog> start_reply_watchdog_{};
 
   std::unique_ptr<util::Watchdog> monitoring_frame_watchdog_{};
-  uint16_t consecutive_monitoring_retries{ 0 };
+  uint16_t consecutive_monitoring_frame_timeouts{ 0 };
 
   ScanBuffer scan_buffer_{ DEFAULT_NUM_MSG_PER_ROUND };
   boost::optional<data_conversion_layer::monitoring_frame::Message> zoneset_reference_msg_;
