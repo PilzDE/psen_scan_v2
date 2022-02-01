@@ -174,6 +174,30 @@ TEST(IOStateConversionsTest, shouldReturnOutputPinStatesForAllUsedOutputsWithout
   }
 }
 
+TEST(IOStateConversionsTest, shouldIgnoreChangeOfUnusedInput)
+{
+  PinData pin_data1{};
+  PinData pin_data2{};
+  ASSERT_FALSE(data_conversion_layer::isUsedInputBit(2, 3));
+  pin_data2.input_state.at(2).set(3);
+
+  const auto pin_states{ data_conversion_layer::generateChangedInputStates(pin_data2, pin_data1) };
+
+  EXPECT_TRUE(pin_states.empty());
+}
+
+TEST(IOStateConversionsTest, shouldIgnoreChangeOfUnusedOutput)
+{
+  PinData pin_data1{};
+  PinData pin_data2{};
+  ASSERT_FALSE(data_conversion_layer::isUsedOutputBit(2, 3));
+  pin_data2.output_state.at(2).set(3);
+
+  const auto pin_states{ data_conversion_layer::generateChangedOutputStates(pin_data2, pin_data1) };
+
+  EXPECT_TRUE(pin_states.empty());
+}
+
 }  // namespace psen_scan_v2_standalone_test
 
 int main(int argc, char** argv)

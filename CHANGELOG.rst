@@ -4,6 +4,8 @@ Changelog for package psen_scan_v2
 Forthcoming
 ------------------
 * Remove zoneset bits from IOState.input field since its redundant to the active_zoneset field (#311)
+* Ignore changes of unused IOs. Fix #321
+* Contributors: Pilz GmbH and Co. KG
 
 0.10.1 (2022-01-24)
 -------------------
