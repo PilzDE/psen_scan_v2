@@ -117,19 +117,19 @@ inline LaserScan LaserScanConverter::toLaserScan(
   }
 
   // Issue #320: Only for the io_states, we follow reception order instead Theta order.
-  // Other wise: index=0 who is the bigger Theta and correspond to the first io_state of the 
+  // Other wise: index=0 who is the bigger Theta and correspond to the first io_state of the
   // frame is placed at last item of vector io_states, and it provokes that io_states flicks.
-  for (auto sigle_msg : stamped_msgs) 
+  for (const auto& single_msg : stamped_msgs)
   {
-    if (sigle_msg.msg_.hasIOPinField())
+    if (single_msg.msg_.hasIOPinField())
     {
-      PSENSCAN_DEBUG("io_states: ", "stamp_: {} fromTheta: {} ioPinDate: {} ",
-                      sigle_msg.stamp_,
-                      std::to_string(sigle_msg.msg_.fromTheta().toRad()),
-                      util::formatRange(sigle_msg.msg_.iOPinData().input_state)
-      );
-      
-      io_states.emplace_back(sigle_msg.msg_.iOPinData(), sigle_msg.stamp_);
+      PSENSCAN_DEBUG("io_states: ",
+                     "stamp_: {} fromTheta: {} ioPinDate: {} ",
+                     single_msg.stamp_,
+                     std::to_string(single_msg.msg_.fromTheta().toRad()),
+                     util::formatRange(single_msg.msg_.iOPinData().input_state));
+
+      io_states.emplace_back(single_msg.msg_.iOPinData(), single_msg.stamp_);
     }
   }
 
