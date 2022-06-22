@@ -30,7 +30,7 @@ namespace psen_scan_v2
 {
 static const std::string DEFAULT_ACTIVE_ZONESET_TOPIC = "active_zoneset";
 static const std::string DEFAULT_ZONECONFIGURATION_TOPIC = "zoneconfiguration";
-static const std::string DEFAULT_ZONESET_MARKER_TOPIC = "active_zoneset_marker";
+static const std::string DEFAULT_ZONESET_MARKER_ARRAY_TOPIC = "active_zoneset_markers";
 
 /**
  * @brief ROS Node that continuously publishes a marker for the active_zoneset.
@@ -65,16 +65,19 @@ private:
   void deleteLastMarkers();
   void addMarkers(std::vector<visualization_msgs::Marker>& new_markers);
   bool containLastMarkers(const std::vector<visualization_msgs::Marker>& new_markers);
+  void publishCurrentMarkers();
+  void addDeleteForUnusedLastMarkers();
 
 private:
   ros::NodeHandle nh_;
   ros::Subscriber zoneset_subscriber_;
   ros::Subscriber active_zoneset_subscriber_;
-  ros::Publisher zoneset_marker_;
+  ros::Publisher zoneset_markers_;
 
   boost::optional<ZoneSetConfiguration> zoneset_config_;
   boost::optional<std_msgs::UInt8> active_zoneset_id_;
   std::vector<visualization_msgs::Marker> last_markers_;
+  std::vector<visualization_msgs::Marker> current_markers_;
 };
 
 }  // namespace psen_scan_v2

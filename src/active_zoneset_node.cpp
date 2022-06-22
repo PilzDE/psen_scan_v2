@@ -15,12 +15,13 @@
 
 #include <algorithm>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 #include <boost/optional.hpp>
 
 #include <ros/ros.h>
-#include <visualization_msgs/Marker.h>
+#include <visualization_msgs/MarkerArray.h>
 #include <std_msgs/UInt8.h>
 
 #include "psen_scan_v2/active_zoneset_node.h"
@@ -34,7 +35,7 @@ ActiveZonesetNode::ActiveZonesetNode(ros::NodeHandle& nh) : nh_(nh)
   zoneset_subscriber_ = nh_.subscribe(DEFAULT_ZONECONFIGURATION_TOPIC, 2, &ActiveZonesetNode::zonesetCallback, this);
   active_zoneset_subscriber_ =
       nh_.subscribe(DEFAULT_ACTIVE_ZONESET_TOPIC, 10, &ActiveZonesetNode::activeZonesetCallback, this);
-  zoneset_marker_ = nh_.advertise<visualization_msgs::Marker>(DEFAULT_ZONESET_MARKER_TOPIC, 10);
+  zoneset_markers_ = nh_.advertise<visualization_msgs::MarkerArray>(DEFAULT_ZONESET_MARKER_ARRAY_TOPIC, 10);
 }
 
 void ActiveZonesetNode::zonesetCallback(const ZoneSetConfiguration& zoneset_config)
@@ -56,10 +57,6 @@ void ActiveZonesetNode::updateMarkers()
     try
     {
       auto new_markers = toMarkers(activeZoneset());
-      if (!containLastMarkers(new_markers))
-      {
-        deleteLastMarkers();
-      }
       addMarkers(new_markers);
     }
     catch (std::out_of_range const& e)
@@ -67,8 +64,9 @@ void ActiveZonesetNode::updateMarkers()
       ROS_ERROR_STREAM_THROTTLE(1,
                                 "Active zone " << static_cast<unsigned>(active_zoneset_id_->data)
                                                << " of your scanner does not exist in the provided configuration!");
-      deleteLastMarkers();
     }
+    addDeleteForUnusedLastMarkers();
+    publishCurrentMarkers();
   }
 }
 
@@ -93,35 +91,39 @@ void ActiveZonesetNode::addMarkers(std::vector<visualization_msgs::Marker>& new_
 {
   for (const auto& marker : new_markers)
   {
-    zoneset_marker_.publish(marker);
+    current_markers_.push_back(marker);
   }
-  last_markers_ = std::move(new_markers);
 }
 
-void ActiveZonesetNode::deleteLastMarkers()
+void ActiveZonesetNode::addDeleteForUnusedLastMarkers()
 {
+  std::vector<std::string> current_marker_namespaces;
+  for (const auto& cm : current_markers_)
+  {
+    current_marker_namespaces.push_back(cm.ns);
+  }
   for (const auto& lm : last_markers_)
   {
-    auto marker = visualization_msgs::Marker();
-    marker.action = visualization_msgs::Marker::DELETE;
-    marker.ns = lm.ns;
-    marker.id = 0;
-    zoneset_marker_.publish(marker);
+    if (std::find(current_marker_namespaces.begin(), current_marker_namespaces.end(), lm.ns) ==
+        current_marker_namespaces.end())
+    // not in current markers -> delete it
+    {
+      auto marker = visualization_msgs::Marker();
+      marker.action = visualization_msgs::Marker::DELETE;
+      marker.ns = lm.ns;
+      marker.id = lm.id;
+      current_markers_.push_back(marker);
+    }
   }
   last_markers_.clear();
 }
 
-bool ActiveZonesetNode::containLastMarkers(const std::vector<visualization_msgs::Marker>& new_markers)
+void ActiveZonesetNode::publishCurrentMarkers()
 {
-  if (new_markers.size() < last_markers_.size())
-  {
-    return false;
-  }
-  return std::mismatch(last_markers_.begin(),
-                       last_markers_.end(),
-                       new_markers.begin(),
-                       [](const auto& m1, const auto& m2) { return m1.ns == m2.ns; })
-             .first == last_markers_.end();
+  auto ma = visualization_msgs::MarkerArray();
+  ma.markers = current_markers_;
+  zoneset_markers_.publish(ma);
+  last_markers_ = std::move(current_markers_);
 }
 
 }  // namespace psen_scan_v2
