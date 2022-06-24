@@ -231,7 +231,7 @@ For visualizing the active zoneset in RViz you can run the `active_zoneset_node`
 ### Branching model
 [`main`](https://github.com/PilzDE/psen_scan_v2/tree/main) is considered to be the active development branch, it targets the ROS distributions `melodic` and `noetic`.
 
-The branch **ROS 2** branches [`foxy`](https://github.com/PilzDE/psen_scan_v2/tree/foxy) and [`rolling`](https://github.com/PilzDE/psen_scan_v2/tree/rolling) target the distributions according to their name.
+The branch [`ros2`](https://github.com/PilzDE/psen_scan_v2/tree/ros2) is still experimental and targets the ROS 2 distributions `foxy` and `rolling`.
 
 With the first ROS 2 release the version number model of this package was changed:
 - ROS 1 releases now count from 0.10.0 upwards.
