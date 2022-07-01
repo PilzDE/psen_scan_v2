@@ -1,0 +1,28 @@
+<!--
+Copyright (c) 2022 Pilz GmbH & Co. KG
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<!-- Includes starting the scanner driver together with a robot model and preconfigured rviz. -->
+<launch>
+  <!-- Name of the scanner (required to run multiple scanners) -->
+  <arg name="tf_prefix" default="laser_1" />
+
+  <node ns="$(arg tf_prefix)" name="scan_to_scan_filter_chain" pkg="laser_filters" 
+  type="scan_to_scan_filter_chain" output="screen">
+    <rosparam command="load" file="$(find psen_scan_v2)/config/filter.yaml" />
+    <!-- <remap from="scan" to="$(arg tf_prefix)/scan" /> -->
+  </node>
+</launch>
