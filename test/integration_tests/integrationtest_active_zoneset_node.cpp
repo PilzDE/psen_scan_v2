@@ -25,7 +25,7 @@
 // Needed only for FMT_VERSION define but version 4.0.0 used on Ubuntu 18 (melodic) does not yet use a core.h
 #include <fmt/format.h>
 
-#include <visualization_msgs/Marker.h>
+#include <visualization_msgs/MarkerArray.h>
 #include <std_msgs/UInt8.h>
 
 #include "psen_scan_v2/ros_integrationtest_helper.h"
@@ -81,9 +81,9 @@ static const std::string WARN_NS_ZONE_1{ "active zoneset warn1 min:-10 max:+10" 
 static const std::string SAFETY_NS_ZONE_2{ "active zoneset safety1 min:+11 max:+50" };
 #endif
 
-TEST(ActiveZonesetNodeTopicTest, shouldAdvertiseZonesetMarkerTopic)
+TEST(ActiveZonesetNodeTopicTest, shouldAdvertiseZonesetMarkersTopic)
 {
-  EXPECT_TRUE(TopicExists("/test_ns_laser_1/active_zoneset_marker"));
+  EXPECT_TRUE(TopicExists("/test_ns_laser_1/active_zoneset_markers"));
 }
 
 class ActiveZonesetNodeTest : public testing::Test
