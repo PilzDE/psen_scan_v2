@@ -7,7 +7,7 @@ from std_msgs.msg import Byte
 if __name__ == "__main__":
     rospy.init_node("multiple_zones_test")
 
-    pub = rospy.Publisher("/relay_cmd", Byte, queue_size=1)
+    pub = rospy.Publisher("/relay_cmd", Byte, queue_size=10)
 
     r1 = rospy.Rate(1)  # 1hz
     r10 = rospy.Rate(10)  # 10hz
