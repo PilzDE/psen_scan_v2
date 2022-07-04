@@ -26,7 +26,7 @@
 
 #include <ros/master.h>
 
-#include <visualization_msgs/Marker.h>
+#include <visualization_msgs/MarkerArray.h>
 
 #include "psen_scan_v2/subscriber_mock.h"
 
@@ -111,7 +111,7 @@ MATCHER_P(LaserScanMsgEq, msg, "")
          arg.range_max == msg.range_max && arg.ranges == msg.ranges && arg.intensities == msg.intensities;
 }
 
-bool isConnected(SubscriberMock<visualization_msgs::MarkerConstPtr>& subscriber,
+bool isConnected(SubscriberMock<visualization_msgs::MarkerArray>& subscriber,
                  const ros::Duration& timeout = ros::Duration(3.0))
 {
   const auto start_time = ros::Time::now();
