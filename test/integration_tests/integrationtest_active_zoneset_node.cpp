@@ -33,6 +33,7 @@
 
 #include "psen_scan_v2_standalone/util/async_barrier.h"
 #include "psen_scan_v2_standalone/util/gmock_expectations.h"
+#include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 
 namespace psen_scan_v2_test
 {
@@ -127,13 +128,14 @@ const std::string ACTIVE_ZONESET_MARKER_TOPICNAME{ "/test_ns_laser_1/active_zone
     return ::testing::AssertionFailure() << "Could not connect with subscriber on marker topic.";
   }
 
-  auto invalid_marker_barrier = EXPECT_ASYNC_CALL(
-      invalid_marker_mock, callback(Field(&visualization_msgs::MarkerArray::markers, Contains(hasDeleteAction()))));
+  util::Barrier invalid_marker_barrier;
+  ON_CALL(invalid_marker_mock, callback(Field(&visualization_msgs::MarkerArray::markers, Contains(hasDeleteAction()))))
+      .WillByDefault(OpenBarrier(&invalid_marker_barrier));
 
   sendActiveZone(5);
-  if (!invalid_marker_barrier->waitTillRelease(3s))
+  if (!invalid_marker_barrier.waitTillRelease(3s))
   {
-    return ::testing::AssertionFailure() << "Failed to receive 2 markers for deletion.";
+    return ::testing::AssertionFailure() << "Failed to receive markers for deletion.";
   }
   return ::testing::AssertionSuccess();
 }
@@ -237,8 +239,7 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishMarkersForNewActiveZoneAfterSwitchFro
 
   auto barrier = EXPECT_ASYNC_CALL(*marker_sub_mock_,
                                    callback(Field(&visualization_msgs::MarkerArray::markers,
-                                                  AllOf(SizeIs(2),
-                                                        Contains(AllOf(hasNS(SAFETY_NS_ZONE_1), hasAddAction())),
+                                                  AllOf(Contains(AllOf(hasNS(SAFETY_NS_ZONE_1), hasAddAction())),
                                                         Contains(AllOf(hasNS(WARN_NS_ZONE_1), hasAddAction()))))));
   sendActiveZone(0);
   barrier->waitTillRelease(3s);
