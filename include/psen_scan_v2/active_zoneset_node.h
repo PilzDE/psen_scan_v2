@@ -38,7 +38,7 @@ static const std::string DEFAULT_ZONESET_MARKER_ARRAY_TOPIC = "active_zoneset_ma
  * subscribes to: ns/active_zoneset
  * subscribes to: ns/zoneconfiguration
  *
- * advertises: ns/active_zoneset_marker
+ * advertises: ns/active_zoneset_markers
  */
 class ActiveZonesetNode
 {
@@ -62,9 +62,7 @@ private:
   [[deprecated("use ZoneSet activeZoneset() const instead")]] ZoneSet getActiveZoneset() const;
   ZoneSet activeZoneset() const;
 
-  void deleteLastMarkers();
   void addMarkers(std::vector<visualization_msgs::Marker>& new_markers);
-  bool containLastMarkers(const std::vector<visualization_msgs::Marker>& new_markers);
   void publishCurrentMarkers();
   void addDeleteForUnusedLastMarkers();
 
