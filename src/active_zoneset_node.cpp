@@ -97,17 +97,11 @@ void ActiveZonesetNode::addMarkers(std::vector<visualization_msgs::Marker>& new_
 
 void ActiveZonesetNode::addDeleteForUnusedLastMarkers()
 {
-  std::vector<std::string> current_marker_namespaces;
-  for (const auto& cm : current_markers_)
-  {
-    current_marker_namespaces.push_back(cm.ns);
-  }
   for (const auto& lm : last_markers_)
   {
-    if (std::find(current_marker_namespaces.begin(), current_marker_namespaces.end(), lm.ns) ==
-        current_marker_namespaces.end())
-    // not in current markers -> delete it
-    {
+    auto has_lm_namespace = [&lm](visualization_msgs::Marker& x) { return x.ns == lm.ns; };
+    if (std::find_if(current_markers_.begin(), current_markers_.end(), has_lm_namespace) == current_markers_.end())
+    {  // not in current markers -> delete it
       auto marker = visualization_msgs::Marker();
       marker.action = visualization_msgs::Marker::DELETE;
       marker.ns = lm.ns;
