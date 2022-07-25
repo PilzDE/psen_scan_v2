@@ -1,13 +1,13 @@
-# Acceptance test to verify the bug where multiple zones are displayed at the same time. 
+# Acceptance test to verify that multiple zones are not displayed simultaneously.  
 
-[#328](https://github.com/PilzDE/psen_scan_v2/issues/328)
+Definition of the identified error case can be found in : [Issue #328](https://github.com/PilzDE/psen_scan_v2/issues/328)
 
 ## Setup
 Make sure your scanner has a configuration with two different zone sets, for example like [this file](acceptancetest_multiple_zones_display.xml)
 
 Then make sure, the launchfile `acceptancetest_multiple_zones_display.launch` also uses that config.
 
-## Expected output
+## Test procedure
 When starting the test you are looking for this **error**:
 
 ![error, negative result](acceptancetest_multiple_zones_display_neg.png)

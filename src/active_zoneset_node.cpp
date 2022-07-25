@@ -65,7 +65,7 @@ void ActiveZonesetNode::updateMarkers()
                                 "Active zone " << static_cast<unsigned>(active_zoneset_id_->data)
                                                << " of your scanner does not exist in the provided configuration!");
     }
-    addDeleteForUnusedLastMarkers();
+    addDeleteMessageForUnusedLastMarkers();
     publishCurrentMarkers();
   }
 }
@@ -95,7 +95,7 @@ void ActiveZonesetNode::addMarkers(std::vector<visualization_msgs::Marker>& new_
   }
 }
 
-void ActiveZonesetNode::addDeleteForUnusedLastMarkers()
+void ActiveZonesetNode::addDeleteMessageForUnusedLastMarkers()
 {
   for (const auto& lm : last_markers_)
   {

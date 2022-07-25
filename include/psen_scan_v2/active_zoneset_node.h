@@ -64,7 +64,7 @@ private:
 
   void addMarkers(std::vector<visualization_msgs::Marker>& new_markers);
   void publishCurrentMarkers();
-  void addDeleteForUnusedLastMarkers();
+  void addDeleteMessageForUnusedLastMarkers();
 
 private:
   ros::NodeHandle nh_;

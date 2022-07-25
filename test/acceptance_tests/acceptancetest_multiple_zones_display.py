@@ -9,15 +9,21 @@ if __name__ == "__main__":
 
     pub = rospy.Publisher("/relay_cmd", Byte, queue_size=10)
 
+    def publish_zone_and_sleep(zone: int):
+        if zone == 0:
+            pub.publish(0)
+        elif zone == 1:
+            pub.publish(1)
+        else:
+            raise NotImplementedError("Only zones 0 and 1 are supported.")
+        r10.sleep()
+
     r1 = rospy.Rate(1)  # 1hz
-    r10 = rospy.Rate(10)  # 10hz
+    r10 = rospy.Rate(8)  # 10hz
     while not rospy.is_shutdown():
-        pub.publish(0)
-        r10.sleep()
-        pub.publish(8)
-        r10.sleep()
-        pub.publish(0)
+        publish_zone_and_sleep(0)
+        publish_zone_and_sleep(1)
+        publish_zone_and_sleep(0)
         if random.random() > .5:
-            r10.sleep()
-            pub.publish(8)
+            publish_zone_and_sleep(1)
         r1.sleep()
