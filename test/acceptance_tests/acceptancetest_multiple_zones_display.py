@@ -13,7 +13,7 @@ if __name__ == "__main__":
         if zone == 0:
             pub.publish(0)
         elif zone == 1:
-            pub.publish(1)
+            pub.publish(8)
         else:
             raise NotImplementedError("Only zones 0 and 1 are supported.")
         r10.sleep()
