@@ -326,10 +326,10 @@ TEST(LaserScanConversionsTest, laserScanShouldContainAllIOStatesInCorrectOrder)
   std::unique_ptr<LaserScan> scan_ptr;
   ASSERT_NO_THROW(
       scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
-
-  EXPECT_THAT(scan_ptr->ioStates().at(0), IOStateFromStampedMsg(stamped_msgs.at(2)));
+  // Issue #320: Due to bugfix the test have to change, Now we expect the ioStates as reception order.
+  EXPECT_THAT(scan_ptr->ioStates().at(0), IOStateFromStampedMsg(stamped_msgs.at(0)));
   EXPECT_THAT(scan_ptr->ioStates().at(1), IOStateFromStampedMsg(stamped_msgs.at(1)));
-  EXPECT_THAT(scan_ptr->ioStates().at(2), IOStateFromStampedMsg(stamped_msgs.at(0)));
+  EXPECT_THAT(scan_ptr->ioStates().at(2), IOStateFromStampedMsg(stamped_msgs.at(2)));
 }
 
 TEST(LaserScanConversionsTest, laserScanShouldContainActiveZonesetOfLastMsg)
