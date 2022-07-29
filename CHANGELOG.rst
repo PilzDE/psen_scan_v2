@@ -5,10 +5,6 @@ Forthcoming
 ------------------
 * Remove zoneset bits from IOState.input field since its redundant to the active_zoneset field (#311)
 * Ignore changes of unused IOs. Fix #321
-* Contributors: Pilz GmbH and Co. KG
-
-0.11.0 (2022-07-29)
--------------------
 * Fill "io_states" vector as received instead of order by theta to avoid flickering. Fix #320
 * Contributors: Pilz GmbH and Co. KG
 
