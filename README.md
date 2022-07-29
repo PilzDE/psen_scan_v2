@@ -91,7 +91,7 @@ _resolution_ (_double_, default: 0.0017 (= 0.1 deg))<br/>
 Scan angle resolution. (Radian) The value is rounded to a multiple of 0.1 deg and has to be in the range [0.1, 10] degrees.
 
 _config_file_ (_string_, default: "")
-Full path to a scanner config file. If a file is provided the configured zonesets and active zone marker are published, see [here](#importing-the-zoneset-configuration) for more information.
+Full path to a scanner config file. If a file is provided the configured zonesets and active zone markers are published, see [here](#importing-the-zoneset-configuration) for more information.
 
 ### Expert Parameters (optional)
 
@@ -128,7 +128,7 @@ Start a preconfigured rviz visualizing the scan data.
 
 * `Hint 1: If no zonesets are configured the driver will publish "0" as default.`
 
-/\<name\>/active_zoneset_marker ([visualization_msgs/Marker][]) <br/>
+/\<name\>/active_zoneset_markers ([visualization_msgs/MarkerArray][]) <br/>
 
 * The markers published represent the currently active zoneset as triangle lists. They can be viewed e.g. in rviz.
 
@@ -217,7 +217,7 @@ If you want to use the configuration node in your launchfile add a section such 
 ```
 
 ### Visualizing the active zoneset
-For visualizing the active zoneset in RViz you can run the `active_zoneset_node`. It will publish markers on the `/<name>/active_zoneset_marker` topic like shown in the RViz screenshot above.
+For visualizing the active zoneset in RViz you can run the `active_zoneset_node`. It will publish markers on the `/<name>/active_zoneset_markers` topic like shown in the RViz screenshot above.
 
 ## Developer Information
 ### Build Status
