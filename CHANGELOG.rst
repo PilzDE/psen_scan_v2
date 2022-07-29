@@ -7,6 +7,11 @@ Forthcoming
 * Ignore changes of unused IOs. Fix #321
 * Contributors: Pilz GmbH and Co. KG
 
+0.11.0 (2022-07-29)
+-------------------
+* Fill "io_states" vector as received instead of order by theta to avoid flickering. Fix #320
+* Contributors: Pilz GmbH and Co. KG
+
 0.10.1 (2022-01-24)
 -------------------
 * Separate 'PinState' formating from 'formatRange' (#313)
