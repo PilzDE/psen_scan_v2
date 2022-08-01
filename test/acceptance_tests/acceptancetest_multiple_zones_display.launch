@@ -1,0 +1,28 @@
+<!--
+Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+
+<!-- Includes starting the scanner driver together with a robot model and preconfigured rviz. -->
+<launch>
+    <node pkg="sainsmart_relay_usb" type="relay_node" name="sainsmart_relay_node" />
+
+    <include file="$(find psen_scan_v2)/launch/psen_scan_v2.launch">
+        <arg name="config_file" value="$(find psen_scan_v2)/test/acceptance_tests/acceptancetest_multiple_zones_display.xml" />
+    </include>
+
+    <node name="acceptancetest_multiple_zones_display" type="acceptancetest_multiple_zones_display.py" pkg="psen_scan_v2">
+    </node>
+</launch>
