@@ -7,6 +7,7 @@ Forthcoming
 * Ignore changes of unused IOs. Fix #321
 * Fill "io_states" vector as received instead of order by theta to avoid flickering. Fix #320
 * Fixed bug of multiple zonesets being visible #328
+* Fix compatibilities of the hardware test with python2 and python3. Fix #332
 * Contributors: Pilz GmbH and Co. KG
 
 0.10.1 (2022-01-24)
