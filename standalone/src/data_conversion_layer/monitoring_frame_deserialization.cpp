@@ -76,6 +76,11 @@ static constexpr double toIntensities(const uint16_t& value)
   return static_cast<double>(retval & 0b0011111111111111);
 }
 
+static constexpr double toEncoder(const uint16_t& value)
+{
+  return static_cast<double>(value);
+}
+
 monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data, const std::size_t& num_bytes)
 {
   data_conversion_layer::monitoring_frame::MessageBuilder msg_builder;
@@ -151,6 +156,14 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
         std::vector<double> intensities;
         raw_processing::readArray<uint16_t, double>(ss, intensities, num_measurements, std::bind(toIntensities, _1));
         msg_builder.intensities(intensities);
+        break;
+      }
+      case AdditionalFieldHeaderID::encoder: {
+        const size_t num_encoder_values{ static_cast<size_t>(additional_header.length()) /
+                                       NUMBER_OF_BYTES_ENCODER_DATA };
+        std::vector<double> encoder_data;
+        raw_processing::readArray<uint16_t, double>(ss, encoder_data, num_encoder_values, toEncoder);
+        msg_builder.encoderData(encoder_data);
         break;
       }
       default:

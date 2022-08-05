@@ -118,6 +118,16 @@ void LaserScan::setIntensities(const IntensityData& intensities)
 {
   this->intensities(intensities);
 }
+
+const LaserScan::IntensityData& LaserScan::getEncoderData() const
+{
+  return this->encoderData();
+}
+
+void LaserScan::setEncoderData(const EncoderData& encoderData)
+{
+  this->encoderData(encoderData);
+}
 // LCOV_EXCL_STOP
 
 const util::TenthOfDegree& LaserScan::minScanAngle() const
@@ -168,6 +178,16 @@ const LaserScan::IntensityData& LaserScan::intensities() const
 void LaserScan::intensities(const IntensityData& intensities)
 {
   intensities_ = intensities;
+}
+
+const LaserScan::EncoderData& LaserScan::encoderData() const
+{
+  return encoderData_;
+}
+
+void LaserScan::encoderData(const EncoderData& encoderData)
+{
+  encoderData_ = encoderData;
 }
 
 // LCOV_EXCL_START

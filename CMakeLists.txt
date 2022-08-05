@@ -57,6 +57,7 @@ add_message_files(
   IOState.msg
   ZoneSet.msg
   ZoneSetConfiguration.msg
+  EncoderData.msg
 )
 
 generate_messages(

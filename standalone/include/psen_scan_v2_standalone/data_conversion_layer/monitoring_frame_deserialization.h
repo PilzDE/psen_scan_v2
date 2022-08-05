@@ -60,6 +60,7 @@ static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_MEASUREMENT{ 2 };
 static constexpr uint16_t NO_SIGNAL_ARRIVED{ 59956 };
 static constexpr uint16_t SIGNAL_TOO_LATE{ 59958 };
 static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_INTENSITY{ 2 };
+static constexpr uint16_t NUMBER_OF_BYTES_ENCODER_DATA{ 2 };
 
 /**
  * @brief The information included in every single monitoring frame.
@@ -140,6 +141,7 @@ enum class AdditionalFieldHeaderID : AdditionalFieldHeader::Id
   diagnostics = 0x04,
   measurements = 0x05,
   intensities = 0x06,
+  encoder = 0x07, 
   end_of_frame = 0x09
 };
 

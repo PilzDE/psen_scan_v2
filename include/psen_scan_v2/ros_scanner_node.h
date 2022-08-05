@@ -33,6 +33,7 @@
 
 #include "psen_scan_v2_standalone/scanner_v2.h"
 
+#include "psen_scan_v2/EncoderData.h"
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 #include "psen_scan_v2/io_state_ros_conversion.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
@@ -80,12 +81,14 @@ public:
 private:
   void laserScanCallback(const LaserScan& scan);
   void publishChangedIOStates(const std::vector<psen_scan_v2_standalone::IOState>& io_states);
+  void publishEncoderData(const std::vector<double>& encoder_data);
 
 private:
   ros::NodeHandle nh_;
   ros::Publisher pub_scan_;
   ros::Publisher pub_zone_;
   ros::Publisher pub_io_;
+  ros::Publisher pub_encoder_;
   std::string tf_prefix_;
   double x_axis_rotation_;
   S scanner_;
@@ -124,6 +127,7 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
   pub_scan_ = nh_.advertise<sensor_msgs::LaserScan>(topic, 1);
   pub_zone_ = nh_.advertise<std_msgs::UInt8>("active_zoneset", 1);
   pub_io_ = nh_.advertise<psen_scan_v2::IOState>("io_state", 6, true /* latched */);
+  pub_encoder_ = nh.advertise<psen_scan_v2::EncoderData>("encoder_data", 6, true);
 }
 
 template <typename S>
@@ -146,6 +150,9 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
     pub_zone_.publish(active_zoneset);
 
     publishChangedIOStates(scan.ioStates());
+
+    if (!scan.encoderData().empty())
+      publishEncoderData(scan.encoderData());
   }
   // LCOV_EXCL_START
   catch (const std::invalid_argument& e)
@@ -171,6 +178,44 @@ void ROSScannerNodeT<S>::publishChangedIOStates(const std::vector<psen_scan_v2_s
       last_io_state_ = io;
     }
   }
+}
+
+template <typename S>
+void ROSScannerNodeT<S>::publishEncoderData(const std::vector<double>& encoder_data)
+{
+  psen_scan_v2::EncoderData ros_message;
+
+  //for (auto value : encoder_data)
+  //{
+  //  ros_message.encodeData.push_back(value);
+  //}
+  
+  ros_message.encodeData.insert(ros_message.encodeData.begin(), encoder_data.cbegin(), encoder_data.cend());
+
+  pub_encoder_.publish(ros_message);
+
+  //ros_message.intensities.insert(
+      //ros_message.intensities.begin(), laserscan.intensities().cbegin(), laserscan.intensities().cend());
+
+  //if (encoder_data.timestamp() < 0)
+  //{
+  //  throw std::invalid_argument("IOState of Laserscan message has an invalid timestamp: " +
+  //                              std::to_string(io_state.timestamp()));
+  //}
+  //
+  //for (const auto& io : io_states)
+  //{
+  //  if (last_io_state_ != io)
+  //  {
+  //    pub_io_.publish(toIOStateMsg(io, tf_prefix_));
+  //
+  //    PSENSCAN_INFO("RosScannerNode",
+  //                  "IOs changed, new input: {}, new output: {}",
+  //                  formatPinStates(io.changedInputStates(last_io_state_)),
+  //                  formatPinStates(io.changedOutputStates(last_io_state_)));
+  //    last_io_state_ = io;
+  //  }
+  //}
 }
 
 template <typename S>

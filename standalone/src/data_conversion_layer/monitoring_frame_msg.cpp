@@ -103,6 +103,18 @@ const std::vector<double>& Message::intensities() const
   }
 }
 
+const std::vector<double>& Message::encoderData() const
+{
+  if (encoder_data_.is_initialized())
+  {
+    return encoder_data_.get();
+  }
+  else
+  {
+    throw AdditionalFieldMissing("Encoder data");
+  }
+}
+
 std::vector<diagnostic::Message> Message::diagnosticMessages() const
 {
   if (diagnostic_messages_.is_initialized())
@@ -143,6 +155,11 @@ bool Message::hasIntensitiesField() const
 bool Message::hasDiagnosticMessagesField() const
 {
   return diagnostic_messages_.is_initialized();
+}
+
+bool Message::hasEncoderDataField() const
+{
+  return encoder_data_.is_initialized();
 }
 }  // namespace monitoring_frame
 }  // namespace data_conversion_layer

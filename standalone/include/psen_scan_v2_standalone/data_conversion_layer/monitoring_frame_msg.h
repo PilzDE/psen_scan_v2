@@ -75,6 +75,8 @@ public:
   const std::vector<double>& measurements() const;
   //! @throw AdditionalFieldMissing if intensities were missing during deserialization of a Message.
   const std::vector<double>& intensities() const;
+  //! @throw AdditionalFieldMissing if encoder data were missing during deserialization of a Message.
+  const std::vector<double>& encoderData() const;
   //! @throw AdditionalFieldMissing if diagnostic_messages were missing during deserialization of a Message.
   std::vector<diagnostic::Message> diagnosticMessages() const;
 
@@ -83,6 +85,7 @@ public:
   bool hasIOPinField() const;
   bool hasMeasurementsField() const;
   bool hasIntensitiesField() const;
+  bool hasEncoderDataField() const;
   bool hasDiagnosticMessagesField() const;
 
 private:
@@ -96,6 +99,7 @@ private:
   boost::optional<io::PinData> io_pin_data_;
   boost::optional<std::vector<double>> measurements_;
   boost::optional<std::vector<double>> intensities_;
+  boost::optional<std::vector<double>> encoder_data_;
   boost::optional<std::vector<diagnostic::Message>> diagnostic_messages_;
 
 public:

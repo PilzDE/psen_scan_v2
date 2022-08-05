@@ -35,6 +35,7 @@ static constexpr unsigned short CONTROL_PORT_OF_HOST_DEVICE{ 55116 };
 static constexpr bool FRAGMENTED_SCANS{ false };
 static constexpr bool INTENSITIES{ false };
 static constexpr bool DIAGNOSTICS{ false };
+static constexpr bool ENCODER{ false };
 
 //! @brief Start angle of measurement.
 static constexpr double DEFAULT_ANGLE_START(-data_conversion_layer::degreeToRadian(137.4));

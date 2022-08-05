@@ -49,6 +49,7 @@ const std::string PARAM_X_AXIS_ROTATION{ "x_axis_rotation" };
 const std::string PARAM_FRAGMENTED_SCANS{ "fragmented_scans" };
 const std::string PARAM_INTENSITIES{ "intensities" };
 const std::string PARAM_RESOLUTION{ "resolution" };
+const std::string PARAM_ENCODER_DATA{ "encoder_data" };
 
 static const std::string DEFAULT_TF_PREFIX = "laser_1";
 
@@ -97,12 +98,18 @@ int main(int argc, char** argv)
           .enableIntensities(getOptionalParamFromServer<bool>(pnh, PARAM_INTENSITIES, configuration::INTENSITIES))
           .scanResolution(util::TenthOfDegree::fromRad(
               getOptionalParamFromServer<double>(pnh, PARAM_RESOLUTION, configuration::DEFAULT_SCAN_ANGLE_RESOLUTION)))
+          .enableEncoder(getOptionalParamFromServer<bool>(pnh, PARAM_ENCODER_DATA, configuration::ENCODER))
           .build()
     };
 
     if (scanner_configuration.fragmentedScansEnabled())
     {
       ROS_INFO("Using fragmented scans.");
+    }
+    
+    if (scanner_configuration.encoderEnabled())
+    {
+      ROS_INFO("Reading data from encoders");
     }
 
     ROSScannerNode ros_scanner_node(pnh,

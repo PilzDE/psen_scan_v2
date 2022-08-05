@@ -74,15 +74,17 @@ private:
   class DeviceSettings
   {
   public:
-    constexpr DeviceSettings(const bool diagnostics_enabled, const bool intensities_enabled);
+    constexpr DeviceSettings(const bool diagnostics_enabled, const bool intensities_enabled, const bool encoder_data_enabled);
 
   public:
     constexpr bool diagnosticsEnabled() const;
     constexpr bool intensitiesEnabled() const;
+    constexpr bool encoderDataEnabled() const;
 
   private:
     const bool diagnostics_enabled_;
     const bool intensities_enabled_;
+    const bool encoder_data_enabled_;
   };
 
 private:
@@ -114,8 +116,8 @@ constexpr util::TenthOfDegree Message::LaserScanSettings::resolution() const
   return resolution_;
 };
 
-constexpr Message::DeviceSettings::DeviceSettings(const bool diagnostics_enabled, const bool intensities_enabled)
-  : diagnostics_enabled_(diagnostics_enabled), intensities_enabled_(intensities_enabled)
+constexpr Message::DeviceSettings::DeviceSettings(const bool diagnostics_enabled, const bool intensities_enabled, const bool encoder_data_enabled)
+  : diagnostics_enabled_(diagnostics_enabled), intensities_enabled_(intensities_enabled), encoder_data_enabled_(encoder_data_enabled)
 {
 }
 
@@ -127,6 +129,11 @@ constexpr bool Message::DeviceSettings::diagnosticsEnabled() const
 constexpr bool Message::DeviceSettings::intensitiesEnabled() const
 {
   return intensities_enabled_;
+};
+
+constexpr bool Message::DeviceSettings::encoderDataEnabled() const
+{
+  return encoder_data_enabled_;
 };
 
 }  // namespace start_request
