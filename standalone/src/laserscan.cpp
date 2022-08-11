@@ -119,15 +119,6 @@ void LaserScan::setIntensities(const IntensityData& intensities)
   this->intensities(intensities);
 }
 
-const LaserScan::IntensityData& LaserScan::getEncoderData() const
-{
-  return this->encoderData();
-}
-
-void LaserScan::setEncoderData(const EncoderData& encoderData)
-{
-  this->encoderData(encoderData);
-}
 // LCOV_EXCL_STOP
 
 const util::TenthOfDegree& LaserScan::minScanAngle() const
@@ -180,14 +171,24 @@ void LaserScan::intensities(const IntensityData& intensities)
   intensities_ = intensities;
 }
 
-const LaserScan::EncoderData& LaserScan::encoderData() const
+const LaserScan::EncoderData& LaserScan::getEncoderStates() const
 {
-  return encoderData_;
+  return encoderStates();
 }
 
-void LaserScan::encoderData(const EncoderData& encoderData)
+const LaserScan::EncoderData& LaserScan::encoderStates() const
 {
-  encoderData_ = encoderData;
+  return encoder_states_;
+}
+
+void LaserScan::setEncoderStates(const EncoderData& encoder_states)
+{
+  encoderStates(encoder_states);
+}
+
+void LaserScan::encoderStates(const EncoderData& encoder_states)
+{
+  encoder_states_ = encoder_states;
 }
 
 // LCOV_EXCL_START
@@ -215,7 +216,7 @@ const LaserScan::IOData& LaserScan::ioStates() const
 std::ostream& operator<<(std::ostream& os, const LaserScan& scan)
 {
   os << fmt::format("LaserScan(timestamp = {} nsec, scanCounter = {}, minScanAngle = {} deg, maxScanAngle = {} deg, "
-                    "resolution = {} deg, active_zoneset = {}, measurements = {}, intensities = {}, io_states = {})",
+                    "resolution = {} deg, active_zoneset = {}, measurements = {}, intensities = {}, io_states = {}, encoder_states = {})",
                     scan.timestamp(),
                     scan.scanCounter(),
                     scan.minScanAngle().value() / 10.,
@@ -224,7 +225,8 @@ std::ostream& operator<<(std::ostream& os, const LaserScan& scan)
                     scan.activeZoneset(),
                     util::formatRange(scan.measurements()),
                     util::formatRange(scan.intensities()),
-                    util::formatRange(scan.ioStates()));
+                    util::formatRange(scan.ioStates()),
+                    util::formatRange(scan.encoderStates()));
   return os;
 }
 

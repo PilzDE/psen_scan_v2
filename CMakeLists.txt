@@ -57,7 +57,7 @@ add_message_files(
   IOState.msg
   ZoneSet.msg
   ZoneSetConfiguration.msg
-  EncoderData.msg
+  EncoderState.msg
 )
 
 generate_messages(
@@ -137,6 +137,7 @@ include_directories(
 set(${PROJECT_NAME}_standalone_sources
   standalone/src/scanner_v2.cpp
   standalone/src/io_state.cpp
+  standalone/src/encoder_state.cpp
   standalone/src/laserscan.cpp
   standalone/src/data_conversion_layer/monitoring_frame_msg.cpp
   standalone/src/data_conversion_layer/start_request.cpp

@@ -60,7 +60,7 @@ static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_MEASUREMENT{ 2 };
 static constexpr uint16_t NO_SIGNAL_ARRIVED{ 59956 };
 static constexpr uint16_t SIGNAL_TOO_LATE{ 59958 };
 static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_INTENSITY{ 2 };
-static constexpr uint16_t NUMBER_OF_BYTES_ENCODER_DATA{ 2 };
+static constexpr uint16_t NUMBER_OF_BYTES_ENCODER_DATA{ 4 };
 
 /**
  * @brief The information included in every single monitoring frame.

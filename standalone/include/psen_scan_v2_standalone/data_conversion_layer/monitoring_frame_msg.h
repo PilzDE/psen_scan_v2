@@ -26,6 +26,7 @@
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/encoder_data.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
@@ -76,7 +77,7 @@ public:
   //! @throw AdditionalFieldMissing if intensities were missing during deserialization of a Message.
   const std::vector<double>& intensities() const;
   //! @throw AdditionalFieldMissing if encoder data were missing during deserialization of a Message.
-  const std::vector<double>& encoderData() const;
+  const encoder::EncoderData& encoderData() const;
   //! @throw AdditionalFieldMissing if diagnostic_messages were missing during deserialization of a Message.
   std::vector<diagnostic::Message> diagnosticMessages() const;
 
@@ -99,7 +100,7 @@ private:
   boost::optional<io::PinData> io_pin_data_;
   boost::optional<std::vector<double>> measurements_;
   boost::optional<std::vector<double>> intensities_;
-  boost::optional<std::vector<double>> encoder_data_;
+  boost::optional<encoder::EncoderData> encoder_data_;
   boost::optional<std::vector<diagnostic::Message>> diagnostic_messages_;
 
 public:

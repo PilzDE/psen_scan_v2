@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "psen_scan_v2_standalone/io_state.h"
+#include "psen_scan_v2_standalone/encoder_state.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
@@ -39,6 +40,7 @@ namespace psen_scan_v2_standalone
  * - ID of the currently active zoneset.
  * - Time of the first scan ray.
  * - All states of the I/O pins recorded during the scan.
+ * - All states of the encoders reading during the scan.
  *
  * The measures use the target frame defined as \<tf_prefix\>.
  * @see https://github.com/PilzDE/psen_scan_v2_standalone/blob/main/README.md#tf-frames
@@ -49,7 +51,7 @@ public:
   using MeasurementData = std::vector<double>;
   using IntensityData = std::vector<double>;
   using IOData = std::vector<IOState>;
-  using EncoderData = std::vector<double>;
+  using EncoderData = std::vector<EncoderState>;
 
 public:
   LaserScan(const util::TenthOfDegree& resolution,
@@ -119,13 +121,13 @@ public:
   void ioStates(const IOData& io_states);
 
   /*! deprecated: use const EncoderData& encoderData() instead */
-  [[deprecated("use const EncoderData& encoderData() const instead")]] const EncoderData& getEncoderData() const;
-  const EncoderData& encoderData() const;
+  [[deprecated("use const EncoderData& encoderData() const instead")]] const EncoderData& getEncoderStates() const;
+  const EncoderData& encoderStates() const;
 
   /*! deprecated: use void encoderData(const EncoderData& encoderData) instead */
   [[deprecated("use void encoderData(const EncoderData& encoderData) instead")]] void
-  setEncoderData(const EncoderData& encoderData);
-  void encoderData(const EncoderData& encoderData);
+  setEncoderStates(const EncoderData& encoder_states);
+  void encoderStates(const EncoderData& encoder_states);
 
 private:
   //! Measurement data of the laserscan (in Millimeters).
@@ -147,7 +149,7 @@ private:
   //! Time of the first ray in this scan round (or fragment if fragmented_scans is enabled).
   const int64_t timestamp_;
   //! Stores the received normalized encoder signals.
-  EncoderData encoderData_;
+  EncoderData encoder_states_;
 };
 
 std::ostream& operator<<(std::ostream& os, const LaserScan& scan);

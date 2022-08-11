@@ -103,7 +103,7 @@ const std::vector<double>& Message::intensities() const
   }
 }
 
-const std::vector<double>& Message::encoderData() const
+const encoder::EncoderData& Message::encoderData() const
 {
   if (encoder_data_.is_initialized())
   {

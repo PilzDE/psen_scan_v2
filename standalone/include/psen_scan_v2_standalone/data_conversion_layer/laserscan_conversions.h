@@ -102,7 +102,7 @@ inline LaserScan LaserScanConverter::toLaserScan(
   std::vector<double> measurements;
   std::vector<double> intensities;
   std::vector<IOState> io_states;
-  std::vector<double> encoderData;
+  std::vector<EncoderState> encoder_states;
 
   for (auto index : sorted_stamped_msgs_indices)
   {
@@ -132,13 +132,18 @@ inline LaserScan LaserScanConverter::toLaserScan(
 
       io_states.emplace_back(single_msg.msg_.iOPinData(), single_msg.stamp_);
     }
-  // Create the encoder_data as reception order.
-    if(single_msg.msg_.hasEncoderDataField())
+    // Fill the data with the encoder information as reception order.
+    if (single_msg.msg_.hasEncoderDataField())
     {
-      encoderData.insert(encoderData.end(),
-                          single_msg.msg_.encoderData().begin(),
-                          single_msg.msg_.encoderData().end());
-    }  
+      PSENSCAN_DEBUG("encoder_states: ",
+                     "stamp_: {} fromTheta: {} encoder_1: {} encoder_2: {}",
+                     single_msg.stamp_,
+                     std::to_string(single_msg.msg_.fromTheta().toRad()),
+                     single_msg.msg_.encoderData().encoder_1,
+                     single_msg.msg_.encoderData().encoder_2);
+
+      encoder_states.emplace_back(single_msg.msg_.encoderData(), single_msg.stamp_);
+    }
   }
 
   LaserScan scan(stamped_msgs[0].msg_.resolution(),
@@ -151,7 +156,7 @@ inline LaserScan LaserScanConverter::toLaserScan(
   scan.measurements(measurements);
   scan.intensities(intensities);
   scan.ioStates(io_states);
-  scan.encoderData(encoderData);
+  scan.encoderStates(encoder_states);
 
   return scan;
 }

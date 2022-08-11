@@ -46,7 +46,7 @@ public:
   MessageBuilder& intensities(const std::vector<double>& intensities);
   MessageBuilder& diagnosticMessages(const std::vector<diagnostic::Message>& diagnostic_messages);
   MessageBuilder& iOPinData(const io::PinData& io_pin_data);
-  MessageBuilder& encoderData(const std::vector<double>& encoder_data);
+  MessageBuilder& encoderData(const encoder::EncoderData& encoder_data);
 
 private:
   Message msg_;
@@ -115,7 +115,8 @@ inline MessageBuilder& MessageBuilder::iOPinData(const io::PinData& io_pin_data)
   msg_.io_pin_data_ = io_pin_data;
   return *this;
 }
-inline MessageBuilder& MessageBuilder::encoderData(const std::vector<double>& encoder_data)
+
+inline MessageBuilder& MessageBuilder::encoderData(const encoder::EncoderData& encoder_data)
 {
   msg_.encoder_data_ = encoder_data;
   return *this;
