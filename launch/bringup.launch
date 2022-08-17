@@ -1,5 +1,5 @@
 <!--
-Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -49,7 +49,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- Set the following to true in order to publish scan data as soon as a UDP packet is ready, instead of waiting for a full scan -->
   <arg name="fragmented_scans" default="false" />
   
-  <!-- Set the following to true in order to publish scan data as soon as a UDP packet is ready, instead of waiting for a full scan -->
+  <!-- Set the following to true in order to publish encoder data -->
   <arg name="encoder_data" default="false" />
 
   <node name="$(arg tf_prefix)" type="psen_scan_v2_node" pkg="psen_scan_v2" output="screen" required="true">

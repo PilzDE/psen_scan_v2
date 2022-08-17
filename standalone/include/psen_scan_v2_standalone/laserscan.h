@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -120,13 +120,8 @@ public:
   [[deprecated("use void ioStates(const IOData& io_states) instead")]] void setIOStates(const IOData& io_states);
   void ioStates(const IOData& io_states);
 
-  /*! deprecated: use const EncoderData& encoderData() instead */
-  [[deprecated("use const EncoderData& encoderData() const instead")]] const EncoderData& getEncoderStates() const;
   const EncoderData& encoderStates() const;
 
-  /*! deprecated: use void encoderData(const EncoderData& encoderData) instead */
-  [[deprecated("use void encoderData(const EncoderData& encoderData) instead")]] void
-  setEncoderStates(const EncoderData& encoder_states);
   void encoderStates(const EncoderData& encoder_states);
 
 private:

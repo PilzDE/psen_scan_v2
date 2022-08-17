@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Pilz GmbH & Co. KG
+// Copyright (c) 2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -46,4 +46,4 @@ psen_scan_v2::EncoderState toEncoderStateMsg(const psen_scan_v2_standalone::Enco
 
 }  // namespace psen_scan_v2
 
-#endif  // PSEN_SCAN_V2_IO_STATE_ROS_CONVERSIONS_H
+#endif  // PSEN_SCAN_V2_ENCODER_STATE_ROS_CONVERSIONS_H

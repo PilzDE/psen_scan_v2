@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -171,19 +171,9 @@ void LaserScan::intensities(const IntensityData& intensities)
   intensities_ = intensities;
 }
 
-const LaserScan::EncoderData& LaserScan::getEncoderStates() const
-{
-  return encoderStates();
-}
-
 const LaserScan::EncoderData& LaserScan::encoderStates() const
 {
   return encoder_states_;
-}
-
-void LaserScan::setEncoderStates(const EncoderData& encoder_states)
-{
-  encoderStates(encoder_states);
 }
 
 void LaserScan::encoderStates(const EncoderData& encoder_states)

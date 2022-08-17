@@ -174,8 +174,8 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
         raw_processing::read<uint16_t>(ss, encoder_2_read_buffer);
 
         encoder::EncoderData encoder_data;
-        encoder_data.encoder_1 = (double)encoder_1_read_buffer;
-        encoder_data.encoder_2 = (double)encoder_2_read_buffer;
+        encoder_data.encoder_1 = toEncoder(encoder_1_read_buffer);
+        encoder_data.encoder_2 = toEncoder(encoder_2_read_buffer);
 
         msg_builder.encoderData(encoder_data);
         break;

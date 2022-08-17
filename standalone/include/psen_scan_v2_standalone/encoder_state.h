@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022 Pilz GmbH & Co. KG
+// Copyright (c) 2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -44,4 +44,4 @@ public:
 std::ostream& operator<<(std::ostream& os, const EncoderState& encoder_state);
 }  // namespace psen_scan_v2_standalone
 
-#endif  // PSEN_SCAN_V2_STANDALONE_IO_STATE_H
+#endif  // PSEN_SCAN_V2_STANDALONE_ENCODER_STATE_H
