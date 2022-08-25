@@ -22,6 +22,7 @@
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/io_state.h"
+#include "psen_scan_v2_standalone/encoder_state.h"
 #include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/laserscan_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
@@ -42,6 +43,7 @@
             .activeZoneset(msg.activeZoneset())                                                                        \
             .measurements(msg.measurements())                                                                          \
             .intensities(msg.intensities())                                                                            \
+            .encoderData(msg.encoderData())                                                                            \
             .property(msg.property() + offset)
 
 using namespace psen_scan_v2_standalone;
@@ -78,7 +80,8 @@ static double addOffsetToMsgMeasurement(data_conversion_layer::monitoring_frame:
             .activeZoneset(msg.activeZoneset())
             .iOPinData(msg.iOPinData())
             .measurements(measurements_copy)
-            .intensities(msg.intensities());
+            .intensities(msg.intensities())
+            .encoderData(msg.encoderData());
   return measurements_copy.at(index);
 }
 
@@ -91,7 +94,8 @@ static MessageBuilder createDefaultMsgBuilder()
       .activeZoneset(0)
       .iOPinData(createPinData())
       .measurements({ 1., 2., 3., 4.5, 5., 42., .4 })
-      .intensities({ 0., 4., 3., 1007., 508., 14000., .4 });
+      .intensities({ 0., 4., 3., 1007., 508., 14000., .4 })
+      .encoderData({ 12.005, 25.876 });
 }
 
 static MessageStamped createDefaultStampedMsg(const int64_t timestamp = DEFAULT_TIMESTAMP, uint32_t msg_nr = 0)
@@ -219,6 +223,24 @@ TEST(LaserScanConversionsTest, laserScanShouldContainCorrectIOStateAfterConversi
   EXPECT_THAT(scan_ptr->ioStates().at(0), IOStateFromStampedMsg(stamped_msg));
 }
 
+MATCHER_P(EncoderStateFromStampedMsg, stamped_msg, "")
+{
+  return ExplainMatchResult(
+      EncoderStateEq(EncoderState(stamped_msg.msg_.encoderData(), stamped_msg.stamp_)), arg, result_listener);
+}
+
+TEST(LaserScanConversionsTest, laserScanShouldContainCorrectEncoderStateAfterConversion)
+{
+  const auto stamped_msg{ createDefaultStampedMsg() };
+
+  std::unique_ptr<LaserScan> scan_ptr;
+  ASSERT_NO_THROW(
+      scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan({ stamped_msg }) }););
+
+  ASSERT_EQ(scan_ptr->encoderStates().size(), 1u);
+  EXPECT_THAT(scan_ptr->encoderStates().at(0), EncoderStateFromStampedMsg(stamped_msg));
+}
+
 /////////////////////////////////////////
 //  Test Cases with Multiple Messages  //
 /////////////////////////////////////////
@@ -314,6 +336,22 @@ TEST(LaserScanConversionsTest, laserScanShouldContainAllIOStates)
   for (size_t i = 0; i < msg_count; i++)
   {
     EXPECT_THAT(scan_ptr->ioStates().at(i), IOStateFromStampedMsg(stamped_msgs.at(i)));
+  }
+}
+
+TEST(LaserScanConversionsTest, laserScanShouldContainAllEncoderStates)
+{
+  const size_t msg_count = 6;
+  const auto stamped_msgs = createValidStampedMsgs(msg_count);
+
+  std::unique_ptr<LaserScan> scan_ptr;
+  ASSERT_NO_THROW(
+      scan_ptr.reset(new LaserScan{ data_conversion_layer::LaserScanConverter::toLaserScan(stamped_msgs) }););
+
+  ASSERT_EQ(scan_ptr->encoderStates().size(), msg_count);
+  for (size_t i = 0; i < msg_count; i++)
+  {
+    EXPECT_THAT(scan_ptr->encoderStates().at(i), EncoderStateFromStampedMsg(stamped_msgs.at(i)));
   }
 }
 

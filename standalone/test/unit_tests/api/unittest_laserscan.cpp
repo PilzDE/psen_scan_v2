@@ -22,8 +22,10 @@
 #include <fmt/ostream.h>
 
 #include "psen_scan_v2_standalone/io_state.h"
+#include "psen_scan_v2_standalone/encoder_state.h"
 #include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/encoder_data.h"
 
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
 
@@ -174,6 +176,21 @@ TEST(LaserScanTest, testSetAndGetIOStates)
   EXPECT_EQ(laser_scan->ioStates()[0].timestamp(), 42);
 }
 
+TEST(LaserScanTest, testSetAndGetEncoderStates)
+{
+  LaserScanBuilder laser_scan_builder;
+  std::unique_ptr<LaserScan> laser_scan;
+  ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
+
+  EncoderState state{ { 12.005, 25.876 }, 65 /*timestamp*/ };
+  std::vector<EncoderState> encoder_states{ state };
+  laser_scan->encoderStates(encoder_states);
+
+  EXPECT_EQ(laser_scan->encoderStates()[0].getEncoder_1(), state.getEncoder_1());
+  EXPECT_EQ(laser_scan->encoderStates()[0].getEncoder_2(), state.getEncoder_2());
+  EXPECT_EQ(laser_scan->encoderStates()[0].timestamp(), 65);
+}
+
 TEST(LaserScanTest, testPrintMessageSuccess)
 {
   LaserScanBuilder laser_scan_builder;
@@ -183,6 +200,10 @@ TEST(LaserScanTest, testPrintMessageSuccess)
   laser_scan->measurements({ 45.0, 44.0, 43.0, 42.0 });
   laser_scan->ioStates({ IOState(createPinData(), 41 /*timestamp*/) });
 
+  EncoderState state{ { 12.005, 25.876 }, 41 /*timestamp*/ };
+  std::vector<EncoderState> encoder_states{ state };
+  laser_scan->encoderStates(encoder_states);
+
 // For compatibility with different ubuntu versions (resp. fmt), we need to take account of changes in
 // the default formatting of floating point numbers
 #if (FMT_VERSION >= 60000 && FMT_VERSION < 70100)
@@ -191,14 +212,18 @@ TEST(LaserScanTest, testPrintMessageSuccess)
       "LaserScan(timestamp = 1 nsec, scanCounter = 1, minScanAngle = 0.1 deg, maxScanAngle = 0.2 deg, resolution "
       "= 0.1 deg, active_zoneset = 2, measurements = {45.0, 44.0, 43.0, 42.0}, intensities = {}, io_states = "
       "{IOState(timestamp = 41 nsec, io::PinData(input = {01001101, 00000000, 00000000, 00000000, 10011010, 00000000, "
-      "00000000, 00000000}, output = {01010101, 00000000, 00000000, 00000000}))})");
+      "00000000, 00000000}, output = {01010101, 00000000, 00000000, 00000000}))}, encoder_states = "
+      "{EncoderState(timestamp "
+      "= 41 nsec, EncoderData(encoder_1 = 12.005, encoder_2 = 25.876))})");
 #else
   EXPECT_EQ(
       fmt::format("{}", *laser_scan),
       "LaserScan(timestamp = 1 nsec, scanCounter = 1, minScanAngle = 0.1 deg, maxScanAngle = 0.2 deg, resolution "
       "= 0.1 deg, active_zoneset = 2, measurements = {45, 44, 43, 42}, intensities = {}, io_states = "
       "{IOState(timestamp = 41 nsec, io::PinData(input = {01001101, 00000000, 00000000, 00000000, 10011010, 00000000, "
-      "00000000, 00000000}, output = {01010101, 00000000, 00000000, 00000000}))})");
+      "00000000, 00000000}, output = {01010101, 00000000, 00000000, 00000000}))}, encoder_states = "
+      "{EncoderState(timestamp "
+      "= 41 nsec, EncoderData(encoder_1 = 12.005, encoder_2 = 25.876))})");
 #endif
 }
 

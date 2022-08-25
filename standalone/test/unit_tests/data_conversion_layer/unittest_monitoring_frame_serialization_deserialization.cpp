@@ -144,6 +144,8 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
   pin_data.input_state.at(5).set(4);
   pin_data.output_state.at(0).set(5);
 
+  data_conversion_layer::monitoring_frame::encoder::EncoderData encoder_data{ 12, 25 };
+
   auto msg =
       monitoring_frame::MessageBuilder()
           .fromTheta(util::TenthOfDegree(25))
@@ -153,6 +155,7 @@ TEST(MonitoringFrameSerializationTest, shouldSerializeAndDeserializeFrameConsist
           .measurements({ 10, 20, std::numeric_limits<double>::infinity(), 40 })
           .intensities({ 15, 25, 35, 45 })
           .iOPinData(pin_data)
+          .encoderData(encoder_data)
           .diagnosticMessages(
               { monitoring_frame::diagnostic::Message(configuration::ScannerId::master, error_locations.at(0)),
                 monitoring_frame::diagnostic::Message(configuration::ScannerId::master, error_locations.at(1)),
@@ -174,6 +177,7 @@ TEST(MonitoringFrameSerializationTest, shouldFailOnSerializeAndDeserializeFrameW
                  .activeZoneset(0)
                  .measurements({ 0 })
                  .intensities({ 70045 })
+                 .encoderData({ 0, 0 })
                  .diagnosticMessages({})
                  .build();
 

@@ -371,5 +371,17 @@ target_link_libraries(integrationtest_udp_client
 add_test(NAME integrationtest_udp_client
         COMMAND integrationtest_udp_client)
 
+ADD_EXECUTABLE(unittest_encoder_state
+               test/unit_tests/api/unittest_encoder_state.cpp
+               src/io_state.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_encoder_state
+    ${PROJECT_NAME}
+    gtest
+)
+
+ADD_TEST(NAME unittest_encoder_state
+         COMMAND unittest_encoder_state)
+
 endif ()
 endif ()

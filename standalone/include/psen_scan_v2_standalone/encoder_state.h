@@ -33,6 +33,8 @@ public:
   //! @return time[ns] of the monitoring frame this state is linked to.
   int64_t timestamp() const;
 
+  bool operator==(const EncoderState& encoder_state) const;
+
 private:
   data_conversion_layer::monitoring_frame::encoder::EncoderData encoder_data_{};
   int64_t timestamp_{};

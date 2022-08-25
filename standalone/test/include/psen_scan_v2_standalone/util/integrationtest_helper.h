@@ -34,6 +34,7 @@
 #include "psen_scan_v2_standalone/util/format_range.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 #include "psen_scan_v2_standalone/io_state.h"
+#include "psen_scan_v2_standalone/encoder_state.h"
 #include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/scan_range.h"
 
@@ -96,6 +97,8 @@ createMonitoringFrameMsgBuilderWithoutDiagnostics(const util::TenthOfDegree star
   msg_builder.intensities(generateIntensities(num_elements, lowest_intensity, highest_intensity));
 
   msg_builder.iOPinData(createPinData());
+
+  msg_builder.encoderData({ 12.005, 25.876 });
 
   return msg_builder;
 }

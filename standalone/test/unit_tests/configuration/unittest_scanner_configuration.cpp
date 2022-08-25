@@ -59,6 +59,7 @@ static ScannerConfiguration createValidConfig()
       .scanResolution(SCAN_RESOLUTION)
       .enableDiagnostics()
       .enableIntensities()
+      .enableEncoder(true)
       .build();
 }
 
@@ -75,6 +76,7 @@ static ScannerConfiguration createValidConfig(const std::string& host_ip)
       .enableDiagnostics()
       .enableIntensities()
       .enableFragmentedScans(true)
+      .enableEncoder(true)
       .build();
 }
 
@@ -314,6 +316,20 @@ TEST_F(ScannerConfigurationTest, shouldThrowInvalidArgumentWithResolutionViolati
 {
   auto sb = ScannerConfigurationBuilder(VALID_IP).scanRange(SCAN_RANGE);
   EXPECT_THROW(sb.scanResolution(util::TenthOfDegree{ 101u }), std::invalid_argument);
+}
+
+TEST_F(ScannerConfigurationTest, shouldReturnCorrectEncoderFlagAfterDefaultConstruction)
+{
+  const ScannerConfiguration config{ createValidDefaultConfig() };
+
+  EXPECT_FALSE(config.encoderEnabled());
+}
+
+TEST_F(ScannerConfigurationTest, shouldReturnCorrectEncoderFlagAfterValidConstruction)
+{
+  const ScannerConfiguration config{ createValidConfig()};
+
+  EXPECT_TRUE(config.encoderEnabled());
 }
 
 }  // namespace psen_scan_v2_standalone_test

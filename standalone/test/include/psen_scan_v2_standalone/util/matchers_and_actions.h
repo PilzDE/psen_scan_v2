@@ -76,6 +76,12 @@ MATCHER_P(IOStateEq, io_state, "")
          io_state.timestamp() == arg.timestamp();
 }
 
+MATCHER_P(EncoderStateEq, encoder_state, "")
+{
+  return encoder_state.getEncoder_1() == arg.getEncoder_1() && encoder_state.getEncoder_2() == arg.getEncoder_2() &&
+         encoder_state.timestamp() == arg.timestamp();
+}
+
 MATCHER_P(PointwiseIOStateEq, vec, "")
 {
   return std::equal(vec.begin(), vec.end(), arg.begin(), arg.end(), [result_listener](const auto& a, const auto& b) {
@@ -120,6 +126,12 @@ MATCHER_P(IOPinDataEq, ref_pin, "")
          Matches(Pointwise(Eq(), ref_pin.output_state))(arg.output_state);
 }
 
+MATCHER_P(EncoderDataEq, ref_encoder, "")
+{
+  return ref_encoder.encoder_1 == arg.encoder_1 &&
+         ref_encoder.encoder_2 == arg.encoder_2;
+}
+
 MATCHER_P(MonitoringFrameEq, reference_msg, "")
 {
   return arg.fromTheta() == reference_msg.fromTheta() && arg.resolution() == reference_msg.resolution() &&
@@ -127,7 +139,8 @@ MATCHER_P(MonitoringFrameEq, reference_msg, "")
          Matches(PointwiseDoubleEq(reference_msg.measurements()))(arg.measurements()) &&
          Matches(PointwiseDoubleEq(reference_msg.intensities()))(arg.intensities()) &&
          Matches(Pointwise(Eq(), reference_msg.diagnosticMessages()))(arg.diagnosticMessages()) &&
-         Matches(IOPinDataEq(reference_msg.iOPinData()))(arg.iOPinData());
+         Matches(IOPinDataEq(reference_msg.iOPinData()))(arg.iOPinData()) &&
+         Matches(EncoderDataEq(reference_msg.encoderData()))(arg.encoderData());
 }
 }  // namespace psen_scan_v2_standalone_test
 

@@ -45,4 +45,10 @@ std::ostream& operator<<(std::ostream& os, const EncoderState& encoder_state)
             << ")";
 }
 
+bool EncoderState::operator==(const EncoderState& encoder_state) const
+{
+  return encoder_data_.encoder_1 == encoder_state.getEncoder_1() &&
+         encoder_data_.encoder_2 == encoder_state.getEncoder_2();
+}
+
 }  // namespace psen_scan_v2_standalone

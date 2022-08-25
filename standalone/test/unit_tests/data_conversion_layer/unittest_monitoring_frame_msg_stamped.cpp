@@ -39,6 +39,8 @@ static data_conversion_layer::monitoring_frame::Message createMsg()
   io_pin_data.input_state.at(0).set(3);
   io_pin_data.output_state.at(0).reset(1);
 
+  data_conversion_layer::monitoring_frame::encoder::EncoderData encoder_data{ 12.005, 25.876 };
+
   return data_conversion_layer::monitoring_frame::MessageBuilder()
       .fromTheta(util::TenthOfDegree{ 10 })
       .resolution(util::TenthOfDegree{ 90 })
@@ -49,7 +51,8 @@ static data_conversion_layer::monitoring_frame::Message createMsg()
       .diagnosticMessages({ data_conversion_layer::monitoring_frame::diagnostic::Message{
           configuration::ScannerId::master,
           data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 7) } })
-      .iOPinData(io_pin_data);
+      .iOPinData(io_pin_data)
+      .encoderData(encoder_data);
 }
 
 TEST(MonitoringFrameMsgStampedTest, testMsg)
