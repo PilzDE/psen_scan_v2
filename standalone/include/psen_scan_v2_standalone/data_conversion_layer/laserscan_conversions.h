@@ -97,7 +97,7 @@ inline LaserScan LaserScanConverter::toLaserScan(
   const auto max_angle = calculateMaxAngle(stamped_msgs, min_angle);
 
   const auto timestamp = calculateTimestamp(stamped_msgs, sorted_stamped_msgs_indices);
-  configuration::ScannerId scanner_id = frames[sorted_frames_indices[0]].scannerId();
+  configuration::ScannerId scanner_id = stamped_msgs[sorted_stamped_msgs_indices[0]].msg_.scannerId();
 
   std::vector<double> measurements;
   std::vector<double> intensities;

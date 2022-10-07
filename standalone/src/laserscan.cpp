@@ -38,10 +38,11 @@ LaserScan::LaserScan(const util::TenthOfDegree& resolution,
                      const configuration::ScannerId scanner_id)
   : resolution_(resolution)
   , min_scan_angle_(min_scan_angle)
-  , max_scan_angle_(max_scan_angle), scanner_id_(scanner_id)
+  , max_scan_angle_(max_scan_angle)
   , scan_counter_(scan_counter)
   , active_zoneset_(active_zoneset)
   , timestamp_(timestamp)
+  , scanner_id_(scanner_id)
 {
   if (scanResolution() == util::TenthOfDegree(0))
   {
@@ -131,7 +132,7 @@ const util::TenthOfDegree& LaserScan::maxScanAngle() const
   return max_scan_angle_;
 }
 
-configuration::ScannerId LaserScan::getScannerId() const
+configuration::ScannerId LaserScan::scannerId() const
 {
   return scanner_id_;
 }

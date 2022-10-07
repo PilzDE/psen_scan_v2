@@ -235,7 +235,18 @@ inline void ScannerProtocolDef::checkForDiagnosticErrors(const data_conversion_l
 }
 
 inline void
-ScannerProtocolDef::informUserAboutTheScanData(const data_conversion_layer::monitoring_frame::Message& frame)
+ScannerProtocolDef::checkForChangedActiveZoneset(const data_conversion_layer::monitoring_frame::Message& msg)
+{
+  if (!zoneset_reference_msg_.is_initialized() || (msg.scanCounter() >= zoneset_reference_msg_->scanCounter() &&
+                                                   msg.activeZoneset() != zoneset_reference_msg_->activeZoneset()))
+  {
+    PSENSCAN_INFO("Scanner", "The scanner switched to active zoneset {}", msg.activeZoneset());
+    zoneset_reference_msg_ = msg;
+  }
+}
+
+inline void ScannerProtocolDef::informUserAboutTheScanData(
+    const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg)
 {
   try
   {

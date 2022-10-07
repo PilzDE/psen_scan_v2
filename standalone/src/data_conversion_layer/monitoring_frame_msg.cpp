@@ -26,6 +26,8 @@ namespace psen_scan_v2_standalone
 {
 namespace data_conversion_layer
 {
+namespace monitoring_frame
+{
 util::TenthOfDegree data_conversion_layer::monitoring_frame::Message::fromTheta() const
 {
   return from_theta_;
@@ -94,11 +96,6 @@ const std::vector<double>& Message::intensities() const
   {
     throw AdditionalFieldMissing("Intensities");
   }
-}
-
-const std::vector<double>& data_conversion_layer::monitoring_frame::Message::intensities() const
-{
-  return intensities_;
 }
 
 bool Message::hasIOPinField() const

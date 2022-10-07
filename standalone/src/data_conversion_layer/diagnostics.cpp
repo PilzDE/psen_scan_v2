@@ -30,9 +30,9 @@ namespace diagnostic
 {
 std::ostream& operator<<(std::ostream& os, const Message& msg)
 {
-  os << fmt::format("Device: {} - {}",
-                    configuration::SCANNER_ID_TO_STRING.at(msg.scannerId()),
-                    ERROR_CODE_TO_STRING.at(msg.diagnosticCode()));
+    // os << fmt::format("Device: {} - {}",
+    //                   configuration::SCANNER_ID_TO_STRING.at(msg.scannerId()),
+    //                   ERROR_CODE_TO_STRING.at(msg.diagnosticCode()));
 
   if (isAmbiguous(msg.diagnosticCode()))
   {

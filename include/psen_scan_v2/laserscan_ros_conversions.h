@@ -30,16 +30,16 @@ sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
                                       const double x_axis_rotation)
 {
   sensor_msgs::LaserScan ros_message;
-  
+
   // tell the receiver where the origin of the data is
-  if (laserscan.getScannerId() == configuration::ScannerId::master)
+  if (laserscan.scannerId() == configuration::ScannerId::master)
   {
     ros_message.header.frame_id = frame_id;
   }
-  else if (laserscan.getScannerId() == configuration::ScannerId::slave0)
+  else if (laserscan.scannerId() == configuration::ScannerId::subscriber0)
   {
     ros_message.header.frame_id = "laser_2";
-  } 
+  }
   else
   {
     PSENSCAN_ERROR("", "unexpected scanner id");

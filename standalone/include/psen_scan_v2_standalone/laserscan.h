@@ -107,7 +107,7 @@ public:
   [[deprecated("use const IntensityData& intensities() const instead")]] const IntensityData& getIntensities() const;
   const IntensityData& intensities() const;
 
-  configuration::ScannerId getScannerId() const;
+  configuration::ScannerId scannerId() const;
 
   /*! deprecated: use void intensities(const IntensityData& intensities) instead */
   [[deprecated("use void intensities(const IntensityData& intensities)) instead")]] void
