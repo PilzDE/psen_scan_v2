@@ -15,7 +15,6 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_UDP_CLIENT_H
 #define PSEN_SCAN_V2_STANDALONE_UDP_CLIENT_H
 
-#include <chrono>
 #include <functional>
 #include <iostream>
 #include <memory>
@@ -37,6 +36,7 @@
 
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/util/logging.h"
+#include "psen_scan_v2_standalone/util/timestamp.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -45,8 +45,9 @@ namespace psen_scan_v2_standalone
  */
 namespace communication_layer
 {
-using NewDataHandler = std::function<void(const data_conversion_layer::RawData&, const std::size_t&)>;
-using ErrorHandler = std::function<void(const std::string&)>;
+using NewMessageCallback =
+    std::function<void(const data_conversion_layer::RawDataConstPtr&, const std::size_t&, const int64_t& timestamp)>;
+using ErrorCallback = std::function<void(const std::string&)>;
 
 /**
  * @brief Lists the different possible receive modi.
@@ -64,9 +65,9 @@ enum class ReceiveMode
  * @brief Helper for asynchronously sending and receiving data via UDP.
  *
  * This class provides methods for opening and closing the UDP connection, writing and receiving data via UDP. The data
- * is represented by @ref data_conversion_layer::RawData. Upon receiving data a @ref NewDataHandler is invoked. When
+ * is represented by @ref data_conversion_layer::RawData. Upon receiving data a @ref NewMessageCallback is invoked. When
  * something goes wrong an
- * @ref ErrorHandler is invoked.
+ * @ref ErrorCallback is invoked.
  *
  * The ScannerV2 constructs two UDP clients, which are then used by the scanner_protocol::ScannerProtocolDef.
  */
@@ -98,14 +99,14 @@ public:
    * @note The client does not start listing for new messages until explicitly triggered via
    * startAsyncReceiving().
    *
-   * @param data_handler Handler called whenever new data are received.
-   * @param error_handler Handler called whenever something wents wrong while receiving data.
+   * @param msg_callback Callback called whenever new messages are received.
+   * @param error_callback Handler called whenever something wents wrong while receiving data.
    * @param host_port Port from which data are sent and received.
    * @param endpoint_ip IP address of the endpoint from which data are received and sent too.
    * @param endpoint_port Port on which the other endpoint is sending and receiving data.
    */
-  UdpClientImpl(const NewDataHandler& data_handler,
-                const ErrorHandler& error_handler,
+  UdpClientImpl(const NewMessageCallback& msg_callback,
+                const ErrorCallback& error_callback,
                 const unsigned short& host_port,
                 const unsigned int& endpoint_ip,
                 const unsigned short& endpoint_port);
@@ -119,8 +120,8 @@ public:
   /**
    * @brief Starts an asynchronous process listing to (a) new message(s) from the other endpoint. If the function
    * continuously listens to new messages or only listens for one message is specified by the receive modi specified.
-   * - If a new message is received, the data handler is called.
-   * - If an error occurs while receiving data, the error handler is called.
+   * - If a new message is received, the message callback is called.
+   * - If an error occurs while receiving data, the error callback is called.
    *
    * @param modi Specifies if the function continuously listens to new messages or or not.
    */
@@ -134,6 +135,14 @@ public:
   void write(const data_conversion_layer::RawData& data);
 
   /**
+   * @brief Stops the underlying io_service so that no messages are received anymore.
+   *
+   * Note: In contrary to close() this is non-blocking but note that after calling stop()
+   * calls to the msg_callback are still possible due to pending messages.
+   */
+  void stop();
+
+  /**
    * @brief Closes the UDP connection and stops all pending asynchronous operation.
    */
   void close();
@@ -141,7 +150,7 @@ public:
   /**
    * @brief Returns local ip address of current socket connection.
    */
-  boost::asio::ip::address_v4 getHostIp();
+  boost::asio::ip::address_v4 hostIp();
 
 private:
   void asyncReceive(const ReceiveMode& modi);
@@ -154,36 +163,36 @@ private:
   boost::asio::io_service::work work_{ io_service_ };
   std::thread io_service_thread_;
 
-  data_conversion_layer::RawData received_data_;
+  data_conversion_layer::RawDataPtr received_data_;
 
-  NewDataHandler data_handler_;
-  ErrorHandler error_handler_;
+  NewMessageCallback message_callback_;
+  ErrorCallback error_callback_;
 
   boost::asio::ip::udp::socket socket_;
   boost::asio::ip::udp::endpoint endpoint_;
 };
 
-inline communication_layer::UdpClientImpl::UdpClientImpl(const NewDataHandler& data_handler,
-                                                         const ErrorHandler& error_handler,
+inline communication_layer::UdpClientImpl::UdpClientImpl(const NewMessageCallback& message_callback,
+                                                         const ErrorCallback& error_callback,
                                                          const unsigned short& host_port,
                                                          const unsigned int& endpoint_ip,
                                                          const unsigned short& endpoint_port)
-  : data_handler_(data_handler)
-  , error_handler_(error_handler)
+  : message_callback_(message_callback)
+  , error_callback_(error_callback)
   , socket_(io_service_, boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(), host_port))
   , endpoint_(boost::asio::ip::address_v4(endpoint_ip), endpoint_port)
 {
-  if (!data_handler)
+  if (!message_callback)
   {
-    throw std::invalid_argument("New data handler is invalid");
+    throw std::invalid_argument("New message callback is invalid");
   }
 
-  if (!error_handler)
+  if (!error_callback)
   {
-    throw std::invalid_argument("Error handler is invalid");
+    throw std::invalid_argument("Error callback is invalid");
   }
 
-  received_data_.resize(psen_scan_v2_standalone::data_conversion_layer::MAX_UDP_PAKET_SIZE);
+  received_data_.reset(new data_conversion_layer::RawData(data_conversion_layer::MAX_UDP_PAKET_SIZE));
   try
   {
     socket_.connect(endpoint_);
@@ -198,6 +207,11 @@ inline communication_layer::UdpClientImpl::UdpClientImpl(const NewDataHandler& d
 
   assert(!io_service_thread_.joinable() && "io_service_thread_ is joinable!");
   io_service_thread_ = std::thread([this]() { io_service_.run(); });
+}
+
+inline void UdpClientImpl::stop()
+{
+  io_service_.stop();
 }
 
 inline void UdpClientImpl::close()
@@ -225,7 +239,7 @@ inline void UdpClientImpl::close()
   // LCOV_EXCL_STOP
 }
 
-inline boost::asio::ip::address_v4 UdpClientImpl::getHostIp()
+inline boost::asio::ip::address_v4 UdpClientImpl::hostIp()
 {
   return socket_.local_endpoint().address().to_v4();
 }
@@ -285,15 +299,15 @@ inline void UdpClientImpl::startAsyncReceiving(const ReceiveMode& modi)
 
 inline void UdpClientImpl::asyncReceive(const ReceiveMode& modi)
 {
-  socket_.async_receive(boost::asio::buffer(received_data_, received_data_.size()),
+  socket_.async_receive(boost::asio::buffer(*received_data_, received_data_->size()),
                         [this, modi](const boost::system::error_code& error_code, const std::size_t& bytes_received) {
                           if (error_code || bytes_received == 0)
                           {
-                            error_handler_(error_code.message());
+                            error_callback_(error_code.message());
                           }
                           else
                           {
-                            data_handler_(received_data_, bytes_received);
+                            message_callback_(received_data_, bytes_received, util::getCurrentTime());
                           }
                           if (modi == ReceiveMode::continuous)
                           {

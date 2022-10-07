@@ -15,6 +15,7 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_RAW_SCANNER_DATA_H
 #define PSEN_SCAN_V2_STANDALONE_RAW_SCANNER_DATA_H
 
+#include <memory>
 #include <vector>
 
 namespace psen_scan_v2_standalone
@@ -23,6 +24,8 @@ namespace data_conversion_layer
 {
 using RawData = std::vector<char>;
 static constexpr std::size_t MAX_UDP_PAKET_SIZE{ 65507 };
+using RawDataPtr = std::shared_ptr<RawData>;
+using RawDataConstPtr = std::shared_ptr<const RawData>;
 }  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
 

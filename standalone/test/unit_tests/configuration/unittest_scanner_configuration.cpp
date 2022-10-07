@@ -24,6 +24,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
 #include "psen_scan_v2_standalone/util/ip_conversion.h"
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scanner_config_builder.h"
 #include "psen_scan_v2_standalone/scan_range.h"
@@ -48,11 +49,10 @@ class ScannerConfigurationTest : public testing::Test
 
 static ScannerConfiguration createValidConfig()
 {
-  return ScannerConfigurationBuilder()
+  return ScannerConfigurationBuilder(VALID_IP)
       .hostIP(VALID_IP)
       .hostDataPort(MAXIMAL_PORT_NUMBER - 1)
       .hostControlPort(MAXIMAL_PORT_NUMBER)
-      .scannerIp(VALID_IP)
       .scannerDataPort(MINIMAL_PORT_NUMBER + 1)
       .scannerControlPort(MINIMAL_PORT_NUMBER + 2)
       .scanRange(SCAN_RANGE)
@@ -64,11 +64,10 @@ static ScannerConfiguration createValidConfig()
 
 static ScannerConfiguration createValidConfig(const std::string& host_ip)
 {
-  return ScannerConfigurationBuilder()
+  return ScannerConfigurationBuilder(VALID_IP)
       .hostIP(host_ip)
       .hostDataPort(MAXIMAL_PORT_NUMBER - 1)
       .hostControlPort(MAXIMAL_PORT_NUMBER)
-      .scannerIp(VALID_IP)
       .scannerDataPort(MINIMAL_PORT_NUMBER + 1)
       .scannerControlPort(MINIMAL_PORT_NUMBER + 2)
       .scanRange(SCAN_RANGE)
@@ -81,7 +80,7 @@ static ScannerConfiguration createValidConfig(const std::string& host_ip)
 
 static ScannerConfiguration createValidDefaultConfig()
 {
-  return ScannerConfigurationBuilder().scannerIp(VALID_IP).scanRange(SCAN_RANGE).build();
+  return ScannerConfigurationBuilder(VALID_IP).scanRange(SCAN_RANGE);
 }
 
 TEST_F(ScannerConfigurationTest, shouldNotThrowInCaseOfValidConfiguration)
@@ -90,26 +89,12 @@ TEST_F(ScannerConfigurationTest, shouldNotThrowInCaseOfValidConfiguration)
   EXPECT_NO_THROW(createValidDefaultConfig());
 }
 
-TEST_F(ScannerConfigurationTest, shouldThrowIfScannerIPMissing)
-{
-  EXPECT_THROW(ScannerConfigurationBuilder()
-                   .hostIP(VALID_IP)
-                   .hostDataPort(MAXIMAL_PORT_NUMBER - 1)
-                   .hostControlPort(MAXIMAL_PORT_NUMBER)
-                   .scannerDataPort(MINIMAL_PORT_NUMBER)
-                   .scannerControlPort(MINIMAL_PORT_NUMBER + 1)
-                   .scanRange(SCAN_RANGE)
-                   .build(),
-               std::runtime_error);
-}
-
 TEST_F(ScannerConfigurationTest, shouldThrowIfScanRangeMissing)
 {
-  EXPECT_THROW(ScannerConfigurationBuilder()
+  EXPECT_THROW(ScannerConfigurationBuilder(VALID_IP)
                    .hostIP(VALID_IP)
                    .hostDataPort(MAXIMAL_PORT_NUMBER - 1)
                    .hostControlPort(MAXIMAL_PORT_NUMBER)
-                   .scannerIp(VALID_IP)
                    .scannerDataPort(MINIMAL_PORT_NUMBER)
                    .scannerControlPort(MINIMAL_PORT_NUMBER + 1)
                    .build(),
@@ -118,62 +103,62 @@ TEST_F(ScannerConfigurationTest, shouldThrowIfScanRangeMissing)
 
 TEST_F(ScannerConfigurationTest, shouldThrowInCaseOfInvalidHostIp)
 {
-  EXPECT_THROW(ScannerConfigurationBuilder().hostIP(INVALID_IP), std::invalid_argument);
+  EXPECT_THROW(ScannerConfigurationBuilder(VALID_IP).hostIP(INVALID_IP), std::invalid_argument);
 }
 
 TEST_F(ScannerConfigurationTest, shouldNotThrowInCaseOfEmptyHostIp)
 {
-  EXPECT_NO_THROW(ScannerConfigurationBuilder().hostIP(EMPTY_IP));
+  EXPECT_NO_THROW(ScannerConfigurationBuilder(VALID_IP).hostIP(EMPTY_IP));
 }
 
 TEST_F(ScannerConfigurationTest, shouldNotThrowInCaseOfAutoHostIp)
 {
-  EXPECT_NO_THROW(ScannerConfigurationBuilder().hostIP(AUTO_IP));
+  EXPECT_NO_THROW(ScannerConfigurationBuilder(VALID_IP).hostIP(AUTO_IP));
 }
 
 TEST_F(ScannerConfigurationTest, shouldThrowInCaseOfInvalidScannerIp)
 {
-  EXPECT_THROW(ScannerConfigurationBuilder().scannerIp(INVALID_IP), std::invalid_argument);
+  EXPECT_THROW(ScannerConfigurationBuilder(INVALID_IP).build(), std::invalid_argument);
 }
 
 TEST_F(ScannerConfigurationTest, shouldThrowIfHostDataPortTooSmall)
 {
-  EXPECT_THROW(ScannerConfigurationBuilder().hostDataPort(-1), std::out_of_range);
+  EXPECT_THROW(ScannerConfigurationBuilder(VALID_IP).hostDataPort(-1), std::out_of_range);
 }
 
 TEST_F(ScannerConfigurationTest, shouldThrowIfHostDataPortTooLarge)
 {
-  EXPECT_THROW(ScannerConfigurationBuilder().hostDataPort(MAXIMAL_PORT_NUMBER + 1), std::out_of_range);
+  EXPECT_THROW(ScannerConfigurationBuilder(VALID_IP).hostDataPort(MAXIMAL_PORT_NUMBER + 1), std::out_of_range);
 }
 
 TEST_F(ScannerConfigurationTest, shouldThrowIfHostControlPortTooSmall)
 {
-  EXPECT_THROW(ScannerConfigurationBuilder().hostControlPort(MINIMAL_PORT_NUMBER - 1), std::out_of_range);
+  EXPECT_THROW(ScannerConfigurationBuilder(VALID_IP).hostControlPort(MINIMAL_PORT_NUMBER - 1), std::out_of_range);
 }
 
 TEST_F(ScannerConfigurationTest, shouldThrowIfHostControlPortTooLarge)
 {
-  EXPECT_THROW(ScannerConfigurationBuilder().hostControlPort(MAXIMAL_PORT_NUMBER + 1), std::out_of_range);
+  EXPECT_THROW(ScannerConfigurationBuilder(VALID_IP).hostControlPort(MAXIMAL_PORT_NUMBER + 1), std::out_of_range);
 }
 
 TEST_F(ScannerConfigurationTest, shouldThrowIfScannerDataPortTooSmall)
 {
-  EXPECT_THROW(ScannerConfigurationBuilder().scannerDataPort(-1), std::out_of_range);
+  EXPECT_THROW(ScannerConfigurationBuilder(VALID_IP).scannerDataPort(-1), std::out_of_range);
 }
 
 TEST_F(ScannerConfigurationTest, shouldThrowIfScannerDataPortTooLarge)
 {
-  EXPECT_THROW(ScannerConfigurationBuilder().scannerDataPort(MAXIMAL_PORT_NUMBER + 1), std::out_of_range);
+  EXPECT_THROW(ScannerConfigurationBuilder(VALID_IP).scannerDataPort(MAXIMAL_PORT_NUMBER + 1), std::out_of_range);
 }
 
 TEST_F(ScannerConfigurationTest, shouldThrowIfScannerControlPortTooSmall)
 {
-  EXPECT_THROW(ScannerConfigurationBuilder().scannerControlPort(MINIMAL_PORT_NUMBER - 1), std::out_of_range);
+  EXPECT_THROW(ScannerConfigurationBuilder(VALID_IP).scannerControlPort(MINIMAL_PORT_NUMBER - 1), std::out_of_range);
 }
 
 TEST_F(ScannerConfigurationTest, shouldThrowIfScannerControlPortTooLarge)
 {
-  EXPECT_THROW(ScannerConfigurationBuilder().scannerControlPort(MAXIMAL_PORT_NUMBER + 1), std::out_of_range);
+  EXPECT_THROW(ScannerConfigurationBuilder(VALID_IP).scannerControlPort(MAXIMAL_PORT_NUMBER + 1), std::out_of_range);
 }
 
 TEST_F(ScannerConfigurationTest, shouldReturnCorrectPortsAfterDefaultConstruction)
@@ -265,14 +250,14 @@ TEST_F(ScannerConfigurationTest, shouldReturnCorrectStartAngleAfterConstruction)
 {
   const ScannerConfiguration sc{ createValidConfig() };
 
-  EXPECT_EQ(SCAN_RANGE.getStart(), sc.scanRange().getStart());
+  EXPECT_EQ(SCAN_RANGE.start(), sc.scanRange().start());
 }
 
 TEST_F(ScannerConfigurationTest, shouldReturnCorrectEndAngleAfterConstruction)
 {
   const ScannerConfiguration sc{ createValidConfig() };
 
-  EXPECT_EQ(SCAN_RANGE.getEnd(), sc.scanRange().getEnd());
+  EXPECT_EQ(SCAN_RANGE.end(), sc.scanRange().end());
 }
 
 TEST_F(ScannerConfigurationTest, shouldReturnSetHostIp)
@@ -280,7 +265,7 @@ TEST_F(ScannerConfigurationTest, shouldReturnSetHostIp)
   ScannerConfiguration sc{ createValidConfig() };
 
   const uint32_t host_ip{ util::convertIP(VALID_IP_OTHER) };
-  sc.setHostIp(host_ip);
+  sc.hostIp(host_ip);
 
   EXPECT_EQ(host_ip, sc.hostIp());
 }
@@ -294,7 +279,8 @@ TEST_F(ScannerConfigurationTest, shouldReturnCorrectResolutionAfterConstruction)
 TEST_F(ScannerConfigurationTest, shouldHaveCorrectResolutionOnDefault)
 {
   const ScannerConfiguration sc{ createValidDefaultConfig() };
-  EXPECT_EQ(data_conversion_layer::radToTenthDegree(configuration::DEFAULT_SCAN_ANGLE_RESOLUTION), sc.scanResolution());
+  EXPECT_EQ(psen_scan_v2_standalone::util::TenthOfDegree::fromRad(configuration::DEFAULT_SCAN_ANGLE_RESOLUTION),
+            sc.scanResolution());
 }
 
 TEST_F(ScannerConfigurationTest, shouldHaveEnabledIntensitiesAfterConstruction)
@@ -311,22 +297,22 @@ TEST_F(ScannerConfigurationTest, shouldLoadIntensitiesFromConfigByDefault)
 
 TEST_F(ScannerConfigurationTest, shouldThrowInvalidArgumentWithLowResolutionAndEnabledIntensitiesOnBuild)
 {
-  ScannerConfigurationBuilder sb{};
-  sb.scannerIp(VALID_IP).scanRange(SCAN_RANGE).enableIntensities().scanResolution(util::TenthOfDegree{ 1u });
+  auto sb = ScannerConfigurationBuilder(VALID_IP)
+                .scanRange(SCAN_RANGE)
+                .enableIntensities()
+                .scanResolution(util::TenthOfDegree{ 1u });
   EXPECT_THROW(sb.build(), std::invalid_argument);
 }
 
 TEST_F(ScannerConfigurationTest, shouldThrowInvalidArgumentWithResolutionViolatingLowerLimit)
 {
-  ScannerConfigurationBuilder sb{};
-  sb.scannerIp(VALID_IP).scanRange(SCAN_RANGE);
+  auto sb = ScannerConfigurationBuilder(VALID_IP).scanRange(SCAN_RANGE);
   EXPECT_THROW(sb.scanResolution(util::TenthOfDegree{ 0u }), std::invalid_argument);
 }
 
 TEST_F(ScannerConfigurationTest, shouldThrowInvalidArgumentWithResolutionViolatingUpperLimit)
 {
-  ScannerConfigurationBuilder sb{};
-  sb.scannerIp(VALID_IP).scanRange(SCAN_RANGE);
+  auto sb = ScannerConfigurationBuilder(VALID_IP).scanRange(SCAN_RANGE);
   EXPECT_THROW(sb.scanResolution(util::TenthOfDegree{ 101u }), std::invalid_argument);
 }
 

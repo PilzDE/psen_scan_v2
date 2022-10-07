@@ -41,8 +41,13 @@ public:
    */
   constexpr ScanRangeTemplated(const util::TenthOfDegree& start_angle, const util::TenthOfDegree& end_angle);
 
-  const util::TenthOfDegree& getStart() const;
-  const util::TenthOfDegree& getEnd() const;
+  /*! deprecated: use const util::TenthOfDegree& start() const instead */
+  [[deprecated("use const util::TenthOfDegree& start() const instead")]] const util::TenthOfDegree& getStart() const;
+  const util::TenthOfDegree& start() const;
+
+  /*! deprecated: use const util::TenthOfDegree& end() const instead */
+  [[deprecated("use const util::TenthOfDegree& end() const const instead")]] const util::TenthOfDegree& getEnd() const;
+  const util::TenthOfDegree& end() const;
 
 public:
   static constexpr ScanRangeTemplated<min_allowed_angle, max_allowed_angle> createInvalidScanRange();
@@ -55,20 +60,20 @@ private:
   util::TenthOfDegree end_angle_{ 0 };
 };
 
-template <int16_t min_angle, int16_t max_angle>
-constexpr ScanRangeTemplated<min_angle, max_angle>::ScanRangeTemplated(const util::TenthOfDegree& start_angle,
-                                                                       const util::TenthOfDegree& end_angle)
+template <int16_t min_angle_raw, int16_t max_angle_raw>
+constexpr ScanRangeTemplated<min_angle_raw, max_angle_raw>::ScanRangeTemplated(const util::TenthOfDegree& start_angle,
+                                                                               const util::TenthOfDegree& end_angle)
   : start_angle_(start_angle), end_angle_(end_angle)
 {
-  const util::TenthOfDegree MIN_ANGLE{ min_angle };
-  const util::TenthOfDegree MAX_ANGLE{ max_angle };
+  const util::TenthOfDegree min_angle{ min_angle_raw };
+  const util::TenthOfDegree max_angle{ max_angle_raw };
 
-  if (start_angle < MIN_ANGLE || start_angle > MAX_ANGLE)
+  if (start_angle < min_angle || start_angle > max_angle)
   {
     throw std::out_of_range("Start angle out of range");
   }
 
-  if (end_angle < MIN_ANGLE || end_angle > MAX_ANGLE)
+  if (end_angle < min_angle || end_angle > max_angle)
   {
     throw std::out_of_range("End angle out of range");
   }
@@ -86,15 +91,27 @@ constexpr ScanRangeTemplated<min_angle, max_angle> ScanRangeTemplated<min_angle,
 }
 
 template <int16_t min_angle, int16_t max_angle>
-const util::TenthOfDegree& ScanRangeTemplated<min_angle, max_angle>::getStart() const
+const util::TenthOfDegree& ScanRangeTemplated<min_angle, max_angle>::start() const
 {
   return start_angle_;
 }
 
 template <int16_t min_angle, int16_t max_angle>
-const util::TenthOfDegree& ScanRangeTemplated<min_angle, max_angle>::getEnd() const
+const util::TenthOfDegree& ScanRangeTemplated<min_angle, max_angle>::end() const
 {
   return end_angle_;
+}
+
+template <int16_t min_angle, int16_t max_angle>
+const util::TenthOfDegree& ScanRangeTemplated<min_angle, max_angle>::getStart() const
+{
+  return this->start();
+}
+
+template <int16_t min_angle, int16_t max_angle>
+const util::TenthOfDegree& ScanRangeTemplated<min_angle, max_angle>::getEnd() const
+{
+  return this->end();
 }
 
 using ScanRange = ScanRangeTemplated<1, 2749>;

@@ -23,46 +23,46 @@ namespace psen_scan_v2_standalone_test
 TEST(MonitoringFrameDiagnosticMessageTest, shouldConstructMonitoringFrameDiagnosticMessageAsExpected)
 {
   auto msg = data_conversion_layer::monitoring_frame::diagnostic::Message(
-      configuration::ScannerId::slave0, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(4, 3));
-  EXPECT_EQ(msg.getDiagnosticCode(), data_conversion_layer::monitoring_frame::diagnostic::ErrorType::conf_err);
-  EXPECT_EQ(msg.getErrorLocation().getByte(), static_cast<size_t>(4));
-  EXPECT_EQ(msg.getErrorLocation().getBit(), static_cast<size_t>(3));
-  EXPECT_EQ(msg.getScannerId(), configuration::ScannerId::slave0);
+      configuration::ScannerId::subscriber0, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(4, 3));
+  EXPECT_EQ(msg.diagnosticCode(), data_conversion_layer::monitoring_frame::diagnostic::ErrorType::conf_err);
+  EXPECT_EQ(msg.errorLocation().byte(), static_cast<size_t>(4));
+  EXPECT_EQ(msg.errorLocation().bit(), static_cast<size_t>(3));
+  EXPECT_EQ(msg.scannerId(), configuration::ScannerId::subscriber0);
 }
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldBeEqualOnSameInputData)
 {
   auto msg0 = data_conversion_layer::monitoring_frame::diagnostic::Message(
-      configuration::ScannerId::slave1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(3, 0));
+      configuration::ScannerId::subscriber1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(3, 0));
   auto msg1 = data_conversion_layer::monitoring_frame::diagnostic::Message(
-      configuration::ScannerId::slave1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(3, 0));
+      configuration::ScannerId::subscriber1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(3, 0));
   EXPECT_EQ(msg0, msg1);
 }
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldBeNotEqualOnDifferentScannerId)
 {
   auto msg0 = data_conversion_layer::monitoring_frame::diagnostic::Message(
-      configuration::ScannerId::slave0, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(3, 0));
+      configuration::ScannerId::subscriber0, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(3, 0));
   auto msg1 = data_conversion_layer::monitoring_frame::diagnostic::Message(
-      configuration::ScannerId::slave1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(3, 0));
+      configuration::ScannerId::subscriber1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(3, 0));
   EXPECT_FALSE(msg0 == msg1);
 }
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldBeNotEqualOnErrorByteLocation)
 {
   auto msg0 = data_conversion_layer::monitoring_frame::diagnostic::Message(
-      configuration::ScannerId::slave1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(0, 0));
+      configuration::ScannerId::subscriber1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(0, 0));
   auto msg1 = data_conversion_layer::monitoring_frame::diagnostic::Message(
-      configuration::ScannerId::slave1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 0));
+      configuration::ScannerId::subscriber1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 0));
   EXPECT_FALSE(msg0 == msg1);
 }
 
 TEST(MonitoringFrameDiagnosticMessageTest, shouldBeNotEqualOnDifferentErrorBitLocation)
 {
   auto msg0 = data_conversion_layer::monitoring_frame::diagnostic::Message(
-      configuration::ScannerId::slave1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 0));
+      configuration::ScannerId::subscriber1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 0));
   auto msg1 = data_conversion_layer::monitoring_frame::diagnostic::Message(
-      configuration::ScannerId::slave1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 1));
+      configuration::ScannerId::subscriber1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(1, 1));
   EXPECT_FALSE(msg0 == msg1);
 }
 
@@ -78,12 +78,12 @@ TEST(MonitoringFrameDiagnosticMessageTest, shouldOutputTheRightDiagnosticMessage
 TEST(MonitoringFrameDiagnosticMessageTest, shouldOutputTheRightDiagnosticMessageWithBitandBytes)
 {
   auto msg = data_conversion_layer::monitoring_frame::diagnostic::Message(
-      configuration::ScannerId::slave1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(2, 5));
+      configuration::ScannerId::subscriber1, data_conversion_layer::monitoring_frame::diagnostic::ErrorLocation(2, 5));
   std::ostringstream os;
   os << msg;
 
   // Output with byte/bit information since error internal error is ambiguous
-  EXPECT_EQ(os.str(), "Device: Slave1 - Internal error. (Byte:2 Bit:5)");
+  EXPECT_EQ(os.str(), "Device: Subscriber1 - Internal error. (Byte:2 Bit:5)");
 }
 }  // namespace psen_scan_v2_standalone_test
 

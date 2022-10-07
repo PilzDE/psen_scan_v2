@@ -25,7 +25,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
   <rosparam ns="laser_1" command="load" file="$(find psen_scan_v2)/test/hw_tests/config/$(arg config)" />
 
-  <test test-name="scan_range" pkg="psen_scan_v2" type="hwtest_scan_range.py">
+  <!-- The test-name attribute is used for recording the results (see http://wiki.ros.org/roslaunch/XML/test).
+       The result will get overwritten if we don't choose a unique name -->
+  <arg name="test_name_suffix" value="$(eval config.split('.')[0])" />
+
+  <test test-name="scan_range__config_$(arg test_name_suffix)" pkg="psen_scan_v2" type="hwtest_scan_range.py">
     <rosparam command="load" file="$(find psen_scan_v2)/test/hw_tests/config/$(arg config)" />
   </test>
 </launch>

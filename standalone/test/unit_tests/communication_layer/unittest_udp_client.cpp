@@ -13,10 +13,10 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <string>
 #include <array>
 #include <functional>
 #include <memory>
+#include <string>
 
 #include <boost/asio.hpp>
 
@@ -28,22 +28,26 @@
 
 namespace psen_scan_v2_standalone_test
 {
-static constexpr unsigned short HOST_UDP_READ_PORT{ 45001 };
-static constexpr unsigned short UDP_MOCK_SEND_PORT{ HOST_UDP_READ_PORT + 1 };
+static constexpr unsigned short HOST_UDP_READ_PORT{ 40001 };
+static constexpr unsigned short UDP_MOCK_SEND_PORT{ HOST_UDP_READ_PORT + 100 };
 
 static const std::string UDP_MOCK_IP_ADDRESS{ "127.0.0.1" };
 
 using std::placeholders::_1;
 using std::placeholders::_2;
+using std::placeholders::_3;
 
 class CallbackHandler
 {
 public:
-  MOCK_METHOD2(handleNewData, void(const psen_scan_v2_standalone::data_conversion_layer::RawData&, const std::size_t&));
+  MOCK_METHOD3(handleNewData,
+               void(const psen_scan_v2_standalone::data_conversion_layer::RawDataConstPtr&,
+                    const std::size_t&,
+                    const int64_t&));
   MOCK_METHOD1(handleError, void(const std::string&));
 };
 
-TEST(UdpClientTests, testInvalidNewDataHandler)
+TEST(UdpClientTests, testInvalidNewMessageCallback)
 {
   CallbackHandler handler;
 
@@ -74,20 +78,20 @@ TEST(UdpClientTests, testInvalidNewDataHandler)
 #endif
 }
 
-TEST(UdpClientTests, testInvalidErrorHandler)
+TEST(UdpClientTests, testInvalidErrorCallback)
 {
   CallbackHandler handler;
 #if BOOST_VERSION > 107000
   EXPECT_THROW(psen_scan_v2_standalone::communication_layer::UdpClientImpl reader(
-                   std::bind(&CallbackHandler::handleNewData, &handler, _1, _2),
+                   std::bind(&CallbackHandler::handleNewData, &handler, _1, _2, _3),
                    nullptr,
-                   HOST_UDP_READ_PORT,
+                   HOST_UDP_READ_PORT + 1,
                    boost::asio::ip::make_address_v4(UDP_MOCK_IP_ADDRESS.c_str()).to_uint(),
-                   UDP_MOCK_SEND_PORT),
+                   UDP_MOCK_SEND_PORT + 1),
                std::invalid_argument);
 #elif BOOST_VERSION >= 106900
   EXPECT_THROW(psen_scan_v2_standalone::communication_layer::UdpClientImpl reader(
-                   std::bind(&CallbackHandler::handleNewData, &handler, _1, _2),
+                   std::bind(&CallbackHandler::handleNewData, &handler, _1, _2, _3),
                    nullptr,
                    HOST_UDP_READ_PORT,
                    boost::asio::ip::address_v4::make_address_v4(UDP_MOCK_IP_ADDRESS.c_str()).to_uint(),
@@ -95,7 +99,7 @@ TEST(UdpClientTests, testInvalidErrorHandler)
                std::invalid_argument);
 #else
   EXPECT_THROW(psen_scan_v2_standalone::communication_layer::UdpClientImpl reader(
-                   std::bind(&CallbackHandler::handleNewData, &handler, _1, _2),
+                   std::bind(&CallbackHandler::handleNewData, &handler, _1, _2, _3),
                    nullptr,
                    HOST_UDP_READ_PORT,
                    boost::asio::ip::address_v4::from_string(UDP_MOCK_IP_ADDRESS.c_str()).to_ulong(),

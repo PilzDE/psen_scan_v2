@@ -22,6 +22,9 @@
 #include <chrono>
 #include <stdexcept>
 #include <vector>
+#include <boost/optional.hpp>
+
+#define BOOST_MSM_CONSTRUCTOR_ARG_SIZE 12  // see https://www.boost.org/doc/libs/1_66_0/libs/msm/doc/HTML/ch03s05.html
 
 // back-end
 #include <boost/msm/back/state_machine.hpp>
@@ -79,14 +82,17 @@ namespace e = psen_scan_v2_standalone::protocol_layer::scanner_events;
 static constexpr std::chrono::milliseconds WATCHDOG_TIMEOUT{ 1000 };
 static constexpr uint32_t DEFAULT_NUM_MSG_PER_ROUND{ 6 };
 
-using ScannerStartedCB = std::function<void()>;
-using ScannerStoppedCB = std::function<void()>;
-using InformUserAboutLaserScanCB = std::function<void(const LaserScan&)>;
+using ScannerStartedCallback = std::function<void()>;
+using ScannerStoppedCallback = std::function<void()>;
+using StartErrorCallback = std::function<void(const std::string&)>;
+using StopErrorCallback = std::function<void(const std::string&)>;
+using TimeoutCallback = std::function<void()>;
+using InformUserAboutLaserScanCallback = std::function<void(const LaserScan&)>;
 
 /**
- * @brief Interface to create event timeout handlers.
+ * @brief Interface to create event timeout callbacks.
  *
- * Implementations of this Interface should create thread save timeout handlers that
+ * Implementations of this Interface should create thread save timeout callbacks that
  * call an event every time a defined timeout has run out and restart themselves until deleted.
  *
  * @see util::Watchdog
@@ -98,47 +104,24 @@ public:
 
 public:
   virtual std::unique_ptr<util::Watchdog> create(const util::Watchdog::Timeout& timeout,
-                                                 const std::string& event_type) = 0;
+                                                 const TimeoutCallback& timeout_callback) = 0;
 };
 
 /**
- * @brief Helper class used to easily transfer data from the higher level ScannerV2 class
- * to the ScannerProtocolDef class during construction of the scanner_protocol::ScannerStateMachine.
+ * @brief Watchdog factory implementation for scanner interaction timeouts
+ *
+ * Implements the IWatchdogFactory to add behavior to handle specific cases,
+ * where the interaction with the scanner hardware takes longer than expected.
+ *
+ * @see protocol_layer::IWatchdogFactory
+ * @see util::Watchdog
  */
-struct StateMachineArgs
+class WatchdogFactory : public IWatchdogFactory
 {
-  StateMachineArgs(const ScannerConfiguration& scanner_config,
-                   std::unique_ptr<communication_layer::UdpClientImpl> control_client,
-                   std::unique_ptr<communication_layer::UdpClientImpl> data_client,
-                   const ScannerStartedCB& started_cb,
-                   const ScannerStoppedCB& stopped_cb,
-                   const InformUserAboutLaserScanCB& laser_scan_cb,
-                   std::unique_ptr<IWatchdogFactory> watchdog_factory)
-    : config_(scanner_config)
-    , scanner_started_cb(started_cb)
-    , scanner_stopped_cb(stopped_cb)
-    , inform_user_about_laser_scan_cb(laser_scan_cb)
-    , watchdog_factory_(std::move(watchdog_factory))
-    , control_client_(std::move(control_client))
-    , data_client_(std::move(data_client))
-  {
-  }
-
-  ScannerConfiguration config_;
-
-  // Callbacks
-  const ScannerStartedCB scanner_started_cb{};
-  const ScannerStoppedCB scanner_stopped_cb{};
-  const InformUserAboutLaserScanCB inform_user_about_laser_scan_cb{};
-
-  // Factories
-  std::unique_ptr<IWatchdogFactory> watchdog_factory_{};
-
-  // UDP clients
-  // Note: The clients must be declared last, to ensure that they are desroyed first.
-  // If they are not declared last, segmentation default might occur!
-  std::unique_ptr<communication_layer::UdpClientImpl> control_client_{};
-  std::unique_ptr<communication_layer::UdpClientImpl> data_client_{};
+public:
+  WatchdogFactory() = default;
+  std::unique_ptr<util::Watchdog> create(const util::Watchdog::Timeout& timeout,
+                                         const TimeoutCallback& timeout_callback) override;
 };
 
 // front-end: define the FSM structure
@@ -162,7 +145,18 @@ struct StateMachineArgs
 class ScannerProtocolDef : public msm::front::state_machine_def<ScannerProtocolDef>
 {
 public:
-  ScannerProtocolDef(StateMachineArgs* const args);
+  ScannerProtocolDef(const ScannerConfiguration& config,
+                     const communication_layer::NewMessageCallback& control_msg_callback,
+                     const communication_layer::ErrorCallback& control_error_callback,
+                     const communication_layer::ErrorCallback& start_error_callback,
+                     const communication_layer::ErrorCallback& stop_error_callback,
+                     const communication_layer::NewMessageCallback& data_msg_callback,
+                     const communication_layer::ErrorCallback& data_error_callback,
+                     const ScannerStartedCallback& scanner_started_callback,
+                     const ScannerStoppedCallback& scanner_stopped_callback,
+                     const InformUserAboutLaserScanCallback& laser_scan_callback,
+                     const TimeoutCallback& start_timeout_callback,
+                     const TimeoutCallback& monitoring_frame_timeout_callback);
 
 public:  // States
   STATE(Idle);
@@ -170,6 +164,7 @@ public:  // States
   STATE(WaitForMonitoringFrame);
   STATE(WaitForStopReply);
   STATE(Stopped);
+  STATE(Error);
 
 public:  // Action methods
   template <class T>
@@ -179,20 +174,31 @@ public:  // Action methods
   void sendStopRequest(const T& event);
   void handleMonitoringFrame(const scanner_events::RawMonitoringFrameReceived& event);
   void handleMonitoringFrameTimeout(const scanner_events::MonitoringFrameTimeout& event);
+  void notifyUserAboutStart(scanner_events::RawReplyReceived const& reply_event);
+  void notifyUserAboutUnknownStartReply(scanner_events::RawReplyReceived const& reply_event);
+  void notifyUserAboutRefusedStartReply(scanner_events::RawReplyReceived const& reply_event);
+  void notifyUserAboutStop(scanner_events::RawReplyReceived const& reply_event);
+  void notifyUserAboutUnknownStopReply(scanner_events::RawReplyReceived const& reply_event);
+  void notifyUserAboutRefusedStopReply(scanner_events::RawReplyReceived const& reply_event);
 
 public:  // Guards
-  bool isStartReply(scanner_events::RawReplyReceived const& reply_event);
-  bool isStopReply(scanner_events::RawReplyReceived const& reply_event);
+  bool isAcceptedStopReply(scanner_events::RawReplyReceived const& reply_event);
+  bool isUnknownStopReply(scanner_events::RawReplyReceived const& reply_event);
+  bool isRefusedStopReply(scanner_events::RawReplyReceived const& reply_event);
+  bool isAcceptedStartReply(scanner_events::RawReplyReceived const& reply_event);
+  bool isUnknownStartReply(scanner_events::RawReplyReceived const& reply_event);
+  bool isRefusedStartReply(scanner_events::RawReplyReceived const& reply_event);
 
 public:  // Replaces the default exception/no-transition responses
   template <class FSM, class Event>
-  void exception_caught(Event const& event, FSM& fsm, std::exception& exception);
+  void exception_caught(Event const& event, FSM& fsm, std::exception& exception);  // NOLINT
 
   template <class FSM, class Event>
-  void no_transition(Event const& event, FSM&, int state);
+  void no_transition(Event const& event, FSM& /*unused*/, int state);  // NOLINT
 
   template <class FSM>
-  void no_transition(const scanner_events::RawMonitoringFrameReceived&, FSM&, int state);
+  void
+  no_transition(const scanner_events::RawMonitoringFrameReceived& /*unused*/, FSM& /*unused*/, int state);  // NOLINT
 
 public:  // Definition of state machine via table
   typedef Idle initial_state;
@@ -202,21 +208,25 @@ public:  // Definition of state machine via table
   /**
    * @brief Table describing the state machine which is specified in the scanner protocol.
    */
-  struct transition_table : mpl::vector<
+  struct transition_table : mpl::vector<  // NOLINT
       //    Start                         Event                         Next                        Action                        Guard
-      //  +------------------------------+----------------------------+---------------------------+------------------------------+-----------------------------+
-      a_row  < Idle,                      e::StartRequest,              WaitForStartReply,          &m::sendStartRequest                                      >,
-      a_row  < Idle,                      e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                       >,
-      g_row  < WaitForStartReply,         e::RawReplyReceived,          WaitForMonitoringFrame,                                   &m::isStartReply            >,
-      a_irow < WaitForStartReply,         e::StartTimeout,                                          &m::handleStartRequestTimeout                             >,
-      a_irow < WaitForMonitoringFrame,    e::RawMonitoringFrameReceived,                            &m::handleMonitoringFrame                                 >,
-      a_irow < WaitForMonitoringFrame,    e::MonitoringFrameTimeout,                                &m::handleMonitoringFrameTimeout                          >,
-      a_row  < WaitForStartReply,         e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                       >,
-      a_row  < WaitForMonitoringFrame,    e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                       >,
-      _irow  < WaitForStopReply,          e::RawMonitoringFrameReceived                                                                                       >,
-      g_row  < WaitForStopReply,          e::RawReplyReceived,          Stopped,                                                  &m::isStopReply             >,
-      _irow  < Stopped,                   e::RawMonitoringFrameReceived                                                                                       >
-      //  +------------------------------+----------------------------+--------------------------+--------------------------------+-----------------------------+
+      //  +------------------------------+----------------------------+---------------------------+--------------------------------------+-------------------------+
+      a_row  < Idle,                      e::StartRequest,              WaitForStartReply,          &m::sendStartRequest                                           >,
+      a_row  < Idle,                      e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                            >,
+      row    < WaitForStartReply,         e::RawReplyReceived,          WaitForMonitoringFrame,     &m::notifyUserAboutStart,             &m::isAcceptedStartReply >,
+      row    < WaitForStartReply,         e::RawReplyReceived,          Error,                      &m::notifyUserAboutRefusedStartReply, &m::isRefusedStartReply  >,
+      row    < WaitForStartReply,         e::RawReplyReceived,          Error,                      &m::notifyUserAboutUnknownStartReply, &m::isUnknownStartReply  >,
+      a_irow < WaitForStartReply,         e::StartTimeout,                                          &m::handleStartRequestTimeout                                  >,
+      a_irow < WaitForMonitoringFrame,    e::RawMonitoringFrameReceived,                            &m::handleMonitoringFrame                                      >,
+      a_irow < WaitForMonitoringFrame,    e::MonitoringFrameTimeout,                                &m::handleMonitoringFrameTimeout                               >,
+      a_row  < WaitForStartReply,         e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                            >,
+      a_row  < WaitForMonitoringFrame,    e::StopRequest,               WaitForStopReply,           &m::sendStopRequest                                            >,
+      _irow  < WaitForStopReply,          e::RawMonitoringFrameReceived                                                                                            >,
+      row    < WaitForStopReply,          e::RawReplyReceived,          Stopped,                    &m::notifyUserAboutStop,              &m::isAcceptedStopReply  >,
+      row    < WaitForStopReply,          e::RawReplyReceived,          Error,                      &m::notifyUserAboutRefusedStopReply,  &m::isRefusedStopReply   >,
+      row    < WaitForStopReply,          e::RawReplyReceived,          Error,                      &m::notifyUserAboutUnknownStopReply,  &m::isUnknownStopReply   >,
+      _irow  < Stopped,                   e::RawMonitoringFrameReceived                                                                                            >
+      //  +------------------------------+----------------------------+--------------------------+---------------------------------------+-------------------------+
       > {};
   // clang-format on
 
@@ -233,20 +243,64 @@ private:
     InternalScannerReplyError(const std::string& error_msg);
   };
   // LCOV_EXCL_STOP
-  void checkForInternalErrors(const data_conversion_layer::scanner_reply::Message& msg);
+  bool isStartReply(data_conversion_layer::scanner_reply::Message const& msg);
+  bool isStopReply(data_conversion_layer::scanner_reply::Message const& msg);
+  bool isAcceptedReply(data_conversion_layer::scanner_reply::Message const& msg);
+  bool isUnknownReply(data_conversion_layer::scanner_reply::Message const& msg);
+  bool isRefusedReply(data_conversion_layer::scanner_reply::Message const& msg);
 
-  void checkForDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& frame);
-  void informUserAboutTheScanData(const data_conversion_layer::monitoring_frame::Message& frame);
-  void sendMessageWithMeasurements(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames);
-  bool framesContainMeasurements(const std::vector<data_conversion_layer::monitoring_frame::Message>& frames);
+  void checkForInternalErrors(const data_conversion_layer::scanner_reply::Message& msg);
+  void checkForDiagnosticErrors(const data_conversion_layer::monitoring_frame::Message& msg);
+  /**
+   * @throws data_conversion_layer::monitoring_frame::AdditionalFieldMissing if scan_counter or active_zoneset is not
+   * set.
+   */
+  void checkForChangedActiveZoneset(const data_conversion_layer::monitoring_frame::Message& msg);
+
+  /**
+   * @throws data_conversion_layer::monitoring_frame::AdditionalFieldMissing if scan_counter, active_zoneset or
+   * measurements is not set.
+   */
+  void informUserAboutTheScanData(const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg);
+  /**
+   * @throws data_conversion_layer::monitoring_frame::AdditionalFieldMissing if scan_counter, active_zoneset or
+   * measurements is not set in one of the msgs.
+   */
+  void
+  sendMessageWithMeasurements(const std::vector<data_conversion_layer::monitoring_frame::MessageStamped>& stamped_msg);
+  /**
+   * @throws data_conversion_layer::monitoring_frame::AdditionalFieldMissing if measurements is not set in one of the
+   * msgs.
+   */
+  bool
+  framesContainMeasurements(const std::vector<data_conversion_layer::monitoring_frame::MessageStamped>& stamped_msg);
 
 private:
-  const std::unique_ptr<StateMachineArgs> args_;
+  ScannerConfiguration config_;
 
   std::unique_ptr<util::Watchdog> start_reply_watchdog_{};
 
   std::unique_ptr<util::Watchdog> monitoring_frame_watchdog_{};
   ScanBuffer scan_buffer_{ DEFAULT_NUM_MSG_PER_ROUND };
+  boost::optional<data_conversion_layer::monitoring_frame::Message> zoneset_reference_msg_;
+
+  // Udp Clients
+  communication_layer::UdpClientImpl control_client_;
+  communication_layer::UdpClientImpl data_client_;
+
+  // Callbacks
+  const ScannerStartedCallback scanner_started_callback_;
+  const ScannerStoppedCallback scanner_stopped_callback_;
+  const StartErrorCallback start_error_callback_;
+  const StopErrorCallback stop_error_callback_;
+  const InformUserAboutLaserScanCallback inform_user_about_laser_scan_callback_;
+
+  // Timeout Handler
+  const std::function<void()> start_timeout_callback_;
+  const std::function<void()> monitoring_frame_timeout_callback_;
+
+  // Factories
+  WatchdogFactory watchdog_factory_{};
 };
 
 // Pick a back-end

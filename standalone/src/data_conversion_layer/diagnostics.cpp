@@ -16,10 +16,9 @@
 #include <ostream>
 
 #include <fmt/format.h>
+#include <fmt/ostream.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
-
-using namespace psen_scan_v2_standalone;
 
 namespace psen_scan_v2_standalone
 {
@@ -29,17 +28,15 @@ namespace monitoring_frame
 {
 namespace diagnostic
 {
-std::ostream&
-operator<<(std::ostream& os,
-           const psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::diagnostic::Message& msg)
+std::ostream& operator<<(std::ostream& os, const Message& msg)
 {
   os << fmt::format("Device: {} - {}",
-                    configuration::scanner_id_to_string.at(msg.getScannerId()),
-                    error_code_to_string.at(msg.getDiagnosticCode()));
+                    configuration::SCANNER_ID_TO_STRING.at(msg.scannerId()),
+                    ERROR_CODE_TO_STRING.at(msg.diagnosticCode()));
 
-  if (isAmbiguous(msg.getDiagnosticCode()))
+  if (isAmbiguous(msg.diagnosticCode()))
   {
-    os << fmt::format(" (Byte:{} Bit:{})", msg.getErrorLocation().getByte(), msg.getErrorLocation().getBit());
+    os << fmt::format(" (Byte:{} Bit:{})", msg.errorLocation().byte(), msg.errorLocation().bit());
   }
 
   return os;

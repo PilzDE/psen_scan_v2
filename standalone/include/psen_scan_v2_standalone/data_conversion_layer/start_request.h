@@ -44,12 +44,12 @@ class Message
 public:
   Message(const ScannerConfiguration& scanner_configuration);
 
-  friend data_conversion_layer::RawData serialize(const data_conversion_layer::start_request::Message&,
-                                                  const uint32_t&);
+  friend data_conversion_layer::RawData serialize(const data_conversion_layer::start_request::Message& msg,
+                                                  const uint32_t& seq_number);
 
 private:
   /**
-   * @brief Class describing the scan settings of the master and slave devices.
+   * @brief Class describing the scan settings of the master and subscriber devices.
    *
    * The settings include the scan range and the scan resolution of the respective device.
    */
@@ -60,8 +60,8 @@ private:
     constexpr LaserScanSettings(const ScanRange& scan_range, const util::TenthOfDegree& resolution);
 
   public:
-    constexpr const ScanRange& getScanRange() const;
-    constexpr util::TenthOfDegree getResolution() const;
+    constexpr const ScanRange& scanRange() const;
+    constexpr util::TenthOfDegree resolution() const;
 
   private:
     const ScanRange scan_range_{ ScanRange::createInvalidScanRange() };
@@ -69,7 +69,7 @@ private:
   };
 
   /**
-   * @brief Class describing the fundamental settings of the master and slave devices, like id and diagnostics.
+   * @brief Class describing the fundamental settings of the master and subscriber devices, like id and diagnostics.
    */
   class DeviceSettings
   {
@@ -86,7 +86,7 @@ private:
   };
 
 private:
-  static constexpr std::size_t NUM_SLAVES{ 3 };
+  static constexpr std::size_t NUM_SUBSCRIBERS{ 3 };
 
 private:
   const uint32_t host_ip_;  ///< network byte order = big endian
@@ -94,7 +94,8 @@ private:
 
   const DeviceSettings master_device_settings_;
   const LaserScanSettings master_;
-  const std::array<LaserScanSettings, NUM_SLAVES> slaves_;
+  const std::array<LaserScanSettings, NUM_SUBSCRIBERS> subscribers_;  // Note: This refers to the scanner type
+                                                                      // subscriber, *not* a ros subscriber
 };
 
 constexpr Message::LaserScanSettings::LaserScanSettings(const ScanRange& scan_range,
@@ -103,12 +104,12 @@ constexpr Message::LaserScanSettings::LaserScanSettings(const ScanRange& scan_ra
 {
 }
 
-constexpr const ScanRange& Message::LaserScanSettings::getScanRange() const
+constexpr const ScanRange& Message::LaserScanSettings::scanRange() const
 {
   return scan_range_;
 };
 
-constexpr util::TenthOfDegree Message::LaserScanSettings::getResolution() const
+constexpr util::TenthOfDegree Message::LaserScanSettings::resolution() const
 {
   return resolution_;
 };

@@ -54,16 +54,23 @@ public:
   virtual std::future<void> stop() = 0;
 
 protected:
-  const ScannerConfiguration& getConfig() const;
-  const LaserScanCallback& getLaserScanCB() const;
+  /*! deprecated: use const ScannerConfiguration& config() const instead */
+  [[deprecated("use const ScannerConfiguration& config() const instead")]] const ScannerConfiguration&
+  getConfig() const;
+  const ScannerConfiguration& config() const;
+
+  /*! deprecated: use const LaserScanCallback& laserScanCallback() const instead */
+  [[deprecated("use const LaserScanCallback& laserScanCallback() const instead")]] const LaserScanCallback&
+  getLaserScanCallback() const;
+  const LaserScanCallback& laserScanCallback() const;
 
 private:
   const ScannerConfiguration config_;
-  const LaserScanCallback laser_scan_cb_;
+  const LaserScanCallback laser_scan_callback_;
 };
 
 inline IScanner::IScanner(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback)
-  : config_(scanner_config), laser_scan_cb_(laser_scan_callback)
+  : config_(scanner_config), laser_scan_callback_(laser_scan_callback)
 {
   if (!laser_scan_callback)
   {
@@ -71,14 +78,24 @@ inline IScanner::IScanner(const ScannerConfiguration& scanner_config, const Lase
   }
 }
 
-inline const ScannerConfiguration& IScanner::getConfig() const
+inline const ScannerConfiguration& IScanner::config() const
 {
   return config_;
 }
 
-inline const IScanner::LaserScanCallback& IScanner::getLaserScanCB() const
+inline const IScanner::LaserScanCallback& IScanner::laserScanCallback() const
 {
-  return laser_scan_cb_;
+  return laser_scan_callback_;
+}
+
+inline const ScannerConfiguration& IScanner::getConfig() const
+{
+  return this->config();
+}
+
+inline const IScanner::LaserScanCallback& IScanner::getLaserScanCallback() const
+{
+  return this->laserScanCallback();
 }
 
 }  // namespace psen_scan_v2_standalone

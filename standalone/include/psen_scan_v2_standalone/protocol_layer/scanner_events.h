@@ -48,14 +48,17 @@ class StartTimeout
 class RawReplyReceived
 {
 public:
-  RawReplyReceived(const data_conversion_layer::RawData& data, const std::size_t& num_bytes)
-    : data_(data), num_bytes_(num_bytes)
+  RawReplyReceived(const data_conversion_layer::RawDataConstPtr& data,
+                   const std::size_t& num_bytes,
+                   const int64_t& timestamp)
+    : data_(data), num_bytes_(num_bytes), timestamp_(timestamp)
   {
   }
 
 public:
-  const data_conversion_layer::RawData data_;
+  const data_conversion_layer::RawDataConstPtr data_;
   const std::size_t num_bytes_;
+  const int64_t timestamp_;
 };
 
 //! @brief Triggered whenever the receiving of a reply message failes.
@@ -67,14 +70,17 @@ class ReplyReceiveError
 class RawMonitoringFrameReceived
 {
 public:
-  RawMonitoringFrameReceived(const data_conversion_layer::RawData& data, const std::size_t& num_bytes)
-    : data_(data), num_bytes_(num_bytes)
+  RawMonitoringFrameReceived(const data_conversion_layer::RawDataConstPtr& data,
+                             const std::size_t& num_bytes,
+                             const int64_t& timestamp)
+    : data_(data), num_bytes_(num_bytes), timestamp_(timestamp)
   {
   }
 
 public:
-  const data_conversion_layer::RawData data_;
+  const data_conversion_layer::RawDataConstPtr data_;
   const std::size_t num_bytes_;
+  const int64_t timestamp_;
 };
 
 //! @brief Timeout while waiting for MonitoringFrame.

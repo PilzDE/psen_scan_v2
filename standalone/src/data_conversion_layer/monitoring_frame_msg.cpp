@@ -13,46 +13,30 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <algorithm>
 #include <cstdint>
-#include <iomanip>
-#include <iterator>
-#include <sstream>
 #include <string>
 #include <vector>
 
-#include <fmt/format.h>
-#include <fmt/ostream.h>
-
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
-#include "psen_scan_v2_standalone/util/logging.h"
-#include "psen_scan_v2_standalone/util/format_range.h"
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
 {
 namespace data_conversion_layer
 {
-
-configuration::ScannerId data_conversion_layer::monitoring_frame::Message::scannerId() const
-{
-  return scanner_id_;
-}
-
 util::TenthOfDegree data_conversion_layer::monitoring_frame::Message::fromTheta() const
 {
   return from_theta_;
 }
 
-util::TenthOfDegree data_conversion_layer::monitoring_frame::Message::resolution() const
+util::TenthOfDegree Message::resolution() const
 {
   return resolution_;
 }
 
-uint32_t data_conversion_layer::monitoring_frame::Message::scanCounter() const
+uint32_t Message::scanCounter() const
 {
   if (scan_counter_.is_initialized())
   {
@@ -60,13 +44,56 @@ uint32_t data_conversion_layer::monitoring_frame::Message::scanCounter() const
   }
   else
   {
-    throw data_conversion_layer::monitoring_frame::ScanCounterMissing();
+    throw AdditionalFieldMissing("Scan counter");
   }
 }
 
-const std::vector<double>& data_conversion_layer::monitoring_frame::Message::measurements() const
+uint8_t Message::activeZoneset() const
 {
-  return measurements_;
+  if (active_zoneset_.is_initialized())
+  {
+    return active_zoneset_.get();
+  }
+  else
+  {
+    throw AdditionalFieldMissing("Active zoneset");
+  }
+}
+
+const io::PinData& Message::iOPinData() const
+{
+  if (io_pin_data_.is_initialized())
+  {
+    return io_pin_data_.get();
+  }
+  else
+  {
+    throw AdditionalFieldMissing("IO pin data");
+  }
+}
+
+const std::vector<double>& Message::measurements() const
+{
+  if (measurements_.is_initialized())
+  {
+    return measurements_.get();
+  }
+  else
+  {
+    throw AdditionalFieldMissing("Measurements");
+  }
+}
+
+const std::vector<double>& Message::intensities() const
+{
+  if (intensities_.is_initialized())
+  {
+    return intensities_.get();
+  }
+  else
+  {
+    throw AdditionalFieldMissing("Intensities");
+  }
 }
 
 const std::vector<double>& data_conversion_layer::monitoring_frame::Message::intensities() const
@@ -74,34 +101,24 @@ const std::vector<double>& data_conversion_layer::monitoring_frame::Message::int
   return intensities_;
 }
 
-std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message>
-data_conversion_layer::monitoring_frame::Message::diagnosticMessages() const
+bool Message::hasIOPinField() const
 {
-  return diagnostic_messages_;
+  return io_pin_data_.is_initialized();
 }
 
-bool data_conversion_layer::monitoring_frame::Message::operator==(
-    const data_conversion_layer::monitoring_frame::Message& rhs) const
+bool Message::hasMeasurementsField() const
 {
-  return (fromTheta() == rhs.fromTheta() && resolution() == rhs.resolution() && scanCounter() == rhs.scanCounter() &&
-          measurements() == rhs.measurements() && intensities() == rhs.intensities() &&
-          diagnosticMessages() == rhs.diagnosticMessages());
+  return measurements_.is_initialized();
 }
 
-namespace monitoring_frame
+bool Message::hasIntensitiesField() const
 {
-std::ostream& operator<<(std::ostream& os,
-                         const psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message& msg)
+  return intensities_.is_initialized();
+}
+
+bool Message::hasDiagnosticMessagesField() const
 {
-  os << fmt::format("monitoring_frame::Message(fromTheta = {} deg, resolution = {} deg, scanCounter = "
-                    "{}, measurements = {}, intensities = {}, diagnostics = {})",
-                    msg.fromTheta().value() / 10.,
-                    msg.resolution().value() / 10.,
-                    msg.scanCounter(),
-                    util::formatRange(msg.measurements()),
-                    util::formatRange(msg.intensities()),
-                    util::formatRange(msg.diagnosticMessages()));
-  return os;
+  return diagnostic_messages_.is_initialized();
 }
 }  // namespace monitoring_frame
 }  // namespace data_conversion_layer

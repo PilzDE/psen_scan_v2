@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -13,14 +13,23 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <bitset>
-#include <iostream>
+#include <array>
 #include <functional>
+#include <istream>
+#include <sstream>
+#include <vector>
 
 #include <fmt/format.h>
 
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
+#include "psen_scan_v2_standalone/io_state.h"
+#include "psen_scan_v2_standalone/util/logging.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -69,66 +78,92 @@ static constexpr double toIntensities(const uint16_t& value)
 
 monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data, const std::size_t& num_bytes)
 {
-  data_conversion_layer::monitoring_frame::Message msg;
+  data_conversion_layer::monitoring_frame::MessageBuilder msg_builder;
 
-  std::istringstream is(std::string(data.cbegin(), data.cend()));
+  std::stringstream ss;
+  ss.write(data.data(), num_bytes);
 
-  FixedFields frame_header = readFixedFields(is);
+  FixedFields frame_header = readFixedFields(ss);
 
-  msg.scanner_id_ = frame_header.scanner_id();
-  msg.from_theta_ = frame_header.from_theta();
-  msg.resolution_ = frame_header.resolution();
+  msg_builder.scannerId(frame_header.scannerId());
+  msg_builder.fromTheta(frame_header.fromTheta());
+  msg_builder.resolution(frame_header.resolution());
 
   bool end_of_frame{ false };
   while (!end_of_frame)
   {
-    const AdditionalFieldHeader additional_header{ readAdditionalField(is, num_bytes) };
-
+    const AdditionalFieldHeader additional_header{ readAdditionalField(ss, num_bytes) };
     switch (static_cast<AdditionalFieldHeaderID>(additional_header.id()))
     {
       case AdditionalFieldHeaderID::scan_counter:
         if (additional_header.length() != NUMBER_OF_BYTES_SCAN_COUNTER)
         {
-          throw ScanCounterUnexpectedSize(fmt::format("Length of scan counter field is {}, but should be {}.",
-                                                      additional_header.length(),
-                                                      NUMBER_OF_BYTES_SCAN_COUNTER));
+          throw AdditionalFieldUnexpectedSize(fmt::format("Length of scan counter field is {}, but should be {}.",
+                                                          additional_header.length(),
+                                                          NUMBER_OF_BYTES_SCAN_COUNTER));
         }
         uint32_t scan_counter_read_buffer;
-        raw_processing::read<uint32_t>(is, scan_counter_read_buffer);
-        msg.scan_counter_ = scan_counter_read_buffer;
+        raw_processing::read<uint32_t>(ss, scan_counter_read_buffer);
+        msg_builder.scanCounter(scan_counter_read_buffer);
         break;
 
       case AdditionalFieldHeaderID::measurements: {
         const size_t num_measurements{ static_cast<size_t>(additional_header.length()) /
                                        NUMBER_OF_BYTES_SINGLE_MEASUREMENT };
-        raw_processing::readArray<uint16_t, double>(is, msg.measurements_, num_measurements, std::bind(toMeter, _1));
+        std::vector<double> measurements;
+        raw_processing::readArray<uint16_t, double>(ss, measurements, num_measurements, toMeter);
+        msg_builder.measurements(measurements);
         break;
       }
       case AdditionalFieldHeaderID::end_of_frame:
         end_of_frame = true;
         break;
 
+      case AdditionalFieldHeaderID::zone_set:
+        if (additional_header.length() != NUMBER_OF_BYTES_ZONE_SET)
+        {
+          throw AdditionalFieldUnexpectedSize(fmt::format("Length of zone set field is {}, but should be {}.",
+                                                          additional_header.length(),
+                                                          NUMBER_OF_BYTES_ZONE_SET));
+        }
+        uint8_t zone_set_read_buffer;
+        raw_processing::read<uint8_t>(ss, zone_set_read_buffer);
+        msg_builder.activeZoneset(zone_set_read_buffer);
+        break;
+
+      case AdditionalFieldHeaderID::io_pin_data:
+        if (additional_header.length() != io::RAW_CHUNK_LENGTH_IN_BYTES)
+        {
+          throw AdditionalFieldUnexpectedSize(fmt::format("Length of io state field is {}, but should be {}.",
+                                                          additional_header.length(),
+                                                          io::RAW_CHUNK_LENGTH_IN_BYTES));
+        }
+        msg_builder.iOPinData(io::deserializePins(ss));
+        break;
+
       case AdditionalFieldHeaderID::diagnostics:
-        msg.diagnostic_messages_ = diagnostic::deserializeMessages(is);
-        msg.diagnostic_data_enabled_ = true;
+        msg_builder.diagnosticMessages(diagnostic::deserializeMessages(ss));
         break;
 
       case AdditionalFieldHeaderID::intensities: {
         const size_t num_measurements{ static_cast<size_t>(additional_header.length()) /
                                        NUMBER_OF_BYTES_SINGLE_MEASUREMENT };
-        raw_processing::readArray<uint16_t, double>(
-            is, msg.intensities_, num_measurements, std::bind(toIntensities, _1));
+        std::vector<double> intensities;
+        raw_processing::readArray<uint16_t, double>(ss, intensities, num_measurements, std::bind(toIntensities, _1));
+        msg_builder.intensities(intensities);
         break;
       }
       default:
-        throw DecodingFailure(fmt::format(
-            "Header Id {:#04x} unknown. Cannot read additional field of monitoring frame.", additional_header.id()));
+        throw DecodingFailure(
+            fmt::format("Header Id {:#04x} unknown. Cannot read additional field of monitoring frame on position {}.",
+                        additional_header.id(),
+                        ss.tellp()));
     }
   }
-  return msg;
+  return msg_builder.build();
 }
 
-AdditionalFieldHeader readAdditionalField(std::istringstream& is, const std::size_t& max_num_bytes)
+AdditionalFieldHeader readAdditionalField(std::istream& is, const std::size_t& max_num_bytes)
 {
   auto const id = raw_processing::read<AdditionalFieldHeader::Id>(is);
   auto length = raw_processing::read<AdditionalFieldHeader::Length>(is);
@@ -145,9 +180,28 @@ AdditionalFieldHeader readAdditionalField(std::istringstream& is, const std::siz
   return AdditionalFieldHeader(id, length);
 }
 
+namespace io
+{
+PinData deserializePins(std::istream& is)
+{
+  PinData io_pin_data;
+
+  raw_processing::read<
+      std::array<uint8_t, 3 * (RAW_CHUNK_LENGTH_RESERVED_IN_BYTES + RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES)>>(is);
+
+  raw_processing::read<std::array<uint8_t, RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
+  deserializePinField(is, io_pin_data.input_state);
+
+  raw_processing::read<std::array<uint8_t, RAW_CHUNK_LENGTH_RESERVED_IN_BYTES>>(is);
+  deserializePinField(is, io_pin_data.output_state);
+
+  return io_pin_data;
+}
+}  // namespace io
+
 namespace diagnostic
 {
-std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is)
+std::vector<diagnostic::Message> deserializeMessages(std::istream& is)
 {
   std::vector<diagnostic::Message> diagnostic_messages;
 
@@ -163,7 +217,7 @@ std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is)
 
       for (size_t bit_n = 0; bit_n < raw_bits.size(); ++bit_n)
       {
-        if (raw_bits.test(bit_n) && (diagnostic::ErrorType::unused != diagnostic::error_bits[byte_n][bit_n]))
+        if (raw_bits.test(bit_n) && (diagnostic::ErrorType::unused != diagnostic::ERROR_BITS[byte_n][bit_n]))
         {
           diagnostic_messages.push_back(diagnostic::Message(static_cast<configuration::ScannerId>(scanner_id),
                                                             diagnostic::ErrorLocation(byte_n, bit_n)));
@@ -175,7 +229,7 @@ std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is)
 }
 }  // namespace diagnostic
 
-FixedFields readFixedFields(std::istringstream& is)
+FixedFields readFixedFields(std::istream& is)
 {
   const auto device_status = raw_processing::read<FixedFields::DeviceStatus>(is);
   const auto op_code = raw_processing::read<FixedFields::OpCode>(is);

@@ -16,6 +16,8 @@
 #include <functional>
 #include <iostream>
 #include <string>
+#include <thread>
+#include <chrono>
 
 #include <boost/asio.hpp>
 
@@ -27,6 +29,8 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/scanner_reply_serialization_deserialization.h"
+
+using namespace std::chrono_literals;
 
 namespace psen_scan_v2_standalone_test
 {
@@ -81,11 +85,7 @@ ScannerMock::ScannerMock(const std::string& host_ip, const PortHolder& port_hold
   , control_server_(port_holder.control_port_scanner, std::bind(&ScannerMock::receiveControlMsg, this, _1, _2))
   , data_server_(port_holder.data_port_scanner, std::bind(&ScannerMock::receiveDataMsg, this, _1, _2))
 {
-}
-
-void ScannerMock::startListeningForControlMsg()
-{
-  control_server_.asyncReceive();
+  startContinuousListeningForControlMsg();
 }
 
 void ScannerMock::startContinuousListeningForControlMsg()
@@ -93,26 +93,25 @@ void ScannerMock::startContinuousListeningForControlMsg()
   control_server_.asyncReceive(MockUDPServer::ReceiveMode::continuous);
 }
 
-void ScannerMock::sendReply(const data_conversion_layer::scanner_reply::Message::Type& reply_type)
+void ScannerMock::sendReply(const ReplyMsg::Type& reply_type, const ReplyMsg::OperationResult& result)
 {
-  const data_conversion_layer::scanner_reply::Message msg(
-      reply_type, data_conversion_layer::scanner_reply::Message::OperationResult::accepted);
+  const ReplyMsg msg(reply_type, result);
   control_server_.asyncSend(control_msg_receiver_, data_conversion_layer::scanner_reply::serialize(msg));
 }
 
-void ScannerMock::sendStartReply()
+void ScannerMock::sendStartReply(const ReplyMsg::OperationResult& result)
 {
   std::cout << "ScannerMock: Send start reply..." << std::endl;
-  sendReply(data_conversion_layer::scanner_reply::Message::Type::start);
+  sendReply(ReplyMsg::Type::start, result);
 }
 
-void ScannerMock::sendStopReply()
+void ScannerMock::sendStopReply(const ReplyMsg::OperationResult& result)
 {
   std::cout << "ScannerMock: Send stop reply..." << std::endl;
-  sendReply(data_conversion_layer::scanner_reply::Message::Type::stop);
+  sendReply(ReplyMsg::Type::stop, result);
 }
 
-void ScannerMock::sendMonitoringFrame(const data_conversion_layer::monitoring_frame::Message& msg)
+void ScannerMock::sendMonitoringFrame(const MonitoringFrameMsg& msg)
 {
   std::cout << "ScannerMock: Send monitoring frame..." << std::endl;
   data_server_.asyncSend(monitoring_frame_receiver_, data_conversion_layer::monitoring_frame::serialize(msg));
@@ -123,6 +122,16 @@ void ScannerMock::sendEmptyMonitoringFrame()
   psen_scan_v2_standalone::data_conversion_layer::RawData data;
   assert(data.empty());
   data_server_.asyncSend(monitoring_frame_receiver_, data);
+}
+
+void ScannerMock::sendMonitoringFrames(const std::vector<MonitoringFrameMsg>& msgs)
+{
+  for (const auto& msg : msgs)
+  {
+    sendMonitoringFrame(msg);
+    // Sleep to ensure that message are not sent too fast which might cause messages overwrite in socket buffer
+    std::this_thread::sleep_for(10ms);
+  }
 }
 
 }  // namespace psen_scan_v2_standalone_test

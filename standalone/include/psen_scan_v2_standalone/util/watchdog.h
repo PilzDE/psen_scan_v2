@@ -31,9 +31,9 @@ namespace psen_scan_v2_standalone
 namespace util
 {
 /**
- * @brief Watchdog which continuously calls the specified timeout handler
+ * @brief Watchdog which continuously calls the specified timeout callback
  *
- * After the specified timeout time has passed the timeout_handler is called and the timer restarts.
+ * After the specified timeout time has passed the timeout_callback is called and the timer restarts.
  * This continues as long as the watchdog exists.
  */
 class Watchdog
@@ -42,7 +42,7 @@ public:
   using Timeout = const std::chrono::high_resolution_clock::duration;
 
 public:
-  Watchdog(const Timeout& timeout, const std::function<void()>& timeout_handler);
+  Watchdog(const Timeout& timeout, const std::function<void()>& timeout_callback);
   ~Watchdog();
 
 public:
@@ -58,7 +58,7 @@ private:
    * was not notified. For more info see:
    * https://en.cppreference.com/w/cpp/thread/condition_variable/wait_for
    */
-  std::cv_status wait_for(const Timeout& timeout);
+  std::cv_status waitFor(const Timeout& timeout);
 
 private:
   util::Barrier thread_startetd_barrier_;
@@ -68,14 +68,14 @@ private:
   std::thread timer_thread_;
 };
 
-inline Watchdog::Watchdog(const Timeout& timeout, const std::function<void()>& timeout_handler)
-  : timer_thread_([this, timeout, timeout_handler]() {
+inline Watchdog::Watchdog(const Timeout& timeout, const std::function<void()>& timeout_callback)
+  : timer_thread_([this, timeout, timeout_callback]() {
     thread_startetd_barrier_.release();
     while (!terminated_)
     {
-      if ((this->wait_for(timeout) == std::cv_status::timeout) && !terminated_)
+      if ((this->waitFor(timeout) == std::cv_status::timeout) && !terminated_)
       {
-        timeout_handler();
+        timeout_callback();
       }
     }
   })
@@ -92,7 +92,7 @@ inline Watchdog::Watchdog(const Timeout& timeout, const std::function<void()>& t
   }
 }
 
-inline std::cv_status Watchdog::wait_for(const Timeout& timeout)
+inline std::cv_status Watchdog::waitFor(const Timeout& timeout)
 {
   std::unique_lock<std::mutex> lk(cv_m_);
   return cv_.wait_for(lk, timeout);

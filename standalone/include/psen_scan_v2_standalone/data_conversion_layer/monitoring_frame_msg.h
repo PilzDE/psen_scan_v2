@@ -17,20 +17,16 @@
 #define PSEN_SCAN_V2_STANDALONE_MONITORING_FRAME_MSG_H
 
 #include <cstdint>
-#include <functional>
-#include <map>
-#include <iostream>
-#include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <array>
-#include <bitset>
+
 #include <boost/optional.hpp>
 
-#include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
-#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -48,13 +44,12 @@ namespace monitoring_frame
 static constexpr uint8_t MAX_SCANNER_ID{ configuration::VALID_SCANNER_IDS.size() - 1 };
 
 /**
- * @brief Exception thrown if scan_counter was missing during deserialization of a
- * data_conversion_layer::monitoring_frame::Message.
+ * @brief Exception thrown if an additional field was missing during deserialization of a Message.
  */
-class ScanCounterMissing : public std::runtime_error
+class AdditionalFieldMissing : public std::runtime_error
 {
 public:
-  ScanCounterMissing(const std::string& msg = "Scan counter not set! (Contact PILZ support if the error persists.)");
+  AdditionalFieldMissing(const std::string& field_name);
 };
 
 /**
@@ -67,69 +62,61 @@ public:
 class Message
 {
 public:
-  Message() = default;
-  Message(const util::TenthOfDegree& from_theta,
-          const util::TenthOfDegree& resolution,
-          const uint32_t scan_counter,
-          const std::vector<double>& measurements)
-    : from_theta_(from_theta)
-    , resolution_(resolution)
-    , scan_counter_(scan_counter)
-    , measurements_(measurements)
-    , diagnostic_data_enabled_(false){
-
-    };
-
-  Message(const util::TenthOfDegree& from_theta,
-          const util::TenthOfDegree& resolution,
-          const uint32_t scan_counter,
-          const std::vector<double>& measurements,
-          const std::vector<double>& intensities,
-          const std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message>& diagnostic_messages)
-    : from_theta_(from_theta)
-    , resolution_(resolution)
-    , scan_counter_(scan_counter)
-    , measurements_(measurements)
-    , intensities_(intensities)
-    , diagnostic_messages_(diagnostic_messages)
-    , diagnostic_data_enabled_(true){
-
-    };
-
-public:
   configuration::ScannerId scannerId() const;
   util::TenthOfDegree fromTheta() const;
   util::TenthOfDegree resolution() const;
+  //! @throw AdditionalFieldMissing if scan_counter was missing during deserialization of a Message.
   uint32_t scanCounter() const;
+  //! @throw AdditionalFieldMissing if active_zoneset was missing during deserialization of a Message.
+  uint8_t activeZoneset() const;
+  //! @throw AdditionalFieldMissing if io_pin_data was missing during deserialization of a Message.
+  const io::PinData& iOPinData() const;
+  //! @throw AdditionalFieldMissing if measurements were missing during deserialization of a Message.
   const std::vector<double>& measurements() const;
+  //! @throw AdditionalFieldMissing if intensities were missing during deserialization of a Message.
   const std::vector<double>& intensities() const;
-  std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnosticMessages() const;
-  bool operator==(const data_conversion_layer::monitoring_frame::Message& rhs) const;
+  //! @throw AdditionalFieldMissing if diagnostic_messages were missing during deserialization of a Message.
+  std::vector<diagnostic::Message> diagnosticMessages() const;
+
+  bool hasScanCounterField() const;
+  bool hasActiveZonesetField() const;
+  bool hasIOPinField() const;
+  bool hasMeasurementsField() const;
+  bool hasIntensitiesField() const;
+  bool hasDiagnosticMessagesField() const;
 
 private:
+  // fixed fields
   configuration::ScannerId scanner_id_{ configuration::ScannerId::master };
   util::TenthOfDegree from_theta_{ 0 };
-  util::TenthOfDegree resolution_{ 0 };
-
+  util::TenthOfDegree resolution_{ 1 };
+  // additional fields
   boost::optional<uint32_t> scan_counter_;
-  std::vector<double> measurements_;
-  std::vector<double> intensities_;
-  std::vector<data_conversion_layer::monitoring_frame::diagnostic::Message> diagnostic_messages_;
-  bool diagnostic_data_enabled_{ false };
+  boost::optional<uint8_t> active_zoneset_;
+  boost::optional<io::PinData> io_pin_data_;
+  boost::optional<std::vector<double>> measurements_;
+  boost::optional<std::vector<double>> intensities_;
+  boost::optional<std::vector<diagnostic::Message>> diagnostic_messages_;
 
 public:
-  friend data_conversion_layer::RawData serialize(const data_conversion_layer::monitoring_frame::Message& frame);
-  friend data_conversion_layer::monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data,
-                                                                      const std::size_t& num_bytes);
+  friend class MessageBuilder;
 };
 
-inline ScanCounterMissing::ScanCounterMissing(const std::string& msg) : std::runtime_error(msg)
+/**
+ * @brief Wrapping class for a Message and its corresponding timestamp
+ * @see Message
+ **/
+struct MessageStamped
+{
+  MessageStamped(const Message& message, const int64_t timestamp) : msg_(message), stamp_(timestamp){};
+  Message msg_;
+  int64_t stamp_;
+};
+
+inline AdditionalFieldMissing::AdditionalFieldMissing(const std::string& field_name)
+  : std::runtime_error(field_name + " not set! (Contact PILZ support if the error persists.)")
 {
 }
-
-std::ostream& operator<<(std::ostream& os,
-                         const psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::Message& msg);
-
 }  // namespace monitoring_frame
 }  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone

@@ -16,6 +16,8 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_TEST_MOCK_PSEN_SCAN_UDP_INTERFACE_H
 #define PSEN_SCAN_V2_STANDALONE_TEST_MOCK_PSEN_SCAN_UDP_INTERFACE_H
 
+#include <chrono>
+
 #include <boost/asio.hpp>
 
 #include <gmock/gmock.h>

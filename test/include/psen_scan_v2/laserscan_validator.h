@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <chrono>
 #include <future>
 #include <map>
 #include <stdexcept>
@@ -26,7 +27,6 @@
 #include <boost/shared_ptr.hpp>
 
 #include <fmt/format.h>
-#include <fmt/ostream.h>
 
 #include <gtest/gtest.h>
 
@@ -47,24 +47,26 @@
 
 namespace psen_scan_v2_test
 {
-template <int16_t angle_offset = 0>
-void addScanToBin(const psen_scan_v2_standalone::LaserScan& scan, std::map<int16_t, NormalDist>& bin)
+void addScanToBin(const psen_scan_v2_standalone::LaserScan& scan,
+                  std::map<int16_t, NormalDist>& bin,
+                  const int16_t angle_offset = 0)
 {
-  for (size_t i = 0; i < scan.getMeasurements().size(); ++i)
+  for (size_t i = 0; i < scan.measurements().size(); ++i)
   {
-    auto bin_addr = (scan.getMinScanAngle() + scan.getScanResolution() * i).value() + angle_offset;
+    auto bin_addr = (scan.minScanAngle() + scan.scanResolution() * i).value() + angle_offset;
 
     if (bin.find(bin_addr) == bin.end())
     {
       bin.emplace(bin_addr, NormalDist{});
       // Create bin
     }
-    bin[bin_addr].update(scan.getMeasurements()[i]);
+    bin[bin_addr].update(scan.measurements()[i]);
   }
 }
 
-template <int16_t angle_offset = 0>
-void addScanToBin(const sensor_msgs::LaserScan& scan, std::map<int16_t, NormalDist>& bin)
+void addScanToBin(const sensor_msgs::LaserScan& scan,
+                  std::map<int16_t, NormalDist>& bin,
+                  const int16_t angle_offset = 0)
 {
   for (size_t i = 0; i < scan.ranges.size(); ++i)
   {
@@ -81,21 +83,21 @@ void addScanToBin(const sensor_msgs::LaserScan& scan, std::map<int16_t, NormalDi
   }
 }
 
-template <typename ScanConstPtr, int16_t angle_offset = 0>
-std::map<int16_t, NormalDist> binsFromScans(const std::vector<ScanConstPtr>& scans)
+template <typename ScanConstPtr>
+std::map<int16_t, NormalDist> binsFromScans(const std::vector<ScanConstPtr>& scans, const int16_t angle_offset = 0)
 {
   std::map<int16_t, NormalDist> bins;
-  std::for_each(scans.cbegin(), scans.cend(), [&bins](const ScanConstPtr& scan) {
+  std::for_each(scans.cbegin(), scans.cend(), [&bins, &angle_offset](const ScanConstPtr& scan) {
     if (scan == nullptr)
     {
       throw std::invalid_argument("LaserScan pointer must not be null");
     }
-    addScanToBin<angle_offset>(*scan, bins);
+    addScanToBin(*scan, bins, angle_offset);
   });
   return bins;
 }
 
-std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
+std::map<int16_t, NormalDist> binsFromRosbag(const std::string& filepath)
 {
   std::map<int16_t, NormalDist> bins;
 
@@ -103,7 +105,7 @@ std::map<int16_t, NormalDist> binsFromRosbag(std::string filepath)
   bag.open(filepath, rosbag::bagmode::Read);
 
   std::vector<std::string> topics;
-  topics.push_back(std::string("/laser_1_node/scan"));
+  topics.push_back(std::string("/laser_1/scan"));
 
   rosbag::View view(bag, rosbag::TopicQuery(topics));
 
@@ -121,12 +123,11 @@ template <typename ScanType>
 class LaserScanValidator
 {
 public:
-  LaserScanValidator(std::map<int16_t, NormalDist> bins_expected) : bins_expected_(bins_expected){};
+  LaserScanValidator(std::map<int16_t, NormalDist> bins_expected) : bins_expected_(std::move(bins_expected)){};
 
   typedef boost::shared_ptr<ScanType const> ScanConstPtr;
 
-  template <int16_t angle_offset = 0>
-  void scanCb(const ScanConstPtr scan, size_t n_msgs)
+  void scanCb(const ScanConstPtr scan, size_t n_msgs, const int16_t angle_offset = 0)
   {
     PSENSCAN_INFO_THROTTLE(5, "LaserScanValidator", "Checking messages for validity. So far looking good.");
 
@@ -140,7 +141,7 @@ public:
     // To have only one call on the promise the subscriber is shut down
     if (msgs_.size() == n_msgs)
     {
-      auto bins_actual = binsFromScans<ScanConstPtr, angle_offset>(msgs_);
+      auto bins_actual = binsFromScans<ScanConstPtr>(msgs_, angle_offset);
 
       std::string error_string;
       std::size_t counter_deviations{ 0 };
@@ -162,13 +163,13 @@ public:
         auto dist_actual = bin_actual.second;
         auto dist_expected = bin_expected->second;
         auto distance = bhattacharyya_distance(dist_actual, dist_expected);
-        if (distance > 10.)
+        if (distance > 20.)
         {
           error_string +=
               fmt::format("On {:+.1f} deg  expected: {} actual: {} | dist: {:.1f}, dmean: {:.3f}, dstdev: {:.3f}\n",
                           bin_actual.first / 10.,
-                          dist_expected,
-                          dist_actual,
+                          dist_expected.toString(),
+                          dist_actual.toString(),
                           distance,
                           abs(dist_expected.mean() - dist_actual.mean()),
                           abs(dist_expected.stdev() - dist_actual.stdev()));

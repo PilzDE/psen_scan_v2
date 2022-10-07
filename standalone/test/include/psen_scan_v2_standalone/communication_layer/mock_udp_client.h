@@ -37,12 +37,12 @@ static constexpr uint32_t RES_CODE_ACCEPTED{ 0x00 };
 class MockUdpClient
 {
 public:
-  MockUdpClient(const NewDataHandler& data_handler,
-                const ErrorHandler& error_handler,
+  MockUdpClient(const NewMessageCallback& message_callback,
+                const ErrorCallback& error_callback,
                 const unsigned short& host_port,
                 const unsigned int& endpoint_ip,
                 const unsigned short& endpoint_port)
-    : data_handler_(data_handler), error_handler_(error_handler){};
+    : message_callback_(message_callback), error_callback_(error_callback){};
 
 public:
   void sendStartReply();
@@ -61,8 +61,8 @@ private:
   void handleNewData(const data_conversion_layer::RawData& received_data, const std::size_t& bytes_received);
 
 private:
-  NewDataHandler data_handler_;
-  ErrorHandler error_handler_;
+  NewMessageCallback message_callback_;
+  ErrorCallback error_callback_;
 };
 
 void MockUdpClient::sendStartReply()
@@ -94,12 +94,12 @@ void MockUdpClient::sendMonitoringFrame(monitoring_frame::Message& msg)
 void MockUdpClient::handleNewData(const data_conversion_layer::RawData& received_data,
                                   const std::size_t& bytes_received)
 {
-  data_handler_(received_data, bytes_received);
+  message_callback_(received_data, bytes_received);
 }
 
 void MockUdpClient::simulateError(const std::string& msg)
 {
-  error_handler_(msg);
+  error_callback_(msg);
 }
 
 }  // namespace psen_scan_v2_standalone_test

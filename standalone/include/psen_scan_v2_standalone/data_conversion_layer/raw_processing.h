@@ -15,10 +15,11 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_RAW_PROCESSING_H
 #define PSEN_SCAN_V2_STANDALONE_RAW_PROCESSING_H
 
-#include <sstream>
-#include <functional>
-#include <cmath>
 #include <algorithm>
+#include <cmath>
+#include <functional>
+#include <istream>
+#include <sstream>
 #include <vector>
 
 #include <fmt/format.h>
@@ -49,7 +50,7 @@ inline void write(std::ostringstream& os, const T& data)
 }
 
 template <typename T>
-inline void read(std::istringstream& is, T& data)
+inline void read(std::istream& is, T& data)
 {
   is.read(reinterpret_cast<char*>(&data), sizeof(T));
   if (!is)
@@ -60,7 +61,7 @@ inline void read(std::istringstream& is, T& data)
 }
 
 template <typename T>
-inline T read(std::istringstream& is)
+inline T read(std::istream& is)
 {
   T retval;
   raw_processing::read<T>(is, retval);
@@ -71,22 +72,22 @@ template <class ReturnType, class RawType>
 using ConversionFunc = std::function<ReturnType(const RawType&)>;
 
 template <typename RawType, typename ReturnType>
-inline ReturnType read(std::istringstream& is, ConversionFunc<ReturnType, RawType> conversion_fcn)
+inline ReturnType read(std::istream& is, const ConversionFunc<ReturnType, RawType>& conversion_fcn)
 {
   return conversion_fcn(raw_processing::read<RawType>(is));
 }
 
 template <typename RawType, typename ReturnType>
-inline ReturnType read(std::istringstream& is)
+inline ReturnType read(std::istream& is)
 {
   return ReturnType(raw_processing::read<RawType>(is));
 }
 
 template <typename RawType, typename ReturnType>
-inline void readArray(std::istringstream& is,
+inline void readArray(std::istream& is,
                       std::vector<ReturnType>& data,
                       const size_t& number_of_samples,
-                      ConversionFunc<ReturnType, RawType> conversion_fcn)
+                      const ConversionFunc<ReturnType, RawType>& conversion_fcn)
 {
   data.reserve(number_of_samples);
 

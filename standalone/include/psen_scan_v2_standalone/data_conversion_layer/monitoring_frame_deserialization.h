@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -15,12 +15,19 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_MONITORING_FRAME_DESERIALIZATION_H
 #define PSEN_SCAN_V2_STANDALONE_MONITORING_FRAME_DESERIALIZATION_H
 
-#include <ostream>
+#include <istream>
+#include <stdexcept>
+#include <string>
+#include <vector>
+#include <bitset>
 
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
-#include "psen_scan_v2_standalone/util/logging.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
+#include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -48,6 +55,7 @@ static constexpr uint32_t OP_CODE_MONITORING_FRAME{ 0xCA };
 static constexpr uint32_t ONLINE_WORKING_MODE{ 0x00 };
 static constexpr uint32_t GUI_MONITORING_TRANSACTION{ 0x05 };
 static constexpr uint16_t NUMBER_OF_BYTES_SCAN_COUNTER{ 4 };
+static constexpr uint16_t NUMBER_OF_BYTES_ZONE_SET{ 1 };
 static constexpr uint16_t NUMBER_OF_BYTES_SINGLE_MEASUREMENT{ 2 };
 static constexpr uint16_t NO_SIGNAL_ARRIVED{ 59956 };
 static constexpr uint16_t SIGNAL_TOO_LATE{ 59958 };
@@ -76,12 +84,12 @@ public:
               Resolution resolution);
 
 public:
-  DeviceStatus device_status() const;
-  OpCode op_code() const;
-  WorkingMode working_mode() const;
-  TransactionType transaction_type() const;
-  configuration::ScannerId scanner_id() const;
-  FromTheta from_theta() const;
+  DeviceStatus deviceStatus() const;
+  OpCode opCode() const;
+  WorkingMode workingMode() const;
+  TransactionType transactionType() const;
+  configuration::ScannerId scannerId() const;
+  FromTheta fromTheta() const;
   Resolution resolution() const;
 
 private:
@@ -126,21 +134,37 @@ private:
 
 enum class AdditionalFieldHeaderID : AdditionalFieldHeader::Id
 {
+  io_pin_data = 0x01,
   scan_counter = 0x02,
+  zone_set = 0x03,
   diagnostics = 0x04,
   measurements = 0x05,
   intensities = 0x06,
   end_of_frame = 0x09
 };
 
-AdditionalFieldHeader readAdditionalField(std::istringstream& is, const std::size_t& max_num_bytes);
+AdditionalFieldHeader readAdditionalField(std::istream& is, const std::size_t& max_num_bytes);
 
 monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data, const std::size_t& num_bytes);
-FixedFields readFixedFields(std::istringstream& is);
+FixedFields readFixedFields(std::istream& is);
 namespace diagnostic
 {
-std::vector<diagnostic::Message> deserializeMessages(std::istringstream& is);
+std::vector<diagnostic::Message> deserializeMessages(std::istream& is);
 }
+
+namespace io
+{
+template <size_t ChunkSize>
+void deserializePinField(std::istream& is, std::array<std::bitset<8>, ChunkSize>& pin_states)
+{
+  for (auto& byte_states : pin_states)
+  {
+    const auto raw_byte = raw_processing::read<uint8_t>(is);
+    byte_states |= std::bitset<8>(raw_byte);
+  }
+}
+PinData deserializePins(std::istream& is);
+}  // namespace io
 
 /**
  * @brief Exception thrown on problems during the extraction of the measurement data.
@@ -152,26 +176,28 @@ public:
 };
 
 /**
- * @brief Exception thrown on problems with the additional field: scan_counter
+ * @brief Exception thrown on problems with the additional fields with fixed size
  *
- * The length specified in the Header of the additional field "scan_counter"
- * must be exactly as defined in NUMBER_OF_BYTES_SCAN_COUNTER for it to be converted.
+ * The length specified in the Header of the additional fields scan_counter, zone_set and io_state
+ * must be exactly as defined in the protocol.
  *
  * @see data_conversion_layer::monitoring_frame::AdditionalFieldHeader
  * @see data_conversion_layer::monitoring_frame::AdditionalFieldHeaderID
+ * @see data_conversion_layer::monitoring_frame::NUMBER_OF_BYTES_ZONE_SET
  * @see data_conversion_layer::monitoring_frame::NUMBER_OF_BYTES_SCAN_COUNTER
+ * @see data_conversion_layer::monitoring_frame::io::RAW_CHUNK_LENGTH_IN_BYTES
  */
-class ScanCounterUnexpectedSize : public DecodingFailure
+class AdditionalFieldUnexpectedSize : public DecodingFailure
 {
 public:
-  ScanCounterUnexpectedSize(const std::string& msg);
+  AdditionalFieldUnexpectedSize(const std::string& msg);
 };
 
 inline DecodingFailure::DecodingFailure(const std::string& msg) : std::runtime_error(msg)
 {
 }
 
-inline ScanCounterUnexpectedSize::ScanCounterUnexpectedSize(const std::string& msg) : DecodingFailure(msg)
+inline AdditionalFieldUnexpectedSize::AdditionalFieldUnexpectedSize(const std::string& msg) : DecodingFailure(msg)
 {
 }
 
@@ -185,32 +211,32 @@ inline AdditionalFieldHeader::Length AdditionalFieldHeader::length() const
   return length_;
 }
 
-inline FixedFields::DeviceStatus FixedFields::device_status() const
+inline FixedFields::DeviceStatus FixedFields::deviceStatus() const
 {
   return device_status_;
 }
 
-inline FixedFields::OpCode FixedFields::op_code() const
+inline FixedFields::OpCode FixedFields::opCode() const
 {
   return op_code_;
 }
 
-inline FixedFields::WorkingMode FixedFields::working_mode() const
+inline FixedFields::WorkingMode FixedFields::workingMode() const
 {
   return working_mode_;
 }
 
-inline FixedFields::TransactionType FixedFields::transaction_type() const
+inline FixedFields::TransactionType FixedFields::transactionType() const
 {
   return transaction_type_;
 }
 
-inline configuration::ScannerId FixedFields::scanner_id() const
+inline configuration::ScannerId FixedFields::scannerId() const
 {
   return scanner_id_;
 }
 
-inline FixedFields::FromTheta FixedFields::from_theta() const
+inline FixedFields::FromTheta FixedFields::fromTheta() const
 {
   return from_theta_;
 }

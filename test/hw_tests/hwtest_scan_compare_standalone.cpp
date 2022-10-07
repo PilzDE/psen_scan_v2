@@ -13,6 +13,7 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <chrono>
 #include <map>
 #include <sstream>
 #include <stdlib.h>
@@ -24,10 +25,12 @@
 #include <boost/shared_ptr.hpp>
 
 #include "psen_scan_v2_standalone/core.h"
+#include "psen_scan_v2_standalone/util/gtest_expectations.h"
 
 #include "psen_scan_v2/dist.h"
 #include "psen_scan_v2/laserscan_validator.h"
 
+using namespace std::chrono_literals;
 using namespace psen_scan_v2_standalone;
 using namespace psen_scan_v2_test;
 
@@ -93,17 +96,19 @@ TEST_F(ScanComparisonTests, simpleCompare)
 
   ScanRange scan_range{ ANGLE_START, ANGLE_END };
 
-  ScannerConfigurationBuilder config_builder;
-  config_builder.hostIP(host_ip_).scannerIp(scanner_ip_).hostDataPort(HOST_UDP_PORT_DATA).scanRange(scan_range);
+  ScannerConfigurationBuilder config_builder{ scanner_ip_ };
+  config_builder.hostIP(host_ip_).hostDataPort(HOST_UDP_PORT_DATA).scanRange(scan_range);
 
-  ScannerV2 scanner(config_builder.build(), [&laser_scan_validator, &window_size](const ScanType& scan) {
-    return laser_scan_validator.scanCb<-1375>(boost::make_shared<ScanType const>(scan), window_size);
+  ScannerV2 scanner(config_builder, [&laser_scan_validator, &window_size](const ScanType& scan) {
+    return laser_scan_validator.scanCb(boost::make_shared<ScanType const>(scan), window_size, -1375);
   });
   scanner.start();
 
   EXPECT_TRUE(laser_scan_validator.waitForResult(TEST_DURATION_S));
 
-  scanner.stop();
+  auto stop_future = scanner.stop();
+  ASSERT_FUTURE_IS_READY(stop_future, 3s);
+  EXPECT_NO_THROW(stop_future.get());
 }
 }  // namespace psen_scan_v2_standalone_test
 

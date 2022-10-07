@@ -85,7 +85,7 @@ enum class ErrorType
 using Et = ErrorType;
 using ErrorMessage = std::string;
 
-static const std::map<ErrorType, ErrorMessage> error_code_to_string
+static const std::map<ErrorType, ErrorMessage> ERROR_CODE_TO_STRING
 {
   { Et::ossd1_oc, "OSSD1 Overcurrent / Short circuit." },
   { Et::ossd_shrt_c, "Short circuit between at least two OSSDs." },
@@ -120,7 +120,7 @@ static const std::map<ErrorType, ErrorMessage> error_code_to_string
 // clang-format off
   #define REV(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) arg8, arg7, arg6, arg5, arg4, arg3, arg2, arg1
 
-  static constexpr std::array<std::array<ErrorType, 8>, 9> error_bits{{
+  static constexpr std::array<std::array<ErrorType, 8>, 9> ERROR_BITS{{
   //Bit7                 Bit6              Bit5              Bit4              Bit3              Bit2                  Bit1                   Bit0
   { REV(Et::ossd1_oc,    Et::ossd_shrt_c,  Et::ossd_integr,  Et::intern,       Et::intern,       Et::intern,           Et::intern,              Et::intern) },
   { REV(Et::win_cln_al,  Et::power_supply, Et::netw_prb,     Et::dust_crc_fl,  Et::intern,       Et::intern,           Et::unused,              Et::ossd2_overcur) },
@@ -151,11 +151,13 @@ public:
   using ByteLocation = size_t;
   using BitLocation = size_t;
   constexpr ErrorLocation(const ByteLocation& byte, const BitLocation& bit) : byte_(byte), bit_(bit){};
-  inline constexpr ByteLocation getByte() const
+
+  inline constexpr ByteLocation byte() const
   {
     return byte_;
   };
-  inline constexpr BitLocation getBit() const
+
+  inline constexpr BitLocation bit() const
   {
     return bit_;
   };
@@ -184,19 +186,19 @@ public:
 
   friend RawChunk serialize(const std::vector<diagnostic::Message>& messages);
 
-  constexpr configuration::ScannerId getScannerId() const
+  constexpr configuration::ScannerId scannerId() const
   {
     return id_;
   }
 
-  constexpr ErrorLocation getErrorLocation() const
+  constexpr ErrorLocation errorLocation() const
   {
     return error_location_;
   }
 
-  constexpr ErrorType getDiagnosticCode() const
+  constexpr ErrorType diagnosticCode() const
   {
-    return error_bits.at(error_location_.getByte()).at(error_location_.getBit());
+    return ERROR_BITS.at(error_location_.byte()).at(error_location_.bit());
   }
 
 private:
@@ -211,16 +213,16 @@ constexpr inline Message::Message(const configuration::ScannerId& id, const Erro
 
 constexpr inline bool Message::operator==(const Message& rhs) const
 {
-  return (error_location_.getBit() == rhs.error_location_.getBit() &&
-          error_location_.getByte() == rhs.error_location_.getByte() && id_ == rhs.id_);
+  return (error_location_.bit() == rhs.error_location_.bit() && error_location_.byte() == rhs.error_location_.byte() &&
+          id_ == rhs.id_);
 }
 
 // Store ambiguous errors for additional output
-static const std::set<Et> ambiguous_diagnostic_codes = { Et::unused, Et::intern };
+static const std::set<Et> AMBIGUOUS_DIAGNOSTIC_CODES = { Et::unused, Et::intern };
 
 inline bool isAmbiguous(const ErrorType& code)
 {
-  return ambiguous_diagnostic_codes.find(code) != ambiguous_diagnostic_codes.end();
+  return AMBIGUOUS_DIAGNOSTIC_CODES.find(code) != AMBIGUOUS_DIAGNOSTIC_CODES.end();
 }
 
 std::ostream& operator<<(std::ostream& os, const diagnostic::Message& msg);

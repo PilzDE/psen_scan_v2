@@ -1,6 +1,61 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Forthcoming
+------------------
+* Remove zoneset bits from IOState.input field since its redundant to the active_zoneset field (#311)
+* Ignore changes of unused IOs. Fix #321
+* Fill "io_states" vector as received instead of order by theta to avoid flickering. Fix #320
+* Fixed bug of multiple zonesets being visible #328
+* Contributors: Pilz GmbH and Co. KG
+
+0.10.1 (2022-01-24)
+-------------------
+* Separate 'PinState' formating from 'formatRange' (#313)
+* Contributors: Pilz GmbH and Co. KG
+
+0.10.0 (2022-01-20)
+-------------------
+* Change to new versioning method for ROS1 (0.10.0+) and ROS2 (0.20.0+).
+* Deprecate get/set methods with 'get/set' prefix in favour of methods without the prefix(#298)
+* ADD IO states to LaserScan and publish them at ~/io_state (#281)
+* Renaming Slave to Subscriber (#303)
+* Contributors: Pilz GmbH and Co. KG
+
+0.3.4 (2021-12-20)
+------------------
+* Prevent error when diagnostics are disabled. Fix #294
+* Set exception in stop-future
+* Apply clang-tidy fixes to header-files. Fix #277
+* Remove latched flag from active zoneset topic
+* API change: convenience usage of ScannerConfiguration
+* Remove unrelated parameter DEFAULT_X_AXIS_ROTATION from standalone
+* Contributors: Pilz GmbH and Co. KG
+
+0.3.3 (2021-11-10)
+------------------
+* Introduce error state and set exception in start-future
+* Remove dependency on pilz_testutils
+* Always build hardware tests
+* Internal refactorings
+* Importing the config xml-file and publishing the zoneconfiguration
+* Add active zoneset to LaserScan
+* Publish active zoneset id to ~/active_zoneset
+* Add active zoneset visualization in rviz
+* Contributors: Pilz GmbH and Co. KG
+
+0.3.2 (2021-09-16)
+------------------
+* Improve performance of standalone part
+    * Introduce RawDataPtr
+    * Write to std::stringstream instead of constructing from std::string
+    * Pass by reference wherever possible
+* Make release build the default
+* Calculate timestamp as the time of the first ray (udp communication time is neglected)
+* API: Add timestamp (nanoseconds since epoch) to LaserScan
+* API: Add scan counter to LaserScan
+* API: remove LaserScan equality operator
+* Contributors: Pilz GmbH and Co. KG
 
 0.3.1 (2021-07-21)
 ------------------

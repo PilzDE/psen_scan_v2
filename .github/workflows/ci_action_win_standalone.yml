@@ -6,10 +6,11 @@ env:
   BUILD_TYPE: "Release"
   BOOST_ROOT: ${{github.workspace}}/3rdparty/boost
   BOOST_URL: https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_72_0.tar.bz2/download
+  CTEST_OUTPUT_ON_FAILURE: 1
 
 jobs:
   build:
-    runs-on: [windows-latest]
+    runs-on: [windows-2019]
 
     steps:
     - uses: actions/checkout@v2

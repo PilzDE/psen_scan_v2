@@ -62,7 +62,7 @@ An example application, which prints distance data to the screen, is built by de
 ### Build and install dependencies
 #### Visual Studio
 - Get Visual Studio from https://visualstudio.microsoft.com/de/
-- Building is currently tested under `Visual Studio 16 2019`
+- Building is currently tested under `Visual Studio 16 2019` on `Windows Server 2019`
 - Open `Visual Studio Developer Command Prompt`
 - Use this Console for the next steps
 
@@ -152,6 +152,6 @@ For more Documentation please take a look at the generated Doxygen [Code API][].
 
 
 
-[Code API]: http://docs.ros.org/en/noetic/psen_scan_v2/html/
-[LaserScan]: http://docs.ros.org/en/noetic/psen_scan_v2/html/classpsen__scan__v2__standalone_1_1LaserScan.html
-[ScannerV2]: http://docs.ros.org/en/noetic/psen_scan_v2/html/classpsen__scan__v2__standalone_1_1ScannerV2.html
+[Code API]: http://docs.ros.org/en/noetic/api/psen_scan_v2/html/
+[LaserScan]: http://docs.ros.org/en/noetic/api/psen_scan_v2/html/classpsen__scan__v2__standalone_1_1LaserScan.html
+[ScannerV2]: http://docs.ros.org/en/noetic/api/psen_scan_v2/html/classpsen__scan__v2__standalone_1_1ScannerV2.html

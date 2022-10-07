@@ -51,9 +51,14 @@ public:
     return stdev;
   }
 
-  size_t N() const
+  size_t n() const
   {
     return values_.size();
+  }
+
+  std::string toString()
+  {
+    return fmt::format("NormalDist(mean: {:+.3f}, stdev: {:+.3f} N: {})", mean(), stdev(), n());
   }
 
 private:
@@ -70,11 +75,5 @@ double bhattacharyya_distance(const NormalDist& dist1, const NormalDist& dist2)
 }
 
 }  // namespace psen_scan_v2_test
-
-std::ostream& operator<<(std::ostream& os, const psen_scan_v2_test::NormalDist& dist)
-{
-  os << fmt::format("NormalDist(mean: {:+.3f}, stdev: {:+.3f} N: {})", dist.mean(), dist.stdev(), dist.N());
-  return os;
-}
 
 #endif  // PSEN_SCAN_V2_DIST_H

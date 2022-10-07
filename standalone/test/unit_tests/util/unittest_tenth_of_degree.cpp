@@ -22,6 +22,12 @@ using namespace psen_scan_v2_standalone;
 
 namespace psen_scan_v2_standalone_test
 {
+TEST(TenthOfDegreeTest, dTor)
+{
+  util::TenthOfDegree tenth_of_degree;
+  EXPECT_EQ(tenth_of_degree, util::TenthOfDegree(0));
+}
+
 TEST(TenthOfDegreeTest, fromRad)
 {
   const double angle_in_rad{ 0.1 };
@@ -71,6 +77,14 @@ TEST(TenthOfDegreeTest, MultiplicationWithSizeT)
   EXPECT_EQ((tenth_of_degree * int_value).value(), 6);
 }
 
+TEST(TenthOfDegreeTest, MultiplicationWithSizeTConst)
+{
+  const util::TenthOfDegree tenth_of_degree{ 2 };
+  const size_t int_value{ 3 };
+
+  EXPECT_EQ((tenth_of_degree * int_value).value(), 6);
+}
+
 TEST(TenthOfDegreeTest, DivisionWithInteger)
 {
   util::TenthOfDegree tenth_of_degree{ 6 };
@@ -85,6 +99,16 @@ TEST(TenthOfDegreeTest, Addition)
   util::TenthOfDegree tenth_of_degree_2{ 3 };
 
   EXPECT_EQ((tenth_of_degree_1 + tenth_of_degree_2).value(), 5);
+}
+
+TEST(TenthOfDegreeTest, AdditionEqual)
+{
+  util::TenthOfDegree tenth_of_degree_1{ 2 };
+  util::TenthOfDegree tenth_of_degree_2{ 3 };
+
+  tenth_of_degree_1 += tenth_of_degree_2;
+
+  EXPECT_EQ((tenth_of_degree_1).value(), 5);
 }
 
 TEST(TenthOfDegreeTest, Subtraction)
@@ -131,13 +155,6 @@ TEST(TenthOfDegreeTest, LargerThanOrEqualComparison)
   EXPECT_TRUE(util::TenthOfDegree(2) >= util::TenthOfDegree(1));
   EXPECT_TRUE(util::TenthOfDegree(1) >= util::TenthOfDegree(1));
   EXPECT_FALSE(util::TenthOfDegree(1) >= util::TenthOfDegree(2));
-}
-
-TEST(TenthOfDegreeTest, shouldThrowUnderflowErrorOnCastToIntOfValuesUnderZero)
-{
-  EXPECT_THROW(std::cout << static_cast<uint16_t>(util::TenthOfDegree(-1))
-                         << " - printed to not be unused. Should throw before!\n",
-               std::underflow_error);
 }
 
 }  // namespace psen_scan_v2_standalone_test

@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -26,7 +26,7 @@ namespace data_conversion_layer
 {
 namespace monitoring_frame
 {
-RawData serialize(const data_conversion_layer::monitoring_frame::Message& frame)
+RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
 {
   std::ostringstream os;
 
@@ -34,46 +34,70 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& frame)
   raw_processing::write(os, OP_CODE_MONITORING_FRAME);
   raw_processing::write(os, ONLINE_WORKING_MODE);
   raw_processing::write(os, GUI_MONITORING_TRANSACTION);
-  raw_processing::write(os, frame.scanner_id_);
-  raw_processing::write(os, frame.from_theta_.value());
-  raw_processing::write(os, frame.resolution_.value());
+  raw_processing::write(os, msg.scannerId());
+  raw_processing::write(os, msg.fromTheta().value());
+  raw_processing::write(os, msg.resolution().value());
 
-  AdditionalFieldHeader scan_counter_header(
-      static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::scan_counter), sizeof(frame.scan_counter_.get()));
-  write(os, scan_counter_header);
-  uint32_t scan_counter_header_payload = frame.scan_counter_.get();
-  raw_processing::write(os, scan_counter_header_payload);
-
-  if (frame.diagnostic_data_enabled_)
+  if (msg.hasIOPinField())
   {
-    AdditionalFieldHeader diagnostic_data_field_header(
-        static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::diagnostics),
-        diagnostic::RAW_CHUNK_LENGTH_IN_BYTES);
-    write(os, diagnostic_data_field_header);
-    diagnostic::RawChunk diagnostic_data_field_payload = diagnostic::serialize(frame.diagnostic_messages_);
-    data_conversion_layer::raw_processing::write(os, diagnostic_data_field_payload);
+    AdditionalFieldHeader io_pin_data_header(
+        static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::io_pin_data), io::RAW_CHUNK_LENGTH_IN_BYTES);
+    write(os, io_pin_data_header);
+    io::RawChunk io_pin_data_payload = io::serialize(msg.iOPinData());
+    raw_processing::write(os, io_pin_data_payload);
   }
 
-  AdditionalFieldHeader measurements_header(
-      static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::measurements),
-      frame.measurements_.size() * NUMBER_OF_BYTES_SINGLE_MEASUREMENT);
-  write(os, measurements_header);
-  data_conversion_layer::raw_processing::writeArray<uint16_t, double>(os, frame.measurements_, [](double elem) {
-    if (elem == std::numeric_limits<double>::infinity())
-    {
-      return NO_SIGNAL_ARRIVED;
-    }
-    return (static_cast<uint16_t>(std::round(elem * 1000.)));
-  });
+  if (msg.hasScanCounterField())
+  {
+    AdditionalFieldHeader scan_counter_header(
+        static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::scan_counter), sizeof(msg.scanCounter()));
+    write(os, scan_counter_header);
+    uint32_t scan_counter_payload = msg.scanCounter();
+    raw_processing::write(os, scan_counter_payload);
+  }
 
-  if (!frame.intensities_.empty())
+  if (msg.hasActiveZonesetField())
+  {
+    AdditionalFieldHeader zoneset_header(static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::zone_set),
+                                         sizeof(msg.activeZoneset()));
+    write(os, zoneset_header);
+    uint8_t zoneset_payload = msg.activeZoneset();
+    raw_processing::write(os, zoneset_payload);
+  }
+
+  if (msg.hasDiagnosticMessagesField())
+  {
+    diagnostic::RawChunk diagnostic_data_payload = diagnostic::serialize(msg.diagnosticMessages());
+    AdditionalFieldHeader diagnostic_data_header(
+        static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::diagnostics),
+        diagnostic::RAW_CHUNK_LENGTH_IN_BYTES);
+    write(os, diagnostic_data_header);
+    data_conversion_layer::raw_processing::write(os, diagnostic_data_payload);
+  }
+
+  if (msg.hasMeasurementsField())
+  {
+    AdditionalFieldHeader measurements_header(
+        static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::measurements),
+        msg.measurements().size() * NUMBER_OF_BYTES_SINGLE_MEASUREMENT);
+    write(os, measurements_header);
+    data_conversion_layer::raw_processing::writeArray<uint16_t, double>(os, msg.measurements(), [](double elem) {
+      if (elem == std::numeric_limits<double>::infinity())
+      {
+        return NO_SIGNAL_ARRIVED;
+      }
+      return (static_cast<uint16_t>(std::round(elem * 1000.)));
+    });
+  }
+
+  if (msg.hasIntensitiesField())
   {
     AdditionalFieldHeader intensities_header(
         static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::intensities),
-        frame.intensities_.size() * NUMBER_OF_BYTES_SINGLE_INTENSITY);
+        msg.intensities().size() * NUMBER_OF_BYTES_SINGLE_INTENSITY);
     write(os, intensities_header);
     data_conversion_layer::raw_processing::writeArray<uint16_t, double>(
-        os, frame.intensities_, [](double elem) { return (static_cast<uint16_t>(std::round(elem))); });
+        os, msg.intensities(), [](double elem) { return (static_cast<uint16_t>(std::round(elem))); });
   }
 
   AdditionalFieldHeader::Id end_of_frame_header_id =
@@ -92,7 +116,7 @@ constexpr size_t calculateIndexInRawDiagnosticData(const configuration::ScannerI
                                                    const diagnostic::ErrorLocation& location)
 {
   return diagnostic::RAW_CHUNK_UNUSED_OFFSET_IN_BYTES +
-         (static_cast<uint8_t>(id) * diagnostic::RAW_CHUNK_LENGTH_FOR_ONE_DEVICE_IN_BYTES) + location.getByte();
+         (static_cast<uint8_t>(id) * diagnostic::RAW_CHUNK_LENGTH_FOR_ONE_DEVICE_IN_BYTES) + location.byte();
 }
 
 namespace diagnostic
@@ -103,12 +127,55 @@ RawChunk serialize(const std::vector<data_conversion_layer::monitoring_frame::di
 
   for (const auto& elem : messages)
   {
-    raw_diagnostic_data.at(calculateIndexInRawDiagnosticData(elem.getScannerId(), elem.getErrorLocation())) +=
-        (1 << elem.getErrorLocation().getBit());
+    raw_diagnostic_data.at(calculateIndexInRawDiagnosticData(elem.scannerId(), elem.errorLocation())) +=
+        (1 << elem.errorLocation().bit());
   }
   return raw_diagnostic_data;
 }
 }  // namespace diagnostic
+
+namespace io
+{
+std::size_t calculateByteLocation(uint32_t id)
+{
+  return id / 8;
+}
+
+std::size_t calculateBitLocation(uint32_t id)
+{
+  return id % 8;
+}
+
+template <std::size_t ChunkSize>
+void serializeSingleRecord(RawChunk& raw_pin_data,
+                           const std::array<std::bitset<8>, ChunkSize>& pin_states,
+                           std::size_t offset)
+{
+  for (std::size_t byte = 0; byte < pin_states.size(); ++byte)
+  {
+    for (std::size_t bit = 0; bit < 8; ++bit)
+    {
+      if (pin_states[byte][bit])
+      {
+        raw_pin_data.at(offset + byte) += (1 << bit);
+      }
+    }
+  }
+}
+
+RawChunk serialize(const PinData& pin_data)
+{
+  RawChunk raw_pin_data{};
+  std::size_t offset = 3 * (RAW_CHUNK_LENGTH_RESERVED_IN_BYTES + RAW_CHUNK_PHYSICAL_INPUT_SIGNALS_IN_BYTES) +
+                       RAW_CHUNK_LENGTH_RESERVED_IN_BYTES;
+
+  serializeSingleRecord(raw_pin_data, pin_data.input_state, offset);
+  offset += RAW_CHUNK_LOGICAL_INPUT_SIGNALS_IN_BYTES + RAW_CHUNK_LENGTH_RESERVED_IN_BYTES;
+
+  serializeSingleRecord(raw_pin_data, pin_data.output_state, offset);
+  return raw_pin_data;
+}
+}  // namespace io
 
 void write(std::ostringstream& os, const AdditionalFieldHeader& header)
 {

@@ -30,6 +30,10 @@ endif (WIN32)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
+if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
 ## System dependencies are found with CMake's conventions
 find_package(Boost 1.69) ## Boost::system is header-only since 1.69
 if(Boost_FOUND)
@@ -52,6 +56,7 @@ include_directories(
 
 set(${PROJECT_NAME}_sources
   src/scanner_v2.cpp
+  src/io_state.cpp
   src/laserscan.cpp
   src/data_conversion_layer/monitoring_frame_msg.cpp
   src/data_conversion_layer/start_request.cpp
@@ -122,7 +127,7 @@ ADD_EXECUTABLE(unittest_laserscan_conversions test/unit_tests/data_conversion_la
 
 TARGET_LINK_LIBRARIES(unittest_laserscan_conversions
     ${PROJECT_NAME}
-    gtest
+    gtest gmock
 )
 
 ADD_TEST(NAME unittest_laserscan_conversions
@@ -137,6 +142,52 @@ TARGET_LINK_LIBRARIES(unittest_laserscan
 
 ADD_TEST(NAME unittest_laserscan
          COMMAND unittest_laserscan)
+
+ADD_EXECUTABLE(unittest_pin_state
+               test/unit_tests/api/unittest_pin_state.cpp
+               src/io_state.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_pin_state
+    ${PROJECT_NAME}
+    gtest
+)
+
+ADD_TEST(NAME unittest_pin_state
+         COMMAND unittest_pin_state)
+
+ADD_EXECUTABLE(unittest_io_state
+               test/unit_tests/api/unittest_io_state.cpp
+               src/io_state.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_io_state
+    ${PROJECT_NAME}
+    gtest
+)
+
+ADD_TEST(NAME unittest_io_state
+         COMMAND unittest_io_state)
+
+ADD_EXECUTABLE(unittest_io_state_conversions
+               test/unit_tests/data_conversion_layer/unittest_io_state_conversions.cpp
+               src/io_state.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_io_state_conversions
+    ${PROJECT_NAME}
+    gtest
+)
+
+ADD_TEST(NAME unittest_io_state_conversions
+         COMMAND unittest_io_state_conversions)
+
+ADD_EXECUTABLE(unittest_io_pin_data test/unit_tests/data_conversion_layer/unittest_io_pin_data.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_io_pin_data
+    ${PROJECT_NAME}
+    gtest
+)
+
+ADD_TEST(NAME unittest_io_pin_data
+         COMMAND unittest_io_pin_data)
 
 ADD_EXECUTABLE(unittest_logging test/unit_tests/util/unittest_logging.cpp)
 
@@ -163,11 +214,22 @@ ADD_EXECUTABLE(unittest_monitoring_frame_msg test/unit_tests/data_conversion_lay
 
 TARGET_LINK_LIBRARIES(unittest_monitoring_frame_msg
     ${PROJECT_NAME}
-    gtest
+    gtest gmock
 )
 
 ADD_TEST(NAME unittest_monitoring_frame_msg
          COMMAND unittest_monitoring_frame_msg)
+
+ADD_EXECUTABLE(unittest_monitoring_frame_msg_stamped
+               test/unit_tests/data_conversion_layer/unittest_monitoring_frame_msg_stamped.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_monitoring_frame_msg_stamped
+    ${PROJECT_NAME}
+    gtest gmock
+)
+
+ADD_TEST(NAME unittest_monitoring_frame_msg_stamped
+         COMMAND unittest_monitoring_frame_msg_stamped)
 
 ADD_EXECUTABLE(unittest_monitoring_frame_serialization_deserialization
                test/unit_tests/data_conversion_layer/unittest_monitoring_frame_serialization_deserialization.cpp
@@ -175,7 +237,7 @@ ADD_EXECUTABLE(unittest_monitoring_frame_serialization_deserialization
 
 TARGET_LINK_LIBRARIES(unittest_monitoring_frame_serialization_deserialization
     ${PROJECT_NAME}
-    gtest
+    gtest gmock
 )
 
 ADD_TEST(NAME unittest_monitoring_frame_serialization_deserialization
@@ -285,16 +347,7 @@ add_executable(integrationtest_scanner_api
         test/integration_tests/api/integrationtest_scanner_api.cpp
         test/src/communication_layer/mock_udp_server.cpp
         test/src/communication_layer/scanner_mock.cpp
-        test/src/data_conversion_layer/monitoring_frame_serialization.cpp
-        src/scanner_v2.cpp
-        src/laserscan.cpp
-        src/data_conversion_layer/monitoring_frame_msg.cpp
-        src/data_conversion_layer/monitoring_frame_deserialization.cpp
-        src/data_conversion_layer/start_request.cpp
-        src/data_conversion_layer/stop_request_serialization.cpp
-        src/data_conversion_layer/diagnostics.cpp
-        src/data_conversion_layer/start_request_serialization.cpp
-        src/data_conversion_layer/scanner_reply_serialization_deserialization.cpp)
+        test/src/data_conversion_layer/monitoring_frame_serialization.cpp)
 
 target_link_libraries(integrationtest_scanner_api
     ${PROJECT_NAME}
