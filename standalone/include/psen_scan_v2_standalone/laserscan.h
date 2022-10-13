@@ -20,6 +20,7 @@
 #include <ostream>
 #include <vector>
 
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/io_state.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
@@ -60,8 +61,7 @@ public:
             const int64_t timestamp,
             const configuration::ScannerId scanner_id);
 
-public: 
-// getters
+public:
   /*! deprecated: use const util::TenthOfDegree& scanResolution() const instead */
   [[deprecated("use const util::TenthOfDegree& scanResolution() const instead")]] const util::TenthOfDegree&
   getScanResolution() const;

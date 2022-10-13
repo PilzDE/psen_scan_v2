@@ -28,6 +28,11 @@ namespace data_conversion_layer
 {
 namespace monitoring_frame
 {
+configuration::ScannerId data_conversion_layer::monitoring_frame::Message::scannerId() const
+{
+  return scanner_id_;
+}
+
 util::TenthOfDegree data_conversion_layer::monitoring_frame::Message::fromTheta() const
 {
   return from_theta_;
@@ -95,6 +100,18 @@ const std::vector<double>& Message::intensities() const
   else
   {
     throw AdditionalFieldMissing("Intensities");
+  }
+}
+
+std::vector<diagnostic::Message> Message::diagnosticMessages() const
+{
+  if (diagnostic_messages_.is_initialized())
+  {
+    return diagnostic_messages_.get();
+  }
+  else
+  {
+    throw AdditionalFieldMissing("Diagnostic Messages");
   }
 }
 

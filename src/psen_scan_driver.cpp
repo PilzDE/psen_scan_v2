@@ -69,6 +69,7 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "psen_scan_v2_node");
   ros::NodeHandle pnh("~");
+
   std::signal(SIGINT, delayed_shutdown_sig_handler);
 
   try
@@ -99,7 +100,6 @@ int main(int argc, char** argv)
           .build()
     };
 
-// hinzugefügt
     if (scanner_configuration.fragmentedScansEnabled())
     {
       ROS_INFO("Using fragmented scans.");
