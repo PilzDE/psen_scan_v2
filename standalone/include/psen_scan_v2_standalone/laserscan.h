@@ -141,7 +141,7 @@ private:
   const uint8_t active_zoneset_;
   //! Time of the first ray in this scan round (or fragment if fragmented_scans is enabled).
   const int64_t timestamp_;
-  //! distinction between master and slaves
+  //! distinction between master and subscribers
   configuration::ScannerId scanner_id_;
 };
 

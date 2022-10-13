@@ -78,7 +78,7 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
    * and the second Subscriber device.
    */
 
-  const uint8_t device_enabled{ 0b00001100 }; // bitmask for master, slave0: 1100
+  const uint8_t device_enabled{ 0b00001100 };  // bitmask for master, subscriber0: 1100
   const uint8_t intensity_enabled{ static_cast<uint8_t>(
       msg.master_device_settings_.intensitiesEnabled() ? 0b00001000 : 0b00000000) };
   const uint8_t point_in_safety_enabled{ 0 };
@@ -118,19 +118,18 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
                  end,
                  resolution);
 
-    // information for each slave
-    raw_processing::write(os, (int16_t)0);
-    raw_processing::write(os, (int16_t)2750);
-    raw_processing::write(os, (int16_t)5);
+  // information for each subscriber
+  raw_processing::write(os, (int16_t)0);
+  raw_processing::write(os, (int16_t)2750);
+  raw_processing::write(os, (int16_t)5);
 
-    raw_processing::write(os, (int16_t)0);
-    raw_processing::write(os, (int16_t)0);
-    raw_processing::write(os, (int16_t)0);
+  raw_processing::write(os, (int16_t)0);
+  raw_processing::write(os, (int16_t)0);
+  raw_processing::write(os, (int16_t)0);
 
-    raw_processing::write(os, (int16_t)0);
-    raw_processing::write(os, (int16_t)0);
-    raw_processing::write(os, (int16_t)0);
-  
+  raw_processing::write(os, (int16_t)0);
+  raw_processing::write(os, (int16_t)0);
+  raw_processing::write(os, (int16_t)0);
 
   const std::string raw_data_as_str{ os.str() };
   const data_conversion_layer::RawData raw_data(raw_data_as_str.cbegin(), raw_data_as_str.cend());
