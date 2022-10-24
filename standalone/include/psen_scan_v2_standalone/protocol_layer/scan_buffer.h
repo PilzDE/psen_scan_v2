@@ -145,7 +145,7 @@ inline void ScanBuffer::add(const data_conversion_layer::monitoring_frame::Messa
   {
     startNewRound(stamped_msg);
   }
-  else
+  else  // stamped_msg.msg_.scanCounter() <= current_round_[0].msg_.scanCounter()
   {
     throw OutdatedMessageError();
   }

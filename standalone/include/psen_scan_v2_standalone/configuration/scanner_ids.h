@@ -37,6 +37,13 @@ static constexpr std::array<ScannerId, 4> VALID_SCANNER_IDS{ ScannerId::master,
                                                              ScannerId::subscriber1,
                                                              ScannerId::subscriber2 };
 
+static const int MAX_NR_SUBSCRIBERS = VALID_SCANNER_IDS.size() - 1;  // all but the master
+
+static inline ScannerId subscriber_number_to_scanner_id(uint8_t nr)
+{
+  return VALID_SCANNER_IDS.at(nr + 1);
+}
+
 static const std::map<ScannerId, std::string> SCANNER_ID_TO_STRING{ { ScannerId::master, "Master" },
                                                                     { ScannerId::subscriber0, "Subscriber0" },
                                                                     { ScannerId::subscriber1, "Subscriber1" },

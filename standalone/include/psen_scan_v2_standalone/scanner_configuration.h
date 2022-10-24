@@ -52,6 +52,7 @@ public:
   bool intensitiesEnabled() const;
 
   bool fragmentedScansEnabled() const;
+  uint8_t nrSubscribers() const;
 
   /*! deprecated: use void hostIp(const uint32_t& host_ip) instead */
   [[deprecated("use void hostIp(const uint32_t& host_ip) instead")]] void setHostIp(const uint32_t& host_ip);
@@ -79,6 +80,7 @@ private:
   bool diagnostics_enabled_{ configuration::DIAGNOSTICS };
   bool intensities_enabled_{ configuration::INTENSITIES };
   bool fragmented_scans_{ configuration::FRAGMENTED_SCANS };
+  uint8_t nr_subscribers_{ configuration::NR_SUBSCRIBERS };
 };
 
 inline bool ScannerConfiguration::isComplete() const
@@ -149,6 +151,11 @@ inline bool ScannerConfiguration::intensitiesEnabled() const
 inline bool ScannerConfiguration::fragmentedScansEnabled() const
 {
   return fragmented_scans_;
+}
+
+inline uint8_t ScannerConfiguration::nrSubscribers() const
+{
+  return nr_subscribers_;
 }
 
 inline void ScannerConfiguration::hostIp(const uint32_t& host_ip)

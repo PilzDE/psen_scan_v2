@@ -119,9 +119,9 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
                  resolution);
 
   // information for each subscriber
-  raw_processing::write(os, (int16_t)0);
-  raw_processing::write(os, (int16_t)2750);
-  raw_processing::write(os, (int16_t)5);
+  raw_processing::write(os, start);
+  raw_processing::write(os, end);
+  raw_processing::write(os, resolution);
 
   raw_processing::write(os, (int16_t)0);
   raw_processing::write(os, (int16_t)0);
