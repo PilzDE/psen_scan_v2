@@ -133,24 +133,24 @@ inline bool ScanBuffer::isRoundComplete()
 
 inline void ScanBuffer::add(const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg)
 {
-  if (current_round_.empty() || stamped_msg.msg_.scanCounter() == current_round_[0].msg_.scanCounter())
+  if (current_round_.empty() || stamped_msg.msg_.scanCounter() == current_round_.at(0).msg_.scanCounter())
   {
-    current_round_.push_back(stamped_msg);
+    current_round_.push_back(std::move(stamped_msg));
     if (current_round_.size() > num_expected_msgs_)
     {
       throw ScanRoundOversaturatedError();
     }
   }
-  else if (stamped_msg.msg_.scanCounter() > current_round_[0].msg_.scanCounter())
+  else if (stamped_msg.msg_.scanCounter() > current_round_.at(0).msg_.scanCounter())
   {
     startNewRound(stamped_msg);
   }
-  else  // stamped_msg.msg_.scanCounter() < current_round_[0].msg_.scanCounter()
+  else  // stamped_msg.msg_.scanCounter() < current_round_.at(0).msg_.scanCounter()
   {
     PSENSCAN_DEBUG("ScanBuffer",
-                   "stamped_msg.msg_.scanCounter(){} current_round_[0].msg_.scanCounter(){}",
+                   "stamped_msg.msg_.scanCounter(){} current_round_.at(0).msg_.scanCounter(){}",
                    stamped_msg.msg_.scanCounter(),
-                   current_round_[0].msg_.scanCounter());
+                   current_round_.at(0).msg_.scanCounter());
     throw OutdatedMessageError();
   }
 }
