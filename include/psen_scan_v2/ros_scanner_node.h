@@ -144,7 +144,7 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
   {
     std::string tf_prefix_with_subscriber_ = tf_prefixes_.at(scan.scannerId());
     const auto laser_scan_msg = toLaserScanMsg(scan, tf_prefix_with_subscriber_, x_axis_rotation_);
-    PSENSCAN_INFO(
+    PSENSCAN_INFO_ONCE(
         "ScannerNode",
         "Publishing laser scan with angle_min={:.1f} angle_max={:.1f} angle_increment={:.1f} degrees. {} angle values.",
         data_conversion_layer::radianToDegree(laser_scan_msg.angle_min),
