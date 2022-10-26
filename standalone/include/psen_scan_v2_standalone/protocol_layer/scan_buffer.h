@@ -108,7 +108,7 @@ private:
 
 private:
   std::vector<data_conversion_layer::monitoring_frame::MessageStamped> current_round_{};
-  const uint32_t& num_expected_msgs_;
+  const uint32_t num_expected_msgs_;
   bool first_scan_round_ = true;
 };
 

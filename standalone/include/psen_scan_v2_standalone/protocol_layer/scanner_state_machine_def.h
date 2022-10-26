@@ -52,7 +52,7 @@ inline ScannerProtocolDef::ScannerProtocolDef(const ScannerConfiguration& config
   , monitoring_frame_timeout_callback_(monitoring_frame_timeout_callback)
 {
   scan_buffers_.insert(std::make_pair(ScannerId::master, ScanBuffer(DEFAULT_NUM_MSG_PER_ROUND)));
-  for (int i = 0; i <= config.nrSubscribers(); i++)
+  for (int i = 0; i < config.nrSubscribers(); i++)
   {
     ScannerId id = psen_scan_v2_standalone::configuration::subscriber_number_to_scanner_id(i);
     scan_buffers_.insert(std::make_pair(id, ScanBuffer(1)));
@@ -114,7 +114,7 @@ template <class Event, class FSM>
 void ScannerProtocolDef::WaitForMonitoringFrame::on_entry(Event const& /*unused*/, FSM& fsm)  // NOLINT
 {
   PSENSCAN_DEBUG("StateMachine", "Entering state: WaitForMonitoringFrame");
-  for (auto sb : fsm.scan_buffers_)
+  for (auto& sb : fsm.scan_buffers_)
     sb.second.reset();
 
   // Start watchdog...

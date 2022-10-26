@@ -37,6 +37,7 @@
 #include "psen_scan_v2/io_state_ros_conversion.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/util/format_range.h"
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 
 /**
  * @brief Root namespace for the ROS part
@@ -83,7 +84,8 @@ private:
 
 private:
   ros::NodeHandle nh_;
-  ros::Publisher pub_scan_;
+  using ScannerId = psen_scan_v2_standalone::configuration::ScannerId;
+  std::unordered_map<ScannerId, ros::Publisher> pubs_scan_;
   ros::Publisher pub_zone_;
   ros::Publisher pub_io_;
   std::string tf_prefix_;
@@ -121,7 +123,14 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
   , x_axis_rotation_(x_axis_rotation)
   , scanner_(scanner_config, std::bind(&ROSScannerNodeT<S>::laserScanCallback, this, std::placeholders::_1))
 {
-  pub_scan_ = nh_.advertise<sensor_msgs::LaserScan>(topic, 1);
+  pubs_scan_.insert(std::make_pair(ScannerId::master, nh_.advertise<sensor_msgs::LaserScan>(topic, 1)));
+  for (int i = 0; i < scanner_config.nrSubscribers(); i++)
+  {
+    PSENSCAN_DEBUG("ROSNODE", "i{}", i);
+    ScannerId id = psen_scan_v2_standalone::configuration::subscriber_number_to_scanner_id(i);
+    std::string topic_subscriber = topic + psen_scan_v2_standalone::configuration::SCANNER_ID_TO_STRING.at(id);
+    pubs_scan_.insert(std::make_pair(id, nh_.advertise<sensor_msgs::LaserScan>(topic_subscriber, 1)));
+  }
   pub_zone_ = nh_.advertise<std_msgs::UInt8>("active_zoneset", 1);
   pub_io_ = nh_.advertise<psen_scan_v2::IOState>("io_state", 6, true /* latched */);
 }
@@ -139,7 +148,7 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
         data_conversion_layer::radianToDegree(laser_scan_msg.angle_max),
         data_conversion_layer::radianToDegree(laser_scan_msg.angle_increment),
         laser_scan_msg.ranges.size());
-    pub_scan_.publish(laser_scan_msg);
+    pubs_scan_.at(scan.scannerId()).publish(laser_scan_msg);
 
     std_msgs::UInt8 active_zoneset;
     active_zoneset.data = scan.activeZoneset();
