@@ -28,7 +28,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <arg name="angle_start" default="$(eval radians(-137.4))" />
 
   <!-- End angle of measurement in radian -->
-
   <arg name="angle_end" default="$(eval radians(137.4))" />
 
   <!-- Publishing of intensities -->

@@ -41,7 +41,7 @@ class OutdatedMessageError : public ScanRoundError
 {
 public:
   OutdatedMessageError(const std::string& msg = "Detected a MonitoringFrame from an earlier round. "
-                                                " The scan round will ignore it.")
+                                                "The scan round will ignore it.")
     : ScanRoundError(msg){};
 };
 
@@ -145,8 +145,12 @@ inline void ScanBuffer::add(const data_conversion_layer::monitoring_frame::Messa
   {
     startNewRound(stamped_msg);
   }
-  else  // stamped_msg.msg_.scanCounter() <= current_round_[0].msg_.scanCounter()
+  else  // stamped_msg.msg_.scanCounter() < current_round_[0].msg_.scanCounter()
   {
+    PSENSCAN_DEBUG("ScanBuffer",
+                   "stamped_msg.msg_.scanCounter(){} current_round_[0].msg_.scanCounter(){}",
+                   stamped_msg.msg_.scanCounter(),
+                   current_round_[0].msg_.scanCounter());
     throw OutdatedMessageError();
   }
 }
@@ -158,6 +162,11 @@ inline void ScanBuffer::startNewRound(const data_conversion_layer::monitoring_fr
   current_round_.push_back(stamped_msg);
   if (old_round_undersaturated && !first_scan_round_)
   {
+    PSENSCAN_DEBUG("ScanBuffer",
+                   "current_round_.size(){} num_expected_msgs_{} first_scan_round_{}",
+                   current_round_.size(),
+                   num_expected_msgs_,
+                   first_scan_round_);
     throw ScanRoundEndedEarlyError();
   }
   first_scan_round_ = false;

@@ -17,6 +17,9 @@
 #include <ostream>
 #include <stdexcept>
 
+#include <boost/optional.hpp>
+#include <boost/optional/optional_io.hpp>
+
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
@@ -34,7 +37,7 @@ LaserScan::LaserScan(const util::TenthOfDegree& resolution,
                      const util::TenthOfDegree& min_scan_angle,
                      const util::TenthOfDegree& max_scan_angle,
                      const uint32_t scan_counter,
-                     const uint8_t active_zoneset,
+                     const boost::optional<uint8_t> active_zoneset,
                      const int64_t timestamp,
                      const configuration::ScannerId scanner_id)
   : resolution_(resolution)
@@ -97,7 +100,7 @@ int64_t LaserScan::getTimestamp() const
   return this->timestamp();
 }
 
-uint8_t LaserScan::getActiveZoneset() const
+boost::optional<uint8_t> LaserScan::getActiveZoneset() const
 {
   return this->activeZoneset();
 }
@@ -148,7 +151,7 @@ uint32_t LaserScan::scanCounter() const
   return scan_counter_;
 }
 
-uint8_t LaserScan::activeZoneset() const
+boost::optional<uint8_t> LaserScan::activeZoneset() const
 {
   return active_zoneset_;
 }
