@@ -1,9 +1,10 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Forthcoming
-------------------
+0.10.2 (2022-11-03)
+-------------------
 * Remove zoneset bits from IOState.input field since its redundant to the active_zoneset field (#311)
+* Inform about missing configuration confirmation
 * Ignore changes of unused IOs. Fix #321
 * Fill "io_states" vector as received instead of order by theta to avoid flickering. Fix #320
 * Fixed bug of multiple zonesets being visible #328
