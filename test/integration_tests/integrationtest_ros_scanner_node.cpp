@@ -246,7 +246,7 @@ TEST_F(RosScannerNodeTests, shouldPublishActiveZonesetWhenLaserScanCallbackIsInv
 
 const std::string ENCODER_TOPICNAME{ "encoder_state" };
 
-TEST_F(RosScannerNodeTests, shouldPublishEncoderDataEqualToConversionOfSuppliedLaserScan)
+TEST_F(RosScannerNodeTests, shouldPublishEncoderDataEqualToConversionOfSuppliedStandaloneEncoderData)
 {
   const std::string prefix = "scanner";
   ROSScannerNodeT<ScannerMock> ros_scanner_node(
