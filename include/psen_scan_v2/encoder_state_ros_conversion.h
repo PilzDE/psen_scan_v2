@@ -32,7 +32,7 @@ psen_scan_v2::EncoderState toEncoderStateMsg(const psen_scan_v2_standalone::Enco
 
   if (encoder_state.timestamp() < 0)
   {
-    throw std::invalid_argument("IOState of Laserscan message has an invalid timestamp: " +
+    throw std::invalid_argument("EncoderState of Laserscan message has an invalid timestamp: " +
                                 std::to_string(encoder_state.timestamp()));
   }
 
