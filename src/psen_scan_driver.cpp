@@ -109,7 +109,7 @@ int main(int argc, char** argv)
     
     if (scanner_configuration.encoderEnabled())
     {
-      ROS_INFO("Reading data from encoders");
+      ROS_INFO("Reading data from encoders.");
     }
 
     ROSScannerNode ros_scanner_node(pnh,
