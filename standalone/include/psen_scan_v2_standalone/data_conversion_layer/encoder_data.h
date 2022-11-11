@@ -16,7 +16,6 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_ENCODER_PIN_DATA_H
 #define PSEN_SCAN_V2_STANDALONE_ENCODER_PIN_DATA_H
 
-#include <vector>
 #include <ostream>
 
 #include <fmt/format.h>
