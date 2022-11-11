@@ -110,7 +110,7 @@ private:
   FRIEND_TEST(RosScannerNodeTests, shouldThrowExceptionSetInScannerStopFuture);
   FRIEND_TEST(RosScannerNodeTests, shouldPublishChangedIOStatesEqualToConversionOfSuppliedStandaloneIOStates);
   FRIEND_TEST(RosScannerNodeTests, shouldPublishLatchedOnIOStatesTopic);
-  FRIEND_TEST(RosScannerNodeTests, shouldPublishEncoderDataEqualToConversionOfSuppliedLaserScan);
+  FRIEND_TEST(RosScannerNodeTests, shouldPublishEncoderDataEqualToConversionOfSuppliedStandaloneEncoderData);
   FRIEND_TEST(RosScannerNodeTests, shouldLogChangedIOStates);
 };
 
