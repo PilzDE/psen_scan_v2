@@ -40,7 +40,7 @@ namespace psen_scan_v2_standalone
  * - ID of the currently active zoneset.
  * - Time of the first scan ray.
  * - All states of the I/O pins recorded during the scan.
- * - All states of the encoders reading during the scan.
+ * - All states of the encoders read during the scan.
  *
  * The measures use the target frame defined as \<tf_prefix\>.
  * @see https://github.com/PilzDE/psen_scan_v2_standalone/blob/main/README.md#tf-frames
