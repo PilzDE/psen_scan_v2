@@ -37,6 +37,7 @@
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 #include "psen_scan_v2/io_state_ros_conversion.h"
 #include "psen_scan_v2/encoder_state_ros_conversion.h"
+#include "psen_scan_v2_standalone/encoder_state.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/util/format_range.h"
 
