@@ -20,6 +20,7 @@
 #include <algorithm>
 
 #include "psen_scan_v2/EncoderState.h"
+#include "psen_scan_v2_standalone/encoder_state.h"
 
 namespace psen_scan_v2
 {
