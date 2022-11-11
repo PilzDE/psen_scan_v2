@@ -372,8 +372,7 @@ add_test(NAME integrationtest_udp_client
         COMMAND integrationtest_udp_client)
 
 ADD_EXECUTABLE(unittest_encoder_state
-               test/unit_tests/api/unittest_encoder_state.cpp
-               src/io_state.cpp)
+               test/unit_tests/api/unittest_encoder_state.cpp)
 
 TARGET_LINK_LIBRARIES(unittest_encoder_state
     ${PROJECT_NAME}
