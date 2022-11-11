@@ -141,7 +141,7 @@ enum class AdditionalFieldHeaderID : AdditionalFieldHeader::Id
   diagnostics = 0x04,
   measurements = 0x05,
   intensities = 0x06,
-  encoder = 0x07, 
+  encoder = 0x07,
   end_of_frame = 0x09
 };
 
