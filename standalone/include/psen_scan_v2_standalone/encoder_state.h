@@ -16,6 +16,8 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_ENCODER_STATE_H
 #define PSEN_SCAN_V2_STANDALONE_ENCODER_STATE_H
 
+#include <ostream>
+
 #include "psen_scan_v2_standalone/data_conversion_layer/encoder_data.h"
 
 namespace psen_scan_v2_standalone
@@ -32,8 +34,6 @@ public:
   double getEncoder_2() const;
   //! @return time[ns] of the monitoring frame this state is linked to.
   int64_t timestamp() const;
-
-  bool operator==(const EncoderState& encoder_state) const;
 
 private:
   data_conversion_layer::monitoring_frame::encoder::EncoderData encoder_data_{};

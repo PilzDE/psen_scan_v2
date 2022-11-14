@@ -13,8 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef PSEN_SCAN_V2_STANDALONE_ENCODER_PIN_DATA_H
-#define PSEN_SCAN_V2_STANDALONE_ENCODER_PIN_DATA_H
+#ifndef PSEN_SCAN_V2_STANDALONE_ENCODER_DATA_H
+#define PSEN_SCAN_V2_STANDALONE_ENCODER_DATA_H
 
 #include <ostream>
 
@@ -52,4 +52,4 @@ inline std::ostream& operator<<(std::ostream& os, const EncoderData& ed)
 }  // namespace monitoring_frame
 }  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
-#endif  // PSEN_SCAN_V2_STANDALONE_ENCODER_PIN_DATA_H
+#endif  // PSEN_SCAN_V2_STANDALONE_ENCODER_DATA_H

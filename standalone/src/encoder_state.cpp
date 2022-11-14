@@ -13,6 +13,8 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+#include <ostream>
+
 #include "psen_scan_v2_standalone/encoder_state.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/encoder_data.h"
 
@@ -43,12 +45,6 @@ std::ostream& operator<<(std::ostream& os, const EncoderState& encoder_state)
 {
   return os << "EncoderState(timestamp = " << encoder_state.timestamp_ << " nsec, " << encoder_state.encoder_data_
             << ")";
-}
-
-bool EncoderState::operator==(const EncoderState& encoder_state) const
-{
-  return encoder_data_.encoder_1 == encoder_state.getEncoder_1() &&
-         encoder_data_.encoder_2 == encoder_state.getEncoder_2();
 }
 
 }  // namespace psen_scan_v2_standalone

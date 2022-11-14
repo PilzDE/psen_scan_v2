@@ -27,6 +27,8 @@
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/encoder_data.h"
+#include "psen_scan_v2_standalone/encoder_state.h"
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scanner_config_builder.h"
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
