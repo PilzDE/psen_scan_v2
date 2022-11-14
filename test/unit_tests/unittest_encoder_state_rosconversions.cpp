@@ -25,15 +25,42 @@
 
 using namespace psen_scan_v2;
 using namespace psen_scan_v2_standalone;
-
+using data_conversion_layer::monitoring_frame::encoder::EncoderData;
 namespace psen_scan_v2_test
 {
 TEST(EncoderStateROSConversionsTest, shouldConvertSuccessfully)
 {
-  psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::encoder::EncoderData encoder_data{ 12.00, 25.876 };
+  EncoderData encoder_data{ 12.00 /*encoder 1*/, 25.876 /*encoder 2*/};
   psen_scan_v2_standalone::EncoderState encoder_state{ encoder_data, 56 /*timestamp*/ };
 
   EXPECT_NO_THROW(psen_scan_v2::EncoderState ros_message = toEncoderStateMsg(encoder_state, "some_frame"));
+}
+
+TEST(EncoderStateRosConversionsTest, shouldSetCorrectHeaderData)
+{
+  EncoderData encoder_data{ 16.40 /*encoder 1*/, 35.647 /*encoder 2*/};
+  psen_scan_v2_standalone::EncoderState encoder_state(encoder_data , 10 /*timestamp*/);
+  psen_scan_v2::EncoderState ros_message = toEncoderStateMsg(encoder_state, "some_frame");
+
+  EXPECT_EQ(ros_message.header.stamp, ros::Time{}.fromNSec(10));
+  EXPECT_EQ(ros_message.header.frame_id, "some_frame");
+}
+
+TEST(EncoderStateRosConversionsTest, shouldContainCorrectStates)
+{
+  EncoderData encoder_data{ 1.00 /*encoder 1*/, 45.876 /*encoder 2*/};
+  psen_scan_v2_standalone::EncoderState encoder_state{encoder_data, 56 /*timestamp*/ };
+  psen_scan_v2::EncoderState ros_message = toEncoderStateMsg(encoder_state, "some_frame");
+
+  EXPECT_EQ(ros_message.encoder_1, encoder_state.getEncoder_1());
+  EXPECT_EQ(ros_message.encoder_2, encoder_state.getEncoder_2());
+}
+
+TEST(EncoderStateRosConversionsTest, shouldThrowOnNegativeTime)
+{
+  EncoderData encoder_data{ 12.00 /*encoder 1*/, 25.876 /*encoder 2*/};
+  psen_scan_v2_standalone::EncoderState encoder_state(encoder_data, -10 /*timestamp*/);
+  EXPECT_THROW(toEncoderStateMsg(encoder_state, "some_frame"), std::invalid_argument);
 }
 
 }  // namespace psen_scan_v2_test
