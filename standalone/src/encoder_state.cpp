@@ -26,12 +26,12 @@ EncoderState::EncoderState(data_conversion_layer::monitoring_frame::encoder::Enc
 {
 }
 
-double EncoderState::getEncoder_1() const
+double EncoderState::getEncoder1() const
 {
   return encoder_data_.encoder_1;
 }
 
-double EncoderState::getEncoder_2() const
+double EncoderState::getEncoder2() const
 {
   return encoder_data_.encoder_2;
 }

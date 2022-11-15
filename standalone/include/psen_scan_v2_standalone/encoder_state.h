@@ -29,9 +29,9 @@ public:
   EncoderState() = default;
   EncoderState(data_conversion_layer::monitoring_frame::encoder::EncoderData encoder_data, const int64_t& timestamp);
   //! @return double containing the reading of the encoder 1.
-  double getEncoder_1() const;
+  double getEncoder1() const;
   //! @return double containing the reading of the encoder 2.
-  double getEncoder_2() const;
+  double getEncoder2() const;
   //! @return time[ns] of the monitoring frame this state is linked to.
   int64_t timestamp() const;
 

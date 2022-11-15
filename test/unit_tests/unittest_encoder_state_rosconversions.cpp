@@ -52,8 +52,8 @@ TEST(EncoderStateRosConversionsTest, shouldContainCorrectStates)
   psen_scan_v2_standalone::EncoderState encoder_state{encoder_data, 56 /*timestamp*/ };
   psen_scan_v2::EncoderState ros_message = toEncoderStateMsg(encoder_state, "some_frame");
 
-  EXPECT_EQ(ros_message.encoder_1, encoder_state.getEncoder_1());
-  EXPECT_EQ(ros_message.encoder_2, encoder_state.getEncoder_2());
+  EXPECT_EQ(ros_message.encoder_1, encoder_state.getEncoder1());
+  EXPECT_EQ(ros_message.encoder_2, encoder_state.getEncoder2());
 }
 
 TEST(EncoderStateRosConversionsTest, shouldThrowOnNegativeTime)

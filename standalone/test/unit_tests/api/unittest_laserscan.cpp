@@ -187,8 +187,8 @@ TEST(LaserScanTest, testSetAndGetEncoderStates)
   laser_scan->encoderStates(encoder_states);
 
   ASSERT_EQ(laser_scan->encoderStates().size(), 1u);
-  EXPECT_EQ(laser_scan->encoderStates()[0].getEncoder_1(), state.getEncoder_1());
-  EXPECT_EQ(laser_scan->encoderStates()[0].getEncoder_2(), state.getEncoder_2());
+  EXPECT_EQ(laser_scan->encoderStates()[0].getEncoder1(), state.getEncoder1());
+  EXPECT_EQ(laser_scan->encoderStates()[0].getEncoder2(), state.getEncoder2());
   EXPECT_EQ(laser_scan->encoderStates()[0].timestamp(), 65);
 }
 

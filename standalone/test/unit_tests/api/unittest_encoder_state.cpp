@@ -32,14 +32,14 @@ TEST(EncoderStateTests, shouldReturnCorrectTimestamp)
 TEST(EncoderStateTests, shouldReturnCorrectValueForEncoder1)
 {
   const EncoderState encoder_state{ EncoderData{ 12.0005 /*encoder_1*/, 25.786 /*encoder_2*/ }, 42 /*timestamp*/ };
-  const auto encoder_1 = encoder_state.getEncoder_1();
+  const auto encoder_1 = encoder_state.getEncoder1();
   EXPECT_DOUBLE_EQ(encoder_1, 12.0005);
 }
 
 TEST(EncoderStateTests, shouldReturnCorrectValueForEncoder2)
 {
   const EncoderState encoder_state{ EncoderData{ 12.0005 /*encoder_1*/, 25.786 /*encoder_2*/ }, 42 /*timestamp*/ };
-  const auto encoder_2 = encoder_state.getEncoder_2();
+  const auto encoder_2 = encoder_state.getEncoder2();
   EXPECT_DOUBLE_EQ(encoder_2, 25.786);
 }
 

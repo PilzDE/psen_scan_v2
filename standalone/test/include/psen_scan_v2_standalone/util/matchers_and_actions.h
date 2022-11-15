@@ -78,8 +78,8 @@ MATCHER_P(IOStateEq, io_state, "")
 
 MATCHER_P(EncoderStateEq, encoder_state, "")
 {
-  return Matches(DoubleEq(encoder_state.getEncoder_1()))(arg.getEncoder_1()) &&
-         Matches(DoubleEq(encoder_state.getEncoder_2()))(arg.getEncoder_2());
+  return Matches(DoubleEq(encoder_state.getEncoder1()))(arg.getEncoder1()) &&
+         Matches(DoubleEq(encoder_state.getEncoder2()))(arg.getEncoder2());
 }
 
 MATCHER_P(PointwiseIOStateEq, vec, "")

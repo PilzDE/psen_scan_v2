@@ -39,8 +39,8 @@ psen_scan_v2::EncoderState toEncoderStateMsg(const psen_scan_v2_standalone::Enco
   ros_message.header.stamp = ros::Time{}.fromNSec(encoder_state.timestamp());
   ros_message.header.frame_id = frame_id;
 
-  ros_message.encoder_1 = encoder_state.getEncoder_1();
-  ros_message.encoder_2 = encoder_state.getEncoder_2();
+  ros_message.encoder_1 = encoder_state.getEncoder1();
+  ros_message.encoder_2 = encoder_state.getEncoder2();
 
   return ros_message;
 }
