@@ -91,7 +91,7 @@ MATCHER_P(PointwiseIOStateEq, vec, "")
 
 MATCHER_P(PointwiseEncoderStateEq, vec, "")
 {
-    return std::equal(vec.begin(), vec.end(), arg.begin(), arg.end(), [&](const auto& a, const auto& b) {
+  return std::equal(vec.begin(), vec.end(), arg.begin(), arg.end(), [&](const auto& a, const auto& b) {
     return Matches(EncoderStateEq(b))(a);
   });
 }
