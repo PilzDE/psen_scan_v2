@@ -154,6 +154,11 @@ namespace diagnostic
 std::vector<diagnostic::Message> deserializeMessages(std::istream& is);
 }
 
+namespace encoder
+{
+  EncoderData deserializeEncoderData(std::istream& is);
+}
+
 namespace io
 {
 template <size_t ChunkSize>

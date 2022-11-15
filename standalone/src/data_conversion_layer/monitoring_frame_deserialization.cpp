@@ -167,17 +167,7 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
                                                           additional_header.length(),
                                                           NUMBER_OF_BYTES_ENCODER_DATA));
         }
-        uint16_t encoder_1_read_buffer;
-        raw_processing::read<uint16_t>(ss, encoder_1_read_buffer);
-
-        uint16_t encoder_2_read_buffer;
-        raw_processing::read<uint16_t>(ss, encoder_2_read_buffer);
-
-        encoder::EncoderData encoder_data;
-        encoder_data.encoder_1 = toEncoder(encoder_1_read_buffer);
-        encoder_data.encoder_2 = toEncoder(encoder_2_read_buffer);
-
-        msg_builder.encoderData(encoder_data);
+        msg_builder.encoderData(encoder::deserializeEncoderData(ss));
         break;
       }
       default:
@@ -206,6 +196,28 @@ AdditionalFieldHeader readAdditionalField(std::istream& is, const std::size_t& m
   }
   return AdditionalFieldHeader(id, length);
 }
+
+namespace encoder
+{
+EncoderData deserializeEncoderData(std::istream& is)
+{
+  uint16_t encoder_1_read_buffer;
+  raw_processing::read<uint16_t>(is, encoder_1_read_buffer);
+
+  uint16_t encoder_2_read_buffer;
+  raw_processing::read<uint16_t>(is, encoder_2_read_buffer);
+
+  // Change to Big-endian, please check protocol
+  raw_processing::endswap(&encoder_1_read_buffer);
+  raw_processing::endswap(&encoder_2_read_buffer);
+
+  encoder::EncoderData encoder_data;
+  encoder_data.encoder_1 = toEncoder(encoder_1_read_buffer);
+  encoder_data.encoder_2 = toEncoder(encoder_2_read_buffer);
+
+  return encoder_data;
+}
+}  // namespace encoder
 
 namespace io
 {
