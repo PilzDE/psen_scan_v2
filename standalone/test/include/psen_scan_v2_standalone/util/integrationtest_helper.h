@@ -98,7 +98,7 @@ createMonitoringFrameMsgBuilderWithoutDiagnostics(const util::TenthOfDegree star
 
   msg_builder.iOPinData(createPinData());
 
-  msg_builder.encoderData({ 12.005, 25.876 });
+  msg_builder.encoderData({ 12, 25 });
 
   return msg_builder;
 }

@@ -78,8 +78,8 @@ MATCHER_P(IOStateEq, io_state, "")
 
 MATCHER_P(EncoderStateEq, encoder_state, "")
 {
-  return encoder_state.getEncoder_1() == arg.getEncoder_1() && encoder_state.getEncoder_2() == arg.getEncoder_2() &&
-         encoder_state.timestamp() == arg.timestamp();
+  return Matches(DoubleEq(encoder_state.getEncoder_1()))(arg.getEncoder_1()) &&
+         Matches(DoubleEq(encoder_state.getEncoder_2()))(arg.getEncoder_2());
 }
 
 MATCHER_P(PointwiseIOStateEq, vec, "")
@@ -89,13 +89,21 @@ MATCHER_P(PointwiseIOStateEq, vec, "")
   });
 }
 
+MATCHER_P(PointwiseEncoderStateEq, vec, "")
+{
+    return std::equal(vec.begin(), vec.end(), arg.begin(), arg.end(), [&](const auto& a, const auto& b) {
+    return Matches(EncoderStateEq(b))(a);
+  });
+}
+
 MATCHER_P(ScanDataEqual, scan, "")
 {
   return arg.scanCounter() == scan.scanCounter() && arg.scanResolution() == scan.scanResolution() &&
          arg.minScanAngle() == scan.minScanAngle() && arg.maxScanAngle() == scan.maxScanAngle() &&
          Matches(PointwiseDoubleEq(scan.measurements()))(arg.measurements()) &&
          Matches(PointwiseDoubleEq(scan.intensities()))(arg.intensities()) &&
-         ExplainMatchResult(PointwiseIOStateEq(scan.ioStates()), arg.ioStates(), result_listener);
+         ExplainMatchResult(PointwiseIOStateEq(scan.ioStates()), arg.ioStates(), result_listener) &&
+         Matches(PointwiseEncoderStateEq(scan.encoderStates()))(arg.encoderStates());
 }
 
 MATCHER_P2(IOTimestampsInExpectedTimeframe, reference_ios, reference_timestamp, "")
