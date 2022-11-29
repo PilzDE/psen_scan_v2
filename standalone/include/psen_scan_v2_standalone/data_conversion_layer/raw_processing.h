@@ -121,10 +121,10 @@ inline T toArray(std::ostringstream& os)
 
 // Reverse to change Little-endian to Big-endian
 template <typename T>
-inline void endswap(T *objp)
+inline void endianSwap(T& data)
 {
-  unsigned char *memp = reinterpret_cast<unsigned char*>(objp);
-  std::reverse(memp, memp + sizeof(T));
+  unsigned char *data_ptr = reinterpret_cast<unsigned char*>(&data);
+  std::reverse(data_ptr, data_ptr + sizeof(T));
 }
 
 inline StringStreamFailure::StringStreamFailure(const std::string& msg) : std::runtime_error(msg)

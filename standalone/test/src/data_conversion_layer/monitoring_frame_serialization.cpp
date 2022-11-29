@@ -107,11 +107,11 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
     write(os, encoder_header);
 
     uint16_t encoder_1_payload = static_cast<uint16_t>(msg.encoderData().encoder_1);
-    raw_processing::endswap(&encoder_1_payload); //Change to Big-endian
+    raw_processing::endianSwap(encoder_1_payload); //Change to Big-endian
     raw_processing::write(os, encoder_1_payload);
 
     uint16_t encoder_2_payload = static_cast<uint16_t>(msg.encoderData().encoder_2);
-    raw_processing::endswap(&encoder_2_payload); //Change to Big-endian
+    raw_processing::endianSwap(encoder_2_payload); //Change to Big-endian
     raw_processing::write(os, encoder_2_payload);
   }
 

@@ -208,8 +208,8 @@ EncoderData deserializeEncoderData(std::istream& is)
   raw_processing::read<uint16_t>(is, encoder_2_read_buffer);
 
   // Change to Big-endian, please check protocol
-  raw_processing::endswap(&encoder_1_read_buffer);
-  raw_processing::endswap(&encoder_2_read_buffer);
+  raw_processing::endianSwap(encoder_1_read_buffer);
+  raw_processing::endianSwap(encoder_2_read_buffer);
 
   encoder::EncoderData encoder_data;
   encoder_data.encoder_1 = toEncoder(encoder_1_read_buffer);
