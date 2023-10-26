@@ -181,6 +181,31 @@ std::vector<ZoneSet> parseZoneSets(const tinyxml2::XMLConstHandle& doc_handle)
     xml_set_element = xml_set_element->NextSiblingElement("zoneSetInfo");
   }
 
+  /////////////////////////////////////////////////////////
+  // parse zonesets of second scanner (subscriber) (dirty!)
+  tinyxml2::XMLConstHandle xml_set_info_handle2 = doc_handle.FirstChildElement("MIB")
+                                                     .FirstChildElement("scannerDescr")
+                                                     .NextSiblingElement("scannerDescr")
+                                                     .FirstChildElement("zoneSetDefinition")
+                                                     .FirstChildElement("zoneSetInfo");
+
+  const tinyxml2::XMLElement* xml_set_element2 = xml_set_info_handle2.ToElement();
+
+  if (!xml_set_element2)
+  {
+    throw XMLConfigurationParserException(
+        "Could not parse. Chain MIB->scannerDescr(2)->zoneSetDefinition->zoneSetInfo not complete.");
+  }
+
+  while (xml_set_element2)
+  {
+    ZoneSet set = parseZoneSet(xml_set_element2);
+
+    zonesets.push_back(set);
+    xml_set_element2 = xml_set_element2->NextSiblingElement("zoneSetInfo");
+  }
+  /////////////////////////////////////////////////////////
+
   return zonesets;
 }
 

@@ -30,12 +30,16 @@
 
 namespace psen_scan_v2
 {
-ActiveZonesetNode::ActiveZonesetNode(ros::NodeHandle& nh) : nh_(nh)
+ActiveZonesetNode::ActiveZonesetNode(ros::NodeHandle& nh, bool is_subscriber) : nh_(nh), is_subscriber_(is_subscriber)
 {
   zoneset_subscriber_ = nh_.subscribe(DEFAULT_ZONECONFIGURATION_TOPIC, 2, &ActiveZonesetNode::zonesetCallback, this);
   active_zoneset_subscriber_ =
       nh_.subscribe(DEFAULT_ACTIVE_ZONESET_TOPIC, 10, &ActiveZonesetNode::activeZonesetCallback, this);
-  zoneset_markers_ = nh_.advertise<visualization_msgs::MarkerArray>(DEFAULT_ZONESET_MARKER_ARRAY_TOPIC, 10);
+  std::string zoneset_topic = DEFAULT_ZONESET_MARKER_ARRAY_TOPIC;
+  if (is_subscriber) {
+    zoneset_topic = "active_zoneset2_markers";
+  }
+  zoneset_markers_ = nh_.advertise<visualization_msgs::MarkerArray>(zoneset_topic, 10);
 }
 
 void ActiveZonesetNode::zonesetCallback(const ZoneSetConfiguration& zoneset_config)
@@ -77,7 +81,23 @@ bool ActiveZonesetNode::isAllInformationAvailable() const
 
 ZoneSet ActiveZonesetNode::activeZoneset() const
 {
-  return zoneset_config_->zonesets.at(active_zoneset_id_->data);
+  if (this->is_subscriber_)
+  {
+    auto zoneset = zoneset_config_->zonesets.at(active_zoneset_id_->data + 3);
+    zoneset.header.frame_id = "laser_2_scan";
+    return zoneset;
+  }
+  else
+  {
+    auto zoneset = zoneset_config_->zonesets.at(active_zoneset_id_->data);
+    if (active_zoneset_id_->data == 1)
+    {
+      auto safety1 = zoneset.safety1;
+      zoneset.safety1 = zoneset.warn1;
+      zoneset.warn1 = safety1;
+    }
+    return zoneset;
+  }
 }
 
 // LCOV_EXCL_START

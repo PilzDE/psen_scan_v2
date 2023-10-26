@@ -48,7 +48,7 @@ public:
    *
    * @param nh Node handle for the ROS node on which the scanner topic is advertised.
    */
-  ActiveZonesetNode(ros::NodeHandle& nh);
+  ActiveZonesetNode(ros::NodeHandle& nh, bool is_subscriber);
 
 public:
   void zonesetCallback(const ZoneSetConfiguration& zoneset_config);
@@ -76,6 +76,8 @@ private:
   boost::optional<std_msgs::UInt8> active_zoneset_id_;
   std::vector<visualization_msgs::Marker> last_markers_;
   std::vector<visualization_msgs::Marker> current_markers_;
+
+  bool is_subscriber_;
 };
 
 }  // namespace psen_scan_v2

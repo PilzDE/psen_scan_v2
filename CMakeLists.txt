@@ -214,6 +214,19 @@ add_dependencies(active_zoneset_node
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
 )
 
+
+add_executable(active_zoneset2_node
+  src/active_zoneset2_node_main.cpp
+  src/active_zoneset_node.cpp
+)
+target_link_libraries(active_zoneset2_node
+  ${catkin_LIBRARIES}
+  fmt::fmt
+)
+add_dependencies(active_zoneset2_node
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+)
+
 #############
 ## Install ##
 #############
