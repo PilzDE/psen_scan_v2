@@ -85,6 +85,7 @@ ZoneSet ActiveZonesetNode::activeZoneset() const
   {
     auto zoneset = zoneset_config_->zonesets.at(active_zoneset_id_->data + 3);
     zoneset.header.frame_id = "laser_2_scan";
+    zoneset.warn1.points.clear();
     return zoneset;
   }
   else
@@ -92,9 +93,11 @@ ZoneSet ActiveZonesetNode::activeZoneset() const
     auto zoneset = zoneset_config_->zonesets.at(active_zoneset_id_->data);
     if (active_zoneset_id_->data == 1)
     {
-      auto safety1 = zoneset.safety1;
-      zoneset.safety1 = zoneset.warn1;
-      zoneset.warn1 = safety1;
+      zoneset.safety1.points.clear();
+    }
+    else
+    {
+      zoneset.warn1.points.clear();
     }
     return zoneset;
   }
