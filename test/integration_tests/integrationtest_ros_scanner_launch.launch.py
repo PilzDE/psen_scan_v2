@@ -36,7 +36,7 @@ def generate_test_description():
         PathJoinSubstitution([
             get_package_share_directory('psen_scan_v2'),
             'launch',
-            'psen_scan_v2.launch.xml'
+            'bringup.launch.xml'
         ])
     )
 
@@ -71,9 +71,6 @@ class TestNodeAvailable(unittest.TestCase):
 
     def test_psen_scan_v2_node_available(self):
         self.assertTrue(self.isNodeAvailable('laser_1', 10.0))
-
-    def test_robot_state_publisher_node_available(self):
-        self.assertTrue(self.isNodeAvailable('robot_state_publisher', 10.0))
 
 
 @launch_testing.post_shutdown_test()

@@ -104,7 +104,11 @@ std::map<int16_t, NormalDist> binsFromRosbag(std::string path)
   std::map<int16_t, NormalDist> bins;
 
   // the following could be simplified if https://github.com/ros2/rosbag2/pull/452 would be released to foxy
+#ifdef ROSBAG2_VERSION_PRE_0_4  // old api
   rosbag2_cpp::StorageOptions storage_options;
+#else
+  rosbag2_storage::StorageOptions storage_options;
+#endif
   storage_options.uri = path;
   storage_options.storage_id = "sqlite3";
 

@@ -118,6 +118,7 @@ target_include_directories(${PROJECT_NAME}_node
 )
 target_link_libraries(${PROJECT_NAME}_node
   ${PROJECT_NAME}_standalone
+  fmt::fmt
 )
 ament_target_dependencies(${PROJECT_NAME}_node
   rclcpp
@@ -416,7 +417,11 @@ if(BUILD_TESTING)
 
   # This test is intended to be run on in a dedicated environment with a prerecorded reference scan
   # and thus needs to be enabled seperately.
-  find_package(rosbag2_cpp REQUIRED)
+  find_package(rosbag2_cpp 0.4.0)
+  if(NOT rosbag2_cpp_FOUND)
+    find_package(rosbag2_cpp)
+    add_compile_definitions(ROSBAG2_VERSION_PRE_0_4)
+  endif()
   if(ENABLE_HARDWARE_TESTING_WITH_REFERENCE_SCAN)
 
     ament_add_gtest(hwtest_scan_compare_standalone
