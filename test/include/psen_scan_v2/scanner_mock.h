@@ -17,6 +17,7 @@
 #define PSEN_SCAN_V2_TEST_MOCK_SCANNER_IMPL_H
 
 #include <future>
+#include <string>
 
 #include <gmock/gmock.h>
 
@@ -30,21 +31,29 @@ class ScannerMock
 {
 public:
   ScannerMock(const psen_scan_v2_standalone::ScannerConfiguration& scanner_config,
-              const psen_scan_v2_standalone::protocol_layer::LaserScanCallback& laser_scan_callback)
-    : laser_scan_callback_(laser_scan_callback){};
+              const psen_scan_v2_standalone::protocol_layer::LaserScanCallback& laser_scan_callback,
+              const psen_scan_v2_standalone::protocol_layer::ErrorCallback& error_callback)
+    : laser_scan_callback_(laser_scan_callback), error_callback_(error_callback){};
 
   MOCK_METHOD0(start, std::future<void>());
   MOCK_METHOD0(stop, std::future<void>());
 
   void invokeLaserScanCallback(const psen_scan_v2_standalone::LaserScan& scan);
+  void invokeErrorCallback(const std::string& error_msg);
 
 private:
   psen_scan_v2_standalone::protocol_layer::LaserScanCallback laser_scan_callback_;
+  psen_scan_v2_standalone::protocol_layer::ErrorCallback error_callback_;
 };
 
 inline void ScannerMock::invokeLaserScanCallback(const psen_scan_v2_standalone::LaserScan& scan)
 {
   laser_scan_callback_(scan);
+}
+
+inline void ScannerMock::invokeErrorCallback(const std::string& error_msg = "")
+{
+  error_callback_(error_msg);
 }
 
 }  // namespace psen_scan_v2_test

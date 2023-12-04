@@ -33,14 +33,17 @@
 
 #define EXPECT_BARRIER_OPENS(barrier, wait_timeout) EXPECT_TRUE(barrier.waitTillRelease(wait_timeout))
 
-#define EXPECT_NO_BLOCK_NO_THROW(statement)                                                                            \
+#define EXPECT_NO_BLOCK_WITH_TIMEOUT_AND_NO_THROW(statement, wait_timeout)                                             \
   do                                                                                                                   \
   {                                                                                                                    \
     auto future = std::async(std::launch::async, [&]() { statement });                                                 \
     EXPECT_TRUE(future.valid());                                                                                       \
-    EXPECT_FUTURE_IS_READY(future, std::chrono::seconds(2)) << #statement << " does not return.";                      \
+    EXPECT_FUTURE_IS_READY(future, wait_timeout) << #statement << " does not return.";                                 \
     EXPECT_NO_THROW(future.get();) << #statement << " does throw an exception.";                                       \
   } while (false)  // https://stackoverflow.com/questions/1067226/c-multi-line-macro-do-while0-vs-scope-block
+
+#define EXPECT_NO_BLOCK_NO_THROW(statement)                                                                            \
+  EXPECT_NO_BLOCK_WITH_TIMEOUT_AND_NO_THROW(statement, std::chrono::seconds(2))
 
 #define EXPECT_THROW_AND_WHAT(statement, expected_exception, expected_message)                                         \
   EXPECT_THROW(                                                                                                        \

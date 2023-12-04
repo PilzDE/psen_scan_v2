@@ -49,6 +49,7 @@ public:
   ScannerConfigurationBuilder& enableDiagnostics(const bool& enable);
   ScannerConfigurationBuilder& enableIntensities(const bool& enable);
   ScannerConfigurationBuilder& enableFragmentedScans(const bool& enable);
+  ScannerConfigurationBuilder& secondsUntilDataTimeoutCountsAsError(const double seconds_until_data_timeout_counts_as_error);
   operator ScannerConfiguration();
 
 private:
@@ -148,6 +149,13 @@ inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableIntensiti
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableFragmentedScans(const bool& enable = true)
 {
   config_.fragmented_scans_ = enable;
+  return *this;
+}
+
+inline ScannerConfigurationBuilder&
+ScannerConfigurationBuilder::secondsUntilDataTimeoutCountsAsError(const double seconds_until_data_timeout_counts_as_error)
+{
+  config_.seconds_until_data_timeout_counts_as_error_ = seconds_until_data_timeout_counts_as_error;
   return *this;
 }
 

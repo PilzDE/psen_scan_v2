@@ -16,6 +16,8 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/start_request_serialization.h"
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/communication_layer/udp_client.h"
+#include "psen_scan_v2_standalone/configuration/default_parameters.h"
+
 namespace psen_scan_v2_standalone
 {
 namespace protocol_layer
@@ -25,6 +27,7 @@ inline ScannerProtocolDef::ScannerProtocolDef(const ScannerConfiguration& config
                                               const communication_layer::ErrorCallback& control_error_callback,
                                               const communication_layer::ErrorCallback& start_error_callback,
                                               const communication_layer::ErrorCallback& stop_error_callback,
+                                              const communication_layer::ErrorCallback& scanner_error_callback,
                                               const communication_layer::NewMessageCallback& data_msg_callback,
                                               const communication_layer::ErrorCallback& data_error_callback,
                                               const ScannerStartedCallback& scanner_started_callback,
@@ -47,6 +50,7 @@ inline ScannerProtocolDef::ScannerProtocolDef(const ScannerConfiguration& config
   , scanner_stopped_callback_(scanner_stopped_callback)
   , start_error_callback_(start_error_callback)
   , stop_error_callback_(stop_error_callback)
+  , scanner_error_callback_(scanner_error_callback)
   , inform_user_about_laser_scan_callback_(laser_scan_callback)
   , start_timeout_callback_(start_timeout_callback)
   , monitoring_frame_timeout_callback_(monitoring_frame_timeout_callback)
@@ -170,6 +174,7 @@ inline void ScannerProtocolDef::sendStopRequest(const T& event)
 
 inline void ScannerProtocolDef::handleMonitoringFrame(const scanner_events::RawMonitoringFrameReceived& event)
 {
+  monitoring_frame_timeout_secs = 0.0;
   PSENSCAN_DEBUG("StateMachine", "Action: handleMonitoringFrame");
   monitoring_frame_watchdog_->reset();
 
@@ -206,6 +211,13 @@ inline void ScannerProtocolDef::notifyUserAboutUnknownStartReply(scanner_events:
       *(reply_event.data_)) };
   start_error_callback_(
       fmt::format("Unknown result code {:#04x} in start reply.", static_cast<uint32_t>(msg.result())));
+}
+
+inline void
+ScannerProtocolDef::notifyUserAboutDataTimeoutError(scanner_events::MonitoringFrameTimeout const& timeout_event)
+{
+  scanner_error_callback_(
+      fmt::format("No incoming Monitoring frame for {:.1f} seconds", monitoring_frame_timeout_secs));
 }
 
 inline void ScannerProtocolDef::notifyUserAboutRefusedStartReply(scanner_events::RawReplyReceived const& reply_event)
@@ -299,6 +311,7 @@ inline bool ScannerProtocolDef::framesContainMeasurements(
 
 inline void ScannerProtocolDef::handleMonitoringFrameTimeout(const scanner_events::MonitoringFrameTimeout& event)
 {
+  monitoring_frame_timeout_secs += WATCHDOG_TIMEOUT.count() / 1000.0;
   PSENSCAN_DEBUG("StateMachine", "Action: handleMonitoringFrameTimeout");
 
   PSENSCAN_WARN("StateMachine",
@@ -348,6 +361,16 @@ inline bool ScannerProtocolDef::isUnknownStartReply(scanner_events::RawReplyRece
   const data_conversion_layer::scanner_reply::Message msg{ data_conversion_layer::scanner_reply::deserialize(
       *(reply_event.data_)) };
   return isStartReply(msg) && isUnknownReply(msg);
+}
+
+inline bool ScannerProtocolDef::isDataTimeoutWarning(scanner_events::MonitoringFrameTimeout const& error_event)
+{
+  return monitoring_frame_timeout_secs < config_.secondsUntilDataTimeoutCountsAsError();
+}
+
+inline bool ScannerProtocolDef::isDataTimeoutError(scanner_events::MonitoringFrameTimeout const& error_event)
+{
+  return !isDataTimeoutWarning(error_event);
 }
 
 inline bool ScannerProtocolDef::isRefusedStartReply(scanner_events::RawReplyReceived const& reply_event)

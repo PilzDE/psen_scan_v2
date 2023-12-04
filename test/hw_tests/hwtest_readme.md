@@ -22,6 +22,7 @@ To build the hardware tests execute
 ```
 catkin_make
 catkin_make tests -DENABLE_HARDWARE_TESTING=ON
+catkin_make test
 ```
 in your catkin workspace.
 

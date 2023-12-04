@@ -61,6 +61,9 @@ class ScannerV2 : public IScanner
 {
 public:
   ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback);
+  ScannerV2(const ScannerConfiguration& scanner_config,
+            const LaserScanCallback& laser_scan_callback,
+            const ErrorCallback& error_callback);
   ~ScannerV2() override;
 
 public:
@@ -81,6 +84,7 @@ private:
   void scannerStoppedCallback();
   void scannerStartErrorCallback(const std::string& error_msg);
   void scannerStopErrorCallback(const std::string& error_msg);
+  void scannerErrorCallback(const std::string& error_msg);
 
 private:
   using OptionalPromise = boost::optional<std::promise<void>>;

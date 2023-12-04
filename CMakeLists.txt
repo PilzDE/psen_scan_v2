@@ -622,7 +622,29 @@ if(CATKIN_ENABLE_TESTING)
       ARGS config:=with_intensities.yaml)
     add_rostest(test/hw_tests/hwtest_scan_range.test
       ARGS config:=big_resolution.yaml)
+
+    add_rostest_gtest(hwtest_error_callback
+      test/hw_tests/hwtest_error_callback.test
+      test/hw_tests/hwtest_error_callback.cpp
+    )
+    add_dependencies(hwtest_error_callback
+      ${PROJECT_NAME}_node
+      ${${PROJECT_NAME}_EXPORTED_TARGETS}
+    )
+  else()
+
+    catkin_add_executable_with_gtest(hwtest_error_callback
+      test/hw_tests/hwtest_error_callback.cpp
+      EXCLUDE_FROM_ALL
+    )
+    add_dependencies(tests hwtest_error_callback)
   endif()
+
+  target_link_libraries(hwtest_error_callback
+    ${catkin_LIBRARIES}
+    ${PROJECT_NAME}_standalone
+    fmt::fmt
+  )
 
   ###########################################
   ##  Hardware-Tests with saintsmart_relay ##

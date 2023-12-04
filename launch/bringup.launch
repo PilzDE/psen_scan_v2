@@ -49,6 +49,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- Set the following to true in order to publish scan data as soon as a UDP packet is ready, instead of waiting for a full scan -->
   <arg name="fragmented_scans" default="false" />
 
+  <!-- After how many seconds a data connection loss should be counted as an error and invoke the error callback -->
+  <arg name="seconds_until_data_timeout_counts_as_error" default="30.0" />
+
   <node name="$(arg tf_prefix)" type="psen_scan_v2_node" pkg="psen_scan_v2" output="screen" required="true">
     <param name="sensor_ip" value="$(arg sensor_ip)" />
     <param name="tf_prefix" value="$(arg tf_prefix)" />
@@ -60,6 +63,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <param name="host_udp_port_data" value="$(arg host_udp_port_data)" />
     <param name="host_udp_port_control" value="$(arg host_udp_port_control)" />
     <param name="fragmented_scans" value="$(arg fragmented_scans)" />
+    <param name="seconds_until_data_timeout_counts_as_error" value="$(arg seconds_until_data_timeout_counts_as_error)" />
   </node>
 
 </launch>

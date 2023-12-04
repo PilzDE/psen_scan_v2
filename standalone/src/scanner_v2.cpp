@@ -38,8 +38,10 @@ std::unique_ptr<util::Watchdog> WatchdogFactory::create(const util::Watchdog::Ti
   return std::unique_ptr<util::Watchdog>(new util::Watchdog(timeout, timeout_callback));
 }
 
-ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback)
-  : IScanner(scanner_config, laser_scan_callback)
+ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config,
+                     const LaserScanCallback& laser_scan_callback,
+                     const ErrorCallback& error_callback)
+  : IScanner(scanner_config, laser_scan_callback, error_callback)
   , sm_(new ScannerStateMachine(IScanner::config(),
                                 // LCOV_EXCL_START
                                 // The following includes calls to std::bind which are not marked correctly
@@ -48,6 +50,7 @@ ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScan
                                 BIND_EVENT(ReplyReceiveError),
                                 std::bind(&ScannerV2::scannerStartErrorCallback, this, std::placeholders::_1),
                                 std::bind(&ScannerV2::scannerStopErrorCallback, this, std::placeholders::_1),
+                                std::bind(&ScannerV2::scannerErrorCallback, this, std::placeholders::_1),
                                 BIND_RAW_DATA_EVENT(RawMonitoringFrameReceived),
                                 BIND_EVENT(MonitoringFrameReceivedError),
                                 std::bind(&ScannerV2::scannerStartedCallback, this),
@@ -59,6 +62,11 @@ ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScan
 {
   const std::lock_guard<std::mutex> lock(member_mutex_);
   sm_->start();
+}
+
+ScannerV2::ScannerV2(const ScannerConfiguration& scanner_config, const LaserScanCallback& laser_scan_callback)
+  : ScannerV2(scanner_config, laser_scan_callback, nullptr)
+{
 }
 
 ScannerV2::~ScannerV2()
@@ -137,6 +145,15 @@ void ScannerV2::scannerStopErrorCallback(const std::string& error_msg)
   PSENSCAN_INFO("ScannerController", "Scanner stop failed.");
   scanner_has_stopped_.value().set_exception(std::make_exception_ptr(std::runtime_error(error_msg)));
   scanner_has_stopped_ = boost::none;
+}
+
+void ScannerV2::scannerErrorCallback(const std::string& error_msg)
+{
+  PSENSCAN_INFO("ScannerController", "Scanner encountered a runtime error.");
+  if (IScanner::errorCallback())
+  {
+    IScanner::errorCallback()(error_msg);
+  }
 }
 
 }  // namespace psen_scan_v2_standalone

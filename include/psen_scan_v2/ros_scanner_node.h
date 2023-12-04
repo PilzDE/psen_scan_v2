@@ -79,6 +79,7 @@ public:
 
 private:
   void laserScanCallback(const LaserScan& scan);
+  void errorCallback(const std::string& error_msg);
   void publishChangedIOStates(const std::vector<psen_scan_v2_standalone::IOState>& io_states);
 
 private:
@@ -106,6 +107,7 @@ private:
   FRIEND_TEST(RosScannerNodeTests, shouldPublishChangedIOStatesEqualToConversionOfSuppliedStandaloneIOStates);
   FRIEND_TEST(RosScannerNodeTests, shouldPublishLatchedOnIOStatesTopic);
   FRIEND_TEST(RosScannerNodeTests, shouldLogChangedIOStates);
+  FRIEND_TEST(RosScannerNodeTests, shouldTerminateOnErrorCallbackInvocation);
 };
 
 typedef ROSScannerNodeT<> ROSScannerNode;
@@ -119,7 +121,9 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
   : nh_(nh)
   , tf_prefix_(tf_prefix)
   , x_axis_rotation_(x_axis_rotation)
-  , scanner_(scanner_config, std::bind(&ROSScannerNodeT<S>::laserScanCallback, this, std::placeholders::_1))
+  , scanner_(scanner_config,
+             std::bind(&ROSScannerNodeT<S>::laserScanCallback, this, std::placeholders::_1),
+             std::bind(&ROSScannerNodeT<S>::errorCallback, this, std::placeholders::_1))
 {
   pub_scan_ = nh_.advertise<sensor_msgs::LaserScan>(topic, 1);
   pub_zone_ = nh_.advertise<std_msgs::UInt8>("active_zoneset", 1);
@@ -177,6 +181,13 @@ template <typename S>
 void ROSScannerNodeT<S>::terminate()
 {
   terminate_ = true;
+}
+
+template <typename S>
+void ROSScannerNodeT<S>::errorCallback(const std::string& error_msg)
+{
+  PSENSCAN_ERROR("RosScannerNode", error_msg);
+  terminate();
 }
 
 template <typename S>
