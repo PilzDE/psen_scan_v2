@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+# Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -58,6 +58,7 @@ set(${PROJECT_NAME}_sources
   src/scanner_v2.cpp
   src/io_state.cpp
   src/laserscan.cpp
+  src/encoder_state.cpp
   src/data_conversion_layer/monitoring_frame_msg.cpp
   src/data_conversion_layer/start_request.cpp
   src/data_conversion_layer/start_request_serialization.cpp
@@ -343,6 +344,17 @@ ADD_TEST(NAME unittest_udp_client
         COMMAND unittest_udp_client)
 
 
+ADD_EXECUTABLE(unittest_encoder_state test/unit_tests/api/unittest_encoder_state.cpp)
+
+TARGET_LINK_LIBRARIES(unittest_encoder_state
+    ${PROJECT_NAME}
+    gtest
+)
+
+ADD_TEST(NAME unittest_encoder_state
+        COMMAND unittest_encoder_state)
+
+
 add_executable(integrationtest_scanner_api
         test/integration_tests/api/integrationtest_scanner_api.cpp
         test/src/communication_layer/mock_udp_server.cpp
@@ -369,6 +381,7 @@ target_link_libraries(integrationtest_udp_client
 
 add_test(NAME integrationtest_udp_client
         COMMAND integrationtest_udp_client)
+
 
 endif ()
 endif ()

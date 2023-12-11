@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2022 Pilz GmbH & Co. KG
+// Copyright (c) 2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -13,24 +13,43 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include "psen_scan_v2_standalone/data_conversion_layer/start_request.h"
+#ifndef PSEN_SCAN_V2_STANDALONE_ENCODER_DATA_H
+#define PSEN_SCAN_V2_STANDALONE_ENCODER_DATA_H
 
-#include "psen_scan_v2_standalone/scanner_configuration.h"
+#include <ostream>
+
+#include <fmt/format.h>
+#include <fmt/ostream.h>
+
 
 namespace psen_scan_v2_standalone
 {
 namespace data_conversion_layer
 {
-namespace start_request
+namespace monitoring_frame
 {
-Message::Message(const ScannerConfiguration& scanner_configuration)
-  : host_ip_(*scanner_configuration.hostIp())
-  , host_udp_port_data_(scanner_configuration.hostUDPPortData())  // Write is deduced by the scanner
-  , master_device_settings_(scanner_configuration.diagnosticsEnabled(), scanner_configuration.intensitiesEnabled(), scanner_configuration.encoderEnabled())
-  , master_(scanner_configuration.scanRange(), scanner_configuration.scanResolution())
+/**
+ * @brief Contains all types, etc. needed to describe the encoder information contained
+ * in a  data_conversion_layer::monitoring_frame::Message.
+ */
+namespace encoder
 {
+
+struct EncoderData
+{
+  double encoder_1;
+  double encoder_2;
+};
+
+inline std::ostream& operator<<(std::ostream& os, const EncoderData& ed)
+{
+  return os << fmt::format("EncoderData(encoder_1 = {}, encoder_2 = {})",
+                           ed.encoder_1,
+                           ed.encoder_2);
 }
 
-}  // namespace start_request
+}  // namespace encoder
+}  // namespace monitoring_frame
 }  // namespace data_conversion_layer
 }  // namespace psen_scan_v2_standalone
+#endif  // PSEN_SCAN_V2_STANDALONE_ENCODER_DATA_H

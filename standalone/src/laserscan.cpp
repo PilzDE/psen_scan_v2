@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -118,6 +118,7 @@ void LaserScan::setIntensities(const IntensityData& intensities)
 {
   this->intensities(intensities);
 }
+
 // LCOV_EXCL_STOP
 
 const util::TenthOfDegree& LaserScan::minScanAngle() const
@@ -170,6 +171,16 @@ void LaserScan::intensities(const IntensityData& intensities)
   intensities_ = intensities;
 }
 
+const LaserScan::EncoderData& LaserScan::encoderStates() const
+{
+  return encoder_states_;
+}
+
+void LaserScan::encoderStates(const EncoderData& encoder_states)
+{
+  encoder_states_ = encoder_states;
+}
+
 // LCOV_EXCL_START
 void LaserScan::setIOStates(const IOData& io_states)
 {
@@ -195,7 +206,7 @@ const LaserScan::IOData& LaserScan::ioStates() const
 std::ostream& operator<<(std::ostream& os, const LaserScan& scan)
 {
   os << fmt::format("LaserScan(timestamp = {} nsec, scanCounter = {}, minScanAngle = {} deg, maxScanAngle = {} deg, "
-                    "resolution = {} deg, active_zoneset = {}, measurements = {}, intensities = {}, io_states = {})",
+                    "resolution = {} deg, active_zoneset = {}, measurements = {}, intensities = {}, io_states = {}, encoder_states = {})",
                     scan.timestamp(),
                     scan.scanCounter(),
                     scan.minScanAngle().value() / 10.,
@@ -204,7 +215,8 @@ std::ostream& operator<<(std::ostream& os, const LaserScan& scan)
                     scan.activeZoneset(),
                     util::formatRange(scan.measurements()),
                     util::formatRange(scan.intensities()),
-                    util::formatRange(scan.ioStates()));
+                    util::formatRange(scan.ioStates()),
+                    util::formatRange(scan.encoderStates()));
   return os;
 }
 

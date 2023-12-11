@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Pilz GmbH & Co. KG
+// Copyright (c) 2021-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -46,6 +46,7 @@ public:
   MessageBuilder& intensities(const std::vector<double>& intensities);
   MessageBuilder& diagnosticMessages(const std::vector<diagnostic::Message>& diagnostic_messages);
   MessageBuilder& iOPinData(const io::PinData& io_pin_data);
+  MessageBuilder& encoderData(const encoder::EncoderData& encoder_data);
 
 private:
   Message msg_;
@@ -112,6 +113,12 @@ inline MessageBuilder& MessageBuilder::diagnosticMessages(const std::vector<diag
 inline MessageBuilder& MessageBuilder::iOPinData(const io::PinData& io_pin_data)
 {
   msg_.io_pin_data_ = io_pin_data;
+  return *this;
+}
+
+inline MessageBuilder& MessageBuilder::encoderData(const encoder::EncoderData& encoder_data)
+{
+  msg_.encoder_data_ = encoder_data;
   return *this;
 }
 }  // namespace monitoring_frame

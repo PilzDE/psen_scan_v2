@@ -1,4 +1,4 @@
-// Copyright (c) 2021 Pilz GmbH & Co. KG
+// Copyright (c) 2021-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -101,6 +101,12 @@ MATCHER_P(IOStateMsgEq, msg, "")
 {
   return ::testing::Matches(StdMsgsHeaderEq(msg.header))(arg.header) && arg.input == msg.input &&
          arg.output == msg.output;
+}
+
+MATCHER_P(EncoderStateMsgEq, msg, "")
+{
+  return ::testing::Matches(StdMsgsHeaderEq(msg.header))(arg.header) && arg.encoder_1 == msg.encoder_1 &&
+         arg.encoder_2 == msg.encoder_2;
 }
 
 MATCHER_P(LaserScanMsgEq, msg, "")

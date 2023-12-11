@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -53,6 +53,8 @@ public:
 
   bool fragmentedScansEnabled() const;
 
+  bool encoderEnabled() const;
+
   /*! deprecated: use void hostIp(const uint32_t& host_ip) instead */
   [[deprecated("use void hostIp(const uint32_t& host_ip) instead")]] void setHostIp(const uint32_t& host_ip);
   void hostIp(const uint32_t& host_ip);
@@ -79,6 +81,7 @@ private:
   bool diagnostics_enabled_{ configuration::DIAGNOSTICS };
   bool intensities_enabled_{ configuration::INTENSITIES };
   bool fragmented_scans_{ configuration::FRAGMENTED_SCANS };
+  bool encoder_enabled_{ configuration::ENCODER };
 };
 
 inline bool ScannerConfiguration::isComplete() const
@@ -149,6 +152,11 @@ inline bool ScannerConfiguration::intensitiesEnabled() const
 inline bool ScannerConfiguration::fragmentedScansEnabled() const
 {
   return fragmented_scans_;
+}
+
+inline bool ScannerConfiguration::encoderEnabled() const
+{
+  return encoder_enabled_;
 }
 
 inline void ScannerConfiguration::hostIp(const uint32_t& host_ip)

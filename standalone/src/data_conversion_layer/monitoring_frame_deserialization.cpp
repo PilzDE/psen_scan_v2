@@ -23,12 +23,14 @@
 
 #include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/encoder_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/io_state.h"
+#include "psen_scan_v2_standalone/encoder_state.h"
 #include "psen_scan_v2_standalone/util/logging.h"
 
 namespace psen_scan_v2_standalone
@@ -74,6 +76,11 @@ static constexpr double toIntensities(const uint16_t& value)
   // Neglegt the first two bytes.
   uint16_t retval{ value };
   return static_cast<double>(retval & 0b0011111111111111);
+}
+
+static constexpr double toEncoder(const uint16_t& value)
+{
+  return static_cast<double>(value);
 }
 
 monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data, const std::size_t& num_bytes)
@@ -153,6 +160,16 @@ monitoring_frame::Message deserialize(const data_conversion_layer::RawData& data
         msg_builder.intensities(intensities);
         break;
       }
+      case AdditionalFieldHeaderID::encoder: {
+        if (additional_header.length() != NUMBER_OF_BYTES_ENCODER_DATA)
+        {
+          throw AdditionalFieldUnexpectedSize(fmt::format("Length of zone set field is {}, but should be {}.",
+                                                          additional_header.length(),
+                                                          NUMBER_OF_BYTES_ENCODER_DATA));
+        }
+        msg_builder.encoderData(encoder::deserializeEncoderData(ss));
+        break;
+      }
       default:
         throw DecodingFailure(
             fmt::format("Header Id {:#04x} unknown. Cannot read additional field of monitoring frame on position {}.",
@@ -179,6 +196,28 @@ AdditionalFieldHeader readAdditionalField(std::istream& is, const std::size_t& m
   }
   return AdditionalFieldHeader(id, length);
 }
+
+namespace encoder
+{
+EncoderData deserializeEncoderData(std::istream& is)
+{
+  uint16_t encoder_1_read_buffer;
+  raw_processing::read<uint16_t>(is, encoder_1_read_buffer);
+
+  uint16_t encoder_2_read_buffer;
+  raw_processing::read<uint16_t>(is, encoder_2_read_buffer);
+
+  // Change to Big-endian, please check protocol
+  raw_processing::endianSwap(encoder_1_read_buffer);
+  raw_processing::endianSwap(encoder_2_read_buffer);
+
+  encoder::EncoderData encoder_data;
+  encoder_data.encoder_1 = toEncoder(encoder_1_read_buffer);
+  encoder_data.encoder_2 = toEncoder(encoder_2_read_buffer);
+
+  return encoder_data;
+}
+}  // namespace encoder
 
 namespace io
 {

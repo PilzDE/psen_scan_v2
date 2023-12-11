@@ -31,6 +31,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/laserscan_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/encoder_data.h"
 #include "psen_scan_v2_standalone/util/format_range.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 #include "psen_scan_v2_standalone/io_state.h"
@@ -96,6 +97,8 @@ createMonitoringFrameMsgBuilderWithoutDiagnostics(const util::TenthOfDegree star
   msg_builder.intensities(generateIntensities(num_elements, lowest_intensity, highest_intensity));
 
   msg_builder.iOPinData(createPinData());
+
+  msg_builder.encoderData({ 12, 25 });
 
   return msg_builder;
 }

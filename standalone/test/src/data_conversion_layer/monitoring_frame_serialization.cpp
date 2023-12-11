@@ -100,6 +100,21 @@ RawData serialize(const data_conversion_layer::monitoring_frame::Message& msg)
         os, msg.intensities(), [](double elem) { return (static_cast<uint16_t>(std::round(elem))); });
   }
 
+  if (msg.hasEncoderDataField())
+  {
+    AdditionalFieldHeader encoder_header(static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::encoder),
+                                         NUMBER_OF_BYTES_ENCODER_DATA);
+    write(os, encoder_header);
+
+    uint16_t encoder_1_payload = static_cast<uint16_t>(msg.encoderData().encoder_1);
+    raw_processing::endianSwap(encoder_1_payload); //Change to Big-endian
+    raw_processing::write(os, encoder_1_payload);
+
+    uint16_t encoder_2_payload = static_cast<uint16_t>(msg.encoderData().encoder_2);
+    raw_processing::endianSwap(encoder_2_payload); //Change to Big-endian
+    raw_processing::write(os, encoder_2_payload);
+  }
+
   AdditionalFieldHeader::Id end_of_frame_header_id =
       static_cast<AdditionalFieldHeader::Id>(AdditionalFieldHeaderID::end_of_frame);
   data_conversion_layer::raw_processing::write(os, end_of_frame_header_id);

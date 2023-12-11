@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -103,6 +103,18 @@ const std::vector<double>& Message::intensities() const
   }
 }
 
+const encoder::EncoderData& Message::encoderData() const
+{
+  if (encoder_data_.is_initialized())
+  {
+    return encoder_data_.get();
+  }
+  else
+  {
+    throw AdditionalFieldMissing("Encoder data");
+  }
+}
+
 std::vector<diagnostic::Message> Message::diagnosticMessages() const
 {
   if (diagnostic_messages_.is_initialized())
@@ -143,6 +155,11 @@ bool Message::hasIntensitiesField() const
 bool Message::hasDiagnosticMessagesField() const
 {
   return diagnostic_messages_.is_initialized();
+}
+
+bool Message::hasEncoderDataField() const
+{
+  return encoder_data_.is_initialized();
 }
 }  // namespace monitoring_frame
 }  // namespace data_conversion_layer

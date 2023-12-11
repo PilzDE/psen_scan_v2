@@ -53,6 +53,7 @@ static const bool FRAGMENTED_SCAN{ true };
 static const bool UNFRAGMENTED_SCAN{ false };
 static const std::string HOST_IP_ADDRESS{ "127.0.0.1" };
 static const std::string SCANNER_IP_ADDRESS{ "127.0.0.1" };
+static const bool ENCODER_ENABLED{ true };
 
 static constexpr std::chrono::milliseconds FUTURE_WAIT_TIMEOUT{ 10 };
 
@@ -148,6 +149,7 @@ ScannerConfiguration ScannerAPITests::generateScannerConfig(const std::string& h
       .scanRange(DEFAULT_SCAN_RANGE)
       .scanResolution(DEFAULT_SCAN_RESOLUTION)
       .enableIntensities()
+      .enableEncoder(ENCODER_ENABLED)
       .enableFragmentedScans(fragmented);
 }
 

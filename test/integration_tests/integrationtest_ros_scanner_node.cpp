@@ -27,6 +27,8 @@
 
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/encoder_data.h"
+#include "psen_scan_v2_standalone/encoder_state.h"
 #include "psen_scan_v2_standalone/scanner_configuration.h"
 #include "psen_scan_v2_standalone/scanner_config_builder.h"
 #include "psen_scan_v2_standalone/configuration/default_parameters.h"
@@ -62,6 +64,7 @@ static constexpr ScanRange SCAN_RANGE{ util::TenthOfDegree(1), util::TenthOfDegr
 static constexpr std::chrono::seconds DEFAULT_TIMEOUT{ 3 };
 static constexpr std::chrono::seconds LOOP_END_TIMEOUT{ 4 };
 static constexpr std::chrono::seconds STOP_TIMEOUT{ 1 };
+static const bool ENABLE_ENCODER{ true };
 
 static const psen_scan_v2_standalone::LaserScan::IOData IO_DATA1{ {
     psen_scan_v2_standalone::IOState(createPinData({ 0, 0, 0, 0, 0, 0, 0, 0 }, { 6, 0, 0, 0 }), 0 /*timestamp*/),
@@ -71,6 +74,10 @@ static const psen_scan_v2_standalone::LaserScan::IOData IO_DATA2{
     psen_scan_v2_standalone::IOState(createPinData({ 0, 0, 0, 0, 64, 0, 0, 0 }, { 6, 0, 0, 0 }), 0 /*timestamp*/),
     psen_scan_v2_standalone::IOState(createPinData({ 0, 0, 0, 0, 64, 0, 0, 0 }, { 1, 0, 0, 0 }), 0 /*timestamp*/) }
 };
+
+static const psen_scan_v2_standalone::LaserScan::EncoderData ENCODER_DATA{ psen_scan_v2_standalone::EncoderState(
+    psen_scan_v2_standalone::data_conversion_layer::monitoring_frame::encoder::EncoderData{ 12.00, 25 },
+    41 /*timestamp*/) };
 
 static void setDefaultActions(ScannerMock& mock, util::Barrier& start_barrier)
 {
@@ -86,6 +93,7 @@ static ScannerConfiguration createValidConfig()
       .hostControlPort(HOST_UDP_PORT_CONTROL)
       .scannerDataPort(configuration::DATA_PORT_OF_SCANNER_DEVICE)
       .scannerControlPort(configuration::CONTROL_PORT_OF_SCANNER_DEVICE)
+      .enableEncoder(ENABLE_ENCODER)
       .scanRange(SCAN_RANGE);
 }
 
@@ -174,6 +182,12 @@ TEST_F(RosScannerNodeTests, shouldProvideIOTopic)
   EXPECT_TRUE(TopicExists("/integrationtest_ros_scanner_node/io_state"));
 }
 
+TEST_F(RosScannerNodeTests, shouldProvideEncoderTopic)
+{
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(nh_priv_, "scan", "scanner", 1.0 /*x_axis_rotation*/, scanner_config_);
+  EXPECT_TRUE(TopicExists("/integrationtest_ros_scanner_node/encoder_state"));
+}
+
 const std::string SCAN_TOPICNAME{ "scan" };
 
 TEST_F(RosScannerNodeTests, shouldPublishScansWhenLaserScanCallbackIsInvoked)
@@ -227,6 +241,35 @@ TEST_F(RosScannerNodeTests, shouldPublishActiveZonesetWhenLaserScanCallbackIsInv
   ros_scanner_node.scanner_.invokeLaserScanCallback(createValidLaserScan(first_zone));
   ros_scanner_node.scanner_.invokeLaserScanCallback(createValidLaserScan(second_zone));
   zoneset_topic_barrier.waitTillRelease(DEFAULT_TIMEOUT);
+
+  ros_scanner_node.terminate();
+  loop.wait_for(LOOP_END_TIMEOUT);
+}
+
+const std::string ENCODER_TOPICNAME{ "encoder_state" };
+
+TEST_F(RosScannerNodeTests, shouldPublishEncoderDataEqualToConversionOfSuppliedStandaloneEncoderData)
+{
+  const std::string prefix = "scanner";
+  ROSScannerNodeT<ScannerMock> ros_scanner_node(
+      nh_priv_, SCAN_TOPICNAME, prefix, 1.0 /*x_axis_rotation*/, scanner_config_);
+
+  util::Barrier start_barrier;
+  setDefaultActions(ros_scanner_node.scanner_, start_barrier);
+
+  util::Barrier encoder_topic_barrier;
+  SubscriberMock<psen_scan_v2::EncoderState> subscriber(nh_priv_, ENCODER_TOPICNAME, QUEUE_SIZE);
+  auto scan = createValidLaserScan();
+  EXPECT_CALL(subscriber, callback(EncoderStateMsgEq(toEncoderStateMsg(ENCODER_DATA.at(0), prefix))))
+      .WillOnce(OpenBarrier(&encoder_topic_barrier));
+
+  std::future<void> loop = std::async(std::launch::async, [&ros_scanner_node]() { ros_scanner_node.run(); });
+
+  ASSERT_BARRIER_OPENS(start_barrier, DEFAULT_TIMEOUT) << "Scanner start was not called";
+
+  scan.encoderStates(ENCODER_DATA);
+  ros_scanner_node.scanner_.invokeLaserScanCallback(scan);
+  encoder_topic_barrier.waitTillRelease(DEFAULT_TIMEOUT);
 
   ros_scanner_node.terminate();
   loop.wait_for(LOOP_END_TIMEOUT);

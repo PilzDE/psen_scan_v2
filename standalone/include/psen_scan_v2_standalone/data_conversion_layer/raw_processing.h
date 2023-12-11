@@ -119,6 +119,14 @@ inline T toArray(std::ostringstream& os)
   return raw_data;
 }
 
+// Reverse to change Little-endian to Big-endian
+template <typename T>
+inline void endianSwap(T& data)
+{
+  unsigned char *data_ptr = reinterpret_cast<unsigned char*>(&data);
+  std::reverse(data_ptr, data_ptr + sizeof(T));
+}
+
 inline StringStreamFailure::StringStreamFailure(const std::string& msg) : std::runtime_error(msg)
 {
 }

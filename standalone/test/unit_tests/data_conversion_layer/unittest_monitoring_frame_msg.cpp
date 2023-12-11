@@ -20,6 +20,7 @@
 
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/encoder_data.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg_builder.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
@@ -68,6 +69,12 @@ TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUns
       FrameMessage().iOPinData(), AdditionalFieldMissing, ("IO pin data" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
 }
 
+TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetEncoderData)
+{
+  EXPECT_THROW_AND_WHAT(
+      FrameMessage().encoderData(), AdditionalFieldMissing, ("Encoder data" + ADDITIONAL_FIELD_MISSING_TEXT).c_str());
+}
+
 TEST(MonitoringFrameMsgTest, shouldThrowAdditionalFieldMissingWhenTryingToGetUnsetDiagnosticMessages)
 {
   EXPECT_THROW_AND_WHAT(FrameMessage().diagnosticMessages(),
@@ -109,6 +116,12 @@ TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfIOPin)
 {
   EXPECT_FALSE(MessageBuilder().build().hasIOPinField());
   EXPECT_TRUE(MessageBuilder().iOPinData(io::PinData()).build().hasIOPinField());
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectStateOfEncoderData)
+{
+  EXPECT_FALSE(MessageBuilder().build().hasEncoderDataField());
+  EXPECT_TRUE(MessageBuilder().encoderData(encoder::EncoderData()).build().hasEncoderDataField());
 }
 
 TEST(MonitoringFrameMsgTest, shouldReturnCorrectScannerId)
@@ -169,6 +182,14 @@ TEST(MonitoringFrameMsgTest, shouldReturnCorrectIOPin)
   io::PinData io_pin_data;
   ASSERT_NO_THROW(io_pin_data = MessageBuilder().iOPinData(expected_io_pin_data).build().iOPinData());
   EXPECT_THAT(io_pin_data, IOPinDataEq(expected_io_pin_data));
+}
+
+TEST(MonitoringFrameMsgTest, shouldReturnCorrectEncoderData)
+{
+  encoder::EncoderData expected_encoder_data{ 12.005, 25.876 };
+  encoder::EncoderData encoder_data;
+  ASSERT_NO_THROW(encoder_data = MessageBuilder().encoderData(expected_encoder_data).build().encoderData());
+  EXPECT_THAT(encoder_data, EncoderDataEq(expected_encoder_data));
 }
 
 TEST(MonitoringFrameMsgTest, shouldReturnCorrectDiagnosticMessages)

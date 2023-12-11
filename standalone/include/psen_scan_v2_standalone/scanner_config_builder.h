@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -49,6 +49,7 @@ public:
   ScannerConfigurationBuilder& enableDiagnostics(const bool& enable);
   ScannerConfigurationBuilder& enableIntensities(const bool& enable);
   ScannerConfigurationBuilder& enableFragmentedScans(const bool& enable);
+  ScannerConfigurationBuilder& enableEncoder(const bool& enable);
   operator ScannerConfiguration();
 
 private:
@@ -148,6 +149,12 @@ inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableIntensiti
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableFragmentedScans(const bool& enable = true)
 {
   config_.fragmented_scans_ = enable;
+  return *this;
+}
+
+inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableEncoder(const bool& enable = true)
+{
+  config_.encoder_enabled_ = enable;
   return *this;
 }
 

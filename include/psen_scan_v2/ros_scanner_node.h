@@ -33,8 +33,11 @@
 
 #include "psen_scan_v2_standalone/scanner_v2.h"
 
+#include "psen_scan_v2/EncoderState.h"
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 #include "psen_scan_v2/io_state_ros_conversion.h"
+#include "psen_scan_v2/encoder_state_ros_conversion.h"
+#include "psen_scan_v2_standalone/encoder_state.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/util/format_range.h"
 
@@ -80,12 +83,14 @@ public:
 private:
   void laserScanCallback(const LaserScan& scan);
   void publishChangedIOStates(const std::vector<psen_scan_v2_standalone::IOState>& io_states);
+  void publishEncoderData(const std::vector<psen_scan_v2_standalone::EncoderState>& encoder_states);
 
 private:
   ros::NodeHandle nh_;
   ros::Publisher pub_scan_;
   ros::Publisher pub_zone_;
   ros::Publisher pub_io_;
+  ros::Publisher pub_encoder_;
   std::string tf_prefix_;
   double x_axis_rotation_;
   S scanner_;
@@ -105,6 +110,7 @@ private:
   FRIEND_TEST(RosScannerNodeTests, shouldThrowExceptionSetInScannerStopFuture);
   FRIEND_TEST(RosScannerNodeTests, shouldPublishChangedIOStatesEqualToConversionOfSuppliedStandaloneIOStates);
   FRIEND_TEST(RosScannerNodeTests, shouldPublishLatchedOnIOStatesTopic);
+  FRIEND_TEST(RosScannerNodeTests, shouldPublishEncoderDataEqualToConversionOfSuppliedStandaloneEncoderData);
   FRIEND_TEST(RosScannerNodeTests, shouldLogChangedIOStates);
 };
 
@@ -124,6 +130,7 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
   pub_scan_ = nh_.advertise<sensor_msgs::LaserScan>(topic, 1);
   pub_zone_ = nh_.advertise<std_msgs::UInt8>("active_zoneset", 1);
   pub_io_ = nh_.advertise<psen_scan_v2::IOState>("io_state", 6, true /* latched */);
+  pub_encoder_ = nh.advertise<psen_scan_v2::EncoderState>("encoder_state", 6, true);
 }
 
 template <typename S>
@@ -146,6 +153,8 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
     pub_zone_.publish(active_zoneset);
 
     publishChangedIOStates(scan.ioStates());
+
+    publishEncoderData(scan.encoderStates());
   }
   // LCOV_EXCL_START
   catch (const std::invalid_argument& e)
@@ -170,6 +179,15 @@ void ROSScannerNodeT<S>::publishChangedIOStates(const std::vector<psen_scan_v2_s
                     formatPinStates(io.changedOutputStates(last_io_state_)));
       last_io_state_ = io;
     }
+  }
+}
+
+template <typename S>
+void ROSScannerNodeT<S>::publishEncoderData(const std::vector<psen_scan_v2_standalone::EncoderState>& encoder_states)
+{
+  for (const auto& single_state : encoder_states)
+  {
+    pub_encoder_.publish(toEncoderStateMsg(single_state, tf_prefix_));
   }
 }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2020-2021 Pilz GmbH & Co. KG
+// Copyright (c) 2020-2022 Pilz GmbH & Co. KG
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Lesser General Public License as published by
@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "psen_scan_v2_standalone/io_state.h"
+#include "psen_scan_v2_standalone/encoder_state.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
 namespace psen_scan_v2_standalone
@@ -39,6 +40,7 @@ namespace psen_scan_v2_standalone
  * - ID of the currently active zoneset.
  * - Time of the first scan ray.
  * - All states of the I/O pins recorded during the scan.
+ * - All states of the encoders read during the scan.
  *
  * The measures use the target frame defined as \<tf_prefix\>.
  * @see https://github.com/PilzDE/psen_scan_v2_standalone/blob/main/README.md#tf-frames
@@ -49,6 +51,7 @@ public:
   using MeasurementData = std::vector<double>;
   using IntensityData = std::vector<double>;
   using IOData = std::vector<IOState>;
+  using EncoderData = std::vector<EncoderState>;
 
 public:
   LaserScan(const util::TenthOfDegree& resolution,
@@ -117,6 +120,10 @@ public:
   [[deprecated("use void ioStates(const IOData& io_states) instead")]] void setIOStates(const IOData& io_states);
   void ioStates(const IOData& io_states);
 
+  const EncoderData& encoderStates() const;
+
+  void encoderStates(const EncoderData& encoder_states);
+
 private:
   //! Measurement data of the laserscan (in Millimeters).
   MeasurementData measurements_;
@@ -136,6 +143,8 @@ private:
   const uint8_t active_zoneset_;
   //! Time of the first ray in this scan round (or fragment if fragmented_scans is enabled).
   const int64_t timestamp_;
+  //! Stores the received normalized encoder signals.
+  EncoderData encoder_states_;
 };
 
 std::ostream& operator<<(std::ostream& os, const LaserScan& scan);
