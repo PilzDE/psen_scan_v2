@@ -151,6 +151,9 @@ inline void ScanBuffer::add(const data_conversion_layer::monitoring_frame::Messa
                    "stamped_msg.msg_.scanCounter(){} current_round_.at(0).msg_.scanCounter(){}",
                    stamped_msg.msg_.scanCounter(),
                    current_round_.at(0).msg_.scanCounter());
+    
+    current_round_.clear();
+    current_round_.push_back(std::move(stamped_msg));
     throw OutdatedMessageError();
   }
 }

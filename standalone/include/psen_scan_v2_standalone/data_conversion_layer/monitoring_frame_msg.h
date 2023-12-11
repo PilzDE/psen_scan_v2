@@ -68,7 +68,7 @@ public:
   //! @throw AdditionalFieldMissing if scan_counter was missing during deserialization of a Message.
   uint32_t scanCounter() const;
   //! @throw AdditionalFieldMissing if active_zoneset was missing during deserialization of a Message.
-  boost::optional<uint8_t> activeZoneset() const;
+  uint8_t activeZoneset() const;
   //! @throw AdditionalFieldMissing if io_pin_data was missing during deserialization of a Message.
   const io::PinData& iOPinData() const;
   //! @throw AdditionalFieldMissing if measurements were missing during deserialization of a Message.

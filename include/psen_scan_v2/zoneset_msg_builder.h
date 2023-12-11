@@ -36,12 +36,19 @@ public:
   ZoneSetMsgBuilder& headerStamp(const ros::Time& header_stamp);
   ZoneSetMsgBuilder& headerFrameId(const std::string& header_frame_id);
   ZoneSetMsgBuilder& safety1(const geometry_msgs::Polygon& safety1);
+  ZoneSetMsgBuilder& safety1_Sub0(const geometry_msgs::Polygon& safety1_Sub0);
   ZoneSetMsgBuilder& safety2(const geometry_msgs::Polygon& safety2);
+  ZoneSetMsgBuilder& safety2_Sub0(const geometry_msgs::Polygon& safety2_Sub0);
   ZoneSetMsgBuilder& safety3(const geometry_msgs::Polygon& safety3);
+  ZoneSetMsgBuilder& safety3_Sub0(const geometry_msgs::Polygon& safety3_Sub0);
   ZoneSetMsgBuilder& warn1(const geometry_msgs::Polygon& warn1);
+  ZoneSetMsgBuilder& warn1_Sub0(const geometry_msgs::Polygon& warn1_Sub0);
   ZoneSetMsgBuilder& warn2(const geometry_msgs::Polygon& warn2);
+  ZoneSetMsgBuilder& warn2_Sub0(const geometry_msgs::Polygon& warn2_Sub0);
   ZoneSetMsgBuilder& muting1(const geometry_msgs::Polygon& muting1);
+  ZoneSetMsgBuilder& muting1_Sub0(const geometry_msgs::Polygon& muting1_Sub0);
   ZoneSetMsgBuilder& muting2(const geometry_msgs::Polygon& muting2);
+  ZoneSetMsgBuilder& muting2_Sub0(const geometry_msgs::Polygon& muting2_Sub0);
   ZoneSetMsgBuilder& speedLower(const float& speed_lower);
   ZoneSetMsgBuilder& speedUpper(const float& speed_upper);
 
@@ -78,9 +85,21 @@ inline ZoneSetMsgBuilder& ZoneSetMsgBuilder::safety1(const geometry_msgs::Polygo
   return *this;
 }
 
+inline ZoneSetMsgBuilder& ZoneSetMsgBuilder::safety1_Sub0(const geometry_msgs::Polygon& safety1_Sub0)
+{
+  zoneset_msg_.safety1_Sub0 = safety1_Sub0;
+  return *this;
+}
+
 inline ZoneSetMsgBuilder& ZoneSetMsgBuilder::safety2(const geometry_msgs::Polygon& safety2)
 {
   zoneset_msg_.safety2 = safety2;
+  return *this;
+}
+
+inline ZoneSetMsgBuilder& ZoneSetMsgBuilder::safety2_Sub0(const geometry_msgs::Polygon& safety2_Sub0)
+{
+  zoneset_msg_.safety2_Sub0 = safety2_Sub0;
   return *this;
 }
 
@@ -90,9 +109,21 @@ inline ZoneSetMsgBuilder& ZoneSetMsgBuilder::safety3(const geometry_msgs::Polygo
   return *this;
 }
 
+inline ZoneSetMsgBuilder& ZoneSetMsgBuilder::safety3_Sub0(const geometry_msgs::Polygon& safety3_Sub0)
+{
+  zoneset_msg_.safety3_Sub0 = safety3_Sub0;
+  return *this;
+}
+
 inline ZoneSetMsgBuilder& ZoneSetMsgBuilder::warn1(const geometry_msgs::Polygon& warn1)
 {
   zoneset_msg_.warn1 = warn1;
+  return *this;
+}
+
+inline ZoneSetMsgBuilder& ZoneSetMsgBuilder::warn1_Sub0(const geometry_msgs::Polygon& warn1_Sub0)
+{
+  zoneset_msg_.warn1_Sub0 = warn1_Sub0;
   return *this;
 }
 
@@ -102,15 +133,33 @@ inline ZoneSetMsgBuilder& ZoneSetMsgBuilder::warn2(const geometry_msgs::Polygon&
   return *this;
 }
 
+inline ZoneSetMsgBuilder& ZoneSetMsgBuilder::warn2_Sub0(const geometry_msgs::Polygon& warn2_Sub0)
+{
+  zoneset_msg_.warn2_Sub0 = warn2_Sub0;
+  return *this;
+}
+
 inline ZoneSetMsgBuilder& ZoneSetMsgBuilder::muting1(const geometry_msgs::Polygon& muting1)
 {
   zoneset_msg_.muting1 = muting1;
   return *this;
 }
 
+inline ZoneSetMsgBuilder& ZoneSetMsgBuilder::muting1_Sub0(const geometry_msgs::Polygon& muting1_Sub0)
+{
+  zoneset_msg_.muting1_Sub0 = muting1_Sub0;
+  return *this;
+}
+
 inline ZoneSetMsgBuilder& ZoneSetMsgBuilder::muting2(const geometry_msgs::Polygon& muting2)
 {
   zoneset_msg_.muting2 = muting2;
+  return *this;
+}
+
+inline ZoneSetMsgBuilder& ZoneSetMsgBuilder::muting2_Sub0(const geometry_msgs::Polygon& muting2_Sub0)
+{
+  zoneset_msg_.muting2_Sub0 = muting2_Sub0;
   return *this;
 }
 

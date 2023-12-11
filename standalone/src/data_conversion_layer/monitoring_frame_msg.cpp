@@ -56,11 +56,8 @@ uint32_t Message::scanCounter() const
   }
 }
 
-boost::optional<uint8_t> Message::activeZoneset() const
+uint8_t Message::activeZoneset() const
 {
-  using ScannerId = psen_scan_v2_standalone::configuration::ScannerId;
-  if (scannerId() != ScannerId::master)
-    return boost::none;
   if (active_zoneset_.is_initialized())
   {
     return active_zoneset_.get();

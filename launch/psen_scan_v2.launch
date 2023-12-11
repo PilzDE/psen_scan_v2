@@ -34,7 +34,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <arg name="intensities" default="false" />
 
   <!-- Scan resolution in radian -->
-  <arg name="resolution" default="$(eval radians(0.1))" />
+  <arg name="resolution" default="$(eval radians(0.5))" />
 
   <!-- IP-Address of host machine -->
   <arg name="host_ip" default="auto" />
@@ -48,8 +48,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- Set the following to true in order to publish scan data as soon as a UDP packet is ready, instead of waiting for a full scan -->
   <arg name="fragmented_scans" default="false" />
 
+  <!-- How many subscribers are connected to the master scanner, 0 ... 3 are supported. -->
+  <arg name="nr_subscribers" default="1" />
+
   <!-- Load scanner config file to publish zonesets -->
-  <arg name="config_file" default="" />
+  <arg name="config_file" default=""/>
 
   <!-- Start rviz -->
   <arg name="rviz" default="true" />
@@ -66,11 +69,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <arg name="host_udp_port_data" value="$(arg host_udp_port_data)" />
     <arg name="host_udp_port_control" value="$(arg host_udp_port_control)" />
     <arg name="fragmented_scans" value="$(arg fragmented_scans)" />
+    <arg name="nr_subscribers" value="$(arg nr_subscribers)" />
   </include>
 
   <!-- Publish tf frames for the device -->
   <param name="robot_description" command="$(find xacro)/xacro
-    '$(find psen_scan_v2)/urdf/example.urdf.xacro' prefix:=$(arg tf_prefix)" />
+    '$(find psen_scan_v2)/urdf/main.urdf.xacro' prefix:=$(arg tf_prefix)" />
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
   <!-- Publish the defined zonesets from the xml configuration -->

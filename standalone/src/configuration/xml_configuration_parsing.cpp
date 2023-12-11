@@ -19,6 +19,8 @@
 #include "psen_scan_v2_standalone/configuration/xml_configuration_parsing.h"
 #include "psen_scan_v2_standalone/configuration/zoneset_configuration.h"
 
+int Round = 0;
+
 namespace psen_scan_v2_standalone
 {
 namespace configuration
@@ -53,10 +55,62 @@ inline bool textIsEqual(const tinyxml2::XMLElement* element, const char* str)
   return strcmp(getText(element), str) == 0;
 }
 
-ZoneSet parseZoneSet(const tinyxml2::XMLElement* xml_set_element)
+ZoneSet parseZoneSetMaster(const tinyxml2::XMLElement* xml_set_element)
 {
   ZoneSet set;
 
+    const tinyxml2::XMLElement* xml_set_detail_element = getFirstChildElement(xml_set_element, "zoneSetDetail");
+
+    while (xml_set_detail_element)
+    {
+      const tinyxml2::XMLElement* xml_set_detail_type_element = getFirstChildElement(xml_set_detail_element, "type");
+      const tinyxml2::XMLElement* xml_set_detail_ro_element = getFirstChildElement(xml_set_detail_element, "ro");
+
+      if (textIsEqual(xml_set_detail_type_element, "roOSSD1"))
+      {
+        set.safety1_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+      }
+      else if (textIsEqual(xml_set_detail_type_element, "roOSSD2"))
+      {
+        set.safety2_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+      }
+      else if (textIsEqual(xml_set_detail_type_element, "roOSSD3"))
+      {
+        set.safety3_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+      }
+      else if (textIsEqual(xml_set_detail_type_element, "warn1"))
+      {
+        set.warn1_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+      }
+      else if (textIsEqual(xml_set_detail_type_element, "warn2"))
+      {
+        set.warn2_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+      }
+      else if (textIsEqual(xml_set_detail_type_element, "muting1"))
+      {
+        set.muting1_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+      }
+      else if (textIsEqual(xml_set_detail_type_element, "muting2"))
+      {
+        set.muting2_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+      }
+      else
+      {
+        throw XMLConfigurationParserException("Could not parse. Invalid <type> must be \"roOSSD1\", \"roOSSD2\", "
+                                              "\"roOSSD3\", \"warn1\", \"warn2\", \"muting1\" or \"muting2\".");
+      }
+      // Move to next <zoneSetDetail>
+      xml_set_detail_element = xml_set_detail_element->NextSiblingElement("zoneSetDetail");
+    }
+
+  // Set default resolution for now this is only known implicitly
+  set.resolution_ = DEFAULT_ZONESET_ANGLE_STEP;
+
+  return set;
+}
+
+ZoneSet parseZoneSetSub0(const tinyxml2::XMLElement* xml_set_element, ZoneSet set)
+{
   const tinyxml2::XMLElement* xml_set_detail_element = getFirstChildElement(xml_set_element, "zoneSetDetail");
 
   while (xml_set_detail_element)
@@ -66,38 +120,37 @@ ZoneSet parseZoneSet(const tinyxml2::XMLElement* xml_set_element)
 
     if (textIsEqual(xml_set_detail_type_element, "roOSSD1"))
     {
-      set.safety1_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+      set.safety1_Sub0 = ro_string_to_vec(getText(xml_set_detail_ro_element));
     }
     else if (textIsEqual(xml_set_detail_type_element, "roOSSD2"))
     {
-      set.safety2_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+      set.safety2_Sub0 = ro_string_to_vec(getText(xml_set_detail_ro_element));
     }
     else if (textIsEqual(xml_set_detail_type_element, "roOSSD3"))
     {
-      set.safety3_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+      set.safety3_Sub0 = ro_string_to_vec(getText(xml_set_detail_ro_element));
     }
     else if (textIsEqual(xml_set_detail_type_element, "warn1"))
     {
-      set.warn1_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+      set.warn1_Sub0 = ro_string_to_vec(getText(xml_set_detail_ro_element));
     }
     else if (textIsEqual(xml_set_detail_type_element, "warn2"))
     {
-      set.warn2_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+      set.warn2_Sub0 = ro_string_to_vec(getText(xml_set_detail_ro_element));
     }
     else if (textIsEqual(xml_set_detail_type_element, "muting1"))
     {
-      set.muting1_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+      set.muting1_Sub0 = ro_string_to_vec(getText(xml_set_detail_ro_element));
     }
     else if (textIsEqual(xml_set_detail_type_element, "muting2"))
     {
-      set.muting2_ = ro_string_to_vec(getText(xml_set_detail_ro_element));
+      set.muting2_Sub0 = ro_string_to_vec(getText(xml_set_detail_ro_element));
     }
     else
     {
       throw XMLConfigurationParserException("Could not parse. Invalid <type> must be \"roOSSD1\", \"roOSSD2\", "
                                             "\"roOSSD3\", \"warn1\", \"warn2\", \"muting1\" or \"muting2\".");
     }
-
     // Move to next <zoneSetDetail>
     xml_set_detail_element = xml_set_detail_element->NextSiblingElement("zoneSetDetail");
   }
@@ -159,13 +212,12 @@ bool isEncoderEnabled(const tinyxml2::XMLConstHandle& doc_handle)
 std::vector<ZoneSet> parseZoneSets(const tinyxml2::XMLConstHandle& doc_handle)
 {
   tinyxml2::XMLConstHandle xml_set_info_handle = doc_handle.FirstChildElement("MIB")
-                                                     .FirstChildElement("scannerDescr")
-                                                     .FirstChildElement("zoneSetDefinition")
-                                                     .FirstChildElement("zoneSetInfo");
+                                                     .FirstChildElement("scannerDescr");
 
-  const tinyxml2::XMLElement* xml_set_element = xml_set_info_handle.ToElement();
+  const tinyxml2::XMLElement* scanner_descr_element_master = xml_set_info_handle.ToElement();
+  const tinyxml2::XMLElement* scanner_descr_element_sub0 = scanner_descr_element_master->NextSiblingElement("scannerDescr");
 
-  if (!xml_set_element)
+  if (!scanner_descr_element_master)
   {
     throw XMLConfigurationParserException(
         "Could not parse. Chain MIB->scannerDescr->zoneSetDefinition->zoneSetInfo not complete.");
@@ -173,12 +225,20 @@ std::vector<ZoneSet> parseZoneSets(const tinyxml2::XMLConstHandle& doc_handle)
 
   std::vector<ZoneSet> zonesets;
 
-  while (xml_set_element)
-  {
-    ZoneSet set = parseZoneSet(xml_set_element);
+  const tinyxml2::XMLElement* zone_set_definition_element_master = getFirstChildElement(scanner_descr_element_master, "zoneSetDefinition");
+  const tinyxml2::XMLElement* zone_set_info_element_master = getFirstChildElement(zone_set_definition_element_master, "zoneSetInfo");
 
-    zonesets.push_back(set);
-    xml_set_element = xml_set_element->NextSiblingElement("zoneSetInfo");
+  const tinyxml2::XMLElement* zone_set_definition_element_sub0 = getFirstChildElement(scanner_descr_element_sub0, "zoneSetDefinition");
+  const tinyxml2::XMLElement* zone_set_info_element_sub0 = getFirstChildElement(zone_set_definition_element_sub0, "zoneSetInfo");
+
+  while (zone_set_info_element_master && zone_set_info_element_sub0)
+  {
+    ZoneSet set_master = parseZoneSetMaster(zone_set_info_element_master);
+    ZoneSet set_sub0 = parseZoneSetSub0(zone_set_info_element_sub0, set_master);
+
+    zonesets.push_back(set_sub0);
+    zone_set_info_element_master = zone_set_info_element_master->NextSiblingElement("zoneSetInfo");
+    zone_set_info_element_sub0 = zone_set_info_element_sub0->NextSiblingElement("zoneSetInfo");
   }
 
   return zonesets;

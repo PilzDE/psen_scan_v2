@@ -72,12 +72,19 @@ class ZoneSet
 {
 public:
   std::vector<unsigned long> safety1_;
+  std::vector<unsigned long> safety1_Sub0;
   std::vector<unsigned long> safety2_;
+  std::vector<unsigned long> safety2_Sub0;
   std::vector<unsigned long> safety3_;
+  std::vector<unsigned long> safety3_Sub0;
   std::vector<unsigned long> warn1_;
+  std::vector<unsigned long> warn1_Sub0;
   std::vector<unsigned long> warn2_;
+  std::vector<unsigned long> warn2_Sub0;
   std::vector<unsigned long> muting1_;
+  std::vector<unsigned long> muting1_Sub0;
   std::vector<unsigned long> muting2_;
+  std::vector<unsigned long> muting2_Sub0;
 
   //! Distance of angle between the distance values given in safety1_, safety2_, safety3_, warn1_, warn2_, muting1_,
   //! muting2_.

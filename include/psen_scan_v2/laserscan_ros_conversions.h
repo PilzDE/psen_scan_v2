@@ -40,6 +40,14 @@ sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
   {
     ros_message.header.frame_id = "laser_2";
   }
+  else if (laserscan.scannerId() == configuration::ScannerId::subscriber1)
+  {
+    ros_message.header.frame_id = "laser_3";
+  }
+  else if (laserscan.scannerId() == configuration::ScannerId::subscriber2)
+  {
+    ros_message.header.frame_id = "laser_4";
+  }
   else
   {
     PSENSCAN_ERROR("", "unexpected scanner id");

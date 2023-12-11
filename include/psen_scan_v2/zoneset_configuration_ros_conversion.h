@@ -67,16 +67,20 @@ psen_scan_v2::ZoneSet toRosMsg(const ZoneSetStandalone& zoneset,
   psen_scan_v2::ZoneSetMsgBuilder zoneset_msg_builder;
   zoneset_msg_builder.headerStamp(stamp)
       .headerFrameId(frame_id)
-      .safety1(fromPolar(  // LCOV_EXCL_LINE gcov bug?
-          zoneset.safety1_,
-          zoneset.resolution_,
-          psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
+      .safety1(fromPolar(zoneset.safety1_, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
+      .safety1_Sub0(fromPolar(zoneset.safety1_Sub0, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
       .safety2(fromPolar(zoneset.safety2_, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
+      .safety2_Sub0(fromPolar(zoneset.safety2_Sub0, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
       .safety3(fromPolar(zoneset.safety3_, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
+      .safety3_Sub0(fromPolar(zoneset.safety3_Sub0, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
       .warn1(fromPolar(zoneset.warn1_, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
+      .warn1_Sub0(fromPolar(zoneset.warn1_Sub0, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
       .warn2(fromPolar(zoneset.warn2_, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
+      .warn2_Sub0(fromPolar(zoneset.warn2_Sub0, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
       .muting1(fromPolar(zoneset.muting1_, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
-      .muting2(fromPolar(zoneset.muting2_, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION));
+      .muting1_Sub0(fromPolar(zoneset.muting1_Sub0, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
+      .muting2(fromPolar(zoneset.muting2_, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION))
+      .muting2_Sub0(fromPolar(zoneset.muting2_Sub0, zoneset.resolution_, psen_scan_v2::DEFAULT_X_AXIS_ROTATION));
 
   if (zoneset.speed_range_)
   {
