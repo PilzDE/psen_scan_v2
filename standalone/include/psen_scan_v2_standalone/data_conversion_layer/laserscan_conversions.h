@@ -16,16 +16,16 @@
 #ifndef PSEN_SCAN_V2_STANDALONE_LASERSCAN_CONVERSIONS_H
 #define PSEN_SCAN_V2_STANDALONE_LASERSCAN_CONVERSIONS_H
 
-#include "psen_scan_v2_standalone/configuration/default_parameters.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
-#include "psen_scan_v2_standalone/laserscan.h"
-
-#include "psen_scan_v2_standalone/util/logging.h"
-
 #include <algorithm>
 #include <numeric>
 #include <vector>
+#include "psen_scan_v2_standalone/configuration/default_parameters.h"
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/diagnostics.h"
+#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
+#include "psen_scan_v2_standalone/laserscan.h"
+#include "psen_scan_v2_standalone/util/logging.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -94,10 +94,12 @@ inline LaserScan LaserScanConverter::toLaserScan(
   std::vector<int> sorted_stamped_msgs_indices = getFilledFramesIndicesSortedByThetaAngle(stamped_msgs);
   validateMonitoringFrames(stamped_msgs, sorted_stamped_msgs_indices);
 
+  // read properties from first frame
   const auto min_angle = stamped_msgs[sorted_stamped_msgs_indices[0]].msg_.fromTheta();
   const auto max_angle = calculateMaxAngle(stamped_msgs, min_angle);
 
   const auto timestamp = calculateTimestamp(stamped_msgs, sorted_stamped_msgs_indices);
+  configuration::ScannerId scanner_id = stamped_msgs[sorted_stamped_msgs_indices[0]].msg_.scannerId();
 
   std::vector<double> measurements;
   std::vector<double> intensities;
@@ -138,7 +140,8 @@ inline LaserScan LaserScanConverter::toLaserScan(
                  max_angle,
                  stamped_msgs[0].msg_.scanCounter(),
                  stamped_msgs[sorted_stamped_msgs_indices.back()].msg_.activeZoneset(),
-                 timestamp);
+                 timestamp,
+                 scanner_id);
 
   scan.measurements(measurements);
   scan.intensities(intensities);

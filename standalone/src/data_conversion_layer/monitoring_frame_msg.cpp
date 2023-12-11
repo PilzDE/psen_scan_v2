@@ -14,6 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -28,12 +29,12 @@ namespace data_conversion_layer
 {
 namespace monitoring_frame
 {
-configuration::ScannerId Message::scannerId() const
+configuration::ScannerId data_conversion_layer::monitoring_frame::Message::scannerId() const
 {
   return scanner_id_;
 }
 
-util::TenthOfDegree Message::fromTheta() const
+util::TenthOfDegree data_conversion_layer::monitoring_frame::Message::fromTheta() const
 {
   return from_theta_;
 }
@@ -55,8 +56,11 @@ uint32_t Message::scanCounter() const
   }
 }
 
-uint8_t Message::activeZoneset() const
+boost::optional<uint8_t> Message::activeZoneset() const
 {
+  using ScannerId = psen_scan_v2_standalone::configuration::ScannerId;
+  if (scannerId() != ScannerId::master)
+    return boost::none;
   if (active_zoneset_.is_initialized())
   {
     return active_zoneset_.get();
@@ -111,18 +115,8 @@ std::vector<diagnostic::Message> Message::diagnosticMessages() const
   }
   else
   {
-    throw AdditionalFieldMissing("Diagnostic messages");
+    throw AdditionalFieldMissing("Diagnostic Messages");
   }
-}
-
-bool Message::hasScanCounterField() const
-{
-  return scan_counter_.is_initialized();
-}
-
-bool Message::hasActiveZonesetField() const
-{
-  return active_zoneset_.is_initialized();
 }
 
 bool Message::hasIOPinField() const

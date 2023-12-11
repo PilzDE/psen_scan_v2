@@ -49,6 +49,7 @@ public:
   ScannerConfigurationBuilder& enableDiagnostics(const bool& enable);
   ScannerConfigurationBuilder& enableIntensities(const bool& enable);
   ScannerConfigurationBuilder& enableFragmentedScans(const bool& enable);
+  ScannerConfigurationBuilder& nrSubscribers(const uint8_t& nr_subscribers);
   operator ScannerConfiguration();
 
 private:
@@ -148,6 +149,16 @@ inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableIntensiti
 inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::enableFragmentedScans(const bool& enable = true)
 {
   config_.fragmented_scans_ = enable;
+  return *this;
+}
+
+inline ScannerConfigurationBuilder& ScannerConfigurationBuilder::nrSubscribers(const uint8_t& nr_subscribers = 0)
+{
+  if (nr_subscribers > configuration::MAX_NR_SUBSCRIBERS)
+  {
+    throw std::invalid_argument("No more than 3 subscribers are supported.");
+  }
+  config_.nr_subscribers_ = nr_subscribers;
   return *this;
 }
 

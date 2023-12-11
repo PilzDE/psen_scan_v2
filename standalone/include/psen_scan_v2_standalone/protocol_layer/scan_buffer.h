@@ -41,7 +41,7 @@ class OutdatedMessageError : public ScanRoundError
 {
 public:
   OutdatedMessageError(const std::string& msg = "Detected a MonitoringFrame from an earlier round. "
-                                                " The scan round will ignore it.")
+                                                "The scan round will ignore it.")
     : ScanRoundError(msg){};
 };
 
@@ -108,7 +108,7 @@ private:
 
 private:
   std::vector<data_conversion_layer::monitoring_frame::MessageStamped> current_round_{};
-  const uint32_t& num_expected_msgs_;
+  const uint32_t num_expected_msgs_;
   bool first_scan_round_ = true;
 };
 
@@ -133,20 +133,24 @@ inline bool ScanBuffer::isRoundComplete()
 
 inline void ScanBuffer::add(const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg)
 {
-  if (current_round_.empty() || stamped_msg.msg_.scanCounter() == current_round_[0].msg_.scanCounter())
+  if (current_round_.empty() || stamped_msg.msg_.scanCounter() == current_round_.at(0).msg_.scanCounter())
   {
-    current_round_.push_back(stamped_msg);
+    current_round_.push_back(std::move(stamped_msg));
     if (current_round_.size() > num_expected_msgs_)
     {
       throw ScanRoundOversaturatedError();
     }
   }
-  else if (stamped_msg.msg_.scanCounter() > current_round_[0].msg_.scanCounter())
+  else if (stamped_msg.msg_.scanCounter() > current_round_.at(0).msg_.scanCounter())
   {
     startNewRound(stamped_msg);
   }
-  else
+  else  // stamped_msg.msg_.scanCounter() < current_round_.at(0).msg_.scanCounter()
   {
+    PSENSCAN_DEBUG("ScanBuffer",
+                   "stamped_msg.msg_.scanCounter(){} current_round_.at(0).msg_.scanCounter(){}",
+                   stamped_msg.msg_.scanCounter(),
+                   current_round_.at(0).msg_.scanCounter());
     throw OutdatedMessageError();
   }
 }
@@ -158,6 +162,11 @@ inline void ScanBuffer::startNewRound(const data_conversion_layer::monitoring_fr
   current_round_.push_back(stamped_msg);
   if (old_round_undersaturated && !first_scan_round_)
   {
+    PSENSCAN_DEBUG("ScanBuffer",
+                   "current_round_.size(){} num_expected_msgs_{} first_scan_round_{}",
+                   current_round_.size(),
+                   num_expected_msgs_,
+                   first_scan_round_);
     throw ScanRoundEndedEarlyError();
   }
   first_scan_round_ = false;
