@@ -33,7 +33,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <arg name="angle_start" default="$(eval radians(-137.4))" />
 
   <!-- End angle of measurement in radian -->
-
   <arg name="angle_end" default="$(eval radians(137.4))" />
 
   <!-- Publishing of intensities -->
@@ -55,7 +54,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <arg name="fragmented_scans" default="false" />
 
   <!-- Load scanner config file to publish zonesets -->
-  <arg name="config_file" default="/home/pilzcc/PSENscan/ROS_development/v5_final_subscriber_ws/src/psen_scan_v2/config/PSENscan_ME_and_S_10_ZoneSets.xml"/>
+  <arg name="config_file" default=""/>
 
   <!-- Start rviz -->
   <arg name="rviz" default="true" />
@@ -91,7 +90,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <node ns="$(arg tf_prefix)" name="config_server_node" type="config_server_node" pkg="psen_scan_v2">
       <param name="config_file" value="$(arg config_file)" />
       <param name="frame_id" value="$(arg tf_prefix)" />
-      <!-- Falta poner los prefijos de los subscribers -->
     </node>
   </group>
 
