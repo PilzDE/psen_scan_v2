@@ -116,61 +116,124 @@ std::vector<visualization_msgs::Marker> toMarkers(const ZoneSet& zoneset)
 {
   std::vector<visualization_msgs::Marker> return_vec;
 
+  // ZonsetMarkers Master
   if (!zoneset.safety1.points.empty())
   {
     return_vec.push_back(TO_MARKER(zoneset, safety, 1, "laser_1"));
-  }
-  if (!zoneset.safety1_Sub0.points.empty())
-  {
-    return_vec.push_back(TO_MARKER(zoneset, safety, 1_Sub0, "laser_1_Subscriber0"));
   }
   if (!zoneset.safety2.points.empty())
   {
     return_vec.push_back(TO_MARKER(zoneset, safety, 2, "laser_1"));
   }
-  if (!zoneset.safety2_Sub0.points.empty())
-  {
-    return_vec.push_back(TO_MARKER(zoneset, safety, 2_Sub0, "laser_1_Subscriber0"));
-  }
   if (!zoneset.safety3.points.empty())
   {
     return_vec.push_back(TO_MARKER(zoneset, safety, 3, "laser_1"));
-  }
-  if (!zoneset.safety3_Sub0.points.empty())
-  {
-    return_vec.push_back(TO_MARKER(zoneset, safety, 3_Sub0, "laser_1_Subscriber0"));
   }
   if (!zoneset.warn1.points.empty())
   {
     return_vec.push_back(TO_MARKER(zoneset, warn, 1, "laser_1"));
   }
-  if (!zoneset.warn1_Sub0.points.empty())
-  {
-    return_vec.push_back(TO_MARKER(zoneset, warn, 1_Sub0, "laser_1_Subscriber0"));
-  }
   if (!zoneset.warn2.points.empty())
   {
     return_vec.push_back(TO_MARKER(zoneset, warn, 2, "laser_1"));
-  }
-  if (!zoneset.warn2_Sub0.points.empty())
-  {
-    return_vec.push_back(TO_MARKER(zoneset, warn, 2_Sub0, "laser_1_Subscriber0"));
   }
   if (!zoneset.muting1.points.empty())
   {
     return_vec.push_back(TO_MARKER(zoneset, muting, 1, "laser_1"));
   }
-  if (!zoneset.muting1_Sub0.points.empty())
-  {
-    return_vec.push_back(TO_MARKER(zoneset, muting, 1_Sub0, "laser_1_Subscriber0"));
-  }
   if (!zoneset.muting2.points.empty())
   {
     return_vec.push_back(TO_MARKER(zoneset, muting, 2, "laser_1"));
   }
+
+  // ZonsetMarkers Subscriber0
+  if (!zoneset.safety1_Sub0.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, safety, 1_Sub0, "laser_1_Subscriber0"));
+  }
+  if (!zoneset.safety2_Sub0.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, safety, 2_Sub0, "laser_1_Subscriber0"));
+  }
+  if (!zoneset.safety3_Sub0.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, safety, 3_Sub0, "laser_1_Subscriber0"));
+  }
+  if (!zoneset.warn1_Sub0.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, warn, 1_Sub0, "laser_1_Subscriber0"));
+  }
+  if (!zoneset.warn2_Sub0.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, warn, 2_Sub0, "laser_1_Subscriber0"));
+  }
+  if (!zoneset.muting1_Sub0.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, muting, 1_Sub0, "laser_1_Subscriber0"));
+  }
   if (!zoneset.muting2_Sub0.points.empty())
   {
     return_vec.push_back(TO_MARKER(zoneset, muting, 2_Sub0, "laser_1_Subscriber0"));
+  }
+
+  // ZonsetMarkers Subscriber1
+  if (!zoneset.safety1_Sub1.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, safety, 1_Sub1, "laser_1_Subscriber1"));
+  }
+  if (!zoneset.safety2_Sub1.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, safety, 2_Sub1, "laser_1_Subscriber1"));
+  }
+  if (!zoneset.safety3_Sub1.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, safety, 3_Sub1, "laser_1_Subscriber1"));
+  }
+  if (!zoneset.warn1_Sub1.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, warn, 1_Sub1, "laser_1_Subscriber1"));
+  }
+  if (!zoneset.warn2_Sub1.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, warn, 2_Sub1, "laser_1_Subscriber1"));
+  }
+  if (!zoneset.muting1_Sub1.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, muting, 1_Sub1, "laser_1_Subscriber1"));
+  }
+  if (!zoneset.muting2_Sub1.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, muting, 2_Sub1, "laser_1_Subscriber1"));
+  }
+
+  // ZonsetMarkers Subscriber2
+  if (!zoneset.safety1_Sub2.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, safety, 1_Sub2, "laser_1_Subscriber2"));
+  }
+  if (!zoneset.safety2_Sub2.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, safety, 2_Sub2, "laser_1_Subscriber2"));
+  }
+  if (!zoneset.safety3_Sub2.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, safety, 3_Sub2, "laser_1_Subscriber2"));
+  }
+  if (!zoneset.warn1_Sub2.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, warn, 1_Sub2, "laser_1_Subscriber2"));
+  }
+  if (!zoneset.warn2_Sub2.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, warn, 2_Sub2, "laser_1_Subscriber2"));
+  }
+  if (!zoneset.muting1_Sub2.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, muting, 1_Sub2, "laser_1_Subscriber2"));
+  }
+  if (!zoneset.muting2_Sub2.points.empty())
+  {
+    return_vec.push_back(TO_MARKER(zoneset, muting, 2_Sub2, "laser_1_Subscriber2"));
   }
 
   return return_vec;

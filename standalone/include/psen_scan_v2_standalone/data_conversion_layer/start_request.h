@@ -74,15 +74,17 @@ private:
   class DeviceSettings
   {
   public:
-    constexpr DeviceSettings(const bool diagnostics_enabled, const bool intensities_enabled);
+    constexpr DeviceSettings(const bool diagnostics_enabled, const bool intensities_enabled, const uint8_t nr_subscribers);
 
   public:
     constexpr bool diagnosticsEnabled() const;
     constexpr bool intensitiesEnabled() const;
+    constexpr uint8_t nrSubscribers() const;
 
   private:
     const bool diagnostics_enabled_;
     const bool intensities_enabled_;
+    const uint8_t nr_subscribers_;
   };
 
 private:
@@ -114,8 +116,8 @@ constexpr util::TenthOfDegree Message::LaserScanSettings::resolution() const
   return resolution_;
 };
 
-constexpr Message::DeviceSettings::DeviceSettings(const bool diagnostics_enabled, const bool intensities_enabled)
-  : diagnostics_enabled_(diagnostics_enabled), intensities_enabled_(intensities_enabled)
+constexpr Message::DeviceSettings::DeviceSettings(const bool diagnostics_enabled, const bool intensities_enabled, const uint8_t nr_subscribers)
+  : diagnostics_enabled_(diagnostics_enabled), intensities_enabled_(intensities_enabled), nr_subscribers_(nr_subscribers)
 {
 }
 
@@ -127,6 +129,11 @@ constexpr bool Message::DeviceSettings::diagnosticsEnabled() const
 constexpr bool Message::DeviceSettings::intensitiesEnabled() const
 {
   return intensities_enabled_;
+};
+
+constexpr uint8_t Message::DeviceSettings::nrSubscribers() const
+{
+  return nr_subscribers_;
 };
 
 }  // namespace start_request

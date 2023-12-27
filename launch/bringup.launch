@@ -20,6 +20,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- IP-Address of Safety laser scanner -->
   <arg name="sensor_ip" default="192.168.0.10" />
 
+  <!-- How many subscribers are connected to the master scanner, 0 ... 3 are supported. -->
+  <arg name="nr_subscribers" default="1" />
+
   <!-- Name of the scanner (required to run multiple scanners) which by convention
        is the prefix for the urdf description. -->
   <arg name="tf_prefix" default="laser_1" />
@@ -47,9 +50,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
   <!-- Set the following to true in order to publish scan data as soon as a UDP packet is ready, instead of waiting for a full scan -->
   <arg name="fragmented_scans" default="false" />
-
-  <!-- How many subscribers are connected to the master scanner, 0 ... 3 are supported. -->
-  <arg name="nr_subscribers" default="1" />
 
   <node name="$(arg tf_prefix)" type="psen_scan_v2_node" pkg="psen_scan_v2" output="screen" required="true">
     <param name="sensor_ip" value="$(arg sensor_ip)" />

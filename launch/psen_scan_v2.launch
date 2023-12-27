@@ -20,8 +20,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- IP-Address of Safety laser scanner -->
   <arg name="sensor_ip" default="192.168.0.10" />
 
-  <!-- Name of the scanner (required to run multiple scanners) -->
+  <!-- How many subscribers are connected to the master scanner, 0 .. 3 are supported. -->
+  <arg name="nr_subscribers" default="0" />
+
+  <!-- Name of the scanners (required to run multiple scanners) -->
   <arg name="tf_prefix" default="laser_1" />
+  <arg name="tf_prefix_sub0" default="laser_1_Subscriber0" />
+  <arg name="tf_prefix_sub1" default="laser_1_Subscriber1" />
+  <arg name="tf_prefix_sub2" default="laser_1_Subscriber2" />
 
   <!-- Start angle of measurement in radian -->
   <arg name="angle_start" default="$(eval radians(-137.4))" />
@@ -48,11 +54,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- Set the following to true in order to publish scan data as soon as a UDP packet is ready, instead of waiting for a full scan -->
   <arg name="fragmented_scans" default="false" />
 
-  <!-- How many subscribers are connected to the master scanner, 0 ... 3 are supported. -->
-  <arg name="nr_subscribers" default="1" />
-
   <!-- Load scanner config file to publish zonesets -->
-  <arg name="config_file" default=""/>
+  <arg name="config_file" default="/home/pilzcc/PSENscan/ROS_development/v5_final_subscriber_ws/src/psen_scan_v2/config/PSENscan_ME_and_S_10_ZoneSets.xml"/>
 
   <!-- Start rviz -->
   <arg name="rviz" default="true" />
@@ -74,7 +77,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
   <!-- Publish tf frames for the device -->
   <param name="robot_description" command="$(find xacro)/xacro
-    '$(find psen_scan_v2)/urdf/main.urdf.xacro' prefix:=$(arg tf_prefix)" />
+    '$(find psen_scan_v2)/urdf/main.urdf.xacro' 
+    nr_scanners:=$(arg nr_subscribers)
+    prefix:=$(arg tf_prefix)
+    prefix_sub0:=$(arg tf_prefix_sub0)
+    prefix_sub1:=$(arg tf_prefix_sub1)
+    prefix_sub2:=$(arg tf_prefix_sub2)" />
+
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
   <!-- Publish the defined zonesets from the xml configuration -->
@@ -82,6 +91,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <node ns="$(arg tf_prefix)" name="config_server_node" type="config_server_node" pkg="psen_scan_v2">
       <param name="config_file" value="$(arg config_file)" />
       <param name="frame_id" value="$(arg tf_prefix)" />
+      <!-- Falta poner los prefijos de los subscribers -->
     </node>
   </group>
 
