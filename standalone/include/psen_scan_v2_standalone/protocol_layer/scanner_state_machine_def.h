@@ -256,11 +256,6 @@ ScannerProtocolDef::checkForChangedActiveZoneset(const data_conversion_layer::mo
 inline void ScannerProtocolDef::informUserAboutTheScanData(
     const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg)
 {
-  PSENSCAN_DEBUG("Scanner",
-                 "Received scan with scannerId {}, scanCounter {}, measurements().size() {}",
-                 stamped_msg.msg_.scannerId(),
-                 stamped_msg.msg_.scanCounter(),
-                 stamped_msg.msg_.measurements().size());
   try
   {
     scan_buffers_.at(stamped_msg.msg_.scannerId()).add(stamped_msg);

@@ -130,18 +130,12 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
                  end,
                  resolution);
 
-  // information for each subscriber
-  raw_processing::write(os, start);  // hard coded for one subscriber
-  raw_processing::write(os, end);
-  raw_processing::write(os, resolution);
-
-  raw_processing::write(os, (int16_t)0);
-  raw_processing::write(os, (int16_t)0);
-  raw_processing::write(os, (int16_t)0);
-
-  raw_processing::write(os, (int16_t)0);
-  raw_processing::write(os, (int16_t)0);
-  raw_processing::write(os, (int16_t)0);
+  for (int i = 0; i < nrSubscribers; i++)  // Note: This refers to the scanner type subscriber, *not* a ros subscriber
+  {
+    raw_processing::write(os, start);
+    raw_processing::write(os, end);
+    raw_processing::write(os, resolution);
+  }
 
   const std::string raw_data_as_str{ os.str() };
   const data_conversion_layer::RawData raw_data(raw_data_as_str.cbegin(), raw_data_as_str.cend());

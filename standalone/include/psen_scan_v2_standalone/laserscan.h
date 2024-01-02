@@ -20,13 +20,9 @@
 #include <ostream>
 #include <vector>
 
-#include <boost/optional.hpp>
-#include <boost/optional/optional_io.hpp>
-
 #include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/io_state.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
-#include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -60,7 +56,7 @@ public:
             const util::TenthOfDegree& min_scan_angle,
             const util::TenthOfDegree& max_scan_angle,
             const uint32_t scan_counter,
-            const boost::optional<uint8_t> active_zoneset,
+            const uint8_t active_zoneset,
             const int64_t timestamp,
             const configuration::ScannerId scanner_id);
 
@@ -85,9 +81,8 @@ public:
   uint32_t scanCounter() const;
 
   /*! deprecated: use uint8_t activeZoneset() const instead */
-  [[deprecated("use boost::optional<uint8_t> activeZoneset() const instead")]] boost::optional<uint8_t>
-  getActiveZoneset() const;
-  boost::optional<uint8_t> activeZoneset() const;
+  [[deprecated("use uint8_t activeZoneset() const instead")]] uint8_t getActiveZoneset() const;
+  uint8_t activeZoneset() const;
 
   /*! deprecated: use int64_t timestamp() const instead */
   [[deprecated("use int64_t timestamp() const instead")]] int64_t getTimestamp() const;
@@ -142,7 +137,7 @@ private:
   //! Number of the scan round this data belongs to.
   const uint32_t scan_counter_;
   //! The currently active zoneset of the scanner.
-  const boost::optional<uint8_t> active_zoneset_;
+  const uint8_t active_zoneset_;
   //! Time of the first ray in this scan round (or fragment if fragmented_scans is enabled).
   const int64_t timestamp_;
   //! distinction between master and subscribers

@@ -8,7 +8,7 @@
     <xacro:property name="dist_scanning_axis_rear" value="0.0525" /> <!-- src datasheet p 96 -->
 
     <joint name="${prefix}_joint" type="fixed">
-      <parent link="base_link" />
+      <parent link="reference_link" />
       <child link="${prefix}_mount_link" />
       <xacro:insert_block name="origin" />
     </joint>

@@ -153,12 +153,9 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
         laser_scan_msg.ranges.size());
     pubs_scan_.at(scan.scannerId()).publish(laser_scan_msg);
 
-    if (scan.activeZoneset())
-    {
-      std_msgs::UInt8 active_zoneset;
-      active_zoneset.data = *scan.activeZoneset();
-      pub_zone_.publish(active_zoneset);
-    }
+    std_msgs::UInt8 active_zoneset;
+    active_zoneset.data = scan.activeZoneset();
+    pub_zone_.publish(active_zoneset);
 
     publishChangedIOStates(scan.ioStates());
   }

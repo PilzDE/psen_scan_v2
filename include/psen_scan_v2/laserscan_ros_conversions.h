@@ -30,29 +30,6 @@ sensor_msgs::LaserScan toLaserScanMsg(const LaserScan& laserscan,
                                       const double x_axis_rotation)
 {
   sensor_msgs::LaserScan ros_message;
-
-  // tell the receiver where the origin of the data is
-  if (laserscan.scannerId() == configuration::ScannerId::master)
-  {
-    ros_message.header.frame_id = frame_id;
-  }
-  else if (laserscan.scannerId() == configuration::ScannerId::subscriber0)
-  {
-    ros_message.header.frame_id = "laser_2";
-  }
-  else if (laserscan.scannerId() == configuration::ScannerId::subscriber1)
-  {
-    ros_message.header.frame_id = "laser_3";
-  }
-  else if (laserscan.scannerId() == configuration::ScannerId::subscriber2)
-  {
-    ros_message.header.frame_id = "laser_4";
-  }
-  else
-  {
-    PSENSCAN_ERROR("", "unexpected scanner id");
-  }
-
   if (laserscan.timestamp() < 0)
   {
     throw std::invalid_argument("Laserscan message has an invalid timestamp: " + std::to_string(laserscan.timestamp()));

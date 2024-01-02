@@ -21,7 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <arg name="sensor_ip" default="192.168.0.10" />
 
   <!-- How many subscribers are connected to the master scanner, 0 ... 3 are supported. -->
-  <arg name="nr_subscribers" default="1" />
+  <arg name="nr_subscribers" default="0" />
 
   <!-- Name of the scanner (required to run multiple scanners) which by convention
        is the prefix for the urdf description. -->

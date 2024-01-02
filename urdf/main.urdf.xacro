@@ -13,30 +13,30 @@
 
   <xacro:include filename="$(find psen_scan_v2)/urdf/xacros/psen_scan.urdf.xacro" />
 
-  <link name="base_link"/>
+  <link name="reference_link"/>
 
   <!-- PSENscan Master -->
-  <xacro:psen_scan prefix="$(arg prefix)" parent="base_link">
+  <xacro:psen_scan prefix="$(arg prefix)" parent="reference_link">
     <origin xyz="0.5 0 0" rpy="0 0 0" />
   </xacro:psen_scan>
 
   <!-- PSENscan Subscriber0 -->
   <xacro:if value="${nr_sub >= 1}">
-    <xacro:psen_scan prefix="$(arg prefix_sub0)" parent="base_link">
+    <xacro:psen_scan prefix="$(arg prefix_sub0)" parent="reference_link">
       <origin xyz="-0.5 0 0" rpy="0 0 3.14" />
     </xacro:psen_scan>
   </xacro:if>
 
   <!-- PSENscan Subscriber1 -->
   <xacro:if value="${nr_sub >= 2}">
-    <xacro:psen_scan prefix="$(arg prefix_sub1)" parent="base_link">
+    <xacro:psen_scan prefix="$(arg prefix_sub1)" parent="reference_link">
       <origin xyz="0 0.5 0" rpy="0 0 1.57" />
     </xacro:psen_scan>
   </xacro:if>
 
   <!-- PSENscan Subscriber2 -->
   <xacro:if value="${nr_sub == 3}">
-    <xacro:psen_scan prefix="$(arg prefix_sub2)" parent="base_link">
+    <xacro:psen_scan prefix="$(arg prefix_sub2)" parent="reference_link">
       <origin xyz="0 -0.5 0" rpy="0 0 -1.57" />
     </xacro:psen_scan>
   </xacro:if>
