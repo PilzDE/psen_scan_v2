@@ -45,7 +45,7 @@ Additional features: Muting, EDM, Override, restart in accordance with EN ISO 61
 | PSEN sc S 5.5 08-12	| 5.5 m safety zone	| 6D000021 |
 
 ## C++ standalone library
-If you are interested in using the PSENscan safety laser scanner without ROS, please take a look at our C++ standalone library. You can read more about it [in the `standalone` folder](https://github.com/PilzDE/psen_scan_v2/blob/main/standalone/README.md)
+If you are interested in using the PSENscan safety laser scanner without ROS, please take a look at our C++ standalone library. You can read more about it in the [`standalone`](https://github.com/PilzDE/psen_scan_v2/blob/main/standalone/README.md) folder.
 
 ## Table of Contents
 
@@ -83,15 +83,18 @@ This package is capable to read data from 1, 2, 3 and 4 PSENscans with the follo
 <img src="img/PSENscan.jpg">
 </p>
 
-To start reading data from one safety laser scanner (Master) and publishing scanute in a command line: `roslaunch psen_scan_v2 psen_scan_v2.launch` ina comman. This will launch the ROS Node with the default configuration.
+To start reading data from **one** safety laser scanner (Master) and publishing scans execute in a command line:
 
-If you wish to set parameters from the command line, add them to the end of the command as `parameter:=value`, separated by spaces.
+```bash
+ roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10
+```
+
+To read the data from the Master and the subscribers, execute in command line:
 
 ```bash
 roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10 nr_subscribers:=0;
 ```
-
-
+**Note: 0 .. 3 subscribers maximum!**
 
 In order to create an application with your own launch file, you can include the `bringup.launch`, where you can easily adjust the configuration parameters. A more detailed explanation can be found in the [tutorials](http://wiki.ros.org/psen_scan_v2/Tutorials/).
 
@@ -99,6 +102,9 @@ In order to create an application with your own launch file, you can include the
 
 _sensor_ip_ (_string_, default: "192.168.0.10")<br/>
 IP-Address of safety laser scanner.
+
+_nr_subscribers (_int_, default: "0")<br/>
+Number of the subscribers connected to the Master.
 
 ### Optional Parameters
 
@@ -139,6 +145,7 @@ Start a preconfigured rviz visualizing the scan data.
 
 ### Published Topics
 /\<name\>/scan ([sensor_msgs/LaserScan][])<br/>
+/\<name\>/scan_SubscriberX ([sensor_msgs/LaserScan][])<br/>
 
 * If _fragmented_scans_ is set to false (default) the driver will publish complete scan rounds from the PSENscan safety laser scanner as a single message.
 * If _fragmented_scans_ is enabled the driver will send the measurement data as soon as they arrive, instead of waiting for the scan round to be completed. This way the scan data is received sooner but is split into several sensor messages.
