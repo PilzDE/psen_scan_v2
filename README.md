@@ -41,7 +41,7 @@ Additional features: Muting, EDM, Override
 |------|----------|--------------|
 | PSEN sc M 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin, exchangeable memory module	| 6D000016 |
 | PSEN sc M 5.5 08-12	| 5.5 m safety zone, 8 or 12-pin, exchangeable memory module	| 6D000017 |
-| PSEN sc ME 5.5 08-17  | Master Encoder, 5.5 m safety zone, 8 or 17-pin, exchangeable memory | 6D000019 |
+| PSEN sc ME 5.5 08-17  | Master Encoder, 5.5 m safety zone, 8 or 17-pin, exchangeable memory module | 6D000019 |
 
 Additional features: Muting, EDM, Override, restart in accordance with EN ISO 61496-3, vertical applications
 
@@ -112,7 +112,7 @@ _sensor_ip_ (_string_, default: "192.168.0.10")<br/>
 IP-Address of safety laser scanner.
 
 _nr_subscribers (_int_, default: "0")<br/>
-Number of the subscribers connected to the Master.
+Number of Subscribers safety laser scanners connected to the Master.
 
 ### Optional Parameters
 
