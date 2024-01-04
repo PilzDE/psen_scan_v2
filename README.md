@@ -31,7 +31,7 @@ The **psen_scan_v2** package is a ROS integration driver for the PSENscan safety
 #### *Light versions*	
 | Type | Features | Order number |
 |------|----------|--------------|
-| PSEN sc L 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin, exchangeable memory module |	6D000012 |
+| PSEN sc L 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin, exchangeable memory module   | 6D000012 |
 | PSEN sc L 5.5 08-12	| 5.5 m safety zone, 8 or 12-pin, exchangeable memory module	| 6D000013 |
 
 Additional features: Muting, EDM, Override
@@ -41,7 +41,8 @@ Additional features: Muting, EDM, Override
 |------|----------|--------------|
 | PSEN sc M 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin, exchangeable memory module	| 6D000016 |
 | PSEN sc M 5.5 08-12	| 5.5 m safety zone, 8 or 12-pin, exchangeable memory module	| 6D000017 |
-| PSEN sc ME 5.5 08-17  | Master Encoder, 5.5 m safety zone, 8 or 17-pin, exchangeable memory module | 6D000019 |
+| PSEN sc M 5.5 08-17   | 5.5 m safety zone, 8 or 17-pin, exchangeable memory module   | 6D000019 |
+| PSEN sc ME 5.5 08-17  | Master Encoder, 5.5 m safety zone, 8 or 17-pin, exchangeable memory module | 6D000034 |
 
 Additional features: Muting, EDM, Override, restart in accordance with EN ISO 61496-3, vertical applications
 
