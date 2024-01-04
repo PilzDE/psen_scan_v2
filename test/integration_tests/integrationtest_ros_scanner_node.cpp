@@ -36,6 +36,7 @@
 #include "psen_scan_v2_standalone/util/gtest_expectations.h"
 #include "psen_scan_v2_standalone/util/matchers_and_actions.h"
 #include "psen_scan_v2_standalone/util/mock_console_bridge_output_handler.h"
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 
 #include "psen_scan_v2/laserscan_ros_conversions.h"
 #include "psen_scan_v2/ros_scanner_node.h"
@@ -96,7 +97,8 @@ static LaserScan createValidLaserScan(const uint8_t active_zoneset = 1)
                                                      psen_scan_v2_standalone::util::TenthOfDegree(5),
                                                      14,
                                                      active_zoneset,
-                                                     1000000000);
+                                                     1000000000,
+                                                     configuration::ScannerId::master);
   return laser_scan_fake;
 }
 
