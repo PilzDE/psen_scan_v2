@@ -10,18 +10,39 @@ The **psen_scan_v2** package is a ROS integration driver for the PSENscan safety
 <img src="img/PSENscan.jpg" alt="PILZ safety laser scanner" title="PILZ safety laser scanner">
 </p>
 
-PSENscan firmware >= 3.1.0 is supported on the following models:
+**Common features:**
+<ul>
+   <li>Compliant and approved in accordance with: EN/IEC 61496-1: Type 3, EN ISO 13849-1: PL d, IEC 61508: SIL 2</li>
+   <li>Opening angle: 275°</li>
+   <li>Operating range: 3.0 or 5.5 m safety zone, 40 m warning zone</li>
+   <li>Reaction time: 62 ms</li>
+   <li>Protection type: IP65</li>
+   <li>Dimensions (H x W x D) in mm: 152 x 102 x 112.5</li>
+</ul>
 
+### The PSENscan firmware (3.1.x) is supported on the following models:
+
+#### *Light versions*	
 | Type | Features | Order number |
 |------|----------|--------------|
-| |	Common features:<ul><li>compliant and approved in accordance with: EN/IEC 61496-1: Type 3, EN ISO 13849-1: PL d, IEC 61508: SIL 2</li><li>opening angle: 275°</li><li>operating range: 3.0 or 5.5 m safety zone, 40 m warning zone</li><li>reaction time: 62 ms</li><li>Protection type: IP65</li><li>Dimensions (H x W x D) in mm: 152 x 102 x 112.5</li></ul> | |
-| | *Light versions*	Additional features: Muting, EDM, Override | |
 | PSEN sc L 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin exchangeable memory module |	6D000012 |
 | PSEN sc L 5.5 08-12	| 5.5 m safety zone, 8 or 12-pin exchangeable memory module	| 6D000013 |
-| | *Master versions*	Additional features: Muting, EDM, Override, restart in accordance with EN ISO 61496-3, vertical applications| |
+
+Additional features: Muting, EDM, Override
+
+#### *Master versions*
+| Type | Features | Order number |
+|------|----------|--------------|
 | PSEN sc M 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin exchangeable memory module	| 6D000016 |
 | PSEN sc M 5.5 08-12	| 5.5 m safety zone, 8 or 12-pin exchangeable memory module	| 6D000017 |
 | PSEN sc ME 5.5 08-17  | Master Encoder, 5.5 m safety zone, 8/17-pin exchangeable memory | 6D000019 |
+
+Additional features: Muting, EDM, Override, restart in accordance with EN ISO 61496-3, vertical applications
+
+#### *Subscriber versions*	
+| Type | Features | Order number |
+|------|----------|--------------|
+| PSEN sc S 5.5 08-12	| 5.5 m safety zone	| 6D000021 |
 
 ## C++ standalone library
 If you are interested in using the PSENscan safety laser scanner without ROS, please take a look at our C++ standalone library. You can read more about it [in the `standalone` folder](https://github.com/PilzDE/psen_scan_v2/blob/main/standalone/README.md)
@@ -57,14 +78,20 @@ sudo apt install ros-$ROS_DISTRO-psen-scan-v2
 ```
 
 ## Usage
-To start reading data from the safety laser scanner and publishing scans execute `roslaunch psen_scan_v2 psen_scan_v2.launch` in a command line. This will launch the ROS Node with the default configuration.
+This package is capable to read data from 1, 2, 3 and 4 PSENscans with the following configuration:
+<p align="center">
+<img src="img/PSENscan.jpg">
+</p>
+
+To start reading data from one safety laser scanner (Master) and publishing scanute in a command line: `roslaunch psen_scan_v2 psen_scan_v2.launch` ina comman. This will launch the ROS Node with the default configuration.
 
 If you wish to set parameters from the command line, add them to the end of the command as `parameter:=value`, separated by spaces.
 
 ```bash
-roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10
+roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10 nr_subscribers:=0;
 ```
-This example configures the safety laser scanner at 192.168.0.10 to send it´s frames to the ROS node at localhost.
+
+
 
 In order to create an application with your own launch file, you can include the `bringup.launch`, where you can easily adjust the configuration parameters. A more detailed explanation can be found in the [tutorials](http://wiki.ros.org/psen_scan_v2/Tutorials/).
 
