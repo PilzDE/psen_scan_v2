@@ -52,6 +52,8 @@ Additional features: Muting, EDM, Override, restart in accordance with EN ISO 61
 | PSEN sc S 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin	| 6D000020 |
 | PSEN sc S 5.5 08-12	| 5.5 m safety zone, 8 or 12-pin	| 6D000021 |
 
+Additional features: reference marks, vertical applications
+
 ## C++ standalone library
 If you are interested in using the PSENscan safety laser scanner without ROS, please take a look at our C++ standalone library. You can read more about it in the [`standalone`](https://github.com/PilzDE/psen_scan_v2/blob/main/standalone/README.md) folder.
 
