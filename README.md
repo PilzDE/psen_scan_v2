@@ -81,21 +81,21 @@ sudo apt install ros-$ROS_DISTRO-psen-scan-v2
 ## Usage
 This package is capable to read data from 1, 2, 3 and 4 PSENscans with the following configuration:
 <p align="center">
-<img src="img/PSENscan.jpg">
+<img src="img/Master_and_Subscribers.jpg">
 </p>
 
-To start reading data from **one** safety laser scanner (Master) and publishing scans execute in a command line:
+If you want to read data and publishing scans from **1** safety laser scanner (Master, Light), execute in a command line:
 
 ```bash
  roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10
 ```
 
-To read the data from the Master and the subscribers, execute in command line:
+To read the data from differents safety laser scanners (Master and Subscriber0), execute in command line:
 
 ```bash
-roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10 nr_subscribers:=0
+roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10 nr_subscribers:=1
 ```
-**Note: 0 .. 3 subscribers maximum!**
+**Note: nr_subscribers [0 .. 3] maximum!**
 
 In order to create an application with your own launch file, you can include the `bringup.launch`, where you can easily adjust the configuration parameters. A more detailed explanation can be found in the [tutorials](http://wiki.ros.org/psen_scan_v2/Tutorials/).
 
