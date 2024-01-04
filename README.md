@@ -12,7 +12,13 @@ The **psen_scan_v2** package is a ROS integration driver for the PSENscan safety
 
 **Common features:**
 <ul>
-   <li>Compliant and approved in accordance with: EN/IEC 61496-1: Type 3, EN ISO 13849-1: PL d, IEC 61508: SIL 2</li>
+   <li>Compliant and approved in accordance with:
+      <ul>
+         <li> EN/IEC 61496-1: Type 3 </li>
+         <li> EN ISO 13849-1: PL d </li>
+         <li> IEC 61508: SIL 2 </li>
+      </ul>
+   </li>
    <li>Opening angle: 275°</li>
    <li>Operating range: 3.0 or 5.5 m safety zone, 40 m warning zone</li>
    <li>Reaction time: 62 ms</li>
@@ -79,7 +85,8 @@ sudo apt install ros-$ROS_DISTRO-psen-scan-v2
 ```
 
 ## Usage
-This package is capable to read data from 1, 2, 3 and 4 PSENscans with the following configuration:
+This package is capable to read data from 1 to 4 safety laser scanners with the following configuration:
+
 <p align="center">
 <img src="img/Master_and_Subscribers.jpg">
 </p>
