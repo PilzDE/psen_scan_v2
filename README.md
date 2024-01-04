@@ -25,24 +25,25 @@ The **psen_scan_v2** package is a ROS integration driver for the PSENscan safety
 #### *Light versions*	
 | Type | Features | Order number |
 |------|----------|--------------|
-| PSEN sc L 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin exchangeable memory module |	6D000012 |
-| PSEN sc L 5.5 08-12	| 5.5 m safety zone, 8 or 12-pin exchangeable memory module	| 6D000013 |
+| PSEN sc L 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin, exchangeable memory module |	6D000012 |
+| PSEN sc L 5.5 08-12	| 5.5 m safety zone, 8 or 12-pin, exchangeable memory module	| 6D000013 |
 
 Additional features: Muting, EDM, Override
 
 #### *Master versions*
 | Type | Features | Order number |
 |------|----------|--------------|
-| PSEN sc M 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin exchangeable memory module	| 6D000016 |
-| PSEN sc M 5.5 08-12	| 5.5 m safety zone, 8 or 12-pin exchangeable memory module	| 6D000017 |
-| PSEN sc ME 5.5 08-17  | Master Encoder, 5.5 m safety zone, 8/17-pin exchangeable memory | 6D000019 |
+| PSEN sc M 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin, exchangeable memory module	| 6D000016 |
+| PSEN sc M 5.5 08-12	| 5.5 m safety zone, 8 or 12-pin, exchangeable memory module	| 6D000017 |
+| PSEN sc ME 5.5 08-17  | Master Encoder, 5.5 m safety zone, 8 or 17-pin, exchangeable memory | 6D000019 |
 
 Additional features: Muting, EDM, Override, restart in accordance with EN ISO 61496-3, vertical applications
 
 #### *Subscriber versions*	
 | Type | Features | Order number |
 |------|----------|--------------|
-| PSEN sc S 5.5 08-12	| 5.5 m safety zone	| 6D000021 |
+| PSEN sc S 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin	| 6D000020 |
+| PSEN sc S 5.5 08-12	| 5.5 m safety zone, 8 or 12-pin	| 6D000021 |
 
 ## C++ standalone library
 If you are interested in using the PSENscan safety laser scanner without ROS, please take a look at our C++ standalone library. You can read more about it in the [`standalone`](https://github.com/PilzDE/psen_scan_v2/blob/main/standalone/README.md) folder.
@@ -92,7 +93,7 @@ To start reading data from **one** safety laser scanner (Master) and publishing 
 To read the data from the Master and the subscribers, execute in command line:
 
 ```bash
-roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10 nr_subscribers:=0;
+roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10 nr_subscribers:=0
 ```
 **Note: 0 .. 3 subscribers maximum!**
 
