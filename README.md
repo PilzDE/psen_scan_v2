@@ -29,28 +29,28 @@ The **psen_scan_v2** package is a ROS integration driver for the PSENscan safety
 ### The PSENscan firmware (3.1.x) is supported on the following models:
 
 #### *Light versions*	
-| Type | Features | Order number |
-|------|----------|--------------|
-| PSEN sc L 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin, exchangeable memory module   | 6D000012 |
-| PSEN sc L 5.5 08-12	| 5.5 m safety zone, 8 or 12-pin, exchangeable memory module	| 6D000013 |
+| Type                  | Features                                                                 | Order number |
+|-----------------------|--------------------------------------------------------------------------|--------------|
+| PSEN sc L 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin, two safety zones active at the same time | 6D000012     |
+| PSEN sc L 5.5 08-12	| 5.5 m safety zone, 8 or 12-pin, two safety zones active at the same time | 6D000013     |
 
 Additional features: Muting, EDM, Override
 
 #### *Master versions*
-| Type | Features | Order number |
-|------|----------|--------------|
-| PSEN sc M 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin, exchangeable memory module	| 6D000016 |
-| PSEN sc M 5.5 08-12	| 5.5 m safety zone, 8 or 12-pin, exchangeable memory module	| 6D000017 |
-| PSEN sc M 5.5 08-17   | 5.5 m safety zone, 8 or 17-pin, exchangeable memory module   | 6D000019 |
-| PSEN sc ME 5.5 08-17  | Master Encoder, 5.5 m safety zone, 8 or 17-pin, exchangeable memory module | 6D000034 |
+| Type                  | Features                                                                  | Order number |
+|-----------------------|---------------------------------------------------------------------------|--------------|
+| PSEN sc M 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin, two safety zones active at the same time  | 6D000016     |
+| PSEN sc M 5.5 08-12	| 5.5 m safety zone, 8 or 12-pin, two safety zones active at the same time  | 6D000017     |
+| PSEN sc M 5.5 08-17   | 5.5 m safety zone, 8 or 17-pin, two safety zones active at the same time  | 6D000019     |
+| PSEN sc ME 5.5 08-17  | 5.5 m safety zone, 8 or 17-pin, two safety zones active at the same time  | 6D000034     |
 
 Additional features: Muting, EDM, Override, restart in accordance with EN ISO 61496-3, vertical applications
 
 #### *Subscriber versions*	
-| Type | Features | Order number |
-|------|----------|--------------|
-| PSEN sc S 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin	| 6D000020 |
-| PSEN sc S 5.5 08-12	| 5.5 m safety zone, 8 or 12-pin	| 6D000021 |
+| Type                  | Features                                                                  | Order number |
+|-----------------------|---------------------------------------------------------------------------|--------------|
+| PSEN sc S 3.0 08-12	| 3.0 m safety zone, 8 or 12-pin, two safety zones active at the same time  | 6D000020     |
+| PSEN sc S 5.5 08-12	| 5.5 m safety zone, 8 or 12-pin, two safety zones active at the same time  | 6D000021     |
 
 Additional features: reference marks, vertical applications
 
@@ -88,13 +88,13 @@ sudo apt install ros-$ROS_DISTRO-psen-scan-v2
 ```
 
 ## Usage
-This package is capable to read data from 1 to 4 safety laser scanners with the following configuration:
+This package is capable to read data from 1 Master safety laser scanner, and up to 3 Subscribers safety laser scanners, as shown below:
 
 <p align="center">
 <img src="img/Master_and_Subscribers.jpg">
 </p>
 
-If you want to read data and publishing scans from **1** safety laser scanner (Master, Light), execute in a command line:
+To read data and publishing scans from **1** safety laser scanner (Master, Light), execute in a command line:
 
 ```bash
  roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10
@@ -105,7 +105,6 @@ To read the data from differents safety laser scanners (Master and Subscriber0),
 ```bash
 roslaunch psen_scan_v2 psen_scan_v2.launch sensor_ip:=192.168.0.10 nr_subscribers:=1
 ```
-**Note: nr_subscribers [0 .. 3] maximum!**
 
 In order to create an application with your own launch file, you can include the `bringup.launch`, where you can easily adjust the configuration parameters. A more detailed explanation can be found in the [tutorials](http://wiki.ros.org/psen_scan_v2/Tutorials/).
 
@@ -115,7 +114,7 @@ _sensor_ip_ (_string_, default: "192.168.0.10")<br/>
 IP-Address of safety laser scanner.
 
 _nr_subscribers (_int_, default: "0")<br/>
-Number of Subscribers safety laser scanners connected to the Master.
+Number of Subscribers safety laser scanners connected to the Master. **Note: nr_subscribers [0 .. 3] maximum!**
 
 ### Optional Parameters
 
