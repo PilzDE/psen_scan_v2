@@ -130,7 +130,7 @@ static geometry_msgs::Point32 createPoint32(const float& x, const float& y, cons
 static ZoneSet createFullZoneSet()
 {
   ZoneSet zone_set;
-  zone_set.header.frame_id = "test_frame_id";
+  zone_set.header.frame_id = "laser_1";
   zone_set.speed_lower = 0.1;
   zone_set.speed_upper = 0.2;
 

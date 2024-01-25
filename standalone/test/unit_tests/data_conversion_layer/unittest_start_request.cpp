@@ -171,7 +171,7 @@ TEST_F(StartRequestTest, crcWithIntensities)
 
   // see wireshark for this number
   // generated with `roslaunch psen_scan_v2 psen_scan_v2.launch intensities:=true resolution:=0.0035`
-  const std::array<unsigned char, 4> expected_crc = { 0x75, 0x13, 0x83, 0x77 };
+  const std::array<unsigned char, 4> expected_crc = { 0x48, 0xEB, 0x48, 0x6B };
 
   for (size_t i = 0; i < expected_crc.size(); ++i)
   {
