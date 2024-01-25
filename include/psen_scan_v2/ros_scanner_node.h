@@ -142,8 +142,8 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
 {
   try
   {
-    std::string tf_prefix_with_subscriber_ = tf_prefixes_.at(scan.scannerId());
-    const auto laser_scan_msg = toLaserScanMsg(scan, tf_prefix_with_subscriber_, x_axis_rotation_);
+    std::string tf_prefix_with_subscriber = tf_prefixes_.at(scan.scannerId());
+    const auto laser_scan_msg = toLaserScanMsg(scan, tf_prefix_with_subscriber, x_axis_rotation_);
     PSENSCAN_INFO_ONCE(
         "ScannerNode",
         "Publishing laser scan with angle_min={:.1f} angle_max={:.1f} angle_increment={:.1f} degrees. {} angle values.",
@@ -170,12 +170,12 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
 template <typename S>
 void ROSScannerNodeT<S>::publishChangedIOStates(const std::vector<psen_scan_v2_standalone::IOState>& io_states)
 {
-  std::string tf_prefix_with_subscriber_ = tf_prefixes_.at(ScannerId::master);  // assuming all IO is at the master
+  std::string tf_prefix_with_subscriber = tf_prefixes_.at(ScannerId::master);  // assuming all IO is at the master
   for (const auto& io : io_states)
   {
     if (last_io_state_ != io)
     {
-      pub_io_.publish(toIOStateMsg(io, tf_prefix_with_subscriber_));
+      pub_io_.publish(toIOStateMsg(io, tf_prefix_with_subscriber));
 
       PSENSCAN_INFO("RosScannerNode",
                     "IOs changed, new input: {}, new output: {}",
