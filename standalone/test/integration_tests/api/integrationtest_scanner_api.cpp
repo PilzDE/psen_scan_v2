@@ -662,8 +662,8 @@ TEST_F(ScannerAPITestsUnfragmented, shouldIgnoreMonitoringFrameOfFormerScanRound
   auto msg_round2 = createMonitoringFrameMsg(2);
   auto msgs_round3 = createMonitoringFrameMsgsForScanRound(3, 6);
 
-  // util::Barrier monitoring_frame_barrier;
-  // EXPECT_CALLBACK_WILL_OPEN_BARRIER(user_callbacks_, msgs_round3, monitoring_frame_barrier);
+  util::Barrier monitoring_frame_barrier;
+  EXPECT_CALLBACK_WILL_OPEN_BARRIER(user_callbacks_, msgs_round3, monitoring_frame_barrier);
 
   auto last_msg_of_round_3 = msgs_round3.back();
   msgs_round3.pop_back();
@@ -679,7 +679,7 @@ TEST_F(ScannerAPITestsUnfragmented, shouldIgnoreMonitoringFrameOfFormerScanRound
   hw_mock_->sendMonitoringFrame(msg_round2);
   hw_mock_->sendMonitoringFrame(last_msg_of_round_3);
 
-  // monitoring_frame_barrier.waitTillRelease(2s);
+  monitoring_frame_barrier.waitTillRelease(2s);
   user_msg_barrier.waitTillRelease(2s);
 
   EXPECT_SCANNER_TO_STOP_SUCCESSFULLY(hw_mock_, driver_);
