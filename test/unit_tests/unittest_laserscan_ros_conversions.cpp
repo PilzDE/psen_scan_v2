@@ -40,9 +40,10 @@ static LaserScan createScan(int64_t stamp = 1)
   const uint32_t scan_counter{ 1 };
   const uint8_t active_zoneset{ 0 };
   const int64_t timestamp{ stamp };
-  const configuration::ScannerId scanner_id { configuration::ScannerId::master };
+  const configuration::ScannerId scanner_id{ configuration::ScannerId::master };
 
-  LaserScan laserscan(angle_increment, angle_min_raw, angle_max_raw, scan_counter, active_zoneset, timestamp, scanner_id);
+  LaserScan laserscan(
+    angle_increment, angle_min_raw, angle_max_raw, scan_counter, active_zoneset, timestamp, scanner_id);
   const LaserScan::MeasurementData measurements{ 1., 2., 3. };
   laserscan.measurements(measurements);
 

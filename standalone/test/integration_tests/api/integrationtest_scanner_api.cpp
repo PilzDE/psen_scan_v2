@@ -431,6 +431,7 @@ TEST_F(ScannerAPITestsDefaultSetUp, shouldShowInfoWithNewActiveZonesetOnlyWhenIt
       .WillOnce(OpenBarrier(&diagnostic_barrier));
 
   hw_mock_->sendMonitoringFrame(msg1);
+  hw_mock_->sendMonitoringFrame(msg1);
   hw_mock_->sendMonitoringFrame(msg2);
 
   diagnostic_barrier.waitTillRelease(2s);

@@ -28,13 +28,13 @@
 
 #include "psen_scan_v2/ZoneSet.h"
 
-#define TO_MARKER(zoneset_obj, polygon_type, polygon_index, tf_frame)                                                            \
+#define TO_MARKER(zoneset_obj, polygon_type, polygon_index, tf_frame)                                                  \
   createMarker(fmt::format("active zoneset {}{} {}", #polygon_type, #polygon_index, getRangeInfo(zoneset_obj)),        \
                createRGBA(strcmp(#polygon_type, "muting") != 0,                                                        \
                           strcmp(#polygon_type, "warn") == 0,                                                          \
                           strcmp(#polygon_type, "muting") == 0,                                                        \
                           1),                                                                                          \
-               tf_frame,                                                                            \
+               tf_frame,                                                                                               \
                zoneset_obj.polygon_type##polygon_index.points,                                                         \
                0.01 * (strcmp(#polygon_type, "warn") == 0) + 0.02 * (strcmp(#polygon_type, "muting") == 0))
 

@@ -38,14 +38,15 @@ static const util::TenthOfDegree DEFAULT_MAX_SCAN_ANGLE{ 2 };
 static const uint32_t DEFAULT_SCAN_COUNTER{ 1 };
 static const uint8_t DEFAULT_ACTIVE_ZONESET{ 2 };
 static const int64_t DEFAULT_TIMESTAMP{ 1 };
-static const configuration::ScannerId DEFAULT_SCANNER_ID { configuration::ScannerId::master };
+static const configuration::ScannerId DEFAULT_SCANNER_ID{ configuration::ScannerId::master };
 
 class LaserScanBuilder
 {
 public:
   LaserScan build()
   {
-    return LaserScan(resolution_, min_scan_angle_, max_scan_angle_, scan_counter_, active_zoneset_, timestamp_, scanner_id_);
+    return LaserScan(
+      resolution_, min_scan_angle_, max_scan_angle_, scan_counter_, active_zoneset_, timestamp_, scanner_id_);
   }
 
   LaserScanBuilder& resolution(const util::TenthOfDegree& resolution)
