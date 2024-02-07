@@ -241,7 +241,6 @@ inline ZoneSetMsgBuilder& ZoneSetMsgBuilder::muting2Sub2(const geometry_msgs::Po
   return *this;
 }
 
-
 inline ZoneSetMsgBuilder& ZoneSetMsgBuilder::speedLower(const float& speed_lower)
 {
   zoneset_msg_.speed_lower = speed_lower;
