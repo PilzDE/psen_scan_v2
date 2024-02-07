@@ -145,7 +145,7 @@ inline void ScanBuffer::add(const data_conversion_layer::monitoring_frame::Messa
   {
     startNewRound(stamped_msg);
   }
-  else  // stamped_msg.msg_.scanCounter() < current_round_.at(0).msg_.scanCounter()
+  else
   {    
     current_round_.clear();
     current_round_.push_back(stamped_msg);

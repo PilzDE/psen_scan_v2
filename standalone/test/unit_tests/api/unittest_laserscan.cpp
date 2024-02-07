@@ -46,7 +46,7 @@ public:
   LaserScan build()
   {
     return LaserScan(
-      resolution_, min_scan_angle_, max_scan_angle_, scan_counter_, active_zoneset_, timestamp_, scanner_id_);
+        resolution_, min_scan_angle_, max_scan_angle_, scan_counter_, active_zoneset_, timestamp_, scanner_id_);
   }
 
   LaserScanBuilder& resolution(const util::TenthOfDegree& resolution)

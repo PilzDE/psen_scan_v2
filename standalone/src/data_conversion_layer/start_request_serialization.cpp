@@ -89,7 +89,7 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
 
   uint8_t nrSubscribers = static_cast<uint8_t>(msg.master_device_settings_.nrSubscribers());
 
-  const uint8_t device_enabled{ getEnableByte(nrSubscribers) };       // hard coded for one subscriber
+  const uint8_t device_enabled{ getEnableByte(nrSubscribers) };  // hard coded for one subscriber
   const uint8_t intensity_enabled{ static_cast<uint8_t>(
       msg.master_device_settings_.intensitiesEnabled() ? 0b00001000 : 0b00000000) };
   const uint8_t point_in_safety_enabled{ 0 };

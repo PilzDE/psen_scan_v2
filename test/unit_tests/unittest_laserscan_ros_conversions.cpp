@@ -43,7 +43,7 @@ static LaserScan createScan(int64_t stamp = 1)
   const configuration::ScannerId scanner_id{ configuration::ScannerId::master };
 
   LaserScan laserscan(
-    angle_increment, angle_min_raw, angle_max_raw, scan_counter, active_zoneset, timestamp, scanner_id);
+      angle_increment, angle_min_raw, angle_max_raw, scan_counter, active_zoneset, timestamp, scanner_id);
   const LaserScan::MeasurementData measurements{ 1., 2., 3. };
   laserscan.measurements(measurements);
 
