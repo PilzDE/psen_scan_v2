@@ -147,8 +147,8 @@ inline void ScanBuffer::add(const data_conversion_layer::monitoring_frame::Messa
   }
   else
   {
-    current_round_.clear();
-    current_round_.push_back(stamped_msg);
+    // current_round_.clear();
+    // current_round_.push_back(stamped_msg);
     throw OutdatedMessageError();
   }
 }
