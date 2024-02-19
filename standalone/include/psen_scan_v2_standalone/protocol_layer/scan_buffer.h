@@ -20,6 +20,7 @@
 
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/util/logging.h"
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -133,23 +134,27 @@ inline bool ScanBuffer::isRoundComplete()
 
 inline void ScanBuffer::add(const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg)
 {
-  if (current_round_.empty() || stamped_msg.msg_.scanCounter() == current_round_[0].msg_.scanCounter())
-  {
-    current_round_.push_back(stamped_msg);
-    if (current_round_.size() > num_expected_msgs_)
+  //Condition to fix the bug of the first scanCounter data of the Subscriber0
+  if (first_scan_round_ && stamped_msg.msg_.scannerId() == psen_scan_v2_standalone::configuration::ScannerId::subscriber0){
+    first_scan_round_ = false;
+  }
+  else{
+    if (current_round_.empty() || stamped_msg.msg_.scanCounter() == current_round_[0].msg_.scanCounter())
     {
-      throw ScanRoundOversaturatedError();
+      current_round_.push_back(stamped_msg);
+      if (current_round_.size() > num_expected_msgs_)
+      {
+        throw ScanRoundOversaturatedError();
+      }
     }
-  }
-  else if (stamped_msg.msg_.scanCounter() > current_round_[0].msg_.scanCounter())
-  {
-    startNewRound(stamped_msg);
-  }
-  else
-  {
-    // current_round_.clear();
-    // current_round_.push_back(stamped_msg);
-    throw OutdatedMessageError();
+    else if (stamped_msg.msg_.scanCounter() > current_round_[0].msg_.scanCounter())
+    {
+      startNewRound(stamped_msg);
+    }
+    else
+    {
+      throw OutdatedMessageError();
+    }
   }
 }
 

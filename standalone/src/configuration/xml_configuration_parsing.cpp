@@ -349,7 +349,6 @@ std::vector<ZoneSet> parseZoneSets(const tinyxml2::XMLConstHandle& doc_handle)
         getFirstChildElement(scanner_descr_element_sub0, "zoneSetDefinition");
     const tinyxml2::XMLElement* zone_set_info_element_sub0 =
         getFirstChildElement(zone_set_definition_element_sub0, "zoneSetInfo");
-    
     while (zone_set_info_element_master && zone_set_info_element_sub0)
     {
       ZoneSet set_master = parseZoneSetMaster(zone_set_info_element_master);
@@ -363,18 +362,17 @@ std::vector<ZoneSet> parseZoneSets(const tinyxml2::XMLConstHandle& doc_handle)
   else if (nr_subcribers == 3)
   {
     const tinyxml2::XMLElement* scanner_descr_element_sub0 =
-        scanner_descr_element_master->NextSiblingElement("scannerDescr"); 
+        scanner_descr_element_master->NextSiblingElement("scannerDescr");
     const tinyxml2::XMLElement* zone_set_definition_element_sub0 =
-        getFirstChildElement(scanner_descr_element_sub0, "zoneSetDefinition"); 
+        getFirstChildElement(scanner_descr_element_sub0, "zoneSetDefinition");
     const tinyxml2::XMLElement* zone_set_info_element_sub0 =
         getFirstChildElement(zone_set_definition_element_sub0, "zoneSetInfo");
     const tinyxml2::XMLElement* scanner_descr_element_sub1 =
-        scanner_descr_element_sub0->NextSiblingElement("scannerDescr"); 
+        scanner_descr_element_sub0->NextSiblingElement("scannerDescr");
     const tinyxml2::XMLElement* zone_set_definition_element_sub1 =
-        getFirstChildElement(scanner_descr_element_sub1, "zoneSetDefinition"); 
+        getFirstChildElement(scanner_descr_element_sub1, "zoneSetDefinition");
     const tinyxml2::XMLElement* zone_set_info_element_sub1 =
         getFirstChildElement(zone_set_definition_element_sub1, "zoneSetInfo");
-
     while (zone_set_info_element_master && zone_set_info_element_sub0 && zone_set_info_element_sub1)
     {
       ZoneSet set_master = parseZoneSetMaster(zone_set_info_element_master);
@@ -386,17 +384,17 @@ std::vector<ZoneSet> parseZoneSets(const tinyxml2::XMLConstHandle& doc_handle)
       zone_set_info_element_sub1 = zone_set_info_element_sub1->NextSiblingElement("zoneSetInfo");
     }
   }
-
+  
   else if (nr_subcribers == 4)
   {
     const tinyxml2::XMLElement* scanner_descr_element_sub0 =
-        scanner_descr_element_master->NextSiblingElement("scannerDescr");   
+        scanner_descr_element_master->NextSiblingElement("scannerDescr");
     const tinyxml2::XMLElement* zone_set_definition_element_sub0 =
-        getFirstChildElement(scanner_descr_element_sub0, "zoneSetDefinition");  
+        getFirstChildElement(scanner_descr_element_sub0, "zoneSetDefinition");
     const tinyxml2::XMLElement* zone_set_info_element_sub0 =
         getFirstChildElement(zone_set_definition_element_sub0, "zoneSetInfo");
     const tinyxml2::XMLElement* scanner_descr_element_sub1 =
-        scanner_descr_element_sub0->NextSiblingElement("scannerDescr");   
+        scanner_descr_element_sub0->NextSiblingElement("scannerDescr");
     const tinyxml2::XMLElement* zone_set_definition_element_sub1 =
         getFirstChildElement(scanner_descr_element_sub1, "zoneSetDefinition");    
     const tinyxml2::XMLElement* zone_set_info_element_sub1 =
@@ -404,10 +402,9 @@ std::vector<ZoneSet> parseZoneSets(const tinyxml2::XMLConstHandle& doc_handle)
     const tinyxml2::XMLElement* scanner_descr_element_sub2 =
         scanner_descr_element_sub1->NextSiblingElement("scannerDescr");
     const tinyxml2::XMLElement* zone_set_definition_element_sub2 =
-        getFirstChildElement(scanner_descr_element_sub2, "zoneSetDefinition");    
+        getFirstChildElement(scanner_descr_element_sub2, "zoneSetDefinition");
     const tinyxml2::XMLElement* zone_set_info_element_sub2 =
         getFirstChildElement(zone_set_definition_element_sub2, "zoneSetInfo");
-
     while (zone_set_info_element_master && zone_set_info_element_sub0 && zone_set_info_element_sub1 &&
            zone_set_info_element_sub2)
     {
