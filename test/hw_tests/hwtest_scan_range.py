@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # Copyright (c) 2021 Pilz GmbH & Co. KG
 #
 # This program is free software: you can redistribute it and/or modify
@@ -21,8 +21,8 @@ import rospy
 from sensor_msgs.msg import LaserScan
 
 
-def to_multiple_of_tenth_degree_in_radian(radian_angle: float) -> float:
-    reminder = radian_angle % radians(0.1)
+def to_multiple_of_tenth_degree_in_radian(radian_angle):
+    reminder = float(radian_angle) % radians(0.1)
     if (reminder < 0.5 * radians(0.1)):
         return radian_angle - reminder
     return radian_angle + reminder
@@ -52,7 +52,7 @@ class HwtestScanRange(unittest.TestCase):
             rospy.sleep(.1)
 
         self.assertTrue(self.received_msgs)
-        message: LaserScan = self.received_msgs[-1]
+        message = self.received_msgs[-1]
 
         angle_start_rounded = to_multiple_of_tenth_degree_in_radian(self.angle_start)
         angle_end_rounded = to_multiple_of_tenth_degree_in_radian(self.angle_end)

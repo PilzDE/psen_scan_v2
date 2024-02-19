@@ -21,6 +21,7 @@
 #include <mutex>
 #include <chrono>
 #include <stdexcept>
+#include <unordered_map>
 #include <vector>
 #include <boost/optional.hpp>
 
@@ -53,6 +54,7 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_deserialization.h"
 #include "psen_scan_v2_standalone/protocol_layer/scan_buffer.h"
 #include "psen_scan_v2_standalone/util/watchdog.h"
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -281,7 +283,10 @@ private:
   std::unique_ptr<util::Watchdog> start_reply_watchdog_{};
 
   std::unique_ptr<util::Watchdog> monitoring_frame_watchdog_{};
-  ScanBuffer scan_buffer_{ DEFAULT_NUM_MSG_PER_ROUND };
+
+  using ScannerId = psen_scan_v2_standalone::configuration::ScannerId;
+  std::unordered_map<ScannerId, ScanBuffer> scan_buffers_{};
+
   boost::optional<data_conversion_layer::monitoring_frame::Message> zoneset_reference_msg_;
 
   // Udp Clients

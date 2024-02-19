@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:macro name="psen_scan" params="prefix parent *origin">
+    <xacro:property name="mass" value="1.53" /> <!-- src datasheet p 96 -->
+    <xacro:property name="radius" value="0.051" /> <!-- src datasheet p 96 -->
+    <xacro:property name="height" value="0.152" /> <!-- src datasheet p 96 -->
+    <xacro:property name="dist_scanning_plane_top" value="0.0377" /> <!-- src datasheet p 96 -->
+    <xacro:property name="dist_scanning_axis_rear" value="0.0525" /> <!-- src datasheet p 96 -->
+
+    <joint name="${prefix}_joint" type="fixed">
+      <parent link="reference_link" />
+      <child link="${prefix}_mount_link" />
+      <xacro:insert_block name="origin" />
+    </joint>
+
+    <!-- Location of mounting point at the lower back of device -->
+    <link name="${prefix}_mount_link"/>
+
+    <joint name="${prefix}_body_joint" type="fixed">
+      <parent link="${prefix}_mount_link" />
+      <child link="${prefix}_body_link" />
+      <origin rpy="0 0 0" xyz="${radius} 0 0"/>
+    </joint>
+
+    <!-- Location of scanner body -->
+    <link name="${prefix}_body_link">
+      <visual>
+        <origin xyz="-0.016 0 -0.039" rpy="0 0 3.14" />
+        <geometry>
+          <mesh filename="package://psen_scan_v2/urdf/meshes/PSENscan.dae" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="pilz_yellow" >
+          <color rgba="1.0 0.722 0.196 1.0" />
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="-0.016 0 -0.039" rpy="0 0 3.14" />
+        <geometry>
+          <mesh filename="package://psen_scan_v2/urdf/meshes/PSENscan.dae" scale="0.001 0.001 0.001"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="${mass}" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="${1 / 12 * mass * (3 * radius * radius + height * height)}" ixy="0.0" ixz="0.0"
+          iyy="${1 / 12 * mass * (3 * radius * radius + height * height)}" iyz="0.0"
+          izz="${.5 * mass * (radius * radius)}" />
+      </inertial>
+    </link>
+
+    <joint name="${prefix}_scan_joint" type="fixed">
+      <parent link="${prefix}_body_link" />
+      <child link="${prefix}" />
+      <origin rpy="${pi} 0 0" xyz="0 ${radius - dist_scanning_axis_rear} ${height / 2 - dist_scanning_plane_top}"/>
+    </joint>
+
+    <!-- This is the location of the laser scan -->
+    <link name="${prefix}"/>
+  </xacro:macro>
+</robot>

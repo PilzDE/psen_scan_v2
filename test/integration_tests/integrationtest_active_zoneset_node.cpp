@@ -132,7 +132,7 @@ const std::string ACTIVE_ZONESET_MARKER_TOPICNAME{ "/test_ns_laser_1/active_zone
   ON_CALL(invalid_marker_mock, callback(Field(&visualization_msgs::MarkerArray::markers, Contains(hasDeleteAction()))))
       .WillByDefault(OpenBarrier(&invalid_marker_barrier));
 
-  sendActiveZone(5);
+  sendActiveZone(1);
   if (!invalid_marker_barrier.waitTillRelease(3s))
   {
     return ::testing::AssertionFailure() << "Failed to receive markers for deletion.";
@@ -229,7 +229,7 @@ TEST_F(ActiveZonesetNodeTest, shouldPublishDeleteMarkersOnInvalidActiveZone)
                                    callback(Field(&visualization_msgs::MarkerArray::markers,
                                                   AllOf(Contains(AllOf(hasNS(SAFETY_NS_ZONE_1), hasDeleteAction())),
                                                         Contains(AllOf(hasNS(WARN_NS_ZONE_1), hasDeleteAction()))))));
-  sendActiveZone(5);
+  sendActiveZone(1);
   barrier->waitTillRelease(3s);
 }
 

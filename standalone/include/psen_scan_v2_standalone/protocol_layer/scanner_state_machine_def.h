@@ -51,6 +51,12 @@ inline ScannerProtocolDef::ScannerProtocolDef(const ScannerConfiguration& config
   , start_timeout_callback_(start_timeout_callback)
   , monitoring_frame_timeout_callback_(monitoring_frame_timeout_callback)
 {
+  scan_buffers_.insert(std::make_pair(ScannerId::master, ScanBuffer(DEFAULT_NUM_MSG_PER_ROUND)));
+  for (int i = 0; i < config.nrSubscribers(); i++)
+  {
+    ScannerId id = psen_scan_v2_standalone::configuration::subscriber_number_to_scanner_id(i);
+    scan_buffers_.insert(std::make_pair(id, ScanBuffer(1)));
+  }
 }
 
 //+++++++++++++++++++++++++++++++++ States ++++++++++++++++++++++++++++++++++++
@@ -108,7 +114,9 @@ template <class Event, class FSM>
 void ScannerProtocolDef::WaitForMonitoringFrame::on_entry(Event const& /*unused*/, FSM& fsm)  // NOLINT
 {
   PSENSCAN_DEBUG("StateMachine", "Entering state: WaitForMonitoringFrame");
-  fsm.scan_buffer_.reset();
+  for (auto& sb : fsm.scan_buffers_)
+    sb.second.reset();
+
   // Start watchdog...
   fsm.monitoring_frame_watchdog_ =
       fsm.watchdog_factory_.create(WATCHDOG_TIMEOUT, fsm.monitoring_frame_timeout_callback_);
@@ -240,7 +248,7 @@ ScannerProtocolDef::checkForChangedActiveZoneset(const data_conversion_layer::mo
   if (!zoneset_reference_msg_.is_initialized() || (msg.scanCounter() >= zoneset_reference_msg_->scanCounter() &&
                                                    msg.activeZoneset() != zoneset_reference_msg_->activeZoneset()))
   {
-    PSENSCAN_INFO("Scanner", "The scanner switched to active zoneset {}", msg.activeZoneset());
+    PSENSCAN_INFO("Scanner", "The scanner switched to active zoneset {}", msg.activeZoneset() + 1);
     zoneset_reference_msg_ = msg;
   }
 }
@@ -250,10 +258,10 @@ inline void ScannerProtocolDef::informUserAboutTheScanData(
 {
   try
   {
-    scan_buffer_.add(stamped_msg);
-    if (!config_.fragmentedScansEnabled() && scan_buffer_.isRoundComplete())
+    scan_buffers_.at(stamped_msg.msg_.scannerId()).add(stamped_msg);
+    if (!config_.fragmentedScansEnabled() && scan_buffers_.at(stamped_msg.msg_.scannerId()).isRoundComplete())
     {
-      sendMessageWithMeasurements(scan_buffer_.currentRound());
+      sendMessageWithMeasurements(scan_buffers_.at(stamped_msg.msg_.scannerId()).currentRound());
     }
   }
   catch (const ScanRoundError& ex)

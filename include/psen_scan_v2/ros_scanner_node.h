@@ -37,6 +37,7 @@
 #include "psen_scan_v2/io_state_ros_conversion.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/util/format_range.h"
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 
 /**
  * @brief Root namespace for the ROS part
@@ -83,10 +84,11 @@ private:
 
 private:
   ros::NodeHandle nh_;
-  ros::Publisher pub_scan_;
+  using ScannerId = psen_scan_v2_standalone::configuration::ScannerId;
+  std::unordered_map<ScannerId, ros::Publisher> pubs_scan_;
   ros::Publisher pub_zone_;
   ros::Publisher pub_io_;
-  std::string tf_prefix_;
+  std::unordered_map<ScannerId, std::string> tf_prefixes_;
   double x_axis_rotation_;
   S scanner_;
   std::atomic_bool terminate_{ false };
@@ -117,11 +119,20 @@ ROSScannerNodeT<S>::ROSScannerNodeT(ros::NodeHandle& nh,
                                     const double& x_axis_rotation,
                                     const ScannerConfiguration& scanner_config)
   : nh_(nh)
-  , tf_prefix_(tf_prefix)
   , x_axis_rotation_(x_axis_rotation)
   , scanner_(scanner_config, std::bind(&ROSScannerNodeT<S>::laserScanCallback, this, std::placeholders::_1))
 {
-  pub_scan_ = nh_.advertise<sensor_msgs::LaserScan>(topic, 1);
+  pubs_scan_.insert(std::make_pair(ScannerId::master, nh_.advertise<sensor_msgs::LaserScan>(topic, 1)));
+  tf_prefixes_.insert(std::make_pair(ScannerId::master, tf_prefix));
+  for (int i = 0; i < scanner_config.nrSubscribers(); i++)
+  {
+    ScannerId id = psen_scan_v2_standalone::configuration::subscriber_number_to_scanner_id(i);
+    std::string topic_subscriber = topic + "_" + psen_scan_v2_standalone::configuration::SCANNER_ID_TO_STRING.at(id);
+    pubs_scan_.insert(std::make_pair(id, nh_.advertise<sensor_msgs::LaserScan>(topic_subscriber, 1)));
+    std::string tf_prefix_subscriber =
+        tf_prefix + "_" + psen_scan_v2_standalone::configuration::SCANNER_ID_TO_STRING.at(id);
+    tf_prefixes_.insert(std::make_pair(id, tf_prefix_subscriber));
+  }
   pub_zone_ = nh_.advertise<std_msgs::UInt8>("active_zoneset", 1);
   pub_io_ = nh_.advertise<psen_scan_v2::IOState>("io_state", 6, true /* latched */);
 }
@@ -131,7 +142,8 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
 {
   try
   {
-    const auto laser_scan_msg = toLaserScanMsg(scan, tf_prefix_, x_axis_rotation_);
+    std::string tf_prefix_with_subscriber = tf_prefixes_.at(scan.scannerId());
+    const auto laser_scan_msg = toLaserScanMsg(scan, tf_prefix_with_subscriber, x_axis_rotation_);
     PSENSCAN_INFO_ONCE(
         "ScannerNode",
         "Publishing laser scan with angle_min={:.1f} angle_max={:.1f} angle_increment={:.1f} degrees. {} angle values.",
@@ -139,7 +151,7 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
         data_conversion_layer::radianToDegree(laser_scan_msg.angle_max),
         data_conversion_layer::radianToDegree(laser_scan_msg.angle_increment),
         laser_scan_msg.ranges.size());
-    pub_scan_.publish(laser_scan_msg);
+    pubs_scan_.at(scan.scannerId()).publish(laser_scan_msg);
 
     std_msgs::UInt8 active_zoneset;
     active_zoneset.data = scan.activeZoneset();
@@ -158,11 +170,12 @@ void ROSScannerNodeT<S>::laserScanCallback(const LaserScan& scan)
 template <typename S>
 void ROSScannerNodeT<S>::publishChangedIOStates(const std::vector<psen_scan_v2_standalone::IOState>& io_states)
 {
+  std::string tf_prefix_with_subscriber = tf_prefixes_.at(ScannerId::master);  // assuming all IO is at the master
   for (const auto& io : io_states)
   {
     if (last_io_state_ != io)
     {
-      pub_io_.publish(toIOStateMsg(io, tf_prefix_));
+      pub_io_.publish(toIOStateMsg(io, tf_prefix_with_subscriber));
 
       PSENSCAN_INFO("RosScannerNode",
                     "IOs changed, new input: {}, new output: {}",
