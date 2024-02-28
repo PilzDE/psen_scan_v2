@@ -223,7 +223,7 @@ For visualizing the active zoneset in RViz you can run the `active_zoneset_node`
 ### Build Status
 | Platform | Noetic |
 | -------- | ------ |
-| CI | [![CI-Noetic](https://github.com/PilzDE/psen_scan_v2/workflows/ci_action_noetic.yml/badge.svg?branch=main)](https://github.com/PilzDE/psen_scan_v2/workflows/ci_action_noetic.yml) |
+| CI | [![CI-Noetic](https://github.com/PilzDE/psen_scan_v2/actions/workflows/ci_action_noetic.yml/badge.svg?branch=main)](https://github.com/PilzDE/psen_scan_v2/actions/workflows/ci_action_noetic.yml) |
 | Buildfarm src | [![Build Status](http://build.ros.org/job/Nsrc_uF__psen_scan_v2__ubuntu_focal__source/badge/icon)](http://build.ros.org/job/Nsrc_uF__psen_scan_v2__ubuntu_focal__source/) |
 | Buildfarm bin | [![Build Status](http://build.ros.org/job/Nbin_uF64__psen_scan_v2__ubuntu_focal_amd64__binary/badge/icon)](http://build.ros.org/job/Nbin_uF64__psen_scan_v2__ubuntu_focal_amd64__binary/) |
 
