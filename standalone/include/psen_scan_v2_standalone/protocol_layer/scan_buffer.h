@@ -135,10 +135,12 @@ inline bool ScanBuffer::isRoundComplete()
 inline void ScanBuffer::add(const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg)
 {
   //Condition to fix the bug of the first scanCounter data of the Subscriber0
-  if (first_scan_round_ && stamped_msg.msg_.scannerId() == psen_scan_v2_standalone::configuration::ScannerId::subscriber0){
+  if (first_scan_round_ &&
+      stamped_msg.msg_.scannerId() == psen_scan_v2_standalone::configuration::ScannerId::subscriber0){
     first_scan_round_ = false;
   }
-  else{
+  else
+  {
     if (current_round_.empty() || stamped_msg.msg_.scanCounter() == current_round_[0].msg_.scanCounter())
     {
       current_round_.push_back(stamped_msg);

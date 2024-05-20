@@ -384,7 +384,6 @@ std::vector<ZoneSet> parseZoneSets(const tinyxml2::XMLConstHandle& doc_handle)
       zone_set_info_element_sub1 = zone_set_info_element_sub1->NextSiblingElement("zoneSetInfo");
     }
   }
-  
   else if (nr_subcribers == 4)
   {
     const tinyxml2::XMLElement* scanner_descr_element_sub0 =
@@ -396,7 +395,7 @@ std::vector<ZoneSet> parseZoneSets(const tinyxml2::XMLConstHandle& doc_handle)
     const tinyxml2::XMLElement* scanner_descr_element_sub1 =
         scanner_descr_element_sub0->NextSiblingElement("scannerDescr");
     const tinyxml2::XMLElement* zone_set_definition_element_sub1 =
-        getFirstChildElement(scanner_descr_element_sub1, "zoneSetDefinition");    
+        getFirstChildElement(scanner_descr_element_sub1, "zoneSetDefinition");
     const tinyxml2::XMLElement* zone_set_info_element_sub1 =
         getFirstChildElement(zone_set_definition_element_sub1, "zoneSetInfo");
     const tinyxml2::XMLElement* scanner_descr_element_sub2 =
