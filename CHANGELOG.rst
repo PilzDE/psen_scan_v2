@@ -1,12 +1,6 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-0.10.3 (2024-06-05)
--------------------
-* Add the Subscriber Scanner (raw data, inputs/outputs, zonset, markers...)(#338)
-* Add 3D PSENscan model in the urdf(#338)
-* Contributors: Pilz GmbH and Co. KG
-
 0.10.2 (2022-11-03)
 -------------------
 * Remove zoneset bits from IOState.input field since its redundant to the active_zoneset field (#311)

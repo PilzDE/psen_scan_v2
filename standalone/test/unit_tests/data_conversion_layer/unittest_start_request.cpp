@@ -124,17 +124,6 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::master_end_angle), scan_range.end().value()));
   EXPECT_TRUE(DecodingEquals(
       data, static_cast<size_t>(Offset::master_angle_resolution), data_conversion_layer::degreeToTenthDegree(1.0)));
-
-  EXPECT_TRUE(DecodingEquals<uint16_t>(
-      data, static_cast<size_t>(Offset::subscriber_one_start_angle), scan_range.start().value()));
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::subscriber_one_end_angle), 0));
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::subscriber_one_angle_resolution), 0));
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::subscriber_two_start_angle), 0));
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::subscriber_two_end_angle), 0));
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::subscriber_two_angle_resolution), 0));
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::subscriber_three_start_angle), 0));
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::subscriber_three_end_angle), 0));
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::subscriber_three_angle_resolution), 0));
 }
 
 TEST_F(StartRequestTest, endAngleIncreasedWhenMatchingDataPoint)
