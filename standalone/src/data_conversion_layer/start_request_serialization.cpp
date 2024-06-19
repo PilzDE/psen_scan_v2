@@ -27,7 +27,6 @@
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_processing.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/raw_scanner_data.h"
 #include "psen_scan_v2_standalone/util/logging.h"
-#include <iostream>
 
 using namespace std;
 
@@ -147,7 +146,6 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
   data_conversion_layer::RawData raw_data_with_crc{ raw_data_with_crc_str.cbegin(), raw_data_with_crc_str.cend() };
 
   assert(raw_data_with_crc.size() == 58 && "Message data of start request has not the size expceted by protocol");
-  std::cout <<"raw_data_with_crc: " << raw_data_with_crc.size() << std::endl;
 
   return raw_data_with_crc;
 }
