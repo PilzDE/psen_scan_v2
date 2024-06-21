@@ -1,6 +1,12 @@
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Changelog for package psen_scan_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Forthcoming
+-------------------
+* Add PSENscan Subscribers up to 3 (#338)
+* Add PSENscan cad meshes (#338)
+* Contributors: Pilz GmbH and Co. KG
+
 0.10.2 (2022-11-03)
 -------------------
 * Remove zoneset bits from IOState.input field since its redundant to the active_zoneset field (#311)
