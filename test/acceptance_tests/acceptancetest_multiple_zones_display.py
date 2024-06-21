@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import random
 
 import rospy
@@ -9,7 +9,7 @@ if __name__ == "__main__":
 
     pub = rospy.Publisher("/relay_cmd", Byte, queue_size=10)
 
-    def publish_zone_and_sleep(zone: int):
+    def publish_zone_and_sleep(zone):
         if zone == 0:
             pub.publish(0)
         elif zone == 1:

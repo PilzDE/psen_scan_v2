@@ -20,6 +20,7 @@
 #include <ostream>
 #include <vector>
 
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/io_state.h"
 #include "psen_scan_v2_standalone/util/tenth_of_degree.h"
 
@@ -56,7 +57,8 @@ public:
             const util::TenthOfDegree& max_scan_angle,
             const uint32_t scan_counter,
             const uint8_t active_zoneset,
-            const int64_t timestamp);
+            const int64_t timestamp,
+            const configuration::ScannerId scanner_id);
 
 public:
   /*! deprecated: use const util::TenthOfDegree& scanResolution() const instead */
@@ -104,6 +106,8 @@ public:
   [[deprecated("use const IntensityData& intensities() const instead")]] const IntensityData& getIntensities() const;
   const IntensityData& intensities() const;
 
+  configuration::ScannerId scannerId() const;
+
   /*! deprecated: use void intensities(const IntensityData& intensities) instead */
   [[deprecated("use void intensities(const IntensityData& intensities)) instead")]] void
   setIntensities(const IntensityData& intensities);
@@ -136,6 +140,8 @@ private:
   const uint8_t active_zoneset_;
   //! Time of the first ray in this scan round (or fragment if fragmented_scans is enabled).
   const int64_t timestamp_;
+  //! distinction between master and subscribers
+  configuration::ScannerId scanner_id_;
 };
 
 std::ostream& operator<<(std::ostream& os, const LaserScan& scan);

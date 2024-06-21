@@ -20,6 +20,7 @@
 
 #include "psen_scan_v2_standalone/data_conversion_layer/monitoring_frame_msg.h"
 #include "psen_scan_v2_standalone/util/logging.h"
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 
 namespace psen_scan_v2_standalone
 {
@@ -41,7 +42,7 @@ class OutdatedMessageError : public ScanRoundError
 {
 public:
   OutdatedMessageError(const std::string& msg = "Detected a MonitoringFrame from an earlier round. "
-                                                " The scan round will ignore it.")
+                                                "The scan round will ignore it.")
     : ScanRoundError(msg){};
 };
 
@@ -108,7 +109,7 @@ private:
 
 private:
   std::vector<data_conversion_layer::monitoring_frame::MessageStamped> current_round_{};
-  const uint32_t& num_expected_msgs_;
+  const uint32_t num_expected_msgs_;
   bool first_scan_round_ = true;
 };
 
@@ -133,21 +134,30 @@ inline bool ScanBuffer::isRoundComplete()
 
 inline void ScanBuffer::add(const data_conversion_layer::monitoring_frame::MessageStamped& stamped_msg)
 {
-  if (current_round_.empty() || stamped_msg.msg_.scanCounter() == current_round_[0].msg_.scanCounter())
+  // Condition to fix the bug of the first scanCounter data of the Subscriber0
+  if (first_scan_round_ &&
+      stamped_msg.msg_.scannerId() == psen_scan_v2_standalone::configuration::ScannerId::subscriber0)
   {
-    current_round_.push_back(stamped_msg);
-    if (current_round_.size() > num_expected_msgs_)
-    {
-      throw ScanRoundOversaturatedError();
-    }
-  }
-  else if (stamped_msg.msg_.scanCounter() > current_round_[0].msg_.scanCounter())
-  {
-    startNewRound(stamped_msg);
+    first_scan_round_ = false;
   }
   else
   {
-    throw OutdatedMessageError();
+    if (current_round_.empty() || stamped_msg.msg_.scanCounter() == current_round_[0].msg_.scanCounter())
+    {
+      current_round_.push_back(stamped_msg);
+      if (current_round_.size() > num_expected_msgs_)
+      {
+        throw ScanRoundOversaturatedError();
+      }
+    }
+    else if (stamped_msg.msg_.scanCounter() > current_round_[0].msg_.scanCounter())
+    {
+      startNewRound(stamped_msg);
+    }
+    else
+    {
+      throw OutdatedMessageError();
+    }
   }
 }
 

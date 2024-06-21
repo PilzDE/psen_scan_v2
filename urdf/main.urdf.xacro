@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="psen_scan">
+
+  <!-- PSENscan arguments -->
+  <xacro:arg name="nr_scanners" default="0"/>
+  <xacro:arg name="prefix" default="laser_1"/>
+  <xacro:arg name="prefix_sub0" default="laser_1_Subscriber0"/>
+  <xacro:arg name="prefix_sub1" default="laser_1_Subscriber1"/> 
+  <xacro:arg name="prefix_sub2" default="laser_1_Subscriber2"/>
+
+  <!-- Number of Subscribers -->
+  <xacro:property name="nr_sub" value="$(arg nr_scanners)"/>
+
+  <xacro:include filename="$(find psen_scan_v2)/urdf/xacros/psen_scan.urdf.xacro" />
+
+  <link name="reference_link"/>
+
+  <!-- PSENscan Master -->
+  <xacro:psen_scan prefix="$(arg prefix)" parent="reference_link">
+    <origin xyz="0.5 0 0" rpy="0 0 0" />
+  </xacro:psen_scan>
+
+  <!-- PSENscan Subscriber0 -->
+  <xacro:if value="${nr_sub >= 1}">
+    <xacro:psen_scan prefix="$(arg prefix_sub0)" parent="reference_link">
+      <origin xyz="-0.5 0 0" rpy="0 0 3.14" />
+    </xacro:psen_scan>
+  </xacro:if>
+
+  <!-- PSENscan Subscriber1 -->
+  <xacro:if value="${nr_sub >= 2}">
+    <xacro:psen_scan prefix="$(arg prefix_sub1)" parent="reference_link">
+      <origin xyz="0 0.5 0" rpy="0 0 1.57" />
+    </xacro:psen_scan>
+  </xacro:if>
+
+  <!-- PSENscan Subscriber2 -->
+  <xacro:if value="${nr_sub == 3}">
+    <xacro:psen_scan prefix="$(arg prefix_sub2)" parent="reference_link">
+      <origin xyz="0 -0.5 0" rpy="0 0 -1.57" />
+    </xacro:psen_scan>
+  </xacro:if>
+
+</robot>

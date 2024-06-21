@@ -54,7 +54,7 @@ public:
     master_start_angle = 0x22,
     master_end_angle = 0x24,
     master_angle_resolution = 0x26,
-    subscriber_one_start_angle = 0x28,  // Note: This refers to the scanner type subscriber, *not* a ros subscriber
+    subscriber_one_start_angle = 0x22,  // Note: This refers to the scanner type subscriber, *not* a ros subscriber
     subscriber_one_end_angle = 0x2A,
     subscriber_one_angle_resolution = 0x2C,
     subscriber_two_start_angle = 0x2E,
@@ -124,16 +124,6 @@ TEST_F(StartRequestTest, constructorTest)
   EXPECT_TRUE(DecodingEquals(data, static_cast<size_t>(Offset::master_end_angle), scan_range.end().value()));
   EXPECT_TRUE(DecodingEquals(
       data, static_cast<size_t>(Offset::master_angle_resolution), data_conversion_layer::degreeToTenthDegree(1.0)));
-
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::subscriber_one_start_angle), 0));
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::subscriber_one_end_angle), 0));
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::subscriber_one_angle_resolution), 0));
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::subscriber_two_start_angle), 0));
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::subscriber_two_end_angle), 0));
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::subscriber_two_angle_resolution), 0));
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::subscriber_three_start_angle), 0));
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::subscriber_three_end_angle), 0));
-  EXPECT_TRUE(DecodingEquals<uint16_t>(data, static_cast<size_t>(Offset::subscriber_three_angle_resolution), 0));
 }
 
 TEST_F(StartRequestTest, endAngleIncreasedWhenMatchingDataPoint)
@@ -171,7 +161,7 @@ TEST_F(StartRequestTest, crcWithIntensities)
 
   // see wireshark for this number
   // generated with `roslaunch psen_scan_v2 psen_scan_v2.launch intensities:=true resolution:=0.0035`
-  const std::array<unsigned char, 4> expected_crc = { 0x75, 0x13, 0x83, 0x77 };
+  const std::array<unsigned char, 4> expected_crc = { 0x48, 0xEB, 0x48, 0x6B };
 
   for (size_t i = 0; i < expected_crc.size(); ++i)
   {

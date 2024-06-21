@@ -20,6 +20,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <!-- IP-Address of Safety laser scanner -->
   <arg name="sensor_ip" default="192.168.0.10" />
 
+  <!-- How many subscribers are connected to the master scanner, 0 ... 3 are supported. -->
+  <arg name="nr_subscribers" default="0" />
+
   <!-- Name of the scanner (required to run multiple scanners) which by convention
        is the prefix for the urdf description. -->
   <arg name="tf_prefix" default="laser_1" />
@@ -28,14 +31,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <arg name="angle_start" default="$(eval radians(-137.4))" />
 
   <!-- End angle of measurement in radian -->
-
   <arg name="angle_end" default="$(eval radians(137.4))" />
 
   <!-- Publishing of intensities -->
   <arg name="intensities" default="false" />
 
   <!-- Scan resolution in radian -->
-  <arg name="resolution" default="$(eval radians(0.1))" />
+  <arg name="resolution" default="$(eval radians(0.5))" />
 
   <!-- IP-Address of host machine -->
   <arg name="host_ip" default="auto" />
@@ -60,6 +62,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <param name="host_udp_port_data" value="$(arg host_udp_port_data)" />
     <param name="host_udp_port_control" value="$(arg host_udp_port_control)" />
     <param name="fragmented_scans" value="$(arg fragmented_scans)" />
+    <param name="nr_subscribers" value="$(arg nr_subscribers)" />
   </node>
 
 </launch>

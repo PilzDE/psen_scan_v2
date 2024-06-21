@@ -15,7 +15,6 @@
 
 #include <string>
 #include <cassert>
-#include <iostream>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -49,6 +48,16 @@ uint32_t calculateCRC(const data_conversion_layer::RawData& data)
   return static_cast<uint32_t>(crc.checksum());
 }
 
+uint8_t getEnableByte(uint8_t nr_ubscribers)
+{
+  uint8_t base{ 0b00001000 };
+  for (int i = 0; i < nr_ubscribers; i++)
+  {
+    base = base | (base >> 1);
+  }
+  return base;
+}
+
 RawData data_conversion_layer::start_request::serialize(const data_conversion_layer::start_request::Message& msg,
                                                         const uint32_t& seq_number)
 {
@@ -78,14 +87,16 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
    * and the second Subscriber device.
    */
 
-  const uint8_t device_enabled{ 0b00001000 };
+  uint8_t nr_ubscribers = static_cast<uint8_t>(msg.master_device_settings_.nrSubscribers());
+
+  const uint8_t device_enabled{ getEnableByte(nr_ubscribers) };  // hard coded for one subscriber
   const uint8_t intensity_enabled{ static_cast<uint8_t>(
       msg.master_device_settings_.intensitiesEnabled() ? 0b00001000 : 0b00000000) };
   const uint8_t point_in_safety_enabled{ 0 };
-  const uint8_t active_zone_set_enabled{ 0b00001000 };
+  const uint8_t active_zone_set_enabled{ getEnableByte(nr_ubscribers) };
   const uint8_t io_pin_data_enabled{ 0b00001000 };
-  const uint8_t scan_counter_enabled{ 0b00001000 };
-  const uint8_t speed_encoder_enabled{ 0 }; /**< 0000000bin disabled, 00001111bin enabled.*/
+  const uint8_t scan_counter_enabled{ getEnableByte(nr_ubscribers) };  // hard coded for one subscriber
+  const uint8_t speed_encoder_enabled{ 0 };                            /**< 0000000bin disabled, 00001111bin enabled.*/
   const uint8_t diagnostics_enabled{ static_cast<uint8_t>(
       msg.master_device_settings_.diagnosticsEnabled() ? 0b00001000 : 0b00000000) };
 
@@ -118,12 +129,11 @@ RawData data_conversion_layer::start_request::serialize(const data_conversion_la
                  end,
                  resolution);
 
-  for (const auto& subscriber :
-       msg.subscribers_)  // Note: This refers to the scanner type subscriber, *not* a ros subscriber
+  for (int i = 0; i < nr_ubscribers; i++)  // Note: This refers to the scanner type subscriber, *not* a ros subscriber
   {
-    raw_processing::write(os, subscriber.scanRange().start().value());
-    raw_processing::write(os, subscriber.scanRange().end().value());
-    raw_processing::write(os, subscriber.resolution().value());
+    raw_processing::write(os, start);
+    raw_processing::write(os, end);
+    raw_processing::write(os, resolution);
   }
 
   const std::string raw_data_as_str{ os.str() };

@@ -20,6 +20,7 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/angle_conversions.h"
 #include "psen_scan_v2_standalone/io_state.h"
 #include "psen_scan_v2_standalone/laserscan.h"
@@ -34,13 +35,15 @@ LaserScan::LaserScan(const util::TenthOfDegree& resolution,
                      const util::TenthOfDegree& max_scan_angle,
                      const uint32_t scan_counter,
                      const uint8_t active_zoneset,
-                     const int64_t timestamp)
+                     const int64_t timestamp,
+                     const configuration::ScannerId scanner_id)
   : resolution_(resolution)
   , min_scan_angle_(min_scan_angle)
   , max_scan_angle_(max_scan_angle)
   , scan_counter_(scan_counter)
   , active_zoneset_(active_zoneset)
   , timestamp_(timestamp)
+  , scanner_id_(scanner_id)
 {
   if (scanResolution() == util::TenthOfDegree(0))
   {
@@ -128,6 +131,11 @@ const util::TenthOfDegree& LaserScan::minScanAngle() const
 const util::TenthOfDegree& LaserScan::maxScanAngle() const
 {
   return max_scan_angle_;
+}
+
+configuration::ScannerId LaserScan::scannerId() const
+{
+  return scanner_id_;
 }
 
 const LaserScan::MeasurementData& LaserScan::measurements() const

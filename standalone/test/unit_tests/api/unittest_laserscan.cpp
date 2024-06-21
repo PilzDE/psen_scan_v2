@@ -24,6 +24,7 @@
 #include "psen_scan_v2_standalone/io_state.h"
 #include "psen_scan_v2_standalone/laserscan.h"
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data.h"
+#include "psen_scan_v2_standalone/configuration/scanner_ids.h"
 
 #include "psen_scan_v2_standalone/data_conversion_layer/io_pin_data_helper.h"
 
@@ -32,18 +33,20 @@ using namespace psen_scan_v2_standalone;
 namespace psen_scan_v2_standalone_test
 {
 static const util::TenthOfDegree DEFAULT_RESOLUTION{ 1 };
-static const util::TenthOfDegree DEFAULT_START_ANGLE{ 1 };
-static const util::TenthOfDegree DEFAULT_END_ANGLE{ 2 };
-static const int64_t DEFAULT_TIMESTAMP{ 1 };
+static const util::TenthOfDegree DEFAULT_MIN_SCAN_ANGLE{ 1 };
+static const util::TenthOfDegree DEFAULT_MAX_SCAN_ANGLE{ 2 };
 static const uint32_t DEFAULT_SCAN_COUNTER{ 1 };
 static const uint8_t DEFAULT_ACTIVE_ZONESET{ 2 };
+static const int64_t DEFAULT_TIMESTAMP{ 1 };
+static const configuration::ScannerId DEFAULT_SCANNER_ID{ configuration::ScannerId::master };
 
 class LaserScanBuilder
 {
 public:
   LaserScan build()
   {
-    return LaserScan(resolution_, start_angle_, end_angle_, scan_counter_, active_zoneset_, timestamp_);
+    return LaserScan(
+        resolution_, min_scan_angle_, max_scan_angle_, scan_counter_, active_zoneset_, timestamp_, scanner_id_);
   }
 
   LaserScanBuilder& resolution(const util::TenthOfDegree& resolution)
@@ -52,15 +55,15 @@ public:
     return *this;
   }
 
-  LaserScanBuilder& startAngle(const util::TenthOfDegree& start_angle)
+  LaserScanBuilder& minScanAngle(const util::TenthOfDegree& min_scan_angle)
   {
-    start_angle_ = start_angle;
+    min_scan_angle_ = min_scan_angle;
     return *this;
   }
 
-  LaserScanBuilder& endAngle(const util::TenthOfDegree& end_angle)
+  LaserScanBuilder& maxScanAngle(const util::TenthOfDegree& max_scan_angle)
   {
-    end_angle_ = end_angle;
+    max_scan_angle_ = max_scan_angle;
     return *this;
   }
 
@@ -76,13 +79,20 @@ public:
     return *this;
   }
 
+  LaserScanBuilder& scannerId(const configuration::ScannerId scanner_id)
+  {
+    scanner_id_ = scanner_id;
+    return *this;
+  }
+
 private:
   util::TenthOfDegree resolution_{ DEFAULT_RESOLUTION };
-  util::TenthOfDegree start_angle_{ DEFAULT_START_ANGLE };
-  util::TenthOfDegree end_angle_{ DEFAULT_END_ANGLE };
+  util::TenthOfDegree min_scan_angle_{ DEFAULT_MIN_SCAN_ANGLE };
+  util::TenthOfDegree max_scan_angle_{ DEFAULT_MAX_SCAN_ANGLE };
   uint32_t scan_counter_{ DEFAULT_SCAN_COUNTER };
   uint8_t active_zoneset_{ DEFAULT_ACTIVE_ZONESET };
   int64_t timestamp_{ DEFAULT_TIMESTAMP };
+  configuration::ScannerId scanner_id_{ DEFAULT_SCANNER_ID };
 };
 
 TEST(LaserScanTests, testInvalidZeroResolution)
@@ -102,7 +112,7 @@ TEST(LaserScanTests, testOutOfRangeResolution)
 TEST(LaserScanTests, testInvalidStartEndAngle)
 {
   LaserScanBuilder laser_scan_builder;
-  laser_scan_builder.startAngle(DEFAULT_END_ANGLE).endAngle(DEFAULT_START_ANGLE);
+  laser_scan_builder.minScanAngle(DEFAULT_MAX_SCAN_ANGLE).maxScanAngle(DEFAULT_MIN_SCAN_ANGLE);
   EXPECT_THROW(laser_scan_builder.build(), std::invalid_argument);
 }
 
@@ -119,7 +129,7 @@ TEST(LaserScanTest, testGetMinScanAngle)
   LaserScanBuilder laser_scan_builder;
   std::unique_ptr<LaserScan> laser_scan;
   ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
-  EXPECT_EQ(DEFAULT_START_ANGLE, laser_scan->minScanAngle());
+  EXPECT_EQ(DEFAULT_MIN_SCAN_ANGLE, laser_scan->minScanAngle());
 }
 
 TEST(LaserScanTest, testGetMaxScanAngle)
@@ -127,13 +137,13 @@ TEST(LaserScanTest, testGetMaxScanAngle)
   LaserScanBuilder laser_scan_builder;
   std::unique_ptr<LaserScan> laser_scan;
   ASSERT_NO_THROW(laser_scan.reset(new LaserScan(laser_scan_builder.build())););
-  EXPECT_EQ(DEFAULT_END_ANGLE, laser_scan->maxScanAngle());
+  EXPECT_EQ(DEFAULT_MAX_SCAN_ANGLE, laser_scan->maxScanAngle());
 }
 
 TEST(LaserScanTest, testMinEqualsMax)
 {
   LaserScanBuilder laser_scan_builder;
-  laser_scan_builder.startAngle(util::TenthOfDegree(1000u)).endAngle(util::TenthOfDegree(1000u));
+  laser_scan_builder.minScanAngle(util::TenthOfDegree(1000u)).maxScanAngle(util::TenthOfDegree(1000u));
   ASSERT_NO_THROW(laser_scan_builder.build(););
 }
 

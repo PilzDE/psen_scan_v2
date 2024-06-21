@@ -8,5 +8,29 @@ geometry_msgs/Polygon warn2
 geometry_msgs/Polygon muting1
 geometry_msgs/Polygon muting2
 
+geometry_msgs/Polygon safety1_Sub0
+geometry_msgs/Polygon safety2_Sub0
+geometry_msgs/Polygon safety3_Sub0
+geometry_msgs/Polygon warn1_Sub0
+geometry_msgs/Polygon warn2_Sub0
+geometry_msgs/Polygon muting1_Sub0
+geometry_msgs/Polygon muting2_Sub0
+
+geometry_msgs/Polygon safety1_Sub1
+geometry_msgs/Polygon safety2_Sub1
+geometry_msgs/Polygon safety3_Sub1
+geometry_msgs/Polygon warn1_Sub1
+geometry_msgs/Polygon warn2_Sub1
+geometry_msgs/Polygon muting1_Sub1
+geometry_msgs/Polygon muting2_Sub1
+
+geometry_msgs/Polygon safety1_Sub2
+geometry_msgs/Polygon safety2_Sub2
+geometry_msgs/Polygon safety3_Sub2
+geometry_msgs/Polygon warn1_Sub2
+geometry_msgs/Polygon warn2_Sub2
+geometry_msgs/Polygon muting1_Sub2
+geometry_msgs/Polygon muting2_Sub2
+
 float32 speed_lower
 float32 speed_upper

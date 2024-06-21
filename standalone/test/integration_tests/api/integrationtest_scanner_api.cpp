@@ -422,12 +422,12 @@ TEST_F(ScannerAPITestsDefaultSetUp, shouldShowInfoWithNewActiveZonesetOnlyWhenIt
   EXPECT_ANY_LOG().Times(AnyNumber());
   EXPECT_SCANNER_TO_START_SUCCESSFULLY(hw_mock_, driver_, config_);
 
-  const auto msg1{ createMonitoringFrameMsgWithZoneset(2) };
-  const auto msg2{ createMonitoringFrameMsgWithZoneset(4) };
+  const auto msg1{ createMonitoringFrameMsgWithZoneset(0) };
+  const auto msg2{ createMonitoringFrameMsgWithZoneset(1) };
   util::Barrier diagnostic_barrier;
 
-  EXPECT_LOG_SHORT(INFO, "Scanner: The scanner switched to active zoneset 2").Times(1);
-  EXPECT_LOG_SHORT(INFO, "Scanner: The scanner switched to active zoneset 4")
+  EXPECT_LOG_SHORT(INFO, "Scanner: The scanner switched to active zoneset 1").Times(1);
+  EXPECT_LOG_SHORT(INFO, "Scanner: The scanner switched to active zoneset 2")
       .WillOnce(OpenBarrier(&diagnostic_barrier));
 
   hw_mock_->sendMonitoringFrame(msg1);
@@ -673,7 +673,7 @@ TEST_F(ScannerAPITestsUnfragmented, shouldIgnoreMonitoringFrameOfFormerScanRound
   util::Barrier user_msg_barrier;
   EXPECT_LOG_SHORT(WARN,
                    "ScanBuffer: Detected a MonitoringFrame from an earlier round. "
-                   " The scan round will ignore it.")
+                   "The scan round will ignore it.")
       .WillOnce(OpenBarrier(&user_msg_barrier));
 
   hw_mock_->sendMonitoringFrames(first_msgs_of_round_3);

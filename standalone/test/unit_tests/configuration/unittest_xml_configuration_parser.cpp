@@ -248,7 +248,7 @@ TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingChainToZoneSetInfo)
                           "</MIB>";
   EXPECT_THROW_AND_WHAT(parseString(xml.c_str()),
                         XMLConfigurationParserException,
-                        "Could not parse. Chain MIB->scannerDescr->zoneSetDefinition->zoneSetInfo not complete.");
+                        "Could not parse. Element <zoneSetDefinition> is missing a child <zoneSetInfo>.");
 }
 
 TEST_F(XmlConfiguationParserTest, shouldThrowOnMissingChainZoneSetDetail)
