@@ -1,3 +1,13 @@
+# ⚠️ End of Life (EOL) Notice
+
+> **This repository has reached End of Life (EOL) and is no longer maintained.**
+
+### What this means
+- ❌ No new features will be developed.
+- ❌ No bug fixes will be provided.
+- ❌ No security updates will be released.
+- ⚠️ Use at your own risk.
+
 [![PILZ](img/pilz-logo.png)](https://www.pilz.com)
 
 # PILZ safety laser scanner PSENscan
